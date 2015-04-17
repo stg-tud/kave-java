@@ -1,6 +1,6 @@
 package cc.kave.commons.model.names;
 
-public interface ParameterName {
+public interface ParameterName extends Name {
 	TypeName getValueType();
 
 	String getName();

@@ -11,7 +11,7 @@ public class CsParameterName extends CsName implements ParameterName {
 	private static final Map<String, CsParameterName> nameRegistry = new MapMaker()
 			.weakValues().makeMap();
 
-	public static ParameterName newNamespaceName(String identifier) {
+	public static ParameterName newParameterName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new CsParameterName(identifier));
 		}

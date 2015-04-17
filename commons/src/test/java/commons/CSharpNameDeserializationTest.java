@@ -8,15 +8,26 @@ import org.junit.Test;
 import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.EventName;
+import cc.kave.commons.model.names.FieldName;
+import cc.kave.commons.model.names.LocalVariableName;
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.NamespaceName;
+import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsEventName;
+import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsLocalVariableName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsName;
-import cc.kave.commons.utils.json.GsonNameDeserializer;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import cc.kave.commons.model.names.csharp.CsNamespaceName;
+import cc.kave.commons.model.names.csharp.CsParameterName;
+import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.utils.json.JsonUtils;
 
 public class CSharpNameDeserializationTest {
 	@Test
@@ -41,29 +52,56 @@ public class CSharpNameDeserializationTest {
 				EventName.class);
 	}
 
-	private void assertDeserialize(String json, Name expectedInstance, Class<? extends Name> mostSpecificInterface) {
+	@Test
+	public void DeserializesToFieldName() {
+		assertDeserialize("\"CSharp.FieldName:[VT] [DT]._field\"", CsFieldName.newFieldName("[VT] [DT]._field"),
+				FieldName.class);
+	}
+
+	@Test
+	public void DeserializesToLocalVariableName() {
+		assertDeserialize("\"CSharp.LocalVariableName:[VT] v\"", CsLocalVariableName.newLocalVariableName("[VT] v"),
+				LocalVariableName.class);
+	}
+
+	@Test
+	public void DeserializesToMethodName() {
+		assertDeserialize("\"CSharp.MethodName:[RT] [DT].M()\"", CsMethodName.newMethodName("[RT] [DT].M()"),
+				MethodName.class);
+	}
+
+	@Test
+	public void DeserializesToNamespaceName() {
+		assertDeserialize("\"CSharp.NamespaceName:A.B\"", CsNamespaceName.newNamespaceName("A.B"), NamespaceName.class);
+	}
+
+	@Test
+	public void DeserializesToParameterName() {
+		assertDeserialize("\"CSharp.ParameterName:[VT] parameter\"",
+				CsParameterName.newParameterName("[VT] parameter"), ParameterName.class);
+	}
+
+	@Test
+	public void DeserializesToPropertyName() {
+		assertDeserialize("\"CSharp.PropertyName:[VT] [DT].Property\"",
+				CsPropertyName.newPropertyName("[VT] [DT].Property"), PropertyName.class);
+	}
+
+	@Test
+	public void DeserializesToTypeName() {
+		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", CsTypeName.newTypeName("T,A,1.2.3.4"), TypeName.class);
+	}
+
+	// TODO specific name types
+
+	private <T extends Name> void assertDeserialize(String json, T expectedInstance, Class<T> mostSpecificInterface) {
 		assertDeserialize(json, Name.class, expectedInstance);
 		assertDeserialize(json, expectedInstance.getClass(), expectedInstance);
 		assertDeserialize(json, mostSpecificInterface, expectedInstance);
 	}
 
-	private void assertDeserialize(String json, Class<? extends Name> requestedType, Name expectedInstance) {
-		Name name = parseJson(json, requestedType);
+	private <T extends Name> void assertDeserialize(String json, Class<T> requestedType, Name expectedInstance) {
+		Name name = JsonUtils.parseJson(json, requestedType);
 		assertThat(name, sameInstance(expectedInstance));
-	}
-
-	private <T> T parseJson(String json, Class<T> targetType) {
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(EventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(Name.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsEventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsName.class, new GsonNameDeserializer());
-		Gson gson = gsonBuilder.create();
-
-		return gson.fromJson(json, targetType);
 	}
 }
