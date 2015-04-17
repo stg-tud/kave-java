@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
+import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsName;
 
 import com.google.gson.JsonDeserializationContext;
@@ -25,6 +26,8 @@ public class GsonNameDeserializer implements JsonDeserializer<Name> {
 			return CsAliasName.newAliasName(identifier);
 		case "CSharp.AssemblyName":
 			return CsAssemblyName.newAssemblyName(identifier);
+		case "CSharp.EventName":
+			return CsEventName.newEventName(identifier);
 		case "CSharp.Name":
 			return CsName.newName(identifier);
 		default:
