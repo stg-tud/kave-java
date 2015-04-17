@@ -90,9 +90,9 @@ public class CSharpNameDeserializationTest {
 	@Test
 	public void DeserializesToTypeName() {
 		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", CsTypeName.newTypeName("T,A,1.2.3.4"), TypeName.class);
+		assertDeserialize("\"CSharp.ArrayTypeName:T[],A,5.4.3.2\"", CsTypeName.newTypeName("T[],A,5.4.3.2"),
+				TypeName.class);
 	}
-
-	// TODO specific name types
 
 	private <T extends Name> void assertDeserialize(String json, T expectedInstance, Class<T> mostSpecificInterface) {
 		assertDeserialize(json, Name.class, expectedInstance);

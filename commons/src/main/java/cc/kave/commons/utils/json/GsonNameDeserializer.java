@@ -52,7 +52,10 @@ public class GsonNameDeserializer implements JsonDeserializer<Name> {
 		case "CSharp.TypeName":
 			return CsTypeName.newTypeName(identifier);
 		default:
-			throw new IllegalArgumentException("Not a valid serialized name: '" + json + "'");
+			if (discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName")) {
+				return CsTypeName.newTypeName(identifier);
+			}
+			throw new JsonParseException("Not a valid serialized name: '" + json + "'");
 		}
 	}
 
