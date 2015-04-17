@@ -4,7 +4,7 @@ public interface TypeName extends GenericName {
 	/**
 	 * The name of the bundle (e.g., assembly) this type is declared in.
 	 */
-	AssemblyName getAssembly();
+	BundleName getAssembly();
 
 	/**
 	 * A full-qualified identifier of the namespace containing the type.

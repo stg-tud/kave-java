@@ -2,11 +2,11 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import cc.kave.commons.model.names.AssemblyVersion;
+import cc.kave.commons.model.names.BundleVersion;
 
 import com.google.common.collect.MapMaker;
 
-public class CsAssemblyVersion extends CsName implements AssemblyVersion {
+public class CsAssemblyVersion extends CsName implements BundleVersion {
 	private static final Map<String, CsAssemblyVersion> nameRegistry = new MapMaker()
 			.weakValues().makeMap();
 
@@ -14,7 +14,7 @@ public class CsAssemblyVersion extends CsName implements AssemblyVersion {
 	 * Alias names are valid C# identifiers that are not keywords, plus the
 	 * special alias 'global'.
 	 */
-	public static AssemblyVersion newAssemblyVersion(String identifier) {
+	public static BundleVersion newAssemblyVersion(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new CsAssemblyVersion(identifier));
 		}

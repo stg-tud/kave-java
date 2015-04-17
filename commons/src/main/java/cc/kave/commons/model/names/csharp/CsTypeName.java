@@ -3,7 +3,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.commons.model.names.AssemblyName;
+import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.NamespaceName;
 import cc.kave.commons.model.names.TypeName;
 
@@ -38,7 +38,7 @@ public class CsTypeName extends CsName implements TypeName {
 		throw new UnsupportedOperationException();	}
 
 	@Override
-	public AssemblyName getAssembly() {
+	public BundleName getAssembly() {
 		throw new UnsupportedOperationException();	}
 
 	@Override

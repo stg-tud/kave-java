@@ -1,6 +1,6 @@
 package cc.kave.commons.model.names;
 
-public interface AssemblyVersion {
+public interface BundleVersion {
 	int getMajor();
 
 	int getMinor();
