@@ -1,0 +1,47 @@
+package cc.kave.commons.model.names.csharp;
+
+import java.util.Map;
+
+import cc.kave.commons.model.names.AssemblyVersion;
+
+import com.google.common.collect.MapMaker;
+
+public class CsAssemblyVersion extends CsName implements AssemblyVersion {
+	private static final Map<String, CsAssemblyVersion> nameRegistry = new MapMaker()
+			.weakValues().makeMap();
+
+	/**
+	 * Alias names are valid C# identifiers that are not keywords, plus the
+	 * special alias 'global'.
+	 */
+	public static AssemblyVersion newAssemblyVersion(String identifier) {
+		if (!nameRegistry.containsKey(identifier)) {
+			nameRegistry.put(identifier, new CsAssemblyVersion(identifier));
+		}
+		return nameRegistry.get(identifier);
+	}
+
+	private CsAssemblyVersion(String identifier) {
+		super(identifier);
+	}
+
+	@Override
+	public int getMajor() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getMinor() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getBuild() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public int getRevision() {
+		throw new UnsupportedOperationException();
+	}
+}
