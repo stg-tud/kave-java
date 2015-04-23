@@ -7,6 +7,7 @@ import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsName;
@@ -37,6 +38,8 @@ public class GsonNameDeserializer implements JsonDeserializer<Name> {
 			return CsEventName.newEventName(identifier);
 		case "CSharp.FieldName":
 			return CsFieldName.newFieldName(identifier);
+		case "CSharp.LambdaName":
+			return CsLambdaName.newLambdaName(identifier);
 		case "CSharp.LocalVariableName":
 			return CsLocalVariableName.newLocalVariableName(identifier);
 		case "CSharp.MethodName":

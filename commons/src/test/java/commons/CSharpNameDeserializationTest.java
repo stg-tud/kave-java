@@ -9,6 +9,7 @@ import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.FieldName;
+import cc.kave.commons.model.names.LambdaName;
 import cc.kave.commons.model.names.LocalVariableName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
@@ -20,6 +21,7 @@ import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsName;
@@ -56,6 +58,11 @@ public class CSharpNameDeserializationTest {
 	public void DeserializesToFieldName() {
 		assertDeserialize("\"CSharp.FieldName:[VT] [DT]._field\"", CsFieldName.newFieldName("[VT] [DT]._field"),
 				FieldName.class);
+	}
+
+	@Test
+	public void DeserializesToLambdaName() {
+		assertDeserialize("\"CSharp.LambdaName:[VT] ()\"", CsLambdaName.newLambdaName("[VT] ()"), LambdaName.class);
 	}
 
 	@Test
