@@ -10,17 +10,22 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsTypeName extends CsName implements TypeName {
-	private static final Map<String, CsTypeName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static TypeName newTypeName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
-			nameRegistry.put(identifier, new CsTypeName(identifier));
+			CsTypeName newName;
+			if (identifier.startsWith("d:")) {
+				newName = new CsDelegateTypeName(identifier);
+			} else {
+				newName = new CsTypeName(identifier);
+			}
+			nameRegistry.put(identifier, newName);
 		}
 		return nameRegistry.get(identifier);
 	}
 
-	private CsTypeName(String identifier) {
+	protected CsTypeName(String identifier) {
 		super(identifier);
 	}
 
@@ -31,101 +36,126 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean hasTypeParameters() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public List<TypeName> getTypeParameters() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public BundleName getAssembly() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public NamespaceName getNamespace() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public TypeName getDeclaringType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public String getFullName() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public String getName() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isUnknownType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isVoidType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isValueType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isSimpleType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isEnumType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isStructType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isNullableType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isReferenceType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isClassType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isInterfaceType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isDelegateType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isNestedType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isArrayType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public TypeName getArrayBaseType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public TypeName DeriveArrayTypeName(int rank) {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean isTypeParameter() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public String TypeParameterShortName() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public TypeName TypeParameterType() {
-		throw new UnsupportedOperationException();	}
+		throw new UnsupportedOperationException();
+	}
 }

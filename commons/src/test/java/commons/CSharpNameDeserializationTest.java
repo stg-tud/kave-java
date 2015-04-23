@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
+import cc.kave.commons.model.names.DelegateTypeName;
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.LambdaName;
@@ -19,6 +20,7 @@ import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
+import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsLambdaName;
@@ -99,6 +101,12 @@ public class CSharpNameDeserializationTest {
 		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", CsTypeName.newTypeName("T,A,1.2.3.4"), TypeName.class);
 		assertDeserialize("\"CSharp.ArrayTypeName:T[],A,5.4.3.2\"", CsTypeName.newTypeName("T[],A,5.4.3.2"),
 				TypeName.class);
+	}
+
+	@Test
+	public void DeserializesToDelegateTypeName() {
+		assertDeserialize("\"CSharp.DelegateTypeName:d:T,A,1.2.3.4\"",
+				CsDelegateTypeName.newDelegateTypeName("d:T,A,1.2.3.4"), DelegateTypeName.class);
 	}
 
 	private <T extends Name> void assertDeserialize(String json, T expectedInstance, Class<T> mostSpecificInterface) {

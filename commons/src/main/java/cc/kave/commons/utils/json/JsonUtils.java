@@ -2,6 +2,7 @@ package cc.kave.commons.utils.json;
 
 import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
+import cc.kave.commons.model.names.DelegateTypeName;
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.LambdaName;
@@ -14,6 +15,7 @@ import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
+import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsLambdaName;
@@ -44,6 +46,7 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(ParameterName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(PropertyName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(TypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(DelegateTypeName.class, new GsonNameDeserializer());
 		// C# name types
 		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameDeserializer());
@@ -57,6 +60,7 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(CsParameterName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
 		Gson gson = gsonBuilder.create();
 
 		return gson.fromJson(json, targetType);

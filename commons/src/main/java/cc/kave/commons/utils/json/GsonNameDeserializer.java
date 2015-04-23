@@ -26,7 +26,7 @@ public class GsonNameDeserializer implements JsonDeserializer<Name> {
 	@Override
 	public Name deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
-		String[] nameInfo = json.getAsString().split(":");
+		String[] nameInfo = json.getAsString().split(":", 2);
 		String discriminator = nameInfo[0];
 		final String identifier = nameInfo[1];
 		switch (discriminator) {
