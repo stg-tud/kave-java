@@ -46,96 +46,96 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
 public interface ISSTNodeVisitor<TContext, TReturn> {
 
-	TReturn Visit(ISST sst, TContext context);
+	TReturn visit(ISST sst, TContext context);
 
 	// declarations
-	TReturn Visit(IDelegateDeclaration stmt, TContext context);
+	TReturn visit(IDelegateDeclaration stmt, TContext context);
 
-	TReturn Visit(IEventDeclaration stmt, TContext context);
+	TReturn visit(IEventDeclaration stmt, TContext context);
 
-	TReturn Visit(IFieldDeclaration stmt, TContext context);
+	TReturn visit(IFieldDeclaration stmt, TContext context);
 
-	TReturn Visit(IMethodDeclaration stmt, TContext context);
+	TReturn visit(IMethodDeclaration stmt, TContext context);
 
-	TReturn Visit(IPropertyDeclaration stmt, TContext context);
+	TReturn visit(IPropertyDeclaration stmt, TContext context);
 
-	TReturn Visit(IVariableDeclaration stmt, TContext context);
+	TReturn visit(IVariableDeclaration stmt, TContext context);
 
 	// statements
-	TReturn Visit(IAssignment stmt, TContext context);
+	TReturn visit(IAssignment stmt, TContext context);
 
-	TReturn Visit(IBreakStatement stmt, TContext context);
+	TReturn visit(IBreakStatement stmt, TContext context);
 
-	TReturn Visit(IContinueStatement stmt, TContext context);
+	TReturn visit(IContinueStatement stmt, TContext context);
 
-	TReturn Visit(IExpressionStatement stmt, TContext context);
+	TReturn visit(IExpressionStatement stmt, TContext context);
 
-	TReturn Visit(IGotoStatement stmt, TContext context);
+	TReturn visit(IGotoStatement stmt, TContext context);
 
-	TReturn Visit(ILabelledStatement stmt, TContext context);
+	TReturn visit(ILabelledStatement stmt, TContext context);
 
-	TReturn Visit(IReturnStatement stmt, TContext context);
+	TReturn visit(IReturnStatement stmt, TContext context);
 
-	TReturn Visit(IThrowStatement stmt, TContext context);
+	TReturn visit(IThrowStatement stmt, TContext context);
 
 	// blocks
-	TReturn Visit(IDoLoop block, TContext context);
+	TReturn visit(IDoLoop block, TContext context);
 
-	TReturn Visit(IForEachLoop block, TContext context);
+	TReturn visit(IForEachLoop block, TContext context);
 
-	TReturn Visit(IForLoop block, TContext context);
+	TReturn visit(IForLoop block, TContext context);
 
-	TReturn Visit(IIfElseBlock block, TContext context);
+	TReturn visit(IIfElseBlock block, TContext context);
 
-	TReturn Visit(ILockBlock stmt, TContext context);
+	TReturn visit(ILockBlock stmt, TContext context);
 
-	TReturn Visit(ISwitchBlock block, TContext context);
+	TReturn visit(ISwitchBlock block, TContext context);
 
-	TReturn Visit(ITryBlock block, TContext context);
+	TReturn visit(ITryBlock block, TContext context);
 
-	TReturn Visit(IUncheckedBlock block, TContext context);
+	TReturn visit(IUncheckedBlock block, TContext context);
 
-	TReturn Visit(IUnsafeBlock block, TContext context);
+	TReturn visit(IUnsafeBlock block, TContext context);
 
-	TReturn Visit(IUsingBlock block, TContext context);
+	TReturn visit(IUsingBlock block, TContext context);
 
-	TReturn Visit(IWhileLoop block, TContext context);
+	TReturn visit(IWhileLoop block, TContext context);
 
 	// Expressions
-	TReturn Visit(ICompletionExpression entity, TContext context);
+	TReturn visit(ICompletionExpression entity, TContext context);
 
-	TReturn Visit(IComposedExpression expr, TContext context);
+	TReturn visit(IComposedExpression expr, TContext context);
 
-	TReturn Visit(IIfElseExpression expr, TContext context);
+	TReturn visit(IIfElseExpression expr, TContext context);
 
-	TReturn Visit(IInvocationExpression entity, TContext context);
+	TReturn visit(IInvocationExpression entity, TContext context);
 
-	TReturn Visit(ILambdaExpression expr, TContext context);
+	TReturn visit(ILambdaExpression expr, TContext context);
 
-	TReturn Visit(ILoopHeaderBlockExpression expr, TContext context);
+	TReturn visit(ILoopHeaderBlockExpression expr, TContext context);
 
-	TReturn Visit(IConstantValueExpression expr, TContext context);
+	TReturn visit(IConstantValueExpression expr, TContext context);
 
-	TReturn Visit(INullExpression expr, TContext context);
+	TReturn visit(INullExpression expr, TContext context);
 
-	TReturn Visit(IReferenceExpression expr, TContext context);
+	TReturn visit(IReferenceExpression expr, TContext context);
 
 	// References
-	TReturn Visit(IEventReference eventRef, TContext context);
+	TReturn visit(IEventReference eventRef, TContext context);
 
-	TReturn Visit(IFieldReference fieldRef, TContext context);
+	TReturn visit(IFieldReference fieldRef, TContext context);
 
-	TReturn Visit(IMethodReference methodRef, TContext context);
+	TReturn visit(IMethodReference methodRef, TContext context);
 
-	TReturn Visit(IPropertyReference methodRef, TContext context);
+	TReturn visit(IPropertyReference methodRef, TContext context);
 
-	TReturn Visit(IVariableReference varRef, TContext context);
+	TReturn visit(IVariableReference varRef, TContext context);
 
 	// unknowns
-	TReturn Visit(IUnknownReference unknownRef, TContext context);
+	TReturn visit(IUnknownReference unknownRef, TContext context);
 
-	TReturn Visit(IUnknownExpression unknownExpr, TContext context);
+	TReturn visit(IUnknownExpression unknownExpr, TContext context);
 
-	TReturn Visit(IUnknownStatement unknownStmt, TContext context);
+	TReturn visit(IUnknownStatement unknownStmt, TContext context);
 
 }
