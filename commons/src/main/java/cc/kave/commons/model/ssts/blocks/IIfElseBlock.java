@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.blocks;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -13,9 +13,9 @@ public interface IIfElseBlock extends IStatement {
 	ISimpleExpression getCondition();
 
 	@Nonnull
-	Set<IStatement> getThen();
+	List<IStatement> getThen();
 
 	@Nonnull
-	Set<IStatement> getElese();
+	List<IStatement> getElse();
 
 }

@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.blocks;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -13,5 +13,5 @@ public interface IWhileLoop extends IStatement {
 	ILoopHeaderExpression getCondition();
 
 	@Nonnull
-	Set<IStatement> getBody();
+	List<IStatement> getBody();
 }

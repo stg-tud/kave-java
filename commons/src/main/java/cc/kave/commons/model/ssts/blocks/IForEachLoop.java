@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.blocks;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -14,9 +14,9 @@ public interface IForEachLoop extends IStatement {
 	IVariableDeclaration getDeclaration();
 
 	@Nonnull
-	IVariableReference LoopedReference();
+	IVariableReference getLoopedReference();
 
 	@Nonnull
-	Set<IStatement> getBody();
+	List<IStatement> getBody();
 
 }

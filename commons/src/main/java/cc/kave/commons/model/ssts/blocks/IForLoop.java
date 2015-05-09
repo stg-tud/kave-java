@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.blocks;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -10,15 +10,15 @@ import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 public interface IForLoop extends IStatement {
 
 	@Nonnull
-	Set<IStatement> getInit();
+	List<IStatement> getInit();
 
 	@Nonnull
 	ILoopHeaderExpression getCondition();
 
 	@Nonnull
-	Set<IStatement> getStep();
+	List<IStatement> getStep();
 
 	@Nonnull
-	Set<IStatement> getBody();
+	List<IStatement> getBody();
 
 }

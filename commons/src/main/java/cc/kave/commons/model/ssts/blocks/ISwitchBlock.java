@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.blocks;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -13,9 +13,9 @@ public interface ISwitchBlock extends IStatement {
 	IVariableReference getReference();
 
 	@Nonnull
-	Set<ICaseBlock> getSections();
+	List<ICaseBlock> getSections();
 
 	@Nonnull
-	Set<IStatement> getDefaultSection();
+	List<IStatement> getDefaultSection();
 
 }
