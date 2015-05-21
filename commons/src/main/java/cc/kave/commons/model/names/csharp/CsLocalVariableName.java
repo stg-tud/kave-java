@@ -8,8 +8,9 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsLocalVariableName extends CsName implements LocalVariableName {
-	private static final Map<String, CsLocalVariableName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsLocalVariableName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final LocalVariableName UNKNOWN_NAME = newLocalVariableName("[?] ???");
 
 	public static LocalVariableName newLocalVariableName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

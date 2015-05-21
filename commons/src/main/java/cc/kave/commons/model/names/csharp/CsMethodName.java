@@ -3,15 +3,16 @@ package cc.kave.commons.model.names.csharp;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.MapMaker;
-
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 
+import com.google.common.collect.MapMaker;
+
 public class CsMethodName extends CsMemberName implements MethodName {
-	private static final Map<String, CsMethodName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsMethodName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final MethodName UNKNOWN_NAME = newMethodName("[?] [?].???()");
 
 	public static MethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

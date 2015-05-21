@@ -2,9 +2,9 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import com.google.common.collect.MapMaker;
-
 import cc.kave.commons.model.names.AliasName;
+
+import com.google.common.collect.MapMaker;
 
 /**
  * Aliases are defined by using statements, like
@@ -12,8 +12,9 @@ import cc.kave.commons.model.names.AliasName;
  * represents the global namespace by convention.
  */
 public class CsAliasName extends CsName implements AliasName {
-	private static final Map<String, CsAliasName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsAliasName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final AliasName UNKNOWN_NAME = newAliasName(UNKNOWN_NAME_IDENTIFIER);
 
 	/**
 	 * Alias names are valid C# identifiers that are not keywords, plus the

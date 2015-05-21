@@ -7,8 +7,9 @@ import cc.kave.commons.model.names.NamespaceName;
 import com.google.common.collect.MapMaker;
 
 public class CsNamespaceName extends CsName implements NamespaceName {
-	private static final Map<String, CsNamespaceName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsNamespaceName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final NamespaceName UNKNOWN_NAME = newNamespaceName(UNKNOWN_NAME_IDENTIFIER);
 
 	public static NamespaceName newNamespaceName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

@@ -8,8 +8,9 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsFieldName extends CsMemberName implements FieldName {
-	private static final Map<String, CsFieldName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsFieldName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final FieldName UNKNOWN_NAME = newFieldName("[?] [?].???");
 
 	public static FieldName newFieldName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

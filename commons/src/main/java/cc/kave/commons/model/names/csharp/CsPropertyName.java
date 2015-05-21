@@ -2,14 +2,15 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import com.google.common.collect.MapMaker;
-
 import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 
+import com.google.common.collect.MapMaker;
+
 public class CsPropertyName extends CsMemberName implements PropertyName {
-	private static final Map<String, CsPropertyName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsPropertyName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final PropertyName UNKNOWN_NAME = newPropertyName("[?] [?].???");
 
 	public static PropertyName newPropertyName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

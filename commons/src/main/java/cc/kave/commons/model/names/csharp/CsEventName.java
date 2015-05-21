@@ -8,8 +8,9 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsEventName extends CsMemberName implements EventName {
-	private static final Map<String, CsEventName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsEventName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final EventName UNKNOWN_NAME = newEventName("[?] [?].???");
 
 	public static EventName newEventName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {

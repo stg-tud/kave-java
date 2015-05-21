@@ -12,6 +12,8 @@ import com.google.common.collect.MapMaker;
 public class CsTypeName extends CsName implements TypeName {
 	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
 
+	public static final TypeName UNKNOWN_NAME = newTypeName("?");
+
 	public static TypeName newTypeName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			CsTypeName newName;

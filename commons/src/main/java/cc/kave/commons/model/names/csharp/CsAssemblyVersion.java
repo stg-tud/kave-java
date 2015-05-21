@@ -7,8 +7,9 @@ import cc.kave.commons.model.names.BundleVersion;
 import com.google.common.collect.MapMaker;
 
 public class CsAssemblyVersion extends CsName implements BundleVersion {
-	private static final Map<String, CsAssemblyVersion> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	private static final Map<String, CsAssemblyVersion> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final BundleVersion UNKNOWN_NAME = newAssemblyVersion(UNKNOWN_NAME_IDENTIFIER);
 
 	/**
 	 * Alias names are valid C# identifiers that are not keywords, plus the
@@ -39,7 +40,7 @@ public class CsAssemblyVersion extends CsName implements BundleVersion {
 	public int getBuild() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public int getRevision() {
 		throw new UnsupportedOperationException();

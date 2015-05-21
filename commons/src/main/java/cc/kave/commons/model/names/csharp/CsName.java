@@ -8,8 +8,11 @@ import com.google.common.collect.MapMaker;
 
 public class CsName implements Name {
 
-	private static final Map<String, CsName> nameRegistry = new MapMaker()
-			.weakValues().makeMap();
+	protected final static String UNKNOWN_NAME_IDENTIFIER = "???";
+
+	private static final Map<String, CsName> nameRegistry = new MapMaker().weakValues().makeMap();
+
+	public static final Name UNKNOWN_NAME = newName(UNKNOWN_NAME_IDENTIFIER);
 
 	public static Name newName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -38,8 +41,7 @@ public class CsName implements Name {
 	public final int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((identifier == null) ? 0 : identifier.hashCode());
+		result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
 		return result;
 	}
 
