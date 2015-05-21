@@ -7,5 +7,5 @@ public interface IVariableReference extends IAssignableReference {
 	@Nonnull
 	String getIdentifier();
 
-	boolean getIsMissing();
+	boolean isMissing();
 }
