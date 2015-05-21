@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.declarations;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -14,8 +14,8 @@ public interface IPropertyDeclaration extends IMemberDeclaration {
 	PropertyName getName();
 
 	@Nonnull
-	Set<IStatement> getGet();
+	List<IStatement> getGet();
 
 	@Nonnull
-	Set<IStatement> getSet();
+	List<IStatement> getSet();
 }

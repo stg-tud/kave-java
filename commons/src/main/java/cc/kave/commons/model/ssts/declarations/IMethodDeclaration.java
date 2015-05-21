@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.declarations;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -13,9 +13,9 @@ public interface IMethodDeclaration extends IMemberDeclaration {
 	@Nonnull
 	MethodName getName();
 
-	boolean getIsEntryPoint();
+	boolean isEntryPoint();
 
 	@Nonnull
-	Set<IStatement> getBody();
+	List<IStatement> getBody();
 
 }
