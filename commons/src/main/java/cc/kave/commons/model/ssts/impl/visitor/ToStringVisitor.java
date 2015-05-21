@@ -47,259 +47,279 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 public class ToStringVisitor extends AbstractNodeVisitor<StringBuilder> {
 
 	@Override
-	public Void visit(ISST sst, StringBuilder context) {
+	public Void visit(ISST sst, StringBuilder sb) {
+		sb.append("class ");
+		sb.append(sst.getEnclosingType().getName());
+		sb.append(" {\n");
+		for (IEventDeclaration event : sst.getEvents())
+			event.accept(this, sb);
+
+		for (IFieldDeclaration field : sst.getFields())
+			field.accept(this, sb);
+
+		sb.append(" }\n");
+		return null;
+	}
+
+	@Override
+	public Void visit(IDelegateDeclaration stmt, StringBuilder sb) {
+		sb.append(stmt.getName().getDeclaringType().getName());
+		sb.append(" ");
+		sb.append(stmt.getName().getName());
+		sb.append(";\n");
+		return null;
+	}
+
+	@Override
+	public Void visit(IEventDeclaration stmt, StringBuilder sb) {
+		sb.append("\tevent ");
+		sb.append(stmt.getName().getHandlerType().getName());
+		sb.append(" ");
+		sb.append(stmt.getName().getName());
+		sb.append(";\n");
+		return null;
+	}
+
+	@Override
+	public Void visit(IFieldDeclaration stmt, StringBuilder sb) {
+		sb.append("\t");
+		sb.append(stmt.getName().getValueType().getName());
+		sb.append(" ");
+		sb.append(stmt.getName().getName());
+		sb.append(";\n");
+		return null;
+	}
+
+	@Override
+	public Void visit(IMethodDeclaration stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IDelegateDeclaration stmt, StringBuilder context) {
+	public Void visit(IPropertyDeclaration stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IEventDeclaration stmt, StringBuilder context) {
+	public Void visit(IVariableDeclaration stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IFieldDeclaration stmt, StringBuilder context) {
+	public Void visit(IAssignment stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IMethodDeclaration stmt, StringBuilder context) {
+	public Void visit(IBreakStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IPropertyDeclaration stmt, StringBuilder context) {
+	public Void visit(IContinueStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IVariableDeclaration stmt, StringBuilder context) {
+	public Void visit(IExpressionStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IAssignment stmt, StringBuilder context) {
+	public Void visit(IGotoStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IBreakStatement stmt, StringBuilder context) {
+	public Void visit(ILabelledStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IContinueStatement stmt, StringBuilder context) {
+	public Void visit(IReturnStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IExpressionStatement stmt, StringBuilder context) {
+	public Void visit(IThrowStatement stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IGotoStatement stmt, StringBuilder context) {
+	public Void visit(IDoLoop block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ILabelledStatement stmt, StringBuilder context) {
+	public Void visit(IForEachLoop block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IReturnStatement stmt, StringBuilder context) {
+	public Void visit(IForLoop block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IThrowStatement stmt, StringBuilder context) {
+	public Void visit(IIfElseBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IDoLoop block, StringBuilder context) {
+	public Void visit(ILockBlock stmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IForEachLoop block, StringBuilder context) {
+	public Void visit(ISwitchBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IForLoop block, StringBuilder context) {
+	public Void visit(ITryBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IIfElseBlock block, StringBuilder context) {
+	public Void visit(IUncheckedBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ILockBlock stmt, StringBuilder context) {
+	public Void visit(IUnsafeBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ISwitchBlock block, StringBuilder context) {
+	public Void visit(IUsingBlock block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ITryBlock block, StringBuilder context) {
+	public Void visit(IWhileLoop block, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IUncheckedBlock block, StringBuilder context) {
+	public Void visit(ICompletionExpression entity, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnsafeBlock block, StringBuilder context) {
+	public Void visit(IComposedExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IUsingBlock block, StringBuilder context) {
+	public Void visit(IIfElseExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IWhileLoop block, StringBuilder context) {
+	public Void visit(IInvocationExpression entity, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ICompletionExpression entity, StringBuilder context) {
+	public Void visit(ILambdaExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IComposedExpression expr, StringBuilder context) {
+	public Void visit(ILoopHeaderBlockExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IIfElseExpression expr, StringBuilder context) {
+	public Void visit(IConstantValueExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IInvocationExpression entity, StringBuilder context) {
+	public Void visit(INullExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ILambdaExpression expr, StringBuilder context) {
+	public Void visit(IReferenceExpression expr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ILoopHeaderBlockExpression expr, StringBuilder context) {
+	public Void visit(IEventReference eventRef, StringBuilder sb) {
+		sb.append("TODO: IEventReference");
+		return null;
+	}
+
+	@Override
+	public Void visit(IFieldReference fieldRef, StringBuilder sb) {
+		sb.append("TODO: IFieldReference");
+		return null;
+	}
+
+	@Override
+	public Void visit(IMethodReference methodRef, StringBuilder sb) {
+		sb.append("TODO: IMethodReference");
+		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyReference methodRef, StringBuilder sb) {
+		sb.append("TODO: IPropertyReference");
+		return null;
+	}
+
+	@Override
+	public Void visit(IVariableReference varRef, StringBuilder sb) {
+		sb.append("TODO: IVariableReference");
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnknownReference unknownRef, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(IConstantValueExpression expr, StringBuilder context) {
+	public Void visit(IUnknownExpression unknownExpr, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(INullExpression expr, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IReferenceExpression expr, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IEventReference eventRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IFieldReference fieldRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IMethodReference methodRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IPropertyReference methodRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IVariableReference varRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnknownReference unknownRef, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnknownExpression unknownExpr, StringBuilder context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnknownStatement unknownStmt, StringBuilder context) {
+	public Void visit(IUnknownStatement unknownStmt, StringBuilder sb) {
 		// TODO Auto-generated method stub
 		return null;
 	}
