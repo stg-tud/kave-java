@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.expressions.assignable;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -18,5 +18,5 @@ public interface IInvocationExpression extends IAssignableExpression {
 	MethodName getMethodName();
 
 	@Nonnull
-	Set<ISimpleExpression> getParameters();
+	List<ISimpleExpression> getParameters();
 }

@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.expressions.assignable;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -11,8 +11,8 @@ import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 public interface ILambdaExpression extends IAssignableExpression {
 
 	@Nonnull
-	Set<IVariableDeclaration> getParameters();
+	List<IVariableDeclaration> getParameters();
 
 	@Nonnull
-	Set<IStatement> getBody();
+	List<IStatement> getBody();
 }
