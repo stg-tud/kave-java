@@ -9,6 +9,10 @@ public class VariableReference implements IVariableReference {
 
 	private String identifier;
 
+	public VariableReference() {
+		this.identifier = this.defaultIdentifier;
+	}
+
 	@Override
 	public String getIdentifier() {
 		return this.identifier;

@@ -14,6 +14,6 @@ public interface IVariableDeclaration extends IStatement {
 	@Nonnull
 	TypeName getType();
 
-	boolean getIsMissing();
+	boolean isMissing();
 
 }

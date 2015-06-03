@@ -11,7 +11,6 @@ public class VariableDeclaration implements IVariableDeclaration {
 
 	private IVariableReference reference;
 	private TypeName type;
-	private boolean isMissing;
 
 	public VariableDeclaration() {
 		this.reference = new VariableReference();
@@ -29,8 +28,8 @@ public class VariableDeclaration implements IVariableDeclaration {
 	}
 
 	@Override
-	public boolean getIsMissing() {
-		return this.isMissing;
+	public boolean isMissing() {
+		return this.reference.isMissing();
 	}
 
 	public void setReference(IVariableReference reference) {
@@ -39,10 +38,6 @@ public class VariableDeclaration implements IVariableDeclaration {
 
 	public void setType(TypeName type) {
 		this.type = type;
-	}
-
-	public void setMissing(boolean isMissing) {
-		this.isMissing = isMissing;
 	}
 
 	@Override
@@ -59,7 +54,7 @@ public class VariableDeclaration implements IVariableDeclaration {
 		if (getClass() != obj.getClass())
 			return false;
 		VariableDeclaration other = (VariableDeclaration) obj;
-		if (isMissing != other.isMissing)
+		if (reference.isMissing() != other.isMissing())
 			return false;
 		if (reference == null) {
 			if (other.reference != null)

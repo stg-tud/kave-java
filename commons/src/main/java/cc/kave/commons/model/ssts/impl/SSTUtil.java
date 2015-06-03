@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 
 public class SSTUtil {
 
-	public static IVariableDeclaration declar(String identifier, TypeName type) {
+	public static IVariableDeclaration declare(String identifier, TypeName type) {
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setReference(variableReference(identifier));
 		variable.setType(type);
@@ -50,7 +50,7 @@ public class SSTUtil {
 		return variableReference;
 	}
 
-	public static IComposedExpression composedExpression(String[] strReference) {
+	public static IComposedExpression composedExpression(String... strReference) {
 		ComposedExpression composedExpression = new ComposedExpression();
 		List<IVariableReference> varRefs = new ArrayList<IVariableReference>();
 		for (int i = 0; i < strReference.length; i++)
@@ -90,7 +90,7 @@ public class SSTUtil {
 	}
 
 	public static IInvocationExpression invocationExpression(MethodName name, Iterator<ISimpleExpression> parameters) {
-		assert (name.isStatic() || name.isConstructor());
+		// assert (name.isStatic() || name.isConstructor());
 		InvocationExpression invoExpr = new InvocationExpression();
 		invoExpr.setMethodName(name);
 		invoExpr.setParameters(Lists.newArrayList(parameters));
@@ -99,7 +99,7 @@ public class SSTUtil {
 
 	public static IInvocationExpression invocationExpression(String id, MethodName name,
 			Iterator<ISimpleExpression> parameters) {
-		assert (name.isStatic() || name.isConstructor());
+		// assert (name.isStatic() || name.isConstructor());
 		InvocationExpression invocationExpression = new InvocationExpression();
 		invocationExpression.setMethodName(name);
 		invocationExpression.setParameters(Lists.newArrayList(parameters));

@@ -59,21 +59,44 @@ public class ForLoop implements IForLoop {
 		this.condition = condition;
 	}
 
-	private boolean equals(ForLoop other) {
-		return this.body.equals(other.getBody()) && this.step.equals(other.getStep())
-				&& this.init.equals(other.getStep()) && this.condition.equals(other.getCondition());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof ForLoop ? this.equals((ForLoop) obj) : false;
-	}
-
 	public int hashCode() {
 		int hashCode = 34 + this.init.hashCode();
 		hashCode = (hashCode * 397) ^ this.step.hashCode();
 		hashCode = (hashCode * 397) ^ this.body.hashCode();
 		hashCode = (hashCode * 397) ^ this.condition.hashCode();
 		return hashCode;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ForLoop))
+			return false;
+		ForLoop other = (ForLoop) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (condition == null) {
+			if (other.condition != null)
+				return false;
+		} else if (!condition.equals(other.condition))
+			return false;
+		if (init == null) {
+			if (other.init != null)
+				return false;
+		} else if (!init.equals(other.init))
+			return false;
+		if (step == null) {
+			if (other.step != null)
+				return false;
+		} else if (!step.equals(other.step))
+			return false;
+		return true;
 	}
 
 	@Override
