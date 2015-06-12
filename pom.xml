@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>commons</module>
+		<module>namefactory</module>
 	</modules>
 	<repositories>
 		<repository>

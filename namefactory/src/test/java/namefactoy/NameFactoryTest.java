@@ -11,14 +11,21 @@ import namefactory.NameFactory;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class NameFactoryTest {
 
 	private InformationVisitor visitor;
 
+	@BeforeClass
+	public static void setupClass(){
+		System.out.println("before class");
+	}
+	
 	@Before
-	public void loadTestData() {
+	public void setup() {
+		System.out.println("before");
 		visitor = new ASTCreator().getVisitor();
 	}
 
