@@ -8,6 +8,13 @@
 	<modules>
 		<module>commons</module>
 	</modules>
+	<repositories>
+		<repository>
+			<id>eclipse-luna</id>
+			<url>http://download.eclipse.org/releases/luna/</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
