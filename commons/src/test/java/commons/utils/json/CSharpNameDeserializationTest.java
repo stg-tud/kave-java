@@ -1,4 +1,4 @@
-package commons;
+package commons.utils.json;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;

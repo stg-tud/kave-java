@@ -26,6 +26,24 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.IExpression;
+import cc.kave.commons.model.ssts.IMemberDeclaration;
+import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.impl.references.UnknownReference;
+import cc.kave.commons.model.ssts.impl.statements.Assignment;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IReturnStatement;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,6 +79,30 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
+
+		// IMemberDeclaration
+		gsonBuilder.registerTypeAdapter(IMemberDeclaration.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(IFieldDeclaration.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(IPropertyDeclaration.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(IAssignableReference.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(FieldDeclaration.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(PropertyDeclaration.class, new GsonIMemberDeclarationDeserializer());
+		gsonBuilder.registerTypeAdapter(UnknownReference.class, new GsonIMemberDeclarationDeserializer());
+
+		// IExpression
+		gsonBuilder.registerTypeAdapter(IExpression.class, new GsonIExpressionDeserializer());
+		gsonBuilder.registerTypeAdapter(IAssignableExpression.class, new GsonIExpressionDeserializer());
+		gsonBuilder.registerTypeAdapter(ISimpleExpression.class, new GsonIExpressionDeserializer());
+		gsonBuilder.registerTypeAdapter(UnknownExpression.class, new GsonIExpressionDeserializer());
+		// IStatement
+		gsonBuilder.registerTypeAdapter(IStatement.class, new GsonIStatementDeserializer());
+		gsonBuilder.registerTypeAdapter(IAssignment.class, new GsonIStatementDeserializer());
+		gsonBuilder.registerTypeAdapter(IReturnStatement.class, new GsonIStatementDeserializer());
+		gsonBuilder.registerTypeAdapter(Assignment.class, new GsonIStatementDeserializer());
+		gsonBuilder.registerTypeAdapter(ReturnStatement.class, new GsonIStatementDeserializer());
+
+		gsonBuilder.registerTypeAdapter(ISST.class, new GsonISSTDeserializer());
+		gsonBuilder.registerTypeAdapter(SST.class, new GsonISSTDeserializer());
 		Gson gson = gsonBuilder.create();
 
 		return gson.fromJson(json, targetType);

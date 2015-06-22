@@ -10,4 +10,6 @@ public interface IReturnStatement extends IStatement {
 	@Nonnull
 	ISimpleExpression getExpression();
 
+	boolean isVoid();
+
 }

@@ -8,9 +8,20 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class ReturnStatement implements IReturnStatement {
 
 	private ISimpleExpression expression;
+	private boolean isVoid;
 
 	public ReturnStatement() {
 		this.expression = new UnknownExpression();
+		this.isVoid = false;
+	}
+
+	@Override
+	public boolean isVoid() {
+		return isVoid;
+	}
+
+	public void setIsVoid(boolean isVoid) {
+		this.isVoid = isVoid;
 	}
 
 	@Override
@@ -24,7 +35,11 @@ public class ReturnStatement implements IReturnStatement {
 
 	@Override
 	public int hashCode() {
-		return 17 + this.expression.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
+		result = prime * result + (isVoid ? 1231 : 1237);
+		return result;
 	}
 
 	@Override
@@ -41,6 +56,8 @@ public class ReturnStatement implements IReturnStatement {
 				return false;
 		} else if (!expression.equals(other.expression))
 			return false;
+		if (isVoid != other.isVoid)
+			return false;
 		return true;
 	}
 
@@ -48,4 +65,5 @@ public class ReturnStatement implements IReturnStatement {
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
 	}
+
 }
