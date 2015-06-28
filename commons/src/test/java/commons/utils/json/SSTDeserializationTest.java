@@ -3,20 +3,65 @@ package commons.utils.json;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
+import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
-import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
+import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
+import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
+import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
+import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
+import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
+import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
+import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
+import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
+import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.impl.references.EventReference;
+import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.MethodReference;
+import cc.kave.commons.model.ssts.impl.references.PropertyReference;
+import cc.kave.commons.model.ssts.impl.references.UnknownReference;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
+import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
+import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
+import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
+import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.utils.json.JsonUtils;
 
 import com.google.common.collect.Lists;
@@ -26,28 +71,93 @@ public class SSTDeserializationTest {
 
 	@Test
 	public void deserializeToSSTWithEnclosingType() {
-		SST a = buildSST();
-		SST b = JsonUtils.parseJson(getExampleJson_Current(), SST.class);
+		ISST a = getExample();
+		ISST b = JsonUtils.parseJson(getExampleJson_Current(), SST.class);
 		assertThat(a, equalTo(b));
 	}
 
-	public SST buildSST() {
+	private static ISST getExample() {
 		SST sut = new SST();
-
-		sut.setEnclosingType(CsTypeName.newTypeName("T,P"));
 
 		FieldDeclaration fieldDeclaration = new FieldDeclaration();
 		fieldDeclaration.setName(CsFieldName.newFieldName("[T4,P] [T5,P].F"));
-		Set<IFieldDeclaration> fields = new HashSet<>();
-		fields.add(fieldDeclaration);
-		sut.setFields(fields);
 
 		PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
 		propertyDeclaration.setName(CsPropertyName.newPropertyName("[T10,P] [T11,P].P"));
 		propertyDeclaration.setGet(Lists.newArrayList(new ReturnStatement()));
 		propertyDeclaration.setSet(Lists.newArrayList(new Assignment()));
+
+		EventDeclaration eventDeclaration = new EventDeclaration();
+		eventDeclaration.setName(CsEventName.newEventName("[T2,P] [T3,P].E"));
+
+		DelegateDeclaration delegateDeclaration = new DelegateDeclaration();
+		delegateDeclaration.setName(CsDelegateTypeName.newDelegateTypeName("d:[R,P] [T2,P].()"));
+
+		MethodDeclaration methodDeclaration = new MethodDeclaration();
+		methodDeclaration.setName(CsMethodName.newMethodName("[T6,P] [T7,P].M1()"));
+		methodDeclaration.setEntryPoint(false);
+		methodDeclaration.setBody(createBody(true));
+		MethodDeclaration methodDeclaration2 = new MethodDeclaration();
+		methodDeclaration2.setName(CsMethodName.newMethodName("[T8,P] [T9,P].M2()"));
+		methodDeclaration2.setEntryPoint(true);
+
+		sut.setEnclosingType(CsTypeName.newTypeName("T,P"));
 		sut.setProperties(Sets.newHashSet(propertyDeclaration));
+		sut.setFields(Sets.newHashSet(fieldDeclaration));
+		sut.setDelegates(Sets.newHashSet(delegateDeclaration));
+		sut.setEvents(Sets.newHashSet(eventDeclaration));
+		sut.setMethods(Sets.newHashSet(methodDeclaration, methodDeclaration2));
+
 		return sut;
+	}
+
+	private static List<IStatement> createBody(boolean complex) {
+		return Lists.newArrayList(new DoLoop(), new ForEachLoop(), new ForLoop(), new IfElseBlock(), new LockBlock(),
+				new SwitchBlock(), complex ? createComplexTryBlock() : new TryBlock(), new UncheckedBlock(),
+				new UnsafeBlock(), new UsingBlock(), new WhileLoop(), new Assignment(), new BreakStatement(),
+				new ContinueStatement(), new ExpressionStatement(), new GotoStatement(), new LabelledStatement(),
+				new ReturnStatement(), new ThrowStatement(), new UnknownStatement(),
+				nested(new CompletionExpression()), nested(new ComposedExpression()), nested(new IfElseExpression()),
+				nested(new InvocationExpression()), nested(new LambdaExpression()),
+				nested(new LoopHeaderBlockExpression()), nested(new ConstantValueExpression()),
+				nested(new NullExpression()), nested(new ReferenceExpression()), nested(new UnknownExpression()),
+				//
+				nested(new EventReference()), nested(new FieldReference()), nested(new MethodReference()),
+				nested(new PropertyReference()), nested(new UnknownReference()), nested(new VariableReference()));
+
+	}
+
+	private static TryBlock createComplexTryBlock() {
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setBody(Lists.newArrayList(new ContinueStatement()));
+		tryBlock.setFinally(Lists.newArrayList(new BreakStatement()));
+		CatchBlock catchBlock = new CatchBlock();
+		catchBlock.setParameter(CsParameterName.newParameterName("[T,P] p"));
+		catchBlock.setBody(Lists.newArrayList(new ContinueStatement()));
+		catchBlock.setGeneral(true);
+		catchBlock.setUnnamed(true);
+		tryBlock.setCatchBlocks(Lists.newArrayList(catchBlock));
+		return tryBlock;
+	}
+
+	private static IStatement nested(ILoopHeaderBlockExpression expr) {
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(expr);
+		return whileLoop;
+	}
+
+	private static IStatement nested(IAssignableExpression expr) {
+		Assignment assignment = new Assignment();
+		assignment.setExpression(expr);
+		return assignment;
+	}
+
+	private static IStatement nested(IReference reference) {
+		Assignment assignment = new Assignment();
+		ReferenceExpression referenceExpression = new ReferenceExpression();
+		referenceExpression.setReference(reference);
+		assignment.setExpression(referenceExpression);
+		return assignment;
 	}
 
 	private static String getExampleJson_Current() {

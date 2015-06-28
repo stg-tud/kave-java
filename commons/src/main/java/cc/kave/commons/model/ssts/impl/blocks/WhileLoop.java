@@ -16,7 +16,7 @@ public class WhileLoop implements IWhileLoop {
 
 	public WhileLoop() {
 		this.condition = new UnknownExpression();
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override
@@ -37,16 +37,35 @@ public class WhileLoop implements IWhileLoop {
 		this.body = body;
 	}
 
-	private boolean equals(WhileLoop other) {
-		return this.body.equals(other.getBody()) && this.condition.equals(other.getCondition());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof WhileLoop ? this.equals((WhileLoop) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		return (40 + (this.body.hashCode() * 397) ^ this.condition.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((condition == null) ? 0 : condition.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof WhileLoop))
+			return false;
+		WhileLoop other = (WhileLoop) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (condition == null) {
+			if (other.condition != null)
+				return false;
+		} else if (!condition.equals(other.condition))
+			return false;
+		return true;
 	}
 
 	@Override

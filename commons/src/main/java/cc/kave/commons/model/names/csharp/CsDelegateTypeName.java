@@ -8,6 +8,8 @@ import cc.kave.commons.model.names.TypeName;
 
 public class CsDelegateTypeName extends CsTypeName implements DelegateTypeName {
 
+	public static DelegateTypeName UNKNOWN_NAME = newDelegateTypeName("d:[?] [?].()");
+
 	public static DelegateTypeName newDelegateTypeName(String identifier) {
 		return (DelegateTypeName) CsTypeName.newTypeName(identifier);
 	}

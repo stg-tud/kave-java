@@ -4,15 +4,19 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 
 public interface ICatchBlock {
 
 	@Nonnull
-	IVariableDeclaration getException();
+	ParameterName getParameter();
 
 	@Nonnull
 	List<IStatement> getBody();
+
+	boolean isGeneral();
+
+	boolean isUnnamed();
 
 }

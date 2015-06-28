@@ -7,11 +7,12 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 
 import com.google.common.collect.Lists;
+
 import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 

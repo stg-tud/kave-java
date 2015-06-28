@@ -15,7 +15,7 @@ public class CaseBlock implements ICaseBlock {
 
 	public CaseBlock() {
 		label = new UnknownExpression();
-		body = new ArrayList<IStatement>();
+		body = new ArrayList<>();
 	}
 
 	@Override
@@ -36,16 +36,35 @@ public class CaseBlock implements ICaseBlock {
 		this.body = body;
 	}
 
-	private boolean equals(CaseBlock other) {
-		return this.body.equals(other.getBody()) && this.label.equals(other.getLabel());
-	}
-
+	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof CaseBlock ? this.equals((CaseBlock) obj) : false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CaseBlock))
+			return false;
+		CaseBlock other = (CaseBlock) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (label == null) {
+			if (other.label != null)
+				return false;
+		} else if (!label.equals(other.label))
+			return false;
+		return true;
 	}
 
+	@Override
 	public int hashCode() {
-		return 30 + (this.body.hashCode() * 397) ^ this.label.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		return result;
 	}
 
 }

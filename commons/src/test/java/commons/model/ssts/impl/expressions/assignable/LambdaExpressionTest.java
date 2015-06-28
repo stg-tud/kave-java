@@ -8,22 +8,22 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 
 import com.google.common.collect.Lists;
+import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 
-public class LambdaExpressionTest {
+public class LambdaExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void testDefaulValues() {
 		LambdaExpression sut = new LambdaExpression();
 
-		assertThat(new ArrayList<IVariableDeclaration>(), equalTo(sut.getParameters()));
+		assertThat(CsLambdaName.UNKNOWN_NAME, equalTo(sut.getName()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getBody()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
@@ -33,10 +33,10 @@ public class LambdaExpressionTest {
 	public void testSettingValues() {
 		LambdaExpression sut = new LambdaExpression();
 		sut.getBody().add(new GotoStatement());
-		sut.getParameters().add(new VariableDeclaration());
+		sut.setName(someLambdaName());
 
 		assertThat(Lists.newArrayList(new GotoStatement()), equalTo(sut.getBody()));
-		assertThat(Lists.newArrayList(new VariableDeclaration()), equalTo(sut.getParameters()));
+		assertThat(someLambdaName(), equalTo(sut.getName()));
 	}
 
 	@Test
@@ -53,19 +53,19 @@ public class LambdaExpressionTest {
 		LambdaExpression a = new LambdaExpression();
 		LambdaExpression b = new LambdaExpression();
 		a.getBody().add(new GotoStatement());
-		a.getParameters().add(new VariableDeclaration());
+		a.setName(someLambdaName());
 		b.getBody().add(new GotoStatement());
-		b.getParameters().add(new VariableDeclaration());
+		b.setName(someLambdaName());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
 	}
 
 	@Test
-	public void testEqualityDifferentParameters() {
+	public void testEqualityDifferentName() {
 		LambdaExpression a = new LambdaExpression();
 		LambdaExpression b = new LambdaExpression();
-		a.getParameters().add(new VariableDeclaration());
+		a.setName(someLambdaName());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

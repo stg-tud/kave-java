@@ -20,7 +20,7 @@ public class InvocationExpression implements IInvocationExpression {
 	public InvocationExpression() {
 		this.reference = new VariableReference();
 		this.methodName = CsMethodName.UNKNOWN_NAME;
-		this.parameters = new ArrayList<ISimpleExpression>();
+		this.parameters = new ArrayList<>();
 	}
 
 	@Override

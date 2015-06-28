@@ -3,24 +3,20 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.kave.commons.model.names.LambdaName;
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class LambdaExpression implements ILambdaExpression {
 
-	private List<IVariableDeclaration> parameters;
 	private List<IStatement> body;
+	private LambdaName name;
 
 	public LambdaExpression() {
-		this.parameters = new ArrayList<IVariableDeclaration>();
-		this.body = new ArrayList<IStatement>();
-	}
-
-	@Override
-	public List<IVariableDeclaration> getParameters() {
-		return this.parameters;
+		this.body = new ArrayList<>();
+		this.name = CsLambdaName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -28,17 +24,21 @@ public class LambdaExpression implements ILambdaExpression {
 		return this.body;
 	}
 
-	public void setParameters(List<IVariableDeclaration> parameters) {
-		this.parameters = parameters;
-	}
-
 	public void setBody(List<IStatement> body) {
 		this.body = body;
 	}
 
+	public void setName(LambdaName name) {
+		this.name = name;
+	}
+
 	@Override
 	public int hashCode() {
-		return (2990306 + this.body.hashCode() * 5 + this.parameters.hashCode() * 3);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
 	@Override
@@ -55,10 +55,10 @@ public class LambdaExpression implements ILambdaExpression {
 				return false;
 		} else if (!body.equals(other.body))
 			return false;
-		if (parameters == null) {
-			if (other.parameters != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!parameters.equals(other.parameters))
+		} else if (!name.equals(other.name))
 			return false;
 		return true;
 	}
@@ -66,6 +66,11 @@ public class LambdaExpression implements ILambdaExpression {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public LambdaName getName() {
+		return this.name;
 	}
 
 }

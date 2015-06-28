@@ -17,9 +17,9 @@ public class ForLoop implements IForLoop {
 	private ILoopHeaderExpression condition;
 
 	public ForLoop() {
-		this.init = new ArrayList<IStatement>();
-		this.step = new ArrayList<IStatement>();
-		this.body = new ArrayList<IStatement>();
+		this.init = new ArrayList<>();
+		this.step = new ArrayList<>();
+		this.body = new ArrayList<>();
 		this.condition = new UnknownExpression();
 	}
 

@@ -12,7 +12,7 @@ public class LoopHeaderBlockExpression implements ILoopHeaderBlockExpression {
 	private List<IStatement> body;
 
 	public LoopHeaderBlockExpression() {
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override

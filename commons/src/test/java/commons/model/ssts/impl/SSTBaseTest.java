@@ -3,15 +3,19 @@ package commons.model.ssts.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.kave.commons.model.names.LambdaName;
 import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public abstract class SSTBaseTest {
@@ -64,5 +68,13 @@ public abstract class SSTBaseTest {
 			exprs.add(refExpr);
 		}
 		return exprs;
+	}
+
+	protected ParameterName someParameter() {
+		return CsParameterName.newParameterName("[T,P] n");
+	}
+
+	protected LambdaName someLambdaName() {
+		return CsLambdaName.newLambdaName("[T,P] ([T2,P2] p)");
 	}
 }

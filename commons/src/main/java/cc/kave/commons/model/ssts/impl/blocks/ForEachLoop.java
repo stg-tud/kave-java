@@ -6,8 +6,8 @@ import java.util.List;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
@@ -20,7 +20,7 @@ public class ForEachLoop implements IForEachLoop {
 	public ForEachLoop() {
 		this.declaration = new VariableDeclaration();
 		this.loopedReference = new VariableReference();
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override
@@ -50,20 +50,41 @@ public class ForEachLoop implements IForEachLoop {
 		this.body = body;
 	}
 
-	private boolean equals(ForEachLoop other) {
-		return this.body.equals(other.getBody()) && this.declaration.equals(other.getDeclaration())
-				&& this.loopedReference.equals(other.getLoopedReference());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof ForEachLoop ? this.equals((ForEachLoop) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		int hashCode = 33 + this.body.hashCode();
-		hashCode = (hashCode * 397) ^ this.declaration.hashCode();
-		hashCode = (hashCode * 397) ^ this.loopedReference.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((declaration == null) ? 0 : declaration.hashCode());
+		result = prime * result + ((loopedReference == null) ? 0 : loopedReference.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ForEachLoop))
+			return false;
+		ForEachLoop other = (ForEachLoop) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (declaration == null) {
+			if (other.declaration != null)
+				return false;
+		} else if (!declaration.equals(other.declaration))
+			return false;
+		if (loopedReference == null) {
+			if (other.loopedReference != null)
+				return false;
+		} else if (!loopedReference.equals(other.loopedReference))
+			return false;
+		return true;
 	}
 
 	@Override

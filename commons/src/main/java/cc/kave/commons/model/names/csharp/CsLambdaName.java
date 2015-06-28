@@ -12,6 +12,8 @@ import com.google.common.collect.MapMaker;
 public class CsLambdaName extends CsName implements LambdaName {
 	private static final Map<String, CsLambdaName> nameRegistry = new MapMaker().weakValues().makeMap();
 
+	public static final CsLambdaName UNKNOWN_NAME = newLambdaName(UNKNOWN_NAME_IDENTIFIER);
+
 	public static CsLambdaName newLambdaName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new CsLambdaName(identifier));

@@ -17,8 +17,8 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 
 	public PropertyDeclaration() {
 		this.name = CsPropertyName.UNKNOWN_NAME;
-		this.get = new ArrayList<IStatement>();
-		this.set = new ArrayList<IStatement>();
+		this.get = new ArrayList<>();
+		this.set = new ArrayList<>();
 	}
 
 	@Override

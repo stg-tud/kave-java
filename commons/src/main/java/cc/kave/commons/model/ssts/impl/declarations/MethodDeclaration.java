@@ -17,7 +17,7 @@ public class MethodDeclaration implements IMethodDeclaration {
 
 	public MethodDeclaration() {
 		name = CsMethodName.UNKNOWN_NAME;
-		body = new ArrayList<IStatement>();
+		body = new ArrayList<>();
 	}
 
 	@Override

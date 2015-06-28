@@ -11,7 +11,6 @@ import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -19,6 +18,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 import com.google.common.collect.Lists;

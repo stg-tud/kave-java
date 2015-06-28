@@ -18,8 +18,8 @@ public class SwitchBlock implements ISwitchBlock {
 
 	public SwitchBlock() {
 		this.reference = new VariableReference();
-		this.sections = new ArrayList<ICaseBlock>();
-		this.defaultSection = new ArrayList<IStatement>();
+		this.sections = new ArrayList<>();
+		this.defaultSection = new ArrayList<>();
 	}
 
 	@Override
@@ -49,20 +49,41 @@ public class SwitchBlock implements ISwitchBlock {
 		this.defaultSection = defaultSection;
 	}
 
-	private boolean equals(SwitchBlock other) {
-		return this.reference.equals(other.getReference()) && this.sections.equals(other.getSections())
-				&& this.defaultSection.equals(other.getDefaultSection());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof SwitchBlock ? this.equals((SwitchBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		int hashCode = 36 + this.sections.hashCode();
-		hashCode = (hashCode * 397) ^ this.defaultSection.hashCode();
-		hashCode = (hashCode * 397) ^ this.reference.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((defaultSection == null) ? 0 : defaultSection.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		result = prime * result + ((sections == null) ? 0 : sections.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof SwitchBlock))
+			return false;
+		SwitchBlock other = (SwitchBlock) obj;
+		if (defaultSection == null) {
+			if (other.defaultSection != null)
+				return false;
+		} else if (!defaultSection.equals(other.defaultSection))
+			return false;
+		if (reference == null) {
+			if (other.reference != null)
+				return false;
+		} else if (!reference.equals(other.reference))
+			return false;
+		if (sections == null) {
+			if (other.sections != null)
+				return false;
+		} else if (!sections.equals(other.sections))
+			return false;
+		return true;
 	}
 
 	@Override

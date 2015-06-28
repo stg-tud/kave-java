@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.impl.declarations;
+package cc.kave.commons.model.ssts.impl.statements;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;

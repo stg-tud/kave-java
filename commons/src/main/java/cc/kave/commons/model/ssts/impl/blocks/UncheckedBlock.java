@@ -12,7 +12,7 @@ public class UncheckedBlock implements IUncheckedBlock {
 	private List<IStatement> body;
 
 	public UncheckedBlock() {
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override
@@ -24,16 +24,29 @@ public class UncheckedBlock implements IUncheckedBlock {
 		this.body = body;
 	}
 
-	private boolean equals(UncheckedBlock other) {
-		return this.body.equals(other.getBody());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof UncheckedBlock ? this.equals((UncheckedBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		return 372 + this.body.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof UncheckedBlock))
+			return false;
+		UncheckedBlock other = (UncheckedBlock) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		return true;
 	}
 
 	@Override

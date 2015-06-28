@@ -16,7 +16,7 @@ public class LockBlock implements ILockBlock {
 
 	public LockBlock() {
 		this.reference = new VariableReference();
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override
@@ -37,16 +37,35 @@ public class LockBlock implements ILockBlock {
 		this.body = body;
 	}
 
-	private boolean equals(LockBlock other) {
-		return this.reference.equals(other.getReference()) && this.body.equals(other.getBody());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof LockBlock ? this.equals((LockBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		return (16 + this.reference.hashCode() * 8 + this.body.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof LockBlock))
+			return false;
+		LockBlock other = (LockBlock) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (reference == null) {
+			if (other.reference != null)
+				return false;
+		} else if (!reference.equals(other.reference))
+			return false;
+		return true;
 	}
 
 	@Override

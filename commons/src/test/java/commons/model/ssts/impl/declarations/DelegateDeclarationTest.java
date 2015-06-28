@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
 
 import commons.model.ssts.impl.SSTTestHelper;
@@ -17,7 +17,7 @@ public class DelegateDeclarationTest {
 	public void testDefaultValues() {
 		DelegateDeclaration sut = new DelegateDeclaration();
 
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(CsDelegateTypeName.UNKNOWN_NAME, equalTo(sut.getName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}
@@ -25,9 +25,9 @@ public class DelegateDeclarationTest {
 	@Test
 	public void testSettingValues() {
 		DelegateDeclaration sut = new DelegateDeclaration();
-		sut.setName(CsTypeName.newTypeName("SoemType,P"));
+		sut.setName(CsDelegateTypeName.newDelegateTypeName("d:SomeType,P"));
 
-		assertThat(CsTypeName.newTypeName("SoemType,P"), equalTo(sut.getName()));
+		assertThat(CsDelegateTypeName.newDelegateTypeName("d:SomeType,P"), equalTo(sut.getName()));
 	}
 
 	@Test
@@ -42,8 +42,8 @@ public class DelegateDeclarationTest {
 	public void testEqualityReallyTheSame() {
 		DelegateDeclaration a = new DelegateDeclaration();
 		DelegateDeclaration b = new DelegateDeclaration();
-		a.setName(CsTypeName.newTypeName("SoemType,P"));
-		b.setName(CsTypeName.newTypeName("SoemType,P"));
+		a.setName(CsDelegateTypeName.newDelegateTypeName("d:SomeType,P"));
+		b.setName(CsDelegateTypeName.newDelegateTypeName("d:SomeType,P"));
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -53,7 +53,7 @@ public class DelegateDeclarationTest {
 	public void testEqualityDifferentType() {
 		DelegateDeclaration a = new DelegateDeclaration();
 		DelegateDeclaration b = new DelegateDeclaration();
-		a.setName(CsTypeName.newTypeName("SoemType,P"));
+		a.setName(CsDelegateTypeName.newDelegateTypeName("d:SomeType,P"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

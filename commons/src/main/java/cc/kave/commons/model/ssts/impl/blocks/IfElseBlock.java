@@ -17,8 +17,8 @@ public class IfElseBlock implements IIfElseBlock {
 
 	public IfElseBlock() {
 		this.condition = new UnknownExpression();
-		this._else = new ArrayList<IStatement>();
-		this.then = new ArrayList<IStatement>();
+		this._else = new ArrayList<>();
+		this.then = new ArrayList<>();
 	}
 
 	@Override
@@ -48,20 +48,41 @@ public class IfElseBlock implements IIfElseBlock {
 		this.condition = condition;
 	}
 
-	private boolean equals(IfElseBlock other) {
-		return this.then.equals(other.getThen()) && this._else.equals(other.getElse())
-				&& this.condition.equals(other.getCondition());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof IfElseBlock ? this.equals((IfElseBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		int hashCode = 35 + this.then.hashCode();
-		hashCode = (hashCode * 397) ^ this._else.hashCode();
-		hashCode = (hashCode * 397) ^ this.condition.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((_else == null) ? 0 : _else.hashCode());
+		result = prime * result + ((condition == null) ? 0 : condition.hashCode());
+		result = prime * result + ((then == null) ? 0 : then.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof IfElseBlock))
+			return false;
+		IfElseBlock other = (IfElseBlock) obj;
+		if (_else == null) {
+			if (other._else != null)
+				return false;
+		} else if (!_else.equals(other._else))
+			return false;
+		if (condition == null) {
+			if (other.condition != null)
+				return false;
+		} else if (!condition.equals(other.condition))
+			return false;
+		if (then == null) {
+			if (other.then != null)
+				return false;
+		} else if (!then.equals(other.then))
+			return false;
+		return true;
 	}
 
 	@Override

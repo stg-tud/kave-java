@@ -15,9 +15,9 @@ public class TryBlock implements ITryBlock {
 	private List<IStatement> _finally;
 
 	public TryBlock() {
-		this.body = new ArrayList<IStatement>();
-		this.catchBlocks = new ArrayList<ICatchBlock>();
-		this._finally = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
+		this.catchBlocks = new ArrayList<>();
+		this._finally = new ArrayList<>();
 	}
 
 	@Override
@@ -47,20 +47,41 @@ public class TryBlock implements ITryBlock {
 		this.catchBlocks = catchBlocks;
 	}
 
-	private boolean equals(TryBlock other) {
-		return this.body.equals(other.getBody()) && this.catchBlocks.equals(other.getCatchBlocks())
-				&& this._finally.equals(other.getFinally());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof TryBlock ? this.equals((TryBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		int hashCode = 37 + this.body.hashCode();
-		hashCode = (hashCode * 397) ^ this.catchBlocks.hashCode();
-		hashCode = (hashCode * 397) ^ this._finally.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((_finally == null) ? 0 : _finally.hashCode());
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((catchBlocks == null) ? 0 : catchBlocks.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TryBlock))
+			return false;
+		TryBlock other = (TryBlock) obj;
+		if (_finally == null) {
+			if (other._finally != null)
+				return false;
+		} else if (!_finally.equals(other._finally))
+			return false;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (catchBlocks == null) {
+			if (other.catchBlocks != null)
+				return false;
+		} else if (!catchBlocks.equals(other.catchBlocks))
+			return false;
+		return true;
 	}
 
 	@Override

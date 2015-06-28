@@ -12,7 +12,7 @@ public class ComposedExpression implements IComposedExpression {
 	private List<IVariableReference> references;
 
 	public ComposedExpression() {
-		this.references = new ArrayList<IVariableReference>();
+		this.references = new ArrayList<>();
 	}
 
 	@Override

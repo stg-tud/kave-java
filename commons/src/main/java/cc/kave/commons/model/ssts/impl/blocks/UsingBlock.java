@@ -16,7 +16,7 @@ public class UsingBlock implements IUsingBlock {
 
 	public UsingBlock() {
 		this.reference = new VariableReference();
-		this.body = new ArrayList<IStatement>();
+		this.body = new ArrayList<>();
 	}
 
 	@Override
@@ -37,16 +37,35 @@ public class UsingBlock implements IUsingBlock {
 		this.body = body;
 	}
 
-	private boolean equals(UsingBlock other) {
-		return this.body.equals(other.getBody()) && this.reference.equals(other.getReference());
-	}
-
-	public boolean equals(Object obj) {
-		return obj instanceof UsingBlock ? this.equals((UsingBlock) obj) : false;
-	}
-
+	@Override
 	public int hashCode() {
-		return (39 + 6 * this.body.hashCode() + this.reference.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((body == null) ? 0 : body.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof UsingBlock))
+			return false;
+		UsingBlock other = (UsingBlock) obj;
+		if (body == null) {
+			if (other.body != null)
+				return false;
+		} else if (!body.equals(other.body))
+			return false;
+		if (reference == null) {
+			if (other.reference != null)
+				return false;
+		} else if (!reference.equals(other.reference))
+			return false;
+		return true;
 	}
 
 	@Override

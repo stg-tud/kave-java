@@ -8,9 +8,8 @@ import org.junit.Test;
 
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.kave.commons.model.ssts.impl.declarations.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import commons.model.ssts.impl.SSTTestHelper;
 
 public class VariableDeclarationTest {
