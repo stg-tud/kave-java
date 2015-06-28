@@ -263,10 +263,10 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(VariableDeclaration.class, new GsonIStatementDeserializer());
 		gsonBuilder.registerTypeAdapter(WhileLoop.class, new GsonIStatementDeserializer());
 		// Case and CatchBlock
-		gsonBuilder.registerTypeAdapter(ICatchBlock.class, new CatchBlockDeserializer());
-		gsonBuilder.registerTypeAdapter(CatchBlock.class, new CatchBlockDeserializer());
-		gsonBuilder.registerTypeAdapter(ICaseBlock.class, new CaseBlockDeserializer());
-		gsonBuilder.registerTypeAdapter(CaseBlock.class, new CaseBlockDeserializer());
+		gsonBuilder.registerTypeAdapter(ICatchBlock.class, new GsonCatchBlockDeserializer());
+		gsonBuilder.registerTypeAdapter(CatchBlock.class, new GsonCatchBlockDeserializer());
+		gsonBuilder.registerTypeAdapter(ICaseBlock.class, new GsonCaseBlockDeserializer());
+		gsonBuilder.registerTypeAdapter(CaseBlock.class, new GsonCaseBlockDeserializer());
 
 		// SST
 		gsonBuilder.registerTypeAdapter(ISST.class, new GsonISSTDeserializer());

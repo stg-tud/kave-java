@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class CaseBlockDeserializer implements JsonDeserializer<ICaseBlock> {
+public class GsonCaseBlockDeserializer implements JsonDeserializer<ICaseBlock> {
 
 	@Override
 	public ICaseBlock deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)

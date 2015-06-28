@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class CatchBlockDeserializer implements JsonDeserializer<ICatchBlock> {
+public class GsonCatchBlockDeserializer implements JsonDeserializer<ICatchBlock> {
 
 	@Override
 	public ICatchBlock deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
