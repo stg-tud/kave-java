@@ -76,7 +76,7 @@ public class SSTDeserializationTest {
 		assertThat(a, equalTo(b));
 	}
 
-	private static ISST getExample() {
+	public static ISST getExample() {
 		SST sut = new SST();
 
 		FieldDeclaration fieldDeclaration = new FieldDeclaration();
