@@ -1,8 +1,6 @@
 package cc.kave.commons.utils.json;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import cc.kave.commons.model.names.LambdaName;
 import cc.kave.commons.model.names.MethodName;
@@ -28,8 +26,56 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-public class GsonIExpressionDeserializer implements JsonDeserializer<IExpression> {
+public class GsonIExpressionSerializer implements JsonSerializer<IExpression>, JsonDeserializer<IExpression> {
+
+	@Override
+	public JsonElement serialize(IExpression src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject jsonObject = new JsonObject();
+		String discriminator = src.getClass().getSimpleName();
+		jsonObject.addProperty("$type", JsonUtils.getTypePath(src));
+		switch (discriminator) {
+		case "CompletionExpression":
+			CompletionExpression c = (CompletionExpression) src;
+			jsonObject.addProperty("Token", c.getToken());
+			return jsonObject;
+		case "ComposedExpression":
+			ComposedExpression cE = (ComposedExpression) src;
+			jsonObject.add("References", JsonUtils.parseListToJson(cE.getReferences()));
+			return jsonObject;
+		case "IfElseExpression":
+			IfElseExpression i = (IfElseExpression) src;
+			jsonObject.add("Condition", JsonUtils.parseObject(i.getCondition(), i.getCondition().getClass()));
+			jsonObject.add("ThenExpression",
+					JsonUtils.parseObject(i.getThenExpression(), i.getThenExpression().getClass()));
+			jsonObject.add("ElseExpression",
+					JsonUtils.parseObject(i.getElseExpression(), i.getElseExpression().getClass()));
+			return jsonObject;
+		case "InvocationExpression":
+			InvocationExpression iE = (InvocationExpression) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(iE.getReference(), iE.getReference().getClass()));
+			jsonObject.addProperty("MethodName", JsonUtils.parseName(iE.getMethodName()));
+			jsonObject.add("Parameters", JsonUtils.parseListToJson(iE.getParameters()));
+			return jsonObject;
+		case "LambdaExpression":
+			LambdaExpression lE = (LambdaExpression) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(lE.getName()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(lE.getBody()));
+			return jsonObject;
+		case "ReferenceExpression":
+			ReferenceExpression rE = (ReferenceExpression) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(rE.getReference(), rE.getReference().getClass()));
+			return jsonObject;
+		case "LoopHeaderBlockExpression":
+			LoopHeaderBlockExpression l = (LoopHeaderBlockExpression) src;
+			jsonObject.add("Body", JsonUtils.parseListToJson(l.getBody()));
+			return jsonObject;
+		default:
+			return jsonObject;
+		}
+	}
 
 	@Override
 	public IExpression deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -54,11 +100,8 @@ public class GsonIExpressionDeserializer implements JsonDeserializer<IExpression
 			return compExp;
 		case "ComposedExpression":
 			ComposedExpression composedExp = new ComposedExpression();
-			List<IVariableReference> references = new ArrayList<>();
-			for (JsonElement j : jsonObject.getAsJsonArray("References")) {
-				references.add(JsonUtils.parseJson(j.toString(), IVariableReference.class));
-			}
-			composedExp.setReferences(references);
+			composedExp.setReferences(JsonUtils.parseJsonToList(IVariableReference.class,
+					jsonObject.getAsJsonArray("References")));
 			return composedExp;
 		case "IfElseExpression":
 			IfElseExpression ifElseExp = new IfElseExpression();
@@ -73,19 +116,12 @@ public class GsonIExpressionDeserializer implements JsonDeserializer<IExpression
 			InvocationExpression invoExp = new InvocationExpression();
 			invoExp.setMethodName(JsonUtils.parseJson(jsonObject.get("MethodName").toString(), MethodName.class));
 			invoExp.setReference(JsonUtils.parseJson(jsonObject.get("Reference").toString(), IVariableReference.class));
-			List<ISimpleExpression> parameters = new ArrayList<>();
-			for (JsonElement j : jsonObject.getAsJsonArray("Parameters")) {
-				parameters.add(JsonUtils.parseJson(j.toString(), ISimpleExpression.class));
-			}
-			invoExp.setParameters(parameters);
+			invoExp.setParameters(JsonUtils.parseJsonToList(ISimpleExpression.class,
+					jsonObject.getAsJsonArray("Parameters")));
 			return invoExp;
 		case "LambdaExpression":
 			LambdaExpression lambdaExp = new LambdaExpression();
-			List<IStatement> body = new ArrayList<>();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body")) {
-				body.add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
-			lambdaExp.setBody(body);
+			lambdaExp.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			lambdaExp.setName(JsonUtils.parseJson(jsonObject.get("Name").toString(), LambdaName.class));
 			return lambdaExp;
 		case "ConstantValueExpression":
@@ -104,11 +140,7 @@ public class GsonIExpressionDeserializer implements JsonDeserializer<IExpression
 			return new UnknownExpression();
 		case "LoopHeaderBlockExpression":
 			LoopHeaderBlockExpression loopExp = new LoopHeaderBlockExpression();
-			List<IStatement> b = new ArrayList<>();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body")) {
-				b.add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
-			loopExp.setBody(b);
+			loopExp.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			return loopExp;
 		default:
 			return null;

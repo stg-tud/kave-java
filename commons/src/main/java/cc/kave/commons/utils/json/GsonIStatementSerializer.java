@@ -39,8 +39,109 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> {
+public class GsonIStatementSerializer implements JsonSerializer<IStatement>, JsonDeserializer<IStatement> {
+
+	@Override
+	public JsonElement serialize(IStatement src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject jsonObject = new JsonObject();
+		String discriminator = src.getClass().getSimpleName();
+		jsonObject.addProperty("$type", JsonUtils.getTypePath(src));
+		switch (discriminator) {
+		case "Assignment":
+			Assignment a = (Assignment) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(a.getReference(), a.getReference().getClass()));
+			jsonObject.add("Expression", JsonUtils.parseObject(a.getExpression(), a.getExpression().getClass()));
+			return jsonObject;
+		case "DoLoop":
+			DoLoop dL = (DoLoop) src;
+			jsonObject.add("Condition", JsonUtils.parseObject(dL.getCondition(), dL.getCondition().getClass()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(dL.getBody()));
+			return jsonObject;
+		case "ExpressionStatement":
+			ExpressionStatement eS = (ExpressionStatement) src;
+			jsonObject.add("Expression", JsonUtils.parseObject(eS.getExpression(), eS.getExpression().getClass()));
+			return jsonObject;
+		case "ForEachLoop":
+			ForEachLoop fE = (ForEachLoop) src;
+			jsonObject.add("Declaration", JsonUtils.parseObject(fE.getDeclaration(), fE.getDeclaration().getClass()));
+			jsonObject.add("LoopedReference",
+					JsonUtils.parseObject(fE.getLoopedReference(), fE.getLoopedReference().getClass()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(fE.getBody()));
+			return jsonObject;
+		case "ForLoop":
+			ForLoop fL = (ForLoop) src;
+			jsonObject.add("Init", JsonUtils.parseListToJson(fL.getInit()));
+			jsonObject.add("Condition", JsonUtils.parseObject(fL.getCondition(), fL.getCondition().getClass()));
+			jsonObject.add("Step", JsonUtils.parseListToJson(fL.getStep()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(fL.getBody()));
+			return jsonObject;
+		case "GotoStatement":
+			GotoStatement gS = (GotoStatement) src;
+			jsonObject.addProperty("Label", gS.getLabel());
+			return jsonObject;
+		case "IfElseBlock":
+			IfElseBlock iEB = (IfElseBlock) src;
+			jsonObject.add("Condition", JsonUtils.parseObject(iEB.getCondition(), iEB.getCondition().getClass()));
+			jsonObject.add("Then", JsonUtils.parseListToJson(iEB.getThen()));
+			jsonObject.add("Else", JsonUtils.parseListToJson(iEB.getElse()));
+			return jsonObject;
+		case "LabelledStatement":
+			LabelledStatement lS = (LabelledStatement) src;
+			jsonObject.addProperty("Label", lS.getLabel());
+			jsonObject.add("Statement", JsonUtils.parseObject(lS.getStatement(), lS.getStatement().getClass()));
+			return jsonObject;
+		case "LockBlock":
+			LockBlock lB = (LockBlock) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(lB.getReference(), lB.getReference().getClass()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(lB.getBody()));
+			return jsonObject;
+		case "ReturnStatement":
+			ReturnStatement rS = (ReturnStatement) src;
+			jsonObject.add("Expression", JsonUtils.parseObject(rS.getExpression(), rS.getExpression().getClass()));
+			jsonObject.addProperty("IsVoid", rS.isVoid());
+			return jsonObject;
+		case "SwitchBlock":
+			SwitchBlock sB = (SwitchBlock) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(sB.getReference(), sB.getReference().getClass()));
+			jsonObject.add("Sections", JsonUtils.parseListToJson(sB.getSections()));
+			jsonObject.add("DefaultSection", JsonUtils.parseListToJson(sB.getDefaultSection()));
+			return jsonObject;
+		case "ThrowStatement":
+			ThrowStatement tS = (ThrowStatement) src;
+			jsonObject.addProperty("Exception", JsonUtils.parseName(tS.getException()));
+			return jsonObject;
+		case "TryBlock":
+			TryBlock tB = (TryBlock) src;
+			jsonObject.add("Body", JsonUtils.parseListToJson(tB.getBody()));
+			jsonObject.add("CatchBlocks", JsonUtils.parseListToJson(tB.getCatchBlocks()));
+			jsonObject.add("Finally", JsonUtils.parseListToJson(tB.getFinally()));
+			return jsonObject;
+		case "UncheckedBlock":
+			UncheckedBlock unB = (UncheckedBlock) src;
+			jsonObject.add("Body", JsonUtils.parseListToJson(unB.getBody()));
+			return jsonObject;
+		case "UsingBlock":
+			UsingBlock uB = (UsingBlock) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(uB.getReference(), uB.getReference().getClass()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(uB.getBody()));
+			return jsonObject;
+		case "VariableDeclaration":
+			VariableDeclaration vD = (VariableDeclaration) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(vD.getReference(), vD.getReference().getClass()));
+			jsonObject.addProperty("Type", JsonUtils.parseName(vD.getType()));
+			return jsonObject;
+		case "WhileLoop":
+			WhileLoop wL = (WhileLoop) src;
+			jsonObject.add("Condition", JsonUtils.parseObject(wL.getCondition(), wL.getCondition().getClass()));
+			jsonObject.add("Body", JsonUtils.parseListToJson(wL.getBody()));
+			return jsonObject;
+		default:
+			return jsonObject;
+		}
+	}
 
 	@Override
 	public IStatement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -71,9 +172,7 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			DoLoop doLoop = new DoLoop();
 			doLoop.setCondition(JsonUtils
 					.parseJson(jsonObject.get("Condition").toString(), ILoopHeaderExpression.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("Body")) {
-				doLoop.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
+			doLoop.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			return doLoop;
 		case "ExpressionStatement":
 			ExpressionStatement expressionStatement = new ExpressionStatement();
@@ -82,9 +181,7 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return expressionStatement;
 		case "ForEachLoop":
 			ForEachLoop foreachLoop = new ForEachLoop();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body")) {
-				foreachLoop.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
+			foreachLoop.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			foreachLoop.setDeclaration(JsonUtils.parseJson(jsonObject.get("Declaration").toString(),
 					IVariableDeclaration.class));
 			foreachLoop.setLoopedReference(JsonUtils.parseJson(jsonObject.get("LoopedReference").toString(),
@@ -92,12 +189,9 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return foreachLoop;
 		case "ForLoop":
 			ForLoop forLoop = new ForLoop();
-			for (JsonElement j : jsonObject.getAsJsonArray("Init"))
-				forLoop.getInit().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				forLoop.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("Step"))
-				forLoop.getStep().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			forLoop.setInit(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Init")));
+			forLoop.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
+			forLoop.setStep(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Step")));
 			forLoop.setCondition(JsonUtils.parseJson(jsonObject.get("Condition").toString(),
 					ILoopHeaderExpression.class));
 			return forLoop;
@@ -107,10 +201,8 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return gotoStatement;
 		case "IfElseBlock":
 			IfElseBlock ifElseBlock = new IfElseBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Then"))
-				ifElseBlock.getThen().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("Then"))
-				ifElseBlock.getElse().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			ifElseBlock.setThen(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Then")));
+			ifElseBlock.setElse(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Else")));
 			ifElseBlock.setCondition(JsonUtils.parseJson(jsonObject.get("Condition").toString(),
 					ISimpleExpression.class));
 			return ifElseBlock;
@@ -122,8 +214,7 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return labelledStatement;
 		case "LockBlock":
 			LockBlock lockBlock = new LockBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				lockBlock.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			lockBlock.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			lockBlock.setReference(JsonUtils
 					.parseJson(jsonObject.get("Reference").toString(), IVariableReference.class));
 			return lockBlock;
@@ -135,10 +226,9 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return statement;
 		case "SwitchBlock":
 			SwitchBlock switchBlock = new SwitchBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Sections"))
-				switchBlock.getSections().add(JsonUtils.parseJson(j.toString(), ICaseBlock.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("DefaultSection"))
-				switchBlock.getDefaultSection().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			switchBlock.setSections(JsonUtils.parseJsonToList(ICaseBlock.class, jsonObject.getAsJsonArray("Sections")));
+			switchBlock.setDefaultSection(JsonUtils.parseJsonToList(IStatement.class,
+					jsonObject.getAsJsonArray("DefaultSection")));
 			switchBlock.setReference(JsonUtils.parseJson(jsonObject.get("Reference").toString(),
 					IVariableReference.class));
 			return switchBlock;
@@ -148,17 +238,14 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return throwStatement;
 		case "TryBlock":
 			TryBlock tryBlock = new TryBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				tryBlock.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("CatchBlocks"))
-				tryBlock.getCatchBlocks().add(JsonUtils.parseJson(j.toString(), ICatchBlock.class));
-			for (JsonElement j : jsonObject.getAsJsonArray("Finally"))
-				tryBlock.getFinally().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			tryBlock.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
+			tryBlock.setCatchBlocks(JsonUtils.parseJsonToList(ICatchBlock.class,
+					jsonObject.getAsJsonArray("CatchBlocks")));
+			tryBlock.setFinally(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Finally")));
 			return tryBlock;
 		case "UncheckedBlock":
 			UncheckedBlock uncheckedBlock = new UncheckedBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				uncheckedBlock.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			uncheckedBlock.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			return uncheckedBlock;
 		case "UnknownStatement":
 			UnknownStatement unknownStatement = new UnknownStatement();
@@ -168,8 +255,7 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return unsafeBlock;
 		case "UsingBlock":
 			UsingBlock usingBlock = new UsingBlock();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				usingBlock.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			usingBlock.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			usingBlock.setReference(JsonUtils.parseJson(jsonObject.get("Reference").toString(),
 					IVariableReference.class));
 			return usingBlock;
@@ -181,8 +267,7 @@ public class GsonIStatementDeserializer implements JsonDeserializer<IStatement> 
 			return variableDeclaration;
 		case "WhileLoop":
 			WhileLoop whileLoop = new WhileLoop();
-			for (JsonElement j : jsonObject.getAsJsonArray("Body"))
-				whileLoop.getBody().add(JsonUtils.parseJson(j.toString(), IStatement.class));
+			whileLoop.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			whileLoop.setCondition(JsonUtils.parseJson(jsonObject.get("Condition").toString(),
 					ILoopHeaderExpression.class));
 			return whileLoop;

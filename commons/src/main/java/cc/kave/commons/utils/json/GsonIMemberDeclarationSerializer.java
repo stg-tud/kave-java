@@ -1,8 +1,6 @@
 package cc.kave.commons.utils.json;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import cc.kave.commons.model.names.DelegateTypeName;
 import cc.kave.commons.model.names.EventName;
@@ -29,8 +27,70 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-public class GsonIMemberDeclarationDeserializer implements JsonDeserializer<IMemberDeclaration> {
+public class GsonIMemberDeclarationSerializer implements JsonSerializer<IMemberDeclaration>,
+		JsonDeserializer<IMemberDeclaration> {
+
+	@Override
+	public JsonElement serialize(IMemberDeclaration src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject jsonObject = new JsonObject();
+		String discriminator = src.getClass().getSimpleName();
+		jsonObject.addProperty("$type", JsonUtils.getTypePath(src));
+		switch (discriminator) {
+		case "FieldDeclaration":
+			FieldDeclaration f = (FieldDeclaration) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(f.getName()));
+			return jsonObject;
+		case "DelegateDeclaration":
+			DelegateDeclaration d = (DelegateDeclaration) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(d.getName()));
+			return jsonObject;
+		case "EventDeclaration":
+			EventDeclaration e = (EventDeclaration) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(e.getName()));
+			return jsonObject;
+		case "MethodDeclaration":
+			MethodDeclaration m = (MethodDeclaration) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(m.getName()));
+			jsonObject.addProperty("IsEntryPoint", m.isEntryPoint());
+			jsonObject.add("Body", JsonUtils.parseListToJson(m.getBody()));
+			return jsonObject;
+		case "PropertyDeclaration":
+			PropertyDeclaration p = (PropertyDeclaration) src;
+			jsonObject.addProperty("Name", JsonUtils.parseName(p.getName()));
+			jsonObject.add("Get", JsonUtils.parseListToJson(p.getGet()));
+			jsonObject.add("Set", JsonUtils.parseListToJson(p.getSet()));
+			return jsonObject;
+		case "EventReference":
+			EventReference er = (EventReference) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(er.getReference(), er.getReference().getClass()));
+			jsonObject.addProperty("EventName", JsonUtils.parseName(er.getEventName()));
+			return jsonObject;
+		case "FieldReference":
+			FieldReference fr = (FieldReference) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(fr.getReference(), fr.getReference().getClass()));
+			jsonObject.addProperty("FieldName", JsonUtils.parseName(fr.getFieldName()));
+			return jsonObject;
+		case "PropertyReference":
+			PropertyReference pr = (PropertyReference) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(pr.getReference(), pr.getReference().getClass()));
+			jsonObject.addProperty("PropertyName", JsonUtils.parseName(pr.getPropertyName()));
+			return jsonObject;
+		case "VariableReference":
+			VariableReference vr = (VariableReference) src;
+			jsonObject.addProperty("Identifier", vr.getIdentifier());
+			return jsonObject;
+		case "MethodReference":
+			MethodReference mr = (MethodReference) src;
+			jsonObject.add("Reference", JsonUtils.parseObject(mr.getReference(), mr.getReference().getClass()));
+			jsonObject.addProperty("MethodName", JsonUtils.parseName(mr.getMethodName()));
+			return jsonObject;
+		default:
+			return jsonObject;
+		}
+	}
 
 	@Override
 	public IMemberDeclaration deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -59,26 +119,13 @@ public class GsonIMemberDeclarationDeserializer implements JsonDeserializer<IMem
 			MethodDeclaration meDecl = new MethodDeclaration();
 			meDecl.setName(JsonUtils.parseJson(jsonObject.get("Name").toString(), MethodName.class));
 			meDecl.setEntryPoint(jsonObject.get("IsEntryPoint").getAsBoolean());
-			List<IStatement> body = new ArrayList<>();
-			for (int i = 0; i < jsonObject.getAsJsonArray("Body").size(); i++) {
-				JsonElement j = jsonObject.getAsJsonArray("Body").get(i);
-				body.add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
-			meDecl.setBody(body);
+			meDecl.setBody(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Body")));
 			return meDecl;
 		case "PropertyDeclaration":
 			PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
 			propertyDeclaration.setName(JsonUtils.parseJson(jsonObject.get("Name").toString(), PropertyName.class));
-			List<IStatement> get = new ArrayList<IStatement>();
-			for (JsonElement j : jsonObject.getAsJsonArray("Get")) {
-				get.add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
-			List<IStatement> set = new ArrayList<IStatement>();
-			for (JsonElement j : jsonObject.getAsJsonArray("Set")) {
-				set.add(JsonUtils.parseJson(j.toString(), IStatement.class));
-			}
-			propertyDeclaration.setGet(get);
-			propertyDeclaration.setSet(set);
+			propertyDeclaration.setGet(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Get")));
+			propertyDeclaration.setSet(JsonUtils.parseJsonToList(IStatement.class, jsonObject.getAsJsonArray("Set")));
 			return propertyDeclaration;
 		case "EventReference":
 			EventReference evRef = new EventReference();

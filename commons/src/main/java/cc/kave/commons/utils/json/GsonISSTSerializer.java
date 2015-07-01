@@ -18,8 +18,25 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-public class GsonISSTDeserializer implements JsonDeserializer<ISST> {
+public class GsonISSTSerializer implements JsonSerializer<ISST>, JsonDeserializer<ISST> {
+
+	@Override
+	public JsonElement serialize(ISST src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject jsonObject = new JsonObject();
+		String type = "[SST:SST]";
+		jsonObject.addProperty("$type", type);
+		jsonObject.addProperty("EnclosingType", JsonUtils.parseName(src.getEnclosingType()));
+
+		jsonObject.add("Fields", JsonUtils.parseListToJson(src.getFields()));
+		jsonObject.add("Properties", JsonUtils.parseListToJson(src.getProperties()));
+		jsonObject.add("Methods", JsonUtils.parseListToJson(src.getMethods()));
+		jsonObject.add("Events", JsonUtils.parseListToJson(src.getEvents()));
+		jsonObject.add("Delegates", JsonUtils.parseListToJson(src.getDelegates()));
+		return jsonObject;
+	}
 
 	@Override
 	public ISST deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)

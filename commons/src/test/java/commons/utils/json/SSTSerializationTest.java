@@ -67,10 +67,17 @@ import cc.kave.commons.utils.json.JsonUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class SSTDeserializationTest {
+public class SSTSerializationTest {
 
 	@Test
-	public void deserializeToSSTWithEnclosingType() {
+	public void serializeSSTToJson() {
+		ISST a = getExample();
+		String SSTtoJson = JsonUtils.parseObject(a, ISST.class).toString();
+		assertThat(SSTtoJson, equalTo(getExampleJson_Current()));
+	}
+
+	@Test
+	public void deserializeJsonToSST() {
 		ISST a = getExample();
 		ISST b = JsonUtils.parseJson(getExampleJson_Current(), SST.class);
 		assertThat(a, equalTo(b));

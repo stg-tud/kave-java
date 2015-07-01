@@ -19,6 +19,8 @@ public class CsTypeName extends CsName implements TypeName {
 			CsTypeName newName;
 			if (identifier.startsWith("d:")) {
 				newName = new CsDelegateTypeName(identifier);
+			} else if (CsUnknownTypeName.IsUnknownTypeIdentifier(identifier)) {
+				newName = new CsUnknownTypeName(identifier);
 			} else {
 				newName = new CsTypeName(identifier);
 			}
