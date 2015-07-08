@@ -46,7 +46,7 @@ public class SSTFileReaderTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
 		List<SST> SSTList = parseSSTs(inputStream);
 
-		assertThat(SSTList.get(0), equalTo(SSTDeserializationTest.getExample()));
+		assertThat(SSTList.get(0), equalTo(SSTTestfixture.getExample()));
 	}
 
 }
