@@ -1,7 +1,7 @@
 package gsonexample.model;
 
 public class Stringbucket implements IBucket<String> {
-	char[] characters;
+	String characters;
 
 	public Stringbucket() {
 	}
@@ -15,8 +15,7 @@ public class Stringbucket implements IBucket<String> {
 	}
 
 	private void setString(String string) {
-		this.characters = new char[string.length()];
-		string.getChars(0, string.length(), this.characters, 0);
+		this.characters = string;
 	}
 
 	@Override

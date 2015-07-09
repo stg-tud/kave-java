@@ -1,6 +1,7 @@
 package commons.utils.json;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -12,27 +13,54 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
 import cc.kave.commons.utils.json.JsonUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class SSTSerializationTest {
 
 	@Test
+	public void serializedEmptySST() {
+		ISST sst = new SST();
+		String json = GsonUtil.toString(sst);
+		assertEquals(
+				"{\"$type\":\"[SST:SST]\",\"enclosingType\":{\"identifier\":\"?\"},\"fields\":[],\"properties\":[],\"methods\":[],\"events\":[],\"delegates\":[]}",
+				json);
+	}
+
+	@Test
+	public void serializedSimpleSST() {
+		ISST sst = new SST();
+		DelegateDeclaration delegate = new DelegateDeclaration();
+		delegate.setName(CsDelegateTypeName.newDelegateTypeName("CSharp.DelegateTypeName:d:[R,P] [T2,P].()"));
+		sst.getDelegates().add(delegate);
+		String json = GsonUtil.toString(sst);
+		assertEquals(
+				"{\"$type\":\"[SST:SST]\",\"enclosingType\":{\"identifier\":\"?\"},\"fields\":[],\"properties\":[],\"methods\":[],\"events\":[],\"delegates\":[]}",
+				json);
+	}
+
+	@Test
+	public void serializesSST() {
+		ISST sst = SSTTestfixture.getExample();
+		String json = GsonUtil.toString(sst);
+		assertEquals(SSTTestfixture.getExampleJson_Current(), json);
+	}
+
+	@Test
 	public void deserializesFromSerializedSST() {
 		ISST example = SSTTestfixture.getExample();
-		String testable = toGsonString(example);
-		ISST testableSST = fromGsonString(testable);
+		String testable = GsonUtil.toString(example);
+		ISST testableSST = GsonUtil.fromString(testable, ISST.class);
 		assertThat(example, equalTo(testableSST));
 	}
 
 	@Test
 	public void deserialzesWithStockMethod() {
 		ISST example = SSTTestfixture.getExample();
-		String testable = toGsonString(example);
+		String testable = GsonUtil.toString(example);
 		ISST testableSST = JsonUtils.parseJson(testable, SST.class);
 		assertThat(example, equalTo(testableSST));
 	}
@@ -57,16 +85,6 @@ public class SSTSerializationTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
-	}
-
-	static public String toGsonString(ISST sst) {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(sst);
-	}
-
-	static public ISST fromGsonString(String json) {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.fromJson(json, SST.class);
 	}
 
 }

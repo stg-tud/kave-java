@@ -1,6 +1,10 @@
 package gsonexample;
 
+import gsonexample.model.BagOfPrimitives;
+import gsonexample.model.ExtendedBag;
+import gsonexample.model.IBucket;
 import gsonexample.model.Intbucket;
+import gsonexample.model.Stringbucket;
 import gsonexample.serializer.IntbucketSerializer;
 
 import java.io.BufferedReader;
@@ -10,8 +14,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import cc.kave.commons.model.ssts.IExpression;
+import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 public class GsonUtil {
 
@@ -24,14 +35,46 @@ public class GsonUtil {
 	}
 
 	public static <T> T fromString(String str, Class<T> clazz) {
-		Gson gson = new GsonBuilder().create();
+		Gson gson = createGson();
 		T bag = gson.fromJson(str, clazz);
 		return bag;
 	}
 
 	public static <T> String toString(T object) {
-		Gson gson = new GsonBuilder().create();
+		Gson gson = createGson();
 		return gson.toJson(object);
+	}
+
+	private static Gson createGson() {
+		RuntimeTypeAdapterFactory<BagOfPrimitives> bag = RuntimeTypeAdapterFactory.of(BagOfPrimitives.class, "$type")
+				.registerSubtype(BagOfPrimitives.class, BagOfPrimitives.class.getName());
+		RuntimeTypeAdapterFactory<IBucket> bucketFactory = RuntimeTypeAdapterFactory.of(IBucket.class, "$type")
+				.registerSubtype(Intbucket.class, Intbucket.class.getName())
+				.registerSubtype(Stringbucket.class, Stringbucket.class.getName());
+		RuntimeTypeAdapterFactory<ExtendedBag> extendedBagFactory = RuntimeTypeAdapterFactory.of(ExtendedBag.class,
+				"$type").registerSubtype(ExtendedBag.class, ExtendedBag.class.getName());
+
+		RuntimeTypeAdapterFactory<SST> sstFactory = factoryFor(SST.class, SST.class);
+		RuntimeTypeAdapterFactory<?> expFactory = factoryFor(IExpression.class, ComposedExpression.class,
+				CompletionExpression.class, IfElseExpression.class);
+
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(bag).registerTypeAdapterFactory(bucketFactory)
+				.registerTypeAdapterFactory(extendedBagFactory).registerTypeAdapterFactory(sstFactory).create();
+		return gson;
+	}
+
+	@SafeVarargs
+	private static <T> RuntimeTypeAdapterFactory<T> factoryFor(Class<T> baseclass, Class<? extends T>... subclasses) {
+		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(baseclass, "$type");
+		for (Class<? extends T> subclass : subclasses) {
+			String typename = subclass.getName();
+			factory.registerSubtype(subclass, "[" + abbreviateNamespace(typename) + "]");
+		}
+		return factory;
+	}
+
+	private static String abbreviateNamespace(String typename) {
+		return typename.replaceAll("cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.", "SST:");
 	}
 
 	public static <T> String toStringSerializertest(T object) {
