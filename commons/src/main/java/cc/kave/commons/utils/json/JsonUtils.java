@@ -131,35 +131,45 @@ import com.google.gson.GsonBuilder;
 
 public abstract class JsonUtils {
 	public static <T> T parseJson(String json, Class<T> targetType) {
+		Gson gson = createGson();
+		return gson.fromJson(json, targetType);
+	}
+
+	public static String toString(Object instance) {
+		Gson gson = createGson();
+		return gson.toJson(instance);
+	}
+
+	private static Gson createGson() {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		// name interface types
-		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(EventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(FieldName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(LambdaName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(LocalVariableName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(MethodName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(Name.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(NamespaceName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(ParameterName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(PropertyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(TypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(DelegateTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(EventName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(FieldName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(LambdaName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(LocalVariableName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(MethodName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(Name.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(NamespaceName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(ParameterName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(PropertyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(TypeName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(DelegateTypeName.class, new GsonNameAdapter());
 		// C# name types
-		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsEventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsFieldName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsLambdaName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsLocalVariableName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsMethodName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsNamespaceName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsParameterName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsEventName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsFieldName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsLambdaName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsLocalVariableName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsMethodName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsNamespaceName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsParameterName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameAdapter());
 
 		// IMemberDeclaration interfaces
 		gsonBuilder.registerTypeAdapter(IMemberDeclaration.class, new GsonIMemberDeclarationDeserializer());
@@ -272,7 +282,6 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(ISST.class, new GsonISSTDeserializer());
 		gsonBuilder.registerTypeAdapter(SST.class, new GsonISSTDeserializer());
 		Gson gson = gsonBuilder.create();
-
-		return gson.fromJson(json, targetType);
+		return gson;
 	}
 }
