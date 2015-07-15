@@ -10,7 +10,7 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsTypeName extends CsName implements TypeName {
-	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
+	protected static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final TypeName UNKNOWN_NAME = newTypeName("?");
 

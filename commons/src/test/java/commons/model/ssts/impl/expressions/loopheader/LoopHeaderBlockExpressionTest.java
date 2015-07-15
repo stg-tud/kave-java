@@ -9,9 +9,8 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.impl.expressions.loopHeader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
 import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 

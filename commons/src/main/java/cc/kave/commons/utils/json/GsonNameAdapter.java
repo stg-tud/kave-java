@@ -16,6 +16,7 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.CsUnknownTypeName;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -45,6 +46,7 @@ public class GsonNameAdapter implements JsonDeserializer<Name>, JsonSerializer<N
 			put("CSharp.ParameterName", CsParameterName::newParameterName);
 			put("CSharp.PropertyName", CsPropertyName::newPropertyName);
 			put("CSharp.TypeName", CsTypeName::newTypeName);
+			put("CSharp.UnknownTypeName", CsUnknownTypeName::newTypeName);
 		}
 	};
 

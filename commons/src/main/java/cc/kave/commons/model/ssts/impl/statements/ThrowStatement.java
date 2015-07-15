@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.CsUnknownTypeName;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
@@ -9,8 +9,9 @@ public class ThrowStatement implements IThrowStatement {
 
 	private TypeName exception;
 
+	// TODO: Check refactoring
 	public ThrowStatement() {
-		this.exception = CsTypeName.UNKNOWN_NAME;
+		this.exception = CsUnknownTypeName.UNKNOWN_NAME;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.impl.expressions.loopheader;
+package cc.kave.commons.model.ssts.impl.expressions.loopHeader;
 
 import java.util.ArrayList;
 import java.util.List;
