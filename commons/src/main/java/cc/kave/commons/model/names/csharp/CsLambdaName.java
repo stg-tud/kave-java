@@ -27,7 +27,7 @@ public class CsLambdaName extends CsName implements LambdaName {
 
 	@Override
 	public String getSignature() {
-		throw new UnsupportedOperationException();
+		return identifier;
 	}
 
 	@Override

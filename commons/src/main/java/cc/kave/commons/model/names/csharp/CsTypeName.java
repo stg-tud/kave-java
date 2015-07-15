@@ -1,5 +1,6 @@
 package cc.kave.commons.model.names.csharp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,131 +36,164 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean isGenericEntity() {
-		throw new UnsupportedOperationException();
+		return identifier.contains("[[");
 	}
 
 	@Override
 	public boolean hasTypeParameters() {
-		throw new UnsupportedOperationException();
+		return identifier.contains("`");
 	}
 
 	@Override
 	public List<TypeName> getTypeParameters() {
-		throw new UnsupportedOperationException();
+		int i = identifier.indexOf("->", 0);
+		;
+		List<TypeName> list = new ArrayList<TypeName>();
+		while (i < identifier.indexOf("]]") && i >= 0) {
+			list.add(CsTypeName.newTypeName(identifier.substring(i + 3, identifier.indexOf("]", i + 3))));
+			i = identifier.indexOf("->", ++i);
+		}
+		return list;
 	}
 
 	@Override
 	public BundleName getAssembly() {
-		throw new UnsupportedOperationException();
+		int i;
+		if (isGenericEntity()) {
+			i = identifier.indexOf("]]") + 4;
+		} else {
+			i = identifier.indexOf(",") + 2;
+		}
+
+		return CsAssemblyName.newAssemblyName(identifier.substring(i, identifier.lastIndexOf(",")));
 	}
 
 	@Override
 	public NamespaceName getNamespace() {
-		throw new UnsupportedOperationException();
+		int i;
+		if (isGenericEntity()) {
+			i = identifier.indexOf("`");
+		} else {
+			i = identifier.indexOf(",");
+		}
+		i = identifier.substring(0, i).lastIndexOf(".");
+		return CsNamespaceName.newNamespaceName(identifier.substring(0, i));
 	}
 
 	@Override
 	public TypeName getDeclaringType() {
+		// TODO: missing
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getFullName() {
-		throw new UnsupportedOperationException();
+		int i = identifier.indexOf("]]");
+		if (i < 0) {
+			i = identifier.indexOf(",");
+		} else {
+			i += 2;
+		}
+		return identifier.substring(0, i);
 	}
 
 	@Override
 	public String getName() {
-		throw new UnsupportedOperationException();
+		String name = getFullName();
+		if (isGenericEntity()) {
+			name = name.substring(0, name.indexOf("[[") - 2);
+		}
+		int i = name.lastIndexOf(".") + 1;
+		return name.substring(i, name.length());
 	}
 
 	@Override
 	public boolean isUnknownType() {
-		throw new UnsupportedOperationException();
+		return identifier.equals("?");
 	}
 
 	@Override
 	public boolean isVoidType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isValueType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isSimpleType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isEnumType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isStructType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isNullableType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isReferenceType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isClassType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isInterfaceType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isDelegateType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isNestedType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isArrayType() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public TypeName getArrayBaseType() {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	@Override
 	public TypeName DeriveArrayTypeName(int rank) {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	@Override
 	public boolean isTypeParameter() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public String TypeParameterShortName() {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	@Override
 	public TypeName TypeParameterType() {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 }

@@ -28,21 +28,30 @@ public class CsAssemblyVersion extends CsName implements BundleVersion {
 
 	@Override
 	public int getMajor() {
-		throw new UnsupportedOperationException();
+		return splitVersion()[0];
 	}
 
 	@Override
 	public int getMinor() {
-		throw new UnsupportedOperationException();
+		return splitVersion()[1];
 	}
 
 	@Override
 	public int getBuild() {
-		throw new UnsupportedOperationException();
+		return splitVersion()[2];
 	}
 
 	@Override
 	public int getRevision() {
-		throw new UnsupportedOperationException();
+		return splitVersion()[3];
+	}
+
+	private int[] splitVersion() {
+		int[] versions = new int[4];
+		String[] split = identifier.split("\\.");
+		for (int i = 0; i < split.length; i++) {
+			versions[i] = Integer.valueOf(split[i]);
+		}
+		return versions;
 	}
 }

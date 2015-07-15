@@ -25,31 +25,32 @@ public class CsParameterName extends CsName implements ParameterName {
 
 	@Override
 	public TypeName getValueType() {
-		throw new UnsupportedOperationException();
+		String typeName = identifier.substring(1, identifier.indexOf("]"));
+		return CsTypeName.newTypeName(typeName);
 	}
 
 	@Override
 	public String getName() {
-		throw new UnsupportedOperationException();
+		return identifier.substring(identifier.indexOf("] ") + 2, identifier.length());
 	}
 
 	@Override
 	public boolean isPassedByReference() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isOutput() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isParameterArray() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public boolean isOptional() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 }

@@ -21,7 +21,7 @@ public class CsName implements Name {
 		return nameRegistry.get(identifier);
 	}
 
-	private String identifier;
+	protected String identifier;
 
 	protected CsName(String identifier) {
 		this.identifier = identifier;

@@ -1,5 +1,6 @@
 package cc.kave.commons.model.names.csharp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,26 +28,41 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public String getSignature() {
-		throw new UnsupportedOperationException();
+		return identifier.substring(identifier.indexOf("].") + 2, identifier.length());
 	}
 
 	@Override
 	public List<ParameterName> getParameters() {
-		throw new UnsupportedOperationException();
+		List<ParameterName> list = new ArrayList<ParameterName>();
+
+		int low = identifier.indexOf("([", 0) + 1;
+		while (hasParameters() && low != -1) {
+			int up = Math.min(identifier.indexOf(", [", low), identifier.indexOf(")", low));
+
+			if (up == -1) {
+				up = Math.max(identifier.indexOf(", [", low), identifier.indexOf(")", low));
+			}
+
+			list.add(CsParameterName.newParameterName(identifier.substring(low, up)));
+			low = identifier.indexOf("[", low + 1);
+		}
+		return list;
 	}
 
 	@Override
 	public boolean hasParameters() {
-		throw new UnsupportedOperationException();
+		return !identifier.contains("()");
 	}
 
 	@Override
 	public boolean isConstructor() {
-		throw new UnsupportedOperationException();
+		boolean voidReturn = getReturnType().getIdentifier().substring(0, 4).equals("void");
+		boolean upperCase = getSignature().substring(0, 1).equals(getSignature().substring(0, 1).toUpperCase());
+		return voidReturn && upperCase;
 	}
 
 	@Override
 	public TypeName getReturnType() {
-		throw new UnsupportedOperationException();
+		return CsTypeName.newTypeName(identifier.substring(identifier.indexOf("[") + 1, identifier.indexOf("]")));
 	}
 }

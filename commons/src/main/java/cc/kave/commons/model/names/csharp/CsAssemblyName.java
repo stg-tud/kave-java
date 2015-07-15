@@ -25,11 +25,12 @@ public class CsAssemblyName extends CsName implements BundleName {
 
 	@Override
 	public BundleVersion getVersion() {
-		throw new UnsupportedOperationException();
+		return CsAssemblyVersion.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 1,
+				identifier.length()));
 	}
 
 	@Override
 	public String getName() {
-		throw new UnsupportedOperationException();
+		return identifier.substring(0, identifier.indexOf(","));
 	}
 }
