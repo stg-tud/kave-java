@@ -276,18 +276,12 @@ public abstract class JsonUtils {
 		factories.add(factoryFor(IReferenceExpression.class, ReferenceExpression.class));
 		factories.add(factoryFor(IUnknownExpression.class, UnknownExpression.class));
 
-		// factories.add(factoryFor(IEventReference.class,
-		// EventReference.class));
-		// factories.add(factoryFor(IFieldReference.class,
-		// FieldReference.class));
-		// factories.add(factoryFor(IMethodReference.class,
-		// MethodReference.class));
-		// factories.add(factoryFor(IPropertyReference.class,
-		// PropertyReference.class));
-		// factories.add(factoryFor(IUnknownReference.class,
-		// UnknownReference.class));
-		// factories.add(factoryFor(IVariableReference.class,
-		// VariableReference.class));
+		factories.add(factoryFor(IEventReference.class, EventReference.class));
+		factories.add(factoryFor(IFieldReference.class, FieldReference.class));
+		factories.add(factoryFor(IMethodReference.class, MethodReference.class));
+		factories.add(factoryFor(IPropertyReference.class, PropertyReference.class));
+		factories.add(factoryFor(IUnknownReference.class, UnknownReference.class));
+		factories.add(factoryFor(IVariableReference.class, VariableReference.class));
 
 		factories.add(factoryFor(IAssignment.class, Assignment.class));
 		factories.add(factoryFor(IBreakStatement.class, BreakStatement.class));

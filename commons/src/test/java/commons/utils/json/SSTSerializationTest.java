@@ -15,6 +15,7 @@ import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class SSTSerializationTest {
@@ -45,6 +46,12 @@ public class SSTSerializationTest {
 	public void serializedExampleSST() {
 		String json = JsonUtils.toString(SSTTestfixture.getExample());
 		assertEquals(SSTTestfixture.getExampleJson_Current(), json);
+	}
+
+	@Test
+	public void serialzesCompletionExpression() {
+		CompletionExpression ce = new CompletionExpression();
+		JsonUtils.toString(ce);
 	}
 
 	// @Test
