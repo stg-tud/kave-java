@@ -9,7 +9,6 @@ public class ThrowStatement implements IThrowStatement {
 
 	private TypeName exception;
 
-	// TODO: Check refactoring
 	public ThrowStatement() {
 		this.exception = CsUnknownTypeName.UNKNOWN_NAME;
 	}
