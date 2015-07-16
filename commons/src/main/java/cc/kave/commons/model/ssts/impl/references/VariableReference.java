@@ -5,13 +5,12 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class VariableReference implements IVariableReference {
 
-	// private final String defaultIdentifier = "";
+	private static final String DEFAULT_IDENTIFIER = "";
 
 	private String identifier;
 
 	public VariableReference() {
-		// this.identifier = this.defaultIdentifier;
-		this.identifier = "";
+		this.identifier = DEFAULT_IDENTIFIER;
 	}
 
 	@Override
@@ -25,8 +24,7 @@ public class VariableReference implements IVariableReference {
 
 	@Override
 	public boolean isMissing() {
-		// return identifier.equals(defaultIdentifier);
-		return identifier.equals("");
+		return identifier.equals(DEFAULT_IDENTIFIER);
 	}
 
 	@Override
