@@ -10,15 +10,17 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsTypeName extends CsName implements TypeName {
-	protected static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
+	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
 
-	public static final TypeName UNKNOWN_NAME = newTypeName("?");
+	public static final TypeName UNKNOWN_NAME = newTypeName(CsUnknownTypeName.UNKNOWN_TYPE_IDENTIFIER);
 
 	public static TypeName newTypeName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			CsTypeName newName;
 			if (identifier.startsWith("d:")) {
 				newName = new CsDelegateTypeName(identifier);
+			} else if (identifier.equalsIgnoreCase(CsUnknownTypeName.UNKNOWN_TYPE_IDENTIFIER)) {
+				newName = new CsUnknownTypeName();
 			} else {
 				newName = new CsTypeName(identifier);
 			}

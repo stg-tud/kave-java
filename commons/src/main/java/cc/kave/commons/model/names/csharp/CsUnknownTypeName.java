@@ -1,20 +1,11 @@
 package cc.kave.commons.model.names.csharp;
 
-import cc.kave.commons.model.names.TypeName;
 
 public class CsUnknownTypeName extends CsTypeName {
 
-	protected CsUnknownTypeName(String identifier) {
-		super(identifier);
+	protected static final String UNKNOWN_TYPE_IDENTIFIER = "?";
+
+	protected CsUnknownTypeName() {
+		super(UNKNOWN_TYPE_IDENTIFIER);
 	}
-
-	public static TypeName newTypeName(String identifier) {
-		if (!nameRegistry.containsKey(identifier)) {
-			CsUnknownTypeName newName = new CsUnknownTypeName(identifier);
-
-			nameRegistry.put(identifier, newName);
-		}
-		return nameRegistry.get(identifier);
-	}
-
 }
