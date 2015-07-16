@@ -24,7 +24,7 @@ public class SSTSerializationTest {
 		ISST sst = new SST();
 		String json = JsonUtils.toString(sst);
 		assertEquals(
-				"{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.TypeName:?\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[]}",
+				"{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.UnknownTypeName:?\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[]}",
 				json);
 	}
 
@@ -37,7 +37,7 @@ public class SSTSerializationTest {
 		sst.getDelegates().add(delegate);
 		String json = JsonUtils.toString(sst);
 		assertEquals(
-				"{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.TypeName:?\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[{\"$type\":\"[SST:Declarations.DelegateDeclaration]\",\"Name\":\"CSharp.DelegateTypeName:d:[R,P] [T2,P].()\"}]}",
+				"{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.UnknownTypeName:?\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[{\"$type\":\"[SST:Declarations.DelegateDeclaration]\",\"Name\":\"CSharp.DelegateTypeName:d:[R,P] [T2,P].()\"}]}",
 				json);
 	}
 
