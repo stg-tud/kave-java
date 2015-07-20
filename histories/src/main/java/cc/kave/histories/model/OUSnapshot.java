@@ -54,4 +54,8 @@ public class OUSnapshot {
 	public String getEnclosingMethod() {
 		return enclosingMethod;
 	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
 }

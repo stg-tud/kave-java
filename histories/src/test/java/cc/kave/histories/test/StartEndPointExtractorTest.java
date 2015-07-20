@@ -76,6 +76,25 @@ public class StartEndPointExtractorTest {
     }
 
     @Test
+    public void separatesSnapshotsByDay() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2015, 7, 14, 10, 23, 42);
+        Date t1 = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date t2 = calendar.getTime();
+
+        OUSnapshot s1 = new OUSnapshot("1", t1, "M", null, null, false);
+        OUSnapshot s2 = new OUSnapshot("1", t2, "M", null, null, false);
+
+        StartEndPointExtractor uut = new StartEndPointExtractor();
+        uut.process(s1);
+        uut.process(s2);
+        Set<History> actuals = uut.getDetectedPairs();
+
+        assertThat(actuals, is(empty()));
+    }
+
+    @Test
     public void separatesSnapshotsByEnclosingMethod() throws Exception {
         OUSnapshot s1 = new OUSnapshot("a", null, "M1", null, null, false);
         OUSnapshot s2 = new OUSnapshot("a", null, "M2", null, null, false);
@@ -88,7 +107,7 @@ public class StartEndPointExtractorTest {
         assertThat(actuals, is(empty()));
     }
 
-    private History history(OUSnapshot... snapshots){
+    private History history(OUSnapshot... snapshots) {
         History history = new History();
         history.addAll(Arrays.asList(snapshots));
         return history;
@@ -107,7 +126,10 @@ public class StartEndPointExtractorTest {
         }
 
         private String getHistoryId(OUSnapshot snapshot) {
-            return snapshot.getWorkPeriod() + snapshot.getEnclosingMethod();
+            return String.format("%1$s-%2$tY%2$tm%2$td-%3$s",
+                    snapshot.getWorkPeriod(),
+                    snapshot.getTimestamp(),
+                    snapshot.getEnclosingMethod());
         }
 
         public Set<History> getDetectedPairs() {
