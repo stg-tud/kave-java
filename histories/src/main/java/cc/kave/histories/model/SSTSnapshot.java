@@ -9,21 +9,21 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="ContextHistories")
+@Table(name = "ContextHistories")
 @IdClass(SnapshotKey.class)
 public class SSTSnapshot {
 
 	@Id
-	@Column(name="WorkPeriod")
+	@Column(name = "WorkPeriod")
 	private String workPeriod;
-	
+
 	@Id
-	@Column(name="Timestamp", columnDefinition="DATETIME")
+	@Column(name = "Timestamp", columnDefinition = "DATETIME")
 	private Date timestamp;
-	
-	@Column(name="TargetType")
+
+	@Column(name = "TargetType")
 	private String targetType;
-	
-	@Column(name="Context", columnDefinition="TEXT")
+
+	@Column(name = "Context", columnDefinition = "TEXT")
 	private String context;
 }
