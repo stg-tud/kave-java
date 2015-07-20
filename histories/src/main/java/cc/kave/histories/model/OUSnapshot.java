@@ -50,4 +50,8 @@ public class OUSnapshot {
 	public String getWorkPeriod() {
 		return workPeriod;
 	}
+
+	public String getEnclosingMethod() {
+		return enclosingMethod;
+	}
 }

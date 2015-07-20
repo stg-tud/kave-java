@@ -77,16 +77,29 @@ public class StartEndPointExtractorTest {
         assertThat(actuals, is(empty()));
     }
 
+    @Test
+    public void separatesSnapshotsByEnclosingMethod() throws Exception {
+        OUSnapshot s1 = new OUSnapshot("a", null, "M1", null, null, false);
+        OUSnapshot s2 = new OUSnapshot("a", null, "M2", null, null, false);
+
+        StartEndPointExtractor uut = new StartEndPointExtractor();
+        uut.process(s1);
+        uut.process(s2);
+        Set<StatePair> actuals = uut.getDetectedPairs();
+
+        assertThat(actuals, is(empty()));
+    }
+
     private static class StartEndPointExtractor {
 
         private Map<String, List<OUSnapshot>> histories = new HashMap<>();
 
         public void process(OUSnapshot snapshot) {
-            String workPeriod = snapshot.getWorkPeriod();
-            if (!histories.containsKey(workPeriod)) {
-                histories.put(workPeriod, new ArrayList<>());
+            String id = snapshot.getWorkPeriod() + snapshot.getEnclosingMethod();
+            if (!histories.containsKey(id)) {
+                histories.put(id, new ArrayList<>());
             }
-            histories.get(workPeriod).add(snapshot);
+            histories.get(id).add(snapshot);
         }
 
         public Set<StatePair> getDetectedPairs() {
