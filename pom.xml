@@ -8,6 +8,7 @@
 	<modules>
 		<module>commons</module>
 		<module>namefactory</module>
+		<module>histories</module>
 	</modules>
 	<repositories>
 		<repository>
