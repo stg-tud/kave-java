@@ -22,6 +22,9 @@ public class OUSnapshot {
 	@Column(name="Timestamp", columnDefinition="DATETIME")
 	private Date timestamp;
 	
+	@Column(name="EnclosingMethod")
+	private String enclosingMethod;
+	
 	@Column(name="TargetType")
 	private String targetType;
 	
