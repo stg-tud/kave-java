@@ -4,10 +4,8 @@ import static org.junit.Assert.assertThat;
 
 import static org.hamcrest.Matchers.*;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -19,7 +17,7 @@ public class StartEndPointExtractorTest {
     public void createsNoPairIfNoSnapshots() throws Exception {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -29,7 +27,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
         uut.process(new OUSnapshot());
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -42,9 +40,9 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
-        StatePair expected = new StatePair(s1, s2);
+        History expected = history(s1, s2);
         assertThat(actuals, contains(expected));
     }
 
@@ -58,9 +56,9 @@ public class StartEndPointExtractorTest {
         uut.process(s1);
         uut.process(s2);
         uut.process(s3);
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
-        StatePair expected = new StatePair(s1, s3);
+        History expected = history(s1, s2, s3);
         assertThat(actuals, contains(expected));
     }
 
@@ -72,7 +70,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -85,55 +83,38 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<StatePair> actuals = uut.getDetectedPairs();
+        Set<History> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
 
+    private History history(OUSnapshot... snapshots){
+        History history = new History();
+        history.addAll(Arrays.asList(snapshots));
+        return history;
+    }
+
     private static class StartEndPointExtractor {
 
-        private Map<String, List<OUSnapshot>> histories = new HashMap<>();
+        private Map<String, History> histories = new HashMap<>();
 
         public void process(OUSnapshot snapshot) {
-            String id = snapshot.getWorkPeriod() + snapshot.getEnclosingMethod();
+            String id = getHistoryId(snapshot);
             if (!histories.containsKey(id)) {
-                histories.put(id, new ArrayList<>());
+                histories.put(id, new History());
             }
             histories.get(id).add(snapshot);
         }
 
-        public Set<StatePair> getDetectedPairs() {
+        private String getHistoryId(OUSnapshot snapshot) {
+            return snapshot.getWorkPeriod() + snapshot.getEnclosingMethod();
+        }
+
+        public Set<History> getDetectedPairs() {
             return histories.values().stream()
                     .filter(ss -> ss.size() > 1)
-                    .map(ss -> new StatePair(ss.get(0), ss.get(ss.size() - 1)))
                     .collect(Collectors.toSet());
         }
-
     }
 
-    private static class StatePair {
-
-        public StatePair(OUSnapshot start, OUSnapshot end) {
-            super();
-            this.start = start;
-            this.end = end;
-        }
-
-        private OUSnapshot start;
-        private OUSnapshot end;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            StatePair statePair = (StatePair) o;
-            return Objects.equals(start, statePair.start) &&
-                    Objects.equals(end, statePair.end);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(start, end);
-        }
-    }
 }
