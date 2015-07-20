@@ -1,0 +1,43 @@
+package cc.kave.histories.database;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+import cc.kave.histories.model.OUSnapshot;
+import cc.kave.histories.model.SSTSnapshot;
+
+public class SqliteHistoryDatabase implements Closeable {
+
+	private EntityManagerFactory emf;
+	private EntityManager em;
+
+	public SqliteHistoryDatabase() throws SQLException {
+		emf = Persistence.createEntityManagerFactory("histories");
+		em = emf.createEntityManager();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<SSTSnapshot> getSSTHistories() {
+		Query q = em.createQuery("SELECT s FROM SSTSnapshot s ORDER BY s.timestamp ASC");
+		return (List<SSTSnapshot>) q.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<OUSnapshot> getOUHistories() {
+		Query q = em.createQuery("SELECT s FROM OUSnapshot s ORDER BY s.timestamp ASC");
+		return (List<OUSnapshot>) q.getResultList();
+	}
+
+	@Override
+	public void close() throws IOException {
+		em.close();
+		emf.close();
+	}
+}
