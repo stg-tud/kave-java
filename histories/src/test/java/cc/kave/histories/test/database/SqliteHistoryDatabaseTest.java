@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.histories.database.SqliteHistoryDatabase;
@@ -12,7 +13,7 @@ import cc.kave.histories.model.SSTSnapshot;
 
 public class SqliteHistoryDatabaseTest {
 
-	@Test
+	@Test @Ignore
 	public void loadsHistories() throws SQLException, IOException {
 		try (SqliteHistoryDatabase database = new SqliteHistoryDatabase()){
 			List<SSTSnapshot> histories = database.getSSTHistories();
