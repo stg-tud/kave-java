@@ -46,4 +46,8 @@ public class OUSnapshot {
 
 	@Column(name = "IsQuery", columnDefinition = "BOOLEAN")
 	private boolean isQuery;
+
+	public String getWorkPeriod() {
+		return workPeriod;
+	}
 }

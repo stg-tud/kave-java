@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.*;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -17,7 +19,7 @@ public class StartEndPointExtractorTest {
     public void createsNoPairIfNoSnapshots() throws Exception {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
-        List<StatePair> actuals = uut.getDetectedPairs();
+        Set<StatePair> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -27,7 +29,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
         uut.process(new OUSnapshot());
-        List<StatePair> actuals = uut.getDetectedPairs();
+        Set<StatePair> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -40,7 +42,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        List<StatePair> actuals = uut.getDetectedPairs();
+        Set<StatePair> actuals = uut.getDetectedPairs();
 
         StatePair expected = new StatePair(s1, s2);
         assertThat(actuals, contains(expected));
@@ -56,31 +58,42 @@ public class StartEndPointExtractorTest {
         uut.process(s1);
         uut.process(s2);
         uut.process(s3);
-        List<StatePair> actuals = uut.getDetectedPairs();
+        Set<StatePair> actuals = uut.getDetectedPairs();
 
         StatePair expected = new StatePair(s1, s3);
         assertThat(actuals, contains(expected));
     }
 
+    @Test
+    public void separatesSnapshotsByWorkPeriod() throws Exception {
+        OUSnapshot s1 = new OUSnapshot("1", null, null, null, null, false);
+        OUSnapshot s2 = new OUSnapshot("2", null, null, null, null, false);
+
+        StartEndPointExtractor uut = new StartEndPointExtractor();
+        uut.process(s1);
+        uut.process(s2);
+        Set<StatePair> actuals = uut.getDetectedPairs();
+
+        assertThat(actuals, is(empty()));
+    }
+
     private static class StartEndPointExtractor {
 
-        private OUSnapshot start;
-        private OUSnapshot end;
+        private Map<String, List<OUSnapshot>> histories = new HashMap<>();
 
         public void process(OUSnapshot snapshot) {
-            if (start == null) {
-                start = snapshot;
-            } else {
-                end = snapshot;
+            String workPeriod = snapshot.getWorkPeriod();
+            if (!histories.containsKey(workPeriod)) {
+                histories.put(workPeriod, new ArrayList<>());
             }
+            histories.get(workPeriod).add(snapshot);
         }
 
-        public List<StatePair> getDetectedPairs() {
-            ArrayList<StatePair> pairs = new ArrayList<>();
-            if (start != null && end != null){
-                pairs.add(new StatePair(start, end));
-            }
-            return pairs;
+        public Set<StatePair> getDetectedPairs() {
+            return histories.values().stream()
+                    .filter(ss -> ss.size() > 1)
+                    .map(ss -> new StatePair(ss.get(0), ss.get(ss.size() - 1)))
+                    .collect(Collectors.toSet());
         }
 
     }
@@ -95,22 +108,6 @@ public class StartEndPointExtractorTest {
 
         private OUSnapshot start;
         private OUSnapshot end;
-
-        public OUSnapshot getStart() {
-            return start;
-        }
-
-        public OUSnapshot getEnd() {
-            return end;
-        }
-
-        public void setStart(OUSnapshot start) {
-            this.start = start;
-        }
-
-        public void setEnd(OUSnapshot end) {
-            this.end = end;
-        }
 
         @Override
         public boolean equals(Object o) {
