@@ -13,6 +13,20 @@ import javax.persistence.Table;
 @IdClass(SnapshotKey.class)
 public class OUSnapshot {
 
+	public OUSnapshot() {
+	}
+
+	public OUSnapshot(String workPeriod, Date timestamp,
+			String enclosingMethod, String targetType, String objectUsage,
+			boolean isQuery) {
+		this.workPeriod = workPeriod;
+		this.timestamp = timestamp;
+		this.enclosingMethod = enclosingMethod;
+		this.targetType = targetType;
+		this.objectUsage = objectUsage;
+		this.isQuery = isQuery;
+	}
+
 	@Id
 	@Column(name = "WorkPeriod")
 	private String workPeriod;
