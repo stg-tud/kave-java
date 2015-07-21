@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import cc.kave.histories.model.OUHistory;
 import org.junit.Test;
 
 import cc.kave.histories.model.OUSnapshot;
@@ -17,7 +18,7 @@ public class StartEndPointExtractorTest {
     public void createsNoPairIfNoSnapshots() throws Exception {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -27,7 +28,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
 
         uut.process(new OUSnapshot());
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -40,9 +41,9 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
-        History expected = history(s1, s2);
+        OUHistory expected = history(s1, s2);
         assertThat(actuals, contains(expected));
     }
 
@@ -56,9 +57,9 @@ public class StartEndPointExtractorTest {
         uut.process(s1);
         uut.process(s2);
         uut.process(s3);
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
-        History expected = history(s1, s2, s3);
+        OUHistory expected = history(s1, s2, s3);
         assertThat(actuals, contains(expected));
     }
 
@@ -70,7 +71,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -89,7 +90,7 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
@@ -102,25 +103,25 @@ public class StartEndPointExtractorTest {
         StartEndPointExtractor uut = new StartEndPointExtractor();
         uut.process(s1);
         uut.process(s2);
-        Set<History> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedPairs();
 
         assertThat(actuals, is(empty()));
     }
 
-    private History history(OUSnapshot... snapshots) {
-        History history = new History();
+    private OUHistory history(OUSnapshot... snapshots) {
+        OUHistory history = new OUHistory();
         history.addAll(Arrays.asList(snapshots));
         return history;
     }
 
     private static class StartEndPointExtractor {
 
-        private Map<String, History> histories = new HashMap<>();
+        private Map<String, OUHistory> histories = new HashMap<>();
 
         public void process(OUSnapshot snapshot) {
             String id = getHistoryId(snapshot);
             if (!histories.containsKey(id)) {
-                histories.put(id, new History());
+                histories.put(id, new OUHistory());
             }
             histories.get(id).add(snapshot);
         }
@@ -132,7 +133,7 @@ public class StartEndPointExtractorTest {
                     snapshot.getEnclosingMethod());
         }
 
-        public Set<History> getDetectedPairs() {
+        public Set<OUHistory> getDetectedPairs() {
             return histories.values().stream()
                     .filter(ss -> ss.size() > 1)
                     .collect(Collectors.toSet());
