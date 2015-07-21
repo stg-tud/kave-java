@@ -25,13 +25,13 @@ public class SqliteHistoryDatabase implements Closeable {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SSTSnapshot> getSSTHistories() {
+    public List<SSTSnapshot> getSSTSnapshots() {
         Query q = em.createQuery("SELECT s FROM SSTSnapshot s ORDER BY s.timestamp ASC");
         return (List<SSTSnapshot>) q.getResultList();
     }
 
     @SuppressWarnings("unchecked")
-    public List<OUSnapshot> getOUHistories() {
+    public List<OUSnapshot> getOUSnapshots() {
         Query q = em.createQuery("SELECT s FROM OUSnapshot s ORDER BY s.timestamp ASC");
         return (List<OUSnapshot>) q.getResultList();
     }
@@ -51,5 +51,11 @@ public class SqliteHistoryDatabase implements Closeable {
     public void close() throws IOException {
         em.close();
         emf.close();
+    }
+
+    public void insertHistories(List<OUHistory> histories) {
+        em.getTransaction().begin();
+        histories.stream().forEach(history -> em.persist(history));
+        em.getTransaction().commit();
     }
 }
