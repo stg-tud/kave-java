@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.histories.model.OUHistory;
 import org.junit.After;
@@ -49,7 +50,7 @@ public class SqliteHistoryDatabaseTest {
 
         database.insertHistory(history);
 
-        List<OUHistory> histories = database.getHistories();
+        Set<OUHistory> histories = database.getHistories();
         assertThat(histories, contains(history));
     }
 
@@ -64,7 +65,7 @@ public class SqliteHistoryDatabaseTest {
 
         database.insertHistories(Arrays.asList(history1, history2));
 
-        List<OUHistory> histories = database.getHistories();
+        Set<OUHistory> histories = database.getHistories();
         assertThat(histories, containsInAnyOrder(history1, history2));
 
     }

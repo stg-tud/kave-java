@@ -3,7 +3,10 @@ package cc.kave.histories.database;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -37,25 +40,25 @@ public class SqliteHistoryDatabase implements Closeable {
     }
 
     public void insertHistory(OUHistory history) {
-		em.getTransaction().begin();
+        em.getTransaction().begin();
         em.persist(history);
         em.getTransaction().commit();
     }
 
-    public List<OUHistory> getHistories() {
+    public void insertHistories(Iterable<OUHistory> histories) {
+        em.getTransaction().begin();
+        StreamSupport.stream(histories.spliterator(), false).forEach(history -> em.persist(history));
+        em.getTransaction().commit();
+    }
+
+    public Set<OUHistory> getHistories() {
         Query q = em.createQuery("SELECT h FROM OUHistory h");
-        return (List<OUHistory>) q.getResultList();
+        return new HashSet<>((List<OUHistory>) q.getResultList());
     }
 
     @Override
     public void close() throws IOException {
         em.close();
         emf.close();
-    }
-
-    public void insertHistories(List<OUHistory> histories) {
-        em.getTransaction().begin();
-        histories.stream().forEach(history -> em.persist(history));
-        em.getTransaction().commit();
     }
 }
