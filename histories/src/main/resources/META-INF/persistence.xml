@@ -6,6 +6,7 @@
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>cc.kave.histories.model.SSTSnapshot</class>
 		<class>cc.kave.histories.model.OUSnapshot</class>
+		<class>cc.kave.histories.model.OUHistory</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:sqlite:/Users/svenamann/Downloads/DATEV-193.sqlite" />
