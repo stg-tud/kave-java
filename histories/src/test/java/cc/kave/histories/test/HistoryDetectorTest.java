@@ -5,8 +5,8 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+import cc.kave.histories.HistoryDetector;
 import cc.kave.histories.model.OUHistory;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class HistoryDetectorTest {
     public void createsNoPairIfNoSnapshots() throws Exception {
         HistoryDetector uut = new HistoryDetector();
 
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         assertThat(actuals, is(empty()));
     }
@@ -28,7 +28,7 @@ public class HistoryDetectorTest {
         HistoryDetector uut = new HistoryDetector();
 
         uut.process(new OUSnapshot());
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         assertThat(actuals, is(empty()));
     }
@@ -41,7 +41,7 @@ public class HistoryDetectorTest {
         HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         OUHistory expected = history(s1, s2);
         assertThat(actuals, contains(expected));
@@ -57,7 +57,7 @@ public class HistoryDetectorTest {
         uut.process(s1);
         uut.process(s2);
         uut.process(s3);
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         OUHistory expected = history(s1, s2, s3);
         assertThat(actuals, contains(expected));
@@ -71,7 +71,7 @@ public class HistoryDetectorTest {
         HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         assertThat(actuals, is(empty()));
     }
@@ -90,7 +90,7 @@ public class HistoryDetectorTest {
         HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         assertThat(actuals, is(empty()));
     }
@@ -103,7 +103,7 @@ public class HistoryDetectorTest {
         HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedPairs();
+        Set<OUHistory> actuals = uut.getDetectedHistories();
 
         assertThat(actuals, is(empty()));
     }
@@ -112,32 +112,6 @@ public class HistoryDetectorTest {
         OUHistory history = new OUHistory();
         history.addAll(Arrays.asList(snapshots));
         return history;
-    }
-
-    private static class HistoryDetector {
-
-        private Map<String, OUHistory> histories = new HashMap<>();
-
-        public void process(OUSnapshot snapshot) {
-            String id = getHistoryId(snapshot);
-            if (!histories.containsKey(id)) {
-                histories.put(id, new OUHistory());
-            }
-            histories.get(id).add(snapshot);
-        }
-
-        private String getHistoryId(OUSnapshot snapshot) {
-            return String.format("%1$s-%2$tY%2$tm%2$td-%3$s",
-                    snapshot.getWorkPeriod(),
-                    snapshot.getTimestamp(),
-                    snapshot.getEnclosingMethod());
-        }
-
-        public Set<OUHistory> getDetectedPairs() {
-            return histories.values().stream()
-                    .filter(ss -> ss.size() > 1)
-                    .collect(Collectors.toSet());
-        }
     }
 
 }
