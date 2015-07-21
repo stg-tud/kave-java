@@ -10,7 +10,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "OUHistories")
-@IdClass(SnapshotKey.class)
 public class OUSnapshot {
 
 	public OUSnapshot() {
@@ -28,10 +27,12 @@ public class OUSnapshot {
 	}
 
 	@Id
+	@Column(name = "Id")
+	private int id;
+
 	@Column(name = "WorkPeriod")
 	private String workPeriod;
 
-	@Id
 	@Column(name = "Timestamp", columnDefinition = "DATETIME")
 	private Date timestamp;
 

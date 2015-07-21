@@ -10,14 +10,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "ContextHistories")
-@IdClass(SnapshotKey.class)
 public class SSTSnapshot {
 
 	@Id
+	@Column(name = "Id")
+	private int id;
+
 	@Column(name = "WorkPeriod")
 	private String workPeriod;
 
-	@Id
 	@Column(name = "Timestamp", columnDefinition = "DATETIME")
 	private Date timestamp;
 
