@@ -12,11 +12,11 @@ import org.junit.Test;
 
 import cc.kave.histories.model.OUSnapshot;
 
-public class StartEndPointExtractorTest {
+public class HistoryDetectorTest {
 
     @Test
     public void createsNoPairIfNoSnapshots() throws Exception {
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
 
         Set<OUHistory> actuals = uut.getDetectedPairs();
 
@@ -25,7 +25,7 @@ public class StartEndPointExtractorTest {
 
     @Test
     public void createsNoPairFromOneSnapshot() throws Exception {
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
 
         uut.process(new OUSnapshot());
         Set<OUHistory> actuals = uut.getDetectedPairs();
@@ -38,7 +38,7 @@ public class StartEndPointExtractorTest {
         OUSnapshot s1 = new OUSnapshot();
         OUSnapshot s2 = new OUSnapshot();
 
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
         Set<OUHistory> actuals = uut.getDetectedPairs();
@@ -53,7 +53,7 @@ public class StartEndPointExtractorTest {
         OUSnapshot s2 = new OUSnapshot();
         OUSnapshot s3 = new OUSnapshot();
 
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
         uut.process(s3);
@@ -68,7 +68,7 @@ public class StartEndPointExtractorTest {
         OUSnapshot s1 = new OUSnapshot("1", null, null, null, null, false);
         OUSnapshot s2 = new OUSnapshot("2", null, null, null, null, false);
 
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
         Set<OUHistory> actuals = uut.getDetectedPairs();
@@ -87,7 +87,7 @@ public class StartEndPointExtractorTest {
         OUSnapshot s1 = new OUSnapshot("1", t1, "M", null, null, false);
         OUSnapshot s2 = new OUSnapshot("1", t2, "M", null, null, false);
 
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
         Set<OUHistory> actuals = uut.getDetectedPairs();
@@ -100,7 +100,7 @@ public class StartEndPointExtractorTest {
         OUSnapshot s1 = new OUSnapshot("a", null, "M1", null, null, false);
         OUSnapshot s2 = new OUSnapshot("a", null, "M2", null, null, false);
 
-        StartEndPointExtractor uut = new StartEndPointExtractor();
+        HistoryDetector uut = new HistoryDetector();
         uut.process(s1);
         uut.process(s2);
         Set<OUHistory> actuals = uut.getDetectedPairs();
@@ -114,7 +114,7 @@ public class StartEndPointExtractorTest {
         return history;
     }
 
-    private static class StartEndPointExtractor {
+    private static class HistoryDetector {
 
         private Map<String, OUHistory> histories = new HashMap<>();
 
