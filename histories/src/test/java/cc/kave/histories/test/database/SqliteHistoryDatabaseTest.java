@@ -13,9 +13,9 @@ import cc.kave.histories.model.SSTSnapshot;
 
 public class SqliteHistoryDatabaseTest {
 
-	@Test @Ignore
+	@Test
 	public void loadsHistories() throws SQLException, IOException {
-		try (SqliteHistoryDatabase database = new SqliteHistoryDatabase()){
+		try (SqliteHistoryDatabase database = new SqliteHistoryDatabase("test-histories")){
 			List<SSTSnapshot> histories = database.getSSTHistories();
 			System.out.println(histories.size());
 			List<OUSnapshot> histories2 = database.getOUHistories();

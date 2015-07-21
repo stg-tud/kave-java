@@ -19,8 +19,8 @@ public class SqliteHistoryDatabase implements Closeable {
     private EntityManagerFactory emf;
     private EntityManager em;
 
-    public SqliteHistoryDatabase() throws SQLException {
-        emf = Persistence.createEntityManagerFactory("histories");
+    public SqliteHistoryDatabase(String persistenceUnitName) throws SQLException {
+        emf = Persistence.createEntityManagerFactory(persistenceUnitName);
         em = emf.createEntityManager();
     }
 
