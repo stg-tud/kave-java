@@ -5,7 +5,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class VariableReference implements IVariableReference {
 
-	private final String defaultIdentifier = "";
+	private transient final String defaultIdentifier = "";
 
 	private String identifier;
 

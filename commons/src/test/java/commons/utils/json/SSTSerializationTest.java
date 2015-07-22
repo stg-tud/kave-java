@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
@@ -64,22 +67,18 @@ import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.utils.json.JsonUtils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 public class SSTSerializationTest {
 
 	@Test
 	public void serializeSSTToJson() {
-		ISST a = getExample();
-		String SSTtoJson = JsonUtils.parseObject(a, ISST.class).toString();
+		String SSTtoJson = JsonUtils.parseObject(getExample(), ISST.class).toString();
 		assertThat(SSTtoJson, equalTo(getExampleJson_Current()));
 	}
 
 	@Test
 	public void deserializeJsonToSST() {
 		ISST a = getExample();
-		ISST b = JsonUtils.parseJson(getExampleJson_Current(), SST.class);
+		ISST b = JsonUtils.parseJson(getExampleJson_Current(), ISST.class);
 		assertThat(a, equalTo(b));
 	}
 
@@ -123,11 +122,11 @@ public class SSTSerializationTest {
 				new SwitchBlock(), complex ? createComplexTryBlock() : new TryBlock(), new UncheckedBlock(),
 				new UnsafeBlock(), new UsingBlock(), new WhileLoop(), new Assignment(), new BreakStatement(),
 				new ContinueStatement(), new ExpressionStatement(), new GotoStatement(), new LabelledStatement(),
-				new ReturnStatement(), new ThrowStatement(), new UnknownStatement(),
-				nested(new CompletionExpression()), nested(new ComposedExpression()), nested(new IfElseExpression()),
-				nested(new InvocationExpression()), nested(new LambdaExpression()),
-				nested(new LoopHeaderBlockExpression()), nested(new ConstantValueExpression()),
-				nested(new NullExpression()), nested(new ReferenceExpression()), nested(new UnknownExpression()),
+				new ReturnStatement(), new ThrowStatement(), new UnknownStatement(), nested(new CompletionExpression()),
+				nested(new ComposedExpression()), nested(new IfElseExpression()), nested(new InvocationExpression()),
+				nested(new LambdaExpression()), nested(new LoopHeaderBlockExpression()),
+				nested(new ConstantValueExpression()), nested(new NullExpression()), nested(new ReferenceExpression()),
+				nested(new UnknownExpression()),
 				//
 				nested(new EventReference()), nested(new FieldReference()), nested(new MethodReference()),
 				nested(new PropertyReference()), nested(new UnknownReference()), nested(new VariableReference()));

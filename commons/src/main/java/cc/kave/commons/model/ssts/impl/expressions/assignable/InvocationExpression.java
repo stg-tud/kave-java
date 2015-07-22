@@ -52,10 +52,12 @@ public class InvocationExpression implements IInvocationExpression {
 
 	@Override
 	public int hashCode() {
-		int hashCode = 11 + this.reference.hashCode();
-		hashCode = (hashCode * 397) ^ this.methodName.hashCode();
-		hashCode = (hashCode * 397) ^ this.parameters.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
+		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class InvocationExpression implements IInvocationExpression {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof InvocationExpression))
+		if (getClass() != obj.getClass())
 			return false;
 		InvocationExpression other = (InvocationExpression) obj;
 		if (methodName == null) {

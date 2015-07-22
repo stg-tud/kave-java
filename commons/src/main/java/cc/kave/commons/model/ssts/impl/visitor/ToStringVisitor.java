@@ -44,7 +44,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class ToStringVisitor extends AbstractNodeVisitor<StringBuilder> {
+public class ToStringVisitor extends AbstractNodeVisitor<StringBuilder, Void> {
 
 	@Override
 	public Void visit(ISST sst, StringBuilder sb) {

@@ -60,7 +60,7 @@ public class VisitorAssertion {
 	}
 
 	public void verify(Object obj) {
-		AbstractNodeVisitor<Integer> visitor = mock(AbstractNodeVisitor.class);
+		AbstractNodeVisitor<Integer, Void> visitor = mock(AbstractNodeVisitor.class);
 		_node.accept(visitor, _context);
 		if (obj instanceof ISST)
 			Mockito.verify(visitor).visit((ISST) obj, _context);

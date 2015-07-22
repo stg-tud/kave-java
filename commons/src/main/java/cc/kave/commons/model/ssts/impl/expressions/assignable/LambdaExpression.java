@@ -10,9 +10,8 @@ import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class LambdaExpression implements ILambdaExpression {
-
-	private List<IStatement> body;
 	private LambdaName name;
+	private List<IStatement> body;
 
 	public LambdaExpression() {
 		this.body = new ArrayList<>();

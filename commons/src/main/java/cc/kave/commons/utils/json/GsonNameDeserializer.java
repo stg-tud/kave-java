@@ -20,8 +20,11 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-public class GsonNameDeserializer implements JsonDeserializer<Name> {
+public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSerializer<Name> {
 
 	@Override
 	public Name deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -60,6 +63,18 @@ public class GsonNameDeserializer implements JsonDeserializer<Name> {
 			}
 			throw new JsonParseException("Not a valid serialized name: '" + json + "'");
 		}
+	}
+
+	@Override
+	public JsonElement serialize(Name src, Type typeOfSrc, JsonSerializationContext context) {
+		String superType;
+		if (src.getClass().getGenericInterfaces().length != 0) {
+			superType = src.getClass().getGenericInterfaces()[0].getTypeName();
+			superType = superType.substring(superType.lastIndexOf('.'));
+		} else
+			superType = "." + src.getClass().getSimpleName().substring(2);
+
+		return new JsonPrimitive("CSharp" + superType + ":" + src.getIdentifier());
 	}
 
 }

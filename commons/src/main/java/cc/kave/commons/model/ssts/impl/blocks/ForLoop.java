@@ -12,9 +12,9 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class ForLoop implements IForLoop {
 
 	private List<IStatement> init;
+	private ILoopHeaderExpression condition;
 	private List<IStatement> step;
 	private List<IStatement> body;
-	private ILoopHeaderExpression condition;
 
 	public ForLoop() {
 		this.init = new ArrayList<>();

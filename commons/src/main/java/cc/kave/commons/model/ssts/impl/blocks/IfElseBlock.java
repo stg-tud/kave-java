@@ -9,11 +9,14 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
+import com.google.gson.annotations.SerializedName;
+
 public class IfElseBlock implements IIfElseBlock {
 
-	private List<IStatement> then;
-	private List<IStatement> _else;
 	private ISimpleExpression condition;
+	private List<IStatement> then;
+	@SerializedName("Else")
+	private List<IStatement> _else;
 
 	public IfElseBlock() {
 		this.condition = new UnknownExpression();

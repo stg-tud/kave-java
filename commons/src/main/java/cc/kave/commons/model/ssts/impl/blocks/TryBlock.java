@@ -8,10 +8,13 @@ import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
+import com.google.gson.annotations.SerializedName;
+
 public class TryBlock implements ITryBlock {
 
 	private List<IStatement> body;
 	private List<ICatchBlock> catchBlocks;
+	@SerializedName("Finally")
 	private List<IStatement> _finally;
 
 	public TryBlock() {
