@@ -10,7 +10,7 @@
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:sqlite:/Users/svenamann/Downloads/DATEV-193.sqlite" />
-			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.ddl-generation" value="create-tables" />
 			<property name="eclipselink.ddl-generation.output-mode"
 				value="database" />
 		</properties>

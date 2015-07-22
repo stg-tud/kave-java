@@ -11,7 +11,7 @@ public class OUHistoryTest {
     @Test
     public void returnsEnclosingMethod() throws Exception {
         OUHistory history = new OUHistory();
-        history.add(new OUSnapshot(null, null, "EM", null, null, false));
+        history.addSnapshot(new OUSnapshot(null, null, "EM", null, null, false));
 
         assertThat(history.getEnclosingMethod(), is("EM"));
     }
@@ -20,7 +20,7 @@ public class OUHistoryTest {
     public void returnsFirstSnapshot() throws Exception {
         OUSnapshot first = new OUSnapshot();
         OUHistory history = new OUHistory();
-        history.add(first);
+        history.addSnapshot(first);
 
         assertThat(history.getStart(), is(first));
     }
@@ -29,7 +29,7 @@ public class OUHistoryTest {
     public void returnsLastSnapshot() throws Exception {
         OUSnapshot last = new OUSnapshot();
         OUHistory history = new OUHistory();
-        history.add(last);
+        history.addSnapshot(last);
 
         assertThat(history.getEnd(), is(last));
     }

@@ -15,6 +15,10 @@ import cc.kave.histories.database.SqliteHistoryDatabase;
 import cc.kave.histories.model.OUSnapshot;
 import cc.kave.histories.model.SSTSnapshot;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
@@ -22,15 +26,46 @@ import static org.junit.Assert.assertThat;
 public class SqliteHistoryDatabaseTest {
 
     private SqliteHistoryDatabase database;
+    private OUHistory history1;
+    private OUHistory history2;
+
+    private EntityManager em;
+    private EntityManagerFactory emf;
+    private OUSnapshot snapshot1;
+    private OUSnapshot snapshot2;
+    private OUSnapshot snapshot3;
 
     @Before
     public void setUp() throws Exception {
+        emf = Persistence.createEntityManagerFactory("test-histories");
+        em = emf.createEntityManager();
+
+        snapshot1 = new OUSnapshot();
+        snapshot2 = new OUSnapshot();
+        snapshot3 = new OUSnapshot();
+
+        em.getTransaction().begin();
+        em.persist(snapshot1);
+        em.persist(snapshot2);
+        em.persist(snapshot3);
+        em.getTransaction().commit();
+
+        history1 = new OUHistory();
+        history1.addSnapshot(snapshot1);
+
+        history2 = new OUHistory();
+        history2.addSnapshot(snapshot2);
+        history2.addSnapshot(snapshot3);
+
         database = new SqliteHistoryDatabase("test-histories");
     }
 
     @After
     public void tearDown() throws Exception {
         database.close();
+        em.clear();
+        em.close();
+        emf.close();
     }
 
     @Test
@@ -43,30 +78,17 @@ public class SqliteHistoryDatabaseTest {
 
     @Test
     public void persistsHistory() throws Exception {
-        OUHistory history = new OUHistory();
-        history.add(new OUSnapshot());
-        history.add(new OUSnapshot());
-        history.add(new OUSnapshot());
-
-        database.insertHistory(history);
+        database.insertHistory(history1);
 
         Set<OUHistory> histories = database.getHistories();
-        assertThat(histories, contains(history));
+        assertThat(histories, contains(history1));
     }
 
     @Test
     public void persistsHistories() throws Exception {
-        OUHistory history1 = new OUHistory();
-        history1.add(new OUSnapshot());
-        history1.add(new OUSnapshot());
-
-        OUHistory history2 = new OUHistory();
-        history2.add(new OUSnapshot());
-
         database.insertHistories(Arrays.asList(history1, history2));
 
         Set<OUHistory> histories = database.getHistories();
         assertThat(histories, containsInAnyOrder(history1, history2));
-
     }
 }

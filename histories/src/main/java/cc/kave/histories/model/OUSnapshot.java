@@ -2,11 +2,7 @@ package cc.kave.histories.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "OUHistories")
@@ -27,6 +23,7 @@ public class OUSnapshot {
 	}
 
 	@Id
+	@GeneratedValue
 	@Column(name = "Id")
 	private int id;
 

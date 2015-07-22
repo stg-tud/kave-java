@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import cc.kave.histories.HistoryDetector;
 import cc.kave.histories.model.OUHistory;
@@ -110,7 +111,7 @@ public class HistoryDetectorTest {
 
     private OUHistory history(OUSnapshot... snapshots) {
         OUHistory history = new OUHistory();
-        history.addAll(Arrays.asList(snapshots));
+        Stream.of(snapshots).forEach(snapshot -> history.addSnapshot(snapshot));
         return history;
     }
 

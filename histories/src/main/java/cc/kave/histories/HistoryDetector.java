@@ -17,7 +17,7 @@ public class HistoryDetector {
         if (!histories.containsKey(id)) {
             histories.put(id, new OUHistory());
         }
-        histories.get(id).add(snapshot);
+        histories.get(id).addSnapshot(snapshot);
     }
 
     private String getHistoryId(OUSnapshot snapshot) {
