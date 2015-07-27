@@ -16,7 +16,7 @@ import cc.kave.histories.model.OUSnapshot;
 public class HistoryDetectorTest {
 
     @Test
-    public void createsNoPairIfNoSnapshots() throws Exception {
+    public void createsNoHistoryIfNoSnapshots() throws Exception {
         HistoryDetector uut = new HistoryDetector();
 
         Set<OUHistory> actuals = uut.getDetectedHistories();
@@ -25,7 +25,7 @@ public class HistoryDetectorTest {
     }
 
     @Test
-    public void createsNoPairFromOneSnapshot() throws Exception {
+    public void createsNoHistoryFromOneSnapshot() throws Exception {
         HistoryDetector uut = new HistoryDetector();
 
         uut.process(new OUSnapshot());
@@ -35,7 +35,7 @@ public class HistoryDetectorTest {
     }
 
     @Test
-    public void createsAPairFromTwoSnapshots() {
+    public void createsHistoryFromTwoSnapshots() {
         OUSnapshot s1 = new OUSnapshot();
         OUSnapshot s2 = new OUSnapshot();
 
@@ -49,7 +49,7 @@ public class HistoryDetectorTest {
     }
 
     @Test
-    public void createPairFromFirstAndLastSnapshot() throws Exception {
+    public void createsHistoryFromAllRelatedSnapshots() throws Exception {
         OUSnapshot s1 = new OUSnapshot();
         OUSnapshot s2 = new OUSnapshot();
         OUSnapshot s3 = new OUSnapshot();
@@ -69,12 +69,7 @@ public class HistoryDetectorTest {
         OUSnapshot s1 = new OUSnapshot("1", null, null, null, null, false);
         OUSnapshot s2 = new OUSnapshot("2", null, null, null, null, false);
 
-        HistoryDetector uut = new HistoryDetector();
-        uut.process(s1);
-        uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedHistories();
-
-        assertThat(actuals, is(empty()));
+        assertAssignmentToSeparateHistories(s1, s2);
     }
 
     @Test
@@ -88,12 +83,7 @@ public class HistoryDetectorTest {
         OUSnapshot s1 = new OUSnapshot("1", t1, "M", null, null, false);
         OUSnapshot s2 = new OUSnapshot("1", t2, "M", null, null, false);
 
-        HistoryDetector uut = new HistoryDetector();
-        uut.process(s1);
-        uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedHistories();
-
-        assertThat(actuals, is(empty()));
+        assertAssignmentToSeparateHistories(s1, s2);
     }
 
     @Test
@@ -101,12 +91,7 @@ public class HistoryDetectorTest {
         OUSnapshot s1 = new OUSnapshot("a", null, "M1", null, null, false);
         OUSnapshot s2 = new OUSnapshot("a", null, "M2", null, null, false);
 
-        HistoryDetector uut = new HistoryDetector();
-        uut.process(s1);
-        uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedHistories();
-
-        assertThat(actuals, is(empty()));
+        assertAssignmentToSeparateHistories(s1, s2);
     }
 
     @Test
@@ -114,18 +99,22 @@ public class HistoryDetectorTest {
         OUSnapshot s1 = new OUSnapshot("a", null, "M", "T1", null, false);
         OUSnapshot s2 = new OUSnapshot("a", null, "M", "T2", null, false);
 
-        HistoryDetector uut = new HistoryDetector();
-        uut.process(s1);
-        uut.process(s2);
-        Set<OUHistory> actuals = uut.getDetectedHistories();
-
-        assertThat(actuals, is(empty()));
+        assertAssignmentToSeparateHistories(s1, s2);
     }
 
     private OUHistory history(OUSnapshot... snapshots) {
         OUHistory history = new OUHistory();
         Stream.of(snapshots).forEach(snapshot -> history.addSnapshot(snapshot));
         return history;
+    }
+
+    private void assertAssignmentToSeparateHistories(OUSnapshot s1, OUSnapshot s2) {
+        HistoryDetector uut = new HistoryDetector();
+        uut.process(s1);
+        uut.process(s2);
+        Set<OUHistory> actuals = uut.getDetectedHistories();
+
+        assertThat(actuals, is(empty()));
     }
 
 }
