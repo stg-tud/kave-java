@@ -21,10 +21,11 @@ public class HistoryDetector {
     }
 
     private String getHistoryId(OUSnapshot snapshot) {
-        return String.format("%1$s-%2$tY%2$tm%2$td-%3$s",
+        return String.format("%1$s-%2$tY%2$tm%2$td-%3$s-%4$s",
                 snapshot.getWorkPeriod(),
                 snapshot.getTimestamp(),
-                snapshot.getEnclosingMethod());
+                snapshot.getEnclosingMethod(),
+                snapshot.getTargetType());
     }
 
     public Set<OUHistory> getDetectedHistories() {

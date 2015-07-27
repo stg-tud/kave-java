@@ -109,6 +109,19 @@ public class HistoryDetectorTest {
         assertThat(actuals, is(empty()));
     }
 
+    @Test
+    public void separatesSnapshotsByTargetType() throws Exception {
+        OUSnapshot s1 = new OUSnapshot("a", null, "M", "T1", null, false);
+        OUSnapshot s2 = new OUSnapshot("a", null, "M", "T2", null, false);
+
+        HistoryDetector uut = new HistoryDetector();
+        uut.process(s1);
+        uut.process(s2);
+        Set<OUHistory> actuals = uut.getDetectedHistories();
+
+        assertThat(actuals, is(empty()));
+    }
+
     private OUHistory history(OUSnapshot... snapshots) {
         OUHistory history = new OUHistory();
         Stream.of(snapshots).forEach(snapshot -> history.addSnapshot(snapshot));

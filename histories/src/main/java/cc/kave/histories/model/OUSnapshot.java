@@ -56,4 +56,8 @@ public class OUSnapshot {
 	public Date getTimestamp() {
 		return timestamp;
 	}
+
+	public String getTargetType() {
+		return targetType;
+	}
 }
