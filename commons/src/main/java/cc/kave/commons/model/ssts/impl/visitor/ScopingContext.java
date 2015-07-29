@@ -1,40 +1,38 @@
 package cc.kave.commons.model.ssts.impl.visitor;
 
-import cc.kave.commons.model.ssts.IStatement;
-
 public class ScopingContext {
-	private IStatement statement;
-	private boolean inBlock;
-	private boolean afterStatement;
+	private boolean allFields;
+	private boolean returnRef;
+	private boolean withBlocks;
 
-	public ScopingContext(IStatement statement, boolean inBlock) {
-		this.statement = statement;
-		this.inBlock = inBlock;
-		this.afterStatement = false;
+	public ScopingContext() {
+		this.allFields = false;
+		this.returnRef = false;
+		this.withBlocks = false;
 	}
 
-	public IStatement getStatement() {
-		return statement;
+	public void setAllFields(boolean b) {
+		this.allFields = b;
 	}
 
-	public void setStatement(IStatement statement) {
-		this.statement = statement;
+	public boolean isAllFields() {
+		return allFields;
 	}
 
-	public boolean isInBlock() {
-		return inBlock;
+	public boolean isReturnRef() {
+		return returnRef;
 	}
 
-	public void setInBlock(boolean inBlock) {
-		this.inBlock = inBlock;
+	public void setReturnRef(boolean returnRef) {
+		this.returnRef = returnRef;
 	}
 
-	public boolean isAfterStatement() {
-		return afterStatement;
+	public boolean isWithBlocks() {
+		return withBlocks;
 	}
 
-	public void setAfterStatement(boolean afterStatement) {
-		this.afterStatement = afterStatement;
+	public void setWithBlocks(boolean withBlocks) {
+		this.withBlocks = withBlocks;
 	}
 
 }

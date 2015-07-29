@@ -79,15 +79,6 @@ public class NameScopeVisitor extends AbstractNodeVisitor<ScopingContext, Set<IV
 	@Override
 	public Set<IVariableReference> visit(IMethodDeclaration stmt, ScopingContext context) {
 		Set<IVariableReference> names = new HashSet<>();
-		if (context.getStatement() == null)
-			context.setAfterStatement(true);
-		else
-			context.setAfterStatement(false);
-		for (IStatement statement : stmt.getBody()) {
-			if (statement.equals(context.getStatement()))
-				context.setAfterStatement(true);
-			names.addAll(statement.accept(this, context));
-		}
 		return names;
 	}
 
@@ -160,42 +151,36 @@ public class NameScopeVisitor extends AbstractNodeVisitor<ScopingContext, Set<IV
 
 	@Override
 	public Set<IVariableReference> visit(IForEachLoop block, ScopingContext context) {
-		// TODO Auto-generated method stub
+		Set<IVariableReference> names = new HashSet<>();
+		names.addAll(block.getDeclaration().accept(this, context));
+		names.addAll(block.getLoopedReference().accept(this, context));
+		if (context.isWithBlocks()) {
+			for (IStatement statement : block.getBody()) {
+				names.addAll(statement.accept(this, context));
+			}
+		}
 		return Sets.newHashSet();
 	}
 
 	@Override
 	public Set<IVariableReference> visit(IForLoop block, ScopingContext context) {
 		Set<IVariableReference> names = new HashSet<>();
-		boolean tmp = context.isInBlock();
-		if (context.getStatement() != null && context.getStatement().equals(block))
-			context.setInBlock(true);
-		else
-			context.setInBlock(false);
-		for (IStatement statement : block.getBody())
+		for (IStatement statement : block.getInit())
+			names.addAll(statement.accept(this, context));
+		names.addAll(block.getCondition().accept(this, context));
+		for (IStatement statement : block.getStep())
 			names.addAll(statement.accept(this, context));
 
-		if (context.isAfterStatement() || context.isInBlock()) {
-			context.setInBlock(true);
-			for (IStatement statement : block.getInit())
-				names.addAll(statement.accept(this, context));
-			names.addAll(block.getCondition().accept(this, context));
-			for (IStatement statement : block.getStep())
+		if (context.isWithBlocks()) {
+			for (IStatement statement : block.getBody())
 				names.addAll(statement.accept(this, context));
 		}
-		context.setInBlock(tmp);
-
 		return names;
 	}
 
 	@Override
 	public Set<IVariableReference> visit(IIfElseBlock block, ScopingContext context) {
 		Set<IVariableReference> names = new HashSet<>();
-		names.addAll(block.getCondition().accept(this, context));
-		for (IStatement statement : block.getThen())
-			names.addAll(statement.accept(this, context));
-		for (IStatement statement : block.getElse())
-			names.addAll(statement.accept(this, context));
 		return names;
 	}
 
@@ -303,12 +288,12 @@ public class NameScopeVisitor extends AbstractNodeVisitor<ScopingContext, Set<IV
 
 	@Override
 	public Set<IVariableReference> visit(IFieldReference fieldRef, ScopingContext context) {
-		boolean tmp = context.isInBlock();
-		context.setInBlock(true);
-		Set<IVariableReference> names = new HashSet<>();
-		names.addAll(fieldRef.getReference().accept(this, context));
-		context.setInBlock(tmp);
-		return names;
+		if (context.isAllFields()) {
+			ScopingContext newContext = new ScopingContext();
+			newContext.setReturnRef(true);
+			return Sets.newHashSet(fieldRef.getReference().accept(this, newContext));
+		} else
+			return Sets.newHashSet();
 	}
 
 	@Override
@@ -325,9 +310,10 @@ public class NameScopeVisitor extends AbstractNodeVisitor<ScopingContext, Set<IV
 
 	@Override
 	public Set<IVariableReference> visit(IVariableReference varRef, ScopingContext context) {
-		if (context.isInBlock())
+		if (context.isReturnRef())
 			return Sets.newHashSet(varRef);
-		return Sets.newHashSet();
+		else
+			return Sets.newHashSet();
 	}
 
 	@Override

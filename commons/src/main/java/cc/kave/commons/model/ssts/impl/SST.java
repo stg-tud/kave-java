@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -13,8 +15,6 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
-
-import com.google.common.collect.Sets;
 
 public class SST implements ISST {
 
