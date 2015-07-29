@@ -59,31 +59,72 @@ public class CsTypeName extends CsName implements TypeName {
 	@Override
 	public BundleName getAssembly() {
 		int i;
-		if (isGenericEntity()) {
+
+		if (!identifier.contains(",")) {
+			return CsAssemblyName.newAssemblyName(identifier);
+		} else if (isGenericEntity()) {
 			i = identifier.indexOf("]]") + 4;
 		} else {
 			i = identifier.indexOf(",") + 2;
 		}
 
-		return CsAssemblyName.newAssemblyName(identifier.substring(i, identifier.lastIndexOf(",")));
+		return CsAssemblyName.newAssemblyName(identifier.substring(i));
 	}
 
 	@Override
 	public NamespaceName getNamespace() {
 		int i;
+		String identifier = this.identifier;
+
 		if (isGenericEntity()) {
 			i = identifier.indexOf("`");
 		} else {
 			i = identifier.indexOf(",");
 		}
-		i = identifier.substring(0, i).lastIndexOf(".");
-		return CsNamespaceName.newNamespaceName(identifier.substring(0, i));
+
+		if (i == -1) {
+			return CsNamespaceName.newNamespaceName(identifier);
+		}
+
+		identifier = identifier.substring(0, i);
+		i = identifier.lastIndexOf(".");
+
+		if (i == -1) {
+			return CsNamespaceName.newNamespaceName(identifier);
+		} else {
+			return CsNamespaceName.newNamespaceName(identifier.substring(0, i));
+		}
 	}
 
 	@Override
 	public TypeName getDeclaringType() {
-		// TODO: missing
-		throw new UnsupportedOperationException();
+		if (!isNestedType()) {
+			return null;
+		}
+
+		String fullName = getFullName();
+		int endOfDeclaringType = fullName.lastIndexOf("+");
+		String declaringTypeName = fullName.substring(0, endOfDeclaringType);
+
+		if (declaringTypeName.indexOf("`") > 1 && hasTypeParameters()) {
+			int startIndex = 0;
+			int numberOfParameters = 0;
+
+			while ((startIndex = declaringTypeName.indexOf("+", startIndex) + 1) > 0) {
+				int endIndex = declaringTypeName.indexOf("+", startIndex);
+				if (endIndex > -1) {
+					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex, endIndex
+							- startIndex));
+				} else {
+					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
+				}
+				List<TypeName> typeParameters = getTypeParameters();
+				declaringTypeName += "[["
+						+ String.join("],[", typeParameters.toArray(new CharSequence[typeParameters.size()])) + "]]";
+			}
+			return CsTypeName.newTypeName(declaringTypeName + ", " + getAssembly());
+		}
+		return null;
 	}
 
 	@Override
@@ -91,6 +132,9 @@ public class CsTypeName extends CsName implements TypeName {
 		int i = identifier.indexOf("]]");
 		if (i < 0) {
 			i = identifier.indexOf(",");
+			if (i < 0) {
+				return identifier;
+			}
 		} else {
 			i += 2;
 		}
@@ -107,9 +151,22 @@ public class CsTypeName extends CsName implements TypeName {
 		return name.substring(i, name.length());
 	}
 
+	public String getRawFullName() {
+
+		String fullName = getFullName();
+		int i = fullName.indexOf("[[");
+
+		if (i == -1) {
+			i = fullName.indexOf(", ");
+		}
+		return i < 0 ? fullName : fullName.substring(0, i);
+
+	}
+
+	// TODO: wrong implementation?
 	@Override
 	public boolean isUnknownType() {
-		return identifier.equals("?");
+		return this.equals(CsUnknownTypeName.instance());
 	}
 
 	@Override
@@ -119,7 +176,7 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean isValueType() {
-		return false;
+		return isStructType() || isEnumType() || isVoidType();
 	}
 
 	@Override
@@ -144,12 +201,12 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean isReferenceType() {
-		return false;
+		return isClassType() || isInterfaceType() || isArrayType() || isDelegateType();
 	}
 
 	@Override
 	public boolean isClassType() {
-		return false;
+		return !isValueType() && !isInterfaceType() && !isArrayType() && !isDelegateType() && !isUnknownType();
 	}
 
 	@Override
@@ -164,7 +221,7 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean isNestedType() {
-		return false;
+		return getRawFullName().contains("+");
 	}
 
 	@Override

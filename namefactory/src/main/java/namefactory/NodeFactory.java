@@ -16,7 +16,6 @@
 
 package namefactory;
 
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -42,25 +41,38 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
+
 public class NodeFactory {
 
 	public static Name getNodeName(ASTNode node) {
 		StringBuilder sb = new StringBuilder();
-
+		
 		switch (node.getNodeType()) {
 		case ASTNode.METHOD_DECLARATION:
 			MethodDeclaration methodNode = (MethodDeclaration) node;
 			IMethodBinding method = methodNode.resolveBinding();
 			BindingFactory.modifierHelper(sb, method);
-			IJavaElement javaElement = method.getJavaElement();
 
-			sb.append("[").append(
-					BindingFactory.getBindingName(method.getReturnType()));
+			sb.append("[");
+
+			if (method.isConstructor()) {
+				sb.append(BindingFactory.getBindingName(method
+						.getDeclaringClass()));
+			} else {
+				sb.append(BindingFactory.getBindingName(method.getReturnType()));
+			}
+
 			sb.append("] ");
 			sb.append("[");
 			sb.append(BindingFactory.getBindingName(method.getDeclaringClass()));
 			sb.append("].");
-			sb.append(method.getName());
+
+			if (method.isConstructor()) {
+				sb.append(".ctor");
+			} else {
+				sb.append(method.getName());
+			}
+
 			sb.append("(");
 
 			ITypeBinding[] parameterTypes = method.getParameterTypes();
@@ -133,10 +145,11 @@ public class NodeFactory {
 			// ITypeBinding
 			case 2:
 				ITypeBinding type = (ITypeBinding) binding;
+				String qualifiedName = type.getQualifiedName();
 
 				if (type.isParameterizedType()) {
-					sb.append(type.getQualifiedName().substring(0,
-							type.getQualifiedName().indexOf("<")));
+					sb.append(qualifiedName.substring(0,
+							qualifiedName.indexOf("<")));
 					sb.append("`");
 					sb.append(type.getTypeArguments().length);
 					sb.append("[");
@@ -152,17 +165,18 @@ public class NodeFactory {
 					sb.deleteCharAt(sb.toString().length() - 1);
 					sb.append("]");
 				} else {
-					sb.append(type.getQualifiedName());
+					sb.append(qualifiedName);
 				}
 
 				sb.append(", ");
-				String qualifiedName = type.getQualifiedName();
-				if (qualifiedName.contains("."))
-					sb.append(qualifiedName.substring(0,
-							qualifiedName.lastIndexOf(".")));
-				else
-					sb.append(qualifiedName);
-				sb.append(", VersionPlaceholder");
+
+				// String temp = type.getDeclaringClass().getQualifiedName() +
+				// "."
+				// + type.getName();
+				sb.append(getAssemblyName(qualifiedName));
+
+				// version has to be implemented
+				// sb.append(", VersionPlaceholder");
 
 				return sb.toString();
 
@@ -203,6 +217,34 @@ public class NodeFactory {
 				sb.append("synchronized ");
 
 			return sb;
+		}
+
+		public static String getAssemblyName(String qualifiedName) {
+			Class c = null;
+
+			try {
+				c = Class.forName(qualifiedName);
+			} catch (ClassNotFoundException e) {
+				// e.printStackTrace();
+				return "?";
+			}
+
+			if (c.getProtectionDomain().getCodeSource() == null) {
+				return "rt.jar";
+			}
+
+			String path = c.getProtectionDomain().getCodeSource().getLocation()
+					.getPath();
+
+			if (path.endsWith(".jar")) {
+				return path.substring(path.lastIndexOf("/") + 1);
+			} else if (path.endsWith("/bin/")) {
+				String project = path.substring(0, path.length() - 5);
+				return project.substring(project.lastIndexOf("/") + 1,
+						project.length());
+			} else {
+			}
+			return path;
 		}
 	}
 }

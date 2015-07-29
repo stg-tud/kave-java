@@ -33,4 +33,12 @@ public class CsAssemblyName extends CsName implements BundleName {
 	public String getName() {
 		return identifier.substring(0, identifier.indexOf(","));
 	}
+
+	public static BundleName unknownName() {
+		return CsAssemblyName.newAssemblyName(unknownNameIdentifier);
+	}
+
+	public boolean isUnknown() {
+		return this.equals(unknownName());
+	}
 }

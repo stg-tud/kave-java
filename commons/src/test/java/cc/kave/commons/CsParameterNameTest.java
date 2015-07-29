@@ -17,30 +17,93 @@
 package cc.kave.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
+import cc.kave.commons.model.names.csharp.CsTypeName;
 
 public class CsParameterNameTest {
 
-	private ParameterName name = CsParameterName
-			.newParameterName("[org.eclipse.jdt.core.IPackageFragment, org.eclipse.jdt.core, VersionPlaceholder] packages");
-
 	@Test
-	public void getValueType() {
-		String actual = name.getValueType().getIdentifier();
-		String expected = "org.eclipse.jdt.core.IPackageFragment, org.eclipse.jdt.core, VersionPlaceholder";
-
-		assertEquals(expected, actual);
+	public void shouldImplementIsUnknown() {
+		assertTrue(CsParameterName.getUnknownName().isUnknown());
 	}
 
 	@Test
-	public void getName() {
-		String actual = name.getName();
-		String expected = "packages";
+	public void shouldBeSimpleParameter() {
+		ParameterName parameterName = CsParameterName.newParameterName("[ValueType, Assembly, 1.2.3.4] ParameterName");
 
-		assertEquals(expected, actual);
+		assertEquals("ValueType, Assembly, 1.2.3.4", parameterName.getValueType().getIdentifier());
+		assertEquals("ParameterName", parameterName.getName());
+		assertFalse(parameterName.isOptional());
+		assertFalse(parameterName.isOutput());
+		assertFalse(parameterName.isParameterArray());
+		assertTrue(parameterName.isPassedByReference());
 	}
+
+	@Test
+	public void shouldBeOutputParameter() {
+		ParameterName parameterName = CsParameterName.newParameterName("out [VT, A, 1.0.0.0] PName");
+
+		assertEquals("VT, A, 1.0.0.0", parameterName.getValueType().getIdentifier());
+		assertEquals("PName", parameterName.getName());
+		assertTrue(parameterName.isOutput());
+	}
+
+	@Test
+	public void shouldBeValueParameter() {
+		ParameterName parameterName = CsParameterName.newParameterName("[System.Single, mscore, 4.0.0.0] i");
+
+		assertFalse(parameterName.isPassedByReference());
+	}
+
+	@Test
+	public void shouldBeReferenceParameter() {
+		ParameterName parameterName = CsParameterName.newParameterName("ref [System.Single, mscore, 4.0.0.0] i");
+
+		assertTrue(parameterName.isPassedByReference());
+	}
+
+	@Test
+	public void shouldBeParameterArray() {
+		ParameterName parameterName = CsParameterName.newParameterName("params [T, P, 1.3.2.4] name");
+
+		assertTrue(parameterName.isParameterArray());
+	}
+
+	@Test
+	public void shouldNoBeParameterArray() {
+		ParameterName parameterName = CsParameterName.newParameterName("[T[], P, 1.3.2.4] name");
+
+		assertTrue(parameterName.getValueType().isArrayType());
+		assertFalse(parameterName.isParameterArray());
+	}
+
+	@Test
+	public void shouldHaveDefaultValue() {
+		ParameterName parameterName = CsParameterName.newParameterName("opt [T, A, 4.3.2.1] p");
+
+		assertTrue(parameterName.isOptional());
+	}
+
+	@Test
+	public void shouldBeOptionalReferenceParameter() {
+		ParameterName parameterName = CsParameterName
+				.newParameterName("opt ref [System.Double, mscore, 4.0.0.0] param");
+
+		assertTrue(parameterName.isOptional());
+		assertTrue(parameterName.isPassedByReference());
+		assertFalse(parameterName.isOutput());
+		assertFalse(parameterName.isParameterArray());
+	}
+
+	public void shouldBeUnknownParameter() {
+		assertEquals(CsTypeName.getUnknownName(), CsParameterName.getUnknownName().getValueType());
+		assertEquals("???", CsParameterName.getUnknownName().getName());
+	}
+
 }

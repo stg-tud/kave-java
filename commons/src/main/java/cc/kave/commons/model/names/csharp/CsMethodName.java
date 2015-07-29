@@ -56,9 +56,7 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public boolean isConstructor() {
-		boolean voidReturn = getReturnType().getIdentifier().substring(0, 4).equals("void");
-		boolean upperCase = getSignature().substring(0, 1).equals(getSignature().substring(0, 1).toUpperCase());
-		return voidReturn && upperCase;
+		return getSignature().startsWith(".ctor(");
 	}
 
 	@Override

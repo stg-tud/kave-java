@@ -18,6 +18,7 @@ package namefactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -25,11 +26,15 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+
+import visitors.InformationVisitor;
 
 public class ASTCreator {
 
 	private InformationVisitor visitor = new InformationVisitor();
+	private CompilationUnit cu;
 
 	public ASTCreator() {
 		String path = "D:\\Eclipse Workspace\\de.vogella.jdt.astsimple\\src\\de\\vogella\\jdt\\astsimple\\handler\\GetInfo.java";
@@ -61,13 +66,13 @@ public class ASTCreator {
 				true);
 		parser.setSource(source.toCharArray());
 
-		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		cu = (CompilationUnit) parser.createAST(null);
 
 		if (cu.getAST().hasBindingsRecovery()) {
 			System.out.println("Binding activated.");
 		}
 
-		cu.accept(visitor);
+		// cu.accept(visitor);
 	}
 
 	private String[] getJarPaths(String path) {
@@ -100,5 +105,26 @@ public class ASTCreator {
 
 	public InformationVisitor getVisitor() {
 		return visitor;
+	}
+
+	public CompilationUnit getCompilationUnit() {
+		return cu;
+	}
+
+	public void accept(ASTVisitor visitor) {
+		cu.accept(visitor);
+	}
+	
+	public void runTests(){
+		NodeFactoryTest nodeFactoryTest = new NodeFactoryTest();
+		try {
+			nodeFactoryTest.runAllTests();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

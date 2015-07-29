@@ -34,7 +34,7 @@ public class CsName implements Name {
 
 	@Override
 	public boolean isUnknown() {
-		throw new UnsupportedOperationException();
+		return this.equals(getUnknownName());
 	}
 
 	@Override
@@ -65,5 +65,9 @@ public class CsName implements Name {
 	@Override
 	public final String toString() {
 		return identifier;
+	}
+
+	public static Name getUnknownName() {
+		return CsName.newName(unknownNameIdentifier);
 	}
 }

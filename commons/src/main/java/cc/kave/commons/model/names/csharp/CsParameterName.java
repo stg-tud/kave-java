@@ -8,6 +8,12 @@ import cc.kave.commons.model.names.TypeName;
 import com.google.common.collect.MapMaker;
 
 public class CsParameterName extends CsName implements ParameterName {
+
+	public final String passByReferenceModifier = "ref";
+	public final String outputModifier = "out";
+	public final String varArgsModifier = "params";
+	public final String optionalModifier = "opt";
+
 	private static final Map<String, CsParameterName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final ParameterName UNKNOWN_NAME = newParameterName("[?] ???");
@@ -23,34 +29,48 @@ public class CsParameterName extends CsName implements ParameterName {
 		super(identifier);
 	}
 
+	public static ParameterName getUnknownName() {
+		return CsParameterName.newParameterName("[?] ???");
+	}
+
+	public boolean isUnknown() {
+		return this.equals(getUnknownName());
+	}
+
 	@Override
 	public TypeName getValueType() {
-		String typeName = identifier.substring(1, identifier.indexOf("]"));
+		int start = identifier.indexOf("[") + 1;
+		int end = identifier.lastIndexOf("]");
+		String typeName = identifier.substring(start, identifier.indexOf("]"));
 		return CsTypeName.newTypeName(typeName);
 	}
 
 	@Override
 	public String getName() {
-		return identifier.substring(identifier.indexOf("] ") + 2, identifier.length());
+		return identifier.substring(identifier.lastIndexOf(" ") + 1);
 	}
 
 	@Override
 	public boolean isPassedByReference() {
-		return false;
+		return getValueType().isReferenceType() || getModifiers().contains(passByReferenceModifier);
 	}
 
 	@Override
 	public boolean isOutput() {
-		return false;
+		return getModifiers().contains(outputModifier);
 	}
 
 	@Override
 	public boolean isParameterArray() {
-		return false;
+		return getModifiers().contains(varArgsModifier);
 	}
 
 	@Override
 	public boolean isOptional() {
-		return false;
+		return getModifiers().contains(optionalModifier);
+	}
+
+	private String getModifiers() {
+		return identifier.substring(0, identifier.indexOf('['));
 	}
 }

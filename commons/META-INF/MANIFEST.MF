@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: commons
+Bundle-SymbolicName: commons
+Bundle-Version: 1.0.0.qualifier
+Export-Package: cc.kave.commons,
+ cc.kave.commons.model.names,
+ cc.kave.commons.model.names.csharp,
+ cc.kave.commons.utils.json
+Require-Bundle: com.google.gson,
+ org.apache.commons.io,
+ com.google.guava,
+ org.junit

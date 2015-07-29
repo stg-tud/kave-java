@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package namefactory;
+package visitors;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import namefactory.NodeFactory;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -35,14 +37,12 @@ public class InformationVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		fields.add(node);
-		NodeFactory.getNodeName(node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		methods.add(node);
-		NodeFactory.getNodeName(node);
 		return super.visit(node);
 	}
 
@@ -54,21 +54,19 @@ public class InformationVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		NodeFactory.getNodeName(node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ImportDeclaration node) {
 		imports.add(node);
-		NodeFactory.getNodeName(node);
 		return super.visit(node);
 	}
 
 	public List<MethodDeclaration> getMethods() {
 		return methods;
 	}
-
+	
 	public List<FieldDeclaration> getFields() {
 		return fields;
 	}
