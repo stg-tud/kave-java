@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.MapMaker;
+
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
-
-import com.google.common.collect.MapMaker;
 
 public class CsMethodName extends CsMemberName implements MethodName {
 	private static final Map<String, CsMethodName> nameRegistry = new MapMaker().weakValues().makeMap();
@@ -28,7 +28,7 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public String getSignature() {
-		return identifier.substring(identifier.indexOf("].") + 2, identifier.length());
+		return identifier.substring(identifier.lastIndexOf("].") + 2, identifier.length());
 	}
 
 	@Override

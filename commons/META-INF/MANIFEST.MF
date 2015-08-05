@@ -10,4 +10,7 @@ Export-Package: cc.kave.commons,
 Require-Bundle: com.google.gson,
  org.apache.commons.io,
  com.google.guava,
- org.junit
+ org.junit,
+ org.mockito;bundle-version="1.9.5",
+ org.eclipse.jdt.annotation;bundle-version="2.0.100",
+ com.google.code.findbugs.jsr305;bundle-version="2.0.1"

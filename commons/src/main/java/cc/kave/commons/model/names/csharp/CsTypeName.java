@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.MapMaker;
+
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.NamespaceName;
 import cc.kave.commons.model.names.TypeName;
-
-import com.google.common.collect.MapMaker;
 
 public class CsTypeName extends CsName implements TypeName {
 	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
@@ -113,8 +113,8 @@ public class CsTypeName extends CsName implements TypeName {
 			while ((startIndex = declaringTypeName.indexOf("+", startIndex) + 1) > 0) {
 				int endIndex = declaringTypeName.indexOf("+", startIndex);
 				if (endIndex > -1) {
-					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex, endIndex
-							- startIndex));
+					numberOfParameters += Integer
+							.parseInt(declaringTypeName.substring(startIndex, endIndex - startIndex));
 				} else {
 					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
 				}
@@ -166,7 +166,7 @@ public class CsTypeName extends CsName implements TypeName {
 	// TODO: wrong implementation?
 	@Override
 	public boolean isUnknownType() {
-		return this.equals(CsUnknownTypeName.instance());
+		return this.equals(CsUnknownTypeName.getInstance());
 	}
 
 	@Override

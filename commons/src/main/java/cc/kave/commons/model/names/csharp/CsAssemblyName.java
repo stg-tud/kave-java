@@ -2,10 +2,10 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
+import com.google.common.collect.MapMaker;
+
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.BundleVersion;
-
-import com.google.common.collect.MapMaker;
 
 public class CsAssemblyName extends CsName implements BundleName {
 	private static final Map<String, CsAssemblyName> nameRegistry = new MapMaker().weakValues().makeMap();
@@ -25,8 +25,8 @@ public class CsAssemblyName extends CsName implements BundleName {
 
 	@Override
 	public BundleVersion getVersion() {
-		return CsAssemblyVersion.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 1,
-				identifier.length()));
+		return CsAssemblyVersion
+				.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 1, identifier.length()));
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class CsAssemblyName extends CsName implements BundleName {
 	}
 
 	public static BundleName unknownName() {
-		return CsAssemblyName.newAssemblyName(unknownNameIdentifier);
+		return CsAssemblyName.newAssemblyName(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	public boolean isUnknown() {

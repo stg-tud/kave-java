@@ -2,9 +2,9 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import cc.kave.commons.model.names.Name;
-
 import com.google.common.collect.MapMaker;
+
+import cc.kave.commons.model.names.Name;
 
 public class CsName implements Name {
 
@@ -68,6 +68,6 @@ public class CsName implements Name {
 	}
 
 	public static Name getUnknownName() {
-		return CsName.newName(unknownNameIdentifier);
+		return CsName.newName(UNKNOWN_NAME_IDENTIFIER);
 	}
 }
