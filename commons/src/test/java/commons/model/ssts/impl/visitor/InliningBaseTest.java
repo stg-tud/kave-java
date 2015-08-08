@@ -13,6 +13,7 @@ import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -25,6 +26,7 @@ import cc.kave.commons.model.ssts.blocks.ILockBlock;
 import cc.kave.commons.model.ssts.blocks.ISwitchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
+import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -32,7 +34,9 @@ import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -47,22 +51,38 @@ import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
+import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
+import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.PropertyReference;
+import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
+import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
+import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
+import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
+import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -71,6 +91,13 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 
 public class InliningBaseTest {
+
+	protected IStatement label(String label, IStatement statement) {
+		LabelledStatement labelled = new LabelledStatement();
+		labelled.setLabel(label);
+		labelled.setStatement(statement);
+		return labelled;
+	}
 
 	protected IStatement invocationStatement(String name, IVariableReference reference,
 			ISimpleExpression... parameters) {
@@ -135,10 +162,11 @@ public class InliningBaseTest {
 		return forLoop;
 	}
 
-	protected IIfElseBlock simpleIf(IStatement... body) {
+	protected IIfElseBlock simpleIf(IStatement elseStatement, ISimpleExpression condition, IStatement... body) {
 		IfElseBlock ifElse = new IfElseBlock();
-		ifElse.setCondition(constant("true"));
+		ifElse.setCondition(condition);
 		ifElse.setThen(Lists.newArrayList(body));
+		ifElse.setElse(Lists.newArrayList(elseStatement));
 		return ifElse;
 	}
 
@@ -191,6 +219,14 @@ public class InliningBaseTest {
 		return tryBlock;
 	}
 
+	protected ITryBlock tryBlock(IStatement body, IStatement finallyB, ICatchBlock block) {
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setBody(Lists.newArrayList(body));
+		tryBlock.setCatchBlocks(Lists.newArrayList(block));
+		tryBlock.setFinally(Lists.newArrayList(finallyB));
+		return tryBlock;
+	}
+
 	protected ICatchBlock catchBlock(IStatement... body) {
 		CatchBlock catchBlock = new CatchBlock();
 		catchBlock.setBody(Lists.newArrayList(body));
@@ -203,11 +239,33 @@ public class InliningBaseTest {
 		return uncheckedBlock;
 	}
 
+	protected IUsingBlock usingBlock(IVariableReference ref, IStatement... body) {
+		UsingBlock usingBlock = new UsingBlock();
+		usingBlock.setReference(ref);
+		usingBlock.setBody(Lists.newArrayList(body));
+		return usingBlock;
+	}
+
+	protected ILambdaExpression lambdaExpr(IStatement... body) {
+		LambdaExpression expr = new LambdaExpression();
+		expr.setBody(Lists.newArrayList(body));
+		return expr;
+	}
+
 	protected IWhileLoop whileLoop(ILoopHeaderBlockExpression condition, IStatement... body) {
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(Lists.newArrayList(body));
 		whileLoop.setCondition(condition);
 		return whileLoop;
+	}
+
+	protected IIfElseExpression ifElseExpr(ISimpleExpression condition, ISimpleExpression elseExpr,
+			ISimpleExpression thenExpr) {
+		IfElseExpression expr = new IfElseExpression();
+		expr.setCondition(condition);
+		expr.setElseExpression(elseExpr);
+		expr.setThenExpression(thenExpr);
+		return expr;
 	}
 
 	protected ILoopHeaderBlockExpression loopHeader(IStatement... condition) {
@@ -235,6 +293,12 @@ public class InliningBaseTest {
 		return refExpr;
 	}
 
+	protected IReferenceExpression refExpr(IReference identifier) {
+		ReferenceExpression refExpr = new ReferenceExpression();
+		refExpr.setReference(identifier);
+		return refExpr;
+	}
+
 	protected IVariableReference ref(String identifier) {
 		VariableReference ref = new VariableReference();
 		ref.setIdentifier(identifier);
@@ -246,6 +310,71 @@ public class InliningBaseTest {
 		ref.setFieldName(CsFieldName.newFieldName(identifier));
 		ref.setReference(ref(identifier));
 		return ref;
+	}
+
+	protected IStatement breakStatement() {
+		BreakStatement breakStatement = new BreakStatement();
+		return breakStatement;
+	}
+
+	protected IStatement continueStatement() {
+		ContinueStatement continueStatement = new ContinueStatement();
+		return continueStatement;
+	}
+
+	protected IStatement gotoStatement(String label) {
+		GotoStatement gotoStatement = new GotoStatement();
+		gotoStatement.setLabel(label);
+		return gotoStatement;
+	}
+
+	protected IStatement unknownStatement() {
+		UnknownStatement statement = new UnknownStatement();
+		return statement;
+	}
+
+	protected IReference refEvent(String identifier) {
+		EventReference event = new EventReference();
+		event.setReference(ref(identifier));
+		return event;
+	}
+
+	protected ISimpleExpression unknownExpression() {
+		UnknownExpression expr = new UnknownExpression();
+		return expr;
+	}
+
+	protected ISimpleExpression nullExpr() {
+		NullExpression expr = new NullExpression();
+		return expr;
+	}
+
+	protected IAssignableExpression completionExpr(String ref) {
+		CompletionExpression completionExpr = new CompletionExpression();
+		completionExpr.setToken("token");
+		completionExpr.setObjectReference(ref(ref));
+		return completionExpr;
+	}
+
+	protected IReference unknownRef() {
+		UnknownReference ref = new UnknownReference();
+		return ref;
+	}
+
+	protected IReference refProperty(String identifier) {
+		PropertyReference ref = new PropertyReference();
+		ref.setReference(ref(identifier));
+		return ref;
+	}
+
+	protected IStatement throwStatement() {
+		ThrowStatement statement = new ThrowStatement();
+		return statement;
+	}
+
+	protected IStatement unsafeBlock() {
+		UnsafeBlock block = new UnsafeBlock();
+		return block;
 	}
 
 	protected IVariableDeclaration declareVar(String identifier) {

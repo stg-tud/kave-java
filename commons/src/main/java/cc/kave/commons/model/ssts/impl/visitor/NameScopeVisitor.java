@@ -1,12 +1,11 @@
 package cc.kave.commons.model.ssts.impl.visitor;
 
-import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.ICaseBlock;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -18,12 +17,10 @@ import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
-import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
-import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
-import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
@@ -34,6 +31,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -50,288 +48,288 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class NameScopeVisitor extends AbstractNodeVisitor<ScopingContext, Set<IVariableReference>> {
-
+public class NameScopeVisitor extends AbstractNodeVisitor<Set<IVariableReference>, Void> {
 	@Override
-	public Set<IVariableReference> visit(ISST sst, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IAssignment stmt, Set<IVariableReference> context) {
+		stmt.getExpression().accept(this, context);
+		stmt.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IDelegateDeclaration stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IEventDeclaration stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IFieldDeclaration stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IMethodDeclaration stmt, ScopingContext context) {
-		Set<IVariableReference> names = new HashSet<>();
-		return names;
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IPropertyDeclaration stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IVariableDeclaration stmt, ScopingContext context) {
-		return Sets.newHashSet(stmt.getReference().accept(this, context));
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IAssignment stmt, ScopingContext context) {
-		Set<IVariableReference> names = new HashSet<>();
-		names.addAll(stmt.getReference().accept(this, context));
-		names.addAll(stmt.getExpression().accept(this, context));
-		return names;
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IBreakStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IContinueStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IExpressionStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IGotoStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(ILabelledStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IReturnStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IThrowStatement stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IDoLoop block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
-	}
-
-	@Override
-	public Set<IVariableReference> visit(IForEachLoop block, ScopingContext context) {
-		Set<IVariableReference> names = new HashSet<>();
-		names.addAll(block.getDeclaration().accept(this, context));
-		names.addAll(block.getLoopedReference().accept(this, context));
-		if (context.isWithBlocks()) {
-			for (IStatement statement : block.getBody()) {
-				names.addAll(statement.accept(this, context));
-			}
+	public Void visit(ISST sst, Set<IVariableReference> context) {
+		for (IMethodDeclaration method : sst.getMethods()) {
+			method.accept(this, context);
 		}
-		return Sets.newHashSet();
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IForLoop block, ScopingContext context) {
-		Set<IVariableReference> names = new HashSet<>();
+	public Void visit(IMethodDeclaration stmt, Set<IVariableReference> context) {
+		for (IStatement statement : stmt.getBody())
+			statement.accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyDeclaration stmt, Set<IVariableReference> context) {
+		for (IStatement statement : stmt.getGet())
+			statement.accept(this, context);
+		for (IStatement statement : stmt.getSet())
+			statement.accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IVariableDeclaration stmt, Set<IVariableReference> context) {
+		stmt.getReference().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IBreakStatement stmt, Set<IVariableReference> context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IContinueStatement stmt, Set<IVariableReference> context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IExpressionStatement stmt, Set<IVariableReference> context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IGotoStatement stmt, Set<IVariableReference> context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(ILabelledStatement stmt, Set<IVariableReference> context) {
+		stmt.getStatement().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IReturnStatement stmt, Set<IVariableReference> context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IThrowStatement stmt, Set<IVariableReference> context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IDoLoop block, Set<IVariableReference> context) {
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		block.getCondition().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IForEachLoop block, Set<IVariableReference> context) {
+		block.getDeclaration().accept(this, context);
+		block.getLoopedReference().accept(this, context);
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IForLoop block, Set<IVariableReference> context) {
+		block.getCondition().accept(this, context);
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
 		for (IStatement statement : block.getInit())
-			names.addAll(statement.accept(this, context));
-		names.addAll(block.getCondition().accept(this, context));
+			statement.accept(this, context);
 		for (IStatement statement : block.getStep())
-			names.addAll(statement.accept(this, context));
-
-		if (context.isWithBlocks()) {
-			for (IStatement statement : block.getBody())
-				names.addAll(statement.accept(this, context));
-		}
-		return names;
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IIfElseBlock block, ScopingContext context) {
-		Set<IVariableReference> names = new HashSet<>();
-		return names;
+	public Void visit(IIfElseBlock block, Set<IVariableReference> context) {
+		block.getCondition().accept(this, context);
+		for (IStatement statement : block.getElse())
+			statement.accept(this, context);
+		for (IStatement statement : block.getThen())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ILockBlock stmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ILockBlock stmt, Set<IVariableReference> context) {
+		stmt.getReference().accept(this, context);
+		for (IStatement statement : stmt.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ISwitchBlock block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ISwitchBlock block, Set<IVariableReference> context) {
+		block.getReference().accept(this, context);
+		for (IStatement statement : block.getDefaultSection())
+			statement.accept(this, context);
+		for (ICaseBlock caseBlock : block.getSections())
+			for (IStatement statement : caseBlock.getBody())
+				statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ITryBlock block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ITryBlock block, Set<IVariableReference> context) {
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		for (IStatement statement : block.getFinally())
+			statement.accept(this, context);
+		for (ICatchBlock catchBlock : block.getCatchBlocks())
+			for (IStatement statement : catchBlock.getBody())
+				statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUncheckedBlock block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUncheckedBlock block, Set<IVariableReference> context) {
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUnsafeBlock block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUnsafeBlock block, Set<IVariableReference> context) {
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUsingBlock block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUsingBlock block, Set<IVariableReference> context) {
+		block.getReference().accept(this, context);
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IWhileLoop block, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IWhileLoop block, Set<IVariableReference> context) {
+		block.getCondition().accept(this, context);
+		for (IStatement statement : block.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ICompletionExpression entity, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ICompletionExpression entity, Set<IVariableReference> context) {
+		entity.getObjectReference().accept(this, context);
+		return null;
+		// TODO test
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IComposedExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IComposedExpression expr, Set<IVariableReference> context) {
+		for (IVariableReference ref : expr.getReferences())
+			ref.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IIfElseExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IIfElseExpression expr, Set<IVariableReference> context) {
+		expr.getCondition().accept(this, context);
+		expr.getElseExpression().accept(this, context);
+		expr.getThenExpression().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IInvocationExpression entity, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IInvocationExpression entity, Set<IVariableReference> context) {
+		if (entity.getReference() != null)
+			entity.getReference().accept(this, context);
+		for (ISimpleExpression statement : entity.getParameters())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ILambdaExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ILambdaExpression expr, Set<IVariableReference> context) {
+		for (IStatement statement : expr.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(ILoopHeaderBlockExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(ILoopHeaderBlockExpression expr, Set<IVariableReference> context) {
+		for (IStatement statement : expr.getBody())
+			statement.accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IConstantValueExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IConstantValueExpression expr, Set<IVariableReference> context) {
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(INullExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(INullExpression expr, Set<IVariableReference> context) {
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IReferenceExpression expr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IReferenceExpression expr, Set<IVariableReference> context) {
+		expr.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IEventReference eventRef, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IEventReference eventRef, Set<IVariableReference> context) {
+		eventRef.getReference().accept(this, context);
+		return null;
+		// TODO test
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IFieldReference fieldRef, ScopingContext context) {
-		if (context.isAllFields()) {
-			ScopingContext newContext = new ScopingContext();
-			newContext.setReturnRef(true);
-			return Sets.newHashSet(fieldRef.getReference().accept(this, newContext));
-		} else
-			return Sets.newHashSet();
+	public Void visit(IFieldReference fieldRef, Set<IVariableReference> context) {
+		fieldRef.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IMethodReference methodRef, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IMethodReference methodRef, Set<IVariableReference> context) {
+		methodRef.getReference().accept(this, context);
+		return null;
+		// TODO test
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IPropertyReference methodRef, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IPropertyReference methodRef, Set<IVariableReference> context) {
+		methodRef.getReference().accept(this, context);
+		return null;
+		// TODO test
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IVariableReference varRef, ScopingContext context) {
-		if (context.isReturnRef())
-			return Sets.newHashSet(varRef);
-		else
-			return Sets.newHashSet();
+	public Void visit(IVariableReference varRef, Set<IVariableReference> context) {
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier(varRef.getIdentifier());
+		context.add(ref);
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUnknownReference unknownRef, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUnknownReference unknownRef, Set<IVariableReference> context) {
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUnknownExpression unknownExpr, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUnknownExpression unknownExpr, Set<IVariableReference> context) {
+		return null;
 	}
 
 	@Override
-	public Set<IVariableReference> visit(IUnknownStatement unknownStmt, ScopingContext context) {
-		// TODO Auto-generated method stub
-		return Sets.newHashSet();
+	public Void visit(IUnknownStatement unknownStmt, Set<IVariableReference> context) {
+		return null;
 	}
-
 }
