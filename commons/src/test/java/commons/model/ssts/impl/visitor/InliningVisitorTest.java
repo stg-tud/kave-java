@@ -5,9 +5,12 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 import cc.kave.commons.utils.visitor.InliningContext;
+import cc.kave.commons.utils.visitor.InliningUtil;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -132,7 +135,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 	@Test
 	public void testSecondEntryPoint() {
 		ISST sst = buildSST(
-				declareMethod("m2", true, //
+				declareEntryPoint("m2", //
 						declareVar("c"), //
 						assign(ref("c"), constant("1")), //
 						declareVar("d"), //
@@ -271,16 +274,17 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public void testIfInlinie() {
 		ISST sst = buildSST( //
 				declareNonEntryPoint("m2", //
-						declareVar("a"), simpleIf(declareVar("b"), constant("true"), declareVar("c"))),
+						declareVar("a"),
+						simpleIf(Lists.newArrayList(declareVar("b")), constant("true"), declareVar("c"))),
 				declareEntryPoint("m1", //
 						declareVar("a"), //
-						simpleIf(declareVar("b"), constant("true"), invocationStatement("m2"))));
+						simpleIf(Lists.newArrayList(declareVar("b")), constant("true"), invocationStatement("m2"))));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
-						simpleIf(declareVar("b"), constant("true"), //
+						simpleIf(Lists.newArrayList(declareVar("b")), constant("true"), //
 								declareVar("$0_a"), //
-								simpleIf(declareVar("$1_b"), constant("true"), declareVar("c")))));
+								simpleIf(Lists.newArrayList(declareVar("$1_b")), constant("true"), declareVar("c")))));
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
 		assertThat(context.getSST(), equalTo(inlinedSST));
@@ -526,6 +530,67 @@ public class InliningVisitorTest extends InliningBaseTest {
 						expr(ifElseExpr(nullExpr(), unknownExpression(), constant("true"))), //
 						expr(lambdaExpr(declareVar("$0_a"))), //
 						assign(ref("$0_a"), completionExpr("$1_b"))));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testSettingUpGuardVariables() {
+		ISST sst = buildSST( //
+				declareNonEntryPoint("m2", //
+						simpleIf(Lists.newArrayList(returnStatement(constant("5"), false)), constant("true"),
+								returnStatement(constant("6"), false))), //
+				declareEntryPoint("m1", //
+						assign(ref("b"), invocationExpr("m2", ref("b")))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar(InliningUtil.RESULT_NAME + "[?] [?].m2()"), //
+						declareVar(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), //
+						assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("false")), //
+						simpleIf(
+								Lists.newArrayList(
+										assign(ref(InliningUtil.RESULT_NAME + "[?] [?].m2()"), constant("5")),
+										assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("true"))),
+								constant("true"), assign(ref(InliningUtil.RESULT_NAME + "[?] [?].m2()"), constant("6")),
+								assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("true"))),
+						assign(ref("b"), refExpr(InliningUtil.RESULT_NAME + "[?] [?].m2()"))));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testCreateGuardStatement() {
+		ISST sst = buildSST( //
+				declareNonEntryPoint("m2", //
+						declareVar("a"), //
+						simpleIf(Lists.newArrayList(), constant("true"), //
+								simpleIf(Lists.newArrayList(), constant("false"), //
+										returnStatement(constant("6"), true)), //
+								declareVar("b"), //
+								declareVar("c"), //
+								returnStatement(constant("7"), true))),
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						assign(ref("a"), invocationExpr("m2", ref("a")))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						declareVar(InliningUtil.RESULT_NAME + "[?] [?].m2()"), //
+						declareVar(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), //
+						assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("false")), //
+						declareVar("$0_a"), //
+						simpleIf(Lists.newArrayList(), constant("true"), //
+								simpleIf(Lists.newArrayList(), constant("false"), //
+										assign(ref(InliningUtil.RESULT_NAME + "[?] [?].m2()"), constant("6")),
+										assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("true"))), //
+								simpleIf(Lists.newArrayList(), refExpr(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), //
+										declareVar("b"), //
+										declareVar("c"), //
+										assign(ref(InliningUtil.RESULT_NAME + "[?] [?].m2()"), constant("7")),
+										assign(ref(InliningUtil.RESULT_FLAG + "[?] [?].m2()"), constant("true")))),
+						assign(ref("a"), refExpr(InliningUtil.RESULT_NAME + "[?] [?].m2()"))));
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
 		assertThat(context.getSST(), equalTo(inlinedSST));

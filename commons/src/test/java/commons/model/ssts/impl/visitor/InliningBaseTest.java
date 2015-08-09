@@ -109,7 +109,7 @@ public class InliningBaseTest {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setParameters(Lists.newArrayList(parameters));
 		invocation.setReference(reference);
-		invocation.setMethodName(CsMethodName.newMethodName(name));
+		invocation.setMethodName(CsMethodName.newMethodName("[?] [?]." + name + "()"));
 		return invocation;
 	}
 
@@ -140,7 +140,7 @@ public class InliningBaseTest {
 
 	protected IMethodDeclaration declareMethod(String name, boolean entryPoint, IStatement... statements) {
 		MethodDeclaration method = new MethodDeclaration();
-		method.setName(CsMethodName.newMethodName(name));
+		method.setName(CsMethodName.newMethodName("[?] [?]." + name + "()"));
 		method.setEntryPoint(entryPoint);
 		for (IStatement s : statements)
 			method.getBody().add(s);
@@ -162,11 +162,11 @@ public class InliningBaseTest {
 		return forLoop;
 	}
 
-	protected IIfElseBlock simpleIf(IStatement elseStatement, ISimpleExpression condition, IStatement... body) {
+	protected IIfElseBlock simpleIf(List<IStatement> elseStatement, ISimpleExpression condition, IStatement... body) {
 		IfElseBlock ifElse = new IfElseBlock();
 		ifElse.setCondition(condition);
 		ifElse.setThen(Lists.newArrayList(body));
-		ifElse.setElse(Lists.newArrayList(elseStatement));
+		ifElse.setElse(elseStatement);
 		return ifElse;
 	}
 

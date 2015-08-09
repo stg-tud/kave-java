@@ -15,12 +15,14 @@ public class Scope {
 	public Set<IVariableReference> existingIds;
 	public Map<IVariableReference, IVariableReference> changedNames;
 	public List<IStatement> body;
+	public String resultName;
 
 	public Scope() {
 		this.parent = null;
 		this.existingIds = new HashSet<>();
 		this.changedNames = new HashMap<>();
 		this.body = new ArrayList<>();
+		this.resultName = "";
 	}
 
 	public IVariableReference resolve(IVariableReference ref) {

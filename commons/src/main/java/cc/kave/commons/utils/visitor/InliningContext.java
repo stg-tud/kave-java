@@ -22,6 +22,7 @@ public class InliningContext {
 	private Scope scope;
 	private Set<IMethodDeclaration> nonEntryPoints;
 	private boolean inline = false;
+	private boolean guardNeeded = false;
 
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
@@ -90,6 +91,7 @@ public class InliningContext {
 		newScope.parent = scope;
 		newScope.existingIds.addAll(scope.existingIds);
 		newScope.changedNames = scope.changedNames;
+		newScope.resultName = scope.resultName;
 		scope = newScope;
 	}
 
@@ -131,5 +133,21 @@ public class InliningContext {
 
 	public ISST getSST() {
 		return sst;
+	}
+
+	public String getResultName() {
+		return scope.resultName;
+	}
+
+	public void setResultName(String name) {
+		scope.resultName = name;
+	}
+
+	public void setGuardNeeded(boolean b) {
+		this.guardNeeded = b;
+	}
+
+	public boolean isGuardNeeded() {
+		return this.guardNeeded;
 	}
 }

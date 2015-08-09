@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -48,7 +49,7 @@ public class ScopeVisitorTest extends InliningBaseTest {
 				label("label", returnStatement(refExpr("h"), false)), //
 				doLoop(loopHeader(expr(constant("true")), declareVar("i"))), //
 				forEachLoop("j", "l", assign(ref("m"), constant("1"))), //
-				simpleIf(declareVar("n"), refExpr("o"), declareVar("p")), //
+				simpleIf(Lists.newArrayList(declareVar("n")), refExpr("o"), declareVar("p")), //
 				lockBlock("q", declareVar("r")), //
 				switchBlock("s", caseBlock("1", declareVar("t"))), //
 				tryBlock(declareVar("u"), declareVar("v"), catchBlock(declareVar("w"))), //
