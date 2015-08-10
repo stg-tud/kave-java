@@ -32,7 +32,7 @@ public class SubGroum extends Groum implements ISubGroum {
 			return null;
 		else {
 			if (successors.iterator().next().equals(root)) {
-				ISubGroum extendedSubgroum = this;
+				ISubGroum extendedSubgroum = (ISubGroum) this.clone();
 				extendedSubgroum.addVertex(root);
 				extendedSubgroum.addEdge(leaf, root);
 				return extendedSubgroum;

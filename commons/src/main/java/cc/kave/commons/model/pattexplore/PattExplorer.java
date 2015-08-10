@@ -1,5 +1,6 @@
 package cc.kave.commons.model.pattexplore;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,37 +28,41 @@ public class PattExplorer implements IPattExplorer {
 			}
 		}
 
+		List<ISubGroum> patterns = new ArrayList<>();
 		for (ISubGroum pattern : L) {
-			explore(pattern, L, D);
+			patterns.addAll(explore(pattern, L, D));
 		}
 
-		return L;
+		return patterns;
 
 	}
 
-	private void explore(ISubGroum P, List<ISubGroum> L, List<IGroum> D) {
+	private List<ISubGroum> explore(ISubGroum P, List<ISubGroum> L, List<IGroum> D) {
+		List<ISubGroum> patterns = new ArrayList<>();
+		patterns.addAll(L);
 		for (ISubGroum U : L) {
 			if (U.getAllNodes().size() != 1)
 				break;
 
 			ISubGroum Q = P.extensibleWith(U);
 			if (Q != null) {
-				List<ISubGroum> patterns = new LinkedList<>();
+				List<ISubGroum> candidates = new LinkedList<>();
 
 				for (ISubGroum pattern : L) {
 					if (pattern.equals(P)) {
 						ISubGroum candidate = pattern.extensibleWith(U);
 						if (candidate != null)
-							patterns.add(candidate);
+							candidates.add(candidate);
 					}
 				}
 				if (patterns.size() >= threshold) {
-					L.addAll(patterns);
-					explore(Q, L, D);
+					patterns.addAll(patterns);
+					patterns.addAll(explore(Q, patterns, D));
 				}
 			}
 
 		}
+		return patterns;
 	}
 
 }

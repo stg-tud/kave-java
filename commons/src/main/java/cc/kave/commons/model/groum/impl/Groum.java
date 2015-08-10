@@ -15,13 +15,31 @@ import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.ISubgraphStrategy;
 
-public class Groum implements IGroum {
+public class Groum implements IGroum, Cloneable {
 	DirectedGraph<INode, DefaultEdge> groum;
 	INode root;
 	ISubgraphStrategy subgraphStrategy;
 
 	public Groum() {
 		groum = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
+	}
+
+	@Override
+	public Object clone() {
+		Groum clone;
+		try {
+			clone = (Groum) super.clone();
+			clone.groum = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
+			for (INode node : getAllNodes()) {
+				clone.groum.addVertex(node);
+			}
+			for (DefaultEdge edge : getAllEdges()) {
+				clone.groum.addEdge(groum.getEdgeSource(edge), groum.getEdgeTarget(edge));
+			}
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*

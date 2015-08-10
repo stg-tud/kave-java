@@ -134,16 +134,7 @@ public class Fixture_Groumtest {
 	 * 29 Nodes in 11 Groums
 	 */
 	public static List<IGroum> getTestList() {
-		ActionNode a1 = new ActionNode("A", "A");
-		ActionNode a2 = new ActionNode("A", "A");
-		ActionNode b1 = new ActionNode("B", "B");
-		ActionNode b2 = new ActionNode("B", "B");
-		ActionNode c1 = new ActionNode("C", "C");
-		ActionNode c2 = new ActionNode("C", "C");
-		ActionNode d1 = new ActionNode("D", "D");
-		ActionNode d2 = new ActionNode("D", "D");
-		ActionNode e1 = new ActionNode("E", "E");
-		ActionNode e2 = new ActionNode("E", "E");
+		
 
 		// 5x A
 		// 7x B
@@ -155,56 +146,56 @@ public class Fixture_Groumtest {
 		// 4x BC
 
 		IGroum aGroum = new SubGroum(null);
-		aGroum.addVertex(a1);
-		aGroum.addVertex(b1);
-		aGroum.addVertex(c1);
+		aGroum.addVertex(new ActionNode("A", "A"));
+		aGroum.addVertex(new ActionNode("B", "B"));
+		aGroum.addVertex(new ActionNode("C", "C"));
 
 		IGroum bGroum1 = new SubGroum(null);
-		bGroum1.addVertex(a2);
-		bGroum1.addVertex(b2);
-		bGroum1.addVertex(c2);
+		bGroum1.addVertex(new ActionNode("A", "A"));
+		bGroum1.addVertex(new ActionNode("B", "B"));
+		bGroum1.addVertex(new ActionNode("C", "C"));
 
 		IGroum bGroum2 = new SubGroum(null);
-		bGroum2.addVertex(a1);
-		bGroum2.addVertex(b1);
+		bGroum2.addVertex(new ActionNode("A", "A"));
+		bGroum2.addVertex(new ActionNode("B", "B"));
 
 		IGroum cGroum1 = new SubGroum(null);
-		cGroum1.addVertex(b1);
-		cGroum1.addVertex(b2);
+		cGroum1.addVertex(new ActionNode("B", "B"));
+		cGroum1.addVertex(new ActionNode("B", "B"));
 
 		IGroum cGroum2 = new SubGroum(null);
-		cGroum2.addVertex(a1);
-		cGroum2.addVertex(b2);
-		cGroum2.addVertex(c1);
-		cGroum2.addVertex(d1);
+		cGroum2.addVertex(new ActionNode("A", "A"));
+		cGroum2.addVertex(new ActionNode("B", "B"));
+		cGroum2.addVertex(new ActionNode("C", "C"));
+		cGroum2.addVertex(new ActionNode("D", "D"));
 
 		IGroum cGroum3 = new SubGroum(null);
-		cGroum3.addVertex(c1);
-		cGroum3.addVertex(d2);
+		cGroum3.addVertex(new ActionNode("C", "C"));
+		cGroum3.addVertex(new ActionNode("D", "D"));
 
 		IGroum dGroum1 = new SubGroum(null);
-		dGroum1.addVertex(d1);
-		dGroum1.addVertex(e2);
+		dGroum1.addVertex(new ActionNode("D", "D"));
+		dGroum1.addVertex(new ActionNode("E", "E"));
 
 		IGroum dGroum2 = new SubGroum(null);
-		dGroum2.addVertex(c2);
-		dGroum2.addVertex(d1);
-		dGroum2.addVertex(e2);
+		dGroum2.addVertex(new ActionNode("C", "C"));
+		dGroum2.addVertex(new ActionNode("D", "D"));
+		dGroum2.addVertex(new ActionNode("E", "E"));
 
 		IGroum dGroum3 = new SubGroum(null);
-		dGroum3.addVertex(b1);
-		dGroum3.addVertex(c2);
-		dGroum3.addVertex(d2);
-		dGroum3.addVertex(e2);
+		dGroum3.addVertex(new ActionNode("B", "B"));
+		dGroum3.addVertex(new ActionNode("C", "C"));
+		dGroum3.addVertex(new ActionNode("D", "D"));
+		dGroum3.addVertex(new ActionNode("E", "E"));
 
 		IGroum dGroum4 = new SubGroum(null);
-		dGroum4.addVertex(e1);
-		dGroum4.addVertex(d2);
+		dGroum4.addVertex(new ActionNode("E", "E"));
+		dGroum4.addVertex(new ActionNode("D", "D"));
 
 		IGroum eGroum = new SubGroum(null);
-		eGroum.addVertex(c1);
-		eGroum.addVertex(b1);
-		eGroum.addVertex(a2);
+		eGroum.addVertex(new ActionNode("C", "C"));
+		eGroum.addVertex(new ActionNode("B", "B"));
+		eGroum.addVertex(new ActionNode("A", "A"));
 
 		List<IGroum> list = new LinkedList<>();
 		list.add(dGroum1);
