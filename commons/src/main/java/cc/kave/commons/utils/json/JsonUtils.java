@@ -369,7 +369,192 @@ public abstract class JsonUtils {
 	}
 
 	private static Gson createGson() {
+		// GsonBuilder gsonBuilder = new GsonBuilder();
+
+		/*
+		 * 
+		 */
 		GsonBuilder gsonBuilder = new GsonBuilder();
+		List<RuntimeTypeAdapterFactory> factories = new LinkedList<RuntimeTypeAdapterFactory>();
+
+		// name interface types
+		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(EventName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(FieldName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(LambdaName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(LocalVariableName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(MethodName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(Name.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(NamespaceName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(ParameterName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(PropertyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(TypeName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(DelegateTypeName.class, new GsonNameAdapter());
+		// C# name types
+		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsEventName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsFieldName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsLambdaName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsLocalVariableName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsMethodName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsNamespaceName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsParameterName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameAdapter());
+		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameAdapter());
+
+		// Dummy Adapters for simple Class printing
+		factories.add(factoryFor(SST.class, SST.class));
+
+		factories.add(factoryFor(CaseBlock.class, CaseBlock.class));
+		factories.add(factoryFor(CatchBlock.class, CatchBlock.class));
+		factories.add(factoryFor(DoLoop.class, DoLoop.class));
+		factories.add(factoryFor(ForEachLoop.class, ForEachLoop.class));
+		factories.add(factoryFor(ForLoop.class, ForLoop.class));
+		factories.add(factoryFor(IfElseBlock.class, IfElseBlock.class));
+		factories.add(factoryFor(LockBlock.class, LockBlock.class));
+		factories.add(factoryFor(SwitchBlock.class, SwitchBlock.class));
+		factories.add(factoryFor(TryBlock.class, TryBlock.class));
+		factories.add(factoryFor(UncheckedBlock.class, UncheckedBlock.class));
+		factories.add(factoryFor(UnsafeBlock.class, UnsafeBlock.class));
+		factories.add(factoryFor(UsingBlock.class, UsingBlock.class));
+		factories.add(factoryFor(WhileLoop.class, WhileLoop.class));
+
+		factories.add(factoryFor(DelegateDeclaration.class, DelegateDeclaration.class));
+		factories.add(factoryFor(EventDeclaration.class, EventDeclaration.class));
+		factories.add(factoryFor(FieldDeclaration.class, FieldDeclaration.class));
+		factories.add(factoryFor(MethodDeclaration.class, MethodDeclaration.class));
+		factories.add(factoryFor(PropertyDeclaration.class, PropertyDeclaration.class));
+
+		factories.add(factoryFor(CompletionExpression.class, CompletionExpression.class));
+		factories.add(factoryFor(ComposedExpression.class, ComposedExpression.class));
+		factories.add(factoryFor(IfElseExpression.class, IfElseExpression.class));
+		factories.add(factoryFor(InvocationExpression.class, InvocationExpression.class));
+		factories.add(factoryFor(LambdaExpression.class, LambdaExpression.class));
+
+		factories.add(factoryFor(LoopHeaderBlockExpression.class, LoopHeaderBlockExpression.class));
+
+		factories.add(factoryFor(ConstantValueExpression.class, ConstantValueExpression.class));
+		factories.add(factoryFor(NullExpression.class, NullExpression.class));
+		factories.add(factoryFor(ReferenceExpression.class, ReferenceExpression.class));
+		factories.add(factoryFor(UnknownExpression.class, UnknownExpression.class));
+
+		factories.add(factoryFor(EventReference.class, EventReference.class));
+		factories.add(factoryFor(FieldReference.class, FieldReference.class));
+		factories.add(factoryFor(MethodReference.class, MethodReference.class));
+		factories.add(factoryFor(PropertyReference.class, PropertyReference.class));
+		factories.add(factoryFor(UnknownReference.class, UnknownReference.class));
+		factories.add(factoryFor(VariableReference.class, VariableReference.class));
+
+		factories.add(factoryFor(Assignment.class, Assignment.class));
+		factories.add(factoryFor(BreakStatement.class, BreakStatement.class));
+		factories.add(factoryFor(ContinueStatement.class, ContinueStatement.class));
+		factories.add(factoryFor(ExpressionStatement.class, ExpressionStatement.class));
+		factories.add(factoryFor(GotoStatement.class, GotoStatement.class));
+		factories.add(factoryFor(LabelledStatement.class, LabelledStatement.class));
+		factories.add(factoryFor(ReturnStatement.class, ReturnStatement.class));
+		factories.add(factoryFor(ThrowStatement.class, ThrowStatement.class));
+		factories.add(factoryFor(UnknownStatement.class, UnknownStatement.class));
+		factories.add(factoryFor(VariableDeclaration.class, VariableDeclaration.class));
+
+		// Adapters for 1st lvl interfaces
+		factories.add(factoryFor(ISST.class, SST.class));
+
+		factories.add(factoryFor(ICaseBlock.class, CaseBlock.class));
+		factories.add(factoryFor(ICatchBlock.class, CatchBlock.class));
+		factories.add(factoryFor(IDoLoop.class, DoLoop.class));
+		factories.add(factoryFor(IForEachLoop.class, ForEachLoop.class));
+		factories.add(factoryFor(IForLoop.class, ForLoop.class));
+		factories.add(factoryFor(IIfElseBlock.class, IfElseBlock.class));
+		factories.add(factoryFor(ILockBlock.class, LockBlock.class));
+		factories.add(factoryFor(ISwitchBlock.class, SwitchBlock.class));
+		factories.add(factoryFor(ITryBlock.class, TryBlock.class));
+		factories.add(factoryFor(IUncheckedBlock.class, UncheckedBlock.class));
+		factories.add(factoryFor(IUnsafeBlock.class, UnsafeBlock.class));
+		factories.add(factoryFor(IUsingBlock.class, UsingBlock.class));
+		factories.add(factoryFor(IWhileLoop.class, WhileLoop.class));
+
+		factories.add(factoryFor(IDelegateDeclaration.class, DelegateDeclaration.class));
+		factories.add(factoryFor(IEventDeclaration.class, EventDeclaration.class));
+		factories.add(factoryFor(IFieldDeclaration.class, FieldDeclaration.class));
+		factories.add(factoryFor(IMethodDeclaration.class, MethodDeclaration.class));
+		factories.add(factoryFor(IPropertyDeclaration.class, PropertyDeclaration.class));
+
+		factories.add(factoryFor(ICompletionExpression.class, CompletionExpression.class));
+		factories.add(factoryFor(IComposedExpression.class, ComposedExpression.class));
+		factories.add(factoryFor(IIfElseExpression.class, IfElseExpression.class));
+		factories.add(factoryFor(IInvocationExpression.class, InvocationExpression.class));
+		factories.add(factoryFor(ILambdaExpression.class, LambdaExpression.class));
+
+		factories.add(factoryFor(ILoopHeaderBlockExpression.class, LoopHeaderBlockExpression.class));
+
+		factories.add(factoryFor(IConstantValueExpression.class, ConstantValueExpression.class));
+		factories.add(factoryFor(INullExpression.class, NullExpression.class));
+		factories.add(factoryFor(IReferenceExpression.class, ReferenceExpression.class));
+		factories.add(factoryFor(IUnknownExpression.class, UnknownExpression.class));
+
+		factories.add(factoryFor(IEventReference.class, EventReference.class));
+		factories.add(factoryFor(IFieldReference.class, FieldReference.class));
+		factories.add(factoryFor(IMethodReference.class, MethodReference.class));
+		factories.add(factoryFor(IPropertyReference.class, PropertyReference.class));
+		factories.add(factoryFor(IUnknownReference.class, UnknownReference.class));
+		factories.add(factoryFor(IVariableReference.class, VariableReference.class));
+
+		factories.add(factoryFor(IAssignment.class, Assignment.class));
+		factories.add(factoryFor(IBreakStatement.class, BreakStatement.class));
+		factories.add(factoryFor(IContinueStatement.class, ContinueStatement.class));
+		factories.add(factoryFor(IExpressionStatement.class, ExpressionStatement.class));
+		factories.add(factoryFor(IGotoStatement.class, GotoStatement.class));
+		factories.add(factoryFor(ILabelledStatement.class, LabelledStatement.class));
+		factories.add(factoryFor(IReturnStatement.class, ReturnStatement.class));
+		factories.add(factoryFor(IThrowStatement.class, ThrowStatement.class));
+		factories.add(factoryFor(IUnknownStatement.class, UnknownStatement.class));
+		factories.add(factoryFor(IVariableDeclaration.class, VariableDeclaration.class));
+
+		// Recursive interface adapters
+		factories.add(factoryFor(IStatement.class, Assignment.class, BreakStatement.class, ContinueStatement.class,
+				DoLoop.class, ExpressionStatement.class, ForEachLoop.class, ForLoop.class, GotoStatement.class,
+				IfElseBlock.class, LabelledStatement.class, LockBlock.class, ReturnStatement.class, SwitchBlock.class,
+				ThrowStatement.class, TryBlock.class, UncheckedBlock.class, UnknownStatement.class, UnsafeBlock.class,
+				UsingBlock.class, VariableDeclaration.class, WhileLoop.class));
+		factories.add(factoryFor(ISimpleExpression.class, ConstantValueExpression.class, NullExpression.class,
+				ReferenceExpression.class, UnknownExpression.class));
+		factories.add(factoryFor(IMemberDeclaration.class, DelegateDeclaration.class, EventDeclaration.class,
+				FieldDeclaration.class, MethodDeclaration.class, PropertyDeclaration.class, EventReference.class,
+				FieldReference.class, PropertyReference.class, UnknownReference.class, VariableReference.class,
+				MethodReference.class));
+		factories.add(factoryFor(IReference.class, EventReference.class, FieldReference.class, PropertyReference.class,
+				UnknownReference.class, VariableReference.class, MethodReference.class));
+		factories.add(factoryFor(IAssignableReference.class, EventReference.class, FieldReference.class,
+				PropertyReference.class, UnknownReference.class, VariableReference.class));
+		factories.add(factoryFor(IMemberReference.class, EventReference.class, FieldReference.class,
+				PropertyReference.class, MethodReference.class));
+		factories.add(factoryFor(IExpression.class, CompletionExpression.class, ComposedExpression.class,
+				IfElseExpression.class, InvocationExpression.class, LambdaExpression.class,
+				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
+				UnknownExpression.class, LoopHeaderBlockExpression.class));
+		factories
+				.add(factoryFor(IAssignableExpression.class, CompletionExpression.class, ComposedExpression.class,
+						IfElseExpression.class, InvocationExpression.class, LambdaExpression.class,
+						ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
+						UnknownExpression.class));
+		factories
+				.add(factoryFor(ILoopHeaderExpression.class, LoopHeaderBlockExpression.class,
+						ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
+						UnknownExpression.class));
+
+		for (RuntimeTypeAdapterFactory factory : factories)
+			gsonBuilder.registerTypeAdapterFactory(factory);
+
+		gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
+
+		/*
+		 * 
+		 */
+
 		// name interface types
 		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameAdapter());
 		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameAdapter());

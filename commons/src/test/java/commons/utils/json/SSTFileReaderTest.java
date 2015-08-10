@@ -3,6 +3,7 @@ package commons.utils.json;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -38,6 +39,17 @@ public class SSTFileReaderTest {
 			SSTList.add(JsonUtils.parseJson(line, SST.class));
 		}
 		return SSTList;
+	}
+
+	@Test
+	public void parsesSnakeGameSST() throws IOException {
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(
+				"CSharpConsoleGames.sln_SyntaxTrees (edit).log");
+		List<SST> SSTList = parseSSTs(inputStream);
+		SST sst = SSTList.get(0);
+		SST sst2 = SSTList.get(1);
+		sst.toString();
+		assertTrue(true);
 	}
 
 	@Test
