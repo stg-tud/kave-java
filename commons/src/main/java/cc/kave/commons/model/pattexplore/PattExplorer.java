@@ -7,6 +7,9 @@ import java.util.List;
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.ISubGroum;
 
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
+
 public class PattExplorer implements IPattExplorer {
 	int threshold;
 
@@ -21,6 +24,9 @@ public class PattExplorer implements IPattExplorer {
 		for (IGroum groum : D) {
 			L.addAll(Utils.breakdown(groum));
 		}
+
+		Multiset<ISubGroum> a = TreeMultiset.create(new GroumComparator());
+
 		List<List<ISubGroum>> isomorphGroups = Utils.makeIsomorphGroups(L);
 		for (List<ISubGroum> aList : isomorphGroups) {
 			if (aList.size() < threshold) {
