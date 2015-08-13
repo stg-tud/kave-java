@@ -3,9 +3,11 @@ package cc.kave.commons.model.groum.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
@@ -36,20 +38,21 @@ public class PattUtilsTest {
 	}
 
 	@Test
+	@Ignore
 	public void removesCorrectlyIndeed() {
 
 		List<ISubGroum> subgroums = new LinkedList<>();
 
-		for (IGroum groum : Fixture_Groumtest.getTestList()) {
+		for (IGroum groum : Fixture_Groumtest.getListOfXGroums(25)) {
 			subgroums.addAll(Utils.breakdown(groum));
 
 		}
-		ActionNode node = new ActionNode("A", "A");
+		ActionNode node = new ActionNode("25", "25");
 		ISubGroum subgroum = new SubGroum(null);
 		subgroum.addVertex(node);
 
 		subgroums = Utils.removeEqualPatterns(subgroum, subgroums);
-		assertTrue(subgroums.size() == 25);
+		assertTrue(subgroums.size() == 24);
 	}
 
 	@Test
@@ -135,5 +138,19 @@ public class PattUtilsTest {
 		List<List<ISubGroum>> result = Utils.makeIsomorphGroups(list);
 		// System.out.println(result);
 		assertTrue(result.size() == 5);
+	}
+
+	@Test
+	public void breakdownworks() {
+		List<IGroum> groums = Fixture_Groumtest.getListOfXGroums(10);
+		List<ISubGroum> subgroums = new LinkedList<>();
+		for (IGroum groum : groums) {
+			subgroums.addAll(Utils.breakdown(groum));
+		}
+		Collections.sort(subgroums);
+		// for (ISubGroum subgroum : subgroums) {
+		// System.out.println(subgroum + "--> " + subgroum.getParent());
+		// }
+		assertTrue(subgroums.size() == 55);
 	}
 }

@@ -3,9 +3,13 @@ package cc.kave.commons.model.groum.impl;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
+import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
@@ -15,7 +19,7 @@ public class GroumTest {
 
 	@Test
 	public void groumDrawsItself() {
-		System.out.println(Fixture_Groumtest.getPapersExampleGroum().toString());
+		assertTrue(Fixture_Groumtest.getPapersExampleGroum().toString() != null);
 	}
 
 	@Test
@@ -187,6 +191,59 @@ public class GroumTest {
 		groum2.addEdge(c, d);
 
 		assertTrue(groum.compareTo(groum2) == -1);
+	}
+
+	@Test
+	public void canBeCloned() {
+		ActionNode a = new ActionNode("A", "1");
+		ActionNode b = new ActionNode("A", "1");
+		ActionNode c = new ActionNode("A", "2");
+		ActionNode d = new ActionNode("A", "2");
+
+		Groum groum = new Groum();
+		groum.addVertex(a);
+		groum.addVertex(b);
+		groum.addEdge(a, b);
+
+		Groum groum3 = (Groum) groum.clone();
+
+		List<INode> list = new LinkedList<>();
+		list.addAll(groum.getAllNodes());
+		int i = 0;
+		boolean success = true;
+		for (INode node : groum3.getAllNodes()) {
+			if (node != list.get(i)) {
+				success = false;
+				break;
+			}
+			i++;
+		}
+
+		assertTrue(success);
+	}
+
+	@Test
+	public void groumsCanBeGenerated() {
+		IGroum groum = Fixture_Groumtest.createConnectedGroumOfSize(10);
+		assertTrue(groum.getAllNodes().size() == 10 && groum.getEdgeCount() == 9);
+	}
+
+	@Test
+	public void generatedGroumsHaveCorrectLeaf() {
+		IGroum groum = Fixture_Groumtest.createConnectedGroumOfSize(10);
+		assertTrue(groum.getLeaf().equals(Fixture_Groumtest.createActionNodeInstance("10")));
+	}
+
+	@Test
+	public void listOfGroumsCanBeGenerated() {
+		List<IGroum> groums = Fixture_Groumtest.getListOfXGroums(10);
+		assertTrue(groums.size() == 10 && groums.get(0).getAllNodes().size() == 1);
+	}
+
+	@Test
+	public void listOfGroumsCanBeGeneratedReversely() {
+		List<IGroum> groums = Fixture_Groumtest.getListOfXGroumsReverse(10);
+		assertTrue(groums.size() == 10 && groums.get(0).getAllNodes().size() == 10);
 	}
 
 }

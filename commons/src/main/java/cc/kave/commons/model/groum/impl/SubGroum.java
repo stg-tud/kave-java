@@ -14,6 +14,11 @@ public class SubGroum extends Groum implements ISubGroum {
 		this.parent = parent;
 	}
 
+	public SubGroum() {
+		super();
+		this.parent = null;
+	}
+
 	public void setParent(IGroum parent) {
 		this.parent = parent;
 	}
@@ -23,8 +28,8 @@ public class SubGroum extends Groum implements ISubGroum {
 		return parent;
 	}
 
-	@Override
-	public ISubGroum extensibleWith(ISubGroum groum) {
+	@Deprecated
+	public ISubGroum extensibleWithOld(ISubGroum groum) {
 		INode leaf = getLeaf();
 		INode root = groum.getRoot();
 		Set<INode> successors = parent.getSuccessors(leaf);
@@ -43,4 +48,28 @@ public class SubGroum extends Groum implements ISubGroum {
 
 	}
 
+	@Override
+	public ISubGroum extensibleWith(ISubGroum groum) {
+		INode leaf = getLeaf();
+
+		INode extendingNode = groum.getAllNodes().iterator().next();
+		if (extendingNode == null)
+			return null;
+
+		Set<INode> successors = parent.getSuccessors(leaf);
+		if (successors.size() == 0)
+			return null;
+		else {
+			INode candidate = successors.iterator().next();
+			if (candidate.equals(extendingNode)) {
+				ISubGroum extendedSubgroum = (ISubGroum) this.clone();
+				extendedSubgroum.addVertex(candidate);
+				extendedSubgroum.addEdge(leaf, candidate);
+				return extendedSubgroum;
+			} else {
+				return null;
+			}
+		}
+
+	}
 }

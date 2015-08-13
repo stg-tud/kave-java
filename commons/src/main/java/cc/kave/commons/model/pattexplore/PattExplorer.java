@@ -1,14 +1,14 @@
 package cc.kave.commons.model.pattexplore;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.ISubGroum;
+import cc.kave.commons.model.groum.impl.comparator.SubGroumComparator;
+import cc.kave.commons.model.groum.impl.comparator.SubGroumIdentComparator;
 
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
+import com.google.common.collect.TreeMultimap;
 
 public class PattExplorer implements IPattExplorer {
 	int threshold;
@@ -19,56 +19,72 @@ public class PattExplorer implements IPattExplorer {
 
 	@Override
 	public List<ISubGroum> explorePatterns(List<IGroum> D) {
-		List<ISubGroum> L = new LinkedList<>();
+
+		TreeMultimap<ISubGroum, ISubGroum> L = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
 
 		for (IGroum groum : D) {
-			L.addAll(Utils.breakdown(groum));
-		}
 
-		Multiset<ISubGroum> a = TreeMultiset.create(new GroumComparator());
-
-		List<List<ISubGroum>> isomorphGroups = Utils.makeIsomorphGroups(L);
-		for (List<ISubGroum> aList : isomorphGroups) {
-			if (aList.size() < threshold) {
-				L = Utils.removeEqualPatterns(aList.get(0), L);
+			List<ISubGroum> subgroums = Utils.breakdown(groum);
+			for (ISubGroum subgroum : subgroums) {
+				L.put(subgroum, subgroum);
 			}
 		}
 
-		List<ISubGroum> patterns = new ArrayList<>();
-		for (ISubGroum pattern : L) {
-			patterns.addAll(explore(pattern, L, D));
+		List<ISubGroum> smallPatterns = new LinkedList<>();
+		for (ISubGroum subgroum : L.keySet()) {
+			if (L.get(subgroum).size() < threshold) {
+				smallPatterns.add(subgroum);
+			}
 		}
 
-		return patterns;
+		for (ISubGroum smallpattern : smallPatterns) {
+			L.removeAll(smallpattern);
+		}
+
+		TreeMultimap<ISubGroum, ISubGroum> explored = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
+
+		for (ISubGroum pattern : L.keySet()) {
+			explored.putAll(explore(pattern, L, D));
+		}
+		L.putAll(explored);
+		LinkedList<ISubGroum> distinctPatterns = new LinkedList<>();
+		distinctPatterns.addAll(L.keySet());
+		return distinctPatterns;
 
 	}
 
-	private List<ISubGroum> explore(ISubGroum P, List<ISubGroum> L, List<IGroum> D) {
-		List<ISubGroum> patterns = new ArrayList<>();
-		patterns.addAll(L);
-		for (ISubGroum U : L) {
-			if (U.getAllNodes().size() != 1)
-				break;
+	private TreeMultimap<ISubGroum, ISubGroum> explore(ISubGroum P, TreeMultimap<ISubGroum, ISubGroum> L, List<IGroum> D) {
+		TreeMultimap<ISubGroum, ISubGroum> patterns = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
+		TreeMultimap<ISubGroum, ISubGroum> newPatterns = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
 
-			ISubGroum Q = P.extensibleWith(U);
-			if (Q != null) {
-				List<ISubGroum> candidates = new LinkedList<>();
+		patterns.putAll(L);
 
-				for (ISubGroum pattern : L) {
-					if (pattern.equals(P)) {
-						ISubGroum candidate = pattern.extensibleWith(U);
+		for (ISubGroum U : L.keySet()) {
+			if (U.getAllNodes().size() == 1) {
+
+				List<ISubGroum> Q = new LinkedList<>();
+
+				for (ISubGroum occurrence : patterns.get(P)) {
+					if (occurrence.equals(P)) {
+						ISubGroum candidate = occurrence.extensibleWith(U);
 						if (candidate != null)
-							candidates.add(candidate);
+							Q.add(candidate);
 					}
 				}
-				if (patterns.size() >= threshold) {
-					patterns.addAll(patterns);
-					patterns.addAll(explore(Q, patterns, D));
+				if (Q.size() >= threshold) {
+					newPatterns.putAll(Q.iterator().next(), Q);
+					patterns.putAll(newPatterns);
+
+					newPatterns.putAll(explore(Q.iterator().next(), patterns, D));
+
 				}
+
 			}
-
 		}
-		return patterns;
+		return newPatterns;
 	}
-
 }

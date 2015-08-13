@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.IGroum;
+import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.nodes.IActionNode;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
@@ -130,87 +131,63 @@ public class Fixture_Groumtest {
 
 	}
 
+	public static <E extends IGroum> List<IGroum> getGroumsOfSizeX(int x, List<E> groums) {
+		List<IGroum> group = new LinkedList<>();
+
+		for (IGroum groum : groums) {
+
+			if (groum.getAllNodes().size() == x) {
+				group.add(groum);
+			}
+		}
+
+		return group;
+	}
+
 	/*
 	 * 29 Nodes in 11 Groums
 	 */
-	public static List<IGroum> getTestList() {
-		
+	public static List<IGroum> getListOfXGroums(int x) {
+		List<IGroum> groumlist = new LinkedList<>();
 
-		// 5x A
-		// 7x B
-		// 7x C
-		// 5x D
-		// 4x E
+		for (int i = 1; i <= x; i++) {
+			groumlist.add(Fixture_Groumtest.createConnectedGroumOfSize(i));
+		}
 
-		// 3x AB
-		// 4x BC
-
-		IGroum aGroum = new SubGroum(null);
-		aGroum.addVertex(new ActionNode("A", "A"));
-		aGroum.addVertex(new ActionNode("B", "B"));
-		aGroum.addVertex(new ActionNode("C", "C"));
-
-		IGroum bGroum1 = new SubGroum(null);
-		bGroum1.addVertex(new ActionNode("A", "A"));
-		bGroum1.addVertex(new ActionNode("B", "B"));
-		bGroum1.addVertex(new ActionNode("C", "C"));
-
-		IGroum bGroum2 = new SubGroum(null);
-		bGroum2.addVertex(new ActionNode("A", "A"));
-		bGroum2.addVertex(new ActionNode("B", "B"));
-
-		IGroum cGroum1 = new SubGroum(null);
-		cGroum1.addVertex(new ActionNode("B", "B"));
-		cGroum1.addVertex(new ActionNode("B", "B"));
-
-		IGroum cGroum2 = new SubGroum(null);
-		cGroum2.addVertex(new ActionNode("A", "A"));
-		cGroum2.addVertex(new ActionNode("B", "B"));
-		cGroum2.addVertex(new ActionNode("C", "C"));
-		cGroum2.addVertex(new ActionNode("D", "D"));
-
-		IGroum cGroum3 = new SubGroum(null);
-		cGroum3.addVertex(new ActionNode("C", "C"));
-		cGroum3.addVertex(new ActionNode("D", "D"));
-
-		IGroum dGroum1 = new SubGroum(null);
-		dGroum1.addVertex(new ActionNode("D", "D"));
-		dGroum1.addVertex(new ActionNode("E", "E"));
-
-		IGroum dGroum2 = new SubGroum(null);
-		dGroum2.addVertex(new ActionNode("C", "C"));
-		dGroum2.addVertex(new ActionNode("D", "D"));
-		dGroum2.addVertex(new ActionNode("E", "E"));
-
-		IGroum dGroum3 = new SubGroum(null);
-		dGroum3.addVertex(new ActionNode("B", "B"));
-		dGroum3.addVertex(new ActionNode("C", "C"));
-		dGroum3.addVertex(new ActionNode("D", "D"));
-		dGroum3.addVertex(new ActionNode("E", "E"));
-
-		IGroum dGroum4 = new SubGroum(null);
-		dGroum4.addVertex(new ActionNode("E", "E"));
-		dGroum4.addVertex(new ActionNode("D", "D"));
-
-		IGroum eGroum = new SubGroum(null);
-		eGroum.addVertex(new ActionNode("C", "C"));
-		eGroum.addVertex(new ActionNode("B", "B"));
-		eGroum.addVertex(new ActionNode("A", "A"));
-
-		List<IGroum> list = new LinkedList<>();
-		list.add(dGroum1);
-		list.add(bGroum1);
-		list.add(cGroum3);
-		list.add(aGroum);
-		list.add(cGroum1);
-		list.add(cGroum2);
-		list.add(eGroum);
-		list.add(dGroum4);
-		list.add(dGroum3);
-		list.add(bGroum2);
-		list.add(dGroum2);
-
-		return list;
+		return groumlist;
 	}
 
+	/*
+	 * 29 Nodes in 11 Groums
+	 */
+	public static List<IGroum> getListOfXGroumsReverse(int x) {
+		List<IGroum> groumlist = new LinkedList<>();
+
+		for (int i = x; i > 0; i--) {
+			groumlist.add(Fixture_Groumtest.createConnectedGroumOfSize(i));
+		}
+
+		return groumlist;
+	}
+
+	public static IActionNode createActionNodeInstance(String name) {
+		return new ActionNode(name, name);
+	}
+
+	public static IGroum createConnectedGroumOfSize(int size) {
+		if (size == 0)
+			return null;
+
+		IGroum groum = new Groum();
+		INode previous = createActionNodeInstance(String.valueOf(1));
+		groum.addVertex(previous);
+
+		for (int i = 2; i <= size; i++) {
+			INode next = createActionNodeInstance(String.valueOf(i));
+			groum.addVertex(next);
+			groum.addEdge(previous, next);
+			previous = next;
+		}
+		return groum;
+	}
 }
