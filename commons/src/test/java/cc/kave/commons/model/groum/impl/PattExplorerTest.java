@@ -1,16 +1,15 @@
 package cc.kave.commons.model.groum.impl;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.pattexplore.PattExplorer;
+
+import static org.junit.Assert.assertTrue;
 
 public class PattExplorerTest {
 
@@ -51,6 +50,29 @@ public class PattExplorerTest {
 
 		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
 		assertTrue(patterns.size() == 3);
+
+	}
+
+	@Test
+	public void findsNoInversePatterns() {
+		IGroum groum1 = new Groum();
+		ActionNode node1a = new ActionNode("A", "A");
+		ActionNode node2a = new ActionNode("B", "B");
+		groum1.addVertex(node1a);
+		groum1.addVertex(node2a);
+		groum1.addEdge(node1a, node2a);
+
+		IGroum groum2 = new Groum();
+		ActionNode node1b = new ActionNode("B", "B");
+		ActionNode node2b = new ActionNode("A", "A");
+		groum2.addVertex(node1b);
+		groum2.addVertex(node2b);
+		groum2.addEdge(node1b, node2b);
+
+		PattExplorer uut = new PattExplorer(2);
+
+		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
+		assertTrue(patterns.size() == 2);
 
 	}
 
@@ -124,7 +146,6 @@ public class PattExplorerTest {
 	}
 
 	@Test
-	@Ignore
 	public void findsGenerated30NodesPatterns() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroums = Fixture_Groumtest.getListOfXGroums(30);
