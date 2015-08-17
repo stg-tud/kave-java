@@ -6,11 +6,13 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.jdt.core,
  org.apache.commons.io,
  commons,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.jdt,
+ org.junit,
+ org.eclipse.core.commands;bundle-version="3.7.0"
 Export-Package: namefactory,
  visitors
-Import-Package: org.junit,
- org.osgi.framework.namespace;version="1.0.0",
- org.osgi.framework.wiring;version="1.1.0",
- org.osgi.resource;version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

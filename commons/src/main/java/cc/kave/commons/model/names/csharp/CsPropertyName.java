@@ -2,15 +2,16 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
-
 import com.google.common.collect.MapMaker;
+
+import cc.kave.commons.model.names.PropertyName;
 
 public class CsPropertyName extends CsMemberName implements PropertyName {
 	private static final Map<String, CsPropertyName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final PropertyName UNKNOWN_NAME = newPropertyName("[?] [?].???");
+	public final String SETTER_MODIFIER = "set";
+	public final String GETTER_MODIFIER = "get";
 
 	public static PropertyName newPropertyName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -19,22 +20,21 @@ public class CsPropertyName extends CsMemberName implements PropertyName {
 		return nameRegistry.get(identifier);
 	}
 
+	public boolean isUnknown() {
+		return this.equals(UNKNOWN_NAME);
+	}
+
 	private CsPropertyName(String identifier) {
 		super(identifier);
 	}
 
 	@Override
 	public boolean hasSetter() {
-		throw new UnsupportedOperationException();
+		return getModifiers().contains(SETTER_MODIFIER);
 	}
 
 	@Override
 	public boolean hasGetter() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public TypeName getValueType() {
-		throw new UnsupportedOperationException();
+		return getModifiers().contains(GETTER_MODIFIER);
 	}
 }

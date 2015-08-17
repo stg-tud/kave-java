@@ -11,23 +11,55 @@ import cc.kave.commons.model.names.NamespaceName;
 import cc.kave.commons.model.names.TypeName;
 
 public class CsTypeName extends CsName implements TypeName {
-	private static final Map<String, CsTypeName> nameRegistry = new MapMaker().weakValues().makeMap();
+	private static final Map<String, TypeName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final TypeName UNKNOWN_NAME = newTypeName("?");
 
 	public static TypeName newTypeName(String identifier) {
+		identifier = fixLegacyNameFormat(identifier);
+
 		if (!nameRegistry.containsKey(identifier)) {
-			CsTypeName newName;
-			if (identifier.startsWith("d:")) {
-				newName = new CsDelegateTypeName(identifier);
-			} else if (CsUnknownTypeName.IsUnknownTypeIdentifier(identifier)) {
-				newName = new CsUnknownTypeName(identifier);
-			} else {
-				newName = new CsTypeName(identifier);
-			}
-			nameRegistry.put(identifier, newName);
+			TypeName newName;
+			newName = createTypeName(identifier);
+			nameRegistry.put(identifier, (TypeName) newName);
 		}
+
 		return nameRegistry.get(identifier);
+	}
+
+	private static TypeName createTypeName(String identifier) {
+		// checked first, because it's a special case
+		if (CsUnknownTypeName.isUnknownTypeIdentifier(identifier)) {
+			return new CsUnknownTypeName(identifier);
+		}
+		// checked second, since type parameters can have any kind of type
+		if (CsTypeParameterName.isTypeParameterIdentifier(identifier)) {
+			return new CsTypeParameterName(identifier);
+		}
+		// checked third, since the array's value type can have any kind of type
+		if (CsArrayTypeName.isArrayTypeIdentifier(identifier)) {
+			return new CsArrayTypeName(identifier);
+		}
+		if (CsInterfaceTypeName.isInterfaceTypeIdentifier(identifier)) {
+			return new CsInterfaceTypeName(identifier);
+		}
+		if (CsStructTypeName.isStructTypeIdentifier(identifier)) {
+			return new CsStructTypeName(identifier);
+		}
+		if (CsEnumTypeName.isEnumTypeIdentifier(identifier)) {
+			return new CsEnumTypeName(identifier);
+		}
+		if (CsDelegateTypeName.isDelegateTypeIdentifier(identifier)) {
+			return new CsDelegateTypeName(identifier);
+		}
+		return new CsTypeName(identifier);
+	}
+
+	private static String fixLegacyNameFormat(String identifier) {
+		if (CsDelegateTypeName.isDelegateTypeIdentifier(identifier)) {
+			return CsDelegateTypeName.fixLegacyDelegateNames(identifier);
+		}
+		return identifier;
 	}
 
 	protected CsTypeName(String identifier) {
@@ -46,127 +78,176 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public List<TypeName> getTypeParameters() {
-		int i = identifier.indexOf("->", 0);
-		;
-		List<TypeName> list = new ArrayList<TypeName>();
-		while (i < identifier.indexOf("]]") && i >= 0) {
-			list.add(CsTypeName.newTypeName(identifier.substring(i + 3, identifier.indexOf("]", i + 3))));
-			i = identifier.indexOf("->", ++i);
-		}
-		return list;
+		return hasTypeParameters() ? CsGenericNameUtils.parseTypeParameters(getFullName()) : new ArrayList<TypeName>();
 	}
 
 	@Override
 	public BundleName getAssembly() {
-		int i;
-
-		if (!identifier.contains(",")) {
-			return CsAssemblyName.newAssemblyName(identifier);
-		} else if (isGenericEntity()) {
-			i = identifier.indexOf("]]") + 4;
-		} else {
-			i = identifier.indexOf(",") + 2;
-		}
-
-		return CsAssemblyName.newAssemblyName(identifier.substring(i));
+		int endOfTypeName = getLengthOfTypeName(identifier);
+		String assemblyIdentifier = identifier.substring(endOfTypeName).trim();
+		// TODO: (new char[] { ' ', ',' });
+		return CsAssemblyName.newAssemblyName(assemblyIdentifier);
 	}
 
 	@Override
 	public NamespaceName getNamespace() {
-		int i;
-		String identifier = this.identifier;
-
-		if (isGenericEntity()) {
-			i = identifier.indexOf("`");
-		} else {
-			i = identifier.indexOf(",");
-		}
-
-		if (i == -1) {
-			return CsNamespaceName.newNamespaceName(identifier);
-		}
-
-		identifier = identifier.substring(0, i);
-		i = identifier.lastIndexOf(".");
-
-		if (i == -1) {
-			return CsNamespaceName.newNamespaceName(identifier);
-		} else {
-			return CsNamespaceName.newNamespaceName(identifier.substring(0, i));
-		}
+		String id = getRawFullName();
+		int endIndexOfNamespaceIdentifier = id.lastIndexOf('.');
+		return endIndexOfNamespaceIdentifier < 0 ? CsNamespaceName.getGlobalNamespace()
+				: CsNamespaceName.newNamespaceName(id.substring(0, endIndexOfNamespaceIdentifier));
 	}
 
+	// TODO: Siehe C# implementation
 	@Override
 	public TypeName getDeclaringType() {
+		// if (!isNestedType()) {
+		// return null;
+		// }
+		//
+		// String fullName = getFullName();
+		//
+		// if (hasTypeParameters()) {
+		// fullName = fullName.substring(0, fullName.indexOf('`'));
+		// }
+		//
+		// int endOfDeclaringTypeName = fullName.lastIndexOf("+");
+		//
+		// if (endOfDeclaringTypeName == -1) {
+		// return UNKNOWN_NAME;
+		// }
+		//
+		// String declaringTypeName = fullName.substring(0,
+		// endOfDeclaringTypeName);
+		//
+		// if (declaringTypeName.indexOf("`") > -1 && hasTypeParameters()) {
+		// int startIndex = 0;
+		// int numberOfParameters = 0;
+		//
+		// while ((startIndex = declaringTypeName.indexOf("+", startIndex) + 1)
+		// > 0) {
+		// int endIndex = declaringTypeName.indexOf("+", startIndex);
+		//
+		// if (endIndex > -1) {
+		// numberOfParameters += Integer
+		// .parseInt(declaringTypeName.substring(startIndex, endIndex -
+		// startIndex));
+		// } else {
+		// numberOfParameters +=
+		// Integer.parseInt(declaringTypeName.substring(startIndex));
+		// }
+		//
+		// List<TypeName> typeParameters = getTypeParameters();
+		// declaringTypeName += "[["
+		// + String.join("],[", typeParameters.toArray(new
+		// CharSequence[typeParameters.size()])) + "]]";
+		// }
+		// return CsTypeName.newTypeName(declaringTypeName + ", " +
+		// getAssembly());
+		// }
+		// return null;
+
 		if (!isNestedType()) {
 			return null;
 		}
 
 		String fullName = getFullName();
-		int endOfDeclaringType = fullName.lastIndexOf("+");
-		String declaringTypeName = fullName.substring(0, endOfDeclaringType);
+		if (hasTypeParameters()) {
+			fullName = takeUntilChar(fullName, new char[] { '[', ',' });
+		}
+		int endOfDeclaringTypeName = fullName.lastIndexOf('+');
+		if (endOfDeclaringTypeName == -1) {
+			return UNKNOWN_NAME;
+		}
 
-		if (declaringTypeName.indexOf("`") > 1 && hasTypeParameters()) {
+		String declaringTypeName = fullName.substring(0, endOfDeclaringTypeName);
+		if (declaringTypeName.indexOf('`') > -1 && hasTypeParameters()) {
 			int startIndex = 0;
 			int numberOfParameters = 0;
-
-			while ((startIndex = declaringTypeName.indexOf("+", startIndex) + 1) > 0) {
-				int endIndex = declaringTypeName.indexOf("+", startIndex);
+			while ((startIndex = declaringTypeName.indexOf('`', startIndex) + 1) > 0) {
+				int endIndex = declaringTypeName.indexOf('+', startIndex);
 				if (endIndex > -1) {
-					numberOfParameters += Integer
-							.parseInt(declaringTypeName.substring(startIndex, endIndex - startIndex));
+					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex, endIndex));
 				} else {
 					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
 				}
-				List<TypeName> typeParameters = getTypeParameters();
-				declaringTypeName += "[["
-						+ String.join("],[", typeParameters.toArray(new CharSequence[typeParameters.size()])) + "]]";
 			}
-			return CsTypeName.newTypeName(declaringTypeName + ", " + getAssembly());
+			// List<TypeName> outerTypeParameters =
+			// getTypeParameters().Take(numberOfParameters).ToList();
+			//
+			// declaringTypeName += "[[";
+			// for (TypeName typeName : outerTypeParameters) {
+			// declaringTypeName += "],[" + typeName.getIdentifier();
+			// }
+			// declaringTypeName += "[[" + String.join("],[",
+			// outerTypeParameters.Select(t => t.Identifier)) +
+			// "]]";
 		}
-		return null;
+		return newTypeName(declaringTypeName + ", " + getAssembly());
+	}
+
+	private String takeUntilChar(String fullName, char[] stopChars) {
+		int i = 0;
+		for (char c : getFullName().toCharArray()) {
+			for (int j = 0; j < stopChars.length; j++) {
+				if (stopChars[j] == c) {
+					return fullName.substring(0, i);
+				}
+			}
+			i++;
+		}
+
+		return fullName.substring(0, i);
 	}
 
 	@Override
 	public String getFullName() {
-		int i = identifier.indexOf("]]");
-		if (i < 0) {
-			i = identifier.indexOf(",");
-			if (i < 0) {
-				return identifier;
-			}
-		} else {
-			i += 2;
+		int length = getLengthOfTypeName(identifier);
+		return identifier.substring(0, length);
+	}
+
+	protected static int getLengthOfTypeName(String identifier) {
+		if (CsUnknownTypeName.isUnknownTypeIdentifier(identifier)) {
+			return identifier.length();
 		}
-		return identifier.substring(0, i);
+		int length = identifier.lastIndexOf(']') + 1;
+		if (length > 0) {
+			return length;
+		}
+		return identifier.indexOf(',');
 	}
 
 	@Override
 	public String getName() {
-		String name = getFullName();
-		if (isGenericEntity()) {
-			name = name.substring(0, name.indexOf("[[") - 2);
+		String rawFullName = getRawFullName();
+		int endOfOutTypeName = rawFullName.lastIndexOf('+');
+
+		if (endOfOutTypeName > -1) {
+			rawFullName = rawFullName.substring(endOfOutTypeName + 1);
 		}
-		int i = name.lastIndexOf(".") + 1;
-		return name.substring(i, name.length());
+
+		int endOfTypeName = rawFullName.lastIndexOf('`');
+
+		if (endOfTypeName > -1) {
+			rawFullName = rawFullName.substring(0, endOfTypeName);
+		}
+
+		int startIndexOfSimpleName = rawFullName.lastIndexOf('.');
+		return rawFullName.substring(startIndexOfSimpleName + 1);
 	}
 
 	public String getRawFullName() {
-
 		String fullName = getFullName();
-		int i = fullName.indexOf("[[");
+		int indexOfGenericList = fullName.indexOf("[[");
 
-		if (i == -1) {
-			i = fullName.indexOf(", ");
+		if (indexOfGenericList < 0) {
+			indexOfGenericList = fullName.indexOf(", ");
 		}
-		return i < 0 ? fullName : fullName.substring(0, i);
-
+		return indexOfGenericList < 0 ? fullName : fullName.substring(0, indexOfGenericList);
 	}
 
-	// TODO: wrong implementation?
 	@Override
 	public boolean isUnknownType() {
-		return this.equals(CsUnknownTypeName.getInstance());
+		return false;
 	}
 
 	@Override
@@ -245,12 +326,12 @@ public class CsTypeName extends CsName implements TypeName {
 	}
 
 	@Override
-	public String TypeParameterShortName() {
+	public String getTypeParameterShortName() {
 		return null;
 	}
 
 	@Override
-	public TypeName TypeParameterType() {
+	public TypeName getTypeParameterType() {
 		return null;
 	}
 }

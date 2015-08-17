@@ -44,7 +44,7 @@ public class CsMethodNameTest {
 		assertEquals("T, P, 1.2.3.4", methodName.getDeclaringType().getIdentifier());
 		assertEquals("System.Void, mscore, 4.0.0.0", methodName.getReturnType().getIdentifier());
 		assertEquals("MethodName", methodName.getName());
-		assertTrue(false); // TODO: methodName.TypeParameters
+		assertTrue(methodName.getTypeParameters().isEmpty());
 		assertFalse(methodName.hasParameters());
 		assertTrue(methodName.getParameters().isEmpty());
 	}
@@ -61,7 +61,7 @@ public class CsMethodNameTest {
 		assertEquals(declaringTypeIdentifier, methodName.getDeclaringType().getIdentifier());
 		assertEquals(returnTypeIdentifier, methodName.getReturnType().getIdentifier());
 		assertEquals("M", methodName.getName());
-		assertFalse(true); // TODO: methodName.HasTypeParameters
+		assertFalse(methodName.hasTypeParameters());
 		assertEquals(1, methodName.getParameters().size());
 		assertEquals(parameterIdentifier, methodName.getParameters().get(0).getIdentifier());
 	}
@@ -112,9 +112,8 @@ public class CsMethodNameTest {
 	public void shouldHaveNoTypeParameters() {
 		MethodName methodName = CsMethodName.newMethodName("[Value, A, 0.0.0.1] [Declarator, A, 0.0.0.1].Method()");
 
-		// assertFalse(methodName.HasTypeParameters);
-		// assertEquals(0, methodName.TypeParameters.Count);
-		assertTrue(false); // TODO: beide asserts
+		assertFalse(methodName.hasTypeParameters());
+		assertEquals(0, methodName.getTypeParameters().size());
 	}
 
 	@Test
@@ -122,8 +121,7 @@ public class CsMethodNameTest {
 		MethodName methodName = CsMethodName
 				.newMethodName("[Value, A, 0.0.0.1] [Declarator, A, 0.0.0.1].Method`1[[T]]()");
 
-		// assertTrue(methodName.HasTypeParameters);
-		assertTrue(false); // TODO: siehe oben
+		assertTrue(methodName.hasTypeParameters());
 	}
 
 	@Test
@@ -131,8 +129,7 @@ public class CsMethodNameTest {
 		MethodName methodName = CsMethodName.newMethodName("[T] [D, D, 4.5.6.7].M`2[[T],[O]]([O] p)");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("T"), CsTypeName.newTypeName("O") };
-		// assertEquals(expected, methodName.TypeParameters);
-		assertTrue(false); // TODO: siehe oben
+		assertEquals(expected, methodName.getTypeParameters());
 	}
 
 	@Test
@@ -141,8 +138,7 @@ public class CsMethodNameTest {
 				.newMethodName("[A] [D, D, 1.2.3.4].M`1[[A -> System.Int32, mscorlib, 4.0.0.0]]()");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("A -> System.Int32, mscorlib, 4.0.0.0") };
-		// assertEquals(expected, methodName.TypeParameters);
-		assertTrue(false); // TODO: siehe oben
+		assertEquals(expected, methodName.getTypeParameters());
 	}
 
 	@Test
@@ -150,9 +146,8 @@ public class CsMethodNameTest {
 		MethodName methodName = CsMethodName
 				.newMethodName("[R, R, 1.2.3.4] [D, D, 5.6.7.8].M([F`1[[T -> G, G, 5.3.2.1]]] p)");
 
-		// assertFalse(methodName.HasTypeParameters);
-		// assertEquals(0, methodName.TypeParameters.Count);
-		assertTrue(false); // TODO: siehe oben
+		assertFalse(methodName.hasTypeParameters());
+		assertEquals(0, methodName.getTypeParameters().size());
 	}
 
 	@Test
@@ -161,8 +156,7 @@ public class CsMethodNameTest {
 				.newMethodName("[T, A, 1.0.0.0] [T, A, 1.0.0.0].M`1[[T]]([F`1[[U]], A, 1.0.0.0] p)");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("T") };
-		// assertEquals(expected, method.TypeParameters);
-		assertTrue(false); // TODO: siehe oben
+		assertEquals(expected, method.getTypeParameters());
 	}
 
 	@Test

@@ -2,10 +2,10 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
+import com.google.common.collect.MapMaker;
+
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
-
-import com.google.common.collect.MapMaker;
 
 public class CsParameterName extends CsName implements ParameterName {
 
@@ -39,10 +39,11 @@ public class CsParameterName extends CsName implements ParameterName {
 
 	@Override
 	public TypeName getValueType() {
-		int start = identifier.indexOf("[") + 1;
-		int end = identifier.lastIndexOf("]");
-		String typeName = identifier.substring(start, identifier.indexOf("]"));
-		return CsTypeName.newTypeName(typeName);
+		int startOfValueTypeIdentifier = identifier.indexOf('[') + 1;
+		int endOfValueTypeIdentifier = identifier.lastIndexOf(']') + 1;
+		int lengthOfValueTypeIdentifier = endOfValueTypeIdentifier - startOfValueTypeIdentifier
+				+ getModifiers().length();
+		return CsTypeName.newTypeName(identifier.substring(startOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
 	}
 
 	@Override

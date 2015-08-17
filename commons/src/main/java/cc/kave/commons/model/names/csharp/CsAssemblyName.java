@@ -25,20 +25,33 @@ public class CsAssemblyName extends CsName implements BundleName {
 
 	@Override
 	public BundleVersion getVersion() {
-		return CsAssemblyVersion
-				.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 1, identifier.length()));
+		if (isUnknown()) {
+			return CsAssemblyVersion.UNKNOWN_NAME;
+		} else if (!identifier.contains(",")) {
+			return CsAssemblyVersion.UNKNOWN_NAME;
+		} else {
+			return CsAssemblyVersion
+					.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 2, identifier.length()));
+		}
+
 	}
 
 	@Override
 	public String getName() {
-		return identifier.substring(0, identifier.indexOf(","));
+		if (isUnknown()) {
+			return identifier;
+		} else if (!identifier.contains(",")) {
+			return identifier;
+		} else {
+			return identifier.substring(0, identifier.indexOf(",")).trim();
+		}
 	}
 
-	public static BundleName unknownName() {
+	public static BundleName getUnknownName() {
 		return CsAssemblyName.newAssemblyName(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	public boolean isUnknown() {
-		return this.equals(unknownName());
+		return this.equals(getUnknownName());
 	}
 }

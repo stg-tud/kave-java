@@ -120,10 +120,8 @@ public class ASTCreator {
 		try {
 			nodeFactoryTest.runAllTests();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

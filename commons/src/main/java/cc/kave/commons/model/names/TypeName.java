@@ -75,7 +75,7 @@ public interface TypeName extends GenericName {
 
 	boolean isTypeParameter();
 
-	String TypeParameterShortName();
+	String getTypeParameterShortName();
 
-	TypeName TypeParameterType();
+	TypeName getTypeParameterType();
 }

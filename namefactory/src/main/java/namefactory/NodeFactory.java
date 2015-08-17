@@ -219,6 +219,7 @@ public class NodeFactory {
 			return sb;
 		}
 
+		
 		public static String getAssemblyName(String qualifiedName) {
 			Class c = null;
 
@@ -227,7 +228,7 @@ public class NodeFactory {
 			} catch (ClassNotFoundException e) {
 				// e.printStackTrace();
 				return "?";
-			}
+			} 
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
 				return "rt.jar";

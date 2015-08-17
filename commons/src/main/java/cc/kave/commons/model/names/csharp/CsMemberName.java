@@ -17,7 +17,21 @@ public abstract class CsMemberName extends CsName implements MemberName {
 
 	@Override
 	public TypeName getDeclaringType() {
-		throw new UnsupportedOperationException();
+		int indexOf = identifier.indexOf("[");
+		if (indexOf == -1) {
+			return null;
+		}
+		int start = CsNameUtils.getClosingBracketIndex(identifier, identifier.indexOf("["));
+		start = identifier.indexOf("[", start);
+		int end = CsNameUtils.getClosingBracketIndex(identifier, start);
+		return CsTypeName.newTypeName(identifier.substring(start + 1, end - 1));
+	}
+
+	@Override
+	public TypeName getValueType() {
+		int start = identifier.indexOf("[");
+		int end = CsNameUtils.getClosingBracketIndex(identifier, start);
+		return CsTypeName.newTypeName(identifier.substring(start + 1, end - 1));
 	}
 
 	@Override

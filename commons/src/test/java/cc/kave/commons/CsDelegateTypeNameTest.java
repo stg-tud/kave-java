@@ -31,6 +31,7 @@ import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
@@ -47,23 +48,29 @@ public class CsDelegateTypeNameTest {
 			PARAMETERIZED_DELEGATE_NAME };
 
 	// TODO:
-	/*
-	 * [TestCaseSource("DelegateTypeNames")] public void
-	 * ParsesFullName(IDelegateTypeName delegateType) {
-	 * Assert.AreEqual("Some.DelegateType", delegateType.FullName); }
-	 * 
-	 * [TestCaseSource("DelegateTypeNames")] public void
-	 * ParsesName(IDelegateTypeName delegateType) {
-	 * Assert.AreEqual("DelegateType", delegateType.Name); }
-	 * 
-	 * [TestCaseSource("DelegateTypeNames")] public void
-	 * ParsesNamespace(IDelegateTypeName delegateType) {
-	 * Assert.AreEqual(NamespaceName.Get("Some"), delegateType.Namespace); }
-	 */
 
 	@Test
-	public void ParsesFullName() {
-		assertTrue(false);
+	public void parsesFullName() {
+		assertEquals("Some.DelegateType", CsDelegateTypeNameTest.LEGACY_DELEGATE_NAME.getFullName());
+		assertEquals("Some.DelegateType", CsDelegateTypeNameTest.PARAMETERLESS_DELEGATE_NAME.getFullName());
+		assertEquals("Some.DelegateType", CsDelegateTypeNameTest.PARAMETERIZED_DELEGATE_NAME.getFullName());
+	}
+
+	@Test
+	public void parsesName() {
+		assertEquals("DelegateType", CsDelegateTypeNameTest.LEGACY_DELEGATE_NAME.getName());
+		assertEquals("DelegateType", CsDelegateTypeNameTest.PARAMETERLESS_DELEGATE_NAME.getName());
+		assertEquals("DelegateType", CsDelegateTypeNameTest.PARAMETERIZED_DELEGATE_NAME.getName());
+	}
+
+	@Test
+	public void parsesNamespace() {
+		assertEquals(CsNamespaceName.newNamespaceName("Some"),
+				CsDelegateTypeNameTest.LEGACY_DELEGATE_NAME.getNamespace());
+		assertEquals(CsNamespaceName.newNamespaceName("Some"),
+				CsDelegateTypeNameTest.PARAMETERLESS_DELEGATE_NAME.getNamespace());
+		assertEquals(CsNamespaceName.newNamespaceName("Some"),
+				CsDelegateTypeNameTest.PARAMETERIZED_DELEGATE_NAME.getNamespace());
 	}
 
 	@Test
@@ -150,9 +157,8 @@ public class CsDelegateTypeNameTest {
 		TypeName typeName = CsTypeName.newTypeName("d:[T] [DT`1[[T -> String, mscorlib]]].([T] p)");
 
 		assertTrue(typeName.hasTypeParameters());
-		// assertEquals(new Object[] { CsTypeParameterName.Get("T -> String,
-		// mscorlib") },
-		// typeName.getTypeParameters().toArray());
+		assertEquals(new Object[] { CsDelegateTypeName.newDelegateTypeName("T -> String, mscorlib") },
+				typeName.getTypeParameters().toArray());
 		assertTrue(false);
 	}
 

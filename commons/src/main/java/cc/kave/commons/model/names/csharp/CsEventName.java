@@ -2,10 +2,10 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
+import com.google.common.collect.MapMaker;
+
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.TypeName;
-
-import com.google.common.collect.MapMaker;
 
 public class CsEventName extends CsMemberName implements EventName {
 	private static final Map<String, CsEventName> nameRegistry = new MapMaker().weakValues().makeMap();
@@ -25,6 +25,10 @@ public class CsEventName extends CsMemberName implements EventName {
 
 	@Override
 	public TypeName getHandlerType() {
-		throw new UnsupportedOperationException();
+		return getValueType();
+	}
+
+	public boolean isUnknown() {
+		return this.equals(UNKNOWN_NAME);
 	}
 }

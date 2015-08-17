@@ -17,31 +17,46 @@
 package cc.kave.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
+import cc.kave.commons.model.names.csharp.CsAssemblyVersion;
 
 public class CsAssemblyNameTest {
 
-	BundleName name = CsAssemblyName.newAssemblyName("java.lang, VersionPlaceholder");
-
 	@Test
-	public void getName() {
-		String actual = name.getName();
-		String expected = "java.lang";
-
-		assertEquals(expected, actual);
+	public void shouldImplementIsUnknown() {
+		assertTrue(CsAssemblyName.UNKNOWN_NAME.isUnknown());
 	}
 
 	@Test
-	public void getVersion() {
-		// TODO: testStub
-		String actual = name.getIdentifier().substring(name.getIdentifier().indexOf(",") + 2,
-				name.getIdentifier().length()); // name.getVersion().;
-		String expected = "VersionPlaceholder";
+	public void shouldBeMSCorLibAssembly() {
+		final String identifier = "mscorlib, 4.0.0.0";
+		BundleName mscoreAssembly = CsAssemblyName.newAssemblyName(identifier);
 
-		assertEquals(expected, actual);
+		assertEquals("mscorlib", mscoreAssembly.getName());
+		assertEquals("4.0.0.0", mscoreAssembly.getVersion().getIdentifier());
+		assertEquals(identifier, mscoreAssembly.getIdentifier());
+	}
+
+	@Test
+	public void shouldBeVersionlessAssembly() {
+		final String identifier = "assembly";
+		BundleName assemblyName = CsAssemblyName.newAssemblyName(identifier);
+
+		assertEquals("assembly", assemblyName.getName());
+		assertEquals(CsAssemblyVersion.UNKNOWN_NAME, assemblyName.getVersion());
+		assertEquals(identifier, assemblyName.getIdentifier());
+	}
+
+	@Test
+	public void shouldHaveUnknownVersionIfUnknown() {
+		BundleName uut = CsAssemblyName.UNKNOWN_NAME;
+
+		assertEquals("???", uut.getName());
+		assertEquals(CsAssemblyVersion.UNKNOWN_NAME, uut.getVersion());
 	}
 }

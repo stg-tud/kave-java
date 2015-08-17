@@ -3,6 +3,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.MapMaker;
 
@@ -14,6 +15,10 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	private static final Map<String, CsMethodName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final MethodName UNKNOWN_NAME = newMethodName("[?] [?].???()");
+
+	private static final Pattern signatureSyntax = Pattern
+			.compile("\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
+	// .compile("\\\\\\]\\\\.((([^(\\[]+)(?:`[0-9]+\\\\[\\[^(]+\\\\\\]){0,1})\\\\(.*\\\\))$");
 
 	public static MethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -33,20 +38,7 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public List<ParameterName> getParameters() {
-		List<ParameterName> list = new ArrayList<ParameterName>();
-
-		int low = identifier.indexOf("([", 0) + 1;
-		while (hasParameters() && low != -1) {
-			int up = Math.min(identifier.indexOf(", [", low), identifier.indexOf(")", low));
-
-			if (up == -1) {
-				up = Math.max(identifier.indexOf(", [", low), identifier.indexOf(")", low));
-			}
-
-			list.add(CsParameterName.newParameterName(identifier.substring(low, up)));
-			low = identifier.indexOf("[", low + 1);
-		}
-		return list;
+		return CsNameUtils.getParameterNames(identifier);
 	}
 
 	@Override
@@ -62,5 +54,33 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	@Override
 	public TypeName getReturnType() {
 		return CsTypeName.newTypeName(identifier.substring(identifier.indexOf("[") + 1, identifier.indexOf("]")));
+	}
+
+	// TODO:
+	public String getFullName() {
+		// String group = signatureSyntax.matcher(identifier).group(2);
+		// signatureSyntax.matcher(identifier).group(2);
+		// return signatureSyntax.matcher(identifier).group(2);
+		return "";
+	}
+
+	public String getName() {
+		return "";
+	}
+
+	@Override
+	public boolean hasTypeParameters() {
+		// TODO: get { return FullName.Contains("[["); }
+		return getFullName().contains("[[");
+	}
+
+	@Override
+	public List<TypeName> getTypeParameters() {
+		return hasTypeParameters() ? CsGenericNameUtils.parseTypeParameters(getFullName()) : new ArrayList<TypeName>();
+	}
+
+	@Override
+	public boolean isGenericEntity() {
+		return hasTypeParameters();
 	}
 }

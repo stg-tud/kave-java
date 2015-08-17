@@ -11,7 +11,7 @@ public class CsUnknownTypeName extends CsTypeName {
 		return CsTypeName.newTypeName(IDENTIFIER);
 	}
 
-	public static boolean IsUnknownTypeIdentifier(String identifier) {
+	public static boolean isUnknownTypeIdentifier(String identifier) {
 		return identifier.equals(IDENTIFIER);
 	}
 
@@ -30,7 +30,7 @@ public class CsUnknownTypeName extends CsTypeName {
 
 	@Override
 	public BundleName getAssembly() {
-		return CsAssemblyName.unknownName();
+		return CsAssemblyName.getUnknownName();
 	}
 
 	@Override
