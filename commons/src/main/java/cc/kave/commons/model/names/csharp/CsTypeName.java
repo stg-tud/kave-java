@@ -171,16 +171,13 @@ public class CsTypeName extends CsName implements TypeName {
 					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
 				}
 			}
-			// List<TypeName> outerTypeParameters =
-			// getTypeParameters().Take(numberOfParameters).ToList();
-			//
-			// declaringTypeName += "[[";
-			// for (TypeName typeName : outerTypeParameters) {
-			// declaringTypeName += "],[" + typeName.getIdentifier();
-			// }
-			// declaringTypeName += "[[" + String.join("],[",
-			// outerTypeParameters.Select(t => t.Identifier)) +
-			// "]]";
+
+			List<TypeName> outerTypeParameters = getTypeParameters().subList(0, numberOfParameters);
+
+			declaringTypeName += "[[";
+			for (TypeName typeName : outerTypeParameters) {
+				declaringTypeName += "],[" + typeName.getIdentifier();
+			}
 		}
 		return newTypeName(declaringTypeName + ", " + getAssembly());
 	}
