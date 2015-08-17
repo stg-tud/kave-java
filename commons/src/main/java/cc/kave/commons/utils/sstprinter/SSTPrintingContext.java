@@ -171,7 +171,9 @@ public class SSTPrintingContext {
 	/// <param name="typeName">The type name to append.</param>
 	/// <returns>The context after appending.</returns>
 	public SSTPrintingContext typeNameOnly(TypeName typeName) {
-		return text(typeName.getName());
+		if (typeName != null)
+			return text(typeName.getName());
+		return this;
 	}
 
 	protected SSTPrintingContext typeParameterShortName(String typeParameterShortName) {
@@ -188,7 +190,7 @@ public class SSTPrintingContext {
 
 		typeNameOnly(typeName);
 
-		if (typeName.hasTypeParameters()) {
+		if (typeName != null && typeName.hasTypeParameters()) {
 			typeParameters(typeName.getTypeParameters());
 		}
 
@@ -199,7 +201,7 @@ public class SSTPrintingContext {
 		leftAngleBracket();
 
 		for (TypeName p : typeParameters) {
-			if (p.isUnknownType() || p.TypeParameterType().isUnknownType()) {
+			if (p.isUnknownType() || (p.TypeParameterType() != null && p.TypeParameterType().isUnknownType())) {
 				typeParameterShortName(CsTypeName.UNKNOWN_NAME.getIdentifier());
 			} else {
 				type(p.TypeParameterType());

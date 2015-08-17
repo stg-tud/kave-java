@@ -5,6 +5,7 @@ import java.util.List;
 
 import cc.kave.commons.model.names.NamespaceName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
+import cc.kave.commons.model.ssts.ISST;
 
 public class SSTPrintingUtils {
 	public static void formatAsUsingList(List<NamespaceName> namespaces, SSTPrintingContext context) {
@@ -25,5 +26,11 @@ public class SSTPrintingUtils {
 				context.newLine();
 			}
 		}
+	}
+
+	public static String printSST(ISST sst) {
+		SSTPrintingContext context = new SSTPrintingContext();
+		sst.accept(new SSTPrintingVisitor(), context);
+		return context.toString();
 	}
 }

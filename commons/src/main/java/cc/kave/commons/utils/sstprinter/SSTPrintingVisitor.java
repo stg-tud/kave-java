@@ -493,13 +493,15 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IConstantValueExpression expr, SSTPrintingContext c) {
-		String value = !expr.getValue().isEmpty() ? expr.getValue() : "...";
+		if (expr.getValue() != null) {
+			String value = !expr.getValue().isEmpty() ? expr.getValue() : "...";
 
-		// Double.TryParse(expr.Value, out parsed
-		if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")) {
-			c.keyword(value);
-		} else {
-			c.stringLiteral(value);
+			// Double.TryParse(expr.Value, out parsed
+			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")) {
+				c.keyword(value);
+			} else {
+				c.stringLiteral(value);
+			}
 		}
 		return null;
 	}
