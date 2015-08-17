@@ -1,5 +1,11 @@
 package cc.kave.commons.utils.json;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,10 +28,13 @@ import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAliasName;
+import cc.kave.commons.model.names.csharp.CsArrayTypeName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
+import cc.kave.commons.model.names.csharp.CsEnumTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsInterfaceTypeName;
 import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
@@ -33,7 +42,9 @@ import cc.kave.commons.model.names.csharp.CsName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.csharp.CsStructTypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.CsTypeParameterName;
 import cc.kave.commons.model.names.csharp.CsUnknownTypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
@@ -105,16 +116,42 @@ import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
 
 public abstract class JsonUtils {
-	public static <T> T parseJson(String json, Class<T> targetType) {
+	public static <T> T parseJson(String json, Type targetType) {
 		json = addDetails(json);
 		Gson gson = createGson();
 		return gson.fromJson(json, targetType);
 	}
 
-	public static <T> String parseObject(Object obj, Class<T> targetType) {
+	public static <T> String parseObject(Object obj, Type targetType) {
 		Gson gson = createGson();
 		String json = gson.toJsonTree(obj, targetType).toString();
 		return removeDetails(json);
+	}
+
+	public static <T> T deserialize(File file, Type targetType) {
+		StringBuilder builder = new StringBuilder();
+		try {
+			FileInputStream stream = new FileInputStream(file);
+			int ch;
+
+			while ((ch = stream.read()) != -1) {
+				builder.append((char) ch);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return parseJson(builder.toString(), targetType);
+	}
+
+	public static <T> void serialize(T object, File file) {
+		try {
+			Writer stream = new FileWriter(file);
+			String output = parseObject(object, object.getClass());
+			stream.write(output);
+			stream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static String removeDetails(String json) {
@@ -215,6 +252,11 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
 		gsonBuilder.registerTypeAdapter(CsUnknownTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsTypeParameterName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsStructTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsInterfaceTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsEnumTypeName.class, new GsonNameDeserializer());
+		gsonBuilder.registerTypeAdapter(CsArrayTypeName.class, new GsonNameDeserializer());
 
 		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableExpression.class, "$type")
 				.registerSubtype(CompletionExpression.class).registerSubtype(ComposedExpression.class)
@@ -239,9 +281,10 @@ public abstract class JsonUtils {
 						.registerSubtype(UnknownReference.class).registerSubtype(EventReference.class)
 						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
 						.registerSubtype(MethodReference.class).registerSubtype(VariableReference.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type")
-				.registerSubtype(EventReference.class).registerSubtype(FieldReference.class)
-				.registerSubtype(PropertyReference.class).registerSubtype(UnknownReference.class));
+		gsonBuilder.registerTypeAdapterFactory(
+				RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type").registerSubtype(EventReference.class)
+						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
+						.registerSubtype(UnknownReference.class).registerSubtype(VariableReference.class));
 		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableReference.class, "$type")
 				.registerSubtype(VariableReference.class));
 		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISimpleExpression.class, "$type")

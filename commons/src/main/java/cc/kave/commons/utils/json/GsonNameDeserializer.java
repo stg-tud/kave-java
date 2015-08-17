@@ -2,6 +2,14 @@ package cc.kave.commons.utils.json;
 
 import java.lang.reflect.Type;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.names.csharp.CsAliasName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
@@ -15,14 +23,6 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSerializer<Name> {
 
@@ -58,7 +58,8 @@ public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSeriali
 		case "CSharp.TypeName":
 			return CsTypeName.newTypeName(identifier);
 		default:
-			if (discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName")) {
+			if ((discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName"))
+					|| discriminator.equals("CSharp.TypeParameterName")) {
 				return CsTypeName.newTypeName(identifier);
 			}
 			throw new JsonParseException("Not a valid serialized name: '" + json + "'");
@@ -67,14 +68,8 @@ public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSeriali
 
 	@Override
 	public JsonElement serialize(Name src, Type typeOfSrc, JsonSerializationContext context) {
-		String superType;
-		if (src.getClass().getGenericInterfaces().length != 0) {
-			superType = src.getClass().getGenericInterfaces()[0].getTypeName();
-			superType = superType.substring(superType.lastIndexOf('.'));
-		} else
-			superType = "." + src.getClass().getSimpleName().substring(2);
-
-		return new JsonPrimitive("CSharp" + superType + ":" + src.getIdentifier());
+		return new JsonPrimitive(
+				"CSharp." + src.getClass().getSimpleName().replaceFirst("Cs", "") + ":" + src.getIdentifier());
 	}
 
 }
