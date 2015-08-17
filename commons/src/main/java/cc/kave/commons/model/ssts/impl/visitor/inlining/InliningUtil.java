@@ -1,4 +1,4 @@
-package cc.kave.commons.utils.visitor;
+package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,20 +10,18 @@ import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 
 public class InliningUtil {
-	public static final TypeName RESULT_TYPE = CsTypeName.newTypeName("int");
-	public static final TypeName GOT_RESULT_TYPE = CsTypeName.newTypeName("boolean");
+	public static final TypeName GOT_RESULT_TYPE = CsTypeName.newTypeName("Boolean");
 	public static final String RESULT_NAME = "$result_";
-	public static final String RESULT_FLAG = "$gotResult_";
+	public static final String RESULT_FLAG = "$gotNoResult_";
 
 	public static void visit(List<IStatement> body, List<IStatement> blockBody, InliningContext context) {
 		context.enterBlock();
 		int index = 0;
 		for (IStatement statement : body) {
-			statement.accept(new InliningIStatementVisitor(), context);
-			if (context.isGuardNeeded() && body.subList(index + 1, body.size()).size() > 0) {
+			statement.accept(context.getStatementVisitor(), context);
+			if ((context.isGuardNeeded()) && body.subList(index + 1, body.size()).size() > 0) {
 				IfElseBlock block = new IfElseBlock();
 				block.setCondition(SSTUtil.referenceExprToVariable(RESULT_FLAG + context.getResultName()));
 				context.setGuardNeeded(false);
@@ -32,6 +30,7 @@ public class InliningUtil {
 				break;
 			}
 			index++;
+
 		}
 		context.leaveBlock(blockBody);
 	}
@@ -43,19 +42,23 @@ public class InliningUtil {
 	}
 
 	public static void visitScope(List<IStatement> body, List<IStatement> newBody, InliningContext context) {
-		context.enterScope(body);
+		context.enterScope(body, null);
 		int index = 0;
 		for (IStatement statement : body) {
-			statement.accept(new InliningIStatementVisitor(), context);
-			if (context.isGuardNeeded() && body.subList(index + 1, body.size()).size() > 0) {
+			statement.accept(context.getStatementVisitor(), context);
+
+			if ((context.isGuardNeeded() || context.isGlobalGuardNeeded())
+					&& body.subList(index + 1, body.size()).size() > 0) {
 				IfElseBlock block = new IfElseBlock();
 				block.setCondition(SSTUtil.referenceExprToVariable(RESULT_FLAG + context.getResultName()));
 				context.setGuardNeeded(false);
+				context.setGlobalGuardNeeded(false);
 				visit(body.subList(index + 1, body.size()), block.getThen(), context);
 				context.addStatement(block);
 				break;
 			}
 			index++;
+
 		}
 		newBody.addAll(context.getBody());
 		context.leaveScope();

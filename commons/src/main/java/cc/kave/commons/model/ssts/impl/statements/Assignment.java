@@ -37,7 +37,11 @@ public class Assignment implements IAssignment {
 
 	@Override
 	public int hashCode() {
-		return 11 + (this.reference.hashCode() * 397) ^ this.expression.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -46,7 +50,7 @@ public class Assignment implements IAssignment {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Assignment))
+		if (getClass() != obj.getClass())
 			return false;
 		Assignment other = (Assignment) obj;
 		if (expression == null) {

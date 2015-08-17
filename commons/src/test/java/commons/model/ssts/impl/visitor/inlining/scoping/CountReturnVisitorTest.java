@@ -1,4 +1,4 @@
-package commons.model.ssts.impl.visitor;
+package commons.model.ssts.impl.visitor.inlining.scoping;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -8,7 +8,8 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.CountReturnsVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
+import commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
 
 public class CountReturnVisitorTest extends InliningBaseTest {
 

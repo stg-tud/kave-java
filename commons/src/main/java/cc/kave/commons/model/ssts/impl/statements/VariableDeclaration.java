@@ -42,7 +42,11 @@ public class VariableDeclaration implements IVariableDeclaration {
 
 	@Override
 	public int hashCode() {
-		return 20 + (reference.hashCode() * 397) ^ type.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 
 	@Override
@@ -54,8 +58,6 @@ public class VariableDeclaration implements IVariableDeclaration {
 		if (getClass() != obj.getClass())
 			return false;
 		VariableDeclaration other = (VariableDeclaration) obj;
-		if (reference.isMissing() != other.isMissing())
-			return false;
 		if (reference == null) {
 			if (other.reference != null)
 				return false;

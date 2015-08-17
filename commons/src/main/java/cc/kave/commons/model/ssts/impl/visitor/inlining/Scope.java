@@ -1,4 +1,4 @@
-package cc.kave.commons.utils.visitor;
+package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import java.util.ArrayList;
 import java.util.HashMap;

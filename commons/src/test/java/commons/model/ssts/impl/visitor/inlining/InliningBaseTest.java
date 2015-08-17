@@ -1,4 +1,4 @@
-package commons.model.ssts.impl.visitor;
+package commons.model.ssts.impl.visitor.inlining;
 
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
@@ -92,6 +94,10 @@ import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 
 public class InliningBaseTest {
 
+	public static final TypeName INTEGER = CsTypeName.newTypeName("Integer");
+	public static final TypeName BOOLEAN = CsTypeName.newTypeName("Boolean");
+	public static final String SIGNATURE = "[Integer] [?].";
+
 	protected IStatement label(String label, IStatement statement) {
 		LabelledStatement labelled = new LabelledStatement();
 		labelled.setLabel(label);
@@ -109,7 +115,18 @@ public class InliningBaseTest {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setParameters(Lists.newArrayList(parameters));
 		invocation.setReference(reference);
-		invocation.setMethodName(CsMethodName.newMethodName("[?] [?]." + name + "()"));
+		invocation.setMethodName(CsMethodName.newMethodName(SIGNATURE + name + "()"));
+		return invocation;
+	}
+
+	protected IStatement invocationStatement(MethodName name, ISimpleExpression... parameters) {
+		return expr(invocationExpr(name, parameters));
+	}
+
+	protected IInvocationExpression invocationExpr(MethodName name, ISimpleExpression... parameters) {
+		InvocationExpression invocation = new InvocationExpression();
+		invocation.setParameters(Lists.newArrayList(parameters));
+		invocation.setMethodName(name);
 		return invocation;
 	}
 
@@ -138,9 +155,18 @@ public class InliningBaseTest {
 		return declareMethod(name, false, statements);
 	}
 
+	protected IMethodDeclaration declareMethod(MethodName name, boolean entryPoint, IStatement... statements) {
+		MethodDeclaration method = new MethodDeclaration();
+		method.setName(name);
+		method.setEntryPoint(entryPoint);
+		for (IStatement s : statements)
+			method.getBody().add(s);
+		return method;
+	}
+
 	protected IMethodDeclaration declareMethod(String name, boolean entryPoint, IStatement... statements) {
 		MethodDeclaration method = new MethodDeclaration();
-		method.setName(CsMethodName.newMethodName("[?] [?]." + name + "()"));
+		method.setName(CsMethodName.newMethodName(SIGNATURE + name + "()"));
 		method.setEntryPoint(entryPoint);
 		for (IStatement s : statements)
 			method.getBody().add(s);
@@ -380,6 +406,27 @@ public class InliningBaseTest {
 	protected IVariableDeclaration declareVar(String identifier) {
 		// TODO: int, bool, unknown Type methods
 		VariableDeclaration variable = new VariableDeclaration();
+		variable.setReference(ref(identifier));
+		return variable;
+	}
+
+	protected IVariableDeclaration declareInt(String identifier) {
+		VariableDeclaration variable = new VariableDeclaration();
+		variable.setReference(ref(identifier));
+		variable.setType(INTEGER);
+		return variable;
+	}
+
+	protected IVariableDeclaration declareBoolean(String identifier) {
+		VariableDeclaration variable = new VariableDeclaration();
+		variable.setReference(ref(identifier));
+		variable.setType(BOOLEAN);
+		return variable;
+	}
+
+	protected IVariableDeclaration declareVar(String identifier, TypeName type) {
+		VariableDeclaration variable = new VariableDeclaration();
+		variable.setType(type);
 		variable.setReference(ref(identifier));
 		return variable;
 	}

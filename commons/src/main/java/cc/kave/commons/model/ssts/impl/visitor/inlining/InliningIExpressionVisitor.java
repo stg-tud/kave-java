@@ -1,12 +1,15 @@
 package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -28,12 +31,12 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
-import cc.kave.commons.model.ssts.impl.visitor.CountReturnsVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
+import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.utils.visitor.InliningContext;
-import cc.kave.commons.utils.visitor.InliningUtil;
 
 public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningContext, IExpression> {
 
@@ -41,28 +44,49 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
 		if (method != null) {
 			List<IStatement> body = new ArrayList<>();
-			// TODO: Testing Methods with Parameters
+			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
 			if (method.getName().hasParameters()) {
-				for (int i = 0; i < expr.getParameters().size(); i++) {
-					ParameterName parameter = method.getName().getParameters().get(i);
-					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expr.getParameters().get(i)));
+				List<ParameterName> parameters = method.getName().getParameters();
+				for (int i = 0; i < parameters.size(); i++) {
+					ParameterName parameter = parameters.get(i);
+					// TODO what to do when parameter has out/ref keyWord but is
+					// no ReferenceExpression ?
+					if (parameter.isPassedByReference() && expr.getParameters().get(i) instanceof ReferenceExpression) {
+						ReferenceExpression refExpr = (ReferenceExpression) expr.getParameters().get(i);
+						if (refExpr.getReference() instanceof VariableReference) {
+							preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
+									(IVariableReference) refExpr.getReference());
+						} else if (refExpr.getReference() instanceof IMemberReference) {
+							preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
+									((IMemberReference) refExpr.getReference()).getReference());
+						}
+						continue;
+					} else if (parameter.isParameterArray()) {
+						body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
+						body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
+						break;
+					}
+					if (i < expr.getParameters().size()) {
+						body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
+						body.add(SSTUtil.assigmentToLocal(parameter.getName(), expr.getParameters().get(i)));
+					}
 				}
 			}
-			// Setting up guarding if needed, TODO: Tests, TODO: Setting Guards
+			// Setting up guarding if needed
 			boolean guardsNeeded = method.accept(new CountReturnsVisitor(), null) > 1 ? true : false;
 			if (guardsNeeded) {
-				body.add(SSTUtil.declare(InliningUtil.RESULT_NAME + method.getName().getIdentifier(),
-						InliningUtil.RESULT_TYPE));
+				IVariableDeclaration variable = SSTUtil.declare(
+						InliningUtil.RESULT_NAME + method.getName().getIdentifier(), method.getName().getReturnType());
+				body.add(variable);
 				body.add(SSTUtil.declare(InliningUtil.RESULT_FLAG + method.getName().getIdentifier(),
 						InliningUtil.GOT_RESULT_TYPE));
 				ConstantValueExpression constant = new ConstantValueExpression();
-				constant.setValue("false");
+				constant.setValue("true");
 				body.add(SSTUtil.assigmentToLocal(InliningUtil.RESULT_FLAG + method.getName().getIdentifier(),
 						constant));
 			}
 			body.addAll(method.getBody());
-			context.enterScope(body);
+			context.enterScope(body, preChangedNames);
 			if (guardsNeeded)
 				context.setResultName(method.getName().getIdentifier());
 			context.setInline(true);
@@ -73,7 +97,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 						context.leaveScope();
 						return stmt.getExpression();
 					}
-					statement.accept(new InliningIStatementVisitor(), context);
+					statement.accept(context.getStatementVisitor(), context);
 				}
 			} else {
 				InliningUtil.visit(body, context.getBody(), context);
@@ -91,7 +115,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 
 	public IExpression visit(IReferenceExpression expr, InliningContext context) {
 		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(expr.getReference().accept(new InliningIReferenceVisitor(), context));
+		refExpr.setReference(expr.getReference().accept(context.getReferenceVisitor(), context));
 		return refExpr;
 	}
 
@@ -106,7 +130,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	public IExpression visit(IComposedExpression expr, InliningContext context) {
 		ComposedExpression composed = new ComposedExpression();
 		for (IVariableReference ref : expr.getReferences())
-			composed.getReferences().add((IVariableReference) ref.accept(new InliningIReferenceVisitor(), context));
+			composed.getReferences().add((IVariableReference) ref.accept(context.getReferenceVisitor(), context));
 		return composed;
 	}
 
@@ -120,12 +144,12 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	@Override
 	public IExpression visit(IIfElseExpression expr, InliningContext context) {
 		IfElseExpression expression = new IfElseExpression();
-		expression.setCondition(
-				(ISimpleExpression) expr.getCondition().accept(new InliningIExpressionVisitor(), context));
+		expression
+				.setCondition((ISimpleExpression) expr.getCondition().accept(context.getExpressionVisitor(), context));
 		expression.setElseExpression(
-				(ISimpleExpression) expr.getElseExpression().accept(new InliningIExpressionVisitor(), context));
+				(ISimpleExpression) expr.getElseExpression().accept(context.getExpressionVisitor(), context));
 		expression.setThenExpression(
-				(ISimpleExpression) expr.getThenExpression().accept(new InliningIExpressionVisitor(), context));
+				(ISimpleExpression) expr.getThenExpression().accept(context.getExpressionVisitor(), context));
 		return expression;
 	}
 
@@ -153,7 +177,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	public IExpression visit(ICompletionExpression entity, InliningContext context) {
 		CompletionExpression expression = new CompletionExpression();
 		expression.setObjectReference(
-				(IVariableReference) entity.getObjectReference().accept(new InliningIReferenceVisitor(), context));
+				(IVariableReference) entity.getObjectReference().accept(context.getReferenceVisitor(), context));
 		expression.setToken(entity.getToken());
 		expression.setTypeReference(entity.getTypeReference());
 		return expression;

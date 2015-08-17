@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.impl.visitor;
+package cc.kave.commons.model.ssts.impl.visitor.inlining.util;
 
 import java.util.Set;
 
@@ -32,6 +32,7 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;

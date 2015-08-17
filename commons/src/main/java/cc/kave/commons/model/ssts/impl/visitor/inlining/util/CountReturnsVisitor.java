@@ -1,6 +1,11 @@
-package cc.kave.commons.model.ssts.impl.visitor;
+package cc.kave.commons.model.ssts.impl.visitor.inlining.util;
+
+import java.util.List;
 
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.ICaseBlock;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -24,6 +29,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -54,13 +60,12 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 
 	@Override
 	public Integer visit(IMethodDeclaration stmt, Void context) {
-		stmt.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(stmt.getBody());
 		return counter;
 	}
 
 	@Override
 	public Integer visit(IVariableDeclaration stmt, Void context) {
-		stmt.getReference().accept(this, context);
 		return null;
 	}
 
@@ -113,13 +118,13 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 	@Override
 	public Integer visit(IDoLoop block, Void context) {
 		block.getCondition().accept(this, context);
-		block.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(block.getBody());
 		return null;
 	}
 
 	@Override
 	public Integer visit(IForEachLoop block, Void context) {
-		block.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(block.getBody());
 		block.getDeclaration().accept(this, context);
 		block.getLoopedReference().accept(this, context);
 		return null;
@@ -128,46 +133,47 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 	@Override
 	public Integer visit(IForLoop block, Void context) {
 		block.getCondition().accept(this, context);
-		block.getInit().stream().forEach(s -> s.accept(this, context));
-		block.getBody().stream().forEach(s -> s.accept(this, context));
-		block.getStep().stream().forEach(s -> s.accept(this, context));
+		visit(block.getInit());
+		visit(block.getBody());
+		visit(block.getStep());
 		return null;
 	}
 
 	@Override
 	public Integer visit(IIfElseBlock block, Void context) {
 		block.getCondition().accept(this, context);
-		block.getElse().stream().forEach(s -> s.accept(this, context));
-		block.getThen().stream().forEach(s -> s.accept(this, context));
+		visit(block.getElse());
+		visit(block.getThen());
 		return null;
 	}
 
 	@Override
 	public Integer visit(ILockBlock stmt, Void context) {
-		stmt.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(stmt.getBody());
 		return null;
 	}
 
 	@Override
 	public Integer visit(ISwitchBlock block, Void context) {
-		block.getDefaultSection().stream().forEach(s -> s.accept(this, context));
+		visit(block.getDefaultSection());
 		block.getReference().accept(this, context);
-		block.getSections().stream().forEach(s -> s.getBody().stream().forEach(f -> f.accept(this, context)));
-		block.getSections().stream().forEach(s -> s.getLabel().accept(this, context));
+		for (ICaseBlock caseBlock : block.getSections())
+			visit(caseBlock.getBody());
 		return null;
 	}
 
 	@Override
 	public Integer visit(ITryBlock block, Void context) {
-		block.getFinally().stream().forEach(s -> s.accept(this, context));
-		block.getBody().stream().forEach(s -> s.accept(this, context));
-		block.getCatchBlocks().stream().forEach(c -> c.getBody().stream().forEach(s -> s.accept(this, context)));
+		visit(block.getBody());
+		visit(block.getFinally());
+		for (ICatchBlock catchBlock : block.getCatchBlocks())
+			visit(catchBlock.getBody());
 		return null;
 	}
 
 	@Override
 	public Integer visit(IUncheckedBlock block, Void context) {
-		block.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(block.getBody());
 		return null;
 	}
 
@@ -178,14 +184,14 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 
 	@Override
 	public Integer visit(IUsingBlock block, Void context) {
-		block.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(block.getBody());
 		block.getReference().accept(this, context);
 		return null;
 	}
 
 	@Override
 	public Integer visit(IWhileLoop block, Void context) {
-		block.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(block.getBody());
 		block.getCondition().accept(this, context);
 		return null;
 	}
@@ -212,13 +218,13 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 
 	@Override
 	public Integer visit(ILambdaExpression expr, Void context) {
-		expr.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(expr.getBody());
 		return null;
 	}
 
 	@Override
 	public Integer visit(ILoopHeaderBlockExpression expr, Void context) {
-		expr.getBody().stream().forEach(s -> s.accept(this, context));
+		visit(expr.getBody());
 		return null;
 	}
 
@@ -275,6 +281,12 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
 	@Override
 	public Integer visit(IUnknownStatement unknownStmt, Void context) {
 		return null;
+	}
+
+	public void visit(List<IStatement> body) {
+		for (IStatement statement : body) {
+			statement.accept(this, null);
+		}
 	}
 
 }

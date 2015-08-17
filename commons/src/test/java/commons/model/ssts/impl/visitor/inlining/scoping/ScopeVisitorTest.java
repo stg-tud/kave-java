@@ -1,4 +1,4 @@
-package commons.model.ssts.impl.visitor;
+package commons.model.ssts.impl.visitor.inlining.scoping;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -14,8 +14,9 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.NameScopeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.NameScopeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
 
 public class ScopeVisitorTest extends InliningBaseTest {
 

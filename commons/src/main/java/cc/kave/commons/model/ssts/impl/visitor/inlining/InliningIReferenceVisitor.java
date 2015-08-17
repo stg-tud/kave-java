@@ -11,7 +11,6 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.utils.visitor.InliningContext;
 
 public class InliningIReferenceVisitor extends AbstractNodeVisitor<InliningContext, IReference> {
 
