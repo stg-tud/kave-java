@@ -41,11 +41,13 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningContext, IExpression> {
 
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
+		int stack = Thread.currentThread().getStackTrace().length;
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
 		if (method != null) {
 			List<IStatement> body = new ArrayList<>();
 			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
 			if (method.getName().hasParameters()) {
+
 				List<ParameterName> parameters = method.getName().getParameters();
 				for (int i = 0; i < parameters.size(); i++) {
 					ParameterName parameter = parameters.get(i);
@@ -87,9 +89,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			}
 			body.addAll(method.getBody());
 			context.enterScope(body, preChangedNames);
-			if (guardsNeeded)
-				context.setResultName(method.getName().getIdentifier());
-			context.setInline(true);
+			// context.setInline(true); TODO: RETURNSTATEMENTS when not inlining
 			if (!guardsNeeded) {
 				for (IStatement statement : body) {
 					if (statement instanceof IReturnStatement) {
@@ -100,17 +100,15 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					statement.accept(context.getStatementVisitor(), context);
 				}
 			} else {
+				context.setResultName(method.getName().getIdentifier());
 				InliningUtil.visit(body, context.getBody(), context);
 				context.leaveScope();
-				context.setInline(false);
 				return SSTUtil.referenceExprToVariable(InliningUtil.RESULT_NAME + method.getName().getIdentifier());
 			}
 			context.leaveScope();
-			context.setInline(false);
 			return null;
-		} else {
-			return expr;
 		}
+		return expr;
 	}
 
 	public IExpression visit(IReferenceExpression expr, InliningContext context) {

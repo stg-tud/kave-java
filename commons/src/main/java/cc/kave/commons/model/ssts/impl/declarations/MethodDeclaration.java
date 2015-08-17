@@ -3,6 +3,9 @@ package cc.kave.commons.model.ssts.impl.declarations;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.IStatement;
@@ -82,5 +85,10 @@ public class MethodDeclaration implements IMethodDeclaration {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 }

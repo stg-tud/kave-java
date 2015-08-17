@@ -2,6 +2,7 @@ package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 
@@ -10,6 +11,7 @@ import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class InliningUtil {
 	public static final TypeName GOT_RESULT_TYPE = CsTypeName.newTypeName("Boolean");
@@ -42,7 +44,12 @@ public class InliningUtil {
 	}
 
 	public static void visitScope(List<IStatement> body, List<IStatement> newBody, InliningContext context) {
-		context.enterScope(body, null);
+		visitScope(body, newBody, context, null);
+	}
+
+	public static void visitScope(List<IStatement> body, List<IStatement> newBody, InliningContext context,
+			Map<IVariableReference, IVariableReference> preChangedNames) {
+		context.enterScope(body, preChangedNames);
 		int index = 0;
 		for (IStatement statement : body) {
 			statement.accept(context.getStatementVisitor(), context);
