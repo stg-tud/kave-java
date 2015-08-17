@@ -201,10 +201,10 @@ public class SSTPrintingContext {
 		leftAngleBracket();
 
 		for (TypeName p : typeParameters) {
-			if (p.isUnknownType() || (p.TypeParameterType() != null && p.TypeParameterType().isUnknownType())) {
+			if (p.isUnknownType() || (p.getTypeParameterType() != null && p.getTypeParameterType().isUnknownType())) {
 				typeParameterShortName(CsTypeName.UNKNOWN_NAME.getIdentifier());
 			} else {
-				type(p.TypeParameterType());
+				type(p.getTypeParameterType());
 			}
 
 			if (!p.equals(typeParameters.get(typeParameters.size() - 1))) {
