@@ -41,7 +41,6 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningContext, IExpression> {
 
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
-		int stack = Thread.currentThread().getStackTrace().length;
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
 		if (method != null) {
 			List<IStatement> body = new ArrayList<>();
@@ -53,7 +52,8 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					ParameterName parameter = parameters.get(i);
 					// TODO what to do when parameter has out/ref keyWord but is
 					// no ReferenceExpression ?
-					if (parameter.isPassedByReference() && expr.getParameters().get(i) instanceof ReferenceExpression) {
+					if (parameter.isPassedByReference() && !parameter.isParameterArray()
+							&& expr.getParameters().get(i) instanceof ReferenceExpression) {
 						ReferenceExpression refExpr = (ReferenceExpression) expr.getParameters().get(i);
 						if (refExpr.getReference() instanceof VariableReference) {
 							preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
