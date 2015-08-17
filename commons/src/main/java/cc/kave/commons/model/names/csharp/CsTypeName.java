@@ -170,7 +170,10 @@ public class CsTypeName extends CsName implements TypeName {
 				} else {
 					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
 				}
+			if (i != 1)
 			}
+		return CsNamespaceName.UNKNOWN_NAME;
+	}
 
 			List<TypeName> outerTypeParameters = getTypeParameters().subList(0, numberOfParameters);
 

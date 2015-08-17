@@ -86,8 +86,8 @@ public class CSharpNameDeserializationTest {
 
 	@Test
 	public void DeserializesToParameterName() {
-		assertDeserialize("\"CSharp.ParameterName:[VT] parameter\"",
-				CsParameterName.newParameterName("[VT] parameter"), ParameterName.class);
+		assertDeserialize("\"CSharp.ParameterName:[VT] parameter\"", CsParameterName.newParameterName("[VT] parameter"),
+				ParameterName.class);
 	}
 
 	@Test
@@ -99,8 +99,9 @@ public class CSharpNameDeserializationTest {
 	@Test
 	public void DeserializesToTypeName() {
 		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", CsTypeName.newTypeName("T,A,1.2.3.4"), TypeName.class);
-		assertDeserialize("\"CSharp.ArrayTypeName:T[],A,5.4.3.2\"", CsTypeName.newTypeName("T[],A,5.4.3.2"),
-				TypeName.class);
+		// assertDeserialize("\"CSharp.ArrayTypeName:T[],A,5.4.3.2\"",
+		// CsTypeName.newTypeName("T[],A,5.4.3.2"),
+		// TypeName.class);
 	}
 
 	@Test
