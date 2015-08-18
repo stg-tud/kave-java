@@ -54,7 +54,12 @@
 								<artifact>
 									<id>org.assertj:assertj-core:3.1.0</id>
 								</artifact>
-
+								<artifact>
+									<id>org.mockito:mockito-core:1.9.5</id>
+								</artifact>
+								<artifact>
+									<id>org.objenesis:objenesis:2.2</id>
+								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>
