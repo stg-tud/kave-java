@@ -16,12 +16,12 @@
 
 package cc.kave.commons;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -84,7 +84,7 @@ public class CsMethodNameTest {
 		assertEquals(3, methodName.getParameters().size());
 		assertEquals(param1Identifier, methodName.getParameters().get(0).getIdentifier());
 		assertEquals(param2Identifier, methodName.getParameters().get(1).getIdentifier());
-		assertEquals(param3Identifier, methodName.getParameters().get(3).getIdentifier());
+		assertEquals(param3Identifier, methodName.getParameters().get(2).getIdentifier());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class CsMethodNameTest {
 		MethodName methodName = CsMethodName.newMethodName("[T] [D, D, 4.5.6.7].M`2[[T],[O]]([O] p)");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("T"), CsTypeName.newTypeName("O") };
-		assertEquals(expected, methodName.getTypeParameters());
+		assertArrayEquals(expected, methodName.getTypeParameters().toArray());
 	}
 
 	@Test
@@ -139,7 +139,7 @@ public class CsMethodNameTest {
 				.newMethodName("[A] [D, D, 1.2.3.4].M`1[[A -> System.Int32, mscorlib, 4.0.0.0]]()");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("A -> System.Int32, mscorlib, 4.0.0.0") };
-		assertEquals(expected, methodName.getTypeParameters());
+		assertArrayEquals(expected, methodName.getTypeParameters().toArray());
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class CsMethodNameTest {
 				.newMethodName("[T, A, 1.0.0.0] [T, A, 1.0.0.0].M`1[[T]]([F`1[[U]], A, 1.0.0.0] p)");
 
 		Object[] expected = new Object[] { CsTypeName.newTypeName("T") };
-		assertEquals(expected, method.getTypeParameters());
+		assertArrayEquals(expected, method.getTypeParameters().toArray());
 	}
 
 	@Test
@@ -226,10 +226,4 @@ public class CsMethodNameTest {
 		List<ParameterName> ps = methodName.getParameters();
 	}
 
-	@Test
-	public void test() {
-		MethodName methodName = CsMethodName.newMethodName("[A,P] [d:[B,P] [C,P].([D,P] args)].M([E,P] p)");
-		Pattern signatureSyntax = Pattern.compile("\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
-		assertEquals("", signatureSyntax.matcher(methodName.getIdentifier()).group());
-	}
 }

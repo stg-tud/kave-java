@@ -3,6 +3,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.MapMaker;
@@ -15,9 +16,10 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	private static final Map<String, CsMethodName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final MethodName UNKNOWN_NAME = newMethodName("[?] [?].???()");
-
 	private static final Pattern signatureSyntax = Pattern
-			.compile("\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
+			.compile(".*\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\)).*");
+
+	// "\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$"
 
 	public static MethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -32,9 +34,11 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public String getSignature() {
-		return signatureSyntax.matcher(identifier).group(1);
-		// return identifier.substring(identifier.lastIndexOf("].") + 2,
-		// identifier.length());
+		Matcher matcher = signatureSyntax.matcher(identifier);
+		if (!matcher.matches()) {
+			throw new RuntimeException("Invalid Signature Syntax: " + identifier);
+		}
+		return matcher.group(1);
 	}
 
 	@Override
@@ -59,12 +63,19 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	// TODO:
 	public String getFullName() {
-		return signatureSyntax.matcher(identifier).group(2);
-		// return "";
+		Matcher matcher = signatureSyntax.matcher(identifier);
+		if (!matcher.matches()) {
+			throw new RuntimeException("Invalid Signature Syntax: " + identifier);
+		}
+		return matcher.group(2);
 	}
 
 	public String getName() {
-		return signatureSyntax.matcher(identifier).group(3);
+		Matcher matcher = signatureSyntax.matcher(identifier);
+		if (!matcher.matches()) {
+			throw new RuntimeException("Invalid Signature Syntax: " + identifier);
+		}
+		return matcher.group(3);
 	}
 
 	@Override
