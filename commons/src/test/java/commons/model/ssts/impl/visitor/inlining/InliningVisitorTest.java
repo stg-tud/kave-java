@@ -14,6 +14,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningUtil;
+import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -885,6 +886,22 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testPreChangedNameInvocationStatement() {
-
+		MethodName name = CsMethodName.newMethodName("[?] [?].m2([?] b)");
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement(name, refExpr("a")), //
+						declareVar("b")), //
+				declareMethod(name, false, //
+						assign(ref("b"), constant("1"))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						assign(ref("a"), constant("1")), //
+						declareVar("b")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

@@ -91,6 +91,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			}
 			expression.setReference(
 					(IVariableReference) expr.getReference().accept(context.getReferenceVisitor(), context));
+
 			return expression;
 		}
 	}
@@ -113,8 +114,35 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			// TODO what to do when parameter has out/ref keyWord but is
 			// no ReferenceExpression ?
 			if (!parameter.isOptional() || expressions.size() == parameters.size()) {
-				if (parameter.isPassedByReference() && !parameter.isParameterArray() && i < expressions.size()
-						&& expressions.get(i) instanceof ReferenceExpression) {
+
+				/*
+				 * if (parameter.isPassedByReference() &&
+				 * !parameter.isParameterArray() && i < expressions.size() &&
+				 * expressions.get(i) instanceof ReferenceExpression) {
+				 * ReferenceExpression refExpr = (ReferenceExpression)
+				 * expressions.get(i); if (refExpr.getReference() instanceof
+				 * VariableReference) {
+				 * preChangedNames.put(SSTUtil.variableReference(parameter.
+				 * getName()), (IVariableReference) refExpr.getReference()); }
+				 * else if (refExpr.getReference() instanceof IMemberReference)
+				 * { preChangedNames.put(SSTUtil.variableReference(parameter.
+				 * getName()), ((IMemberReference)
+				 * refExpr.getReference()).getReference()); } continue; } else
+				 * if (parameter.isParameterArray()) {
+				 * body.add(SSTUtil.declare(parameter.getName(),
+				 * parameter.getValueType()));
+				 * body.add(SSTUtil.assigmentToLocal(parameter.getName(), new
+				 * UnknownExpression())); break; } else {
+				 * body.add(SSTUtil.declare(parameter.getName(),
+				 * parameter.getValueType()));
+				 * body.add(SSTUtil.assigmentToLocal(parameter.getName(),
+				 * expressions.get(i))); }
+				 */
+				if (parameter.isParameterArray() && !parameter.isPassedByReference()) {
+					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
+					body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
+					break;
+				} else if (i < expressions.size() && expressions.get(i) instanceof ReferenceExpression) {
 					ReferenceExpression refExpr = (ReferenceExpression) expressions.get(i);
 					if (refExpr.getReference() instanceof VariableReference) {
 						preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
@@ -123,11 +151,6 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 						preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
 								((IMemberReference) refExpr.getReference()).getReference());
 					}
-					continue;
-				} else if (parameter.isParameterArray()) {
-					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-					body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
-					break;
 				} else {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
 					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expressions.get(i)));

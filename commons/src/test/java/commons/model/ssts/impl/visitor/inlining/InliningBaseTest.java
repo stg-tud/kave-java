@@ -114,7 +114,8 @@ public class InliningBaseTest {
 			ISimpleExpression... parameters) {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setParameters(Lists.newArrayList(parameters));
-		invocation.setReference(reference);
+		if (reference != null)
+			invocation.setReference(reference);
 		invocation.setMethodName(CsMethodName.newMethodName(SIGNATURE + name + "()"));
 		return invocation;
 	}
