@@ -42,10 +42,7 @@ class CsGenericNameUtils {
 				openBraces--;
 
 				if (openBraces == 0) {
-					int indexAfterOpeningBrace = startIndex + 1;
-					int lengthToBeforeClosingBrace = currentIndex - startIndex - 1;
-					String descriptor = fullNameOrSignature.substring(indexAfterOpeningBrace,
-							lengthToBeforeClosingBrace);
+					String descriptor = fullNameOrSignature.substring(startIndex + 1, currentIndex);
 					TypeName parameterTypeName = CsTypeName.newTypeName(descriptor);
 					parameters.add(parameterTypeName);
 					startIndex = fullNameOrSignature.indexOf('[', currentIndex);

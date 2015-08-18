@@ -21,7 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.TypeName;
@@ -29,14 +28,13 @@ import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
-@Ignore
 public class CsTypeNameTest {
 
 	private final String TestAssemblyIdentifier = "a, 1.0.0.0";
 
 	@Test
 	public void shouldImplementIsUnknown() {
-		assertTrue(CsTypeName.getUnknownName().isUnknown());
+		assertTrue(CsTypeName.UNKNOWN_NAME.isUnknown());
 	}
 
 	@Test
@@ -373,8 +371,7 @@ public class CsTypeNameTest {
 
 	@Test
 	public void unknownTypeShouldNotHaveNamespace() {
-		TypeName name = CsTypeName.newTypeName("?");
-		assertEquals(CsNamespaceName.getUnknownName(), name.getNamespace());
+		assertEquals(CsNamespaceName.UNKNOWN_NAME, CsTypeName.UNKNOWN_NAME.getNamespace());
 	}
 
 	private String[][] shouldDetermineAssemblyCases() {
@@ -397,7 +394,7 @@ public class CsTypeNameTest {
 	@Test
 	public void unknownTypeShouldHaveUnknownAssembly() {
 		TypeName name = CsTypeName.newTypeName("?");
-		assertEquals(CsAssemblyName.getUnknownName(), name.getAssembly());
+		assertEquals(CsAssemblyName.UNKNOWN_NAME, name.getAssembly());
 	}
 
 	@Test
