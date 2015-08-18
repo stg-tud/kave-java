@@ -74,6 +74,12 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 			for (IMethodDeclaration method : sst.getMethods())
 				context.addMethod(method);
 		}
+		for (IMethodDeclaration method : context.getRemoveList()) {
+			context.getNonEntryPoints().remove(method);
+		}
+		for (IMethodDeclaration method : context.getNonEntryPoints()) {
+			context.addMethod(method);
+		}
 		return null;
 	}
 
@@ -86,7 +92,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		context.addMethod(method);
 
 		// Clear body for next Method
-		context.getBody().clear();
+		context.resetScope();
 		return null;
 	}
 

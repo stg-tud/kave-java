@@ -39,6 +39,8 @@ public class InliningContext {
 	private final InliningIReferenceVisitor referenceVisitor;
 	private final InliningIExpressionVisitor expressionVisitor;
 
+	private Set<IMethodDeclaration> removeList;
+
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
 		this.sst = new SST();
@@ -49,6 +51,7 @@ public class InliningContext {
 		this.statementVisitor = new InliningIStatementVisitor();
 		this.referenceVisitor = new InliningIReferenceVisitor();
 		this.expressionVisitor = new InliningIExpressionVisitor();
+		this.removeList = new HashSet<>();
 	}
 
 	public InliningIStatementVisitor getStatementVisitor() {
@@ -257,5 +260,18 @@ public class InliningContext {
 
 	public boolean isGlobalGuardNeeded() {
 		return this.globalGuardNeed;
+	}
+
+	public void addMethodToRemove(IMethodDeclaration method) {
+		this.removeList.add(method);
+	}
+
+	public Set<IMethodDeclaration> getRemoveList() {
+		return removeList;
+	}
+
+	public void resetScope() {
+		scope = null;
+		counter = 0;
 	}
 }

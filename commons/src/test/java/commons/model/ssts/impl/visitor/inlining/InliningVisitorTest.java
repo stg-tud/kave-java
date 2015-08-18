@@ -835,4 +835,56 @@ public class InliningVisitorTest extends InliningBaseTest {
 		sst.accept(new InliningIStatementVisitor(), context);
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
+
+	@Test
+	public void testTwoMethodsWithInlining() {
+		ISST sst = buildSST(//
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement("m3")), //
+				declareEntryPoint("m2", //
+						declareVar("b"), //
+						invocationStatement("m3")), //
+				declareNonEntryPoint("m3", //
+						declareVar("a"), //
+						declareVar("b")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						declareVar("$0_a"), //
+						declareVar("b")), //
+				declareEntryPoint("m2", //
+						declareVar("b"), //
+						declareVar("a"), //
+						declareVar("$0_b")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testPersistenceOfNotInlinedMethod() {
+		ISST sst = buildSST(//
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						declareVar("b")),
+				declareNonEntryPoint("m3", //
+						declareVar("c")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						declareVar("b")),
+				declareNonEntryPoint("m3", //
+						declareVar("c")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testPreChangedNameInvocationStatement() {
+
+	}
 }

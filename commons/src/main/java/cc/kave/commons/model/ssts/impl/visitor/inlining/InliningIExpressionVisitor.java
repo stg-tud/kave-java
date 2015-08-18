@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -43,8 +44,8 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
-
 		if (method != null) {
+			context.addMethodToRemove(method);
 			List<IStatement> body = new ArrayList<>();
 			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
 
@@ -82,8 +83,16 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			context.leaveScope();
 			context.setInline(false);
 			return null;
+		} else {
+			InvocationExpression expression = new InvocationExpression();
+			expression.setMethodName(expr.getMethodName());
+			for (ISimpleExpression e : expr.getParameters()) {
+				expression.getParameters().add(e);
+			}
+			expression.setReference(
+					(IVariableReference) expr.getReference().accept(context.getReferenceVisitor(), context));
+			return expression;
 		}
-		return expr;
 	}
 
 	private void setupGuardVariables(MethodName methodName, List<IStatement> body, InliningContext context) {
@@ -119,8 +128,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
 					body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
 					break;
-				}
-				if (i < expressions.size()) {
+				} else {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
 					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expressions.get(i)));
 				}

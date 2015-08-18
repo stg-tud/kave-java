@@ -16,6 +16,7 @@
 
 package cc.kave.commons.model.names.csharp;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cc.kave.commons.model.names.BundleName;
@@ -23,7 +24,7 @@ import cc.kave.commons.model.names.TypeName;
 
 public class CsArrayTypeName extends CsTypeName {
 
-	private static final Pattern ArrayTypeNameSuffix = Pattern.compile("(\\[[,]*\\])([^()]*)$");
+	private static final Pattern ArrayTypeNameSuffix = Pattern.compile(".*(\\[[,]*\\])([^()]*).*");
 
 	protected CsArrayTypeName(String identifier) {
 		super(identifier);
@@ -93,15 +94,21 @@ public class CsArrayTypeName extends CsTypeName {
 
 	// TODO:
 	public static int getArrayRank(TypeName arrayTypeName) {
-		String group = ArrayTypeNameSuffix.matcher(arrayTypeName.getIdentifier()).group(1);
-		int count = 1;
 
-		for (int i = 0; i < group.length(); i++) {
-			if (group.charAt(i) == ',') {
-				count++;
+		Matcher matcher = ArrayTypeNameSuffix.matcher(arrayTypeName.getIdentifier());
+		if (matcher.matches()) {
+			String group = matcher.group(1);
+			int count = 1;
+
+			for (int i = 0; i < group.length(); i++) {
+				if (group.charAt(i) == ',') {
+					count++;
+				}
 			}
+			return count;
+		} else {
+			throw new RuntimeException("Invalid ArrayTypeName Identifier: " + arrayTypeName.getIdentifier());
 		}
-		return count;
 	}
 
 	@Override
