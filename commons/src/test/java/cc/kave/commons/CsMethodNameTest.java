@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.MethodName;
@@ -31,7 +30,6 @@ import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
-@Ignore
 public class CsMethodNameTest {
 
 	@Test

@@ -16,6 +16,8 @@
 
 package cc.kave.commons.model.names.csharp;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import cc.kave.commons.model.names.BundleName;
@@ -38,7 +40,7 @@ public class CsTypeParameterName extends CsName implements TypeName {
 	/// cref="Get(string,string)" /> for details on how to
 	/// instantiate type-parameter names.
 	/// </summary>
-	static TypeName newCsTypeParameterName(String identifier) {
+	public static TypeName newTypeParameterName(String identifier) {
 		return CsTypeName.newTypeName(identifier);
 	}
 
@@ -46,11 +48,11 @@ public class CsTypeParameterName extends CsName implements TypeName {
 	/// Gets the <see cref="ITypeName" /> for the identifer
 	/// <code>'short name' -&gt; 'actual-type identifier'</code>.
 	/// </summary>
-	public static TypeName newCsTypeParameterName(String typeParameterShortName, String actualTypeIdentifier) {
+	public static TypeName newTypeParameterName(String typeParameterShortName, String actualTypeIdentifier) {
 		if (CsUnknownTypeName.isUnknownTypeIdentifier(actualTypeIdentifier)) {
-			return newCsTypeParameterName(typeParameterShortName);
+			return newTypeParameterName(typeParameterShortName);
 		}
-		return newCsTypeParameterName(typeParameterShortName + ParameterNameTypeSeparater + actualTypeIdentifier);
+		return newTypeParameterName(typeParameterShortName + ParameterNameTypeSeparater + actualTypeIdentifier);
 	}
 
 	static boolean isTypeParameterIdentifier(String identifier) {
@@ -71,8 +73,6 @@ public class CsTypeParameterName extends CsName implements TypeName {
 		// not, because
 		// the separator is only in the type's parameter-type list, i.e., after
 		// the '`'.
-		// TODO: identifier.indexOf(ParameterNameTypeSeparater,
-		// StringComparison.Ordinal)
 		int indexOfMapping = identifier.indexOf(ParameterNameTypeSeparater);
 		int endOfTypeName = identifier.indexOf('`');
 		return indexOfMapping >= 0 && (endOfTypeName == -1 || endOfTypeName > indexOfMapping);
@@ -193,13 +193,18 @@ public class CsTypeParameterName extends CsName implements TypeName {
 		return true;
 	}
 
-	// TODO test this method
+	@Override
+	public boolean isUnknown() {
+		return this.equals(UNKNOWN_NAME);
+	}
+
 	@Override
 	public TypeName DeriveArrayTypeName(int rank) {
-		// Asserts.That(rank > 0, "rank smaller than 1");
+		assertTrue("rank smaller than 1", rank > 0);
 		String typeParameterShortName = getTypeParameterShortName();
 		String suffix = identifier.substring(typeParameterShortName.length());
-		return CsTypeName.newTypeName(String.format("{%s}[{%s}]{%s}", typeParameterShortName, ",", rank - 1, suffix));
+		return CsTypeName.newTypeName(
+				String.format("{%s}[{%s}]{%s}", typeParameterShortName, "," + String.valueOf(rank - 1), suffix));
 	}
 
 	@Override

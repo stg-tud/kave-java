@@ -59,8 +59,6 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	// TODO:
 	public String getFullName() {
-		String group = signatureSyntax.matcher(identifier).group(2);
-		signatureSyntax.matcher(identifier).group(2);
 		return signatureSyntax.matcher(identifier).group(2);
 		// return "";
 	}

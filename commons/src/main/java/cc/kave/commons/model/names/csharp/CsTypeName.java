@@ -100,51 +100,6 @@ public class CsTypeName extends CsName implements TypeName {
 	// TODO: Siehe C# implementation
 	@Override
 	public TypeName getDeclaringType() {
-		// if (!isNestedType()) {
-		// return null;
-		// }
-		//
-		// String fullName = getFullName();
-		//
-		// if (hasTypeParameters()) {
-		// fullName = fullName.substring(0, fullName.indexOf('`'));
-		// }
-		//
-		// int endOfDeclaringTypeName = fullName.lastIndexOf("+");
-		//
-		// if (endOfDeclaringTypeName == -1) {
-		// return UNKNOWN_NAME;
-		// }
-		//
-		// String declaringTypeName = fullName.substring(0,
-		// endOfDeclaringTypeName);
-		//
-		// if (declaringTypeName.indexOf("`") > -1 && hasTypeParameters()) {
-		// int startIndex = 0;
-		// int numberOfParameters = 0;
-		//
-		// while ((startIndex = declaringTypeName.indexOf("+", startIndex) + 1)
-		// > 0) {
-		// int endIndex = declaringTypeName.indexOf("+", startIndex);
-		//
-		// if (endIndex > -1) {
-		// numberOfParameters += Integer
-		// .parseInt(declaringTypeName.substring(startIndex, endIndex -
-		// startIndex));
-		// } else {
-		// numberOfParameters +=
-		// Integer.parseInt(declaringTypeName.substring(startIndex));
-		// }
-		//
-		// List<TypeName> typeParameters = getTypeParameters();
-		// declaringTypeName += "[["
-		// + String.join("],[", typeParameters.toArray(new
-		// CharSequence[typeParameters.size()])) + "]]";
-		// }
-		// return CsTypeName.newTypeName(declaringTypeName + ", " +
-		// getAssembly());
-		// }
-		// return null;
 
 		if (!isNestedType()) {
 			return null;
@@ -332,4 +287,10 @@ public class CsTypeName extends CsName implements TypeName {
 	public TypeName getTypeParameterType() {
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		return this.equals(UNKNOWN_NAME);
+	}
+
 }

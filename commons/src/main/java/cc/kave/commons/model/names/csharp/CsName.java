@@ -34,7 +34,7 @@ public class CsName implements Name {
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(getUnknownName());
+		return this.equals(UNKNOWN_NAME);
 	}
 
 	@Override

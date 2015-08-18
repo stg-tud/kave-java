@@ -434,16 +434,21 @@ public class CsTypeNameTest {
 	}
 
 	private String[][] shouldBeNestedTypeCases() {
-		return new String[][] { new String[] { "a.p.T+N", "a.p.T" }, new String[] { "N.O+M+I", "N.O+M" } };
+		return new String[][] { new String[] { "a.p.T+N", "a.p.T" }, new String[] { "N.O+M+I", "N.O+M" },
+				new String[] { "n.T+A`1[[T1 -> e:n.T+B, P]], P", "n.T, P" },
+				new String[] { "n.T`1+U`1[[T2 -> T2]], P", "n.T`1[[T2 -> T2]], P" } };
 	}
 
+	// TODO: "// obviously an error in the analysis, second typeparam missing"
 	@Test
 	public void shouldBeNestedType() {
 		String[][] cases = shouldBeNestedTypeCases();
 		for (int i = 0; i < cases.length; i++) {
 			String nestedTypeFullName = cases[i][0];
 			String expectedDeclaringTypeFullName = cases[i][1];
-			TypeName expected = CsTypeName.newTypeName(expectedDeclaringTypeFullName + "," + TestAssemblyIdentifier);
+
+			TypeName expected = expectedDeclaringTypeFullName.equals("?") ? CsTypeName.UNKNOWN_NAME
+					: CsTypeName.newTypeName(expectedDeclaringTypeFullName + ", " + TestAssemblyIdentifier);
 
 			TypeName nestedTypeName = CsTypeName.newTypeName(nestedTypeFullName + ", " + TestAssemblyIdentifier);
 			TypeName actual = nestedTypeName.getDeclaringType();

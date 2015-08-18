@@ -34,6 +34,7 @@ import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.CsTypeParameterName;
 
 public class CsDelegateTypeNameTest {
 
@@ -157,10 +158,8 @@ public class CsDelegateTypeNameTest {
 		TypeName typeName = CsTypeName.newTypeName("d:[T] [DT`1[[T -> String, mscorlib]]].([T] p)");
 
 		assertTrue(typeName.hasTypeParameters());
-		// TODO:
-		// assertEquals(new Object[] { CsDelegateTypeName.newDelegateTypeName("T
-		// -> String, mscorlib") },
-		// typeName.getTypeParameters().toArray());
+		assertEquals(new Object[] { CsTypeParameterName.newTypeParameterName("T -> String, mscorlib") },
+				typeName.getTypeParameters().toArray());
 	}
 
 	@Test

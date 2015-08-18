@@ -5,8 +5,6 @@ import java.util.Map;
 import com.google.common.collect.MapMaker;
 
 import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.TypeName;
-
 import cc.kave.commons.model.names.FieldName;
 
 public class CsFieldName extends CsMemberName implements FieldName {
@@ -28,10 +26,5 @@ public class CsFieldName extends CsMemberName implements FieldName {
 	@Override
 	public boolean isUnknown() {
 		return this.equals(UNKNOWN_NAME);
-	}
-	
-	@Override
-	public TypeName getValueType() {
-		return CsTypeName.UNKNOWN_NAME;
 	}
 }
