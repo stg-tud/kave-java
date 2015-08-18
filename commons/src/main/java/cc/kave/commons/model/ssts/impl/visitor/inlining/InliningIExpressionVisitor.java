@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IStatement;
@@ -42,73 +43,90 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
+
 		if (method != null) {
 			List<IStatement> body = new ArrayList<>();
 			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
-			if (method.getName().hasParameters()) {
 
-				List<ParameterName> parameters = method.getName().getParameters();
-				for (int i = 0; i < parameters.size(); i++) {
-					ParameterName parameter = parameters.get(i);
-					// TODO what to do when parameter has out/ref keyWord but is
-					// no ReferenceExpression ?
-					if (parameter.isPassedByReference() && !parameter.isParameterArray()
-							&& expr.getParameters().get(i) instanceof ReferenceExpression) {
-						ReferenceExpression refExpr = (ReferenceExpression) expr.getParameters().get(i);
-						if (refExpr.getReference() instanceof VariableReference) {
-							preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
-									(IVariableReference) refExpr.getReference());
-						} else if (refExpr.getReference() instanceof IMemberReference) {
-							preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
-									((IMemberReference) refExpr.getReference()).getReference());
-						}
-						continue;
-					} else if (parameter.isParameterArray()) {
-						body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-						body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
-						break;
-					}
-					if (i < expr.getParameters().size()) {
-						body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-						body.add(SSTUtil.assigmentToLocal(parameter.getName(), expr.getParameters().get(i)));
-					}
-				}
+			if (method.getName().hasParameters()) {
+				createParameterVariables(body, method.getName().getParameters(), expr.getParameters(), preChangedNames);
 			}
-			// Setting up guarding if needed
+			// Checking if guards statements are needed and setting them up if
+			// so
 			boolean guardsNeeded = method.accept(new CountReturnsVisitor(), null) > 1 ? true : false;
 			if (guardsNeeded) {
-				IVariableDeclaration variable = SSTUtil.declare(
-						InliningUtil.RESULT_NAME + method.getName().getIdentifier(), method.getName().getReturnType());
-				body.add(variable);
-				body.add(SSTUtil.declare(InliningUtil.RESULT_FLAG + method.getName().getIdentifier(),
-						InliningUtil.GOT_RESULT_TYPE));
-				ConstantValueExpression constant = new ConstantValueExpression();
-				constant.setValue("true");
-				body.add(SSTUtil.assigmentToLocal(InliningUtil.RESULT_FLAG + method.getName().getIdentifier(),
-						constant));
+				setupGuardVariables(method.getName(), body, context);
 			}
+			// Add all Statements from the method body
 			body.addAll(method.getBody());
+			// enter a new Scope
 			context.enterScope(body, preChangedNames);
-			// context.setInline(true); TODO: RETURNSTATEMENTS when not inlining
+			context.setInline(true);
+			context.setGuardVariableNames(method.getName().getIdentifier());
 			if (!guardsNeeded) {
 				for (IStatement statement : body) {
 					if (statement instanceof IReturnStatement) {
 						IReturnStatement stmt = (IReturnStatement) statement;
 						context.leaveScope();
+						context.setInline(false);
 						return stmt.getExpression();
 					}
 					statement.accept(context.getStatementVisitor(), context);
 				}
 			} else {
-				context.setResultName(method.getName().getIdentifier());
 				InliningUtil.visit(body, context.getBody(), context);
 				context.leaveScope();
-				return SSTUtil.referenceExprToVariable(InliningUtil.RESULT_NAME + method.getName().getIdentifier());
+				context.setInline(false);
+				return SSTUtil.referenceExprToVariable(context.getResultName());
 			}
 			context.leaveScope();
+			context.setInline(false);
 			return null;
 		}
 		return expr;
+	}
+
+	private void setupGuardVariables(MethodName methodName, List<IStatement> body, InliningContext context) {
+		context.setGuardVariableNames(methodName.getIdentifier());
+		IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
+		body.add(variable);
+		body.add(SSTUtil.declare(context.getGotResultName(), InliningUtil.GOT_RESULT_TYPE));
+		ConstantValueExpression constant = new ConstantValueExpression();
+		constant.setValue("true");
+		body.add(SSTUtil.assigmentToLocal(context.getGotResultName(), constant));
+
+	}
+
+	private void createParameterVariables(List<IStatement> body, List<ParameterName> parameters,
+			List<ISimpleExpression> expressions, Map<IVariableReference, IVariableReference> preChangedNames) {
+		for (int i = 0; i < parameters.size(); i++) {
+			ParameterName parameter = parameters.get(i);
+			// TODO what to do when parameter has out/ref keyWord but is
+			// no ReferenceExpression ?
+			if (!parameter.isOptional() || expressions.size() == parameters.size()) {
+				if (parameter.isPassedByReference() && !parameter.isParameterArray() && i < expressions.size()
+						&& expressions.get(i) instanceof ReferenceExpression) {
+					ReferenceExpression refExpr = (ReferenceExpression) expressions.get(i);
+					if (refExpr.getReference() instanceof VariableReference) {
+						preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
+								(IVariableReference) refExpr.getReference());
+					} else if (refExpr.getReference() instanceof IMemberReference) {
+						preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
+								((IMemberReference) refExpr.getReference()).getReference());
+					}
+					continue;
+				} else if (parameter.isParameterArray()) {
+					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
+					body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
+					break;
+				}
+				if (i < expressions.size()) {
+					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
+					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expressions.get(i)));
+				}
+			}
+		}
+
 	}
 
 	public IExpression visit(IReferenceExpression expr, InliningContext context) {

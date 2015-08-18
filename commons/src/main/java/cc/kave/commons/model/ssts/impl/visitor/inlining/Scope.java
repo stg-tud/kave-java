@@ -16,6 +16,7 @@ public class Scope {
 	public Map<IVariableReference, IVariableReference> changedNames;
 	public List<IStatement> body;
 	public String resultName;
+	public String gotResultName;
 
 	public Scope() {
 		this.parent = null;
@@ -23,6 +24,7 @@ public class Scope {
 		this.changedNames = new HashMap<>();
 		this.body = new ArrayList<>();
 		this.resultName = "";
+		this.gotResultName = "";
 	}
 
 	public IVariableReference resolve(IVariableReference ref) {

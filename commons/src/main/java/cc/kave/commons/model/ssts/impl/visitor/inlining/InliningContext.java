@@ -10,6 +10,8 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -20,6 +22,11 @@ import cc.kave.commons.model.ssts.impl.visitor.inlining.util.RecursiveCallVisito
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class InliningContext {
+
+	private static final TypeName GOT_RESULT_TYPE = CsTypeName.newTypeName("Boolean");
+	private static final String RESULT_NAME = "$result_";
+	private static final String RESULT_FLAG = "$gotNoResult_";
+
 	private int counter;
 	private SST sst;
 	private NameScopeVisitor visitor;
@@ -67,20 +74,30 @@ public class InliningContext {
 	private Set<IMethodDeclaration> testForRecursiveCalls(Set<IMethodDeclaration> nonEntryPoints) {
 		Map<MethodName, Set<MethodName>> calls = new HashMap<>();
 		Set<IMethodDeclaration> outputNonEntryPoints = new HashSet<>();
+		Set<MethodName> removeMethods = new HashSet<>();
 		for (IMethodDeclaration method : nonEntryPoints) {
 			Set<MethodName> context = new HashSet<>();
 			method.accept(new RecursiveCallVisitor(), context);
+			if (calls.containsKey(method.getName()))
+				removeMethods.add(method.getName());
 			calls.put(method.getName(), context);
 		}
+		for (MethodName name : removeMethods) {
+			calls.remove(name);
+		}
 		for (IMethodDeclaration method : nonEntryPoints) {
-			Set<MethodName> invocations = calls.get(method.getName());
-			boolean hasRecursiveCall = invocations.contains(method.getName());
-			if (!hasRecursiveCall && !invocations.isEmpty() && invocations != null) {
-				hasRecursiveCall = checkCallTree(invocations, calls, Sets.newHashSet(), method);
+			if (calls.containsKey(method.getName())) {
+				Set<MethodName> invocations = calls.get(method.getName());
+				boolean hasRecursiveCall = invocations.contains(method.getName());
+				if (!hasRecursiveCall && !invocations.isEmpty() && invocations != null) {
+					hasRecursiveCall = checkCallTree(invocations, calls, Sets.newHashSet(), method);
+				}
+				if (!hasRecursiveCall)
+					outputNonEntryPoints.add(method);
+				else
+					addMethod(method);
 			}
-			if (!hasRecursiveCall)
-				outputNonEntryPoints.add(method);
-			else
+			if (removeMethods.contains(method.getName()))
 				addMethod(method);
 		}
 		return outputNonEntryPoints;
@@ -160,6 +177,7 @@ public class InliningContext {
 			newScope.existingIds.addAll(scope.existingIds);
 			newScope.changedNames = scope.changedNames;
 			newScope.resultName = scope.resultName;
+			newScope.gotResultName = scope.gotResultName;
 		}
 		scope = newScope;
 	}
@@ -208,8 +226,21 @@ public class InliningContext {
 		return scope.resultName;
 	}
 
+	public String getGotResultName() {
+		return scope.gotResultName;
+	}
+
 	public void setResultName(String name) {
 		scope.resultName = name;
+	}
+
+	public void setGotResultName(String name) {
+		scope.gotResultName = name;
+	}
+
+	public void setGuardVariableNames(String name) {
+		scope.resultName = RESULT_NAME + name;
+		scope.gotResultName = RESULT_FLAG + name;
 	}
 
 	public void setGuardNeeded(boolean b) {

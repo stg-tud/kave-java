@@ -25,7 +25,7 @@ public class InliningUtil {
 			statement.accept(context.getStatementVisitor(), context);
 			if ((context.isGuardNeeded()) && body.subList(index + 1, body.size()).size() > 0) {
 				IfElseBlock block = new IfElseBlock();
-				block.setCondition(SSTUtil.referenceExprToVariable(RESULT_FLAG + context.getResultName()));
+				block.setCondition(SSTUtil.referenceExprToVariable(context.getGotResultName()));
 				context.setGuardNeeded(false);
 				visit(body.subList(index + 1, body.size()), block.getThen(), context);
 				context.addStatement(block);
@@ -43,11 +43,11 @@ public class InliningUtil {
 		return body.get(0);
 	}
 
-	public static void visitScope(List<IStatement> body, List<IStatement> newBody, InliningContext context) {
-		visitScope(body, newBody, context, null);
+	public static void visitScope(List<IStatement> body, InliningContext context) {
+		visitScope(body, context, null);
 	}
 
-	public static void visitScope(List<IStatement> body, List<IStatement> newBody, InliningContext context,
+	public static void visitScope(List<IStatement> body, InliningContext context,
 			Map<IVariableReference, IVariableReference> preChangedNames) {
 		context.enterScope(body, preChangedNames);
 		int index = 0;
@@ -57,7 +57,7 @@ public class InliningUtil {
 			if ((context.isGuardNeeded() || context.isGlobalGuardNeeded())
 					&& body.subList(index + 1, body.size()).size() > 0) {
 				IfElseBlock block = new IfElseBlock();
-				block.setCondition(SSTUtil.referenceExprToVariable(RESULT_FLAG + context.getResultName()));
+				block.setCondition(SSTUtil.referenceExprToVariable(context.getGotResultName()));
 				context.setGuardNeeded(false);
 				context.setGlobalGuardNeeded(false);
 				visit(body.subList(index + 1, body.size()), block.getThen(), context);
@@ -67,7 +67,7 @@ public class InliningUtil {
 			index++;
 
 		}
-		newBody.addAll(context.getBody());
+		// newBody.addAll(context.getBody());
 		context.leaveScope();
 	}
 }

@@ -43,6 +43,7 @@ import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
@@ -78,10 +79,14 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 
 	public Void visit(IMethodDeclaration stmt, InliningContext context) {
 		MethodDeclaration method = new MethodDeclaration();
-		InliningUtil.visitScope(stmt.getBody(), method.getBody(), context);
+		InliningUtil.visitScope(stmt.getBody(), context);
+		method.getBody().addAll(context.getBody());
 		method.setEntryPoint(true);
 		method.setName(CsMethodName.newMethodName(stmt.getName().getIdentifier()));
 		context.addMethod(method);
+
+		// Clear body for next Method
+		context.getBody().clear();
 		return null;
 	}
 
@@ -115,18 +120,26 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	}
 
 	public Void visit(IReturnStatement stmt, InliningContext context) {
-		Assignment assignment = new Assignment();
-		assignment.setReference(SSTUtil.variableReference(InliningUtil.RESULT_NAME + context.getResultName()));
-		assignment.setExpression(stmt.getExpression());
-		context.addStatement(assignment);
-		Assignment resultAssignment = new Assignment();
-		resultAssignment.setReference(SSTUtil.variableReference(InliningUtil.RESULT_FLAG + context.getResultName()));
-		ConstantValueExpression constant = new ConstantValueExpression();
-		constant.setValue("false");
-		resultAssignment.setExpression(constant);
-		context.addStatement(resultAssignment);
-		context.setGuardNeeded(true);
-		context.setGlobalGuardNeeded(true);
+		if (context.isInline()) {
+			Assignment assignment = new Assignment();
+			assignment.setReference(SSTUtil.variableReference(context.getResultName()));
+			assignment.setExpression(stmt.getExpression());
+			context.addStatement(assignment);
+			Assignment resultAssignment = new Assignment();
+			resultAssignment.setReference(SSTUtil.variableReference(context.getGotResultName()));
+			ConstantValueExpression constant = new ConstantValueExpression();
+			constant.setValue("false");
+			resultAssignment.setExpression(constant);
+			context.addStatement(resultAssignment);
+			context.setGuardNeeded(true);
+			context.setGlobalGuardNeeded(true);
+		} else {
+			ReturnStatement statement = new ReturnStatement();
+			statement.setIsVoid(stmt.isVoid());
+			statement.setExpression(
+					(ISimpleExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
+			context.addStatement(statement);
+		}
 		return null;
 	}
 
@@ -296,4 +309,5 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		context.addStatement(statement);
 		return null;
 	}
+
 }

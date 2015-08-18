@@ -779,4 +779,60 @@ public class InliningVisitorTest extends InliningBaseTest {
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 
+	@Test
+	public void testMethodsWithSameName() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2"), //
+				declareNonEntryPoint("m2", //
+						invocationStatement("m2")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2"), //
+				declareNonEntryPoint("m2", //
+						invocationStatement("m2")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testMethodsWithSameName2() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						invocationStatement("m2")), //
+				declareNonEntryPoint("m2", declareVar("a")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", declareVar("a")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testReturnStatementInEntryPoint() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2"), //
+						returnStatement(constant("true"), false)), //
+				declareNonEntryPoint("m2", //
+						declareVar("a"), //
+						declareVar("b")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						declareVar("b"), //
+						returnStatement(constant("true"), false)));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
 }
