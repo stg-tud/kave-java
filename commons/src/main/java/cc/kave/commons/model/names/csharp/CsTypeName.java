@@ -68,12 +68,12 @@ public class CsTypeName extends CsName implements TypeName {
 
 	@Override
 	public boolean isGenericEntity() {
-		return identifier.contains("[[");
+		return identifier.indexOf('`') > 0;
 	}
 
 	@Override
 	public boolean hasTypeParameters() {
-		return identifier.contains("`");
+		return getFullName().indexOf("[[") > -1;
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class CsTypeName extends CsName implements TypeName {
 	public BundleName getAssembly() {
 		int endOfTypeName = getLengthOfTypeName(identifier);
 		String assemblyIdentifier = identifier.substring(endOfTypeName).trim();
-		// TODO: (new char[] { ' ', ',' });
+		assemblyIdentifier = assemblyIdentifier.replaceFirst(",", "").trim();
 		return CsAssemblyName.newAssemblyName(assemblyIdentifier);
 	}
 
@@ -118,6 +118,7 @@ public class CsTypeName extends CsName implements TypeName {
 		if (declaringTypeName.indexOf('`') > -1 && hasTypeParameters()) {
 			int startIndex = 0;
 			int numberOfParameters = 0;
+
 			while ((startIndex = declaringTypeName.indexOf('`', startIndex) + 1) > 0) {
 				int endIndex = declaringTypeName.indexOf('+', startIndex);
 				if (endIndex > -1) {
@@ -132,8 +133,11 @@ public class CsTypeName extends CsName implements TypeName {
 			declaringTypeName += "[[";
 
 			for (TypeName typeName : outerTypeParameters) {
-				declaringTypeName += "],[" + typeName.getIdentifier();
+				declaringTypeName += typeName.getIdentifier() + "],[";
 			}
+
+			declaringTypeName = declaringTypeName.substring(0, declaringTypeName.length() - 3);
+			declaringTypeName += "]]";
 		}
 		return newTypeName(declaringTypeName + ", " + getAssembly());
 	}
