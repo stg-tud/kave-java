@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Running Platform" sequenceNumber="21">
+<?pde version="3.8"?><target name="Running Platform" sequenceNumber="22">
 <locations>
-<location path="C:\Users\M14X\maven-to-p2\maven-to-p2-minimal\test-site" type="Directory"/>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="epp.package.java" version="4.5.0.20150621-1200"/>
 <repository location="http://download.eclipse.org/releases/mars/"/>
@@ -19,6 +18,7 @@
 <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20150519210750/repository/"/>
 </location>
+<location path="/Users/jonasschlitzer/kave-java/dependencies/test-site" type="Directory"/>
 </locations>
 <environment>
 <os>win32</os>
