@@ -19,24 +19,29 @@ package namefactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import visitors.InformationVisitor;
+import visitors.MethodVisitor;
 
-public class ASTCreator {
+public class StandaloneAstParser {
 
 	private InformationVisitor visitor = new InformationVisitor();
+	private MethodVisitor methodVisitor = new MethodVisitor();
 	private CompilationUnit cu;
 
-	public ASTCreator() {
+	public StandaloneAstParser() {
 		String path = "D:\\Eclipse Workspace\\de.vogella.jdt.astsimple\\src\\de\\vogella\\jdt\\astsimple\\handler\\GetInfo.java";
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setResolveBindings(true);
@@ -62,8 +67,7 @@ public class ASTCreator {
 		classpath = Arrays.copyOf(classpath, classpath.length + 1);
 		classpath[classpath.length - 1] = getRtJar();
 
-		parser.setEnvironment(classpath, sources, new String[] { "UTF-8" },
-				true);
+		parser.setEnvironment(classpath, sources, new String[] { "UTF-8" }, true);
 		parser.setSource(source.toCharArray());
 
 		cu = (CompilationUnit) parser.createAST(null);
@@ -72,7 +76,8 @@ public class ASTCreator {
 			System.out.println("Binding activated.");
 		}
 
-		// cu.accept(visitor);
+		cu.accept(visitor);
+		cu.accept(methodVisitor);
 	}
 
 	private String[] getJarPaths(String path) {
@@ -114,8 +119,8 @@ public class ASTCreator {
 	public void accept(ASTVisitor visitor) {
 		cu.accept(visitor);
 	}
-	
-	public void runTests(){
+
+	public void runTests() {
 		NodeFactoryTest nodeFactoryTest = new NodeFactoryTest();
 		try {
 			nodeFactoryTest.runAllTests();
@@ -124,5 +129,9 @@ public class ASTCreator {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public MethodDeclaration getMethodDeclaration(String projectName, String qualifiedName, String methodSignature) {
+		return methodVisitor.getMethod(methodSignature);
 	}
 }

@@ -21,7 +21,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.MethodName;
@@ -29,6 +31,7 @@ import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
+@Ignore
 public class CsMethodNameTest {
 
 	@Test
@@ -223,5 +226,12 @@ public class CsMethodNameTest {
 		MethodName methodName = CsMethodName.newMethodName("[A,P] [d:[B,P] [C,P].([D,P] args)].M([E,P] p)");
 
 		List<ParameterName> ps = methodName.getParameters();
+	}
+
+	@Test
+	public void test() {
+		MethodName methodName = CsMethodName.newMethodName("[A,P] [d:[B,P] [C,P].([D,P] args)].M([E,P] p)");
+		Pattern signatureSyntax = Pattern.compile("\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
+		assertEquals("", signatureSyntax.matcher(methodName.getIdentifier()).group());
 	}
 }

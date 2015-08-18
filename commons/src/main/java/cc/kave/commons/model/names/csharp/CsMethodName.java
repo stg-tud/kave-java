@@ -17,8 +17,7 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	public static final MethodName UNKNOWN_NAME = newMethodName("[?] [?].???()");
 
 	private static final Pattern signatureSyntax = Pattern
-			.compile("\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
-	// .compile("\\\\\\]\\\\.((([^(\\[]+)(?:`[0-9]+\\\\[\\[^(]+\\\\\\]){0,1})\\\\(.*\\\\))$");
+			.compile("\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$");
 
 	public static MethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -33,7 +32,9 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public String getSignature() {
-		return identifier.substring(identifier.lastIndexOf("].") + 2, identifier.length());
+		return signatureSyntax.matcher(identifier).group(1);
+		// return identifier.substring(identifier.lastIndexOf("].") + 2,
+		// identifier.length());
 	}
 
 	@Override
@@ -58,19 +59,18 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	// TODO:
 	public String getFullName() {
-		// String group = signatureSyntax.matcher(identifier).group(2);
-		// signatureSyntax.matcher(identifier).group(2);
-		// return signatureSyntax.matcher(identifier).group(2);
-		return "";
+		String group = signatureSyntax.matcher(identifier).group(2);
+		signatureSyntax.matcher(identifier).group(2);
+		return signatureSyntax.matcher(identifier).group(2);
+		// return "";
 	}
 
 	public String getName() {
-		return "";
+		return signatureSyntax.matcher(identifier).group(3);
 	}
 
 	@Override
 	public boolean hasTypeParameters() {
-		// TODO: get { return FullName.Contains("[["); }
 		return getFullName().contains("[[");
 	}
 

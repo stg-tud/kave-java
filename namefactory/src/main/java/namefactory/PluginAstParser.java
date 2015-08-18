@@ -39,13 +39,13 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import visitors.MethodVisitor;
 
-public class PluginAstCreator {
+public class PluginAstParser {
 
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private CompilationUnit parsed;
 
 	// @Override
-	public PluginAstCreator()	{
+	public PluginAstParser()	{
 //		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 //		IWorkspaceRoot root = workspace.getRoot();
 //		// Get all projects in the workspace

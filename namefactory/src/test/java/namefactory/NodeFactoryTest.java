@@ -22,7 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import namefactory.ASTCreator;
+import namefactory.StandaloneAstParser;
 import namefactory.NodeFactory;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -36,12 +36,13 @@ import visitors.FieldVisitor;
 import visitors.ImportVisitor;
 import visitors.MethodVisitor;
 import visitors.PackageVisitor;
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 
 public class NodeFactoryTest {
 
-	private static ASTCreator astCreator;
+	private static StandaloneAstParser astCreator;
 	// private static InformationVisitor visitor;
 	private static MethodVisitor methodVisitor;
 	private static FieldVisitor fieldVisitor;
@@ -50,7 +51,7 @@ public class NodeFactoryTest {
 
 	@BeforeClass
 	public static void setupClass() {
-		astCreator = new ASTCreator();
+		astCreator = new StandaloneAstParser();
 	}
 
 	@Before
@@ -76,10 +77,9 @@ public class NodeFactoryTest {
 		// }
 	}
 
-	public void runAllTests() throws IllegalAccessException,
-			InvocationTargetException {
+	public void runAllTests() throws IllegalAccessException, InvocationTargetException {
 		setupClass();
-		
+
 		methodVisitor = new MethodVisitor();
 		fieldVisitor = new FieldVisitor();
 		importVisitor = new ImportVisitor();
@@ -110,8 +110,7 @@ public class NodeFactoryTest {
 	// FieldDeclaration -> CsTypeName
 	@Test
 	public void csTypeName() {
-		ITypeBinding typeBinding = ((FieldDeclaration) fieldVisitor
-				.getField("JDT_NATURE")).getType().resolveBinding();
+		ITypeBinding typeBinding = ((FieldDeclaration) fieldVisitor.getField("JDT_NATURE")).getType().resolveBinding();
 		String actual = NodeFactory.BindingFactory.getBindingName(typeBinding);
 		String expected = "java.lang.String, rt.jar";
 
@@ -125,11 +124,10 @@ public class NodeFactoryTest {
 		// Name actual = ReadTestMethod("TextXY", "Method3");
 		// Name expected = CsMethodName.newMethodName("[T,P] [T,P].M()");
 		// assertEquals(expected, actual);
-		
 
-		String actual = NodeFactory.getNodeName(
-				methodVisitor.getMethod("findClass(IPackageFragment packages,"
-						+ " String className)")).getIdentifier();
+		String actual = NodeFactory
+				.getNodeName(methodVisitor.getMethod("findClass(IPackageFragment packages, String className)"))
+				.getIdentifier();
 		String expected = "[org.eclipse.jdt.core.dom.CompilationUnit, org.eclipse.jdt.core-3.10.0.jar]"
 				+ " [de.vogella.jdt.astsimple.handler.GetInfo, /D:/Eclipse%20Workspace/de.vogella.jdt.astsimple/target/classes/]"
 				+ ".findClass([org.eclipse.jdt.core.IPackageFragment, org.eclipse.jdt.core-3.10.0.jar] packages, "
@@ -151,8 +149,7 @@ public class NodeFactoryTest {
 	// PackageDeclaration -> CsNamespaceName
 	@Test
 	public void csNamespaceName() {
-		String actual = NodeFactory.getNodeName(packageVisitor.getPackage())
-				.getIdentifier();
+		String actual = NodeFactory.getNodeName(packageVisitor.getPackage()).getIdentifier();
 		String expected = "de.vogella.jdt.astsimple.handler";
 		assertEquals(expected, actual);
 	}
@@ -160,10 +157,8 @@ public class NodeFactoryTest {
 	// MethodDeclaration -> CsParameterName
 	@Test
 	public void csParameterName() {
-		CsMethodName methodName = (CsMethodName) NodeFactory
-				.getNodeName(methodVisitor
-						.getMethod("findClass(IPackageFragment packages,"
-								+ " String className)"));
+		MethodName methodName = (CsMethodName) NodeFactory
+				.getNodeName(methodVisitor.getMethod("findClass(IPackageFragment packages," + " String className)"));
 		String actual = methodName.getParameters().get(0).getIdentifier();
 		String expected = "[org.eclipse.jdt.core.IPackageFragment, org.eclipse.jdt.core-3.10.0.jar] packages";
 		assertEquals(expected, actual);
