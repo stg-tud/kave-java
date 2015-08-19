@@ -20,14 +20,14 @@ public class PattUtilsTest {
 
 	@Test
 	public void splitsCorrectly() {
-		IGroum groum = Fixture_Groumtest.getExampleGroum();
+		IGroum groum = Fixture.getExampleGroum();
 		List<ISubGroum> subgroums = Utils.breakdown(groum);
 		assertTrue(subgroums.size() == 13);
 	}
 
 	@Test
 	public void removesCorrectly() {
-		IGroum groum = Fixture_Groumtest.getExampleGroum();
+		IGroum groum = Fixture.getExampleGroum();
 		List<ISubGroum> subgroums = Utils.breakdown(groum);
 		ActionNode node = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
 		node.addDependency("strbuf");
@@ -43,7 +43,7 @@ public class PattUtilsTest {
 
 		List<ISubGroum> subgroums = new LinkedList<>();
 
-		for (IGroum groum : Fixture_Groumtest.getListOfXGroums(25)) {
+		for (IGroum groum : Fixture.getListOfXGroums(25)) {
 			subgroums.addAll(Utils.breakdown(groum));
 
 		}
@@ -57,7 +57,7 @@ public class PattUtilsTest {
 
 	@Test
 	public void computesFrequency() {
-		IGroum groum = Fixture_Groumtest.getExampleGroum();
+		IGroum groum = Fixture.getExampleGroum();
 		ActionNode node = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
 		node.addDependency("strbuf");
 		ISubGroum reference = new SubGroum(null);
@@ -142,7 +142,7 @@ public class PattUtilsTest {
 
 	@Test
 	public void breakdownworks() {
-		List<IGroum> groums = Fixture_Groumtest.getListOfXGroums(10);
+		List<IGroum> groums = Fixture.getListOfXGroums(10);
 		List<ISubGroum> subgroums = new LinkedList<>();
 		for (IGroum groum : groums) {
 			subgroums.addAll(Utils.breakdown(groum));

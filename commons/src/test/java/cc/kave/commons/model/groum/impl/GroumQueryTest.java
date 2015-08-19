@@ -37,7 +37,7 @@ public class GroumQueryTest {
 		ActionNode sbInit1 = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
 		sbInit1.addDependency("strbuf");
 
-		Groum groum = (Groum) Fixture_Groumtest.getExampleGroum();
+		Groum groum = (Groum) Fixture.getExampleGroum();
 		assertTrue(groum.getEqualNodes(sbInit1).size() == 2);
 	}
 

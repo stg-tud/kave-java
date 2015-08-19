@@ -34,7 +34,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(if1);
 		groum.addEdge(sbLength, if1);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getPapersExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getPapersExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		// System.out.println(subgraphs.get(0));
@@ -50,7 +50,7 @@ public class NaivSubgraphStrategyTest {
 		sbAppend.addDependency("strbuf");
 		groum.addVertex(sbAppend);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getPapersExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getPapersExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		// System.out.println(subgraphs.get(0));
@@ -74,7 +74,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(sbLength);
 		groum.addEdge(if1, sbLength);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getPapersExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getPapersExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		// System.out.println(subgraphs.get(0));
@@ -97,7 +97,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(brInit);
 		groum.addEdge(frInit, brInit);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		// System.out.println(subgraphs.get(0));
@@ -134,7 +134,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(brInit);
 		groum.addEdge(frInit, brInit);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		// System.out.println(subgraphs.get(0));
@@ -171,7 +171,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(if1);
 		groum.addEdge(sbLength, if1);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getPapersExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getPapersExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		List<ISubGroum> subgraphs = parentGroum.getSubgraphs(groum);
 		assertTrue(subgraphs.get(0).getLeaf().equals(if1));
@@ -194,7 +194,7 @@ public class NaivSubgraphStrategyTest {
 		groum.addVertex(if1);
 		groum.addEdge(sbLength, if1);
 
-		Groum parentGroum = (Groum) Fixture_Groumtest.getPapersExampleGroum();
+		Groum parentGroum = (Groum) Fixture.getPapersExampleGroum();
 		parentGroum.setSubgraphStrategy(new NaivSubgraphStrategy());
 		ISubGroum subgroum = parentGroum.getSubgraphs(groum).get(0);
 

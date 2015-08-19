@@ -10,7 +10,7 @@ import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.groum.nodes.impl.ControlNode;
 
-public class Fixture_Groumtest {
+public class Fixture {
 	public static IGroum getPapersExampleGroum() {
 		Groum groum = new Groum();
 
@@ -151,7 +151,7 @@ public class Fixture_Groumtest {
 		List<IGroum> groumlist = new LinkedList<>();
 
 		for (int i = 1; i <= x; i++) {
-			groumlist.add(Fixture_Groumtest.createConnectedGroumOfSize(i));
+			groumlist.add(Fixture.createConnectedGroumOfSize(i));
 		}
 
 		return groumlist;
@@ -164,7 +164,7 @@ public class Fixture_Groumtest {
 		List<IGroum> groumlist = new LinkedList<>();
 
 		for (int i = x; i > 0; i--) {
-			groumlist.add(Fixture_Groumtest.createConnectedGroumOfSize(i));
+			groumlist.add(Fixture.createConnectedGroumOfSize(i));
 		}
 
 		return groumlist;
@@ -189,5 +189,30 @@ public class Fixture_Groumtest {
 			previous = next;
 		}
 		return groum;
+	}
+
+	public static IGroum createConnectedGroumOfSize(int low, int high) {
+		if (high < low)
+			return null;
+
+		IGroum groum = new Groum();
+		INode previous = createActionNodeInstance(String.valueOf(low));
+		groum.addVertex(previous);
+
+		for (int i = low + 1; i <= high; i++) {
+			INode next = createActionNodeInstance(String.valueOf(i));
+			groum.addVertex(next);
+			groum.addEdge(previous, next);
+			previous = next;
+		}
+		return groum;
+	}
+
+	public static boolean containsPattern(List<IGroum> list, IGroum pattern) {
+		for (IGroum test : list) {
+			if (test.equals(pattern))
+				return true;
+		}
+		return false;
 	}
 }

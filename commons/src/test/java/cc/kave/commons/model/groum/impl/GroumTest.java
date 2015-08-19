@@ -11,6 +11,7 @@ import org.junit.Test;
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.ISubGroum;
+import cc.kave.commons.model.groum.nodes.IActionNode;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.groum.nodes.impl.ControlNode;
@@ -19,13 +20,13 @@ public class GroumTest {
 
 	@Test
 	public void groumDrawsItself() {
-		assertTrue(Fixture_Groumtest.getPapersExampleGroum().toString() != null);
+		assertTrue(Fixture.getPapersExampleGroum().toString() != null);
 	}
 
 	@Test
 	public void equalityWorksFine() {
-		IGroum a = Fixture_Groumtest.getPapersExampleGroum();
-		IGroum b = Fixture_Groumtest.getPapersExampleGroum();
+		IGroum a = Fixture.getPapersExampleGroum();
+		IGroum b = Fixture.getPapersExampleGroum();
 		assertTrue(a.equals(b));
 	}
 
@@ -53,7 +54,7 @@ public class GroumTest {
 
 	@Test
 	public void findsLeaf() {
-		IGroum groum = Fixture_Groumtest.getPapersExampleGroum();
+		IGroum groum = Fixture.getPapersExampleGroum();
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
 		brClose.addDependency("in");
@@ -86,8 +87,8 @@ public class GroumTest {
 
 	@Test
 	public void identityWorksFine() {
-		IGroum a = Fixture_Groumtest.getPapersExampleGroum();
-		IGroum b = Fixture_Groumtest.getPapersExampleGroum();
+		IGroum a = Fixture.getPapersExampleGroum();
+		IGroum b = Fixture.getPapersExampleGroum();
 		assertFalse(a == b);
 	}
 
@@ -133,8 +134,8 @@ public class GroumTest {
 
 	@Test
 	public void comparesEqualGroums() {
-		IGroum a = Fixture_Groumtest.getExampleGroum();
-		IGroum b = Fixture_Groumtest.getExampleGroum();
+		IGroum a = Fixture.getExampleGroum();
+		IGroum b = Fixture.getExampleGroum();
 		assertTrue(a.compareTo(b) == 0);
 	}
 
@@ -224,25 +225,51 @@ public class GroumTest {
 
 	@Test
 	public void groumsCanBeGenerated() {
-		IGroum groum = Fixture_Groumtest.createConnectedGroumOfSize(10);
+		IGroum groum = Fixture.createConnectedGroumOfSize(10);
 		assertTrue(groum.getAllNodes().size() == 10 && groum.getEdgeCount() == 9);
 	}
 
 	@Test
+	public void groumsCanBeGeneratedLowEqualsHigh() {
+		IGroum groum = Fixture.createConnectedGroumOfSize(5, 5);
+		IGroum target = new Groum();
+		IActionNode node = new ActionNode("5", "5");
+		target.addVertex(node);
+		assertTrue(groum.getAllNodes().size() == 1 && groum.equals(target));
+	}
+
+	@Test
+	public void groumsCanBeGeneratedLowHigh() {
+		IGroum groum = Fixture.createConnectedGroumOfSize(6, 10);
+		IActionNode node6 = new ActionNode("6", "6");
+		IActionNode node10 = new ActionNode("10", "10");
+		boolean contains6 = false;
+		boolean contains10 = false;
+
+		for (INode node : groum.getAllNodes()) {
+			if (node.equals(node6))
+				contains6 = true;
+			if (node.equals(node10))
+				contains10 = true;
+		}
+		assertTrue(groum.getAllNodes().size() == 5 && contains6 && contains10);
+	}
+
+	@Test
 	public void generatedGroumsHaveCorrectLeaf() {
-		IGroum groum = Fixture_Groumtest.createConnectedGroumOfSize(10);
-		assertTrue(groum.getLeaf().equals(Fixture_Groumtest.createActionNodeInstance("10")));
+		IGroum groum = Fixture.createConnectedGroumOfSize(10);
+		assertTrue(groum.getLeaf().equals(Fixture.createActionNodeInstance("10")));
 	}
 
 	@Test
 	public void listOfGroumsCanBeGenerated() {
-		List<IGroum> groums = Fixture_Groumtest.getListOfXGroums(10);
+		List<IGroum> groums = Fixture.getListOfXGroums(10);
 		assertTrue(groums.size() == 10 && groums.get(0).getAllNodes().size() == 1);
 	}
 
 	@Test
 	public void listOfGroumsCanBeGeneratedReversely() {
-		List<IGroum> groums = Fixture_Groumtest.getListOfXGroumsReverse(10);
+		List<IGroum> groums = Fixture.getListOfXGroumsReverse(10);
 		assertTrue(groums.size() == 10 && groums.get(0).getAllNodes().size() == 10);
 	}
 

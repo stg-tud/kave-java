@@ -25,10 +25,10 @@ public class GroumMultisetTest {
 	@Test
 	public void comparatorWorksForGroums() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(1);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(1);
 		treeset.add(groum1);
 		treeset.add(groum2);
 		treeset.add(groum3);
@@ -40,21 +40,21 @@ public class GroumMultisetTest {
 	@Test
 	public void comparatorWorksForSubgroums() {
 		TreeMultiset<ISubGroum> treeset = TreeMultiset.create(new SubGroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(2);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(2);
 		((Groum) groum1).setSubgraphStrategy(new NaivSubgraphStrategy());
-		ISubGroum subGroum1 = groum1.getSubgraphs(Fixture_Groumtest.createConnectedGroumOfSize(2)).get(0);
+		ISubGroum subGroum1 = groum1.getSubgraphs(Fixture.createConnectedGroumOfSize(2)).get(0);
 
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
 		((Groum) groum2).setSubgraphStrategy(new NaivSubgraphStrategy());
-		ISubGroum subGroum2 = groum2.getSubgraphs(Fixture_Groumtest.createConnectedGroumOfSize(2)).get(0);
+		ISubGroum subGroum2 = groum2.getSubgraphs(Fixture.createConnectedGroumOfSize(2)).get(0);
 
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
 		((Groum) groum3).setSubgraphStrategy(new NaivSubgraphStrategy());
-		ISubGroum subGroum3 = groum3.getSubgraphs(Fixture_Groumtest.createConnectedGroumOfSize(2)).get(0);
+		ISubGroum subGroum3 = groum3.getSubgraphs(Fixture.createConnectedGroumOfSize(2)).get(0);
 
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(1);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(1);
 		((Groum) groum4).setSubgraphStrategy(new NaivSubgraphStrategy());
-		ISubGroum subGroum4 = groum4.getSubgraphs(Fixture_Groumtest.createConnectedGroumOfSize(1)).get(0);
+		ISubGroum subGroum4 = groum4.getSubgraphs(Fixture.createConnectedGroumOfSize(1)).get(0);
 
 		treeset.add(subGroum1);
 		treeset.add(subGroum2);
@@ -67,13 +67,13 @@ public class GroumMultisetTest {
 	@Test
 	public void removesSubset() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(1);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum5 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum6 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum7 = Fixture_Groumtest.createConnectedGroumOfSize(3);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum5 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum7 = Fixture.createConnectedGroumOfSize(3);
 
 		treeset.addAll(Arrays.asList(groum1, groum2, groum3, groum4, groum5, groum6, groum7));
 		treeset.removeAll(Arrays.asList(groum6));
@@ -83,16 +83,16 @@ public class GroumMultisetTest {
 	@Test
 	public void removesSeveralSubsets() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(1);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum5 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum6 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum7 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum8 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum9 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum10 = Fixture_Groumtest.createConnectedGroumOfSize(4);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum5 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum7 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum8 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum9 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum10 = Fixture.createConnectedGroumOfSize(4);
 
 		treeset.addAll(Arrays.asList(groum1, groum2, groum3, groum4, groum5, groum6, groum7, groum8, groum9, groum10));
 		treeset.removeAll(Arrays.asList(groum4, groum9));
@@ -103,16 +103,16 @@ public class GroumMultisetTest {
 	@Test
 	public void iteratesOverOccurences() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(1);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum5 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum6 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum7 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum8 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum9 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum10 = Fixture_Groumtest.createConnectedGroumOfSize(4);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum5 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum7 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum8 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum9 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum10 = Fixture.createConnectedGroumOfSize(4);
 		treeset.addAll(Arrays.asList(groum1, groum2, groum3, groum4, groum5, groum6, groum7, groum8, groum9, groum10));
 
 		int i = 0;
@@ -126,16 +126,16 @@ public class GroumMultisetTest {
 	@Test
 	public void copiesAllOccurences() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(1);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum5 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum6 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum7 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum8 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum9 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum10 = Fixture_Groumtest.createConnectedGroumOfSize(4);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum5 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum7 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum8 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum9 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum10 = Fixture.createConnectedGroumOfSize(4);
 		treeset.addAll(Arrays.asList(groum1, groum2, groum3, groum4, groum5, groum6, groum7, groum8, groum9, groum10));
 
 		TreeMultiset<IGroum> treesetCopy = TreeMultiset.create(new GroumComparator());
@@ -146,16 +146,16 @@ public class GroumMultisetTest {
 	@Test
 	public void retrievesSubSet() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
-		IGroum groum1 = Fixture_Groumtest.createConnectedGroumOfSize(1);
-		IGroum groum2 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture_Groumtest.createConnectedGroumOfSize(2);
-		IGroum groum4 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum5 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum6 = Fixture_Groumtest.createConnectedGroumOfSize(3);
-		IGroum groum7 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum8 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum9 = Fixture_Groumtest.createConnectedGroumOfSize(4);
-		IGroum groum10 = Fixture_Groumtest.createConnectedGroumOfSize(4);
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
+		IGroum groum4 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum5 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum7 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum8 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum9 = Fixture.createConnectedGroumOfSize(4);
+		IGroum groum10 = Fixture.createConnectedGroumOfSize(4);
 		treeset.addAll(Arrays.asList(groum1, groum2, groum3, groum4, groum5, groum6, groum7, groum8, groum9, groum10));
 
 		SortedMultiset<IGroum> subMultiset = treeset.subMultiset(groum5, BoundType.CLOSED, groum5, BoundType.CLOSED);
@@ -167,7 +167,7 @@ public class GroumMultisetTest {
 	@Test
 	@Ignore
 	public void preservesParents() {
-		List<IGroum> groums = Fixture_Groumtest.getListOfXGroums(10);
+		List<IGroum> groums = Fixture.getListOfXGroums(10);
 		List<ISubGroum> subgroums = new LinkedList<>();
 		for (IGroum groum : groums) {
 			subgroums.addAll(Utils.breakdown(groum));
