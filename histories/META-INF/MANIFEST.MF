@@ -3,12 +3,3 @@ Bundle-ManifestVersion: 2
 Bundle-Name: histories
 Bundle-SymbolicName: histories
 Bundle-Version: 1.0.0.qualifier
-Export-Package: src,
- src.test,
- src.test.java,
- src.test.java.cc,
- src.test.java.cc.kave,
- src.test.java.cc.kave.histories,
- src.test.resources,
- target,
- target.classes

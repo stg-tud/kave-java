@@ -13,7 +13,13 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.events.completionevents.IProposal;
+import cc.kave.commons.model.events.completionevents.IProposalSelection;
+import cc.kave.commons.model.events.completionevents.Proposal;
+import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.DelegateTypeName;
@@ -114,6 +120,7 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
+import cc.kave.commons.utils.Asserts;
 
 public abstract class JsonUtils {
 	public static <T> T parseJson(String json, Type targetType) {
@@ -123,8 +130,14 @@ public abstract class JsonUtils {
 	}
 
 	public static <T> String parseObject(Object obj, Type targetType) {
+		return toJson(obj);
+	}
+
+	// TODO review this
+	public static <T> String toJson(Object obj) {
 		Gson gson = createGson();
-		String json = gson.toJsonTree(obj, targetType).toString();
+		String json = gson.toJson(obj);
+		// String json = gson.toJsonTree(obj, targetType).toString();
 		return removeDetails(json);
 	}
 
@@ -222,83 +235,82 @@ public abstract class JsonUtils {
 	}
 
 	public static Gson createGson() {
-		GsonBuilder gsonBuilder = new GsonBuilder();
+		GsonBuilder gb = new GsonBuilder();
 		// name interface types
-		gsonBuilder.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(BundleName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(EventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(FieldName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(LambdaName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(LocalVariableName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(MethodName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(Name.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(NamespaceName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(ParameterName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(PropertyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(TypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(DelegateTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(BundleName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(EventName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(FieldName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(LambdaName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(LocalVariableName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(MethodName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(Name.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(NamespaceName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(ParameterName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(PropertyName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(TypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(DelegateTypeName.class, new GsonNameDeserializer());
 		// C# name types
-		gsonBuilder.registerTypeAdapter(CsAliasName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsAssemblyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsEventName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsFieldName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsLambdaName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsLocalVariableName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsMethodName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsNamespaceName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsParameterName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsPropertyName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsUnknownTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsTypeParameterName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsStructTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsInterfaceTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsEnumTypeName.class, new GsonNameDeserializer());
-		gsonBuilder.registerTypeAdapter(CsArrayTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsAliasName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsAssemblyName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsEventName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsFieldName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsLambdaName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsLocalVariableName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsMethodName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsNamespaceName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsParameterName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsPropertyName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsDelegateTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsUnknownTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsTypeParameterName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsStructTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsInterfaceTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsEnumTypeName.class, new GsonNameDeserializer());
+		gb.registerTypeAdapter(CsArrayTypeName.class, new GsonNameDeserializer());
 
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableExpression.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableExpression.class, "$type")
 				.registerSubtype(CompletionExpression.class).registerSubtype(ComposedExpression.class)
 				.registerSubtype(IfElseExpression.class).registerSubtype(InvocationExpression.class)
 				.registerSubtype(LambdaExpression.class).registerSubtype(UnknownExpression.class)
 				.registerSubtype(ConstantValueExpression.class).registerSubtype(NullExpression.class)
 				.registerSubtype(ReferenceExpression.class));
-		gsonBuilder.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(ISST.class, "$type").registerSubtype(SST.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMemberDeclaration.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISST.class, "$type").registerSubtype(SST.class));
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMemberDeclaration.class, "$type")
 				.registerSubtype(IMemberDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(IFieldDeclaration.class, "$type").registerSubtype(FieldDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IDelegateDeclaration.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IDelegateDeclaration.class, "$type")
 				.registerSubtype(DelegateDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IPropertyDeclaration.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IPropertyDeclaration.class, "$type")
 				.registerSubtype(PropertyDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(IEventDeclaration.class, "$type").registerSubtype(EventDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(IReference.class, "$type").registerSubtype(IReference.class)
 						.registerSubtype(UnknownReference.class).registerSubtype(EventReference.class)
 						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
 						.registerSubtype(MethodReference.class).registerSubtype(VariableReference.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type").registerSubtype(EventReference.class)
 						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
 						.registerSubtype(UnknownReference.class).registerSubtype(VariableReference.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableReference.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableReference.class, "$type")
 				.registerSubtype(VariableReference.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISimpleExpression.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISimpleExpression.class, "$type")
 				.registerSubtype(UnknownExpression.class).registerSubtype(ReferenceExpression.class)
 				.registerSubtype(NullExpression.class).registerSubtype(ConstantValueExpression.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMethodDeclaration.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMethodDeclaration.class, "$type")
 				.registerSubtype(MethodDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableDeclaration.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableDeclaration.class, "$type")
 				.registerSubtype(VariableDeclaration.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ILoopHeaderExpression.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ILoopHeaderExpression.class, "$type")
 				.registerSubtype(LoopHeaderBlockExpression.class).registerSubtype(UnknownExpression.class)
 				.registerSubtype(NullExpression.class).registerSubtype(ConstantValueExpression.class)
 				.registerSubtype(ReferenceExpression.class));
-		gsonBuilder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IStatement.class, "$type")
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IStatement.class, "$type")
 				.registerSubtype(Assignment.class).registerSubtype(BreakStatement.class)
 				.registerSubtype(ContinueStatement.class).registerSubtype(DoLoop.class)
 				.registerSubtype(ExpressionStatement.class).registerSubtype(ForEachLoop.class)
@@ -309,23 +321,40 @@ public abstract class JsonUtils {
 				.registerSubtype(UncheckedBlock.class).registerSubtype(UnknownStatement.class)
 				.registerSubtype(UnsafeBlock.class).registerSubtype(UsingBlock.class)
 				.registerSubtype(VariableDeclaration.class).registerSubtype(WhileLoop.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(ICatchBlock.class, "$type").registerSubtype(CatchBlock.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(ICaseBlock.class, "$type").registerSubtype(CaseBlock.class));
 
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(Context.class, "$type").registerSubtype(Context.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(ITypeShape.class, "$type").registerSubtype(TypeShape.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(IMethodHierarchy.class, "$type").registerSubtype(MethodHierarchy.class));
-		gsonBuilder.registerTypeAdapterFactory(
+		gb.registerTypeAdapterFactory(
 				RuntimeTypeAdapterFactory.of(ITypeHierarchy.class, "$type").registerSubtype(TypeHierarchy.class));
 
-		gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
-		gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
-		return gsonBuilder.create();
+		// completion event
+		register(gb, ICompletionEvent.class, CompletionEvent.class);
+		register(gb, IProposal.class, Proposal.class);
+		register(gb, IProposalSelection.class, ProposalSelection.class);
+
+		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
+		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
+		return gb.create();
+	}
+
+	@SafeVarargs
+	private static <T> void register(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
+		Asserts.assertThat(subtypes.length > 0);
+
+		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
+		for (int i = 1; i < subtypes.length; i++) {
+			factory = factory.registerSubtype(subtypes[i]);
+		}
+
+		gsonBuilder.registerTypeAdapterFactory(factory);
 	}
 
 }

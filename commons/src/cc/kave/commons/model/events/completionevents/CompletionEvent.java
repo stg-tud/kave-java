@@ -25,7 +25,7 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
 	public Context Context;
 
-	public IProposalCollection ProposalCollection;
+	public List<IProposal> ProposalCollection;
 
 	public String Prefix;
 
@@ -41,7 +41,7 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 	}
 
 	@Override
-	public IProposalCollection getProposalCollection() {
+	public List<IProposal> getProposalCollection() {
 		return ProposalCollection;
 	}
 

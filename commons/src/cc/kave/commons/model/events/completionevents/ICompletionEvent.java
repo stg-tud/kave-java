@@ -28,7 +28,7 @@ public interface ICompletionEvent {
 	public Context getContext();
 
 	@Nonnull
-	public IProposalCollection getProposalCollection();
+	public List<IProposal> getProposalCollection();
 
 	@Nonnull
 	public String getPrefix();
