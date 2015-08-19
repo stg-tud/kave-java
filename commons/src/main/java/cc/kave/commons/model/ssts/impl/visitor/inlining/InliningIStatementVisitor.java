@@ -1,5 +1,9 @@
 package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -48,6 +52,7 @@ import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.RecursiveCallVisitor;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -71,8 +76,24 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 				method.accept(this, context);
 			}
 		} else {
-			for (IMethodDeclaration method : sst.getMethods())
+			for (IMethodDeclaration method : sst.getMethods()) {
 				context.addMethod(method);
+			}
+		}
+		Set<Set<MethodName>> calls = new HashSet<>();
+		for (IMethodDeclaration method : context.getNonEntryPoints()) {
+			Set<MethodName> invokes = new HashSet<>();
+			method.accept(new RecursiveCallVisitor(), invokes);
+			calls.add(invokes);
+		}
+		for (IMethodDeclaration method : context.getNonEntryPoints()) {
+			for (Set<MethodName> invokes : calls) {
+				if (invokes.contains(method.getName())) {
+					context.addMethod(method);
+					break;
+				}
+
+			}
 		}
 		for (IMethodDeclaration method : context.getRemoveList()) {
 			context.getNonEntryPoints().remove(method);

@@ -14,7 +14,6 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningUtil;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -901,7 +900,66 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b")));
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
-		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testDeclareAndAssignParameters() {
+		MethodName name = CsMethodName.newMethodName("[?] [?].m2([?] b)");
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement(name, constant("true")), //
+						declareVar("b")), //
+				declareMethod(name, false, //
+						assign(ref("b"), constant("1"))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						declareVar("$0_b"), //
+						assign(ref("$0_b"), constant("true")), //
+						assign(ref("$0_b"), constant("1")), //
+						declareVar("b")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testAssignFieldInvocation() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						assign(refField("[T4,P] [T5,P].F"), constant("true")), //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						assign(ref("b"), invocationExpr("m3", ref("[T4,P] [T5,P].F")))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						assign(refField("[T4,P] [T5,P].F"), constant("true")), //
+						assign(ref("b"), invocationExpr("m3", ref("[T4,P] [T5,P].F")))));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+
+	@Test
+	public void testInlineInEntryAndNonEntryPoint() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m3", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						declareVar("a")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a")),
+				declareNonEntryPoint("m3", //
+						invocationStatement("m2")),
+				declareNonEntryPoint("m2", //
+						declareVar("a")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

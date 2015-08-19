@@ -151,7 +151,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 						preChangedNames.put(SSTUtil.variableReference(parameter.getName()),
 								((IMemberReference) refExpr.getReference()).getReference());
 					}
-				} else {
+				} else if (i < expressions.size()) {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
 					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expressions.get(i)));
 				}
