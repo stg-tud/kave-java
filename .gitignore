@@ -1,4 +1,7 @@
-**/target/
-
+**/target
+**/bin
 **/*.jar
-**/test-site/
+**/test-site
+dependencies/*.target
+
+

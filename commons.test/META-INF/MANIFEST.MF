@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: commons.test
+Bundle-Version: 1.0.0.qualifier
+Export-Package: cc.kave.commons
+Require-Bundle: commons,
+ org.objenesis,
+ org.mockito.mockito-core,
+ org.junit,
+ com.google.gson,
+ org.apache.commons.io,
+ com.google.guava,
+ org.eclipse.jdt.annotation,
+ com.google.code.findbugs.jsr305,
+ org.apache.commons.lang3

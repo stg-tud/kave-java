@@ -16,8 +16,6 @@
 
 package cc.kave.commons.model.names.csharp;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 
 import cc.kave.commons.model.names.BundleName;
@@ -200,7 +198,9 @@ public class CsTypeParameterName extends CsName implements TypeName {
 
 	@Override
 	public TypeName DeriveArrayTypeName(int rank) {
-		assertTrue("rank smaller than 1", rank > 0);
+		if (rank <= 0) {
+			throw new RuntimeException("rank smaller than 1");
+		}
 		String typeParameterShortName = getTypeParameterShortName();
 		String suffix = identifier.substring(typeParameterShortName.length());
 		return CsTypeName.newTypeName(
