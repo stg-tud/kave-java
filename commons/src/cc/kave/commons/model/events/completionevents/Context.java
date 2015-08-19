@@ -1,5 +1,10 @@
 package cc.kave.commons.model.events.completionevents;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.google.gson.annotations.SerializedName;
 
 import cc.kave.commons.model.ssts.ISST;
@@ -34,34 +39,17 @@ public class Context {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((sst == null) ? 0 : sst.hashCode());
-		result = prime * result + ((typeShape == null) ? 0 : typeShape.hashCode());
-		return result;
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Context other = (Context) obj;
-		if (sst == null) {
-			if (other.sst != null)
-				return false;
-		} else if (!sst.equals(other.sst))
-			return false;
-		if (typeShape == null) {
-			if (other.typeShape != null)
-				return false;
-		} else if (!typeShape.equals(other.typeShape))
-			return false;
-		return true;
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
 }

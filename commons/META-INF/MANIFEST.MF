@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: commons
 Bundle-SymbolicName: commons
 Bundle-Version: 1.0.0.qualifier
-Export-Package: cc.kave.commons.model.events.completionevents,
+Export-Package: cc.kave.commons.model.events,
+ cc.kave.commons.model.events.completionevents,
  cc.kave.commons.model.names,
  cc.kave.commons.model.names.csharp,
  cc.kave.commons.model.ssts,
