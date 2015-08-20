@@ -21,12 +21,13 @@ public class ZipWriter {
 	}
 
 	public <T> void add(T obj) {
-		entries.add(JsonUtils.parseObject(obj, obj.getClass()));
+		entries.add(JsonUtils.toJson(obj, obj.getClass()));
 	}
 
 	public <T> void addAll(List<T> entries) {
 		for (T obj : entries) {
-			this.entries.add(JsonUtils.parseObject(obj, obj.getClass()));
+			String json = JsonUtils.toJson(obj, obj.getClass());
+			this.entries.add(json);
 		}
 	}
 

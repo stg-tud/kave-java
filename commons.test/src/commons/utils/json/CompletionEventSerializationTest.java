@@ -16,8 +16,6 @@
 
 package commons.utils.json;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,58 +24,37 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.kave.commons.model.typeshapes.TypeShape;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class CompletionEventSerializationTest {
 
 	@Test
 	public void verifyToJson() {
-		String actual = JsonUtils.parseObject(GetExample(), CompletionEvent.class);
+		CompletionEvent getExample = GetExample();
+		String actual = JsonUtils.toJson(getExample, ICompletionEvent.class);
 		String expected = GetExampleJson_Current();
 		Assert.assertEquals(expected, actual);
 	}
 
 	@Test
-	public void verifyToJson2() {
-		System.out.println(JsonUtils.toJson(new TypeShape()));
-
-		Proposal p = new Proposal();
-		p.Name = CsName.newName("asd");
-		System.out.println(JsonUtils.toJson(p));
-
-		List<IProposal> pc = Lists.newLinkedList();
-		pc.add(createProposal("[T1,P1] [T1,P2].M1()"));
-		pc.add(createProposal("[T1,P1] [T1,P2].M2()"));
-		System.out.println(JsonUtils.toJson(pc));
-
-		CompletionEvent e = new CompletionEvent();
-		e.ProposalCollection = Lists.newLinkedList();
-		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M1()"));
-		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M2()"));
-		System.out.println(JsonUtils.toJson(e));
-
-	}
-
-	@Test
 	public void verifyFromJson() {
-		CompletionEvent actual = JsonUtils.parseJson(GetExampleJson_Current(), CompletionEvent.class);
-		CompletionEvent expected = GetExample();
+		ICompletionEvent actual = JsonUtils.fromJson(GetExampleJson_Current(), ICompletionEvent.class);
+		ICompletionEvent expected = GetExample();
 		Assert.assertEquals(expected, actual);
 	}
 
 	@Test
 	public void verifyObjToObjEquality() {
-		String json = JsonUtils.parseObject(GetExample(), CompletionEvent.class);
-		CompletionEvent actual = JsonUtils.parseJson(json, CompletionEvent.class);
+		String json = JsonUtils.toJson(GetExample(), ICompletionEvent.class);
+		CompletionEvent actual = JsonUtils.fromJson(json, ICompletionEvent.class);
 		CompletionEvent expected = GetExample();
 		Assert.assertEquals(expected, actual);
 	}
@@ -103,19 +80,16 @@ public class CompletionEventSerializationTest {
 		e.Context.setSST(sst);
 
 		e.ProposalCollection = Lists.newLinkedList();
-		// e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M1()"));
-		// e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M2()"));
+		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M1()"));
+		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M2()"));
 
 		e.Prefix = "Foo";
 
-		/*
-		 * e.Selections = Lists.newLinkedList();
-		 * e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()",
-		 * "18:54:59.6720000")); e.Selections.add(createProposalSelection(
-		 * "[T1,P1] [T1,P2].M2()", "18:54:59.7830000"));
-		 * e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()",
-		 * "18:54:59.8940000"));
-		 */
+		e.Selections = Lists.newLinkedList();
+		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.6720000"));
+		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M2()", "18:54:59.7830000"));
+		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.8940000"));
+
 		e.TerminatedBy = Trigger.Typing;
 		e.TerminatedState = TerminationState.Applied;
 
@@ -131,7 +105,7 @@ public class CompletionEventSerializationTest {
 
 	private static IProposal createProposal(String methodName) {
 		Proposal p = new Proposal();
-		p.Name = CsMethodName.newName(methodName);
+		p.Name = CsMethodName.newMethodName(methodName);
 		p.Relevance = 42;
 		return p;
 	}

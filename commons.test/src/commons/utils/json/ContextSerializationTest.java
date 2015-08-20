@@ -14,13 +14,13 @@ public class ContextSerializationTest {
 
 	@Test
 	public void testSerializeToJson() {
-		String sut = JsonUtils.parseObject(getExampleContext(), Context.class);
+		String sut = JsonUtils.toJson(getExampleContext(), Context.class);
 		assertThat(sut, equalTo(getExampleJson_Current()));
 	}
 
 	@Test
 	public void testDeserializeToContext() {
-		Context sut = JsonUtils.parseJson(getExampleJson_Current(), Context.class);
+		Context sut = JsonUtils.fromJson(getExampleJson_Current(), Context.class);
 		assertThat(sut, equalTo(getExampleContext()));
 	}
 
@@ -35,5 +35,4 @@ public class ContextSerializationTest {
 		context.setSST(sst);
 		return context;
 	}
-
 }

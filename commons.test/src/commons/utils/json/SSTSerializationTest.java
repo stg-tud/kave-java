@@ -71,14 +71,14 @@ public class SSTSerializationTest {
 
 	@Test
 	public void serializeSSTToJson() {
-		String SSTtoJson = JsonUtils.parseObject(getExample(), ISST.class).toString();
+		String SSTtoJson = JsonUtils.toJson(getExample(), ISST.class).toString();
 		assertThat(SSTtoJson, equalTo(getExampleJson_Current()));
 	}
 
 	@Test
 	public void deserializeJsonToSST() {
 		ISST a = getExample();
-		ISST b = JsonUtils.parseJson(getExampleJson_Current(), ISST.class);
+		ISST b = JsonUtils.fromJson(getExampleJson_Current(), ISST.class);
 		assertThat(a, equalTo(b));
 	}
 

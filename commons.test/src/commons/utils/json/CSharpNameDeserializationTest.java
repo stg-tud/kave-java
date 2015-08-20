@@ -117,7 +117,7 @@ public class CSharpNameDeserializationTest {
 	}
 
 	private <T extends Name> void assertDeserialize(String json, Class<T> requestedType, Name expectedInstance) {
-		Name name = JsonUtils.parseJson(json, requestedType);
+		Name name = JsonUtils.fromJson(json, requestedType);
 		assertThat(name, sameInstance(expectedInstance));
 	}
 }

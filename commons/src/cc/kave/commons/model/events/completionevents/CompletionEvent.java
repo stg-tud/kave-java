@@ -18,11 +18,14 @@ package cc.kave.commons.model.events.completionevents;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 import cc.kave.commons.model.events.IDEEvent;
 import cc.kave.commons.model.events.Trigger;
 
 public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
+	@SerializedName("Context2")
 	public Context Context;
 
 	public List<IProposal> ProposalCollection;

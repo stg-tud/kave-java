@@ -1,10 +1,5 @@
 package cc.kave.commons.utils.json;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -20,6 +16,7 @@ import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.IProposalSelection;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
+import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.AliasName;
 import cc.kave.commons.model.names.BundleName;
 import cc.kave.commons.model.names.DelegateTypeName;
@@ -123,119 +120,12 @@ import cc.kave.commons.model.typeshapes.TypeShape;
 import cc.kave.commons.utils.Asserts;
 
 public abstract class JsonUtils {
-	public static <T> T parseJson(String json, Type targetType) {
-		json = addDetails(json);
-		Gson gson = createGson();
-		return gson.fromJson(json, targetType);
-	}
 
-	public static <T> String parseObject(Object obj, Type targetType) {
-		return toJson(obj);
-	}
+	private static Gson gson;
 
-	// TODO review this
-	public static <T> String toJson(Object obj) {
-		Gson gson = createGson();
-		String json = gson.toJson(obj);
-		// String json = gson.toJsonTree(obj, targetType).toString();
-		return removeDetails(json);
-	}
-
-	public static <T> T deserialize(File file, Type targetType) {
-		StringBuilder builder = new StringBuilder();
-		try {
-			FileInputStream stream = new FileInputStream(file);
-			int ch;
-
-			while ((ch = stream.read()) != -1) {
-				builder.append((char) ch);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return parseJson(builder.toString(), targetType);
-	}
-
-	public static <T> void serialize(T object, File file) {
-		try {
-			Writer stream = new FileWriter(file);
-			String output = parseObject(object, object.getClass());
-			stream.write(output);
-			stream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static String removeDetails(String json) {
-		StringBuffer resultString = new StringBuffer();
-		Pattern regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)");
-		Matcher regexMatcher = regex.matcher(json);
-		while (regexMatcher.find()) {
-			String replacement = "[SST:" + upperCase(regexMatcher.group(1)) + "]";
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)");
-		regexMatcher = regex.matcher(resultString.toString());
-		resultString = new StringBuffer();
-		while (regexMatcher.find()) {
-			String replacement = "KaVE.Commons.Model." + upperCase(regexMatcher.group(1)) + ", KaVE.Commons";
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		return resultString.toString();
-	}
-
-	private static String addDetails(String json) {
-		StringBuffer resultString = new StringBuffer();
-		Pattern regex = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
-		Matcher regexMatcher = regex.matcher(json);
-		while (regexMatcher.find()) {
-			String replacement = "cc.kave.commons.model.ssts.impl." + lowerCase(regexMatcher.group(1));
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-
-		regexMatcher.appendTail(resultString);
-		regex = Pattern.compile("KaVE\\.Commons\\.Model\\.([.a-zA-Z0-9_]+), KaVE.Commons");
-		regexMatcher = regex.matcher(resultString.toString());
-		resultString = new StringBuffer();
-		while (regexMatcher.find()) {
-			String replacement = "cc.kave.commons.model." + lowerCase(regexMatcher.group(1));
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		return resultString.toString();
-	}
-
-	private static String lowerCase(String string) {
-		if (string.contains(".")) {
-			return string.substring(0, string.lastIndexOf(".")).toLowerCase()
-					+ string.substring(string.lastIndexOf("."));
-		}
-		return string;
-	}
-
-	private static String upperCase(String string) {
-		String[] path = string.split("[.]");
-		String type = "";
-		for (int i = 0; i < path.length; i++) {
-			if (i != path.length - 1) {
-				if (path[i].equals("loopheader"))
-					path[i] = "loopHeader";
-				else if (path[i].equals("completionevents"))
-					path[i] = "completionEvents";
-				else if (path[i].equals("typeshapes"))
-					path[i] = "typeShapes";
-				type += path[i].substring(0, 1).toUpperCase() + path[i].substring(1) + ".";
-			} else
-				type += path[i];
-		}
-		return type;
-	}
-
-	public static Gson createGson() {
+	static {
 		GsonBuilder gb = new GsonBuilder();
+
 		// name interface types
 		gb.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
 		gb.registerTypeAdapter(BundleName.class, new GsonNameDeserializer());
@@ -340,9 +230,13 @@ public abstract class JsonUtils {
 		register(gb, IProposal.class, Proposal.class);
 		register(gb, IProposalSelection.class, ProposalSelection.class);
 
+		// enums
+		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
+		gb.registerTypeAdapter(TerminationState.class, EnumDeSerializer.create(TerminationState.values()));
+
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
-		return gb.create();
+		gson = gb.create();
 	}
 
 	@SafeVarargs
@@ -350,11 +244,94 @@ public abstract class JsonUtils {
 		Asserts.assertThat(subtypes.length > 0);
 
 		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
-		for (int i = 1; i < subtypes.length; i++) {
+		for (int i = 0; i < subtypes.length; i++) {
 			factory = factory.registerSubtype(subtypes[i]);
 		}
 
 		gsonBuilder.registerTypeAdapterFactory(factory);
 	}
 
+	public static <T> T fromJson(String json, Type targetType) {
+		json = toJavaTypeNames(json);
+		return gson.fromJson(json, targetType);
+	}
+
+	public static <T> String toJson(Object obj, Type targetType) {
+		String json = gson.toJsonTree(obj, targetType).toString();
+		return toCSharpTypeNames(json);
+	}
+
+	public static <T> String toJson(Object obj) {
+		String json = gson.toJson(obj);
+		return toCSharpTypeNames(json);
+	}
+
+	private static String toCSharpTypeNames(String json) {
+		StringBuffer resultString = new StringBuffer();
+		Pattern regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)");
+		Matcher regexMatcher = regex.matcher(json);
+		while (regexMatcher.find()) {
+			String replacement = "[SST:" + toUpperCaseNamespace(regexMatcher.group(1)) + "]";
+			regexMatcher.appendReplacement(resultString, replacement);
+		}
+		regexMatcher.appendTail(resultString);
+		regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)");
+		regexMatcher = regex.matcher(resultString.toString());
+		resultString = new StringBuffer();
+		while (regexMatcher.find()) {
+			String replacement = "KaVE.Commons.Model." + toUpperCaseNamespace(regexMatcher.group(1)) + ", KaVE.Commons";
+			regexMatcher.appendReplacement(resultString, replacement);
+		}
+		regexMatcher.appendTail(resultString);
+		return resultString.toString();
+	}
+
+	private static String toJavaTypeNames(String json) {
+		StringBuffer resultString = new StringBuffer();
+		Pattern regex = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
+		Matcher regexMatcher = regex.matcher(json);
+		while (regexMatcher.find()) {
+			String replacement = "cc.kave.commons.model.ssts.impl." + toLowerCaseNamespace(regexMatcher.group(1));
+			regexMatcher.appendReplacement(resultString, replacement);
+		}
+
+		// cc.kave.commons.model.events.completionevents.CompletionEvent
+
+		regexMatcher.appendTail(resultString);
+		regex = Pattern.compile("KaVE\\.Commons\\.Model\\.([.a-zA-Z0-9_]+), KaVE.Commons");
+		regexMatcher = regex.matcher(resultString.toString());
+		resultString = new StringBuffer();
+		while (regexMatcher.find()) {
+			String replacement = "cc.kave.commons.model." + toLowerCaseNamespace(regexMatcher.group(1));
+			regexMatcher.appendReplacement(resultString, replacement);
+		}
+		regexMatcher.appendTail(resultString);
+		return resultString.toString();
+	}
+
+	private static String toLowerCaseNamespace(String string) {
+		if (string.contains(".")) {
+			return string.substring(0, string.lastIndexOf(".")).toLowerCase()
+					+ string.substring(string.lastIndexOf("."));
+		}
+		return string;
+	}
+
+	private static String toUpperCaseNamespace(String string) {
+		String[] path = string.split("[.]");
+		String type = "";
+		for (int i = 0; i < path.length; i++) {
+			if (i != path.length - 1) {
+				if (path[i].equals("loopheader"))
+					path[i] = "loopHeader";
+				else if (path[i].equals("completionevents"))
+					path[i] = "completionEvents";
+				else if (path[i].equals("typeshapes"))
+					path[i] = "typeShapes";
+				type += path[i].substring(0, 1).toUpperCase() + path[i].substring(1) + ".";
+			} else
+				type += path[i];
+		}
+		return type;
+	}
 }

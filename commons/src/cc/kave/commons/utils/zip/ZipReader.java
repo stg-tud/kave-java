@@ -62,7 +62,8 @@ public class ZipReader {
 	}
 
 	public <T> T getNext(Type targetType) {
-		return JsonUtils.parseJson(files.next(), targetType);
+		T obj = JsonUtils.fromJson(files.next(), targetType);
+		return obj;
 	}
 
 	public <T> List<T> getAll(Class<T> targetType) {
@@ -72,5 +73,4 @@ public class ZipReader {
 		}
 		return all;
 	}
-
 }
