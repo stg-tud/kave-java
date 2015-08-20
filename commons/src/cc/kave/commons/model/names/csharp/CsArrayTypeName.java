@@ -58,22 +58,22 @@ public class CsArrayTypeName extends CsTypeName {
 		}
 
 		String identifier = baseType.getIdentifier();
-		String arrayMarker = CreateArrayMarker(rank);
+		String arrayMarker = createArrayMarker(rank);
 
 		String derivedIdentifier;
 		if (baseType.isDelegateType()) {
 			derivedIdentifier = identifier + arrayMarker;
 		} else {
-			derivedIdentifier = InsertMarkerAfterRawName(identifier, arrayMarker);
+			derivedIdentifier = insertMarkerAfterRawName(identifier, arrayMarker);
 		}
 		return derivedIdentifier;
 	}
 
-	private static String CreateArrayMarker(int rank) {
-		return String.format("[{%s}]", ",", rank - 1);
+	private static String createArrayMarker(int rank) {
+		return String.format("[%s]", "," + (rank - 1));
 	}
 
-	private static String InsertMarkerAfterRawName(String identifier, String arrayMarker) {
+	private static String insertMarkerAfterRawName(String identifier, String arrayMarker) {
 		int endOfRawName = identifier.indexOf('[');
 		if (endOfRawName < 0) {
 			endOfRawName = identifier.indexOf(',');
@@ -85,30 +85,25 @@ public class CsArrayTypeName extends CsTypeName {
 		return new StringBuilder(identifier).insert(endOfRawName, arrayMarker).toString();
 	}
 
-	public static CsArrayTypeName from(TypeName baseType, int rank) {
-		// TODO: ???
-		// Asserts.That(rank > 0, "rank smaller than 1");
+	public static TypeName from(TypeName baseType, int rank) {
 		TypeName typeName = CsArrayTypeName.newTypeName(deriveArrayTypeNameIdentifier(baseType, rank));
-		return (CsArrayTypeName) typeName;
+		return typeName;
 	}
 
-	// TODO:
 	public static int getArrayRank(TypeName arrayTypeName) {
-
 		Matcher matcher = ArrayTypeNameSuffix.matcher(arrayTypeName.getIdentifier());
-		if (matcher.matches()) {
-			String group = matcher.group(1);
-			int count = 1;
-
-			for (int i = 0; i < group.length(); i++) {
-				if (group.charAt(i) == ',') {
-					count++;
-				}
-			}
-			return count;
-		} else {
-			throw new RuntimeException("Invalid ArrayTypeName Identifier: " + arrayTypeName.getIdentifier());
+		if (!matcher.matches()) {
+			throw new RuntimeException("Invalid Signature Syntax: " + arrayTypeName.getIdentifier());
 		}
+		String group = matcher.group(1);
+		int count = 1;
+
+		for (int i = 0; i < group.length(); i++) {
+			if (group.charAt(i) == ',') {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	@Override
@@ -116,12 +111,11 @@ public class CsArrayTypeName extends CsTypeName {
 		return true;
 	}
 
-	@Override
 	public String getFullName() {
-		return getArrayBaseType().getFullName() + CreateArrayMarker(Rank());
+		return getArrayBaseType().getFullName() + createArrayMarker(getRank());
 	}
 
-	public int Rank() {
+	public int getRank() {
 		return getArrayRank(this);
 
 	}
@@ -142,6 +136,7 @@ public class CsArrayTypeName extends CsTypeName {
 
 		startIdx = idx;
 		while (id.charAt(++idx) == ',') {
+
 		}
 		endIdx = idx;
 
