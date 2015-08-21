@@ -37,7 +37,7 @@ public class CsArrayTypeNameTest {
 				new String[] { "d:[RT, A] [DT, A].()", "d:[RT, A] [DT, A].()[]" },
 				new String[] { "d:[RT[], A] [DT, A].([PT[], A] p)", "d:[RT[], A] [DT, A].([PT[], A] p)[]" },
 				new String[] { "A[], B", "A[,], B" }, new String[] { "A[,,], B", "A[,,,], B" }, new String[] {
-						"T`1[[T -> d:[TR] [T2, P2].([T] arg)]], P", "T`1[][[T -> d:[TR], [T2, P2].([T] arg)]], P" } };
+						"T`1[[T -> d:[TR] [T2, P2].([T] arg)]], P", "T`1[][[T -> d:[TR] [T2, P2].([T] arg)]], P" } };
 	}
 
 	@Test
@@ -56,6 +56,7 @@ public class CsArrayTypeNameTest {
 	public void derivesMultiDimensionalArray() {
 		TypeName arrayTypeName = CsArrayTypeName.from(CsTypeName.newTypeName("SomeType, Assembly, 1.2.3.4"), 2);
 
+		assertEquals(CsTypeName.newTypeName("SomeType[,], Assembly, 1.2.3.4").getIdentifier(), arrayTypeName.getIdentifier());
 		assertEquals(CsTypeName.newTypeName("SomeType[,], Assembly, 1.2.3.4"), arrayTypeName);
 	}
 
@@ -147,6 +148,8 @@ public class CsArrayTypeNameTest {
 	@Test
 	public void handlesDelegateBaseType() {
 		TypeName uut = CsTypeName.newTypeName("d:[RT, A] [N.O+DT, AA, 1.2.3.4].()[]");
+		String fullName = uut.getFullName();
+		String fullName2 = uut.getArrayBaseType().getFullName();
 
 		assertEquals("N.O+DT[]", uut.getFullName());
 		assertEquals("N", uut.getNamespace().getIdentifier());

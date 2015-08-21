@@ -30,6 +30,10 @@ public class CsArrayTypeName extends CsTypeName {
 		super(identifier);
 	}
 
+	static TypeName newCsArrayTypeName(String identifier) {
+		return new CsTypeName(identifier);
+	}
+
 	static boolean isArrayTypeIdentifier(String id) {
 		if (id.startsWith("d:")) {
 			int idx = id.lastIndexOf(')');
@@ -70,7 +74,14 @@ public class CsArrayTypeName extends CsTypeName {
 	}
 
 	private static String createArrayMarker(int rank) {
-		return String.format("[%s]", "," + (rank - 1));
+		StringBuilder marker = new StringBuilder();
+
+		for (int i = 0; i < rank - 1; i++) {
+			marker.append(",");
+		}
+
+		return String.format("[%s]", marker.toString());
+
 	}
 
 	private static String insertMarkerAfterRawName(String identifier, String arrayMarker) {
@@ -86,8 +97,8 @@ public class CsArrayTypeName extends CsTypeName {
 	}
 
 	public static TypeName from(TypeName baseType, int rank) {
-		TypeName typeName = CsArrayTypeName.newTypeName(deriveArrayTypeNameIdentifier(baseType, rank));
-		return typeName;
+		TypeName typeName = CsTypeName.newTypeName(deriveArrayTypeNameIdentifier(baseType, rank));
+		return (CsArrayTypeName) typeName;
 	}
 
 	public static int getArrayRank(TypeName arrayTypeName) {
@@ -111,6 +122,7 @@ public class CsArrayTypeName extends CsTypeName {
 		return true;
 	}
 
+	@Override
 	public String getFullName() {
 		return getArrayBaseType().getFullName() + createArrayMarker(getRank());
 	}
@@ -136,7 +148,6 @@ public class CsArrayTypeName extends CsTypeName {
 
 		startIdx = idx;
 		while (id.charAt(++idx) == ',') {
-
 		}
 		endIdx = idx;
 
