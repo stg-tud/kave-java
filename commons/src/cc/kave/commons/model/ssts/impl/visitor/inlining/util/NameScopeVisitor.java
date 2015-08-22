@@ -225,7 +225,8 @@ public class NameScopeVisitor extends AbstractNodeVisitor<Set<IVariableReference
 
 	@Override
 	public Void visit(ICompletionExpression entity, Set<IVariableReference> context) {
-		entity.getObjectReference().accept(this, context);
+		if (entity.getObjectReference() != null)
+			entity.getObjectReference().accept(this, context);
 		return null;
 		// TODO test
 	}

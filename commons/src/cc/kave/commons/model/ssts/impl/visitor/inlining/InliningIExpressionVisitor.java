@@ -223,10 +223,12 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	@Override
 	public IExpression visit(ICompletionExpression entity, InliningContext context) {
 		CompletionExpression expression = new CompletionExpression();
-		expression.setObjectReference(
-				(IVariableReference) entity.getObjectReference().accept(context.getReferenceVisitor(), context));
-		expression.setToken(entity.getToken());
+		if (entity.getObjectReference() != null)
+			expression.setObjectReference(
+					(IVariableReference) entity.getObjectReference().accept(context.getReferenceVisitor(), context));
 		expression.setTypeReference(entity.getTypeReference());
+		expression.setToken(entity.getToken());
 		return expression;
+		// TODO tests
 	}
 }
