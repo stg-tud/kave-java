@@ -267,8 +267,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			CatchBlock newCatch = new CatchBlock();
 			InliningUtil.visit(catchBlock.getBody(), newCatch.getBody(), context);
-			newCatch.setGeneral(catchBlock.isGeneral());
-			newCatch.setUnnamed(catchBlock.isUnnamed());
+			newCatch.setKind(catchBlock.getKind());
 			newCatch.setParameter(catchBlock.getParameter());
 			tryBlock.getCatchBlocks().add(newCatch);
 		}

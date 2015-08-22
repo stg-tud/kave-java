@@ -6,20 +6,18 @@ import java.util.List;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 
 public class CatchBlock implements ICatchBlock {
-
+	private CatchBlockKind kind;
 	private ParameterName parameter;
 	private List<IStatement> body;
-	private boolean isGeneral;
-	private boolean isUnnamed;
 
 	public CatchBlock() {
 		this.parameter = CsParameterName.UNKNOWN_NAME;
 		this.body = new ArrayList<>();
-		this.isGeneral = false;
-		this.isUnnamed = false;
+		this.kind = CatchBlockKind.Default;
 	}
 
 	@Override
@@ -40,22 +38,12 @@ public class CatchBlock implements ICatchBlock {
 		this.parameter = parameter;
 	}
 
-	@Override
-	public boolean isUnnamed() {
-		return this.isUnnamed;
+	public CatchBlockKind getKind() {
+		return kind;
 	}
 
-	@Override
-	public boolean isGeneral() {
-		return this.isGeneral;
-	}
-
-	public void setGeneral(boolean isGeneral) {
-		this.isGeneral = isGeneral;
-	}
-
-	public void setUnnamed(boolean isUnnamed) {
-		this.isUnnamed = isUnnamed;
+	public void setKind(CatchBlockKind kind) {
+		this.kind = kind;
 	}
 
 	@Override
@@ -63,8 +51,7 @@ public class CatchBlock implements ICatchBlock {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((body == null) ? 0 : body.hashCode());
-		result = prime * result + (isGeneral ? 1231 : 1237);
-		result = prime * result + (isUnnamed ? 1231 : 1237);
+		result = prime * result + ((kind == null) ? 0 : kind.hashCode());
 		result = prime * result + ((parameter == null) ? 0 : parameter.hashCode());
 		return result;
 	}
@@ -75,7 +62,7 @@ public class CatchBlock implements ICatchBlock {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof CatchBlock))
+		if (getClass() != obj.getClass())
 			return false;
 		CatchBlock other = (CatchBlock) obj;
 		if (body == null) {
@@ -83,9 +70,7 @@ public class CatchBlock implements ICatchBlock {
 				return false;
 		} else if (!body.equals(other.body))
 			return false;
-		if (isGeneral != other.isGeneral)
-			return false;
-		if (isUnnamed != other.isUnnamed)
+		if (kind != other.kind)
 			return false;
 		if (parameter == null) {
 			if (other.parameter != null)

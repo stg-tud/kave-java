@@ -54,6 +54,7 @@ import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -236,6 +237,7 @@ public abstract class JsonUtils {
 		// enums
 		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
 		gb.registerTypeAdapter(TerminationState.class, EnumDeSerializer.create(TerminationState.values()));
+		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
 
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);

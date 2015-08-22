@@ -8,6 +8,7 @@ import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
@@ -377,10 +378,10 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			c.newLine().indentation().keyword("catch");
 
-			if (!catchBlock.isGeneral()) {
+			if (catchBlock.getKind() != CatchBlockKind.General) {
 				c.space().text("(").type(catchBlock.getParameter().getValueType());
 
-				if (!catchBlock.isUnnamed()) {
+				if (catchBlock.getKind() != CatchBlockKind.Unnamed) {
 					c.space().text(catchBlock.getParameter().getName());
 				}
 

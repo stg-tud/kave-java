@@ -9,14 +9,12 @@ import cc.kave.commons.model.ssts.IStatement;
 
 public interface ICatchBlock {
 
+	CatchBlockKind getKind();
+
 	@Nonnull
 	ParameterName getParameter();
 
 	@Nonnull
 	List<IStatement> getBody();
-
-	boolean isGeneral();
-
-	boolean isUnnamed();
 
 }
