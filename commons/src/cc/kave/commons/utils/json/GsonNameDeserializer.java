@@ -23,6 +23,7 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.resharper.LiveTemplateName;
 
 public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSerializer<Name> {
 
@@ -57,6 +58,9 @@ public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSeriali
 			return CsPropertyName.newPropertyName(identifier);
 		case "CSharp.TypeName":
 			return CsTypeName.newTypeName(identifier);
+		/* resharper name */
+		case "ReSharper.LiveTemplateName":
+			return LiveTemplateName.newLiveTemplateName(identifier);
 		default:
 			if ((discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName"))
 					|| discriminator.equals("CSharp.TypeParameterName")) {
