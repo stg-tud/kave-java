@@ -3,6 +3,7 @@ package cc.kave.commons.utils.zip;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -21,7 +22,7 @@ public class ZipWriter {
 	}
 
 	public <T> void add(T obj) {
-		entries.add(JsonUtils.toJson(obj, obj.getClass()));
+		add(obj, obj.getClass());
 	}
 
 	public <T> void addAll(List<T> entries) {
@@ -29,6 +30,11 @@ public class ZipWriter {
 			String json = JsonUtils.toJson(obj, obj.getClass());
 			this.entries.add(json);
 		}
+	}
+
+	public <T> void add(T obj, Type targetType) {
+		String json = JsonUtils.toJson(obj, targetType);
+		entries.add(json);
 	}
 
 	public void dispose() {
