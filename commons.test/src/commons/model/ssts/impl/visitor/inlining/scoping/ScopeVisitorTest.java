@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.NameScopeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
@@ -60,13 +61,15 @@ public class ScopeVisitorTest extends InliningBaseTest {
 				expr(ifElseExpr(refExpr("ä"), refExpr("ü"), refExpr("a1"))), //
 				invocationStatement("m1", ref("b1"), refExpr("c1")), //
 				expr(lambdaExpr(declareVar("d1"))), //
-				assign(refField("k"), constant("1")));
+				assign(refField("k"), constant("1")), //
+				expr(completionExpr("e1")), //
+				expr(new CompletionExpression()));
 	}
 
 	private Set<IVariableReference> getExampleReference() {
 		return Sets.newHashSet(ref("a"), ref("b"), ref("c"), ref("d"), ref("e"), ref("f"), ref("g"), ref("h"), ref("i"),
 				ref("j"), ref("k"), ref("l"), ref("m"), ref("n"), ref("o"), ref("p"), ref("q"), ref("r"), ref("s"),
 				ref("t"), ref("u"), ref("v"), ref("w"), ref("x"), ref("y"), ref("z"), ref("ä"), ref("ü"), ref("ö"),
-				ref("a1"), ref("b1"), ref("c1"), ref("d1"));
+				ref("a1"), ref("b1"), ref("c1"), ref("d1"), ref("e1"));
 	}
 }

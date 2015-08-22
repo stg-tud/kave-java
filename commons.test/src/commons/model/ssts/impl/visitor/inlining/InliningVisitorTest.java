@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
@@ -926,23 +927,6 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
-	public void testAssignFieldInvocation() {
-		ISST sst = buildSST( //
-				declareEntryPoint("m1", //
-						assign(refField("[T4,P] [T5,P].F"), constant("true")), //
-						invocationStatement("m2")),
-				declareNonEntryPoint("m2", //
-						assign(ref("b"), invocationExpr("m3", ref("[T4,P] [T5,P].F")))));
-		ISST inlinedSST = buildSST( //
-				declareEntryPoint("m1", //
-						assign(refField("[T4,P] [T5,P].F"), constant("true")), //
-						assign(ref("b"), invocationExpr("m3", ref("[T4,P] [T5,P].F")))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
-	}
-
-	@Test
 	public void testInlineInEntryAndNonEntryPoint() {
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
@@ -958,6 +942,40 @@ public class InliningVisitorTest extends InliningBaseTest {
 						invocationStatement("m2")),
 				declareNonEntryPoint("m2", //
 						declareVar("a")));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+	
+	@Test
+	public void testCompletionExprInlining(){
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement("m2")), //
+				declareNonEntryPoint("m2", //
+						expr(completionExpr("a"))));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						expr(completionExpr("$0_a"))));
+		InliningContext context = new InliningContext();
+		sst.accept(new InliningIStatementVisitor(), context);
+		assertThat(context.getSST(), equalTo(inlinedSST));
+	}
+	
+	@Test
+	public void testNullCompletionExprInlining(){
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						invocationStatement("m2")), //
+				declareNonEntryPoint("m2", //
+						expr(new CompletionExpression())));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("m1", //
+						declareVar("a"), //
+						expr(new CompletionExpression())));
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
 		assertThat(context.getSST(), equalTo(inlinedSST));
