@@ -72,8 +72,8 @@ public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSeriali
 
 	@Override
 	public JsonElement serialize(Name src, Type typeOfSrc, JsonSerializationContext context) {
-		return new JsonPrimitive(
-				"CSharp." + src.getClass().getSimpleName().replaceFirst("Cs", "") + ":" + src.getIdentifier());
+		return new JsonPrimitive((src.getClass() != LiveTemplateName.class ? "CSharp." : "ReSharper.")
+				+ src.getClass().getSimpleName().replaceFirst("Cs", "") + ":" + src.getIdentifier());
 	}
 
 }
