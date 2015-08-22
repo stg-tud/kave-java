@@ -49,6 +49,7 @@ import cc.kave.commons.model.names.csharp.CsStructTypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.names.csharp.CsTypeParameterName;
 import cc.kave.commons.model.names.csharp.CsUnknownTypeName;
+import cc.kave.commons.model.names.resharper.LiveTemplateName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -160,6 +161,8 @@ public abstract class JsonUtils {
 		gb.registerTypeAdapter(CsInterfaceTypeName.class, new GsonNameDeserializer());
 		gb.registerTypeAdapter(CsEnumTypeName.class, new GsonNameDeserializer());
 		gb.registerTypeAdapter(CsArrayTypeName.class, new GsonNameDeserializer());
+		// resharper names
+		gb.registerTypeAdapter(LiveTemplateName.class, new GsonNameDeserializer());
 
 		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableExpression.class, "$type")
 				.registerSubtype(CompletionExpression.class).registerSubtype(ComposedExpression.class)
