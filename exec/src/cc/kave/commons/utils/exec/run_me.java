@@ -26,11 +26,14 @@ public class run_me {
 	private static String dirCompletionEventsInlined = root + "Events/OnlyCompletion-inlined/";
 	private static String dirContexts = root + "Context/Github";
 	private static String dirContextsInlined = root + "Context/Github-inlined";
+	private static String zipTestCases = root + "AnalysisTestCases.sln-contexts.zip";
 
 	public static void main(String[] args) {
 		cleanDirs(dirCompletionEventsInlined);
 		// new BatchInlining().run(dirContexts, dirContextsInlined);
-		new CompletionEventProcessor(dirCompletionEvents, dirCompletionEventsInlined).run();
+		// new CompletionEventProcessor(dirCompletionEvents,
+		// dirCompletionEventsInlined).run();
+		new SSTComparison(zipTestCases).run();
 	}
 
 	private static void cleanDirs(String... dirs) {
