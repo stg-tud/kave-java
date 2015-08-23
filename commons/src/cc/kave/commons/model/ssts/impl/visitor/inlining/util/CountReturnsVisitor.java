@@ -46,246 +46,245 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class CountReturnsVisitor extends AbstractNodeVisitor<Void, Integer> {
-
-	private Integer counter = new Integer(0);
+public class CountReturnsVisitor extends AbstractNodeVisitor<CountReturnContext, Void> {
 
 	@Override
-	public Integer visit(ISST sst, Void context) {
+	public Void visit(ISST sst, CountReturnContext context) {
 		for (IMethodDeclaration method : sst.getMethods()) {
 			method.accept(this, context);
 		}
-		return counter;
-	}
-
-	@Override
-	public Integer visit(IMethodDeclaration stmt, Void context) {
-		visit(stmt.getBody());
-		return counter;
-	}
-
-	@Override
-	public Integer visit(IVariableDeclaration stmt, Void context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IAssignment stmt, Void context) {
+	public Void visit(IMethodDeclaration stmt, CountReturnContext context) {
+		visit(stmt.getBody(), context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IVariableDeclaration stmt, CountReturnContext context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IAssignment stmt, CountReturnContext context) {
 		stmt.getExpression().accept(this, context);
 		stmt.getReference().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IBreakStatement stmt, Void context) {
+	public Void visit(IBreakStatement stmt, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IContinueStatement stmt, Void context) {
+	public Void visit(IContinueStatement stmt, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IExpressionStatement stmt, Void context) {
+	public Void visit(IExpressionStatement stmt, CountReturnContext context) {
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IGotoStatement stmt, Void context) {
+	public Void visit(IGotoStatement stmt, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(ILabelledStatement stmt, Void context) {
+	public Void visit(ILabelledStatement stmt, CountReturnContext context) {
 		stmt.getStatement().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IReturnStatement stmt, Void context) {
+	public Void visit(IReturnStatement stmt, CountReturnContext context) {
 		stmt.getExpression().accept(this, context);
-		counter++;
+		context.returnCount++;
+		context.isVoid = stmt.isVoid();
 		return null;
 	}
 
 	@Override
-	public Integer visit(IThrowStatement stmt, Void context) {
+	public Void visit(IThrowStatement stmt, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IDoLoop block, Void context) {
+	public Void visit(IDoLoop block, CountReturnContext context) {
 		block.getCondition().accept(this, context);
-		visit(block.getBody());
+		visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IForEachLoop block, Void context) {
-		visit(block.getBody());
+	public Void visit(IForEachLoop block, CountReturnContext context) {
+		visit(block.getBody(), context);
 		block.getDeclaration().accept(this, context);
 		block.getLoopedReference().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IForLoop block, Void context) {
+	public Void visit(IForLoop block, CountReturnContext context) {
 		block.getCondition().accept(this, context);
-		visit(block.getInit());
-		visit(block.getBody());
-		visit(block.getStep());
+		visit(block.getInit(), context);
+		visit(block.getBody(), context);
+		visit(block.getStep(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IIfElseBlock block, Void context) {
+	public Void visit(IIfElseBlock block, CountReturnContext context) {
 		block.getCondition().accept(this, context);
-		visit(block.getElse());
-		visit(block.getThen());
+		visit(block.getElse(), context);
+		visit(block.getThen(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(ILockBlock stmt, Void context) {
-		visit(stmt.getBody());
+	public Void visit(ILockBlock stmt, CountReturnContext context) {
+		visit(stmt.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(ISwitchBlock block, Void context) {
-		visit(block.getDefaultSection());
+	public Void visit(ISwitchBlock block, CountReturnContext context) {
+		visit(block.getDefaultSection(), context);
 		block.getReference().accept(this, context);
 		for (ICaseBlock caseBlock : block.getSections())
-			visit(caseBlock.getBody());
+			visit(caseBlock.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(ITryBlock block, Void context) {
-		visit(block.getBody());
-		visit(block.getFinally());
+	public Void visit(ITryBlock block, CountReturnContext context) {
+		visit(block.getBody(), context);
+		visit(block.getFinally(), context);
 		for (ICatchBlock catchBlock : block.getCatchBlocks())
-			visit(catchBlock.getBody());
+			visit(catchBlock.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUncheckedBlock block, Void context) {
-		visit(block.getBody());
+	public Void visit(IUncheckedBlock block, CountReturnContext context) {
+		visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUnsafeBlock block, Void context) {
+	public Void visit(IUnsafeBlock block, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUsingBlock block, Void context) {
-		visit(block.getBody());
+	public Void visit(IUsingBlock block, CountReturnContext context) {
+		visit(block.getBody(), context);
 		block.getReference().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IWhileLoop block, Void context) {
-		visit(block.getBody());
+	public Void visit(IWhileLoop block, CountReturnContext context) {
+		visit(block.getBody(), context);
 		block.getCondition().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(ICompletionExpression entity, Void context) {
+	public Void visit(ICompletionExpression entity, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IComposedExpression expr, Void context) {
+	public Void visit(IComposedExpression expr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IIfElseExpression expr, Void context) {
+	public Void visit(IIfElseExpression expr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IInvocationExpression entity, Void context) {
+	public Void visit(IInvocationExpression entity, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(ILambdaExpression expr, Void context) {
-		visit(expr.getBody());
+	public Void visit(ILambdaExpression expr, CountReturnContext context) {
+		visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(ILoopHeaderBlockExpression expr, Void context) {
-		visit(expr.getBody());
+	public Void visit(ILoopHeaderBlockExpression expr, CountReturnContext context) {
+		visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Integer visit(IConstantValueExpression expr, Void context) {
+	public Void visit(IConstantValueExpression expr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(INullExpression expr, Void context) {
+	public Void visit(INullExpression expr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IReferenceExpression expr, Void context) {
+	public Void visit(IReferenceExpression expr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IEventReference eventRef, Void context) {
+	public Void visit(IEventReference eventRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IFieldReference fieldRef, Void context) {
+	public Void visit(IFieldReference fieldRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IMethodReference methodRef, Void context) {
+	public Void visit(IMethodReference methodRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IPropertyReference methodRef, Void context) {
+	public Void visit(IPropertyReference methodRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IVariableReference varRef, Void context) {
+	public Void visit(IVariableReference varRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUnknownReference unknownRef, Void context) {
+	public Void visit(IUnknownReference unknownRef, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUnknownExpression unknownExpr, Void context) {
+	public Void visit(IUnknownExpression unknownExpr, CountReturnContext context) {
 		return null;
 	}
 
 	@Override
-	public Integer visit(IUnknownStatement unknownStmt, Void context) {
+	public Void visit(IUnknownStatement unknownStmt, CountReturnContext context) {
 		return null;
 	}
 
-	public void visit(List<IStatement> body) {
+	public void visit(List<IStatement> body, CountReturnContext context) {
 		for (IStatement statement : body) {
-			statement.accept(this, null);
+			statement.accept(this, context);
 		}
 	}
 

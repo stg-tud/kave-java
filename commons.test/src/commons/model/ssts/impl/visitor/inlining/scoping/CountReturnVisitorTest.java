@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
 
@@ -22,6 +23,8 @@ public class CountReturnVisitorTest extends InliningBaseTest {
 								returnStatement(constant("5"), false))),
 				simpleIf(Lists.newArrayList(returnStatement(constant("6"), false)), constant("true"),
 						returnStatement(constant("7"), true)));
-		assertThat(4, equalTo(method.accept(new CountReturnsVisitor(), null)));
+		CountReturnContext context = new CountReturnContext();
+		method.accept(new CountReturnsVisitor(), context);
+		assertThat(4, equalTo(context.returnCount));
 	}
 }

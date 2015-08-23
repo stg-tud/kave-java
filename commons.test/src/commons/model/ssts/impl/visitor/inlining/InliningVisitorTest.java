@@ -3,6 +3,8 @@ package commons.model.ssts.impl.visitor.inlining;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -10,11 +12,13 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningUtil;
+import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -25,9 +29,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						invocationStatement("m2")));
 		ISST inlinedSST = buildSST(declareEntryPoint("m1"));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -46,23 +48,12 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b"), //
 						declareVar("$0_a"), //
 						declareVar("$1_b")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
 	public void testBasicInline() {
 		ISST sst = buildSST( //
-				declareNonEntryPoint("m2", //
-						declareVar("a"), //
-						declareVar("b"), //
-						assign(ref("a"), refExpr("b"))),
-				declareEntryPoint("m1", //
-						declareVar("a"), //
-						declareVar("b"), //
-						invocationStatement("m2")));
-		ISST defaultSST = buildSST( //
 				declareNonEntryPoint("m2", //
 						declareVar("a"), //
 						declareVar("b"), //
@@ -78,10 +69,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("$0_a"), //
 						declareVar("$1_b"), //
 						assign(ref("$0_a"), refExpr("$1_b")))); //
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
-		assertThat(sst, equalTo(defaultSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -102,9 +90,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b"), //
 						assign(ref("b"), constant("5")), //
 						declareVar("d")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -133,9 +119,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						assign(ref("d"), constant("3")), //
 						assign(ref("d"), compose(ref("c"), ref("d"))), //
 						assign(ref("b"), refExpr("d"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -152,9 +136,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b"), //
 						assign(ref("b"), constant("1")), //
 						invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(sst));
+		assertSSTs(sst, sst);
 	}
 
 	@Test
@@ -170,9 +152,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareVar("b"), //
 				declareVar("a"), //
 				forLoop("i", loopHeader(expr(constant("true"))), declareVar("d"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -191,9 +171,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						forLoop("i", loopHeader(expr(constant("true"))), //
 								declareVar("$0_a"), //
 								declareVar("$1_i"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -210,9 +188,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						forLoop("i", loopHeader(expr(constant("true"))), //
 								declareVar("a")), //
 						declareVar("$0_i")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -229,9 +205,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						forLoop("i", loopHeader(expr(constant("true"))), //
 								declareVar("a"), declareVar("$0_i")), //
 						declareVar("$1_i")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -250,9 +224,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						forLoop("i", loopHeader(expr(constant("true"))), //
 								declareVar("a"), declareVar("$1_i")), //
 						declareVar("$2_i")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -271,9 +243,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								declareVar("c"), //
 								declareVar("$0_b"), //
 								whileLoop(loopHeader(expr(constant("true")), declareVar("$1_c")))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -291,9 +261,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						simpleIf(Lists.newArrayList(declareVar("b")), constant("true"), //
 								declareVar("$0_a"), //
 								simpleIf(Lists.newArrayList(declareVar("$1_b")), constant("true"), declareVar("c")))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -316,9 +284,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								declareVar("$0_a"), //
 								doLoop(loopHeader(expr(constant("true"))), //
 										declareVar("b")))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -340,9 +306,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("$0_a"), //
 						forEachLoop("$1_i", "$0_a", //
 								assign(ref("$1_i"), constant("1"))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -365,9 +329,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								caseBlock("2", declareVar("$0_a"), //
 										switchBlock("$0_a", //
 												caseBlock("1", declareVar("$1_b")))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -388,9 +350,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								catchBlock(declareVar("$0_a"), //
 										tryBlock(declareVar("$1_b"), declareVar("$2_c"),
 												catchBlock(declareVar("$3_d")))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -409,9 +369,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						uncheckedBlock(declareVar("b"), //
 								declareVar("$0_a"), //
 								uncheckedBlock(declareVar("$1_b")))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -429,9 +387,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						usingBlock(ref("a"), //
 								declareVar("$0_a"), //
 								usingBlock(ref("$0_a"), assign(ref("$0_a"), refExpr("b"))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -449,9 +405,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						lockBlock("b", //
 								declareVar("a"), //
 								lockBlock("a", assign(ref("a"), refExpr("$0_b"))))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -480,9 +434,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						assign(ref("$0_a"), refExpr(refEvent("c"))), //
 						assign(ref("$0_a"), refExpr(refField("d"))), //
 						assign(ref("$0_a"), refExpr(unknownRef()))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -515,9 +467,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								gotoStatement("a"), //
 								throwStatement()), //
 						declareVar("d")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -538,9 +488,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						expr(ifElseExpr(nullExpr(), unknownExpression(), constant("true"))), //
 						expr(lambdaExpr(declareVar("$0_a"))), //
 						assign(ref("$0_a"), completionExpr("$1_b"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -565,9 +513,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
 								assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
 						assign(ref("b"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -577,10 +523,10 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a"), //
 						simpleIf(Lists.newArrayList(), constant("true"), //
 								simpleIf(Lists.newArrayList(), constant("false"), //
-										returnStatement(constant("6"), true)), //
+										returnStatement(constant("6"), false)), //
 								declareVar("b"), //
 								declareVar("c"), //
-								returnStatement(constant("7"), true))),
+								returnStatement(constant("7"), false))),
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						assign(ref("a"), invocationExpr("m2", ref("a")))));
@@ -603,9 +549,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false")))),
 						assign(ref("a"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -615,13 +559,13 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a"), //
 						simpleIf(Lists.newArrayList(), constant("true"), //
 								simpleIf(Lists.newArrayList(), constant("false"), //
-										returnStatement(constant("6"), true)), //
+										returnStatement(constant("6"), false)), //
 								declareVar("b"), //
 								declareVar("c"), //
-								returnStatement(constant("7"), true)),
+								returnStatement(constant("7"), false)),
 						declareVar("d"), //
 						declareVar("e"), //
-						returnStatement(constant("8"), true)),
+						returnStatement(constant("8"), false)),
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						assign(ref("a"), invocationExpr("m2", ref("a")))));
@@ -649,9 +593,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("8")),
 								assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
 						assign(ref("a"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -664,9 +606,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", invocationStatement("m2")), //
 				declareNonEntryPoint("m2", invocationStatement("m3")), //
 				declareNonEntryPoint("m3", invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -677,9 +617,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("m1", invocationStatement("m2")), //
 				declareNonEntryPoint("m2", invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -698,9 +636,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareNonEntryPoint("m4", invocationStatement("m5")),
 				declareNonEntryPoint("m5", invocationStatement("m6")),
 				declareNonEntryPoint("m6", invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -717,9 +653,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						invocationStatement("m4")), //
 				declareNonEntryPoint("m3", invocationStatement("m2")),
 				declareNonEntryPoint("m4", invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -735,9 +669,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						assign(ref("a"), constant("1"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -753,9 +685,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						assign(ref("a"), constant("1"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -775,9 +705,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("$0_b", INTEGER), //
 						assign(ref("$0_b"), new UnknownExpression()), //
 						declareVar("d")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -794,9 +722,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareNonEntryPoint("m2"), //
 				declareNonEntryPoint("m2", //
 						invocationStatement("m2")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -813,9 +739,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareNonEntryPoint("m2", //
 						invocationStatement("m2")),
 				declareNonEntryPoint("m2", declareVar("a")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -832,9 +756,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a"), //
 						declareVar("b"), //
 						returnStatement(constant("true"), false)));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -858,9 +780,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b"), //
 						declareVar("a"), //
 						declareVar("$0_b")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -879,9 +799,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("b")),
 				declareNonEntryPoint("m3", //
 						declareVar("c")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -899,9 +817,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a"), //
 						assign(ref("a"), constant("1")), //
 						declareVar("b")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -921,9 +837,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						assign(ref("$0_b"), constant("true")), //
 						assign(ref("$0_b"), constant("1")), //
 						declareVar("b")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 
 	@Test
@@ -942,9 +856,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 						invocationStatement("m2")),
 				declareNonEntryPoint("m2", //
 						declareVar("a")));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 	
 	@Test
@@ -959,9 +871,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						expr(completionExpr("$0_a"))));
-		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		assertThat(context.getSST(), equalTo(inlinedSST));
+		assertSSTs(sst, inlinedSST);
 	}
 	
 	@Test
@@ -976,8 +886,69 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						expr(new CompletionExpression())));
+		assertSSTs(sst, inlinedSST);
+	}
+	
+	@Test
+	public void testMultipleNonEntryPoints(){
+		ISST sst = buildSST( //
+				declareEntryPoint("ep1", //
+						invocationStatement("p1")), //
+				declareNonEntryPoint("p1", //
+						invocationStatement("p2")), //
+				declareNonEntryPoint("p2", //
+						declareVar("a")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("ep1", //
+						declareVar("a")));
+		assertSSTs(sst, inlinedSST);
+	}
+	
+	@Test
+	public void testMultipleNonEntryPoints2(){
+		ISST sst = buildSST( //
+				declareEntryPoint("ep1", //
+						invocationStatement("p1")), //
+				declareNonEntryPoint("p1", //
+						invocationStatement("p2")), //
+				declareNonEntryPoint("p2", //
+						declareVar("a")), //
+				declareEntryPoint("ep2", //
+						invocationStatement("p2")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("ep1", //
+						declareVar("a")), //
+				declareEntryPoint("ep2", //
+						declareVar("a")));
+		assertSSTs(sst, inlinedSST);
+	}
+	
+	@Test
+	public void testMultipleReturns(){
+		MethodName name = CsMethodName.newMethodName("[Void] [?].p1()");
+		ISST sst = buildSST( //
+				declareEntryPoint("ep1", // 
+						declareVar("a"), //
+						invocationStatement(name)), //
+				declareMethod(name, false, //
+						simpleIf(new ArrayList<IStatement>(), new UnknownExpression(), returnStatement(new UnknownExpression(), true)), //
+						declareVar("a")));
+		ISST inlinedSST = buildSST( //
+				declareEntryPoint("ep1", //
+						declareVar("a"), //
+						declareVar(InliningUtil.RESULT_FLAG + "[Void] [?].p1()", BOOLEAN), //
+						assign(ref(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), constant("true")), //
+						simpleIf(new ArrayList<IStatement>(), new UnknownExpression(),
+								assign(ref(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), constant("false"))), //
+						simpleIf(new ArrayList<IStatement>(), refExpr(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), declareVar("$0_a"))));
+		assertSSTs(sst, inlinedSST);
+	}
+	
+	
+	public static void assertSSTs(ISST sst, ISST inlinedSST){
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
+		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

@@ -35,6 +35,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -45,7 +46,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());
 		if (method != null) {
-			context.addMethodToRemove(method);
+			context.addInlinedMethod(method);
 			List<IStatement> body = new ArrayList<>();
 			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
 
@@ -54,7 +55,14 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			}
 			// Checking if guards statements are needed and setting them up if
 			// so
-			boolean guardsNeeded = method.accept(new CountReturnsVisitor(), null) > 1 ? true : false;
+			CountReturnContext countReturnContext = new CountReturnContext();
+			method.accept(new CountReturnsVisitor(), countReturnContext);
+			int returnStatementCount = countReturnContext.returnCount;
+			context.setVoid(countReturnContext.isVoid);
+			boolean guardsNeeded = returnStatementCount > 1 ? true : false;
+			if (returnStatementCount == 1 && method.getBody().size() > 0) {
+				guardsNeeded = !(method.getBody().get(method.getBody().size() - 1) instanceof IReturnStatement);
+			}
 			if (guardsNeeded) {
 				setupGuardVariables(method.getName(), body, context);
 			}
@@ -75,10 +83,13 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					statement.accept(context.getStatementVisitor(), context);
 				}
 			} else {
-				InliningUtil.visit(body, context.getBody(), context);
+				InliningUtil.visitBlock(body, context.getBody(), context);
 				context.leaveScope();
 				context.setInline(false);
-				return SSTUtil.referenceExprToVariable(context.getResultName());
+				if (!context.isVoid())
+					return SSTUtil.referenceExprToVariable(context.getResultName());
+				else
+					return null;
 			}
 			context.leaveScope();
 			context.setInline(false);
@@ -98,8 +109,10 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 
 	private void setupGuardVariables(MethodName methodName, List<IStatement> body, InliningContext context) {
 		context.setGuardVariableNames(methodName.getIdentifier());
-		IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
-		body.add(variable);
+		if (!context.isVoid()) {
+			IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
+			body.add(variable);
+		}
 		body.add(SSTUtil.declare(context.getGotResultName(), InliningUtil.GOT_RESULT_TYPE));
 		ConstantValueExpression constant = new ConstantValueExpression();
 		constant.setValue("true");
@@ -184,7 +197,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	@Override
 	public IExpression visit(ILoopHeaderBlockExpression expr, InliningContext context) {
 		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		InliningUtil.visit(expr.getBody(), loopHeader.getBody(), context);
+		InliningUtil.visitBlock(expr.getBody(), loopHeader.getBody(), context);
 		return loopHeader;
 	}
 
@@ -216,7 +229,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	public IExpression visit(ILambdaExpression expr, InliningContext context) {
 		LambdaExpression expression = new LambdaExpression();
 		expression.setName(expr.getName());
-		InliningUtil.visit(expr.getBody(), expression.getBody(), context);
+		InliningUtil.visitBlock(expr.getBody(), expression.getBody(), context);
 		return expression;
 	}
 

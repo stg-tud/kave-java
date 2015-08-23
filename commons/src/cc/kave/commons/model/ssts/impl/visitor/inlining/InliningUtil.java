@@ -18,16 +18,17 @@ public class InliningUtil {
 	public static final String RESULT_NAME = "$result_";
 	public static final String RESULT_FLAG = "$gotNoResult_";
 
-	public static void visit(List<IStatement> body, List<IStatement> blockBody, InliningContext context) {
+	public static void visitBlock(List<IStatement> body, List<IStatement> blockBody, InliningContext context) {
 		context.enterBlock();
 		int index = 0;
 		for (IStatement statement : body) {
 			statement.accept(context.getStatementVisitor(), context);
-			if ((context.isGuardNeeded()) && body.subList(index + 1, body.size()).size() > 0) {
+			if ((context.isGuardNeeded()) && index < body.size() - 1
+					&& body.subList(index + 1, body.size()).size() > 0) {
 				IfElseBlock block = new IfElseBlock();
 				block.setCondition(SSTUtil.referenceExprToVariable(context.getGotResultName()));
 				context.setGuardNeeded(false);
-				visit(body.subList(index + 1, body.size()), block.getThen(), context);
+				visitBlock(body.subList(index + 1, body.size()), block.getThen(), context);
 				context.addStatement(block);
 				break;
 			}
@@ -39,7 +40,7 @@ public class InliningUtil {
 
 	public static IStatement visit(IStatement statement, InliningContext context) {
 		List<IStatement> body = new ArrayList<>();
-		visit(Lists.newArrayList(statement), body, context);
+		visitBlock(Lists.newArrayList(statement), body, context);
 		return body.get(0);
 	}
 
@@ -60,7 +61,7 @@ public class InliningUtil {
 				block.setCondition(SSTUtil.referenceExprToVariable(context.getGotResultName()));
 				context.setGuardNeeded(false);
 				context.setGlobalGuardNeeded(false);
-				visit(body.subList(index + 1, body.size()), block.getThen(), context);
+				visitBlock(body.subList(index + 1, body.size()), block.getThen(), context);
 				context.addStatement(block);
 				break;
 			}

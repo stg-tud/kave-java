@@ -39,7 +39,8 @@ public class InliningContext {
 	private final InliningIReferenceVisitor referenceVisitor;
 	private final InliningIExpressionVisitor expressionVisitor;
 
-	private Set<IMethodDeclaration> removeList;
+	private Set<IMethodDeclaration> inlinedMethods;
+	private boolean isVoid;
 
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
@@ -51,7 +52,7 @@ public class InliningContext {
 		this.statementVisitor = new InliningIStatementVisitor();
 		this.referenceVisitor = new InliningIReferenceVisitor();
 		this.expressionVisitor = new InliningIExpressionVisitor();
-		this.removeList = new HashSet<>();
+		this.inlinedMethods = new HashSet<>();
 	}
 
 	public InliningIStatementVisitor getStatementVisitor() {
@@ -187,6 +188,9 @@ public class InliningContext {
 
 	public void leaveBlock(List<IStatement> body) {
 		body.addAll(scope.body);
+		scope.parent.resultName = scope.resultName;
+		scope.parent.gotResultName = scope.gotResultName;
+		this.setGuardNeeded(isGlobalGuardNeeded());
 		scope = scope.parent;
 	}
 
@@ -262,16 +266,24 @@ public class InliningContext {
 		return this.globalGuardNeed;
 	}
 
-	public void addMethodToRemove(IMethodDeclaration method) {
-		this.removeList.add(method);
+	public void addInlinedMethod(IMethodDeclaration method) {
+		this.inlinedMethods.add(method);
 	}
 
-	public Set<IMethodDeclaration> getRemoveList() {
-		return removeList;
+	public Set<IMethodDeclaration> getInlinedMethods() {
+		return inlinedMethods;
 	}
 
 	public void resetScope() {
 		scope = null;
 		counter = 0;
+	}
+
+	public boolean isVoid() {
+		return isVoid;
+	}
+
+	public void setVoid(boolean b) {
+		this.isVoid = b;
 	}
 }
