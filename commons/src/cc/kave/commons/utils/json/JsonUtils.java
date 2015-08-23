@@ -1,8 +1,15 @@
 package cc.kave.commons.utils.json;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -119,7 +126,8 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
-import cc.kave.commons.utils.Asserts;
+import cc.recommenders.assertions.Asserts;
+import cc.recommenders.assertions.Throws;
 
 public abstract class JsonUtils {
 
@@ -246,7 +254,7 @@ public abstract class JsonUtils {
 
 	@SafeVarargs
 	private static <T> void register(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
-		Asserts.assertThat(subtypes.length > 0);
+		Asserts.assertTrue(subtypes.length > 0);
 
 		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
 		for (int i = 0; i < subtypes.length; i++) {
@@ -338,5 +346,32 @@ public abstract class JsonUtils {
 				type += path[i];
 		}
 		return type;
+	}
+
+	public static <T> T fromJson(File file, Type classOfT) {
+		try {
+			String json = FileUtils.readFileToString(file);
+			return fromJson(json, classOfT);
+		} catch (IOException e) {
+			throw Throws.throwUnhandledException(e);
+		}
+	}
+
+	public static <T> T fromJson(InputStream in, Type classOfT) {
+		try {
+			String json = IOUtils.toString(in, Charset.defaultCharset().toString());
+			return fromJson(json, classOfT);
+		} catch (IOException e) {
+			throw Throws.throwUnhandledException(e);
+		}
+	}
+
+	public static <T> void toJson(T obj, File file) {
+		try {
+			String json = toJson(obj);
+			FileUtils.writeStringToFile(file, json);
+		} catch (IOException e) {
+			throw Throws.throwUnhandledException(e);
+		}
 	}
 }
