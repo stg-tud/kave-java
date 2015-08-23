@@ -29,9 +29,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.utils.Asserts;
 import cc.kave.commons.utils.zip.ZipReader;
 import cc.kave.commons.utils.zip.ZipWriter;
+import cc.recommenders.assertions.Asserts;
 
 public class CompletionEventProcessor {
 
@@ -65,7 +65,7 @@ public class CompletionEventProcessor {
 	}
 
 	private String getOutName(String inName) {
-		Asserts.assertThat(inName.startsWith(dirIn));
+		Asserts.assertTrue(inName.startsWith(dirIn));
 		String relativeName = inName.substring(dirIn.length());
 		String outName = dirOut + relativeName;
 		return outName;
