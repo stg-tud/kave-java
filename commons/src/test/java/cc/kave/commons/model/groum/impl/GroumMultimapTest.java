@@ -46,8 +46,7 @@ public class GroumMultimapTest {
 
 	}
 
-	@Test
-	@Ignore
+	@Test	
 	public void comparatorWorksForSubgroums() {
 		TreeMultiset<ISubGroum> treeset = TreeMultiset.create(new SubGroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(2);
@@ -74,8 +73,7 @@ public class GroumMultimapTest {
 
 	}
 
-	@Test
-	@Ignore
+	@Test	
 	public void removesSubset() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -91,8 +89,7 @@ public class GroumMultimapTest {
 		assertTrue(treeset.size() == 3);
 	}
 
-	@Test
-	@Ignore
+	@Test	
 	public void removesSeveralSubsets() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -112,8 +109,7 @@ public class GroumMultimapTest {
 		assertTrue(treeset.size() == 3 && treeset.elementSet().size() == 2);
 	}
 
-	@Test
-	@Ignore
+	@Test	
 	public void iteratesOverOccurences() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);

@@ -19,9 +19,11 @@ public class Groum implements IGroum, Cloneable {
 	DirectedGraph<INode, DefaultEdge> groum;
 	INode root;
 	ISubgraphStrategy subgraphStrategy;
+	Boolean dirty;
 
 	public Groum() {
 		groum = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
+		dirty = true;
 	}
 
 	@Override
@@ -42,15 +44,6 @@ public class Groum implements IGroum, Cloneable {
 		}
 	}
 
-	/*
-	 * TODO: Implement dynamic solution (non-Javadoc) e.g. only Node without
-	 * incoming Edges
-	 * 
-	 * @see cc.kave.commons.model.groum.IGroum#getRoot()
-	 */
-	public INode getRoot() {
-		return root;
-	}
 
 	public void setSubgraphStrategy(ISubgraphStrategy strategy) {
 		this.subgraphStrategy = strategy;
@@ -83,8 +76,23 @@ public class Groum implements IGroum, Cloneable {
 			Collections.sort(otherNodes);
 
 			for (int i = 0; i < myNodes.size(); i++) {
-				if (!(myNodes.get(i).equals(otherNodes.get(i))))
+				if (!(myNodes.get(i).equals(otherNodes.get(i)))) {
+					return false;					
+				}
+				List<INode> mysuccessors = new LinkedList<>();
+				List<INode> othersuccessors = new LinkedList<>();					
+				mysuccessors.addAll(getSuccessors(myNodes.get(i)));
+				othersuccessors.addAll(groum.getSuccessors(otherNodes.get(i)));
+				if (mysuccessors.size() != othersuccessors.size())
 					return false;
+				
+				Collections.sort(mysuccessors);
+				Collections.sort(othersuccessors);
+				
+				for (int x = 0; x < mysuccessors.size(); x++) {
+					if (!(mysuccessors.get(x).equals(othersuccessors.get(x)))) 
+							return false;
+				}
 			}
 			return true;
 		}
@@ -129,7 +137,7 @@ public class Groum implements IGroum, Cloneable {
 	@Override
 	public void addEdge(INode source, INode target) {
 		groum.addEdge(source, target);
-
+		dirty = true;
 	}
 
 	@Override
@@ -202,7 +210,32 @@ public class Groum implements IGroum, Cloneable {
 			return toString().compareTo(o.toString());
 	}
 
+	/*
+	 * Groums will have one root?
+	 * @see cc.kave.commons.model.groum.IGroum#getRoot()
+	 */
 	@Override
+	@Deprecated
+	public INode getRoot() {
+		if (dirty) {
+			int count = 0;
+			for (INode node: getAllNodes()) {
+				if (groum.incomingEdgesOf(node).size() == 0) {
+					count++;
+					root = node;
+				}
+			}			
+			if (count != 1)
+				throw new RuntimeException("Groum has more then one vertices with no incoming edges.");
+		}
+		return root;
+	}
+	/*
+	 * There can be several leaves
+	 * @see cc.kave.commons.model.groum.IGroum#getLeaf()
+	 */
+	@Override
+	@Deprecated
 	public INode getLeaf() {
 		for (INode node : getAllNodes()) {
 			if (groum.outDegreeOf(node) == 0)

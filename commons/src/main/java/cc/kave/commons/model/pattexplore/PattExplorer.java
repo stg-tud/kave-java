@@ -69,11 +69,11 @@ public class PattExplorer implements IPattExplorer {
 				List<ISubGroum> Q = new LinkedList<>();
 
 				for (ISubGroum occurrence : patterns.get(P)) {
-					if (occurrence.equals(P)) {
+//					if (occurrence.equals(P)) {
 						ISubGroum candidate = occurrence.extensibleWith(U);
 						if (candidate != null)
 							Q.add(candidate);
-					}
+//					}
 				}
 				if (Q.size() >= threshold) {
 					newPatterns.putAll(Q.iterator().next(), Q);

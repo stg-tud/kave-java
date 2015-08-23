@@ -54,7 +54,6 @@ public class NaivSubgraphStrategy implements ISubgraphStrategy {
 				if (!failure) {
 					subgroums.add(candidatesubgroum);
 				}
-
 			}
 			return subgroums;
 		}

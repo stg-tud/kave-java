@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ ActionNodeTest.class, ControlNodeTest.class, GroumTest.class, GroumQueryTest.class,
 		NaivSubgraphStrategyTest.class, PattUtilsTest.class, PattExplorerTest.class, GroumMultisetTest.class,
-		GroumMultimapTest.class })
+		GroumMultimapTest.class, PattExplorerGraphTest.class })
 public class AllTests {
 
 }

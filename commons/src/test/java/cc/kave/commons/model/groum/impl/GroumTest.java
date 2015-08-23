@@ -39,17 +39,68 @@ public class GroumTest {
 
 		ISubGroum groum = new SubGroum(null);
 		groum.addVertex(a);
-		// groum.addVertex(b);
+		 groum.addVertex(b);
 
-		// groum.addEdge(a, b);
+		 groum.addEdge(a, b);
 
 		ISubGroum groum2 = new SubGroum(null);
 		groum2.addVertex(c);
-		// groum2.addVertex(d);
+		 groum2.addVertex(d);
 
-		// groum2.addEdge(c, d);
+		 groum2.addEdge(c, d);
 
 		assertFalse(groum.equals(groum2));
+	}
+	@Test
+	public void equalityFindEdgeInquality() {
+		ActionNode a1 = new ActionNode("A", "1");
+		ActionNode a2 = new ActionNode("A", "1");
+		ActionNode b1 = new ActionNode("B", "2");
+		ActionNode b2 = new ActionNode("B", "2");
+		ActionNode c1 = new ActionNode("C", "3");
+		ActionNode c2 = new ActionNode("C", "3");
+
+		ISubGroum groum = new SubGroum(null);
+		groum.addVertex(a1);
+		groum.addVertex(b1);
+		groum.addVertex(c1);
+
+		groum.addEdge(a1, b1);
+
+		ISubGroum groum2 = new SubGroum(null);
+		groum2.addVertex(a2);
+		groum2.addVertex(b2);
+		groum2.addVertex(c2);
+		groum2.addEdge(b2, c2);
+
+		assertFalse(groum.equals(groum2));
+	}
+	
+	@Test
+	public void equalityWorksFineForMultipleEdges() {
+		ActionNode a1 = new ActionNode("A", "1");
+		ActionNode a2 = new ActionNode("A", "1");
+		ActionNode b1 = new ActionNode("B", "2");
+		ActionNode b2 = new ActionNode("B", "2");
+		ActionNode c1 = new ActionNode("C", "3");
+		ActionNode c2 = new ActionNode("C", "3");
+
+		ISubGroum groum = new SubGroum(null);
+		groum.addVertex(a1);
+		groum.addVertex(b1);
+		groum.addVertex(c1);
+
+		groum.addEdge(a1, c1);
+		groum.addEdge(a1, b1);
+
+		ISubGroum groum2 = new SubGroum(null);
+		groum2.addVertex(a2);
+		groum2.addVertex(c2);
+		groum2.addVertex(b2);
+		groum2.addEdge(a2, b2);
+		groum2.addEdge(a2, c2);
+
+		assertTrue(groum.equals(groum2));
 	}
 
 	@Test

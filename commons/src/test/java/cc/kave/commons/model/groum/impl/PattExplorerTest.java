@@ -32,7 +32,6 @@ public class PattExplorerTest {
 		IGroum testgroum = new Groum();
 		testgroum.addVertex(new ActionNode("A", "A"));
 		assertTrue(patterns.size() == 1 && patterns.get(0).equals(testgroum));
-
 	}
 
 	@Test
@@ -156,10 +155,6 @@ public class PattExplorerTest {
 		IGroum pattern3 = new Groum();
 		ActionNode node3 = new ActionNode("3", "3");
 		pattern3.addVertex(node3);
-
-		IGroum pattern4 = new Groum();
-		ActionNode node4 = new ActionNode("4", "4");
-		pattern4.addVertex(node4);
 
 		IGroum pattern12 = new Groum();
 		pattern12.addVertex(node1);
@@ -947,8 +942,7 @@ public class PattExplorerTest {
 	public void findPatternsOfSize5() {
 		PattExplorer uut = new PattExplorer(5);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(10);
-		List patterns = uut.explorePatterns(listOfXGroums);
-		System.out.println(patterns);
+		List patterns = uut.explorePatterns(listOfXGroums);		
 
 		// Target patterns:
 		// Target patterns:
