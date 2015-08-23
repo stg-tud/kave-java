@@ -948,7 +948,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public static void assertSSTs(ISST sst, ISST inlinedSST){
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
-		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		//System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

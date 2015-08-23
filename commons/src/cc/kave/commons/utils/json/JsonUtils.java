@@ -311,11 +311,12 @@ public abstract class JsonUtils {
 		// cc.kave.commons.model.events.completionevents.CompletionEvent
 
 		regexMatcher.appendTail(resultString);
-		regex = Pattern.compile("KaVE\\.Commons\\.Model\\.([.a-zA-Z0-9_]+), KaVE.Commons");
+		regex = Pattern.compile("\"\\$type\":\"KaVE\\.Commons\\.Model\\.([.a-zA-Z0-9_]+), KaVE.Commons\"");
 		regexMatcher = regex.matcher(resultString.toString());
 		resultString = new StringBuffer();
 		while (regexMatcher.find()) {
-			String replacement = "cc.kave.commons.model." + toLowerCaseNamespace(regexMatcher.group(1));
+			String replacement = "\"\\$type\": \"" + "cc.kave.commons.model."
+					+ toLowerCaseNamespace(regexMatcher.group(1)) + "\"";
 			regexMatcher.appendReplacement(resultString, replacement);
 		}
 		regexMatcher.appendTail(resultString);
