@@ -219,7 +219,6 @@ public class CsTypeParameterName extends CsName implements TypeName {
 
 	@Override
 	public TypeName getTypeParameterType() {
-
 		int startOfTypeName = getTypeParameterShortName().length() + ParameterNameTypeSeparater.length();
 		return startOfTypeName >= identifier.length() ? CsUnknownTypeName.getInstance()
 				: CsTypeName.newTypeName(identifier.substring(startOfTypeName));

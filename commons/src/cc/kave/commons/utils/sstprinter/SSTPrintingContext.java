@@ -63,7 +63,7 @@ public class SSTPrintingContext {
 	}
 
 	public void setTypeShape(ITypeShape typeShape) {
-		typeShape = typeShape;
+		this.typeShape = typeShape;
 	}
 
 	public Iterator<NamespaceName> getSeenNamespaces() {

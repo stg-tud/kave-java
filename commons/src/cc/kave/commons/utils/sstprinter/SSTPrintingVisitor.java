@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cc.kave.commons.model.names.DelegateTypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -73,8 +74,8 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 		}
 
 		c.space().type(sst.getEnclosingType());
-
 		if (c.typeShape != null && c.typeShape.getTypeHierarchy().hasSupertypes()) {
+
 			c.text(" : ");
 
 			if (c.typeShape.getTypeHierarchy().hasSuperclass() && c.typeShape.getTypeHierarchy().getExtends() != null) {
@@ -87,10 +88,10 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 			int index = 0;
 			for (ITypeHierarchy i : c.typeShape.getTypeHierarchy().getImplements()) {
 				c.type(i.getElement());
+				index++;
 				if (index != c.typeShape.getTypeHierarchy().getImplements().size()) {
 					c.text(", ");
 				}
-				index++;
 			}
 		}
 
@@ -114,13 +115,13 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 			int inBetweenNewLineCount, int trailingNewLineCount) {
 
 		List<IMemberDeclaration> nodeList = nodeGroup.stream().collect(Collectors.toList());
-		for (IMemberDeclaration node : nodeList) {
+		for (int i = 0; i < nodeList.size(); i++) {
+			IMemberDeclaration node = nodeList.get(i);
 			node.accept(this, c);
 
-			int newLinesNeeded = node.equals(nodeList.get(nodeGroup.size() - 1)) ? inBetweenNewLineCount
-					: trailingNewLineCount;
+			int newLinesNeeded = (i < (nodeList.size() - 1) ? inBetweenNewLineCount : trailingNewLineCount);
 
-			for (int i = 0; i < newLinesNeeded; i++) {
+			for (int j = 0; j < newLinesNeeded; j++) {
 				c.newLine();
 			}
 		}
@@ -129,7 +130,7 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 
 	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext c) {
 		c.indentation().keyword("delegate").space().type(stmt.getName())
-				.typeParameters(stmt.getName().getTypeParameters()).text(";");
+				.parameterList(((DelegateTypeName) stmt.getName()).getParameters()).text(";");
 		return null;
 	}
 
@@ -158,8 +159,8 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 		}
 
 		c.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
-		if (stmt.getName().hasParameters()) {
-			// c.typeParameters(stmt.getName().getParameters().stream().);
+		if (stmt.getName().hasTypeParameters()) {
+			c.typeParameters(stmt.getName().getTypeParameters());
 		}
 
 		c.parameterList(stmt.getName().getParameters());
@@ -295,7 +296,7 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IForEachLoop block, SSTPrintingContext c) {
-		c.indentation().keyword("for").space().text("(").type(block.getDeclaration().getType()).space();
+		c.indentation().keyword("foreach").space().text("(").type(block.getDeclaration().getType()).space();
 		block.getDeclaration().getReference().accept(this, c);
 		c.space().keyword("in").space();
 		block.getLoopedReference().accept(this, c);
@@ -498,7 +499,8 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 			String value = !expr.getValue().isEmpty() ? expr.getValue() : "...";
 
 			// Double.TryParse(expr.Value, out parsed
-			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")) {
+			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")
+					|| value.matches("[0-9]+\\.[0-9]+")) {
 				c.keyword(value);
 			} else {
 				c.stringLiteral(value);

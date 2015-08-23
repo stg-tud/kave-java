@@ -13,7 +13,6 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
-
 import commons.model.ssts.impl.SSTTestHelper;
 
 public class AssignmentTest {
@@ -51,8 +50,8 @@ public class AssignmentTest {
 
 	@Test
 	public void testEqualityReallyTheSame() {
-		Assignment a = (Assignment) SSTUtil.assigmentToLocal("x", new ConstantValueExpression());
-		Assignment b = (Assignment) SSTUtil.assigmentToLocal("x", new ConstantValueExpression());
+		Assignment a = (Assignment) SSTUtil.assignmentToLocal("x", new ConstantValueExpression());
+		Assignment b = (Assignment) SSTUtil.assignmentToLocal("x", new ConstantValueExpression());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -60,8 +59,8 @@ public class AssignmentTest {
 
 	@Test
 	public void testEqualityDifferentReference() {
-		Assignment a = (Assignment) SSTUtil.assigmentToLocal("a", new ConstantValueExpression());
-		Assignment b = (Assignment) SSTUtil.assigmentToLocal("b", new ConstantValueExpression());
+		Assignment a = (Assignment) SSTUtil.assignmentToLocal("a", new ConstantValueExpression());
+		Assignment b = (Assignment) SSTUtil.assignmentToLocal("b", new ConstantValueExpression());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
@@ -69,8 +68,8 @@ public class AssignmentTest {
 
 	@Test
 	public void testEqualityDifferentExpression() {
-		Assignment a = (Assignment) SSTUtil.assigmentToLocal("a", new ConstantValueExpression());
-		Assignment b = (Assignment) SSTUtil.assigmentToLocal("a", new ComposedExpression());
+		Assignment a = (Assignment) SSTUtil.assignmentToLocal("a", new ConstantValueExpression());
+		Assignment b = (Assignment) SSTUtil.assignmentToLocal("a", new ComposedExpression());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

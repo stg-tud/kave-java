@@ -2,13 +2,14 @@ package cc.kave.commons.utils.sstprinter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.names.NamespaceName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 
 public class SSTPrintingUtils {
-	public static void formatAsUsingList(List<NamespaceName> namespaces, SSTPrintingContext context) {
+	public static void formatAsUsingList(Set<NamespaceName> namespaces, SSTPrintingContext context) {
 		List<String> filteredNamespaceStrings = new ArrayList();
 		for (NamespaceName name : namespaces) {
 			if (!name.equals(CsNamespaceName.UNKNOWN_NAME)) {

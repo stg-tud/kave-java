@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
@@ -26,8 +28,6 @@ import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
-
-import com.google.common.collect.Lists;
 
 public class SSTUtil {
 
@@ -59,7 +59,7 @@ public class SSTUtil {
 		return composedExpression;
 	}
 
-	public static IAssignment assigmentToLocal(String identifier, IAssignableExpression expr) {
+	public static IAssignment assignmentToLocal(String identifier, IAssignableExpression expr) {
 		Assignment assignment = new Assignment();
 		assignment.setExpression(expr);
 		assignment.setReference(variableReference(identifier));

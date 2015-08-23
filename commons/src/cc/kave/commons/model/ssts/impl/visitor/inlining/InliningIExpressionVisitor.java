@@ -103,7 +103,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 		body.add(SSTUtil.declare(context.getGotResultName(), InliningUtil.GOT_RESULT_TYPE));
 		ConstantValueExpression constant = new ConstantValueExpression();
 		constant.setValue("true");
-		body.add(SSTUtil.assigmentToLocal(context.getGotResultName(), constant));
+		body.add(SSTUtil.assignmentToLocal(context.getGotResultName(), constant));
 
 	}
 
@@ -140,7 +140,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 				 */
 				if (parameter.isParameterArray() && !parameter.isPassedByReference()) {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-					body.add(SSTUtil.assigmentToLocal(parameter.getName(), new UnknownExpression()));
+					body.add(SSTUtil.assignmentToLocal(parameter.getName(), new UnknownExpression()));
 					break;
 				} else if (i < expressions.size() && expressions.get(i) instanceof ReferenceExpression) {
 					ReferenceExpression refExpr = (ReferenceExpression) expressions.get(i);
@@ -153,7 +153,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					}
 				} else if (i < expressions.size()) {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-					body.add(SSTUtil.assigmentToLocal(parameter.getName(), expressions.get(i)));
+					body.add(SSTUtil.assignmentToLocal(parameter.getName(), expressions.get(i)));
 				}
 			}
 		}
