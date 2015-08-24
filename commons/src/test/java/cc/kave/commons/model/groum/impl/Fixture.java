@@ -5,6 +5,7 @@ import java.util.List;
 
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.IActionNode;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
@@ -206,13 +207,5 @@ public class Fixture {
 			previous = next;
 		}
 		return groum;
-	}
-
-	public static boolean containsPattern(List<IGroum> list, IGroum pattern) {
-		for (IGroum test : list) {
-			if (test.equals(pattern))
-				return true;
-		}
-		return false;
 	}
 }

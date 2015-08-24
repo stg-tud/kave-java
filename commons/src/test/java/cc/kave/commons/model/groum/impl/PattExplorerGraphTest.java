@@ -2,6 +2,8 @@ package cc.kave.commons.model.groum.impl;
 
 import static org.junit.Assert.assertTrue;
 
+import static cc.kave.commons.model.groum.impl.PatternAssert.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,10 +18,52 @@ import cc.kave.commons.model.pattexplore.PattExplorer;
 
 public class PattExplorerGraphTest {
 
+	@Test
+	public void distinguishesPatternsByStructure() {
+		//      1          1     1
+		//    /   \        |     | \
+		//   2     3  =>   2  ,  2  3
+		//   |             |
+		//   3             3
+		
+		Groum subject = new Groum();
+		ActionNode node1 = new ActionNode("1", "1");
+		subject.addVertex(node1);
+		ActionNode node2 = new ActionNode("2", "2");
+		subject.addVertex(node2);
+		ActionNode node3a = new ActionNode("3", "3");
+		subject.addVertex(node3a);
+		ActionNode node3b = new ActionNode("3", "3");
+		subject.addVertex(node3b);
+		
+		subject.addEdge(node1, node2);
+		subject.addEdge(node1, node3a);
+		subject.addEdge(node2, node3b);
+		
+		PattExplorer uut = new PattExplorer(1);
+		List<ISubGroum> actuals = uut.explorePatterns(Arrays.asList(subject));
+		
+		Groum patternA = new Groum();
+		patternA.addVertex(node1);
+		patternA.addVertex(node2);
+		patternA.addVertex(node3a);
+		patternA.addEdge(node1, node2);
+		patternA.addEdge(node1, node3a);
+		
+		Groum patternB = new Groum();
+		patternB.addVertex(node1);
+		patternB.addVertex(node2);
+		patternB.addVertex(node3b);
+		patternB.addEdge(node1, node2);
+		patternB.addEdge(node2, node3b);
+		
+		assertContainsPatterns(patternsOfSize(actuals, 3), patternA, patternB);
+	}
+
 	/*
 	 * 			1    			1			1			1				1
-	 * 		 /     \ 			|			|			|			   /
-	 *      2       3a (!)		2			2			4			  2
+	 * 		 /     \ 			|			|			|			   / \
+	 *      2       4 (!)		2			2			4			  2   4
 	 *    /   \   /     		|			|			|			/   \
 	 *   3  ->  4      			3			4			4		   3  -> 4
 	 *           \				|			|			|
@@ -57,8 +101,6 @@ public class PattExplorerGraphTest {
 		
 
 		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(complexGroum, listGroum));
-		System.out.println(patterns);
-		System.out.println(patterns.size());
 		assertTrue(patterns.size() == 15);
 	}
 

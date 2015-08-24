@@ -44,7 +44,6 @@ public class Groum implements IGroum, Cloneable {
 		}
 	}
 
-
 	public void setSubgraphStrategy(ISubgraphStrategy strategy) {
 		this.subgraphStrategy = strategy;
 	}
@@ -62,40 +61,42 @@ public class Groum implements IGroum, Cloneable {
 		if (!(anotherGroum instanceof Groum))
 			return false;
 		else {
-			Groum groum = (Groum) anotherGroum;
+			return equals((Groum) anotherGroum);
+		}
+	}
 
-			if (getAllNodes().size() != groum.getAllNodes().size())
+	private boolean equals(Groum groum) {
+		if (getAllNodes().size() != groum.getAllNodes().size())
+			return false;
+
+		List<INode> myNodes = new LinkedList<>();
+		myNodes.addAll(getAllNodes());
+		List<INode> otherNodes = new LinkedList<>();
+		otherNodes.addAll(groum.getAllNodes());
+
+		Collections.sort(myNodes);
+		Collections.sort(otherNodes);
+
+		for (int i = 0; i < myNodes.size(); i++) {
+			if (!(myNodes.get(i).equals(otherNodes.get(i)))) {
+				return false;
+			}
+			List<INode> mysuccessors = new LinkedList<>();
+			List<INode> othersuccessors = new LinkedList<>();
+			mysuccessors.addAll(getSuccessors(myNodes.get(i)));
+			othersuccessors.addAll(groum.getSuccessors(otherNodes.get(i)));
+			if (mysuccessors.size() != othersuccessors.size())
 				return false;
 
-			List<INode> myNodes = new LinkedList<>();
-			myNodes.addAll(getAllNodes());
-			List<INode> otherNodes = new LinkedList<>();
-			otherNodes.addAll(groum.getAllNodes());
+			Collections.sort(mysuccessors);
+			Collections.sort(othersuccessors);
 
-			Collections.sort(myNodes);
-			Collections.sort(otherNodes);
-
-			for (int i = 0; i < myNodes.size(); i++) {
-				if (!(myNodes.get(i).equals(otherNodes.get(i)))) {
-					return false;					
-				}
-				List<INode> mysuccessors = new LinkedList<>();
-				List<INode> othersuccessors = new LinkedList<>();					
-				mysuccessors.addAll(getSuccessors(myNodes.get(i)));
-				othersuccessors.addAll(groum.getSuccessors(otherNodes.get(i)));
-				if (mysuccessors.size() != othersuccessors.size())
+			for (int x = 0; x < mysuccessors.size(); x++) {
+				if (!(mysuccessors.get(x).equals(othersuccessors.get(x))))
 					return false;
-				
-				Collections.sort(mysuccessors);
-				Collections.sort(othersuccessors);
-				
-				for (int x = 0; x < mysuccessors.size(); x++) {
-					if (!(mysuccessors.get(x).equals(othersuccessors.get(x)))) 
-							return false;
-				}
 			}
-			return true;
 		}
+		return true;
 	}
 
 	public Set<DefaultEdge> getAllEdges() {
@@ -212,6 +213,7 @@ public class Groum implements IGroum, Cloneable {
 
 	/*
 	 * Groums will have one root?
+	 * 
 	 * @see cc.kave.commons.model.groum.IGroum#getRoot()
 	 */
 	@Override
@@ -219,19 +221,21 @@ public class Groum implements IGroum, Cloneable {
 	public INode getRoot() {
 		if (dirty) {
 			int count = 0;
-			for (INode node: getAllNodes()) {
+			for (INode node : getAllNodes()) {
 				if (groum.incomingEdgesOf(node).size() == 0) {
 					count++;
 					root = node;
 				}
-			}			
+			}
 			if (count != 1)
 				throw new RuntimeException("Groum has more then one vertices with no incoming edges.");
 		}
 		return root;
 	}
+
 	/*
 	 * There can be several leaves
+	 * 
 	 * @see cc.kave.commons.model.groum.IGroum#getLeaf()
 	 */
 	@Override

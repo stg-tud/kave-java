@@ -66,23 +66,23 @@ public class PattExplorer implements IPattExplorer {
 		for (ISubGroum U : L.keySet()) {
 			if (U.getAllNodes().size() == 1) {
 
-				List<ISubGroum> Q = new LinkedList<>();
+				TreeMultimap<ISubGroum, ISubGroum> Q = TreeMultimap.create(new SubGroumComparator(),
+						new SubGroumIdentComparator());
 
 				for (ISubGroum occurrence : patterns.get(P)) {
-//					if (occurrence.equals(P)) {
-						ISubGroum candidate = occurrence.extensibleWith(U);
-						if (candidate != null)
-							Q.add(candidate);
-//					}
-				}
-				if (Q.size() >= threshold) {
-					newPatterns.putAll(Q.iterator().next(), Q);
-					patterns.putAll(newPatterns);
-
-					newPatterns.putAll(explore(Q.iterator().next(), patterns, D));
-
+					ISubGroum candidate = occurrence.extensibleWith(U);
+					if (candidate != null)
+						Q.put(candidate, candidate);
 				}
 
+				for (ISubGroum candidate : Q.keySet()) {
+					if (Q.get(candidate).size() >= threshold) {
+						newPatterns.putAll(candidate, Q.get(candidate));
+						patterns.putAll(newPatterns);
+
+						newPatterns.putAll(explore(candidate, patterns, D));
+					}
+				}
 			}
 		}
 		return newPatterns;

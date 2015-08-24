@@ -1,8 +1,5 @@
 package cc.kave.commons.model.groum.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,11 +7,15 @@ import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.IActionNode;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.groum.nodes.impl.ControlNode;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GroumTest {
 
@@ -24,35 +25,28 @@ public class GroumTest {
 	}
 
 	@Test
-	public void equalityWorksFine() {
+	public void equalityEqualGroums() {
 		IGroum a = Fixture.getPapersExampleGroum();
 		IGroum b = Fixture.getPapersExampleGroum();
-		assertTrue(a.equals(b));
+		assertEquals(a, b);
 	}
 
 	@Test
-	public void equalityWorksFineForUnequal() {
+	public void equalityUnequalNodes() {
 		ActionNode a = new ActionNode("A", "1");
-		ActionNode b = new ActionNode("A", "1");
 		ActionNode c = new ActionNode("A", "2");
-		ActionNode d = new ActionNode("A", "2");
 
-		ISubGroum groum = new SubGroum(null);
+		IGroum groum = new Groum();
 		groum.addVertex(a);
-		 groum.addVertex(b);
 
-		 groum.addEdge(a, b);
-
-		ISubGroum groum2 = new SubGroum(null);
+		IGroum groum2 = new Groum();
 		groum2.addVertex(c);
-		 groum2.addVertex(d);
 
-		 groum2.addEdge(c, d);
-
-		assertFalse(groum.equals(groum2));
+		assertNotEquals(groum, groum2);
 	}
+
 	@Test
-	public void equalityFindEdgeInquality() {
+	public void equalityUnequalEdges() {
 		ActionNode a1 = new ActionNode("A", "1");
 		ActionNode a2 = new ActionNode("A", "1");
 		ActionNode b1 = new ActionNode("B", "2");
@@ -60,22 +54,21 @@ public class GroumTest {
 		ActionNode c1 = new ActionNode("C", "3");
 		ActionNode c2 = new ActionNode("C", "3");
 
-		ISubGroum groum = new SubGroum(null);
+		IGroum groum = new Groum();
 		groum.addVertex(a1);
 		groum.addVertex(b1);
 		groum.addVertex(c1);
-
 		groum.addEdge(a1, b1);
 
-		ISubGroum groum2 = new SubGroum(null);
+		IGroum groum2 = new Groum();
 		groum2.addVertex(a2);
 		groum2.addVertex(b2);
 		groum2.addVertex(c2);
 		groum2.addEdge(b2, c2);
 
-		assertFalse(groum.equals(groum2));
+		assertNotEquals(groum, groum2);
 	}
-	
+
 	@Test
 	public void equalityWorksFineForMultipleEdges() {
 		ActionNode a1 = new ActionNode("A", "1");
@@ -85,22 +78,21 @@ public class GroumTest {
 		ActionNode c1 = new ActionNode("C", "3");
 		ActionNode c2 = new ActionNode("C", "3");
 
-		ISubGroum groum = new SubGroum(null);
+		IGroum groum = new Groum();
 		groum.addVertex(a1);
 		groum.addVertex(b1);
 		groum.addVertex(c1);
-
 		groum.addEdge(a1, c1);
 		groum.addEdge(a1, b1);
 
-		ISubGroum groum2 = new SubGroum(null);
+		IGroum groum2 = new Groum();
 		groum2.addVertex(a2);
 		groum2.addVertex(c2);
 		groum2.addVertex(b2);
 		groum2.addEdge(a2, b2);
 		groum2.addEdge(a2, c2);
 
-		assertTrue(groum.equals(groum2));
+		assertEquals(groum, groum2);
 	}
 
 	@Test

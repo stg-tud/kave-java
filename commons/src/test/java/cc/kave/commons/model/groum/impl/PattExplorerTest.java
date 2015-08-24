@@ -1,7 +1,5 @@
 package cc.kave.commons.model.groum.impl;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,8 +7,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
+import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.pattexplore.PattExplorer;
+
+import static org.junit.Assert.assertTrue;
 
 public class PattExplorerTest {
 
@@ -26,12 +27,13 @@ public class PattExplorerTest {
 
 		PattExplorer uut = new PattExplorer(2);
 
-		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
+		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
 
 		// Target patterns:
 		IGroum testgroum = new Groum();
 		testgroum.addVertex(new ActionNode("A", "A"));
-		assertTrue(patterns.size() == 1 && patterns.get(0).equals(testgroum));
+
+		PatternAssert.assertContainsPatterns(patterns, testgroum);
 	}
 
 	@Test
@@ -52,7 +54,7 @@ public class PattExplorerTest {
 
 		PattExplorer uut = new PattExplorer(2);
 
-		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
+		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
 
 		// Target patterns:
 		IGroum patternA = new Groum();
@@ -68,8 +70,7 @@ public class PattExplorerTest {
 		patternAB.addVertex(nodeb);
 		patternAB.addEdge(nodea, nodeb);
 
-		assertTrue(patterns.size() == 3 && Fixture.containsPattern(patterns, patternA)
-				&& Fixture.containsPattern(patterns, patternB) && Fixture.containsPattern(patterns, patternAB));
+		PatternAssert.assertContainsPatterns(patterns, patternA, patternB, patternAB);
 
 	}
 
@@ -90,7 +91,7 @@ public class PattExplorerTest {
 		groum2.addEdge(node1b, node2b);
 
 		PattExplorer uut = new PattExplorer(2);
-		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
+		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
 
 		// Target patterns:
 		IGroum patternA = new Groum();
@@ -101,9 +102,7 @@ public class PattExplorerTest {
 		ActionNode nodeb = new ActionNode("B", "B");
 		patternB.addVertex(nodeb);
 
-		assertTrue(patterns.size() == 2 && Fixture.containsPattern(patterns, patternA)
-				&& Fixture.containsPattern(patterns, patternB));
-
+		PatternAssert.assertContainsPatterns(patterns, patternA, patternB);
 	}
 
 	@Test
@@ -113,7 +112,7 @@ public class PattExplorerTest {
 
 		PattExplorer uut = new PattExplorer(2);
 
-		List patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
+		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -129,9 +128,7 @@ public class PattExplorerTest {
 		pattern12.addVertex(nodeb);
 		pattern12.addEdge(nodea, nodeb);
 
-		assertTrue(patterns.size() == 3 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern12));
-
+		PatternAssert.assertContainsPatterns(patterns, pattern1, pattern2, pattern12);
 	}
 
 	@Test
@@ -140,8 +137,8 @@ public class PattExplorerTest {
 		IGroum groum2 = Fixture.createConnectedGroumOfSize(3);
 		IGroum groum3 = Fixture.createConnectedGroumOfSize(3);
 		PattExplorer uut = new PattExplorer(1);
-		List list = Arrays.asList(groum1, groum2, groum3);
-		List patterns = uut.explorePatterns(list);
+		List<IGroum> list = Arrays.asList(groum1, groum2, groum3);
+		List<ISubGroum> patterns = uut.explorePatterns(list);
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -173,10 +170,9 @@ public class PattExplorerTest {
 		pattern123.addEdge(node1, node2);
 		pattern123.addEdge(node2, node3);
 
-		assertTrue(patterns.size() == 6 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern12) && Fixture.containsPattern(patterns, pattern23)
-				&& Fixture.containsPattern(patterns, pattern123));
+		assertTrue(patterns.size() == 6 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern12) && patterns.contains(pattern23)
+				&& patterns.contains(pattern123));
 	}
 
 	@Test
@@ -186,8 +182,8 @@ public class PattExplorerTest {
 		IGroum groum3 = Fixture.createConnectedGroumOfSize(4);
 		IGroum groum4 = Fixture.createConnectedGroumOfSize(4);
 		PattExplorer uut = new PattExplorer(1);
-		List list = Arrays.asList(groum1, groum2, groum3, groum4);
-		List patterns = uut.explorePatterns(list);
+		List<IGroum> list = Arrays.asList(groum1, groum2, groum3, groum4);
+		List<ISubGroum> patterns = uut.explorePatterns(list);
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -244,19 +240,17 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern4) && Fixture.containsPattern(patterns, pattern12)
-				&& Fixture.containsPattern(patterns, pattern23) && Fixture.containsPattern(patterns, pattern34)
-				&& Fixture.containsPattern(patterns, pattern123) && Fixture.containsPattern(patterns, pattern234)
-				&& Fixture.containsPattern(patterns, pattern1234));
+		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
+				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
+				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
 	}
 
 	@Test
 	public void findsGeneratedFourNodesPatterns() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(4);
-		List patterns = uut.explorePatterns(listOfXGroums);
+		List<ISubGroum> patterns = uut.explorePatterns(listOfXGroums);
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -313,19 +307,17 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern4) && Fixture.containsPattern(patterns, pattern12)
-				&& Fixture.containsPattern(patterns, pattern23) && Fixture.containsPattern(patterns, pattern34)
-				&& Fixture.containsPattern(patterns, pattern123) && Fixture.containsPattern(patterns, pattern234)
-				&& Fixture.containsPattern(patterns, pattern1234));
+		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
+				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
+				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
 	}
 
 	@Test
 	public void findsGeneratedFourNodesPatternsReverse() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroumsReverse = Fixture.getListOfXGroumsReverse(4);
-		List patterns = uut.explorePatterns(listOfXGroumsReverse);
+		List<ISubGroum> patterns = uut.explorePatterns(listOfXGroumsReverse);
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -382,19 +374,17 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern4) && Fixture.containsPattern(patterns, pattern12)
-				&& Fixture.containsPattern(patterns, pattern23) && Fixture.containsPattern(patterns, pattern34)
-				&& Fixture.containsPattern(patterns, pattern123) && Fixture.containsPattern(patterns, pattern234)
-				&& Fixture.containsPattern(patterns, pattern1234));
+		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
+				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
+				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
 	}
 
 	@Test
 	public void findsGeneratedTenNodesPatterns() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(10);
-		List patterns = uut.explorePatterns(listOfXGroums);
+		List<ISubGroum> patterns = uut.explorePatterns(listOfXGroums);
 
 		// Target patterns:
 		IGroum pattern1 = new Groum();
@@ -902,47 +892,35 @@ public class PattExplorerTest {
 		pattern12345678910.addEdge(node8, node9);
 		pattern12345678910.addEdge(node9, node10);
 
-		assertTrue(patterns.size() == 55 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern4) && Fixture.containsPattern(patterns, pattern5)
-				&& Fixture.containsPattern(patterns, pattern6) && Fixture.containsPattern(patterns, pattern7)
-				&& Fixture.containsPattern(patterns, pattern8) && Fixture.containsPattern(patterns, pattern9)
-				&& Fixture.containsPattern(patterns, pattern10) && Fixture.containsPattern(patterns, pattern12)
-				&& Fixture.containsPattern(patterns, pattern23) && Fixture.containsPattern(patterns, pattern34)
-				&& Fixture.containsPattern(patterns, pattern45) && Fixture.containsPattern(patterns, pattern56)
-				&& Fixture.containsPattern(patterns, pattern67) && Fixture.containsPattern(patterns, pattern78)
-				&& Fixture.containsPattern(patterns, pattern89) && Fixture.containsPattern(patterns, pattern910)
-				&& Fixture.containsPattern(patterns, pattern123) && Fixture.containsPattern(patterns, pattern234)
-				&& Fixture.containsPattern(patterns, pattern345) && Fixture.containsPattern(patterns, pattern456)
-				&& Fixture.containsPattern(patterns, pattern567) && Fixture.containsPattern(patterns, pattern678)
-				&& Fixture.containsPattern(patterns, pattern789) && Fixture.containsPattern(patterns, pattern8910)
-				&& Fixture.containsPattern(patterns, pattern1234) && Fixture.containsPattern(patterns, pattern2345)
-				&& Fixture.containsPattern(patterns, pattern3456) && Fixture.containsPattern(patterns, pattern4567)
-				&& Fixture.containsPattern(patterns, pattern5678) && Fixture.containsPattern(patterns, pattern6789)
-				&& Fixture.containsPattern(patterns, pattern78910) && Fixture.containsPattern(patterns, pattern12345)
-				&& Fixture.containsPattern(patterns, pattern23456) && Fixture.containsPattern(patterns, pattern34567)
-				&& Fixture.containsPattern(patterns, pattern45678) && Fixture.containsPattern(patterns, pattern56789)
-				&& Fixture.containsPattern(patterns, pattern678910) && Fixture.containsPattern(patterns, pattern123456)
-				&& Fixture.containsPattern(patterns, pattern234567) && Fixture.containsPattern(patterns, pattern345678)
-				&& Fixture.containsPattern(patterns, pattern456789)
-				&& Fixture.containsPattern(patterns, pattern5678910)
-				&& Fixture.containsPattern(patterns, pattern1234567)
-				&& Fixture.containsPattern(patterns, pattern2345678)
-				&& Fixture.containsPattern(patterns, pattern3456789)
-				&& Fixture.containsPattern(patterns, pattern45678910)
-				&& Fixture.containsPattern(patterns, pattern12345678)
-				&& Fixture.containsPattern(patterns, pattern23456789)
-				&& Fixture.containsPattern(patterns, pattern345678910)
-				&& Fixture.containsPattern(patterns, pattern123456789)
-				&& Fixture.containsPattern(patterns, pattern2345678910)
-				&& Fixture.containsPattern(patterns, pattern12345678910));
+		assertTrue(patterns.size() == 55 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern5)
+				&& patterns.contains(pattern6) && patterns.contains(pattern7) && patterns.contains(pattern8)
+				&& patterns.contains(pattern9) && patterns.contains(pattern10) && patterns.contains(pattern12)
+				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern45)
+				&& patterns.contains(pattern56) && patterns.contains(pattern67) && patterns.contains(pattern78)
+				&& patterns.contains(pattern89) && patterns.contains(pattern910) && patterns.contains(pattern123)
+				&& patterns.contains(pattern234) && patterns.contains(pattern345) && patterns.contains(pattern456)
+				&& patterns.contains(pattern567) && patterns.contains(pattern678) && patterns.contains(pattern789)
+				&& patterns.contains(pattern8910) && patterns.contains(pattern1234) && patterns.contains(pattern2345)
+				&& patterns.contains(pattern3456) && patterns.contains(pattern4567) && patterns.contains(pattern5678)
+				&& patterns.contains(pattern6789) && patterns.contains(pattern78910) && patterns.contains(pattern12345)
+				&& patterns.contains(pattern23456) && patterns.contains(pattern34567)
+				&& patterns.contains(pattern45678) && patterns.contains(pattern56789)
+				&& patterns.contains(pattern678910) && patterns.contains(pattern123456)
+				&& patterns.contains(pattern234567) && patterns.contains(pattern345678)
+				&& patterns.contains(pattern456789) && patterns.contains(pattern5678910)
+				&& patterns.contains(pattern1234567) && patterns.contains(pattern2345678)
+				&& patterns.contains(pattern3456789) && patterns.contains(pattern45678910)
+				&& patterns.contains(pattern12345678) && patterns.contains(pattern23456789)
+				&& patterns.contains(pattern345678910) && patterns.contains(pattern123456789)
+				&& patterns.contains(pattern2345678910) && patterns.contains(pattern12345678910));
 	}
 
 	@Test
 	public void findPatternsOfSize5() {
 		PattExplorer uut = new PattExplorer(5);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(10);
-		List patterns = uut.explorePatterns(listOfXGroums);		
+		List<ISubGroum> patterns = uut.explorePatterns(listOfXGroums);
 
 		// Target patterns:
 		// Target patterns:
@@ -973,17 +951,14 @@ public class PattExplorerTest {
 
 		IGroum pattern123456 = Fixture.createConnectedGroumOfSize(1, 6);
 
-		assertTrue(patterns.size() == 21 && Fixture.containsPattern(patterns, pattern1)
-				&& Fixture.containsPattern(patterns, pattern2) && Fixture.containsPattern(patterns, pattern3)
-				&& Fixture.containsPattern(patterns, pattern4) && Fixture.containsPattern(patterns, pattern5)
-				&& Fixture.containsPattern(patterns, pattern6) && Fixture.containsPattern(patterns, pattern12)
-				&& Fixture.containsPattern(patterns, pattern23) && Fixture.containsPattern(patterns, pattern34)
-				&& Fixture.containsPattern(patterns, pattern45) && Fixture.containsPattern(patterns, pattern56)
-				&& Fixture.containsPattern(patterns, pattern123) && Fixture.containsPattern(patterns, pattern234)
-				&& Fixture.containsPattern(patterns, pattern345) && Fixture.containsPattern(patterns, pattern456)
-				&& Fixture.containsPattern(patterns, pattern1234) && Fixture.containsPattern(patterns, pattern2345)
-				&& Fixture.containsPattern(patterns, pattern3456) && Fixture.containsPattern(patterns, pattern12345)
-				&& Fixture.containsPattern(patterns, pattern23456) && Fixture.containsPattern(patterns, pattern123456));
+		assertTrue(patterns.size() == 21 && patterns.contains(pattern1) && patterns.contains(pattern2)
+				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern5)
+				&& patterns.contains(pattern6) && patterns.contains(pattern12) && patterns.contains(pattern23)
+				&& patterns.contains(pattern34) && patterns.contains(pattern45) && patterns.contains(pattern56)
+				&& patterns.contains(pattern123) && patterns.contains(pattern234) && patterns.contains(pattern345)
+				&& patterns.contains(pattern456) && patterns.contains(pattern1234) && patterns.contains(pattern2345)
+				&& patterns.contains(pattern3456) && patterns.contains(pattern12345) && patterns.contains(pattern23456)
+				&& patterns.contains(pattern123456));
 	}
 
 	@Test
@@ -991,7 +966,7 @@ public class PattExplorerTest {
 	public void findsGenerated30NodesPatterns() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(30);
-		List patterns = uut.explorePatterns(listOfXGroums);
+		List<ISubGroum> patterns = uut.explorePatterns(listOfXGroums);
 		assertTrue(patterns.size() == 465);
 	}
 
