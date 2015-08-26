@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import cc.kave.commons.model.names.DelegateTypeName;
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -463,23 +464,32 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IInvocationExpression expr, SSTPrintingContext c) {
-		if (expr.getMethodName().isStatic()) {
-			c.text(expr.getMethodName().getDeclaringType().getName());
+		MethodName methodName = expr.getMethodName();
+
+		if (methodName.isConstructor()) {
+			c.keyword("new");
+			c.space();
+			c.text(methodName.getDeclaringType().getName());
 		} else {
-			expr.getReference().accept(this, c);
-		}
-
-		c.text(".").text(expr.getMethodName().getName()).text("(");
-
-		for (ISimpleExpression parameter : expr.getParameters()) {
-			parameter.accept(this, c);
-
-			if (!parameter.equals(expr.getParameters().get(expr.getParameters().size() - 1))) {
-				c.text(", ");
+			if (methodName.isStatic()) {
+				c.text(methodName.getDeclaringType().getName());
+			} else {
+				expr.getReference().accept(this, c);
 			}
+			c.text(".").text(methodName.getName());
 		}
 
+		c.text("(");
+		boolean isFirst = true;
+		for (ISimpleExpression parameter : expr.getParameters()) {
+			if (!isFirst) {
+				c.text(", ");
+				isFirst = false;
+			}
+			parameter.accept(this, c);
+		}
 		c.text(")");
+
 		return null;
 	}
 
@@ -521,21 +531,29 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 
 	public Void visit(IEventReference eventRef, SSTPrintingContext c) {
 		c.text(eventRef.getReference().getIdentifier());
+		c.text(".");
+		c.text(eventRef.getEventName().getName());
 		return null;
 	}
 
 	public Void visit(IFieldReference fieldRef, SSTPrintingContext c) {
 		c.text(fieldRef.getReference().getIdentifier());
+		c.text(".");
+		c.text(fieldRef.getFieldName().getName());
 		return null;
 	}
 
 	public Void visit(IMethodReference methodRef, SSTPrintingContext c) {
 		c.text(methodRef.getReference().getIdentifier());
+		c.text(".");
+		c.text(methodRef.getMethodName().getName());
 		return null;
 	}
 
 	public Void visit(IPropertyReference propertyRef, SSTPrintingContext c) {
 		c.text(propertyRef.getReference().getIdentifier());
+		c.text(".");
+		c.text(propertyRef.getPropertyName().getName());
 		return null;
 	}
 

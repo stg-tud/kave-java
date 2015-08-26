@@ -25,6 +25,7 @@ import cc.recommenders.io.ReadingArchive;
 
 public class SSTComparison {
 
+	private int counter = 0;
 	private String zipTestCases;
 
 	public SSTComparison(String zipTestCases) {
@@ -47,7 +48,7 @@ public class SSTComparison {
 	}
 
 	private void printSeparator() {
-		System.out.printf("\n###########################################\n");
+		System.out.printf("\n### %d ########################################\n", counter++);
 	}
 
 	private void print(Context ctx, String title) {
