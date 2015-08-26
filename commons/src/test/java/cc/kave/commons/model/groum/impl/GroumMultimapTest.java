@@ -229,9 +229,9 @@ public class GroumMultimapTest {
 		
 		treemap.putAll(a, Arrays.asList(a));
 		treemap.putAll(b, Arrays.asList(b));
-//		System.out.println(a);
-//		System.out.println(b);
-//		System.out.println(treemap);
+		System.out.println(a);
+		System.out.println(b);
+		System.out.println(treemap);
 		assertTrue(treemap.keySet().size() == 1);
 		
 		

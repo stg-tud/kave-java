@@ -1,5 +1,7 @@
 package cc.kave.commons.model.groum.impl;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,8 +12,6 @@ import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.pattexplore.PattExplorer;
-
-import static org.junit.Assert.assertTrue;
 
 public class PattExplorerTest {
 
@@ -170,9 +170,7 @@ public class PattExplorerTest {
 		pattern123.addEdge(node1, node2);
 		pattern123.addEdge(node2, node3);
 
-		assertTrue(patterns.size() == 6 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern12) && patterns.contains(pattern23)
-				&& patterns.contains(pattern123));
+		PatternAssert.assertContainsPatterns(patterns, pattern1, pattern2, pattern3, pattern12, pattern23, pattern123);
 	}
 
 	@Test
@@ -240,10 +238,7 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
-				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
-				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
+		PatternAssert.assertContainsPatterns(patterns, pattern1, pattern2, pattern3, pattern4, pattern12, pattern23, pattern34, pattern123, pattern234, pattern1234);
 	}
 
 	@Test
@@ -307,10 +302,7 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
-				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
-				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
+		PatternAssert.assertContainsPatterns(patterns,pattern1,pattern2,pattern3,pattern4,pattern12,pattern23,pattern34,pattern123,pattern234,pattern1234);
 	}
 
 	@Test
@@ -374,10 +366,8 @@ public class PattExplorerTest {
 		pattern1234.addEdge(node2, node3);
 		pattern1234.addEdge(node3, node4);
 
-		assertTrue(patterns.size() == 10 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern12)
-				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern123)
-				&& patterns.contains(pattern234) && patterns.contains(pattern1234));
+		PatternAssert.assertContainsPatterns(patterns,pattern1,pattern2,pattern3,pattern4,pattern12,
+				pattern23,pattern34,pattern123,pattern234,pattern1234);
 	}
 
 	@Test
@@ -891,29 +881,15 @@ public class PattExplorerTest {
 		pattern12345678910.addEdge(node7, node8);
 		pattern12345678910.addEdge(node8, node9);
 		pattern12345678910.addEdge(node9, node10);
-
-		assertTrue(patterns.size() == 55 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern5)
-				&& patterns.contains(pattern6) && patterns.contains(pattern7) && patterns.contains(pattern8)
-				&& patterns.contains(pattern9) && patterns.contains(pattern10) && patterns.contains(pattern12)
-				&& patterns.contains(pattern23) && patterns.contains(pattern34) && patterns.contains(pattern45)
-				&& patterns.contains(pattern56) && patterns.contains(pattern67) && patterns.contains(pattern78)
-				&& patterns.contains(pattern89) && patterns.contains(pattern910) && patterns.contains(pattern123)
-				&& patterns.contains(pattern234) && patterns.contains(pattern345) && patterns.contains(pattern456)
-				&& patterns.contains(pattern567) && patterns.contains(pattern678) && patterns.contains(pattern789)
-				&& patterns.contains(pattern8910) && patterns.contains(pattern1234) && patterns.contains(pattern2345)
-				&& patterns.contains(pattern3456) && patterns.contains(pattern4567) && patterns.contains(pattern5678)
-				&& patterns.contains(pattern6789) && patterns.contains(pattern78910) && patterns.contains(pattern12345)
-				&& patterns.contains(pattern23456) && patterns.contains(pattern34567)
-				&& patterns.contains(pattern45678) && patterns.contains(pattern56789)
-				&& patterns.contains(pattern678910) && patterns.contains(pattern123456)
-				&& patterns.contains(pattern234567) && patterns.contains(pattern345678)
-				&& patterns.contains(pattern456789) && patterns.contains(pattern5678910)
-				&& patterns.contains(pattern1234567) && patterns.contains(pattern2345678)
-				&& patterns.contains(pattern3456789) && patterns.contains(pattern45678910)
-				&& patterns.contains(pattern12345678) && patterns.contains(pattern23456789)
-				&& patterns.contains(pattern345678910) && patterns.contains(pattern123456789)
-				&& patterns.contains(pattern2345678910) && patterns.contains(pattern12345678910));
+		
+		PatternAssert.assertContainsPatterns(patterns, pattern1, pattern2, pattern3, pattern4, pattern5, pattern6
+				, pattern7, pattern8, pattern9, pattern10, pattern12, pattern23, pattern34, pattern45, pattern56, pattern67
+				, pattern78, pattern89, pattern910, pattern123, pattern234, pattern345, pattern456, pattern567, pattern678, pattern789
+				, pattern8910, pattern1234, pattern2345, pattern3456, pattern4567, pattern5678, pattern6789, pattern78910
+				, pattern12345, pattern23456, pattern34567, pattern45678, pattern56789, pattern678910, pattern123456,
+				pattern234567, pattern345678, pattern456789, pattern5678910, pattern1234567, pattern2345678, pattern3456789
+				, pattern45678910, pattern12345678, pattern23456789, pattern345678910, pattern123456789, pattern2345678910
+				, pattern12345678910);
 	}
 
 	@Test
@@ -951,14 +927,9 @@ public class PattExplorerTest {
 
 		IGroum pattern123456 = Fixture.createConnectedGroumOfSize(1, 6);
 
-		assertTrue(patterns.size() == 21 && patterns.contains(pattern1) && patterns.contains(pattern2)
-				&& patterns.contains(pattern3) && patterns.contains(pattern4) && patterns.contains(pattern5)
-				&& patterns.contains(pattern6) && patterns.contains(pattern12) && patterns.contains(pattern23)
-				&& patterns.contains(pattern34) && patterns.contains(pattern45) && patterns.contains(pattern56)
-				&& patterns.contains(pattern123) && patterns.contains(pattern234) && patterns.contains(pattern345)
-				&& patterns.contains(pattern456) && patterns.contains(pattern1234) && patterns.contains(pattern2345)
-				&& patterns.contains(pattern3456) && patterns.contains(pattern12345) && patterns.contains(pattern23456)
-				&& patterns.contains(pattern123456));
+		PatternAssert.assertContainsPatterns(patterns, pattern1, pattern2, pattern3, pattern4, pattern5, pattern6
+				, pattern12, pattern23, pattern34, pattern45, pattern56, pattern123, pattern234, pattern345, pattern456
+				, pattern1234, pattern2345, pattern3456, pattern12345, pattern23456, pattern123456);		
 	}
 
 	@Test
