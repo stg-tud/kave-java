@@ -1,5 +1,10 @@
 package cc.kave.commons.model.groum.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,11 +16,6 @@ import cc.kave.commons.model.groum.nodes.IActionNode;
 import cc.kave.commons.model.groum.nodes.IControlNode;
 import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.groum.nodes.impl.ControlNode;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GroumTest {
 
@@ -93,6 +93,31 @@ public class GroumTest {
 		groum2.addEdge(a2, c2);
 
 		assertEquals(groum, groum2);
+	}
+	
+	@Test
+	public void equalityWorksUnordered() {
+		INode node1 = new ActionNode("1", "1");		
+		INode node2 = new ActionNode("2", "2");
+		INode node3 = new ActionNode("3", "3");		
+		IGroum a = new Groum();
+		a.addVertex(node1);
+		a.addVertex(node2);
+		a.addVertex(node3);
+		a.addEdge(node1, node2);
+		a.addEdge(node1, node3);
+		
+		INode node1b = new ActionNode("1", "1");		
+		INode node2b = new ActionNode("2", "2");
+		INode node3b = new ActionNode("3", "3");		
+		IGroum b = new Groum();
+		b.addVertex(node1b);
+		b.addVertex(node3b);
+		b.addVertex(node2b);
+		b.addEdge(node1b, node3b);
+		b.addEdge(node1b, node2b);
+		
+		assertEquals(a,b);				
 	}
 
 	@Test

@@ -10,11 +10,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
+import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.impl.comparator.GroumComparator;
 import cc.kave.commons.model.groum.impl.comparator.GroumIdentComparator;
 import cc.kave.commons.model.groum.impl.comparator.SubGroumComparator;
 import cc.kave.commons.model.groum.impl.comparator.SubGroumIdentComparator;
+import cc.kave.commons.model.groum.nodes.impl.ActionNode;
 import cc.kave.commons.model.pattexplore.NaivSubgraphStrategy;
 import cc.kave.commons.model.pattexplore.Utils;
 
@@ -196,6 +198,43 @@ public class GroumMultimapTest {
 				System.out.println(contrasubgroum.getParent());
 			}
 		}
+	}
+	
+	@Test
+	public void putsUnorderedGroumIntoSameBucket() {
+		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(), new SubGroumIdentComparator());
+		
+		INode node1 = new ActionNode("1", "1");		
+		INode node2 = new ActionNode("2", "2");
+		INode node3 = new ActionNode("3", "3");		
+		ISubGroum a = new SubGroum(null);
+		a.addVertex(node1);
+		a.addVertex(node2);
+		a.addVertex(node3);
+		a.addEdge(node1, node2);
+		a.addEdge(node1, node3);
+		
+		INode node1b = new ActionNode("1", "1");		
+		INode node2b = new ActionNode("2", "2");
+		INode node3b = new ActionNode("3", "3");		
+		ISubGroum b = new SubGroum(null);
+		b.addVertex(node1b);
+		b.addVertex(node3b);
+		b.addEdge(node1b, node3b);
+		b.addVertex(node2b);
+		b.addEdge(node1b, node2b);
+		
+//		treemap.put(a, a);
+//		treemap.put(b, b);
+		
+		treemap.putAll(a, Arrays.asList(a));
+		treemap.putAll(b, Arrays.asList(b));
+//		System.out.println(a);
+//		System.out.println(b);
+//		System.out.println(treemap);
+		assertTrue(treemap.keySet().size() == 1);
+		
+		
 	}
 
 }

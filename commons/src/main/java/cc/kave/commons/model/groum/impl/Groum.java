@@ -65,14 +65,14 @@ public class Groum implements IGroum, Cloneable {
 		}
 	}
 
-	private boolean equals(Groum groum) {
-		if (getAllNodes().size() != groum.getAllNodes().size())
+	private boolean equals(Groum anotherGroum) {
+		if (this.getAllNodes().size() != anotherGroum.getAllNodes().size())
 			return false;
 
 		List<INode> myNodes = new LinkedList<>();
-		myNodes.addAll(getAllNodes());
+		myNodes.addAll(this.getAllNodes());
 		List<INode> otherNodes = new LinkedList<>();
-		otherNodes.addAll(groum.getAllNodes());
+		otherNodes.addAll(anotherGroum.getAllNodes());
 
 		Collections.sort(myNodes);
 		Collections.sort(otherNodes);
@@ -84,7 +84,7 @@ public class Groum implements IGroum, Cloneable {
 			List<INode> mysuccessors = new LinkedList<>();
 			List<INode> othersuccessors = new LinkedList<>();
 			mysuccessors.addAll(getSuccessors(myNodes.get(i)));
-			othersuccessors.addAll(groum.getSuccessors(otherNodes.get(i)));
+			othersuccessors.addAll(anotherGroum.getSuccessors(otherNodes.get(i)));
 			if (mysuccessors.size() != othersuccessors.size())
 				return false;
 

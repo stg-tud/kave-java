@@ -1,8 +1,8 @@
 package cc.kave.commons.model.groum.impl;
 
+import static cc.kave.commons.model.groum.impl.PatternAssert.assertContainsPatterns;
+import static cc.kave.commons.model.groum.impl.PatternAssert.patternsOfSize;
 import static org.junit.Assert.assertTrue;
-
-import static cc.kave.commons.model.groum.impl.PatternAssert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,7 @@ import cc.kave.commons.model.pattexplore.PattExplorer;
 
 public class PattExplorerGraphTest {
 
-	@Test
+	@Test		
 	public void distinguishesPatternsByStructure() {
 		//      1          1     1
 		//    /   \        |     | \
@@ -56,52 +56,63 @@ public class PattExplorerGraphTest {
 		patternB.addVertex(node3b);
 		patternB.addEdge(node1, node2);
 		patternB.addEdge(node2, node3b);
-		
-		assertContainsPatterns(patternsOfSize(actuals, 3), patternA, patternB);
-	}
+		List<ISubGroum> patternsOfSize = patternsOfSize(actuals, 3);		
+		assertContainsPatterns(patternsOfSize, patternA, patternB);
+	}	
+	
 
 	/*
-	 * 			1    			1			1			1				1
-	 * 		 /     \ 			|			|			|			   / \
-	 *      2       4 (!)		2			2			4			  2   4
-	 *    /   \   /     		|			|			|			/   \
-	 *   3  ->  4      			3			4			4		   3  -> 4
-	 *           \				|			|			|
-	 *            5				4			5			5
+	 * 			1    			1			1
+	 * 		 /     \ 			|		   / \
+	 *      2       3 (!)		2		  2   3
+	 *    /   \   /     		|		
+	 *   3  ->  4      			3			   
+	 *           \				|	
+	 *            5				4	
 	 * 							|
 	 * 							5
 	 */
-	@Test
+	@Test		
 	public void findsTwoNodesPattern() {
 		IPattExplorer uut = new PattExplorer(2);
-		IGroum listGroum = Fixture.createConnectedGroumOfSize(5);
+		IGroum listGroum = Fixture.createConnectedGroumOfSize(3);
+		
 		IGroum complexGroum = new Groum();
 		INode node1 = new ActionNode("1", "1");
 		INode node2 = new ActionNode("2", "2");
-		INode node3a = new ActionNode("3a", "3a");
+		INode node3a = new ActionNode("3", "3");
 		INode node3b = new ActionNode("3", "3");
-		INode node4 = new ActionNode("4", "4");
-		INode node5 = new ActionNode("5", "5");
+//		INode node4 = new ActionNode("4", "4");
+//		INode node5 = new ActionNode("5", "5");
 		complexGroum.addVertex(node1);
 		complexGroum.addVertex(node2);
 		complexGroum.addVertex(node3a);
 		complexGroum.addVertex(node3b);
-		complexGroum.addVertex(node4);
-		complexGroum.addVertex(node5);
-
+//		complexGroum.addVertex(node4);
+//		complexGroum.addVertex(node5);
 		complexGroum.addEdge(node1, node2);
 		complexGroum.addEdge(node1, node3a);
-		complexGroum.addEdge(node2, node4);
+//		complexGroum.addEdge(node2, node4);
 		complexGroum.addEdge(node2, node3b);
-		complexGroum.addEdge(node3a, node4);
-		complexGroum.addEdge(node3b, node4);
-		complexGroum.addEdge(node4, node5);
+//		complexGroum.addEdge(node3a, node4);
+//		complexGroum.addEdge(node3b, node4);
+//		complexGroum.addEdge(node4, node5);
 		
-		IGroum complexGroumSmall = new Groum();
+		IGroum structuredGroum = new Groum();
+		structuredGroum.addVertex(node1);
+		structuredGroum.addVertex(node2);
+		structuredGroum.addVertex(node3a);
+		structuredGroum.addEdge(node1, node2);
+		structuredGroum.addEdge(node1, node3a);
+		
+		IGroum patternA = Fixture.createConnectedGroumOfSize(3);		
 		
 
-		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(complexGroum, listGroum));
-		assertTrue(patterns.size() == 15);
+		List<ISubGroum> actuals = uut.explorePatterns(Arrays.asList(complexGroum,  structuredGroum, listGroum));
+		
+		List<ISubGroum> patternsOfSize = patternsOfSize(actuals, 3);
+		System.out.println(patternsOfSize);
+		assertContainsPatterns(patternsOfSize, patternA, structuredGroum);
 	}
 
 	/*
@@ -116,7 +127,7 @@ public class PattExplorerGraphTest {
 	 *                      5				5
 	 *                       
 	 */
-	@Test	
+	@Test			
 	public void findsPatternsInTwoGroums() {
 		IPattExplorer uut = new PattExplorer(3);
 		IGroum listGroum = Fixture.createConnectedGroumOfSize(5);
@@ -157,7 +168,7 @@ public class PattExplorerGraphTest {
 	 *                         	  \	             /						   \
 	 *                        	   4            4		                    4         				
 	 */
-	@Test
+	@Test		
 	public void findsPatternsInThreeGroums() {
 		IPattExplorer uut = new PattExplorer(6);
 		IGroum groumA = new Groum();
@@ -238,6 +249,6 @@ public class PattExplorerGraphTest {
 
 		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groumA, groumB, groumC));
 		assertTrue(patterns.size() == 3);
-	}
+	}		
 
 }
