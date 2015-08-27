@@ -20,7 +20,6 @@ import cc.kave.commons.model.pattexplore.PattExplorer;
 public class PattExplorerGraphTest {
 
 	@Test		
-	@Ignore
 	public void distinguishesPatternsByStructure() {
 		//      1          1     1
 		//    /   \        |     | \
@@ -129,8 +128,7 @@ public class PattExplorerGraphTest {
 	 *                      5				5
 	 *                       
 	 */
-	@Test			
-	@Ignore
+	@Test
 	public void findsPatternsInTwoGroums() {
 		IPattExplorer uut = new PattExplorer(3);
 		IGroum listGroum = Fixture.createConnectedGroumOfSize(5);
@@ -171,8 +169,7 @@ public class PattExplorerGraphTest {
 	 *                         	  \	             /						   \
 	 *                        	   4            4		                    4         				
 	 */
-	@Test	
-	@Ignore
+	@Test
 	public void findsPatternsInThreeGroums() {
 		IPattExplorer uut = new PattExplorer(6);
 		IGroum groumA = new Groum();
