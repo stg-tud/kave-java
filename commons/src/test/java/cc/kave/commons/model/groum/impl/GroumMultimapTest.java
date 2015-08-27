@@ -1,7 +1,5 @@
 package cc.kave.commons.model.groum.impl;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +22,9 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.collect.TreeMultiset;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GroumMultimapTest {
 
@@ -48,7 +49,7 @@ public class GroumMultimapTest {
 
 	}
 
-	@Test	
+	@Test
 	public void comparatorWorksForSubgroums() {
 		TreeMultiset<ISubGroum> treeset = TreeMultiset.create(new SubGroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(2);
@@ -75,7 +76,7 @@ public class GroumMultimapTest {
 
 	}
 
-	@Test	
+	@Test
 	public void removesSubset() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -91,7 +92,7 @@ public class GroumMultimapTest {
 		assertTrue(treeset.size() == 3);
 	}
 
-	@Test	
+	@Test
 	public void removesSeveralSubsets() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -111,7 +112,7 @@ public class GroumMultimapTest {
 		assertTrue(treeset.size() == 3 && treeset.elementSet().size() == 2);
 	}
 
-	@Test	
+	@Test
 	public void iteratesOverOccurences() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -199,42 +200,75 @@ public class GroumMultimapTest {
 			}
 		}
 	}
-	
+
 	@Test
 	public void putsUnorderedGroumIntoSameBucket() {
-		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(), new SubGroumIdentComparator());
-		
-		INode node1 = new ActionNode("1", "1");		
+		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
+
+		INode node1 = new ActionNode("1", "1");
 		INode node2 = new ActionNode("2", "2");
-		INode node3 = new ActionNode("3", "3");		
+		INode node3 = new ActionNode("3", "3");
 		ISubGroum a = new SubGroum(null);
 		a.addVertex(node1);
 		a.addVertex(node2);
 		a.addVertex(node3);
 		a.addEdge(node1, node2);
 		a.addEdge(node1, node3);
-		
-		INode node1b = new ActionNode("1", "1");		
+
+		INode node1b = new ActionNode("1", "1");
 		INode node2b = new ActionNode("2", "2");
-		INode node3b = new ActionNode("3", "3");		
+		INode node3b = new ActionNode("3", "3");
 		ISubGroum b = new SubGroum(null);
 		b.addVertex(node1b);
 		b.addVertex(node3b);
 		b.addEdge(node1b, node3b);
 		b.addVertex(node2b);
 		b.addEdge(node1b, node2b);
-		
-//		treemap.put(a, a);
-//		treemap.put(b, b);
-		
+
+		// treemap.put(a, a);
+		// treemap.put(b, b);
+
 		treemap.putAll(a, Arrays.asList(a));
 		treemap.putAll(b, Arrays.asList(b));
-//		System.out.println(a);
-//		System.out.println(b);
-//		System.out.println(treemap);
+		// System.out.println(a);
+		// System.out.println(b);
+		// System.out.println(treemap);
 		assertTrue(treemap.keySet().size() == 1);
-		
-		
+
+	}
+
+	@Test
+	public void comparatorProblem() {
+		ActionNode node1 = new ActionNode("1", "1");
+		ActionNode node2 = new ActionNode("2", "2");
+		ISubGroum groum1 = new SubGroum();
+		groum1.addVertex(node1);
+		groum1.addVertex(node2);
+		groum1.addEdge(node1, node2);
+
+		ActionNode node1a = new ActionNode("1", "1");
+		ActionNode node2a = new ActionNode("2", "2");
+		ISubGroum groum2 = new SubGroum();
+		groum2.addVertex(node2a);
+		groum2.addVertex(node1a);
+		groum2.addEdge(node1a, node2a);
+
+		ActionNode node1b = new ActionNode("1", "1");
+		ActionNode node2b = new ActionNode("3", "3");
+		ISubGroum groum3 = new SubGroum();
+		groum3.addVertex(node1b);
+		groum3.addVertex(node2b);
+		groum3.addEdge(node1b, node2b);
+
+		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
+				new SubGroumIdentComparator());
+		treemap.put(groum3, groum3);
+		treemap.put(groum1, groum1);
+		treemap.put(groum2, groum2);
+
+		assertEquals(2, treemap.keySet().size());
+		assertTrue(treemap.keySet().containsAll(Arrays.asList(groum1, groum3)));
 	}
 
 }
