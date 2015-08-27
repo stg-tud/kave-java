@@ -51,7 +51,7 @@ public class SubGroum extends Groum implements ISubGroum {
 	}
 	
 	@Override
-	public List<ISubGroum> extensibleWithMultiple(ISubGroum groum) {
+	public List<ISubGroum> extensibleWith(ISubGroum groum) {
 		INode extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
@@ -108,8 +108,8 @@ public class SubGroum extends Groum implements ISubGroum {
 	}
 	
 
-	@Override
-	public ISubGroum extensibleWith(ISubGroum groum) {
+	@Deprecated
+	public ISubGroum extensibleWithOneNodeMultipleEdge(ISubGroum groum) {
 		INode extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
@@ -143,7 +143,7 @@ public class SubGroum extends Groum implements ISubGroum {
 			return null;
 	}
 	
-	
+	@Deprecated
 	public ISubGroum extensibleWithGreedy(ISubGroum groum) {
 		INode extendingNode = groum.getAllNodes().iterator().next();
 
@@ -173,7 +173,7 @@ public class SubGroum extends Groum implements ISubGroum {
 	}
 
 	@Deprecated
-	public ISubGroum extensibleWithOneEdge(ISubGroum groum) {
+	public ISubGroum extensibleWithOneNodeOneEdge(ISubGroum groum) {
 		INode leaf = getLeaf();
 
 		INode extendingNode = groum.getAllNodes().iterator().next();

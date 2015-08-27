@@ -203,7 +203,7 @@ public class NaivSubgraphStrategyTest {
 		testNode.addDependency("strbuf");
 		testGroum.addVertex(testNode);
 
-		ISubGroum extendedSubGroum = subgroum.extensibleWith(testGroum);
+		ISubGroum extendedSubGroum = subgroum.extensibleWith(testGroum).get(0);
 
 		assertTrue(extendedSubGroum.getAllNodes().size() == 4 && extendedSubGroum.getLeaf().equals(testNode));
 	}

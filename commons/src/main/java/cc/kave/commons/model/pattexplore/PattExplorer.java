@@ -44,17 +44,13 @@ public class PattExplorer implements IPattExplorer {
 
 		TreeMultimap<ISubGroum, ISubGroum> explored = TreeMultimap.create(new SubGroumComparator(),
 				new SubGroumIdentComparator());
-//		explored.putAll(L);
 		
 		for (ISubGroum pattern : L.keySet()) {
-			TreeMultimap<ISubGroum, ISubGroum> newexplored = exploreExt(pattern, L, D);
-			for (ISubGroum key: newexplored.keySet()) {
-				explored.putAll(key, newexplored.get(key));
-			}
+			explored.putAll(explore(pattern, L, D));			
 		}
-		for (ISubGroum key: explored.keySet()) {
-			L.putAll(key, explored.get(key));
-		}		
+		
+		L.putAll(explored);
+				
 		
 		LinkedList<ISubGroum> distinctPatterns = new LinkedList<>();
 		distinctPatterns.addAll(L.keySet());
@@ -63,7 +59,7 @@ public class PattExplorer implements IPattExplorer {
 	}
 
 	
-	private TreeMultimap<ISubGroum, ISubGroum> exploreExt(ISubGroum P, TreeMultimap<ISubGroum, ISubGroum> L, List<IGroum> D) {
+	private TreeMultimap<ISubGroum, ISubGroum> explore(ISubGroum P, TreeMultimap<ISubGroum, ISubGroum> L, List<IGroum> D) {
 		TreeMultimap<ISubGroum, ISubGroum> patterns = TreeMultimap.create(new SubGroumComparator(),
 				new SubGroumIdentComparator());
 		TreeMultimap<ISubGroum, ISubGroum> newPatterns = TreeMultimap.create(new SubGroumComparator(),
@@ -78,7 +74,7 @@ public class PattExplorer implements IPattExplorer {
 						new SubGroumIdentComparator());
 
 				for (ISubGroum occurrence : patterns.get(P)) {
-					List<ISubGroum> candidates = occurrence.extensibleWithMultiple(U);
+					List<ISubGroum> candidates = occurrence.extensibleWith(U);
 					if (candidates != null)
 						for (ISubGroum candidate: candidates) {						
 								Q.put(candidate, candidate);						
@@ -95,51 +91,11 @@ public class PattExplorer implements IPattExplorer {
 //							patterns.putAll(key, newPatterns.get(key));
 //						}
 						
-						TreeMultimap<ISubGroum, ISubGroum> explored = exploreExt(candidate, patterns, D);
-						for (ISubGroum key: explored.keySet()) {
-							newPatterns.putAll(key, explored.get(key));
-							patterns.putAll(key, explored.get(key));
-						}														
-					}
-				}
-			}
-		}
-		return newPatterns;
-	}
-	
-	
-	private TreeMultimap<ISubGroum, ISubGroum> explore(ISubGroum P, TreeMultimap<ISubGroum, ISubGroum> L, List<IGroum> D) {
-		TreeMultimap<ISubGroum, ISubGroum> patterns = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
-		TreeMultimap<ISubGroum, ISubGroum> newPatterns = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
-		
-		patterns.putAll(L);
-		
-		for (ISubGroum U : L.keySet()) {
-			if (U.getAllNodes().size() == 1) {
-				
-				TreeMultimap<ISubGroum, ISubGroum> Q = TreeMultimap.create(new SubGroumComparator(),
-						new SubGroumIdentComparator());
-				
-				for (ISubGroum occurrence : patterns.get(P)) {
-					ISubGroum candidate = occurrence.extensibleWith(U);
-					if (candidate != null)
-						Q.put(candidate, candidate);
-				}
-				
-				for (ISubGroum candidate : Q.keySet()) {
-					if (Q.get(candidate).size() >= threshold) {
-						newPatterns.putAll(candidate, Q.get(candidate));
-						
-						for (ISubGroum key: newPatterns.keySet()) {
-							patterns.putAll(key, newPatterns.get(key));
-						}
-						
 						TreeMultimap<ISubGroum, ISubGroum> explored = explore(candidate, patterns, D);
 						for (ISubGroum key: explored.keySet()) {
-							newPatterns.putAll(key, explored.get(key));
-						}						
+							newPatterns.putAll(explored);
+//							patterns.putAll(key, explored.get(key));
+						}														
 					}
 				}
 			}
