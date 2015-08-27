@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.IGroum;
@@ -932,6 +933,7 @@ public class PattExplorerTest {
 	}
 
 	@Test	
+	@Ignore
 	public void findsGenerated30NodesPatterns() {
 		PattExplorer uut = new PattExplorer(1);
 		List<IGroum> listOfXGroums = Fixture.getListOfXGroums(30);

@@ -29,26 +29,7 @@ public class SubGroum extends Groum implements ISubGroum {
 	public IGroum getParent() {
 		return parent;
 	}
-
-	@Deprecated
-	public ISubGroum extensibleWithOld(ISubGroum groum) {
-		INode leaf = getLeaf();
-		INode root = groum.getRoot();
-		Set<INode> successors = parent.getSuccessors(leaf);
-		if (successors.size() == 0)
-			return null;
-		else {
-			if (successors.iterator().next().equals(root)) {
-				ISubGroum extendedSubgroum = (ISubGroum) this.clone();
-				extendedSubgroum.addVertex(root);
-				extendedSubgroum.addEdge(leaf, root);
-				return extendedSubgroum;
-			} else {
-				return null;
-			}
-		}
-
-	}
+	
 	
 	@Override
 	public List<ISubGroum> extensibleWith(ISubGroum groum) {
@@ -141,60 +122,5 @@ public class SubGroum extends Groum implements ISubGroum {
 			return extendedSubgroum;
 		else
 			return null;
-	}
-	
-	@Deprecated
-	public ISubGroum extensibleWithGreedy(ISubGroum groum) {
-		INode extendingNode = groum.getAllNodes().iterator().next();
-
-		if (extendingNode == null)
-			return null;
-
-		for (INode node : this.getAllNodes()) {
-
-			Set<INode> successors = parent.getSuccessors(node);
-			if (successors.size() == 0)
-				continue;
-			else {
-				for (INode candidate : successors) {
-					if (!(this.containsNode(candidate)))
-						if (candidate.equals(extendingNode)) {
-							ISubGroum extendedSubgroum = (ISubGroum) this.clone();
-							extendedSubgroum.addVertex(candidate);
-							extendedSubgroum.addEdge(node, candidate);
-							return extendedSubgroum;
-						} else {
-							continue;
-						}
-				}
-			}
-		}
-		return null;
-	}
-
-	@Deprecated
-	public ISubGroum extensibleWithOneNodeOneEdge(ISubGroum groum) {
-		INode leaf = getLeaf();
-
-		INode extendingNode = groum.getAllNodes().iterator().next();
-		if (extendingNode == null)
-			return null;
-
-		Set<INode> successors = parent.getSuccessors(leaf);
-		if (successors.size() == 0)
-			return null;
-		else {
-			INode candidate = successors.iterator().next();
-			if (candidate.equals(extendingNode)) {
-				ISubGroum extendedSubgroum = (ISubGroum) this.clone();
-				extendedSubgroum.addVertex(candidate);
-				extendedSubgroum.addEdge(leaf, candidate);
-				return extendedSubgroum;
-			} else {
-				return null;
-			}
-		}
-
-	}
-
+	}			
 }
