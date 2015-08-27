@@ -255,4 +255,66 @@ public class PattExplorerGraphTest {
 		assertTrue(patterns.size() == 3);
 	}		
 
+	@Test
+	public void countsOverlappingInstanesOnlyOnce1() {
+		INode node1 = new ActionNode("1", "1");
+		INode node2a = new ActionNode("2", "2");
+		INode node2b = new ActionNode("2", "2");
+		IGroum overlappingGroum = createGroum(node1, node2a, node2b);
+		overlappingGroum.addEdge(node1, node2a);
+		overlappingGroum.addEdge(node2a, node2b);
+
+		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+
+		IGroum pattern1 = createGroum(node2a);
+		assertContainsPatterns(patterns, pattern1);
+	}
+
+	@Test
+	public void countsOverlappingInstanesOnlyOnce2() {
+		INode node1 = new ActionNode("1", "1");
+		INode node2a = new ActionNode("2", "2");
+		INode node2b = new ActionNode("2", "2");
+		IGroum overlappingGroum = createGroum(node1, node2a, node2b);
+		overlappingGroum.addEdge(node1, node2a);
+		overlappingGroum.addEdge(node1, node2b);
+
+		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+
+		IGroum pattern1 = createGroum(node2a);
+		assertContainsPatterns(patterns, pattern1);
+	}
+
+	@Test
+	public void findsMultipleInstanceInOneGraph() {
+		INode node1a = new ActionNode("1", "1");
+		INode node1b = new ActionNode("1", "1");
+		INode node2a = new ActionNode("2", "2");
+		INode node2b = new ActionNode("2", "2");
+		IGroum overlappingGroum = createGroum(node1a, node1b, node2a, node2b);
+		overlappingGroum.addEdge(node1a, node2a);
+		overlappingGroum.addEdge(node1a, node1b);
+		overlappingGroum.addEdge(node1b, node2b);
+
+		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+
+		IGroum pattern1 = createGroum(node1a, node2a);
+		pattern1.addEdge(node1a, node2a);
+		patterns = patternsOfSize(patterns, 2);
+		assertContainsPatterns(patterns, pattern1);
+	}
+
+	private List<ISubGroum> findPatternsWithMinFrequency(int threshold, IGroum... groums) {
+		IPattExplorer uut = new PattExplorer(threshold);
+		return uut.explorePatterns(Arrays.asList(groums));
+	}
+
+	private IGroum createGroum(INode... nodes) {
+		Groum groum = new Groum();
+		for (INode node : nodes) {
+			groum.addVertex(node);
+		}
+		return groum;
+	}
+
 }
