@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.expressions.simple;
 
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 

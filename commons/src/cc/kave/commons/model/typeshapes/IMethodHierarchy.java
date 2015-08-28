@@ -1,7 +1,7 @@
 package cc.kave.commons.model.typeshapes;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import cc.kave.commons.model.names.MethodName;
 
@@ -9,11 +9,10 @@ public interface IMethodHierarchy {
 	/// <summary>
 	/// The name of a method.
 	/// </summary>
-	@Nonnull
+	@NonNull
 	MethodName getElement();
 
-	@Nonnull
-	void setElement(MethodName name);
+	void setElement(@NonNull MethodName name);
 
 	/// <summary>
 	/// The implementation of the enclosing method that is referred to by
@@ -23,7 +22,6 @@ public interface IMethodHierarchy {
 	@Nullable
 	MethodName getSuper();
 
-	@Nullable
 	void setSuper(MethodName name);
 
 	/// <summary>
@@ -35,7 +33,6 @@ public interface IMethodHierarchy {
 	@Nullable
 	MethodName getFirst();
 
-	@Nullable
 	void setFirst(MethodName name);
 
 	/// <summary>

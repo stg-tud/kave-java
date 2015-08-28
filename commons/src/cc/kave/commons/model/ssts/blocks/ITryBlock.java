@@ -2,19 +2,19 @@ package cc.kave.commons.model.ssts.blocks;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import cc.kave.commons.model.ssts.IStatement;
 
 public interface ITryBlock extends IStatement {
 
-	@Nonnull
+	@NonNull
 	List<IStatement> getBody();
 
-	@Nonnull
+	@NonNull
 	List<ICatchBlock> getCatchBlocks();
 
-	@Nonnull
+	@NonNull
 	List<IStatement> getFinally();
 
 }

@@ -42,9 +42,8 @@ Export-Package: cc.kave.commons.model.events,
  cc.recommenders.exceptions,
  cc.recommenders.io
 Require-Bundle: com.google.gson,
- org.apache.commons.io,
  com.google.guava,
- org.eclipse.jdt.annotation,
- com.google.code.findbugs.jsr305,
  org.apache.commons.lang3,
+ org.apache.commons.io,
+ org.eclipse.jdt.annotation
  org.jgrapht.core

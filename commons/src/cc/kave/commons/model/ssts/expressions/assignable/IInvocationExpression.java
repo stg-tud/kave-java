@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.expressions.assignable;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -11,12 +11,12 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public interface IInvocationExpression extends IAssignableExpression {
 
-	@Nonnull
+	@NonNull
 	IVariableReference getReference();
 
-	@Nonnull
+	@NonNull
 	MethodName getMethodName();
 
-	@Nonnull
+	@NonNull
 	List<ISimpleExpression> getParameters();
 }

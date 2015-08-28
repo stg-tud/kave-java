@@ -2,17 +2,16 @@ package cc.kave.commons.model.typeshapes;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 public interface ITypeShape {
 	/// <summary>
 	/// A description of the enclosing class, including its parent class and
 	/// implemented interfaces.
 	/// </summary>
-	@Nonnull
+	@NonNull
 	ITypeHierarchy getTypeHierarchy();
 
-	@Nonnull
 	void setTypeHierarchy(ITypeHierarchy typeHierarchy);
 
 	/// <summary>
@@ -20,10 +19,9 @@ public interface ITypeShape {
 	/// information about the first and super
 	/// declaration).
 	/// </summary>
-	@Nonnull
+	@NonNull
 	Set<IMethodHierarchy> getMethodHierarchies();
 
-	@Nonnull
 	void setMethodHierarchies(Set<IMethodHierarchy> methodHierarchies);
 
 }

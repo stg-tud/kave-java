@@ -2,8 +2,8 @@ package cc.kave.commons.model.typeshapes;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import cc.kave.commons.model.names.TypeName;
 
@@ -11,7 +11,7 @@ public interface ITypeHierarchy {
 	/// <summary>
 	/// The type at this level in the type hierarchy.
 	/// </summary>
-	@Nonnull
+	@NonNull
 	TypeName getElement();
 
 	/// <summary>
@@ -23,7 +23,7 @@ public interface ITypeHierarchy {
 	/// <summary>
 	/// The interfaces directly implemented by the type at this level.
 	/// </summary>
-	@Nonnull
+	@NonNull
 
 	Set<ITypeHierarchy> getImplements();
 

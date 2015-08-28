@@ -16,12 +16,12 @@
 
 package cc.kave.commons.model.events.completionevents;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 public interface IProposalSelection {
 
-	@Nonnull
+	@NonNull
 	IProposal getProposal();
 
 	@Nullable

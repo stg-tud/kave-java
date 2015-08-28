@@ -49,9 +49,6 @@
 									<id>com.google.code.gson:gson:2.3.1</id>
 								</artifact>
 								<artifact>
-									<id>org.codehaus.mojo:findbugs-maven-plugin:3.0.1</id>
-								</artifact>
-								<artifact>
 									<id>org.assertj:assertj-core:3.1.0</id>
 								</artifact>
 								<artifact>

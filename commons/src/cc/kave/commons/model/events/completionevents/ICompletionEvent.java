@@ -18,27 +18,27 @@ package cc.kave.commons.model.events.completionevents;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import cc.kave.commons.model.events.Trigger;
 
 public interface ICompletionEvent {
 
-	@Nonnull
+	@NonNull
 	public Context getContext();
 
-	@Nonnull
+	@NonNull
 	public List<IProposal> getProposalCollection();
 
-	@Nonnull
+	@NonNull
 	public String getPrefix();
 
-	@Nonnull
+	@NonNull
 	public List<IProposalSelection> getSelections();
 
-	@Nonnull
+	@NonNull
 	public Trigger getTerminatedBy();
 
-	@Nonnull
+	@NonNull
 	public TerminationState getTerminatedState();
 }

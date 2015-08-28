@@ -79,8 +79,9 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 
 			c.text(" : ");
 
-			if (c.typeShape.getTypeHierarchy().hasSuperclass() && c.typeShape.getTypeHierarchy().getExtends() != null) {
-				c.type(c.typeShape.getTypeHierarchy().getExtends().getElement());
+			ITypeHierarchy extends1 = c.typeShape.getTypeHierarchy().getExtends();
+			if (c.typeShape.getTypeHierarchy().hasSuperclass() && extends1 != null) {
+				c.type(extends1.getElement());
 
 				if (c.typeShape.getTypeHierarchy().isImplementingInterfaces()) {
 					c.text(", ");
@@ -428,8 +429,9 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(ICompletionExpression entity, SSTPrintingContext c) {
-		if (entity.getObjectReference() != null) {
-			c.text(entity.getObjectReference().getIdentifier()).text(".");
+		IVariableReference objectReference = entity.getObjectReference();
+		if (objectReference != null) {
+			c.text(objectReference.getIdentifier()).text(".");
 		} else if (entity.getTypeReference() != null) {
 			c.type(entity.getTypeReference()).text(".");
 		}
@@ -505,8 +507,9 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IConstantValueExpression expr, SSTPrintingContext c) {
-		if (expr.getValue() != null) {
-			String value = !expr.getValue().isEmpty() ? expr.getValue() : "...";
+		String value2 = expr.getValue();
+		if (value2 != null) {
+			String value = !value2.isEmpty() ? value2 : "...";
 
 			// Double.TryParse(expr.Value, out parsed
 			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")

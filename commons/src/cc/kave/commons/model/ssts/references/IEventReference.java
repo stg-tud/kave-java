@@ -1,11 +1,11 @@
 package cc.kave.commons.model.ssts.references;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import cc.kave.commons.model.names.EventName;
 
 public interface IEventReference extends IAssignableReference, IMemberReference {
 
-	@Nonnull
+	@NonNull
 	EventName getEventName();
 }
