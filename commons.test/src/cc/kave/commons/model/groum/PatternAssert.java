@@ -18,7 +18,7 @@ public class PatternAssert {
 		assertTrue(actuals.containsAll(expecteds));
 	}
 
-	static List<ISubGroum> patternsOfSize(List<ISubGroum> actuals, int size) {
+	static List<ISubGroum> filterBySize(List<ISubGroum> actuals, int size) {
 		return actuals.stream().filter(g -> (g.getAllNodes().size() == size)).collect(Collectors.toList());
 	}
 

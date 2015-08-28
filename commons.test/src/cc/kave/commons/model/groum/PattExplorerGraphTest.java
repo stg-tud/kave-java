@@ -13,7 +13,7 @@ import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.IPattExplorer;
 import cc.kave.commons.model.pattexplore.PattExplorer;
 import static cc.kave.commons.model.groum.PatternAssert.assertContainsPatterns;
-import static cc.kave.commons.model.groum.PatternAssert.patternsOfSize;
+import static cc.kave.commons.model.groum.PatternAssert.filterBySize;
 
 import static org.junit.Assert.assertTrue;
 
@@ -57,7 +57,7 @@ public class PattExplorerGraphTest {
 		patternB.addVertex(node3b);
 		patternB.addEdge(node1, node2);
 		patternB.addEdge(node2, node3b);
-		List<ISubGroum> patternsOfSize = patternsOfSize(actuals, 3);
+		List<ISubGroum> patternsOfSize = filterBySize(actuals, 3);
 		assertContainsPatterns(patternsOfSize, patternA, patternB);
 	}
 
@@ -109,7 +109,7 @@ public class PattExplorerGraphTest {
 		IGroum patternB = Fixture.createConnectedGroumOfSize(3, 5);
 
 		List<ISubGroum> actuals = uut.explorePatterns(Arrays.asList(complexGroum, structuredGroum, listGroum));
-		List<ISubGroum> patternsOfSize = patternsOfSize(actuals, 3);
+		List<ISubGroum> patternsOfSize = filterBySize(actuals, 3);
 		assertContainsPatterns(patternsOfSize, patternA, patternB, structuredGroum);
 	}
 
@@ -294,7 +294,7 @@ public class PattExplorerGraphTest {
 
 		IGroum pattern1 = createGroum(node1a, node2a);
 		pattern1.addEdge(node1a, node2a);
-		patterns = patternsOfSize(patterns, 2);
+		patterns = filterBySize(patterns, 2);
 		assertContainsPatterns(patterns, pattern1);
 	}
 
@@ -319,7 +319,7 @@ public class PattExplorerGraphTest {
 		pattern1.addEdge(node1, node2);
 		pattern1.addEdge(node1, node3a);
 		pattern1.addEdge(node2, node3a);
-		patterns = patternsOfSize(patterns, 3);
+		patterns = filterBySize(patterns, 3);
 		assertContainsPatterns(patterns, pattern1);
 	}
 
@@ -335,7 +335,7 @@ public class PattExplorerGraphTest {
 
 		List<ISubGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
-		patterns = patternsOfSize(patterns, 3);
+		patterns = filterBySize(patterns, 3);
 		assertContainsPatterns(patterns, groum);
 	}
 
