@@ -8,14 +8,11 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.IGroum;
-import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumIdentComparator;
 import cc.kave.commons.model.groum.nodes.ActionNode;
-import cc.kave.commons.model.groum.nodes.IActionNode;
 
 import com.google.common.collect.TreeMultimap;
 
@@ -25,26 +22,26 @@ public class GroumComparatorTest {
 	public void comparatorProblem() {
 		ActionNode node1 = new ActionNode("1", "1");
 		ActionNode node2 = new ActionNode("2", "2");
-		ISubGroum groum1 = new SubGroum();
+		SubGroum groum1 = new SubGroum();
 		groum1.addVertex(node1);
 		groum1.addVertex(node2);
 		groum1.addEdge(node1, node2);
 
 		ActionNode node1a = new ActionNode("1", "1");
 		ActionNode node2a = new ActionNode("2", "2");
-		ISubGroum groum2 = new SubGroum();
+		SubGroum groum2 = new SubGroum();
 		groum2.addVertex(node2a);
 		groum2.addVertex(node1a);
 		groum2.addEdge(node1a, node2a);
 
 		ActionNode node1b = new ActionNode("1", "1");
 		ActionNode node2b = new ActionNode("3", "3");
-		ISubGroum groum3 = new SubGroum();
+		SubGroum groum3 = new SubGroum();
 		groum3.addVertex(node1b);
 		groum3.addVertex(node2b);
 		groum3.addEdge(node1b, node2b);
 
-		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
+		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
 				new SubGroumIdentComparator());
 		treemap.put(groum3, groum3);
 		treemap.put(groum1, groum1);
@@ -56,36 +53,36 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void NonemptyGroumIsGreaterThanEmptyGroum() {
-		IGroum empty = new Groum();
-		IGroum nonempty = Fixture.createConnectedGroumOfSize(2);
+		Groum empty = new Groum();
+		Groum nonempty = Fixture.createConnectedGroumOfSize(2);
 		GroumComparator uut = new GroumComparator();
 		assertEquals(1, uut.compare(nonempty, empty));
 	}
 	
 	@Test
 	public void emptyGroumIsLessThanNonemptyGroum() {
-		IGroum empty = new Groum();
-		IGroum nonempty = Fixture.createConnectedGroumOfSize(2);
+		Groum empty = new Groum();
+		Groum nonempty = Fixture.createConnectedGroumOfSize(2);
 		GroumComparator uut = new GroumComparator();
 		assertEquals(-1, uut.compare(empty, nonempty));
 	}
 	
 	@Test
 	public void emptyGroumIsEqualToEmptyGroum() {
-		IGroum empty = new Groum();
-		IGroum otherempty = new Groum();
+		Groum empty = new Groum();
+		Groum otherempty = new Groum();
 		GroumComparator uut = new GroumComparator();
 		assertEquals(0, uut.compare(empty, otherempty));
 	}
 	
 	@Test
 	public void findsEdgeCountDifference() {
-		IGroum groum = Fixture.createConnectedGroumOfSize(3);
+		Groum groum = Fixture.createConnectedGroumOfSize(3);
 		
-		IGroum groum_less_eges = new Groum();
-		IActionNode a = new ActionNode("1","1");
-		IActionNode b = new ActionNode("2","2");
-		IActionNode c = new ActionNode("3","3");
+		Groum groum_less_eges = new Groum();
+		INode a = new ActionNode("1","1");
+		INode b = new ActionNode("2","2");
+		INode c = new ActionNode("3","3");
 		groum_less_eges.addVertex(a);
 		groum_less_eges.addVertex(b);
 		groum_less_eges.addVertex(c);
@@ -97,18 +94,18 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsEqualGroumsWithDifferentOrder() {
-		IActionNode node1 = new ActionNode("1","1");
-		IActionNode node2 = new ActionNode("2","2");
-		IActionNode node3 = new ActionNode("3","3");
+		INode node1 = new ActionNode("1","1");
+		INode node2 = new ActionNode("2","2");
+		INode node3 = new ActionNode("3","3");
 		
-		IGroum groum1 = new SubGroum();
+		Groum groum1 = new SubGroum();
 		groum1.addVertex(node1);
 		groum1.addVertex(node2);
 		groum1.addVertex(node3);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node2, node3);
 		
-		IGroum groum2 = new SubGroum();
+		Groum groum2 = new SubGroum();
 		groum2.addVertex(node2);
 		groum2.addVertex(node3);
 		groum2.addEdge(node2, node3);
@@ -121,12 +118,12 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsDifferenceInSuccessorCount() {
-		IActionNode node1 = new ActionNode("1","1");
-		IActionNode node2 = new ActionNode("2","2");
-		IActionNode node3 = new ActionNode("3","3");
-		IActionNode node4 = new ActionNode("4","4");
+		INode node1 = new ActionNode("1","1");
+		INode node2 = new ActionNode("2","2");
+		INode node3 = new ActionNode("3","3");
+		INode node4 = new ActionNode("4","4");
 		
-		ISubGroum groum1 = new SubGroum();
+		SubGroum groum1 = new SubGroum();
 		groum1.addVertex(node1);
 		groum1.addVertex(node2);
 		groum1.addVertex(node3);
@@ -135,7 +132,7 @@ public class GroumComparatorTest {
 		groum1.addEdge(node2, node3);
 		groum1.addEdge(node2, node4);
 		
-		ISubGroum groum2 = new SubGroum();
+		SubGroum groum2 = new SubGroum();
 		groum2.addVertex(node1);
 		groum2.addVertex(node2);
 		groum2.addVertex(node3);
@@ -150,12 +147,12 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsDifferenceInSuccessor() {
-		IActionNode node1 = new ActionNode("1","1");
-		IActionNode node2 = new ActionNode("2","2");
-		IActionNode node3 = new ActionNode("3","3");
-		IActionNode node4 = new ActionNode("4","4");
+		INode node1 = new ActionNode("1","1");
+		INode node2 = new ActionNode("2","2");
+		INode node3 = new ActionNode("3","3");
+		INode node4 = new ActionNode("4","4");
 		
-		ISubGroum groum1 = new SubGroum();
+		SubGroum groum1 = new SubGroum();
 		groum1.addVertex(node1);
 		groum1.addVertex(node2);
 		groum1.addVertex(node3);
@@ -164,7 +161,7 @@ public class GroumComparatorTest {
 		groum1.addEdge(node1, node3);
 		groum1.addEdge(node2, node4);
 		
-		ISubGroum groum2 = new SubGroum();
+		SubGroum groum2 = new SubGroum();
 		groum2.addVertex(node4);
 		groum2.addVertex(node3);
 		groum2.addVertex(node2);

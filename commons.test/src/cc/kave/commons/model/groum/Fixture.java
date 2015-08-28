@@ -4,61 +4,50 @@ import java.util.LinkedList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.groum.nodes.ControlNode;
-import cc.kave.commons.model.groum.nodes.IActionNode;
-import cc.kave.commons.model.groum.nodes.IControlNode;
 
 public class Fixture {
-	public static IGroum getPapersExampleGroum() {
+	public static Groum getPapersExampleGroum() {
 		Groum groum = new Groum();
 
-		ActionNode sbInit = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
-		sbInit.addDependency("strbuf");
+		ActionNode sbInit = new ActionNode("StringBuffer", "<init>");
 		groum.addVertex(sbInit);
 
-		ActionNode frInit = new ActionNode("FileReader", IActionNode.CONTRUCTOR);
+		ActionNode frInit = new ActionNode("FileReader", "<init>");
 		groum.addVertex(frInit);
 		groum.addEdge(sbInit, frInit);
 
-		ActionNode brInit = new ActionNode("BufferedReader", IActionNode.CONTRUCTOR);
-		brInit.addDependency("in");
+		ActionNode brInit = new ActionNode("BufferedReader", "<init>");
 		groum.addVertex(brInit);
 		groum.addEdge(frInit, brInit);
 
 		ActionNode brReadline = new ActionNode("BufferedReader", "readLine");
-		brReadline.addDependency("in");
 		groum.addVertex(brReadline);
 		groum.addEdge(brInit, brReadline);
 
-		ControlNode while1 = new ControlNode(IControlNode.WHILE_NODE);
+		ControlNode while1 = new ControlNode("WHILE");
 		groum.addVertex(while1);
 		groum.addEdge(brReadline, while1);
 
 		ActionNode sbAppend = new ActionNode("StringBuffer", "append");
-		sbAppend.addDependency("strbuf");
 		groum.addVertex(sbAppend);
 		groum.addEdge(while1, sbAppend);
 
 		ActionNode sbLength = new ActionNode("StringBuffer", "length");
-		sbLength.addDependency("strbuf");
 		groum.addVertex(sbLength);
 		groum.addEdge(sbAppend, sbLength);
 
-		ControlNode if1 = new ControlNode(IControlNode.IF_NODE);
+		ControlNode if1 = new ControlNode("IF");
 		groum.addVertex(if1);
 		groum.addEdge(sbLength, if1);
 
 		ActionNode sbToString = new ActionNode("StringBuffer", "toString");
-		sbToString.addDependency("strbuf");
 		groum.addVertex(sbToString);
 		groum.addEdge(if1, sbToString);
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		brClose.addDependency("in");
 		groum.addVertex(brClose);
 		groum.addEdge(sbToString, brClose);
 
@@ -66,66 +55,57 @@ public class Fixture {
 
 	}
 
-	public static IGroum getExampleGroum() {
+	public static Groum getExampleGroum() {
 		Groum groum = new Groum();
 
-		ActionNode sbInit = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
-		sbInit.addDependency("strbuf");
+		ActionNode sbInit = new ActionNode("StringBuffer", "<init>");
 		groum.addVertex(sbInit);
 
-		ActionNode frInit = new ActionNode("FileReader", IActionNode.CONTRUCTOR);
+		ActionNode frInit = new ActionNode("FileReader", "<init>");
 		groum.addVertex(frInit);
 		groum.addEdge(sbInit, frInit);
 
-		ActionNode brInit = new ActionNode("BufferedReader", IActionNode.CONTRUCTOR);
-		brInit.addDependency("in");
+		ActionNode brInit = new ActionNode("BufferedReader", "<init>");
 		groum.addVertex(brInit);
 		groum.addEdge(frInit, brInit);
 
 		ActionNode brReadline = new ActionNode("BufferedReader", "readLine");
-		brReadline.addDependency("in");
 		groum.addVertex(brReadline);
 		groum.addEdge(brInit, brReadline);
 
-		ControlNode while1 = new ControlNode(IControlNode.WHILE_NODE);
+		ControlNode while1 = new ControlNode("WHILE");
 		groum.addVertex(while1);
 		groum.addEdge(brReadline, while1);
 
 		ActionNode sbAppend = new ActionNode("StringBuffer", "append");
-		sbAppend.addDependency("strbuf");
 		groum.addVertex(sbAppend);
 		groum.addEdge(while1, sbAppend);
 
 		ActionNode sbLength = new ActionNode("StringBuffer", "length");
-		sbLength.addDependency("strbuf");
 		groum.addVertex(sbLength);
 		groum.addEdge(sbAppend, sbLength);
 
-		ControlNode if1 = new ControlNode(IControlNode.IF_NODE);
+		ControlNode if1 = new ControlNode("IF");
 		groum.addVertex(if1);
 		groum.addEdge(sbLength, if1);
 
 		ActionNode sbToString = new ActionNode("StringBuffer", "toString");
-		sbToString.addDependency("strbuf");
 		groum.addVertex(sbToString);
 		groum.addEdge(if1, sbToString);
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		brClose.addDependency("in");
 		groum.addVertex(brClose);
 		groum.addEdge(sbToString, brClose);
 
-		ActionNode sbInit1 = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
-		sbInit1.addDependency("strbuf");
+		ActionNode sbInit1 = new ActionNode("StringBuffer", "<init>");
 		groum.addVertex(sbInit1);
 		groum.addEdge(brClose, sbInit1);
 
-		ActionNode frInit1 = new ActionNode("FileReader", IActionNode.CONTRUCTOR);
+		ActionNode frInit1 = new ActionNode("FileReader", "<init>");
 		groum.addVertex(frInit1);
 		groum.addEdge(sbInit1, frInit1);
 
-		ActionNode brInit1 = new ActionNode("BufferedReader", IActionNode.CONTRUCTOR);
-		brInit1.addDependency("in");
+		ActionNode brInit1 = new ActionNode("BufferedReader", "<init>");
 		groum.addVertex(brInit1);
 		groum.addEdge(frInit1, brInit1);
 
@@ -133,10 +113,10 @@ public class Fixture {
 
 	}
 
-	public static <E extends IGroum> List<IGroum> getGroumsOfSizeX(int x, List<E> groums) {
-		List<IGroum> group = new LinkedList<>();
+	public static <E extends Groum> List<Groum> getGroumsOfSizeX(int x, List<E> groums) {
+		List<Groum> group = new LinkedList<>();
 
-		for (IGroum groum : groums) {
+		for (Groum groum : groums) {
 
 			if (groum.getAllNodes().size() == x) {
 				group.add(groum);
@@ -149,8 +129,8 @@ public class Fixture {
 	/*
 	 * 29 Nodes in 11 Groums
 	 */
-	public static List<IGroum> getListOfXGroums(int x) {
-		List<IGroum> groumlist = new LinkedList<>();
+	public static List<Groum> getListOfXGroums(int x) {
+		List<Groum> groumlist = new LinkedList<>();
 
 		for (int i = 1; i <= x; i++) {
 			groumlist.add(Fixture.createConnectedGroumOfSize(i));
@@ -162,8 +142,8 @@ public class Fixture {
 	/*
 	 * 29 Nodes in 11 Groums
 	 */
-	public static List<IGroum> getListOfXGroumsReverse(int x) {
-		List<IGroum> groumlist = new LinkedList<>();
+	public static List<Groum> getListOfXGroumsReverse(int x) {
+		List<Groum> groumlist = new LinkedList<>();
 
 		for (int i = x; i > 0; i--) {
 			groumlist.add(Fixture.createConnectedGroumOfSize(i));
@@ -172,15 +152,15 @@ public class Fixture {
 		return groumlist;
 	}
 
-	public static IActionNode createActionNodeInstance(String name) {
+	public static INode createActionNodeInstance(String name) {
 		return new ActionNode(name, name);
 	}
 
-	public static IGroum createConnectedGroumOfSize(int size) {
+	public static Groum createConnectedGroumOfSize(int size) {
 		if (size == 0)
 			return null;
 
-		IGroum groum = new Groum();
+		Groum groum = new Groum();
 		INode previous = createActionNodeInstance(String.valueOf(1));
 		groum.addVertex(previous);
 
@@ -193,11 +173,11 @@ public class Fixture {
 		return groum;
 	}
 
-	public static IGroum createConnectedGroumOfSize(int low, int high) {
+	public static Groum createConnectedGroumOfSize(int low, int high) {
 		if (high < low)
 			return null;
 
-		IGroum groum = new Groum();
+		Groum groum = new Groum();
 		INode previous = createActionNodeInstance(String.valueOf(low));
 		groum.addVertex(previous);
 

@@ -1,83 +1,42 @@
 package cc.kave.commons.model.groum;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Set;
-import java.util.TreeSet;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.nodes.ActionNode;
-import cc.kave.commons.model.groum.nodes.ControlNode;
-import cc.kave.commons.model.groum.nodes.IActionNode;
-import cc.kave.commons.model.groum.nodes.IControlNode;
 
 public class ActionNodeTest {
 
 	@Test
-	public void nodesAreEqual() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		ActionNode second = new ActionNode("String", IActionNode.CONTRUCTOR);
-		assertTrue(first.equals(second));
+	public void isEqual() {
+		ActionNode first = new ActionNode("String", "length()");
+		ActionNode second = new ActionNode("String", "length()");
+		
+		assertEquals(first ,second);
+	}
+	
+	@Test
+	public void isNotEqual() {
+		ActionNode first = new ActionNode("String", "length()");
+		ActionNode second = new ActionNode("String", "toString()");
+		
+		assertNotEquals(first ,second);
 	}
 
 	@Test
-	public void nodesAreIdentical() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		ActionNode second = new ActionNode("String", IActionNode.CONTRUCTOR);
-		assertFalse(first == second);
-	}
-
-	@Test
-	public void nodesHaveDifferentDependencies() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		first.addDependency("someField");
-		ActionNode second = new ActionNode("String", IActionNode.CONTRUCTOR);
-		second.addDependency("Somefield");
-		assertFalse(first.equals(second));
-	}
-
-	@Test
-	public void nodesHaveSameDependencies() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		first.addDependency("someField");
-		ActionNode second = new ActionNode("String", IActionNode.CONTRUCTOR);
-		second.addDependency("someField");
-		assertTrue(first.equals(second));
-	}
-
-	@Test
-	public void testSetEquality() {
-		Set<String> set1 = new TreeSet<>();
-		Set<String> set2 = new TreeSet<>();
-		set1.add("A");
-		set1.add("B");
-		set2.add("B");
-		set2.add("A");
-
-		assertTrue(set1.equals(set2));
-	}
-
-	@Test
-	public void ActionNodedrawsString() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		assertTrue(first.toString().equals("(String.<init>)"));
-	}
-
-	@Test
-	public void ControlNodedrawsString() {
-		ControlNode node = new ControlNode(IControlNode.DO_WHILE_NODE);
-		assertTrue(node.toString().equals("(DO_WHILE)"));
+	public void serializes() {
+		ActionNode first = new ActionNode("String", "length()");
+		
+		assertEquals("String.length()", first.toString());
 	}
 
 	@Test
 	public void differentHashcode() {
-		ActionNode first = new ActionNode("String", IActionNode.CONTRUCTOR);
-		ActionNode second = new ActionNode("String", IActionNode.CONTRUCTOR);
-		// System.out.println(String.format("%s - %s", first.hashCode(),
-		// second.hashCode()));
-		assertFalse(first.hashCode() == second.hashCode());
+		ActionNode first = new ActionNode("String", "length()");
+		ActionNode second = new ActionNode("String", "length()");
+		
+		assertNotEquals(first.hashCode(), second.hashCode());
 	}
 
 }

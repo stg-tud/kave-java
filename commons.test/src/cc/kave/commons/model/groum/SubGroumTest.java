@@ -5,17 +5,15 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.SubGroum;
 
 public class SubGroumTest {
 
 	@Test
 	public void extendsWithSingleNodeSingleEdge() {
-		IGroum parent = Fixture.createConnectedGroumOfSize(4);		
-		ISubGroum subgroum = new SubGroum(parent);	
+		Groum parent = Fixture.createConnectedGroumOfSize(4);		
+		SubGroum subgroum = new SubGroum(parent);	
 		List<INode> parentnodes = new LinkedList<>();		
 	}
 	

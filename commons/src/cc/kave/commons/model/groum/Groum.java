@@ -10,10 +10,9 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-public class Groum implements IGroum, Cloneable {
+public class Groum implements Comparable<Groum>, Cloneable {
 	DirectedGraph<INode, DefaultEdge> groum;
 	INode root;
-	ISubgraphStrategy subgraphStrategy;
 	Boolean dirty;
 
 	public Groum() {
@@ -38,18 +37,6 @@ public class Groum implements IGroum, Cloneable {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public void setSubgraphStrategy(ISubgraphStrategy strategy) {
-		this.subgraphStrategy = strategy;
-	}
-
-	// @Override
-	// public boolean equals(Object anotherGroum) {
-	// if (!(anotherGroum instanceof Groum))
-	// return false;
-	// else
-	// return (toString().equals(anotherGroum.toString()));
-	// }
 
 	@Override
 	public boolean equals(Object anotherGroum) {
@@ -98,7 +85,6 @@ public class Groum implements IGroum, Cloneable {
 		return groum.edgeSet();
 	}
 
-	@Override
 	public INode getNode(INode node) {
 		if (groum.containsVertex(node)) {
 			for (INode aNode : groum.vertexSet()) {
@@ -111,7 +97,6 @@ public class Groum implements IGroum, Cloneable {
 		return null;
 	}
 
-	@Override
 	public boolean containsEqualNode(INode node) {
 		for (INode aNode : groum.vertexSet()) {
 			if (node.equals(aNode))
@@ -120,30 +105,25 @@ public class Groum implements IGroum, Cloneable {
 		return false;
 	}
 
-	@Override
 	public boolean containsNode(INode node) {
 		return groum.containsVertex(node);
 	}
 
-	@Override
 	public boolean containsEdge(INode source, INode target) {
 		return groum.containsEdge(source, target);
 	}
 
-	@Override
 	public void addEdge(INode source, INode target) {
 		groum.addEdge(source, target);
 		dirty = true;
 	}
 
-	@Override
 	public void addVertex(INode node) {
 		groum.addVertex(node);
 		if (root == null)
 			root = node;
 	}
 
-	@Override
 	public Set<INode> getSuccessors(INode node) {
 		Set<INode> successors = new HashSet<>();
 		Set<DefaultEdge> outgoingEdges = groum.outgoingEdgesOf(node);
@@ -159,22 +139,18 @@ public class Groum implements IGroum, Cloneable {
 		return groum.toString();
 	}
 
-	@Override
 	public int getVertexCount() {
 		return groum.vertexSet().size();
 	}
 
-	@Override
 	public int getEdgeCount() {
 		return groum.edgeSet().size();
 	}
 
-	@Override
 	public Set<INode> getAllNodes() {
 		return groum.vertexSet();
 	}
 
-	@Override
 	public Set<INode> getEqualNodes(INode reference) {
 
 		Set<INode> equalNodes = new HashSet<>();
@@ -187,17 +163,7 @@ public class Groum implements IGroum, Cloneable {
 		return equalNodes;
 	}
 
-	@Override
-	public List<ISubGroum> getSubgraphs(IGroum subgraph) {
-		if (subgraphStrategy == null) {
-			throw new UnsupportedOperationException("Subgraphstrategy has not been set");
-		}
-
-		return subgraphStrategy.getIsomorphSubgraphs(this, subgraph);
-	}
-
-	@Override
-	public int compareTo(IGroum o) {
+	public int compareTo(Groum o) {
 		if (o == null)
 			return 1;
 		else if (this.equals(o))
@@ -211,7 +177,6 @@ public class Groum implements IGroum, Cloneable {
 	 * 
 	 * @see cc.kave.commons.model.groum.IGroum#getRoot()
 	 */
-	@Override
 	@Deprecated
 	public INode getRoot() {
 		if (dirty) {
@@ -233,7 +198,6 @@ public class Groum implements IGroum, Cloneable {
 	 * 
 	 * @see cc.kave.commons.model.groum.IGroum#getLeaf()
 	 */
-	@Override
 	@Deprecated
 	public INode getLeaf() {
 		for (INode node : getAllNodes()) {

@@ -8,9 +8,9 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 
 public class GroumFactory {
-	public List<IGroum> extractGroums(ISST sst) {
+	public List<Groum> extractGroums(ISST sst) {
 		Set<IMethodDeclaration> methods = sst.getMethods();
-		List<IGroum> groums = new LinkedList<>();
+		List<Groum> groums = new LinkedList<>();
 
 		for (IMethodDeclaration method : methods) {
 			extractGroum(method);

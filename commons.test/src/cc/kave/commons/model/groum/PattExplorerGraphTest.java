@@ -6,16 +6,14 @@ import java.util.List;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.ISubGroum;
+import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
-import cc.kave.commons.model.pattexplore.IPattExplorer;
 import cc.kave.commons.model.pattexplore.PattExplorer;
 import static cc.kave.commons.model.groum.PatternAssert.assertContainsPatterns;
 import static cc.kave.commons.model.groum.PatternAssert.filterBySize;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PattExplorerGraphTest {
 
@@ -42,7 +40,7 @@ public class PattExplorerGraphTest {
 		subject.addEdge(node2, node3b);
 
 		PattExplorer uut = new PattExplorer(1);
-		List<ISubGroum> actuals = uut.explorePatterns(Arrays.asList(subject));
+		List<SubGroum> actuals = uut.explorePatterns(Arrays.asList(subject));
 
 		Groum patternA = new Groum();
 		patternA.addVertex(node1);
@@ -57,7 +55,7 @@ public class PattExplorerGraphTest {
 		patternB.addVertex(node3b);
 		patternB.addEdge(node1, node2);
 		patternB.addEdge(node2, node3b);
-		List<ISubGroum> patternsOfSize = filterBySize(actuals, 3);
+		List<SubGroum> patternsOfSize = filterBySize(actuals, 3);
 		assertContainsPatterns(patternsOfSize, patternA, patternB);
 	}
 
@@ -74,10 +72,10 @@ public class PattExplorerGraphTest {
 	 */
 	@Test
 	public void findsTwoNodesPattern() {
-		IPattExplorer uut = new PattExplorer(2);
-		IGroum listGroum = Fixture.createConnectedGroumOfSize(5);
+		PattExplorer uut = new PattExplorer(2);
+		Groum listGroum = Fixture.createConnectedGroumOfSize(5);
 
-		IGroum complexGroum = new Groum();
+		Groum complexGroum = new Groum();
 		INode node1 = new ActionNode("1", "1");
 		INode node2 = new ActionNode("2", "2");
 		INode node3a = new ActionNode("3", "3");
@@ -98,18 +96,18 @@ public class PattExplorerGraphTest {
 		complexGroum.addEdge(node3b, node4);
 		complexGroum.addEdge(node4, node5);
 
-		IGroum structuredGroum = new Groum();
+		Groum structuredGroum = new Groum();
 		structuredGroum.addVertex(node1);
 		structuredGroum.addVertex(node2);
 		structuredGroum.addVertex(node3a);
 		structuredGroum.addEdge(node1, node2);
 		structuredGroum.addEdge(node1, node3a);
 
-		IGroum patternA = Fixture.createConnectedGroumOfSize(3);
-		IGroum patternB = Fixture.createConnectedGroumOfSize(3, 5);
+		Groum patternA = Fixture.createConnectedGroumOfSize(3);
+		Groum patternB = Fixture.createConnectedGroumOfSize(3, 5);
 
-		List<ISubGroum> actuals = uut.explorePatterns(Arrays.asList(complexGroum, structuredGroum, listGroum));
-		List<ISubGroum> patternsOfSize = filterBySize(actuals, 3);
+		List<SubGroum> actuals = uut.explorePatterns(Arrays.asList(complexGroum, structuredGroum, listGroum));
+		List<SubGroum> patternsOfSize = filterBySize(actuals, 3);
 		assertContainsPatterns(patternsOfSize, patternA, patternB, structuredGroum);
 	}
 
@@ -127,9 +125,9 @@ public class PattExplorerGraphTest {
 	 */
 	@Test
 	public void findsPatternsInTwoGroums() {
-		IPattExplorer uut = new PattExplorer(3);
-		IGroum listGroum = Fixture.createConnectedGroumOfSize(5);
-		IGroum complexGroum = new Groum();
+		PattExplorer uut = new PattExplorer(3);
+		Groum listGroum = Fixture.createConnectedGroumOfSize(5);
+		Groum complexGroum = new Groum();
 		INode node1 = new ActionNode("1", "1");
 		INode node2 = new ActionNode("2", "2");
 		INode node3a = new ActionNode("3", "3");
@@ -153,7 +151,7 @@ public class PattExplorerGraphTest {
 		complexGroum.addEdge(node3a, node4b);
 		complexGroum.addEdge(node4a, node5);
 
-		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(listGroum, complexGroum));
+		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(listGroum, complexGroum));
 		assertTrue(patterns.size() == 3);
 	}
 
@@ -168,10 +166,10 @@ public class PattExplorerGraphTest {
 	 */
 	@Test
 	public void findsPatternsInThreeGroums() {
-		IPattExplorer uut = new PattExplorer(6);
-		IGroum groumA = new Groum();
-		IGroum groumB = new Groum();
-		IGroum groumC = new Groum();
+		PattExplorer uut = new PattExplorer(6);
+		Groum groumA = new Groum();
+		Groum groumB = new Groum();
+		Groum groumC = new Groum();
 
 		INode nodeA_1 = new ActionNode("1", "1");
 		INode nodeA_2a = new ActionNode("2", "2");
@@ -245,8 +243,8 @@ public class PattExplorerGraphTest {
 		groumC.addEdge(nodeC_2b, nodeC_3d);
 		groumC.addEdge(nodeC_3d, nodeC_4);
 
-		List<ISubGroum> patterns = uut.explorePatterns(Arrays.asList(groumA, groumB, groumC));
-		assertTrue(patterns.size() == 3);
+		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(groumA, groumB, groumC));
+		assertEquals(3, patterns.size());
 	}
 
 	@Test
@@ -254,13 +252,13 @@ public class PattExplorerGraphTest {
 		INode node1 = new ActionNode("1", "1");
 		INode node2a = new ActionNode("2", "2");
 		INode node2b = new ActionNode("2", "2");
-		IGroum overlappingGroum = createGroum(node1, node2a, node2b);
+		Groum overlappingGroum = createGroum(node1, node2a, node2b);
 		overlappingGroum.addEdge(node1, node2a);
 		overlappingGroum.addEdge(node2a, node2b);
 
-		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+		List<SubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
 
-		IGroum pattern1 = createGroum(node2a);
+		Groum pattern1 = createGroum(node2a);
 		assertContainsPatterns(patterns, pattern1);
 	}
 
@@ -269,13 +267,13 @@ public class PattExplorerGraphTest {
 		INode node1 = new ActionNode("1", "1");
 		INode node2a = new ActionNode("2", "2");
 		INode node2b = new ActionNode("2", "2");
-		IGroum overlappingGroum = createGroum(node1, node2a, node2b);
+		Groum overlappingGroum = createGroum(node1, node2a, node2b);
 		overlappingGroum.addEdge(node1, node2a);
 		overlappingGroum.addEdge(node1, node2b);
 
-		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+		List<SubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
 
-		IGroum pattern1 = createGroum(node2a);
+		Groum pattern1 = createGroum(node2a);
 		assertContainsPatterns(patterns, pattern1);
 	}
 
@@ -285,14 +283,14 @@ public class PattExplorerGraphTest {
 		INode node1b = new ActionNode("1", "1");
 		INode node2a = new ActionNode("2", "2");
 		INode node2b = new ActionNode("2", "2");
-		IGroum overlappingGroum = createGroum(node1a, node1b, node2a, node2b);
+		Groum overlappingGroum = createGroum(node1a, node1b, node2a, node2b);
 		overlappingGroum.addEdge(node1a, node2a);
 		overlappingGroum.addEdge(node1a, node1b);
 		overlappingGroum.addEdge(node1b, node2b);
 
-		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
+		List<SubGroum> patterns = findPatternsWithMinFrequency(2, overlappingGroum);
 
-		IGroum pattern1 = createGroum(node1a, node2a);
+		Groum pattern1 = createGroum(node1a, node2a);
 		pattern1.addEdge(node1a, node2a);
 		patterns = filterBySize(patterns, 2);
 		assertContainsPatterns(patterns, pattern1);
@@ -304,18 +302,18 @@ public class PattExplorerGraphTest {
 		INode node2 = new ActionNode("2", "2");
 		INode node3a = new ActionNode("3", "3");
 		INode node3b = new ActionNode("3", "3");
-		IGroum groum1 = createGroum(node1, node2, node3a);
+		Groum groum1 = createGroum(node1, node2, node3a);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node1, node3a);
 		groum1.addEdge(node2, node3a);
-		IGroum groum2 = createGroum(node1, node2, node3a, node3b);
+		Groum groum2 = createGroum(node1, node2, node3a, node3b);
 		groum2.addEdge(node1, node2);
 		groum2.addEdge(node1, node3a);
 		groum2.addEdge(node2, node3b);
 
-		List<ISubGroum> patterns = findPatternsWithMinFrequency(2, groum1, groum2);
+		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum1, groum2);
 
-		IGroum pattern1 = createGroum(node1, node2, node3a);
+		Groum pattern1 = createGroum(node1, node2, node3a);
 		pattern1.addEdge(node1, node2);
 		pattern1.addEdge(node1, node3a);
 		pattern1.addEdge(node2, node3a);
@@ -328,23 +326,23 @@ public class PattExplorerGraphTest {
 		INode node1 = new ActionNode("1", "1");
 		INode node2 = new ActionNode("2", "2");
 		INode node3 = new ActionNode("3", "3");
-		IGroum groum = createGroum(node1, node2, node3);
+		Groum groum = createGroum(node1, node2, node3);
 		groum.addEdge(node1, node2);
 		groum.addEdge(node1, node3);
 		groum.addEdge(node2, node3);
 
-		List<ISubGroum> patterns = findPatternsWithMinFrequency(1, groum);
+		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
 		patterns = filterBySize(patterns, 3);
 		assertContainsPatterns(patterns, groum);
 	}
 
-	private List<ISubGroum> findPatternsWithMinFrequency(int threshold, IGroum... groums) {
-		IPattExplorer uut = new PattExplorer(threshold);
+	private List<SubGroum> findPatternsWithMinFrequency(int threshold, Groum... groums) {
+		PattExplorer uut = new PattExplorer(threshold);
 		return uut.explorePatterns(Arrays.asList(groums));
 	}
 
-	private IGroum createGroum(INode... nodes) {
+	private Groum createGroum(INode... nodes) {
 		Groum groum = new Groum();
 		for (INode node : nodes) {
 			groum.addVertex(node);

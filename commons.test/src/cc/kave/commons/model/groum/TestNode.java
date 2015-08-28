@@ -1,9 +1,8 @@
 package cc.kave.commons.model.groum;
 
 import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.nodes.Node;
 
-public class TestNode extends Node {
+public class TestNode implements INode {
 
 	public TestNode(String id) {
 		

@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class SubGroum extends Groum implements ISubGroum {
-	protected IGroum parent;
+public class SubGroum extends Groum {
+	protected Groum parent;
 
-	public SubGroum(IGroum parent) {
+	public SubGroum(Groum parent) {
 		super();
 		this.parent = parent;
 	}
@@ -17,24 +17,21 @@ public class SubGroum extends Groum implements ISubGroum {
 		this.parent = null;
 	}
 
-	public void setParent(IGroum parent) {
+	public void setParent(Groum parent) {
 		this.parent = parent;
 	}
 
-	@Override
-	public IGroum getParent() {
+	public Groum getParent() {
 		return parent;
 	}
-	
-	
-	@Override
-	public List<ISubGroum> extensibleWith(ISubGroum groum) {
+
+	public List<SubGroum> extensibleWith(SubGroum groum) {
 		INode extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
 			return null;
 
-		List<ISubGroum> extendedGroums = new LinkedList<>();
+		List<SubGroum> extendedGroums = new LinkedList<>();
 		List<INode> extendingNodes = new LinkedList<>();
 
 		for (INode node : this.getAllNodes()) {
@@ -47,52 +44,51 @@ public class SubGroum extends Groum implements ISubGroum {
 						if (candidate.equals(extendingNode)) {
 							if (extendingNodes.isEmpty())
 								extendingNodes.add(candidate);
-							else {						
+							else {
 								boolean isnewnode = true;
-								for (INode extnode: extendingNodes) {
+								for (INode extnode : extendingNodes) {
 									if (extnode == candidate) {
-										isnewnode=false;
-										continue;																			
+										isnewnode = false;
+										continue;
 									}
 								}
 								if (isnewnode)
 									extendingNodes.add(candidate);
-							}							
+							}
 						}
 				}
 			}
 		}
 		// Build extended groums
-		for (INode extnode: extendingNodes) {
-			ISubGroum extendedSubgroum = (ISubGroum) this.clone();
+		for (INode extnode : extendingNodes) {
+			SubGroum extendedSubgroum = (SubGroum) this.clone();
 			extendedSubgroum.addVertex(extnode);
-			for (INode node: this.getAllNodes()) {
-				Set<INode>nodesuccessors = parent.getSuccessors(node);
-				for (INode successor: nodesuccessors) {
+			for (INode node : this.getAllNodes()) {
+				Set<INode> nodesuccessors = parent.getSuccessors(node);
+				for (INode successor : nodesuccessors) {
 					if (successor == extnode) {
 						extendedSubgroum.addEdge(node, extnode);
 						continue;
-					}					
-				}				
+					}
+				}
 			}
 			extendedGroums.add(extendedSubgroum);
-		}		
-		
-		if (extendedGroums.isEmpty()) 
+		}
+
+		if (extendedGroums.isEmpty())
 			return null;
 		else
 			return extendedGroums;
 	}
-	
 
 	@Deprecated
-	public ISubGroum extensibleWithOneNodeMultipleEdge(ISubGroum groum) {
+	public SubGroum extensibleWithOneNodeMultipleEdge(SubGroum groum) {
 		INode extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
 			return null;
 
-		ISubGroum extendedSubgroum = (ISubGroum) this.clone();
+		SubGroum extendedSubgroum = (SubGroum) this.clone();
 		boolean extended = false;
 		for (INode node : this.getAllNodes()) {
 
@@ -107,16 +103,16 @@ public class SubGroum extends Groum implements ISubGroum {
 								extendedSubgroum.addVertex(candidate);
 								extended = true;
 							}
-							extendedSubgroum.addEdge(node, candidate);							
+							extendedSubgroum.addEdge(node, candidate);
 						} else {
 							continue;
 						}
 				}
 			}
 		}
-		if (extended) 
+		if (extended)
 			return extendedSubgroum;
 		else
 			return null;
-	}			
+	}
 }

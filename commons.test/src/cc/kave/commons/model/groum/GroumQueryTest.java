@@ -9,7 +9,6 @@ import org.junit.Test;
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.nodes.ActionNode;
-import cc.kave.commons.model.groum.nodes.IActionNode;
 
 public class GroumQueryTest {
 
@@ -35,8 +34,7 @@ public class GroumQueryTest {
 
 	@Test
 	public void findsOtherEqualNodes() {
-		ActionNode sbInit1 = new ActionNode("StringBuffer", IActionNode.CONTRUCTOR);
-		sbInit1.addDependency("strbuf");
+		ActionNode sbInit1 = new ActionNode("StringBuffer", "<init>");
 
 		Groum groum = (Groum) Fixture.getExampleGroum();
 		assertTrue(groum.getEqualNodes(sbInit1).size() == 2);

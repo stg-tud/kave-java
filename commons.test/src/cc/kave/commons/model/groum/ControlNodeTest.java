@@ -1,43 +1,40 @@
 package cc.kave.commons.model.groum;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.nodes.ControlNode;
-import cc.kave.commons.model.groum.nodes.IControlNode;
 
 public class ControlNodeTest {
 
 	@Test
-	public void nodesAreEqual() {
-		ControlNode first = new ControlNode(IControlNode.FOR_NODE);
-		ControlNode second = new ControlNode(IControlNode.FOR_NODE);
-		assertTrue(first.equals(second));
+	public void isEqual() {
+		ControlNode first = new ControlNode("WHILE");
+		ControlNode second = new ControlNode("WHILE");
+		assertEquals(first, second);
 	}
 
 	@Test
-	public void nodesNotAreEqual() {
-		ControlNode first = new ControlNode(IControlNode.FOR_NODE);
-		ControlNode second = new ControlNode(IControlNode.WHILE_NODE);
-		assertFalse(first.equals(second));
+	public void isNotEqual() {
+		ControlNode first = new ControlNode("WHILE");
+		ControlNode second = new ControlNode("IF");
+		assertNotEquals(first, second);
 	}
 
 	@Test
-	public void nodesHaveDifferentDependencies() {
-		ControlNode first = new ControlNode(IControlNode.FOR_NODE);
-		first.addDependency("fieldName");
-		ControlNode second = new ControlNode(IControlNode.FOR_NODE);
-		assertFalse(first.equals(second));
+	public void serializes() {
+		ControlNode first = new ControlNode("WHILE");
+
+		assertEquals("WHILE", first.toString());
 	}
 
 	@Test
-	public void nodesHaveSameDependencies() {
-		ControlNode first = new ControlNode(IControlNode.FOR_NODE);
-		first.addDependency("fieldName");
-		ControlNode second = new ControlNode(IControlNode.FOR_NODE);
-		second.addDependency("fieldName");
-		assertTrue(first.equals(second));
+	public void differentHashcode() {
+		ControlNode first = new ControlNode("WHILE");
+		ControlNode second = new ControlNode("WHILE");
+
+		assertNotEquals(first.hashCode(), second.hashCode());
 	}
+
 }

@@ -2,88 +2,57 @@ package cc.kave.commons.model.groum.nodes;
 
 import cc.kave.commons.model.groum.INode;
 
-public class ActionNode extends Node implements IActionNode {
+public class ActionNode implements INode {
 	private String clazz;
 	private String callee;
 
-	public ActionNode() {
-		super();
-	}
-
 	public ActionNode(String clazz, String callee) {
-		this();
 		this.clazz = clazz;
 		this.callee = callee;
 	}
 
-	// @Override
-	// public boolean equals(Object obj) {
-	// if (obj instanceof INode) {
-	// return equals((INode) obj);
-	// } else {
-	// return false;
-	// }
-	// }
-	//
-	// @Override
-	// public boolean equals(INode anotherNode) {
-	// if (!(anotherNode instanceof ActionNode))
-	// return false;
-	// else {
-	// ActionNode aNode = (ActionNode) anotherNode;
-	// if ((aNode.getCallee().compareTo(this.callee) == 0) &&
-	// (aNode.getClazz().compareTo(this.clazz) == 0)
-	// && (getDataDependencies().equals(aNode.getDataDependencies())))
-	// return true;
-	// else
-	// return false;
-	// }
-	// }
-
 	@Override
-	public boolean equals(Object anotherNode) {
-		if (!(anotherNode instanceof ActionNode))
-			return false;
-		else {
-			// if (this.hashCode() != anotherNode.hashCode())
-			// return false;
-			// else {
-			ActionNode aNode = (ActionNode) anotherNode;
-			if ((getCallee().equals(aNode.getCallee())) && (aNode.getClazz().equals(this.clazz))
-					&& (getDataDependencies().equals(aNode.getDataDependencies())))
-				return true;
-			else
-				return false;
-			// }
-		}
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((callee == null) ? 0 : callee.hashCode());
+		result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
+		return result;
 	}
 
-	// @Override
-	// public int hashCode() {
-	// return System.identityHashCode(this);
-	// }
-
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ActionNode other = (ActionNode) obj;
+		if (callee == null) {
+			if (other.callee != null)
+				return false;
+		} else if (!callee.equals(other.callee))
+			return false;
+		if (clazz == null) {
+			if (other.clazz != null)
+				return false;
+		} else if (!clazz.equals(other.clazz))
+			return false;
+		return true;
+	}
+
 	public String getClazz() {
 		return clazz;
 	}
 
-	@Override
 	public String getCallee() {
 		return callee;
 	}
 
-	public void setClazz(String clazz) {
-		this.clazz = clazz;
-	}
-
-	public void setCallee(String callee) {
-		this.callee = callee;
-	}
-
 	@Override
 	public String toString() {
-		return String.format("(%s.%s)", clazz, callee);
+		return String.format("%s.%s", clazz, callee);
 	}
 
 	@Override
