@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum.impl;
+package cc.kave.commons.model.groum;
 
 import static org.junit.Assert.assertTrue;
 

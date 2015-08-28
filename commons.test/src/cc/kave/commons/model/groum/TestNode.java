@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum.impl;
+package cc.kave.commons.model.groum;
 
 import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.nodes.Node;

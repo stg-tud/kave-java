@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum.impl;
+package cc.kave.commons.model.groum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +12,8 @@ import cc.kave.commons.model.groum.ISubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.IPattExplorer;
 import cc.kave.commons.model.pattexplore.PattExplorer;
-import static cc.kave.commons.model.groum.impl.PatternAssert.assertContainsPatterns;
-import static cc.kave.commons.model.groum.impl.PatternAssert.patternsOfSize;
+import static cc.kave.commons.model.groum.PatternAssert.assertContainsPatterns;
+import static cc.kave.commons.model.groum.PatternAssert.patternsOfSize;
 
 import static org.junit.Assert.assertTrue;
 

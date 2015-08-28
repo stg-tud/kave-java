@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum.impl;
+package cc.kave.commons.model.groum;
 
 import java.util.LinkedList;
 import java.util.List;

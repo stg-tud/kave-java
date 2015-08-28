@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum.impl;
+package cc.kave.commons.model.groum;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,42 +11,30 @@ import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.IGroum;
-import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.ISubGroum;
-import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
-import cc.kave.commons.model.groum.comparator.GroumIdentComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumIdentComparator;
-import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.NaivSubgraphStrategy;
 import cc.kave.commons.model.pattexplore.Utils;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.SortedMultiset;
-import com.google.common.collect.TreeMultimap;
 import com.google.common.collect.TreeMultiset;
 
-public class GroumMultimapTest {
+public class GroumMultisetTest {
 
 	@Test
 	public void comparatorWorksForGroums() {
-
-		TreeMultimap<IGroum, IGroum> treemap = TreeMultimap.create(new GroumComparator(), new GroumIdentComparator());
-
-		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
+		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
+		IGroum groum1 = Fixture.createConnectedGroumOfSize(2);
 		IGroum groum2 = Fixture.createConnectedGroumOfSize(2);
-		IGroum groum3 = Fixture.createConnectedGroumOfSize(3);
+		IGroum groum3 = Fixture.createConnectedGroumOfSize(2);
 		IGroum groum4 = Fixture.createConnectedGroumOfSize(1);
-		IGroum groum5 = Fixture.createConnectedGroumOfSize(2);
-		IGroum groum6 = Fixture.createConnectedGroumOfSize(3);
-		treemap.put(groum1, groum1);
-		treemap.put(groum2, groum2);
-		treemap.put(groum3, groum3);
-		treemap.put(groum4, groum4);
-		treemap.put(groum5, groum5);
-		treemap.put(groum6, groum6);
-		assertTrue(treemap.size() == 6 && treemap.get(groum2).size() == 2);
+		treeset.add(groum1);
+		treeset.add(groum2);
+		treeset.add(groum3);
+		treeset.add(groum4);
+		assertTrue(treeset.size() == 4 && treeset.count(groum1) == 3);
 
 	}
 
@@ -137,7 +125,6 @@ public class GroumMultimapTest {
 	}
 
 	@Test
-	@Ignore
 	public void copiesAllOccurences() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -158,7 +145,6 @@ public class GroumMultimapTest {
 	}
 
 	@Test
-	@Ignore
 	public void retrievesSubSet() {
 		TreeMultiset<IGroum> treeset = TreeMultiset.create(new GroumComparator());
 		IGroum groum1 = Fixture.createConnectedGroumOfSize(1);
@@ -188,54 +174,12 @@ public class GroumMultimapTest {
 			subgroums.addAll(Utils.breakdown(groum));
 		}
 
-		TreeMultimap<ISubGroum, ISubGroum> multiset = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
-		for (ISubGroum subgroum : subgroums) {
-			multiset.put(subgroum, subgroum);
-		}
+		TreeMultiset<ISubGroum> multiset = TreeMultiset.create(new SubGroumComparator());
+		multiset.addAll(subgroums);
 
-		for (ISubGroum subgroum : multiset.keySet()) {
-			System.out.println("\n" + subgroum + "--> ");
-			for (ISubGroum contrasubgroum : multiset.get(subgroum)) {
-				System.out.println(contrasubgroum.getParent());
-			}
+		for (ISubGroum subgroum : multiset) {
+			System.out.println(subgroum + "--> " + subgroum.getParent());
 		}
 	}
 
-	@Test
-	public void putsUnorderedGroumIntoSameBucket() {
-		TreeMultimap<ISubGroum, ISubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
-
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3 = new ActionNode("3", "3");
-		ISubGroum a = new SubGroum(null);
-		a.addVertex(node1);
-		a.addVertex(node2);
-		a.addVertex(node3);
-		a.addEdge(node1, node2);
-		a.addEdge(node1, node3);
-
-		INode node1b = new ActionNode("1", "1");
-		INode node2b = new ActionNode("2", "2");
-		INode node3b = new ActionNode("3", "3");
-		ISubGroum b = new SubGroum(null);
-		b.addVertex(node1b);
-		b.addVertex(node3b);
-		b.addEdge(node1b, node3b);
-		b.addVertex(node2b);
-		b.addEdge(node1b, node2b);
-
-		// treemap.put(a, a);
-		// treemap.put(b, b);
-
-		treemap.putAll(a, Arrays.asList(a));
-		treemap.putAll(b, Arrays.asList(b));
-		// System.out.println(a);
-		// System.out.println(b);
-		// System.out.println(treemap);
-		assertTrue(treemap.keySet().size() == 1);
-
-	}
 }
