@@ -60,6 +60,9 @@
 								<artifact>
 									<id>org.objenesis:objenesis:2.2</id>
 								</artifact>
+								<artifact>
+									<id>org.jgrapht:jgrapht-core:0.9.1</id>
+								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>

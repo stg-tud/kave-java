@@ -5,9 +5,13 @@ Bundle-SymbolicName: commons
 Bundle-Version: 1.0.0.qualifier
 Export-Package: cc.kave.commons.model.events,
  cc.kave.commons.model.events.completionevents,
+ cc.kave.commons.model.groum,
+ cc.kave.commons.model.groum.comparator,
+ cc.kave.commons.model.groum.nodes,
  cc.kave.commons.model.names,
  cc.kave.commons.model.names.csharp,
  cc.kave.commons.model.names.resharper,
+ cc.kave.commons.model.pattexplore,
  cc.kave.commons.model.ssts,
  cc.kave.commons.model.ssts.blocks,
  cc.kave.commons.model.ssts.declarations,
@@ -42,4 +46,5 @@ Require-Bundle: com.google.gson,
  com.google.guava,
  org.eclipse.jdt.annotation,
  com.google.code.findbugs.jsr305,
- org.apache.commons.lang3
+ org.apache.commons.lang3,
+ org.jgrapht.core

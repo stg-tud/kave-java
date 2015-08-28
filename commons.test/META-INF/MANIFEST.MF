@@ -13,4 +13,5 @@ Require-Bundle: commons,
  com.google.guava,
  org.eclipse.jdt.annotation,
  com.google.code.findbugs.jsr305,
- org.apache.commons.lang3
+ org.apache.commons.lang3,
+ org.jgrapht.core
