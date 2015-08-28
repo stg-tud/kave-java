@@ -390,8 +390,12 @@ public class DirectoryTest {
 
 		Directory sut = new Directory(tempFileName);
 		Set<String> actual = sut.findFiles(f -> true);
-		Set<String> expected = Sets.newHashSet("a.zip", "b/b.zip", "c/c/c.zip");
+		Set<String> expected = Sets.newHashSet("a.zip", combine("b","b.zip"), combine("c","c","c.zip"));
 		assertEquals(expected, actual);
+	}
+
+	private String combine(String... pathElements) {
+		return String.join(File.separator, pathElements);
 	}
 
 	@Test(expected = AssertionException.class)
