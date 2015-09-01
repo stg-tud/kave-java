@@ -4,8 +4,10 @@ import cc.kave.commons.model.groum.INode;
 
 public class TestNode implements INode {
 
+	private String id;
+
 	public TestNode(String id) {
-		
+		this.id = id;
 	}
 	
 	@Override
@@ -13,5 +15,4 @@ public class TestNode implements INode {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

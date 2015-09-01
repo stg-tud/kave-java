@@ -6,35 +6,17 @@ import org.junit.Test;
 
 import cc.kave.commons.model.groum.nodes.ControlNode;
 
-public class ControlNodeTest {
+public class ControlNodeTest extends NodeContractTest {
 
-	@Test
-	public void isEqual() {
-		ControlNode first = new ControlNode("WHILE");
-		ControlNode second = new ControlNode("WHILE");
-		assertEquals(first, second);
+	@Override
+	protected INode createNode(String id) {
+		return new ControlNode(id);
 	}
-
-	@Test
-	public void isNotEqual() {
-		ControlNode first = new ControlNode("WHILE");
-		ControlNode second = new ControlNode("IF");
-		assertNotEquals(first, second);
-	}
-
+	
 	@Test
 	public void serializes() {
-		ControlNode first = new ControlNode("WHILE");
+		INode first = createNode("WHILE");
 
 		assertEquals("WHILE", first.toString());
 	}
-
-	@Test
-	public void differentHashcode() {
-		ControlNode first = new ControlNode("WHILE");
-		ControlNode second = new ControlNode("WHILE");
-
-		assertNotEquals(first.hashCode(), second.hashCode());
-	}
-
 }

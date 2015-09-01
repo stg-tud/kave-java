@@ -6,37 +6,17 @@ import org.junit.Test;
 
 import cc.kave.commons.model.groum.nodes.ActionNode;
 
-public class ActionNodeTest {
+public class ActionNodeTest extends NodeContractTest {
 
-	@Test
-	public void isEqual() {
-		ActionNode first = new ActionNode("String", "length()");
-		ActionNode second = new ActionNode("String", "length()");
-		
-		assertEquals(first ,second);
-	}
-	
-	@Test
-	public void isNotEqual() {
-		ActionNode first = new ActionNode("String", "length()");
-		ActionNode second = new ActionNode("String", "toString()");
-		
-		assertNotEquals(first ,second);
+	@Override
+	protected INode createNode(String id) {
+		return new ActionNode(id, "foo()");
 	}
 
 	@Test
 	public void serializes() {
-		ActionNode first = new ActionNode("String", "length()");
-		
+		INode first = createNode("A");
+
 		assertEquals("String.length()", first.toString());
 	}
-
-	@Test
-	public void differentHashcode() {
-		ActionNode first = new ActionNode("String", "length()");
-		ActionNode second = new ActionNode("String", "length()");
-		
-		assertNotEquals(first.hashCode(), second.hashCode());
-	}
-
 }
