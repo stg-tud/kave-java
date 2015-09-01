@@ -6,5 +6,4 @@ public class TestNodeTest extends NodeContractTest {
 	protected Node createNode(String id) {
 		return new TestNode(id);
 	}
-
 }

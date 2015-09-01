@@ -39,4 +39,28 @@ public abstract class NodeContractTest {
 
 		assertNotEquals(first.hashCode(), second.hashCode());
 	}
+	
+	@Test
+	public void comparesEqual() {
+		Node node1 = createNode("A");
+		Node node2 = createNode("A");
+		
+		assertEquals(0, node1.compareTo(node2));
+	}
+	
+	@Test
+	public void comparesSmaller() {
+		Node node1 = createNode("A");
+		Node node2 = createNode("B");
+		
+		assertEquals(-1, node1.compareTo(node2));
+	}
+	
+	@Test
+	public void comparesLarger() {
+		Node node1 = createNode("B");
+		Node node2 = createNode("A");
+		
+		assertEquals(1, node1.compareTo(node2));
+	}
 }
