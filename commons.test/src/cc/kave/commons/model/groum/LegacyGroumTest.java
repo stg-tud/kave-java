@@ -15,7 +15,7 @@ import cc.kave.commons.model.groum.INode;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.groum.nodes.ControlNode;
 
-public class GroumTest {
+public class LegacyGroumTest {
 
 	
 
