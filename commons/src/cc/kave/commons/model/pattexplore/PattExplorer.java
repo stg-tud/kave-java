@@ -6,11 +6,10 @@ import java.util.List;
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
+import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 
-import com.google.common.collect.BoundType;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.SortedMultiset;
-import com.google.common.collect.TreeMultiset;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 
 public class PattExplorer {
 	int threshold;
@@ -20,68 +19,69 @@ public class PattExplorer {
 	}
 
 	public List<SubGroum> explorePatterns(List<Groum> D) {
-		TreeMultiset<SubGroum> L2 = TreeMultiset.create(new DFSGroumComparator());
+		TreeMultimap<SubGroum, SubGroum> L = createGroumMap();
 
 		for (Groum groum : D) {
 			List<SubGroum> subgroums = Utils.breakdown(groum);
 			for (SubGroum subgroum : subgroums) {
-				L2.add(subgroum);
+				L.put(subgroum, subgroum);
 			}
 		}
 
-		for (Groum groum : L2.elementSet()) {
-			if (L2.count(groum) < threshold) {
-				L2.remove(groum, threshold);
+		TreeMultimap<SubGroum, SubGroum> L2 = createGroumMap();
+		for (SubGroum groum : L.keySet()) {
+			if (getGroumFrequency(L, groum) >= threshold) {
+				L2.putAll(groum, L.get(groum));
 			}
 		}
 
-		TreeMultiset<SubGroum> explored2 = TreeMultiset.create(new DFSGroumComparator());
-
-		for (SubGroum pattern : L2.elementSet()) {
-			explored2.addAll(explore(pattern, L2, D));
+		TreeMultimap<SubGroum, SubGroum> explored = createGroumMap();
+		for (SubGroum pattern : L2.keySet()) {
+			explored.putAll(explore(pattern, L2, D));
 		}
+		L2.putAll(explored);
 
-		L2.addAll(explored2);
-
-		return new ArrayList<>(L2.elementSet());
+		return new ArrayList<>(L2.keySet());
 
 	}
 
-	private Multiset<SubGroum> explore(SubGroum P, Multiset<SubGroum> L, List<Groum> D) {
-		TreeMultiset<SubGroum> patterns = TreeMultiset.create(new DFSGroumComparator());
-		Multiset<SubGroum> newPatterns = TreeMultiset.create(new DFSGroumComparator());
+	private int getGroumFrequency(TreeMultimap<SubGroum, SubGroum> L, SubGroum groum) {
+		return L.get(groum).size();
+	}
 
-		patterns.addAll(L);
+	private TreeMultimap<SubGroum, SubGroum> createGroumMap() {
+		return TreeMultimap.create(new DFSGroumComparator(), new HashCodeComparator());
+	}
 
-		for (SubGroum U : L.elementSet()) {
+	private Multimap<SubGroum, SubGroum> explore(SubGroum P, Multimap<SubGroum, SubGroum> L, List<Groum> D) {
+		TreeMultimap<SubGroum, SubGroum> patterns = createGroumMap();
+		Multimap<SubGroum, SubGroum> newPatterns = createGroumMap();
+
+		patterns.putAll(L);
+
+		for (SubGroum U : L.keySet()) {
 			if (U.getAllNodes().size() == 1) {
+				TreeMultimap<SubGroum, SubGroum> Q = createGroumMap();
 
-				TreeMultiset<SubGroum> Q = TreeMultiset.create(new DFSGroumComparator());
-
-				for (SubGroum occurrence : getInstances(P, patterns)) {
+				for (SubGroum occurrence : patterns.get(P)) {
 					List<SubGroum> candidates = occurrence.extensibleWith(U);
 					if (candidates != null)
 						for (SubGroum candidate : candidates) {
-							Q.add(candidate);
+							Q.put(candidate, candidate);
 						}
 				}
 
-				for (SubGroum candidate : Q.elementSet()) {
-					if (Q.count(candidate) >= threshold) {
-						newPatterns.addAll(getInstances(candidate, Q));
-						patterns.addAll(getInstances(candidate, Q));
+				for (SubGroum candidate : Q.keySet()) {
+					if (getGroumFrequency(Q, candidate) >= threshold) {
+						newPatterns.putAll(candidate, Q.get(candidate));
+						patterns.putAll(candidate, Q.get(candidate));
 
-						Multiset<SubGroum> explored = explore(candidate, patterns, D);
-						newPatterns.addAll(explored);
+						Multimap<SubGroum, SubGroum> explored = explore(candidate, patterns, D);
+						newPatterns.putAll(explored);
 					}
 				}
 			}
 		}
 		return newPatterns;
-	}
-
-	private SortedMultiset<SubGroum> getInstances(SubGroum P, TreeMultiset<SubGroum> patterns) {
-		SortedMultiset<SubGroum> instances = patterns.subMultiset(P, BoundType.CLOSED, P, BoundType.CLOSED);
-		return instances;
 	}
 }

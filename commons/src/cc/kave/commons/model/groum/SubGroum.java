@@ -41,7 +41,7 @@ public class SubGroum extends Groum {
 			else {
 				for (Node candidate : successors) {
 					if (!(this.containsNode(candidate)))
-						if (candidate.equals(extendingNode)) {
+						if (candidate.compareTo(extendingNode) == 0) {
 							if (extendingNodes.isEmpty())
 								extendingNodes.add(candidate);
 							else {

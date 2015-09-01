@@ -5,9 +5,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.border.EmptyBorder;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
@@ -71,33 +74,18 @@ public class PattExplorerTest {
 
 	@Test
 	public void findsNoInversePatterns() {
-		Groum groum1 = new Groum();
-		ActionNode node1a = new ActionNode("A", "A");
-		ActionNode node2a = new ActionNode("B", "B");
-		groum1.addNode(node1a);
-		groum1.addNode(node2a);
-		groum1.addEdge(node1a, node2a);
+		Node[] nodes1 = createNodes("A", "B");
+		Groum groum1 = createGroum(nodes1);
+		groum1.addEdge(nodes1[0], nodes1[1]);
+		
+		Node[] nodes2 = createNodes("A", "B");
+		Groum groum2 = createGroum(nodes2);
+		groum2.addEdge(nodes2[1], nodes2[0]);
+		
+		List<SubGroum> patterns = whenPatternsAreDetected(2, groum1, groum2);
 
-		Groum groum2 = new Groum();
-		ActionNode node1b = new ActionNode("B", "B");
-		ActionNode node2b = new ActionNode("A", "A");
-		groum2.addNode(node1b);
-		groum2.addNode(node2b);
-		groum2.addEdge(node1b, node2b);
-
-		PattExplorer uut = new PattExplorer(2);
-		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
-
-		// Target patterns:
-		Groum patternA = new Groum();
-		ActionNode nodea = new ActionNode("A", "A");
-		patternA.addNode(nodea);
-
-		Groum patternB = new Groum();
-		ActionNode nodeb = new ActionNode("B", "B");
-		patternB.addNode(nodeb);
-
-		PatternAssert.assertContainsPatterns(patterns, patternA, patternB);
+		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		assertContainsPatterns(patternsOfSize2);
 	}
 
 	@Test
