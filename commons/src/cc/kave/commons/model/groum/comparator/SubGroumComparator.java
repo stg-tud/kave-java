@@ -16,7 +16,7 @@ public class SubGroumComparator implements Comparator<SubGroum> {
 		else if (o1.equals(o2))
 			return 0;
 		else {
-			int nodes = Integer.compare(o1.getVertexCount(), o2.getVertexCount());
+			int nodes = Integer.compare(o1.getNodeCount(), o2.getNodeCount());
 			if (nodes != 0)
 				return nodes;
 			int edges = Integer.compare(o1.getEdgeCount(), o2.getEdgeCount());
@@ -32,7 +32,7 @@ public class SubGroumComparator implements Comparator<SubGroum> {
 		if (o2 == null)
 			return 1;
 
-		int nodes = Integer.compare(o1.getVertexCount(), o2.getVertexCount());
+		int nodes = Integer.compare(o1.getNodeCount(), o2.getNodeCount());
 		if (nodes != 0)
 			return nodes;
 

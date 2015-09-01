@@ -21,11 +21,11 @@ public class GroumQueryTest {
 		ActionNode node5 = new ActionNode("BufferedReader", "readline");
 
 		Groum groum = new Groum();
-		groum.addVertex(node1);
-		groum.addVertex(node2);
-		groum.addVertex(node3);
-		groum.addVertex(node4);
-		groum.addVertex(node5);
+		groum.addNode(node1);
+		groum.addNode(node2);
+		groum.addNode(node3);
+		groum.addNode(node4);
+		groum.addNode(node5);
 
 		Set<INode> equalNodes = groum.getEqualNodes(node1);
 		assertTrue(equalNodes.size() == 3);
@@ -49,10 +49,10 @@ public class GroumQueryTest {
 		ActionNode node5 = new ActionNode("BufferedReader", "readline");
 
 		Groum groum = new Groum();
-		groum.addVertex(node2);
-		groum.addVertex(node3);
-		groum.addVertex(node4);
-		groum.addVertex(node5);
+		groum.addNode(node2);
+		groum.addNode(node3);
+		groum.addNode(node4);
+		groum.addNode(node5);
 
 		assertTrue(groum.containsEqualNode(node1));
 	}

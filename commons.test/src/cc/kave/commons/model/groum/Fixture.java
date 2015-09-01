@@ -13,42 +13,42 @@ public class Fixture {
 		Groum groum = new Groum();
 
 		ActionNode sbInit = new ActionNode("StringBuffer", "<init>");
-		groum.addVertex(sbInit);
+		groum.addNode(sbInit);
 
 		ActionNode frInit = new ActionNode("FileReader", "<init>");
-		groum.addVertex(frInit);
+		groum.addNode(frInit);
 		groum.addEdge(sbInit, frInit);
 
 		ActionNode brInit = new ActionNode("BufferedReader", "<init>");
-		groum.addVertex(brInit);
+		groum.addNode(brInit);
 		groum.addEdge(frInit, brInit);
 
 		ActionNode brReadline = new ActionNode("BufferedReader", "readLine");
-		groum.addVertex(brReadline);
+		groum.addNode(brReadline);
 		groum.addEdge(brInit, brReadline);
 
 		ControlNode while1 = new ControlNode("WHILE");
-		groum.addVertex(while1);
+		groum.addNode(while1);
 		groum.addEdge(brReadline, while1);
 
 		ActionNode sbAppend = new ActionNode("StringBuffer", "append");
-		groum.addVertex(sbAppend);
+		groum.addNode(sbAppend);
 		groum.addEdge(while1, sbAppend);
 
 		ActionNode sbLength = new ActionNode("StringBuffer", "length");
-		groum.addVertex(sbLength);
+		groum.addNode(sbLength);
 		groum.addEdge(sbAppend, sbLength);
 
 		ControlNode if1 = new ControlNode("IF");
-		groum.addVertex(if1);
+		groum.addNode(if1);
 		groum.addEdge(sbLength, if1);
 
 		ActionNode sbToString = new ActionNode("StringBuffer", "toString");
-		groum.addVertex(sbToString);
+		groum.addNode(sbToString);
 		groum.addEdge(if1, sbToString);
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addVertex(brClose);
+		groum.addNode(brClose);
 		groum.addEdge(sbToString, brClose);
 
 		return groum;
@@ -59,54 +59,54 @@ public class Fixture {
 		Groum groum = new Groum();
 
 		ActionNode sbInit = new ActionNode("StringBuffer", "<init>");
-		groum.addVertex(sbInit);
+		groum.addNode(sbInit);
 
 		ActionNode frInit = new ActionNode("FileReader", "<init>");
-		groum.addVertex(frInit);
+		groum.addNode(frInit);
 		groum.addEdge(sbInit, frInit);
 
 		ActionNode brInit = new ActionNode("BufferedReader", "<init>");
-		groum.addVertex(brInit);
+		groum.addNode(brInit);
 		groum.addEdge(frInit, brInit);
 
 		ActionNode brReadline = new ActionNode("BufferedReader", "readLine");
-		groum.addVertex(brReadline);
+		groum.addNode(brReadline);
 		groum.addEdge(brInit, brReadline);
 
 		ControlNode while1 = new ControlNode("WHILE");
-		groum.addVertex(while1);
+		groum.addNode(while1);
 		groum.addEdge(brReadline, while1);
 
 		ActionNode sbAppend = new ActionNode("StringBuffer", "append");
-		groum.addVertex(sbAppend);
+		groum.addNode(sbAppend);
 		groum.addEdge(while1, sbAppend);
 
 		ActionNode sbLength = new ActionNode("StringBuffer", "length");
-		groum.addVertex(sbLength);
+		groum.addNode(sbLength);
 		groum.addEdge(sbAppend, sbLength);
 
 		ControlNode if1 = new ControlNode("IF");
-		groum.addVertex(if1);
+		groum.addNode(if1);
 		groum.addEdge(sbLength, if1);
 
 		ActionNode sbToString = new ActionNode("StringBuffer", "toString");
-		groum.addVertex(sbToString);
+		groum.addNode(sbToString);
 		groum.addEdge(if1, sbToString);
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addVertex(brClose);
+		groum.addNode(brClose);
 		groum.addEdge(sbToString, brClose);
 
 		ActionNode sbInit1 = new ActionNode("StringBuffer", "<init>");
-		groum.addVertex(sbInit1);
+		groum.addNode(sbInit1);
 		groum.addEdge(brClose, sbInit1);
 
 		ActionNode frInit1 = new ActionNode("FileReader", "<init>");
-		groum.addVertex(frInit1);
+		groum.addNode(frInit1);
 		groum.addEdge(sbInit1, frInit1);
 
 		ActionNode brInit1 = new ActionNode("BufferedReader", "<init>");
-		groum.addVertex(brInit1);
+		groum.addNode(brInit1);
 		groum.addEdge(frInit1, brInit1);
 
 		return groum;
@@ -162,11 +162,11 @@ public class Fixture {
 
 		Groum groum = new Groum();
 		INode previous = createActionNodeInstance(String.valueOf(1));
-		groum.addVertex(previous);
+		groum.addNode(previous);
 
 		for (int i = 2; i <= size; i++) {
 			INode next = createActionNodeInstance(String.valueOf(i));
-			groum.addVertex(next);
+			groum.addNode(next);
 			groum.addEdge(previous, next);
 			previous = next;
 		}
@@ -179,11 +179,11 @@ public class Fixture {
 
 		Groum groum = new Groum();
 		INode previous = createActionNodeInstance(String.valueOf(low));
-		groum.addVertex(previous);
+		groum.addNode(previous);
 
 		for (int i = low + 1; i <= high; i++) {
 			INode next = createActionNodeInstance(String.valueOf(i));
-			groum.addVertex(next);
+			groum.addNode(next);
 			groum.addEdge(previous, next);
 			previous = next;
 		}

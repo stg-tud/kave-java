@@ -23,22 +23,22 @@ public class GroumComparatorTest {
 		ActionNode node1 = new ActionNode("1", "1");
 		ActionNode node2 = new ActionNode("2", "2");
 		SubGroum groum1 = new SubGroum();
-		groum1.addVertex(node1);
-		groum1.addVertex(node2);
+		groum1.addNode(node1);
+		groum1.addNode(node2);
 		groum1.addEdge(node1, node2);
 
 		ActionNode node1a = new ActionNode("1", "1");
 		ActionNode node2a = new ActionNode("2", "2");
 		SubGroum groum2 = new SubGroum();
-		groum2.addVertex(node2a);
-		groum2.addVertex(node1a);
+		groum2.addNode(node2a);
+		groum2.addNode(node1a);
 		groum2.addEdge(node1a, node2a);
 
 		ActionNode node1b = new ActionNode("1", "1");
 		ActionNode node2b = new ActionNode("3", "3");
 		SubGroum groum3 = new SubGroum();
-		groum3.addVertex(node1b);
-		groum3.addVertex(node2b);
+		groum3.addNode(node1b);
+		groum3.addNode(node2b);
 		groum3.addEdge(node1b, node2b);
 
 		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
@@ -83,9 +83,9 @@ public class GroumComparatorTest {
 		INode a = new ActionNode("1","1");
 		INode b = new ActionNode("2","2");
 		INode c = new ActionNode("3","3");
-		groum_less_eges.addVertex(a);
-		groum_less_eges.addVertex(b);
-		groum_less_eges.addVertex(c);
+		groum_less_eges.addNode(a);
+		groum_less_eges.addNode(b);
+		groum_less_eges.addNode(c);
 		groum_less_eges.addEdge(a, b);
 
 		GroumComparator uut = new GroumComparator();
@@ -99,17 +99,17 @@ public class GroumComparatorTest {
 		INode node3 = new ActionNode("3","3");
 		
 		Groum groum1 = new SubGroum();
-		groum1.addVertex(node1);
-		groum1.addVertex(node2);
-		groum1.addVertex(node3);
+		groum1.addNode(node1);
+		groum1.addNode(node2);
+		groum1.addNode(node3);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node2, node3);
 		
 		Groum groum2 = new SubGroum();
-		groum2.addVertex(node2);
-		groum2.addVertex(node3);
+		groum2.addNode(node2);
+		groum2.addNode(node3);
 		groum2.addEdge(node2, node3);
-		groum2.addVertex(node1);
+		groum2.addNode(node1);
 		groum2.addEdge(node1, node2);
 		
 		GroumComparator uut = new GroumComparator();
@@ -124,19 +124,19 @@ public class GroumComparatorTest {
 		INode node4 = new ActionNode("4","4");
 		
 		SubGroum groum1 = new SubGroum();
-		groum1.addVertex(node1);
-		groum1.addVertex(node2);
-		groum1.addVertex(node3);
-		groum1.addVertex(node4);
+		groum1.addNode(node1);
+		groum1.addNode(node2);
+		groum1.addNode(node3);
+		groum1.addNode(node4);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node2, node3);
 		groum1.addEdge(node2, node4);
 		
 		SubGroum groum2 = new SubGroum();
-		groum2.addVertex(node1);
-		groum2.addVertex(node2);
-		groum2.addVertex(node3);
-		groum2.addVertex(node4);
+		groum2.addNode(node1);
+		groum2.addNode(node2);
+		groum2.addNode(node3);
+		groum2.addNode(node4);
 		groum2.addEdge(node1, node2);
 		groum2.addEdge(node2, node3);
 		groum2.addEdge(node3, node4);
@@ -153,19 +153,19 @@ public class GroumComparatorTest {
 		INode node4 = new ActionNode("4","4");
 		
 		SubGroum groum1 = new SubGroum();
-		groum1.addVertex(node1);
-		groum1.addVertex(node2);
-		groum1.addVertex(node3);
-		groum1.addVertex(node4);
+		groum1.addNode(node1);
+		groum1.addNode(node2);
+		groum1.addNode(node3);
+		groum1.addNode(node4);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node1, node3);
 		groum1.addEdge(node2, node4);
 		
 		SubGroum groum2 = new SubGroum();
-		groum2.addVertex(node4);
-		groum2.addVertex(node3);
-		groum2.addVertex(node2);
-		groum2.addVertex(node1);
+		groum2.addNode(node4);
+		groum2.addNode(node3);
+		groum2.addNode(node2);
+		groum2.addNode(node1);
 		groum2.addEdge(node1, node2);
 		groum2.addEdge(node1, node3);
 		groum2.addEdge(node3, node4);

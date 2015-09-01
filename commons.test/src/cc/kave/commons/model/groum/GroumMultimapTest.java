@@ -181,9 +181,9 @@ public class GroumMultimapTest {
 		INode node2 = new ActionNode("2", "2");
 		INode node3 = new ActionNode("3", "3");
 		SubGroum a = new SubGroum(null);
-		a.addVertex(node1);
-		a.addVertex(node2);
-		a.addVertex(node3);
+		a.addNode(node1);
+		a.addNode(node2);
+		a.addNode(node3);
 		a.addEdge(node1, node2);
 		a.addEdge(node1, node3);
 
@@ -191,10 +191,10 @@ public class GroumMultimapTest {
 		INode node2b = new ActionNode("2", "2");
 		INode node3b = new ActionNode("3", "3");
 		SubGroum b = new SubGroum(null);
-		b.addVertex(node1b);
-		b.addVertex(node3b);
+		b.addNode(node1b);
+		b.addNode(node3b);
 		b.addEdge(node1b, node3b);
-		b.addVertex(node2b);
+		b.addNode(node2b);
 		b.addEdge(node1b, node2b);
 
 		treemap.putAll(a, Arrays.asList(a));

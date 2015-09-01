@@ -32,10 +32,10 @@ public class GroumTest {
 		ActionNode c = new ActionNode("A", "2");
 
 		Groum groum = new Groum();
-		groum.addVertex(a);
+		groum.addNode(a);
 
 		Groum groum2 = new Groum();
-		groum2.addVertex(c);
+		groum2.addNode(c);
 
 		assertNotEquals(groum, groum2);
 	}
@@ -50,15 +50,15 @@ public class GroumTest {
 		ActionNode c2 = new ActionNode("C", "3");
 
 		Groum groum = new Groum();
-		groum.addVertex(a1);
-		groum.addVertex(b1);
-		groum.addVertex(c1);
+		groum.addNode(a1);
+		groum.addNode(b1);
+		groum.addNode(c1);
 		groum.addEdge(a1, b1);
 
 		Groum groum2 = new Groum();
-		groum2.addVertex(a2);
-		groum2.addVertex(b2);
-		groum2.addVertex(c2);
+		groum2.addNode(a2);
+		groum2.addNode(b2);
+		groum2.addNode(c2);
 		groum2.addEdge(b2, c2);
 
 		assertNotEquals(groum, groum2);
@@ -74,16 +74,16 @@ public class GroumTest {
 		ActionNode c2 = new ActionNode("C", "3");
 
 		Groum groum = new Groum();
-		groum.addVertex(a1);
-		groum.addVertex(b1);
-		groum.addVertex(c1);
+		groum.addNode(a1);
+		groum.addNode(b1);
+		groum.addNode(c1);
 		groum.addEdge(a1, c1);
 		groum.addEdge(a1, b1);
 
 		Groum groum2 = new Groum();
-		groum2.addVertex(a2);
-		groum2.addVertex(c2);
-		groum2.addVertex(b2);
+		groum2.addNode(a2);
+		groum2.addNode(c2);
+		groum2.addNode(b2);
 		groum2.addEdge(a2, b2);
 		groum2.addEdge(a2, c2);
 
@@ -96,9 +96,9 @@ public class GroumTest {
 		INode node2 = new ActionNode("2", "2");
 		INode node3 = new ActionNode("3", "3");		
 		Groum a = new Groum();
-		a.addVertex(node1);
-		a.addVertex(node2);
-		a.addVertex(node3);
+		a.addNode(node1);
+		a.addNode(node2);
+		a.addNode(node3);
 		a.addEdge(node1, node2);
 		a.addEdge(node1, node3);
 		
@@ -106,9 +106,9 @@ public class GroumTest {
 		INode node2b = new ActionNode("2", "2");
 		INode node3b = new ActionNode("3", "3");		
 		Groum b = new Groum();
-		b.addVertex(node1b);
-		b.addVertex(node3b);
-		b.addVertex(node2b);
+		b.addNode(node1b);
+		b.addNode(node3b);
+		b.addNode(node2b);
 		b.addEdge(node1b, node3b);
 		b.addEdge(node1b, node2b);
 		
@@ -120,7 +120,7 @@ public class GroumTest {
 		Groum groum = Fixture.getPapersExampleGroum();
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addVertex(brClose);
+		groum.addNode(brClose);
 
 		assertTrue(groum.getLeaf().equals(brClose));
 	}
@@ -130,7 +130,7 @@ public class GroumTest {
 		Groum groum = new Groum();
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addVertex(brClose);
+		groum.addNode(brClose);
 
 		assertTrue(groum.getLeaf().equals(brClose));
 	}
@@ -140,7 +140,7 @@ public class GroumTest {
 		Groum groum = new Groum();
 
 		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addVertex(brClose);
+		groum.addNode(brClose);
 
 		assertTrue(groum.getRoot().equals(brClose));
 	}
@@ -157,11 +157,11 @@ public class GroumTest {
 		Groum groum = new Groum();
 		ActionNode aNode = new ActionNode("System.out", "println");
 		ActionNode aNode2 = new ActionNode("System.out", "println");
-		groum.addVertex(aNode);
-		groum.addVertex(aNode2);
+		groum.addNode(aNode);
+		groum.addNode(aNode2);
 		
 		assertEquals(aNode, aNode2);
-		assertEquals(2, groum.getVertexCount());
+		assertEquals(2, groum.getNodeCount());
 	}
 
 	@Test
@@ -169,8 +169,8 @@ public class GroumTest {
 		ActionNode aNode = new ActionNode("BufferedReader", "readLine");
 		ActionNode aNode2 = new ActionNode("System.out", "println");
 		Groum groum = new Groum();
-		groum.addVertex(aNode);
-		groum.addVertex(aNode2);
+		groum.addNode(aNode);
+		groum.addNode(aNode2);
 		assertTrue(groum.getNode(aNode) == aNode);
 	}
 
@@ -182,10 +182,10 @@ public class GroumTest {
 		ControlNode d = new ControlNode("WHILE");
 
 		Groum groum = new Groum();
-		groum.addVertex(a);
-		groum.addVertex(b);
-		groum.addVertex(c);
-		groum.addVertex(d);
+		groum.addNode(a);
+		groum.addNode(b);
+		groum.addNode(c);
+		groum.addNode(d);
 
 		groum.addEdge(a, b);
 		groum.addEdge(b, c);
@@ -209,20 +209,20 @@ public class GroumTest {
 		ActionNode d = new ActionNode("D", "4");
 
 		Groum groum = new Groum();
-		groum.addVertex(a);
-		groum.addVertex(b);
-		groum.addVertex(c);
-		groum.addVertex(d);
+		groum.addNode(a);
+		groum.addNode(b);
+		groum.addNode(c);
+		groum.addNode(d);
 
 		groum.addEdge(a, b);
 		groum.addEdge(b, c);
 		groum.addEdge(b, d);
 
 		Groum groum2 = new Groum();
-		groum2.addVertex(a);
-		groum2.addVertex(c);
-		groum2.addVertex(b);
-		groum2.addVertex(d);
+		groum2.addNode(a);
+		groum2.addNode(c);
+		groum2.addNode(b);
+		groum2.addNode(d);
 
 		groum2.addEdge(b, c);
 		groum2.addEdge(a, b);
@@ -238,17 +238,17 @@ public class GroumTest {
 		ActionNode d = new ActionNode("A", "2");
 
 		Groum groum = new Groum();
-		groum.addVertex(a);
-		groum.addVertex(b);
-		groum.addVertex(c);
+		groum.addNode(a);
+		groum.addNode(b);
+		groum.addNode(c);
 
 		groum.addEdge(a, b);
 		groum.addEdge(b, c);
 
 		Groum groum2 = new Groum();
-		groum2.addVertex(b);
-		groum2.addVertex(c);
-		groum2.addVertex(d);
+		groum2.addNode(b);
+		groum2.addNode(c);
+		groum2.addNode(d);
 
 		groum2.addEdge(b, c);
 		groum2.addEdge(c, d);
@@ -262,8 +262,8 @@ public class GroumTest {
 		ActionNode b = new ActionNode("A", "1");
 
 		Groum groum = new Groum();
-		groum.addVertex(a);
-		groum.addVertex(b);
+		groum.addNode(a);
+		groum.addNode(b);
 		groum.addEdge(a, b);
 
 		Groum groum3 = (Groum) groum.clone();
@@ -294,7 +294,7 @@ public class GroumTest {
 		Groum groum = Fixture.createConnectedGroumOfSize(5, 5);
 		Groum target = new Groum();
 		INode node = new ActionNode("5", "5");
-		target.addVertex(node);
+		target.addNode(node);
 		assertTrue(groum.getAllNodes().size() == 1 && groum.equals(target));
 	}
 

@@ -13,7 +13,7 @@ public class Utils {
 		List<SubGroum> subgroums = new LinkedList<>();
 		for (INode node : groum.getAllNodes()) {
 			SubGroum subgroum = new SubGroum(groum);
-			subgroum.addVertex(node);
+			subgroum.addNode(node);
 			subgroums.add(subgroum);
 		}
 		return subgroums;

@@ -27,13 +27,13 @@ public class PattExplorerGraphTest {
 		
 		Groum subject = new Groum();
 		ActionNode node1 = new ActionNode("1", "1");
-		subject.addVertex(node1);
+		subject.addNode(node1);
 		ActionNode node2 = new ActionNode("2", "2");
-		subject.addVertex(node2);
+		subject.addNode(node2);
 		ActionNode node3a = new ActionNode("3", "3");
-		subject.addVertex(node3a);
+		subject.addNode(node3a);
 		ActionNode node3b = new ActionNode("3", "3");
-		subject.addVertex(node3b);
+		subject.addNode(node3b);
 
 		subject.addEdge(node1, node2);
 		subject.addEdge(node1, node3a);
@@ -43,16 +43,16 @@ public class PattExplorerGraphTest {
 		List<SubGroum> actuals = uut.explorePatterns(Arrays.asList(subject));
 
 		Groum patternA = new Groum();
-		patternA.addVertex(node1);
-		patternA.addVertex(node2);
-		patternA.addVertex(node3a);
+		patternA.addNode(node1);
+		patternA.addNode(node2);
+		patternA.addNode(node3a);
 		patternA.addEdge(node1, node2);
 		patternA.addEdge(node1, node3a);
 
 		Groum patternB = new Groum();
-		patternB.addVertex(node1);
-		patternB.addVertex(node2);
-		patternB.addVertex(node3b);
+		patternB.addNode(node1);
+		patternB.addNode(node2);
+		patternB.addNode(node3b);
 		patternB.addEdge(node1, node2);
 		patternB.addEdge(node2, node3b);
 		List<SubGroum> patternsOfSize = filterBySize(actuals, 3);
@@ -82,12 +82,12 @@ public class PattExplorerGraphTest {
 		INode node3b = new ActionNode("3", "3");
 		INode node4 = new ActionNode("4", "4");
 		INode node5 = new ActionNode("5", "5");
-		complexGroum.addVertex(node1);
-		complexGroum.addVertex(node2);
-		complexGroum.addVertex(node3a);
-		complexGroum.addVertex(node3b);
-		complexGroum.addVertex(node4);
-		complexGroum.addVertex(node5);
+		complexGroum.addNode(node1);
+		complexGroum.addNode(node2);
+		complexGroum.addNode(node3a);
+		complexGroum.addNode(node3b);
+		complexGroum.addNode(node4);
+		complexGroum.addNode(node5);
 		complexGroum.addEdge(node1, node2);
 		complexGroum.addEdge(node1, node3a);
 		complexGroum.addEdge(node2, node4);
@@ -97,9 +97,9 @@ public class PattExplorerGraphTest {
 		complexGroum.addEdge(node4, node5);
 
 		Groum structuredGroum = new Groum();
-		structuredGroum.addVertex(node1);
-		structuredGroum.addVertex(node2);
-		structuredGroum.addVertex(node3a);
+		structuredGroum.addNode(node1);
+		structuredGroum.addNode(node2);
+		structuredGroum.addNode(node3a);
 		structuredGroum.addEdge(node1, node2);
 		structuredGroum.addEdge(node1, node3a);
 
@@ -135,13 +135,13 @@ public class PattExplorerGraphTest {
 		INode node4a = new ActionNode("4", "4");
 		INode node4b = new ActionNode("4", "4");
 		INode node5 = new ActionNode("5", "5");
-		complexGroum.addVertex(node1);
-		complexGroum.addVertex(node2);
-		complexGroum.addVertex(node3a);
-		complexGroum.addVertex(node3b);
-		complexGroum.addVertex(node4a);
-		complexGroum.addVertex(node4b);
-		complexGroum.addVertex(node5);
+		complexGroum.addNode(node1);
+		complexGroum.addNode(node2);
+		complexGroum.addNode(node3a);
+		complexGroum.addNode(node3b);
+		complexGroum.addNode(node4a);
+		complexGroum.addNode(node4b);
+		complexGroum.addNode(node5);
 
 		complexGroum.addEdge(node1, node2);
 		complexGroum.addEdge(node1, node3a);
@@ -179,14 +179,14 @@ public class PattExplorerGraphTest {
 		INode nodeA_3c = new ActionNode("3", "3");
 		INode nodeA_3d = new ActionNode("3", "3");
 		INode nodeA_4 = new ActionNode("4", "4");
-		groumA.addVertex(nodeA_1);
-		groumA.addVertex(nodeA_2a);
-		groumA.addVertex(nodeA_2b);
-		groumA.addVertex(nodeA_3a);
-		groumA.addVertex(nodeA_3b);
-		groumA.addVertex(nodeA_3c);
-		groumA.addVertex(nodeA_3d);
-		groumA.addVertex(nodeA_4);
+		groumA.addNode(nodeA_1);
+		groumA.addNode(nodeA_2a);
+		groumA.addNode(nodeA_2b);
+		groumA.addNode(nodeA_3a);
+		groumA.addNode(nodeA_3b);
+		groumA.addNode(nodeA_3c);
+		groumA.addNode(nodeA_3d);
+		groumA.addNode(nodeA_4);
 		groumA.addEdge(nodeA_1, nodeA_2a);
 		groumA.addEdge(nodeA_1, nodeA_2a);
 		groumA.addEdge(nodeA_2a, nodeA_3a);
@@ -203,14 +203,14 @@ public class PattExplorerGraphTest {
 		INode nodeB_3c = new ActionNode("3", "3");
 		INode nodeB_3d = new ActionNode("3", "3");
 		INode nodeB_4 = new ActionNode("4", "4");
-		groumB.addVertex(nodeB_1);
-		groumB.addVertex(nodeB_2a);
-		groumB.addVertex(nodeB_2b);
-		groumB.addVertex(nodeB_3a);
-		groumB.addVertex(nodeB_3b);
-		groumB.addVertex(nodeB_3c);
-		groumB.addVertex(nodeB_3d);
-		groumB.addVertex(nodeB_4);
+		groumB.addNode(nodeB_1);
+		groumB.addNode(nodeB_2a);
+		groumB.addNode(nodeB_2b);
+		groumB.addNode(nodeB_3a);
+		groumB.addNode(nodeB_3b);
+		groumB.addNode(nodeB_3c);
+		groumB.addNode(nodeB_3d);
+		groumB.addNode(nodeB_4);
 		groumB.addEdge(nodeB_1, nodeB_2a);
 		groumB.addEdge(nodeB_1, nodeB_2a);
 		groumB.addEdge(nodeB_2a, nodeB_3a);
@@ -227,14 +227,14 @@ public class PattExplorerGraphTest {
 		INode nodeC_3c = new ActionNode("3", "3");
 		INode nodeC_3d = new ActionNode("3", "3");
 		INode nodeC_4 = new ActionNode("4", "4");
-		groumC.addVertex(nodeC_1);
-		groumC.addVertex(nodeC_2a);
-		groumC.addVertex(nodeC_2b);
-		groumC.addVertex(nodeC_3a);
-		groumC.addVertex(nodeC_3b);
-		groumC.addVertex(nodeC_3c);
-		groumC.addVertex(nodeC_3d);
-		groumC.addVertex(nodeC_4);
+		groumC.addNode(nodeC_1);
+		groumC.addNode(nodeC_2a);
+		groumC.addNode(nodeC_2b);
+		groumC.addNode(nodeC_3a);
+		groumC.addNode(nodeC_3b);
+		groumC.addNode(nodeC_3c);
+		groumC.addNode(nodeC_3d);
+		groumC.addNode(nodeC_4);
 		groumC.addEdge(nodeC_1, nodeC_2a);
 		groumC.addEdge(nodeC_1, nodeC_2a);
 		groumC.addEdge(nodeC_2a, nodeC_3a);
@@ -345,7 +345,7 @@ public class PattExplorerGraphTest {
 	private Groum createGroum(INode... nodes) {
 		Groum groum = new Groum();
 		for (INode node : nodes) {
-			groum.addVertex(node);
+			groum.addNode(node);
 		}
 		return groum;
 	}

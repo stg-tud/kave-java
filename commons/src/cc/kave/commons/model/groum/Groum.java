@@ -118,7 +118,7 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		dirty = true;
 	}
 
-	public void addVertex(INode node) {
+	public void addNode(INode node) {
 		groum.addVertex(node);
 		if (root == null)
 			root = node;
@@ -139,7 +139,7 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		return groum.toString();
 	}
 
-	public int getVertexCount() {
+	public int getNodeCount() {
 		return groum.vertexSet().size();
 	}
 

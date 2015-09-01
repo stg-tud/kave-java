@@ -16,7 +16,7 @@ public class GroumComparator implements Comparator<Groum> {
 		if (o2 == null)
 			return 1;
 
-		int nodes = Integer.compare(o1.getVertexCount(), o2.getVertexCount());
+		int nodes = Integer.compare(o1.getNodeCount(), o2.getNodeCount());
 		if (nodes != 0)
 			return nodes;
 

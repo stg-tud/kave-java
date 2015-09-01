@@ -62,7 +62,7 @@ public class SubGroum extends Groum {
 		// Build extended groums
 		for (INode extnode : extendingNodes) {
 			SubGroum extendedSubgroum = (SubGroum) this.clone();
-			extendedSubgroum.addVertex(extnode);
+			extendedSubgroum.addNode(extnode);
 			for (INode node : this.getAllNodes()) {
 				Set<INode> nodesuccessors = parent.getSuccessors(node);
 				for (INode successor : nodesuccessors) {
@@ -100,7 +100,7 @@ public class SubGroum extends Groum {
 					if (!(this.containsNode(candidate)))
 						if (candidate.equals(extendingNode)) {
 							if (!extendedSubgroum.containsNode(candidate)) {
-								extendedSubgroum.addVertex(candidate);
+								extendedSubgroum.addNode(candidate);
 								extended = true;
 							}
 							extendedSubgroum.addEdge(node, candidate);
