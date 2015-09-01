@@ -12,19 +12,41 @@ import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.PattExplorer;
+import static cc.kave.commons.model.groum.GroumTestUtils.*;
+import static cc.kave.commons.model.groum.PatternAssert.*;
 
 public class PattExplorerTest {
 
 	@Test
+	public void findsSingeNodePatterns() {
+		Groum groum = createGroum("A", "B", "C");
+
+		List<SubGroum> patterns = whenPatternsAreDetected(1, groum);
+
+		assertContainsPatterns(patterns, createGroum("A"), createGroum("B"),
+				createGroum("C"));
+	}
+	
+	@Test
+	public void filtersPatternsByFrequency() {
+		Groum groum1 = createGroum("A", "B");
+		Groum groum2 = createGroum("A");
+
+		List<SubGroum> patterns = whenPatternsAreDetected(2, groum1, groum2);
+
+		assertContainsPatterns(patterns, createGroum("A"));
+	}
+
+	private List<SubGroum> whenPatternsAreDetected(int threshold, Groum... groums) {
+		PattExplorer uut = new PattExplorer(threshold);
+		return uut.explorePatterns(Arrays.asList(groums));
+	}
+	
+	@Test
 	public void findsOneNodePatterns() {
-		Groum groum1 = new Groum();
-		ActionNode node1a = new ActionNode("A", "A");
-		groum1.addNode(node1a);
-
-		Groum groum2 = new Groum();
-		ActionNode node1b = new ActionNode("A", "A");
-		groum2.addNode(node1b);
-
+		Groum groum1 = createGroum(createNodes("A"));
+		Groum groum2 = createGroum(createNodes("A"));
+		
 		PattExplorer uut = new PattExplorer(2);
 
 		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));

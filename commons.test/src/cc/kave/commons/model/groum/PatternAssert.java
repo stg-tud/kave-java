@@ -2,17 +2,21 @@ package cc.kave.commons.model.groum;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PatternAssert {
-
-	static void assertContainsPatterns(List<SubGroum> actuals, Groum... expected) {
-		List<Groum> expecteds = Arrays.asList(expected);
-		assertEquals(String.format("%s, %s", actuals, expecteds), expecteds.size(), actuals.size());
-		assertTrue(actuals.containsAll(expecteds));
+	
+	static void assertContainsPatterns(List<SubGroum> actuals, Groum... expecteds) {
+		TreeSet<Groum> actual = new TreeSet<Groum>(new DFSGroumComparator());
+		actual.addAll(actuals);
+		TreeSet<Groum> expected = new TreeSet<Groum>(new DFSGroumComparator());
+		expected.addAll(Arrays.asList(expecteds));
+		assertEquals(expected, actual);
 	}
 
 	static List<SubGroum> filterBySize(List<SubGroum> actuals, int size) {

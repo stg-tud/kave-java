@@ -15,6 +15,10 @@ public class GroumTestUtils {
 		return groum;
 	}
 	
+	public static Groum createGroum(String... nodeIds) {
+		return createGroum(createNodes(nodeIds));
+	}
+	
 	public static Node[] createNodes(String... nodeIds) {
 		Node[] nodes = new Node[nodeIds.length];
 		for (int i = 0; i < nodeIds.length; i++) {
