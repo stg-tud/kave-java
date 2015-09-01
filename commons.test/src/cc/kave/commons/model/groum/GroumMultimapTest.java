@@ -15,7 +15,7 @@ import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
 import cc.kave.commons.model.groum.comparator.GroumIdentComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumIdentComparator;
+import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.Utils;
 
@@ -159,7 +159,7 @@ public class GroumMultimapTest {
 		}
 
 		TreeMultimap<SubGroum, SubGroum> multiset = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+				new HashCodeComparator());
 		for (SubGroum subgroum : subgroums) {
 			multiset.put(subgroum, subgroum);
 		}
@@ -175,7 +175,7 @@ public class GroumMultimapTest {
 	@Test
 	public void putsUnorderedGroumIntoSameBucket() {
 		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+				new HashCodeComparator());
 
 		Node node1 = new ActionNode("1", "1");
 		Node node2 = new ActionNode("2", "2");

@@ -11,7 +11,7 @@ import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumIdentComparator;
+import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 
 import com.google.common.collect.TreeMultimap;
@@ -42,7 +42,7 @@ public class GroumComparatorTest {
 		groum3.addEdge(node1b, node2b);
 
 		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+				new HashCodeComparator());
 		treemap.put(groum3, groum3);
 		treemap.put(groum1, groum1);
 		treemap.put(groum2, groum2);
