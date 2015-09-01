@@ -135,16 +135,6 @@ public class GroumTest {
 	}
 
 	@Test
-	public void findsIdenticNode() {
-		ActionNode aNode = new ActionNode("BufferedReader", "readLine");
-		ActionNode aNode2 = new ActionNode("System.out", "println");
-		Groum groum = new Groum();
-		groum.addNode(aNode);
-		groum.addNode(aNode2);
-		assertTrue(groum.getNode(aNode) == aNode);
-	}
-
-	@Test
 	public void findsSuccessors() {
 		ActionNode a = new ActionNode("root", "root");
 		ActionNode b = new ActionNode("B", "1");

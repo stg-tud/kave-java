@@ -85,32 +85,8 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		return groum.edgeSet();
 	}
 
-	public INode getNode(INode node) {
-		if (groum.containsVertex(node)) {
-			for (INode aNode : groum.vertexSet()) {
-				if (aNode == node)
-					return node;
-			}
-		} else {
-			return null;
-		}
-		return null;
-	}
-
-	public boolean containsEqualNode(INode node) {
-		for (INode aNode : groum.vertexSet()) {
-			if (node.equals(aNode))
-				return true;
-		}
-		return false;
-	}
-
 	public boolean containsNode(INode node) {
 		return groum.containsVertex(node);
-	}
-
-	public boolean containsEdge(INode source, INode target) {
-		return groum.containsEdge(source, target);
 	}
 
 	public void addEdge(INode source, INode target) {
