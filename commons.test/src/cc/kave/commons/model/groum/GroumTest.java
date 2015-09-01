@@ -116,36 +116,6 @@ public class GroumTest {
 	}
 
 	@Test
-	public void findsLeaf() {
-		Groum groum = Fixture.getPapersExampleGroum();
-
-		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addNode(brClose);
-
-		assertTrue(groum.getLeaf().equals(brClose));
-	}
-
-	@Test
-	public void findsLeafInSoloGroum() {
-		Groum groum = new Groum();
-
-		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addNode(brClose);
-
-		assertTrue(groum.getLeaf().equals(brClose));
-	}
-
-	@Test
-	public void findsRootInSoloGroum() {
-		Groum groum = new Groum();
-
-		ActionNode brClose = new ActionNode("BufferedReader", "close");
-		groum.addNode(brClose);
-
-		assertTrue(groum.getRoot().equals(brClose));
-	}
-
-	@Test
 	public void identityWorksFine() {
 		Groum a = Fixture.getPapersExampleGroum();
 		Groum b = Fixture.getPapersExampleGroum();
@@ -313,12 +283,6 @@ public class GroumTest {
 				contains10 = true;
 		}
 		assertTrue(groum.getAllNodes().size() == 5 && contains6 && contains10);
-	}
-
-	@Test
-	public void generatedGroumsHaveCorrectLeaf() {
-		Groum groum = Fixture.createConnectedGroumOfSize(10);
-		assertTrue(groum.getLeaf().equals(Fixture.createActionNodeInstance("10")));
 	}
 
 	@Test

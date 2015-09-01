@@ -151,18 +151,6 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		return groum.vertexSet();
 	}
 
-	public Set<INode> getEqualNodes(INode reference) {
-
-		Set<INode> equalNodes = new HashSet<>();
-		for (INode node : groum.vertexSet()) {
-			if (node.equals(reference))
-				equalNodes.add(node);
-		}
-		if (equalNodes.size() == 0)
-			return null;
-		return equalNodes;
-	}
-
 	public int compareTo(Groum o) {
 		if (o == null)
 			return 1;
@@ -170,40 +158,5 @@ public class Groum implements Comparable<Groum>, Cloneable {
 			return 0;
 		else
 			return toString().compareTo(o.toString());
-	}
-
-	/*
-	 * Groums will have one root?
-	 * 
-	 * @see cc.kave.commons.model.groum.IGroum#getRoot()
-	 */
-	@Deprecated
-	public INode getRoot() {
-		if (dirty) {
-			int count = 0;
-			for (INode node : getAllNodes()) {
-				if (groum.incomingEdgesOf(node).size() == 0) {
-					count++;
-					root = node;
-				}
-			}
-			if (count != 1)
-				throw new RuntimeException("Groum has more then one vertices with no incoming edges.");
-		}
-		return root;
-	}
-
-	/*
-	 * There can be several leaves
-	 * 
-	 * @see cc.kave.commons.model.groum.IGroum#getLeaf()
-	 */
-	@Deprecated
-	public INode getLeaf() {
-		for (INode node : getAllNodes()) {
-			if (groum.outDegreeOf(node) == 0)
-				return node;
-		}
-		return null;
 	}
 }
