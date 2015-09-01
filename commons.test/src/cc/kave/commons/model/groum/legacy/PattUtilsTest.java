@@ -1,4 +1,4 @@
-package cc.kave.commons.model.groum;
+package cc.kave.commons.model.groum.legacy;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.groum.Groum;
+import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.pattexplore.Utils;
 
 public class PattUtilsTest {

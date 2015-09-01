@@ -1,10 +1,11 @@
-package cc.kave.commons.model.groum;
+package cc.kave.commons.model.groum.legacy;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.SubGroum;
 
