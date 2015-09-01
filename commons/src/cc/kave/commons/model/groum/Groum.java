@@ -135,4 +135,22 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		else
 			return toString().compareTo(o.toString());
 	}
+
+	public INode getRoot() {
+		// TODO this is potentially used very frequently. The result should be
+		// cached and invalidated when the Groum is changed.
+		INode root = null;
+		for (INode node : getAllNodes()) {
+			if (groum.inDegreeOf(node) == 0) {
+				if (root != null) {
+					throw new IllegalStateException("groum has multiple roots: " + toString());
+				}
+				root = node;
+			}
+		}
+		if (root == null) {
+			throw new IllegalStateException("groum has no root: " + toString());
+		}
+		return root;
+	}
 }
