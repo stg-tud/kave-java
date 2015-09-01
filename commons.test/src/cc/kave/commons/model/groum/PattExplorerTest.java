@@ -36,64 +36,37 @@ public class PattExplorerTest {
 
 		assertContainsPatterns(patterns, createGroum("A"));
 	}
+	
+	@Test
+	public void findsTwoNodePattern() {
+		Node[] nodes = createNodes("A", "B");
+		Groum groum = createGroum(nodes);
+		groum.addEdge(nodes[0], nodes[1]);
+		
+		List<SubGroum> patterns = whenPatternsAreDetected(1, groum);
+		
+		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		assertContainsPatterns(patternsOfSize2, groum);
+	}
+	
+	@Test
+	public void filtersTwoNodePatternsByFrequency() {
+		Node[] nodes1 = createNodes("A", "B");
+		Groum groum1 = createGroum(nodes1);
+		groum1.addEdge(nodes1[0], nodes1[1]);
+		Node[] nodes2 = createNodes("A", "B");
+		Groum groum2 = createGroum(nodes2);
+		groum2.addEdge(nodes2[0], nodes2[1]);
+		
+		List<SubGroum> patterns = whenPatternsAreDetected(2, groum1, groum2);
+		
+		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		assertContainsPatterns(patternsOfSize2, groum1);
+	}
 
 	private List<SubGroum> whenPatternsAreDetected(int threshold, Groum... groums) {
 		PattExplorer uut = new PattExplorer(threshold);
 		return uut.explorePatterns(Arrays.asList(groums));
-	}
-	
-	@Test
-	public void findsOneNodePatterns() {
-		Groum groum1 = createGroum(createNodes("A"));
-		Groum groum2 = createGroum(createNodes("A"));
-		
-		PattExplorer uut = new PattExplorer(2);
-
-		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
-
-		// Target patterns:
-		Groum testgroum = new Groum();
-		testgroum.addNode(new ActionNode("A", "A"));
-
-		PatternAssert.assertContainsPatterns(patterns, testgroum);
-	}
-
-	@Test
-	public void findsTwoNodePatterns() {
-		Groum groum1 = new Groum();
-		ActionNode node1a = new ActionNode("A", "A");
-		ActionNode node2a = new ActionNode("B", "B");
-		groum1.addNode(node1a);
-		groum1.addNode(node2a);
-		groum1.addEdge(node1a, node2a);
-
-		Groum groum2 = new Groum();
-		ActionNode node1b = new ActionNode("A", "A");
-		ActionNode node2b = new ActionNode("B", "B");
-		groum2.addNode(node1b);
-		groum2.addNode(node2b);
-		groum2.addEdge(node1b, node2b);
-
-		PattExplorer uut = new PattExplorer(2);
-
-		List<SubGroum> patterns = uut.explorePatterns(Arrays.asList(groum1, groum2));
-
-		// Target patterns:
-		Groum patternA = new Groum();
-		ActionNode nodea = new ActionNode("A", "A");
-		patternA.addNode(nodea);
-
-		Groum patternB = new Groum();
-		ActionNode nodeb = new ActionNode("B", "B");
-		patternB.addNode(nodeb);
-
-		Groum patternAB = new Groum();
-		patternAB.addNode(nodea);
-		patternAB.addNode(nodeb);
-		patternAB.addEdge(nodea, nodeb);
-
-		PatternAssert.assertContainsPatterns(patterns, patternA, patternB, patternAB);
-
 	}
 
 	@Test

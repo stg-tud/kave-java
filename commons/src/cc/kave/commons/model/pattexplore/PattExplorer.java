@@ -1,14 +1,16 @@
 package cc.kave.commons.model.pattexplore;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.SubGroum;
-import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumIdentComparator;
+import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
 
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.BoundType;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
 
 public class PattExplorer {
 	int threshold;
@@ -18,78 +20,68 @@ public class PattExplorer {
 	}
 
 	public List<SubGroum> explorePatterns(List<Groum> D) {
-
-		TreeMultimap<SubGroum, SubGroum> L = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+		TreeMultiset<SubGroum> L2 = TreeMultiset.create(new DFSGroumComparator());
 
 		for (Groum groum : D) {
-
 			List<SubGroum> subgroums = Utils.breakdown(groum);
 			for (SubGroum subgroum : subgroums) {
-				L.put(subgroum, subgroum);
+				L2.add(subgroum);
 			}
 		}
 
-		List<SubGroum> smallPatterns = new LinkedList<>();
-		for (SubGroum subgroum : L.keySet()) {
-			if (L.get(subgroum).size() < threshold) {
-				smallPatterns.add(subgroum);
+		for (Groum groum : L2.elementSet()) {
+			if (L2.count(groum) < threshold) {
+				L2.remove(groum, threshold);
 			}
 		}
 
-		for (SubGroum smallpattern : smallPatterns) {
-			L.removeAll(smallpattern);
+		TreeMultiset<SubGroum> explored2 = TreeMultiset.create(new DFSGroumComparator());
+
+		for (SubGroum pattern : L2.elementSet()) {
+			explored2.addAll(explore(pattern, L2, D));
 		}
 
-		TreeMultimap<SubGroum, SubGroum> explored = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+		L2.addAll(explored2);
 
-		for (SubGroum pattern : L.keySet()) {
-			explored.putAll(explore(pattern, L, D));
-		}
-
-		L.putAll(explored);
-
-		LinkedList<SubGroum> distinctPatterns = new LinkedList<>();
-		distinctPatterns.addAll(L.keySet());
-		return distinctPatterns;
+		return new ArrayList<>(L2.elementSet());
 
 	}
 
-	private TreeMultimap<SubGroum, SubGroum> explore(SubGroum P, TreeMultimap<SubGroum, SubGroum> L, List<Groum> D) {
-		TreeMultimap<SubGroum, SubGroum> patterns = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
-		TreeMultimap<SubGroum, SubGroum> newPatterns = TreeMultimap.create(new SubGroumComparator(),
-				new SubGroumIdentComparator());
+	private Multiset<SubGroum> explore(SubGroum P, Multiset<SubGroum> L, List<Groum> D) {
+		TreeMultiset<SubGroum> patterns = TreeMultiset.create(new DFSGroumComparator());
+		Multiset<SubGroum> newPatterns = TreeMultiset.create(new DFSGroumComparator());
 
-		patterns.putAll(L);
+		patterns.addAll(L);
 
-		for (SubGroum U : L.keySet()) {
+		for (SubGroum U : L.elementSet()) {
 			if (U.getAllNodes().size() == 1) {
 
-				TreeMultimap<SubGroum, SubGroum> Q = TreeMultimap.create(new SubGroumComparator(),
-						new SubGroumIdentComparator());
+				TreeMultiset<SubGroum> Q = TreeMultiset.create(new DFSGroumComparator());
 
-				for (SubGroum occurrence : patterns.get(P)) {
+				for (SubGroum occurrence : getInstances(P, patterns)) {
 					List<SubGroum> candidates = occurrence.extensibleWith(U);
 					if (candidates != null)
 						for (SubGroum candidate : candidates) {
-							Q.put(candidate, candidate);
+							Q.add(candidate);
 						}
 				}
 
-				for (SubGroum candidate : Q.keySet()) {
-					if (Q.get(candidate).size() >= threshold) {
-						newPatterns.putAll(candidate, Q.get(candidate));
+				for (SubGroum candidate : Q.elementSet()) {
+					if (Q.count(candidate) >= threshold) {
+						newPatterns.addAll(getInstances(candidate, Q));
+						patterns.addAll(getInstances(candidate, Q));
 
-						patterns.putAll(candidate, Q.get(candidate));
-
-						TreeMultimap<SubGroum, SubGroum> explored = explore(candidate, patterns, D);
-						newPatterns.putAll(explored);
+						Multiset<SubGroum> explored = explore(candidate, patterns, D);
+						newPatterns.addAll(explored);
 					}
 				}
 			}
 		}
 		return newPatterns;
+	}
+
+	private SortedMultiset<SubGroum> getInstances(SubGroum P, TreeMultiset<SubGroum> patterns) {
+		SortedMultiset<SubGroum> instances = patterns.subMultiset(P, BoundType.CLOSED, P, BoundType.CLOSED);
+		return instances;
 	}
 }
