@@ -14,6 +14,14 @@ public class GroumTestUtils {
 		}
 		return groum;
 	}
+	
+	static Node[] createNodes(String... nodeIds) {
+		Node[] nodes = new Node[nodeIds.length];
+		for (int i = 0; i < nodeIds.length; i++) {
+			nodes[i] = new TestNode(nodeIds[i]);
+		}
+		return nodes;
+	}
 
 	static List<SubGroum> findPatternsWithMinFrequency(int threshold, Groum... groums) {
 		PattExplorer uut = new PattExplorer(threshold);
