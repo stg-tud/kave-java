@@ -113,19 +113,6 @@ public class Fixture {
 
 	}
 
-	public static <E extends Groum> List<Groum> getGroumsOfSizeX(int x, List<E> groums) {
-		List<Groum> group = new LinkedList<>();
-
-		for (Groum groum : groums) {
-
-			if (groum.getAllNodes().size() == x) {
-				group.add(groum);
-			}
-		}
-
-		return group;
-	}
-
 	/*
 	 * 29 Nodes in 11 Groums
 	 */
