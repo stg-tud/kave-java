@@ -17,6 +17,6 @@ public class ActionNodeTest extends NodeContractTest {
 	public void serializes() {
 		INode first = createNode("A");
 
-		assertEquals("String.length()", first.toString());
+		assertEquals("A.foo()", first.toString());
 	}
 }
