@@ -1,10 +1,14 @@
-package cc.kave.commons.model.groum;
+package cc.kave.commons.model.groum.comparator;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+import cc.kave.commons.model.groum.Groum;
+import cc.kave.commons.model.groum.Node;
+import cc.kave.commons.model.groum.TestNode;
 import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
+
 import static cc.kave.commons.model.groum.GroumTestUtils.*;
 
 public class DFSGroumComparatorTest {
