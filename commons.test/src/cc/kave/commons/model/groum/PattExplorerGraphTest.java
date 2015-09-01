@@ -5,15 +5,15 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.INode;
-import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.pattexplore.PattExplorer;
 import static cc.kave.commons.model.groum.PatternAssert.assertContainsPatterns;
 import static cc.kave.commons.model.groum.PatternAssert.filterBySize;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import static cc.kave.commons.model.groum.GroumTestUtils.*;
 
 public class PattExplorerGraphTest {
 
@@ -335,19 +335,6 @@ public class PattExplorerGraphTest {
 
 		patterns = filterBySize(patterns, 3);
 		assertContainsPatterns(patterns, groum);
-	}
-
-	private List<SubGroum> findPatternsWithMinFrequency(int threshold, Groum... groums) {
-		PattExplorer uut = new PattExplorer(threshold);
-		return uut.explorePatterns(Arrays.asList(groums));
-	}
-
-	private Groum createGroum(INode... nodes) {
-		Groum groum = new Groum();
-		for (INode node : nodes) {
-			groum.addNode(node);
-		}
-		return groum;
 	}
 
 }
