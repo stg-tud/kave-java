@@ -9,13 +9,13 @@ import cc.kave.commons.model.groum.nodes.ControlNode;
 public class ControlNodeTest extends NodeContractTest {
 
 	@Override
-	protected INode createNode(String id) {
+	protected Node createNode(String id) {
 		return new ControlNode(id);
 	}
 	
 	@Test
 	public void serializes() {
-		INode first = createNode("WHILE");
+		Node first = createNode("WHILE");
 
 		assertEquals("WHILE", first.toString());
 	}

@@ -7,9 +7,9 @@ import cc.kave.commons.model.pattexplore.PattExplorer;
 
 public class GroumTestUtils {
 
-	static Groum createGroum(INode... nodes) {
+	static Groum createGroum(Node... nodes) {
 		Groum groum = new Groum();
-		for (INode node : nodes) {
+		for (Node node : nodes) {
 			groum.addNode(node);
 		}
 		return groum;

@@ -26,27 +26,27 @@ public class SubGroum extends Groum {
 	}
 
 	public List<SubGroum> extensibleWith(SubGroum groum) {
-		INode extendingNode = groum.getAllNodes().iterator().next();
+		Node extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
 			return null;
 
 		List<SubGroum> extendedGroums = new LinkedList<>();
-		List<INode> extendingNodes = new LinkedList<>();
+		List<Node> extendingNodes = new LinkedList<>();
 
-		for (INode node : this.getAllNodes()) {
-			Set<INode> successors = parent.getSuccessors(node);
+		for (Node node : this.getAllNodes()) {
+			Set<Node> successors = parent.getSuccessors(node);
 			if (successors.size() == 0)
 				continue;
 			else {
-				for (INode candidate : successors) {
+				for (Node candidate : successors) {
 					if (!(this.containsNode(candidate)))
 						if (candidate.equals(extendingNode)) {
 							if (extendingNodes.isEmpty())
 								extendingNodes.add(candidate);
 							else {
 								boolean isnewnode = true;
-								for (INode extnode : extendingNodes) {
+								for (Node extnode : extendingNodes) {
 									if (extnode == candidate) {
 										isnewnode = false;
 										continue;
@@ -60,12 +60,12 @@ public class SubGroum extends Groum {
 			}
 		}
 		// Build extended groums
-		for (INode extnode : extendingNodes) {
+		for (Node extnode : extendingNodes) {
 			SubGroum extendedSubgroum = (SubGroum) this.clone();
 			extendedSubgroum.addNode(extnode);
-			for (INode node : this.getAllNodes()) {
-				Set<INode> nodesuccessors = parent.getSuccessors(node);
-				for (INode successor : nodesuccessors) {
+			for (Node node : this.getAllNodes()) {
+				Set<Node> nodesuccessors = parent.getSuccessors(node);
+				for (Node successor : nodesuccessors) {
 					if (successor == extnode) {
 						extendedSubgroum.addEdge(node, extnode);
 						continue;
@@ -83,20 +83,20 @@ public class SubGroum extends Groum {
 
 	@Deprecated
 	public SubGroum extensibleWithOneNodeMultipleEdge(SubGroum groum) {
-		INode extendingNode = groum.getAllNodes().iterator().next();
+		Node extendingNode = groum.getAllNodes().iterator().next();
 
 		if (extendingNode == null)
 			return null;
 
 		SubGroum extendedSubgroum = (SubGroum) this.clone();
 		boolean extended = false;
-		for (INode node : this.getAllNodes()) {
+		for (Node node : this.getAllNodes()) {
 
-			Set<INode> successors = parent.getSuccessors(node);
+			Set<Node> successors = parent.getSuccessors(node);
 			if (successors.size() == 0)
 				continue;
 			else {
-				for (INode candidate : successors) {
+				for (Node candidate : successors) {
 					if (!(this.containsNode(candidate)))
 						if (candidate.equals(extendingNode)) {
 							if (!extendedSubgroum.containsNode(candidate)) {

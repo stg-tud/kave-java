@@ -76,12 +76,12 @@ public class PattExplorerGraphTest {
 		Groum listGroum = Fixture.createConnectedGroumOfSize(5);
 
 		Groum complexGroum = new Groum();
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3a = new ActionNode("3", "3");
-		INode node3b = new ActionNode("3", "3");
-		INode node4 = new ActionNode("4", "4");
-		INode node5 = new ActionNode("5", "5");
+		Node node1 = new ActionNode("1", "1");
+		Node node2 = new ActionNode("2", "2");
+		Node node3a = new ActionNode("3", "3");
+		Node node3b = new ActionNode("3", "3");
+		Node node4 = new ActionNode("4", "4");
+		Node node5 = new ActionNode("5", "5");
 		complexGroum.addNode(node1);
 		complexGroum.addNode(node2);
 		complexGroum.addNode(node3a);
@@ -128,13 +128,13 @@ public class PattExplorerGraphTest {
 		PattExplorer uut = new PattExplorer(3);
 		Groum listGroum = Fixture.createConnectedGroumOfSize(5);
 		Groum complexGroum = new Groum();
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3a = new ActionNode("3", "3");
-		INode node3b = new ActionNode("3", "3");
-		INode node4a = new ActionNode("4", "4");
-		INode node4b = new ActionNode("4", "4");
-		INode node5 = new ActionNode("5", "5");
+		Node node1 = new ActionNode("1", "1");
+		Node node2 = new ActionNode("2", "2");
+		Node node3a = new ActionNode("3", "3");
+		Node node3b = new ActionNode("3", "3");
+		Node node4a = new ActionNode("4", "4");
+		Node node4b = new ActionNode("4", "4");
+		Node node5 = new ActionNode("5", "5");
 		complexGroum.addNode(node1);
 		complexGroum.addNode(node2);
 		complexGroum.addNode(node3a);
@@ -171,14 +171,14 @@ public class PattExplorerGraphTest {
 		Groum groumB = new Groum();
 		Groum groumC = new Groum();
 
-		INode nodeA_1 = new ActionNode("1", "1");
-		INode nodeA_2a = new ActionNode("2", "2");
-		INode nodeA_2b = new ActionNode("2", "2");
-		INode nodeA_3a = new ActionNode("3", "3");
-		INode nodeA_3b = new ActionNode("3", "3");
-		INode nodeA_3c = new ActionNode("3", "3");
-		INode nodeA_3d = new ActionNode("3", "3");
-		INode nodeA_4 = new ActionNode("4", "4");
+		Node nodeA_1 = new ActionNode("1", "1");
+		Node nodeA_2a = new ActionNode("2", "2");
+		Node nodeA_2b = new ActionNode("2", "2");
+		Node nodeA_3a = new ActionNode("3", "3");
+		Node nodeA_3b = new ActionNode("3", "3");
+		Node nodeA_3c = new ActionNode("3", "3");
+		Node nodeA_3d = new ActionNode("3", "3");
+		Node nodeA_4 = new ActionNode("4", "4");
 		groumA.addNode(nodeA_1);
 		groumA.addNode(nodeA_2a);
 		groumA.addNode(nodeA_2b);
@@ -195,14 +195,14 @@ public class PattExplorerGraphTest {
 		groumA.addEdge(nodeA_2b, nodeA_3d);
 		groumA.addEdge(nodeA_3c, nodeA_4);
 
-		INode nodeB_1 = new ActionNode("1", "1");
-		INode nodeB_2a = new ActionNode("2", "2");
-		INode nodeB_2b = new ActionNode("2", "2");
-		INode nodeB_3a = new ActionNode("3", "3");
-		INode nodeB_3b = new ActionNode("3", "3");
-		INode nodeB_3c = new ActionNode("3", "3");
-		INode nodeB_3d = new ActionNode("3", "3");
-		INode nodeB_4 = new ActionNode("4", "4");
+		Node nodeB_1 = new ActionNode("1", "1");
+		Node nodeB_2a = new ActionNode("2", "2");
+		Node nodeB_2b = new ActionNode("2", "2");
+		Node nodeB_3a = new ActionNode("3", "3");
+		Node nodeB_3b = new ActionNode("3", "3");
+		Node nodeB_3c = new ActionNode("3", "3");
+		Node nodeB_3d = new ActionNode("3", "3");
+		Node nodeB_4 = new ActionNode("4", "4");
 		groumB.addNode(nodeB_1);
 		groumB.addNode(nodeB_2a);
 		groumB.addNode(nodeB_2b);
@@ -219,14 +219,14 @@ public class PattExplorerGraphTest {
 		groumB.addEdge(nodeB_2b, nodeB_3d);
 		groumB.addEdge(nodeB_3b, nodeB_4);
 
-		INode nodeC_1 = new ActionNode("1", "1");
-		INode nodeC_2a = new ActionNode("2", "2");
-		INode nodeC_2b = new ActionNode("2", "2");
-		INode nodeC_3a = new ActionNode("3", "3");
-		INode nodeC_3b = new ActionNode("3", "3");
-		INode nodeC_3c = new ActionNode("3", "3");
-		INode nodeC_3d = new ActionNode("3", "3");
-		INode nodeC_4 = new ActionNode("4", "4");
+		Node nodeC_1 = new ActionNode("1", "1");
+		Node nodeC_2a = new ActionNode("2", "2");
+		Node nodeC_2b = new ActionNode("2", "2");
+		Node nodeC_3a = new ActionNode("3", "3");
+		Node nodeC_3b = new ActionNode("3", "3");
+		Node nodeC_3c = new ActionNode("3", "3");
+		Node nodeC_3d = new ActionNode("3", "3");
+		Node nodeC_4 = new ActionNode("4", "4");
 		groumC.addNode(nodeC_1);
 		groumC.addNode(nodeC_2a);
 		groumC.addNode(nodeC_2b);
@@ -249,9 +249,9 @@ public class PattExplorerGraphTest {
 
 	@Test
 	public void countsOverlappingInstanesOnlyOnce1() {
-		INode node1 = new ActionNode("1", "1");
-		INode node2a = new ActionNode("2", "2");
-		INode node2b = new ActionNode("2", "2");
+		Node node1 = new ActionNode("1", "1");
+		Node node2a = new ActionNode("2", "2");
+		Node node2b = new ActionNode("2", "2");
 		Groum overlappingGroum = createGroum(node1, node2a, node2b);
 		overlappingGroum.addEdge(node1, node2a);
 		overlappingGroum.addEdge(node2a, node2b);
@@ -264,9 +264,9 @@ public class PattExplorerGraphTest {
 
 	@Test
 	public void countsOverlappingInstanesOnlyOnce2() {
-		INode node1 = new ActionNode("1", "1");
-		INode node2a = new ActionNode("2", "2");
-		INode node2b = new ActionNode("2", "2");
+		Node node1 = new ActionNode("1", "1");
+		Node node2a = new ActionNode("2", "2");
+		Node node2b = new ActionNode("2", "2");
 		Groum overlappingGroum = createGroum(node1, node2a, node2b);
 		overlappingGroum.addEdge(node1, node2a);
 		overlappingGroum.addEdge(node1, node2b);
@@ -279,10 +279,10 @@ public class PattExplorerGraphTest {
 
 	@Test
 	public void findsMultipleInstanceInOneGraph() {
-		INode node1a = new ActionNode("1", "1");
-		INode node1b = new ActionNode("1", "1");
-		INode node2a = new ActionNode("2", "2");
-		INode node2b = new ActionNode("2", "2");
+		Node node1a = new ActionNode("1", "1");
+		Node node1b = new ActionNode("1", "1");
+		Node node2a = new ActionNode("2", "2");
+		Node node2b = new ActionNode("2", "2");
 		Groum overlappingGroum = createGroum(node1a, node1b, node2a, node2b);
 		overlappingGroum.addEdge(node1a, node2a);
 		overlappingGroum.addEdge(node1a, node1b);
@@ -298,10 +298,10 @@ public class PattExplorerGraphTest {
 
 	@Test
 	public void findsGraphIsomorphism() {
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3a = new ActionNode("3", "3");
-		INode node3b = new ActionNode("3", "3");
+		Node node1 = new ActionNode("1", "1");
+		Node node2 = new ActionNode("2", "2");
+		Node node3a = new ActionNode("3", "3");
+		Node node3b = new ActionNode("3", "3");
 		Groum groum1 = createGroum(node1, node2, node3a);
 		groum1.addEdge(node1, node2);
 		groum1.addEdge(node1, node3a);
@@ -323,9 +323,9 @@ public class PattExplorerGraphTest {
 
 	@Test
 	public void includesAllEdgesBetweenAllIncludedNodes() {
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3 = new ActionNode("3", "3");
+		Node node1 = new ActionNode("1", "1");
+		Node node2 = new ActionNode("2", "2");
+		Node node3 = new ActionNode("3", "3");
 		Groum groum = createGroum(node1, node2, node3);
 		groum.addEdge(node1, node2);
 		groum.addEdge(node1, node3);

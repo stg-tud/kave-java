@@ -9,13 +9,13 @@ import cc.kave.commons.model.groum.nodes.ActionNode;
 public class ActionNodeTest extends NodeContractTest {
 
 	@Override
-	protected INode createNode(String id) {
+	protected Node createNode(String id) {
 		return new ActionNode(id, "foo()");
 	}
 
 	@Test
 	public void serializes() {
-		INode first = createNode("A");
+		Node first = createNode("A");
 
 		assertEquals("A.foo()", first.toString());
 	}

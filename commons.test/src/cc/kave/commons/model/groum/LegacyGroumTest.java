@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.groum.nodes.ControlNode;
 
@@ -92,9 +92,9 @@ public class LegacyGroumTest {
 	
 	@Test
 	public void equalityWorksUnordered() {
-		INode node1 = new ActionNode("1", "1");		
-		INode node2 = new ActionNode("2", "2");
-		INode node3 = new ActionNode("3", "3");		
+		Node node1 = new ActionNode("1", "1");		
+		Node node2 = new ActionNode("2", "2");
+		Node node3 = new ActionNode("3", "3");		
 		Groum a = new Groum();
 		a.addNode(node1);
 		a.addNode(node2);
@@ -102,9 +102,9 @@ public class LegacyGroumTest {
 		a.addEdge(node1, node2);
 		a.addEdge(node1, node3);
 		
-		INode node1b = new ActionNode("1", "1");		
-		INode node2b = new ActionNode("2", "2");
-		INode node3b = new ActionNode("3", "3");		
+		Node node1b = new ActionNode("1", "1");		
+		Node node2b = new ActionNode("2", "2");
+		Node node3b = new ActionNode("3", "3");		
 		Groum b = new Groum();
 		b.addNode(node1b);
 		b.addNode(node3b);
@@ -228,11 +228,11 @@ public class LegacyGroumTest {
 
 		Groum groum3 = (Groum) groum.clone();
 
-		List<INode> list = new LinkedList<>();
+		List<Node> list = new LinkedList<>();
 		list.addAll(groum.getAllNodes());
 		int i = 0;
 		boolean success = true;
-		for (INode node : groum3.getAllNodes()) {
+		for (Node node : groum3.getAllNodes()) {
 			if (node != list.get(i)) {
 				success = false;
 				break;
@@ -253,7 +253,7 @@ public class LegacyGroumTest {
 	public void groumsCanBeGeneratedLowEqualsHigh() {
 		Groum groum = Fixture.createConnectedGroumOfSize(5, 5);
 		Groum target = new Groum();
-		INode node = new ActionNode("5", "5");
+		Node node = new ActionNode("5", "5");
 		target.addNode(node);
 		assertTrue(groum.getAllNodes().size() == 1 && groum.equals(target));
 	}
@@ -261,12 +261,12 @@ public class LegacyGroumTest {
 	@Test
 	public void groumsCanBeGeneratedLowHigh() {
 		Groum groum = Fixture.createConnectedGroumOfSize(6, 10);
-		INode node6 = new ActionNode("6", "6");
-		INode node10 = new ActionNode("10", "10");
+		Node node6 = new ActionNode("6", "6");
+		Node node10 = new ActionNode("10", "10");
 		boolean contains6 = false;
 		boolean contains10 = false;
 
-		for (INode node : groum.getAllNodes()) {
+		for (Node node : groum.getAllNodes()) {
 			if (node.equals(node6))
 				contains6 = true;
 			if (node.equals(node10))

@@ -11,7 +11,7 @@ public class DirectedGraphExplorationTest {
 
 	@Test
 	public void acceptsTwoEqualNodes() {
-		DirectedGraph<INode, DefaultEdge> g = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
+		DirectedGraph<Node, DefaultEdge> g = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
 		g.addVertex(new TestNode("3"));
 		g.addVertex(new TestNode("3"));
 		assertEquals(2, g.vertexSet().size());

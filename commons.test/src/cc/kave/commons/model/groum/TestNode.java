@@ -1,8 +1,8 @@
 package cc.kave.commons.model.groum;
 
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 
-public class TestNode implements INode {
+public class TestNode extends Node {
 
 	private String id;
 
@@ -11,8 +11,7 @@ public class TestNode implements INode {
 	}
 	
 	@Override
-	public int compareTo(INode o) {
-		// TODO Auto-generated method stub
-		return 0;
+	public String getId() {
+		return id;
 	}
 }

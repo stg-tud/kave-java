@@ -36,7 +36,7 @@ public class GroumRootTest {
 	}
 
 	private void assertRoot(TestNode node, Groum groum) {
-		INode root = groum.getRoot();
+		Node root = groum.getRoot();
 		assertEquals(node, root);
 	}
 }

@@ -1,8 +1,8 @@
 package cc.kave.commons.model.groum.nodes;
 
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 
-public class ActionNode implements INode {
+public class ActionNode extends Node {
 	private String clazz;
 	private String callee;
 
@@ -20,13 +20,7 @@ public class ActionNode implements INode {
 	}
 
 	@Override
-	public String toString() {
+	public String getId() {
 		return String.format("%s.%s", clazz, callee);
 	}
-
-	@Override
-	public int compareTo(INode o) {
-		return toString().compareTo(o.toString());
-	}
-
 }

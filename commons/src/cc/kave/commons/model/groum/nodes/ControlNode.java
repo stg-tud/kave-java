@@ -1,8 +1,8 @@
 package cc.kave.commons.model.groum.nodes;
 
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 
-public class ControlNode implements INode {
+public class ControlNode extends Node {
 	private String kind;
 
 	public ControlNode(String kind) {
@@ -14,12 +14,7 @@ public class ControlNode implements INode {
 	}
 
 	@Override
-	public String toString() {
-		return String.format("%s", kind);
-	}
-
-	@Override
-	public int compareTo(INode o) {
-		return toString().compareTo(o.toString());
+	public String getId() {
+		return kind;
 	}
 }

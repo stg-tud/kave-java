@@ -10,7 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
 import cc.kave.commons.model.groum.comparator.GroumIdentComparator;
@@ -177,9 +177,9 @@ public class GroumMultimapTest {
 		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
 				new SubGroumIdentComparator());
 
-		INode node1 = new ActionNode("1", "1");
-		INode node2 = new ActionNode("2", "2");
-		INode node3 = new ActionNode("3", "3");
+		Node node1 = new ActionNode("1", "1");
+		Node node2 = new ActionNode("2", "2");
+		Node node3 = new ActionNode("3", "3");
 		SubGroum a = new SubGroum(null);
 		a.addNode(node1);
 		a.addNode(node2);
@@ -187,9 +187,9 @@ public class GroumMultimapTest {
 		a.addEdge(node1, node2);
 		a.addEdge(node1, node3);
 
-		INode node1b = new ActionNode("1", "1");
-		INode node2b = new ActionNode("2", "2");
-		INode node3b = new ActionNode("3", "3");
+		Node node1b = new ActionNode("1", "1");
+		Node node2b = new ActionNode("2", "2");
+		Node node3b = new ActionNode("3", "3");
 		SubGroum b = new SubGroum(null);
 		b.addNode(node1b);
 		b.addNode(node3b);

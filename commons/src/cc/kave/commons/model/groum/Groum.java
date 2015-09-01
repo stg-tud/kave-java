@@ -11,12 +11,12 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 public class Groum implements Comparable<Groum>, Cloneable {
-	DirectedGraph<INode, DefaultEdge> groum;
-	INode root;
+	DirectedGraph<Node, DefaultEdge> groum;
+	Node root;
 	Boolean dirty;
 
 	public Groum() {
-		groum = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
+		groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
 		dirty = true;
 	}
 
@@ -25,8 +25,8 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		Groum clone;
 		try {
 			clone = (Groum) super.clone();
-			clone.groum = new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
-			for (INode node : getAllNodes()) {
+			clone.groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
+			for (Node node : getAllNodes()) {
 				clone.groum.addVertex(node);
 			}
 			for (DefaultEdge edge : getAllEdges()) {
@@ -51,9 +51,9 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		if (this.getAllNodes().size() != anotherGroum.getAllNodes().size())
 			return false;
 
-		List<INode> myNodes = new LinkedList<>();
+		List<Node> myNodes = new LinkedList<>();
 		myNodes.addAll(this.getAllNodes());
-		List<INode> otherNodes = new LinkedList<>();
+		List<Node> otherNodes = new LinkedList<>();
 		otherNodes.addAll(anotherGroum.getAllNodes());
 
 		Collections.sort(myNodes);
@@ -63,8 +63,8 @@ public class Groum implements Comparable<Groum>, Cloneable {
 			if (!(myNodes.get(i).equals(otherNodes.get(i)))) {
 				return false;
 			}
-			List<INode> mysuccessors = new LinkedList<>();
-			List<INode> othersuccessors = new LinkedList<>();
+			List<Node> mysuccessors = new LinkedList<>();
+			List<Node> othersuccessors = new LinkedList<>();
 			mysuccessors.addAll(getSuccessors(myNodes.get(i)));
 			othersuccessors.addAll(anotherGroum.getSuccessors(otherNodes.get(i)));
 			if (mysuccessors.size() != othersuccessors.size())
@@ -85,23 +85,23 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		return groum.edgeSet();
 	}
 
-	public boolean containsNode(INode node) {
+	public boolean containsNode(Node node) {
 		return groum.containsVertex(node);
 	}
 
-	public void addEdge(INode source, INode target) {
+	public void addEdge(Node source, Node target) {
 		groum.addEdge(source, target);
 		dirty = true;
 	}
 
-	public void addNode(INode node) {
+	public void addNode(Node node) {
 		groum.addVertex(node);
 		if (root == null)
 			root = node;
 	}
 
-	public Set<INode> getSuccessors(INode node) {
-		Set<INode> successors = new HashSet<>();
+	public Set<Node> getSuccessors(Node node) {
+		Set<Node> successors = new HashSet<>();
 		Set<DefaultEdge> outgoingEdges = groum.outgoingEdgesOf(node);
 
 		for (DefaultEdge edge : outgoingEdges) {
@@ -123,7 +123,7 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		return groum.edgeSet().size();
 	}
 
-	public Set<INode> getAllNodes() {
+	public Set<Node> getAllNodes() {
 		return groum.vertexSet();
 	}
 
@@ -136,11 +136,11 @@ public class Groum implements Comparable<Groum>, Cloneable {
 			return toString().compareTo(o.toString());
 	}
 
-	public INode getRoot() {
+	public Node getRoot() {
 		// TODO this is potentially used very frequently. The result should be
 		// cached and invalidated when the Groum is changed.
-		INode root = null;
-		for (INode node : getAllNodes()) {
+		Node root = null;
+		for (Node node : getAllNodes()) {
 			if (groum.inDegreeOf(node) == 0) {
 				if (root != null) {
 					throw new IllegalStateException("groum has multiple roots: " + toString());

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.SubGroum;
 
 public class SubGroumTest {
@@ -14,7 +14,7 @@ public class SubGroumTest {
 	public void extendsWithSingleNodeSingleEdge() {
 		Groum parent = Fixture.createConnectedGroumOfSize(4);		
 		SubGroum subgroum = new SubGroum(parent);	
-		List<INode> parentnodes = new LinkedList<>();		
+		List<Node> parentnodes = new LinkedList<>();		
 	}
 	
 	@Test

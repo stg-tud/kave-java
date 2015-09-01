@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 
 public class GroumComparator implements Comparator<Groum> {
 
@@ -24,9 +24,9 @@ public class GroumComparator implements Comparator<Groum> {
 		if (edges != 0)
 			return edges;
 
-		List<INode> myNodes = new LinkedList<>();
+		List<Node> myNodes = new LinkedList<>();
 		myNodes.addAll(o1.getAllNodes());
-		List<INode> otherNodes = new LinkedList<>();
+		List<Node> otherNodes = new LinkedList<>();
 		otherNodes.addAll(o2.getAllNodes());
 
 		Collections.sort(myNodes);
@@ -40,8 +40,8 @@ public class GroumComparator implements Comparator<Groum> {
 		}
 
 		for (int i = 0; i < myNodes.size(); i++) {
-			List<INode> mysuccessors = new LinkedList<>();
-			List<INode> othersuccessors = new LinkedList<>();
+			List<Node> mysuccessors = new LinkedList<>();
+			List<Node> othersuccessors = new LinkedList<>();
 			mysuccessors.addAll(o1.getSuccessors(myNodes.get(i)));
 			othersuccessors.addAll(o2.getSuccessors(otherNodes.get(i)));
 

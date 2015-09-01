@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.INode;
+import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 import cc.kave.commons.model.groum.nodes.ControlNode;
 
@@ -152,7 +152,7 @@ public class Fixture {
 		return groumlist;
 	}
 
-	public static INode createActionNodeInstance(String name) {
+	public static Node createActionNodeInstance(String name) {
 		return new ActionNode(name, name);
 	}
 
@@ -161,11 +161,11 @@ public class Fixture {
 			return null;
 
 		Groum groum = new Groum();
-		INode previous = createActionNodeInstance(String.valueOf(1));
+		Node previous = createActionNodeInstance(String.valueOf(1));
 		groum.addNode(previous);
 
 		for (int i = 2; i <= size; i++) {
-			INode next = createActionNodeInstance(String.valueOf(i));
+			Node next = createActionNodeInstance(String.valueOf(i));
 			groum.addNode(next);
 			groum.addEdge(previous, next);
 			previous = next;
@@ -178,11 +178,11 @@ public class Fixture {
 			return null;
 
 		Groum groum = new Groum();
-		INode previous = createActionNodeInstance(String.valueOf(low));
+		Node previous = createActionNodeInstance(String.valueOf(low));
 		groum.addNode(previous);
 
 		for (int i = low + 1; i <= high; i++) {
-			INode next = createActionNodeInstance(String.valueOf(i));
+			Node next = createActionNodeInstance(String.valueOf(i));
 			groum.addNode(next);
 			groum.addEdge(previous, next);
 			previous = next;

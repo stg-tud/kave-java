@@ -80,9 +80,9 @@ public class GroumComparatorTest {
 		Groum groum = Fixture.createConnectedGroumOfSize(3);
 		
 		Groum groum_less_eges = new Groum();
-		INode a = new ActionNode("1","1");
-		INode b = new ActionNode("2","2");
-		INode c = new ActionNode("3","3");
+		Node a = new ActionNode("1","1");
+		Node b = new ActionNode("2","2");
+		Node c = new ActionNode("3","3");
 		groum_less_eges.addNode(a);
 		groum_less_eges.addNode(b);
 		groum_less_eges.addNode(c);
@@ -94,9 +94,9 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsEqualGroumsWithDifferentOrder() {
-		INode node1 = new ActionNode("1","1");
-		INode node2 = new ActionNode("2","2");
-		INode node3 = new ActionNode("3","3");
+		Node node1 = new ActionNode("1","1");
+		Node node2 = new ActionNode("2","2");
+		Node node3 = new ActionNode("3","3");
 		
 		Groum groum1 = new SubGroum();
 		groum1.addNode(node1);
@@ -118,10 +118,10 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsDifferenceInSuccessorCount() {
-		INode node1 = new ActionNode("1","1");
-		INode node2 = new ActionNode("2","2");
-		INode node3 = new ActionNode("3","3");
-		INode node4 = new ActionNode("4","4");
+		Node node1 = new ActionNode("1","1");
+		Node node2 = new ActionNode("2","2");
+		Node node3 = new ActionNode("3","3");
+		Node node4 = new ActionNode("4","4");
 		
 		SubGroum groum1 = new SubGroum();
 		groum1.addNode(node1);
@@ -147,10 +147,10 @@ public class GroumComparatorTest {
 	
 	@Test
 	public void findsDifferenceInSuccessor() {
-		INode node1 = new ActionNode("1","1");
-		INode node2 = new ActionNode("2","2");
-		INode node3 = new ActionNode("3","3");
-		INode node4 = new ActionNode("4","4");
+		Node node1 = new ActionNode("1","1");
+		Node node2 = new ActionNode("2","2");
+		Node node3 = new ActionNode("3","3");
+		Node node4 = new ActionNode("4","4");
 		
 		SubGroum groum1 = new SubGroum();
 		groum1.addNode(node1);
