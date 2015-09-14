@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SubGroum extends Groum {
-	protected Groum parent;
+	private final Groum parent;
 
 	public SubGroum(Groum parent) {
 		super();
