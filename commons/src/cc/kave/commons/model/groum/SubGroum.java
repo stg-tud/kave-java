@@ -17,7 +17,7 @@ public class SubGroum extends Groum {
 		this.parent = null;
 	}
 
-	public List<SubGroum> extensibleWith(Node extendingNode) {
+	public List<SubGroum> computeExtensions(Node extendingNode) {
 		List<SubGroum> extendedGroums = new LinkedList<>();
 		List<Node> extendingNodes = new LinkedList<>();
 
