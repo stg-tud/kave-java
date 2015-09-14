@@ -1,9 +1,6 @@
 package cc.kave.commons.model.groum;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -42,49 +39,6 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public boolean equals(Object anotherGroum) {
-		if (!(anotherGroum instanceof Groum))
-			return false;
-		else {
-			return equals((Groum) anotherGroum);
-		}
-	}
-
-	private boolean equals(Groum anotherGroum) {
-		if (this.getAllNodes().size() != anotherGroum.getAllNodes().size())
-			return false;
-
-		List<Node> myNodes = new LinkedList<>();
-		myNodes.addAll(this.getAllNodes());
-		List<Node> otherNodes = new LinkedList<>();
-		otherNodes.addAll(anotherGroum.getAllNodes());
-
-		Collections.sort(myNodes);
-		Collections.sort(otherNodes);
-
-		for (int i = 0; i < myNodes.size(); i++) {
-			if (!(myNodes.get(i).equals(otherNodes.get(i)))) {
-				return false;
-			}
-			List<Node> mysuccessors = new LinkedList<>();
-			List<Node> othersuccessors = new LinkedList<>();
-			mysuccessors.addAll(getSuccessors(myNodes.get(i)));
-			othersuccessors.addAll(anotherGroum.getSuccessors(otherNodes.get(i)));
-			if (mysuccessors.size() != othersuccessors.size())
-				return false;
-
-			Collections.sort(mysuccessors);
-			Collections.sort(othersuccessors);
-
-			for (int x = 0; x < mysuccessors.size(); x++) {
-				if (!(mysuccessors.get(x).equals(othersuccessors.get(x))))
-					return false;
-			}
-		}
-		return true;
 	}
 
 	public Set<DefaultEdge> getAllEdges() {
