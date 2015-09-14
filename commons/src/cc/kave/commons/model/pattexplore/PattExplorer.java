@@ -22,10 +22,7 @@ public class PattExplorer {
 		TreeMultimap<SubGroum, SubGroum> L = createGroumMap();
 
 		for (Groum groum : D) {
-			List<SubGroum> subgroums = Utils.breakdown(groum);
-			for (SubGroum subgroum : subgroums) {
-				L.put(subgroum, subgroum);
-			}
+			L.putAll(groum.getAtomicSubGroums());
 		}
 
 		TreeMultimap<SubGroum, SubGroum> L2 = createGroumMap();

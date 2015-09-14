@@ -3,18 +3,11 @@ package cc.kave.commons.model.groum.legacy;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.pattexplore.Utils;
-
 import com.google.common.collect.BoundType;
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.TreeMultiset;
@@ -134,23 +127,6 @@ public class GroumMultisetTest {
 		int size = subMultiset.size();
 		assertTrue(size == 3);
 
-	}
-
-	@Test
-	@Ignore
-	public void preservesParents() {
-		List<Groum> groums = Fixture.getListOfXGroums(10);
-		List<SubGroum> subgroums = new LinkedList<>();
-		for (Groum groum : groums) {
-			subgroums.addAll(Utils.breakdown(groum));
-		}
-
-		TreeMultiset<SubGroum> multiset = TreeMultiset.create(new SubGroumComparator());
-		multiset.addAll(subgroums);
-
-		for (SubGroum subgroum : multiset) {
-			System.out.println(subgroum + "--> " + subgroum.getParent());
-		}
 	}
 
 }

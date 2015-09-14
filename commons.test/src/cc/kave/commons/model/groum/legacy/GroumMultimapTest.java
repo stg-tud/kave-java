@@ -3,8 +3,6 @@ package cc.kave.commons.model.groum.legacy;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +15,6 @@ import cc.kave.commons.model.groum.comparator.GroumIdentComparator;
 import cc.kave.commons.model.groum.comparator.SubGroumComparator;
 import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import cc.kave.commons.model.groum.nodes.ActionNode;
-import cc.kave.commons.model.pattexplore.Utils;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.SortedMultiset;
@@ -147,29 +144,6 @@ public class GroumMultimapTest {
 		int size = subMultiset.size();
 		assertTrue(size == 3);
 
-	}
-
-	@Test
-	@Ignore
-	public void preservesParents() {
-		List<Groum> groums = Fixture.getListOfXGroums(10);
-		List<SubGroum> subgroums = new LinkedList<>();
-		for (Groum groum : groums) {
-			subgroums.addAll(Utils.breakdown(groum));
-		}
-
-		TreeMultimap<SubGroum, SubGroum> multiset = TreeMultimap.create(new SubGroumComparator(),
-				new HashCodeComparator());
-		for (SubGroum subgroum : subgroums) {
-			multiset.put(subgroum, subgroum);
-		}
-
-		for (SubGroum subgroum : multiset.keySet()) {
-			System.out.println("\n" + subgroum + "--> ");
-			for (SubGroum contrasubgroum : multiset.get(subgroum)) {
-				System.out.println(contrasubgroum.getParent());
-			}
-		}
 	}
 
 	@Test
