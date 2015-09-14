@@ -61,7 +61,7 @@ public class PattExplorer {
 				TreeMultimap<SubGroum, SubGroum> Q = createGroumMap();
 
 				for (SubGroum occurrence : patterns.get(P)) {
-					List<SubGroum> candidates = occurrence.extensibleWith(U);
+					List<SubGroum> candidates = occurrence.extensibleWith(U.getAllNodes().iterator().next());
 					if (candidates != null)
 						for (SubGroum candidate : candidates) {
 							Q.put(candidate, candidate);

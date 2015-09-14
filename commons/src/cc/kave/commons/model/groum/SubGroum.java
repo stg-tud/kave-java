@@ -17,9 +17,7 @@ public class SubGroum extends Groum {
 		this.parent = null;
 	}
 
-	public List<SubGroum> extensibleWith(SubGroum groum) {
-		Node extendingNode = groum.getAllNodes().iterator().next();
-
+	public List<SubGroum> extensibleWith(Node extendingNode) {
 		if (extendingNode == null)
 			return null;
 
