@@ -1,5 +1,6 @@
 package cc.kave.commons.model.groum;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,18 @@ public class SubGroum extends Groum {
 		if (!parent.containsNode(node))
 			throw new IllegalArgumentException("cannot add a node that is not part of the parent");
 		super.addNode(node);
+	}
+
+	@Override
+	public Set<Node> getSuccessors(Node node) {
+		Set<Node> successors = new HashSet<Node>();
+		Set<Node> parentSuccessors = parent.getSuccessors(node);
+		for (Node successor : parentSuccessors) {
+			if (groum.containsVertex(successor)) {
+				successors.add(successor);
+			}
+		}
+		return successors;
 	}
 
 	public List<SubGroum> computeExtensions(Node extendingNode) {
