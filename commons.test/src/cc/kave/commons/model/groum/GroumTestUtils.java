@@ -31,5 +31,4 @@ public class GroumTestUtils {
 		PattExplorer uut = new PattExplorer(threshold);
 		return uut.explorePatterns(Arrays.asList(groums));
 	}
-
 }
