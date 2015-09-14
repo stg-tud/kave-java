@@ -1,7 +1,7 @@
 package cc.kave.commons.model.groum;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +23,6 @@ public class SubGroum extends Groum {
 	public void addNode(Node node) {
 		if (!parent.containsNode(node))
 			throw new IllegalArgumentException("cannot add a node that is not part of the parent");
-		super.addNode(node);
 		nodes.add(node);
 	}
 
@@ -37,7 +36,6 @@ public class SubGroum extends Groum {
 		if (!parent.getSuccessors(source).contains(target)) {
 			throw new IllegalArgumentException("cannot add an edge that is not part of the parent");
 		}
-		// super.addEdge(source, target);
 	}
 
 	@Override
@@ -52,52 +50,24 @@ public class SubGroum extends Groum {
 		return successors;
 	}
 
-	public List<SubGroum> computeExtensions(Node extendingNode) {
-		List<SubGroum> extendedGroums = new LinkedList<>();
-		List<Node> extendingNodes = new LinkedList<>();
-
-		for (Node node : nodes) {
-			Set<Node> successors = parent.getSuccessors(node);
-			if (successors.size() == 0)
-				continue;
-			else {
-				for (Node candidate : successors) {
-					if (!(nodes.contains(candidate)))
-						if (candidate.compareTo(extendingNode) == 0) {
-							if (extendingNodes.isEmpty())
-								extendingNodes.add(candidate);
-							else {
-								boolean isnewnode = true;
-								for (Node extnode : extendingNodes) {
-									if (extnode == candidate) {
-										isnewnode = false;
-										continue;
-									}
-								}
-								if (isnewnode)
-									extendingNodes.add(candidate);
-							}
-						}
-				}
+	public List<SubGroum> computeExtensions(Node newNode) {
+		List<SubGroum> extensions = new ArrayList<>();
+		Set<Node> neighborNodes = getAllNodesReachableInOneHop();
+		for (Node candidate : neighborNodes) {
+			if (candidate.compareTo(newNode) == 0) {
+				extensions.add(createExtension(candidate));
 			}
 		}
-		// Build extended groums
-		for (Node extnode : extendingNodes) {
-			SubGroum extendedSubgroum = this.copy();
-			extendedSubgroum.addNode(extnode);
-			for (Node node : nodes) {
-				Set<Node> nodesuccessors = parent.getSuccessors(node);
-				for (Node successor : nodesuccessors) {
-					if (successor == extnode) {
-						extendedSubgroum.addEdge(node, extnode);
-						continue;
-					}
-				}
-			}
-			extendedGroums.add(extendedSubgroum);
-		}
+		return extensions;
+	}
 
-		return extendedGroums;
+	private Set<Node> getAllNodesReachableInOneHop() {
+		Set<Node> neighborNodes = new HashSet<>();
+		for (Node node : getAllNodes()) {
+			neighborNodes.addAll(parent.getSuccessors(node));
+		}
+		neighborNodes.removeAll(nodes);
+		return neighborNodes;
 	}
 
 	@Override
@@ -114,9 +84,10 @@ public class SubGroum extends Groum {
 		}
 	}
 
-	private SubGroum copy() {
-		SubGroum clone = new SubGroum(parent);
-		clone.nodes.addAll(nodes);
-		return clone;
+	private SubGroum createExtension(Node extnode) {
+		SubGroum extension = new SubGroum(parent);
+		extension.nodes.addAll(nodes);
+		extension.addNode(extnode);
+		return extension;
 	}
 }
