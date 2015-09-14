@@ -26,6 +26,18 @@ public class GroumTest {
 				createSubGroum(groum, nodes[0]),
 				createSubGroum(groum, nodes[1]));
 	}
+	
+	@Test
+	public void producesMultipleSubGroumsForEqualNodes() {
+		Node[] nodes = createNodes("A", "A");
+		Groum groum = createGroum(nodes);
+		
+		Multimap<SubGroum, SubGroum> atomicSubGroums = groum.getAtomicSubGroums();
+		
+		assertContainsAll(atomicSubGroums,
+				createSubGroum(groum, nodes[0]),
+				createSubGroum(groum, nodes[1]));
+	}
 
 	private SubGroum createSubGroum(Groum groum, Node node) {
 		SubGroum subGroum = new SubGroum(groum);
