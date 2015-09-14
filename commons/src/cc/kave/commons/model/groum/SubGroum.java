@@ -18,9 +18,6 @@ public class SubGroum extends Groum {
 	}
 
 	public List<SubGroum> extensibleWith(Node extendingNode) {
-		if (extendingNode == null)
-			return null;
-
 		List<SubGroum> extendedGroums = new LinkedList<>();
 		List<Node> extendingNodes = new LinkedList<>();
 
@@ -65,9 +62,6 @@ public class SubGroum extends Groum {
 			extendedGroums.add(extendedSubgroum);
 		}
 
-		if (extendedGroums.isEmpty())
-			return null;
-		else
-			return extendedGroums;
+		return extendedGroums;
 	}
 }
