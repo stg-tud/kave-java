@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class SubGroum extends Groum {
 	private final Groum parent;
+	private final Set<Node> nodes = new HashSet<>();
 
 	public SubGroum(Groum parent) {
 		super();
@@ -23,6 +24,20 @@ public class SubGroum extends Groum {
 		if (!parent.containsNode(node))
 			throw new IllegalArgumentException("cannot add a node that is not part of the parent");
 		super.addNode(node);
+		nodes.add(node);
+	}
+
+	@Override
+	public Set<Node> getAllNodes() {
+		return nodes;
+	}
+
+	@Override
+	public void addEdge(Node source, Node target) {
+		if (!parent.getSuccessors(source).contains(target)) {
+			throw new IllegalArgumentException("cannot add an edge that is not part of the parent");
+		}
+		// super.addEdge(source, target);
 	}
 
 	@Override
@@ -30,7 +45,7 @@ public class SubGroum extends Groum {
 		Set<Node> successors = new HashSet<Node>();
 		Set<Node> parentSuccessors = parent.getSuccessors(node);
 		for (Node successor : parentSuccessors) {
-			if (groum.containsVertex(successor)) {
+			if (nodes.contains(successor)) {
 				successors.add(successor);
 			}
 		}
@@ -41,13 +56,13 @@ public class SubGroum extends Groum {
 		List<SubGroum> extendedGroums = new LinkedList<>();
 		List<Node> extendingNodes = new LinkedList<>();
 
-		for (Node node : this.getAllNodes()) {
+		for (Node node : nodes) {
 			Set<Node> successors = parent.getSuccessors(node);
 			if (successors.size() == 0)
 				continue;
 			else {
 				for (Node candidate : successors) {
-					if (!(this.containsNode(candidate)))
+					if (!(nodes.contains(candidate)))
 						if (candidate.compareTo(extendingNode) == 0) {
 							if (extendingNodes.isEmpty())
 								extendingNodes.add(candidate);
@@ -68,9 +83,9 @@ public class SubGroum extends Groum {
 		}
 		// Build extended groums
 		for (Node extnode : extendingNodes) {
-			SubGroum extendedSubgroum = (SubGroum) this.clone();
+			SubGroum extendedSubgroum = this.copy();
 			extendedSubgroum.addNode(extnode);
-			for (Node node : this.getAllNodes()) {
+			for (Node node : nodes) {
 				Set<Node> nodesuccessors = parent.getSuccessors(node);
 				for (Node successor : nodesuccessors) {
 					if (successor == extnode) {
@@ -83,5 +98,25 @@ public class SubGroum extends Groum {
 		}
 
 		return extendedGroums;
+	}
+
+	@Override
+	public Node getRoot() {
+		HashSet<Node> candidates = new HashSet<>(nodes);
+		for (Node node : nodes) {
+			Set<Node> successors = getSuccessors(node);
+			candidates.removeAll(successors);
+		}
+		if (candidates.size() == 1) {
+			return candidates.iterator().next();
+		} else {
+			throw new IllegalStateException("Groum has no uniquly identifiable root (candidates: " + candidates + ")");
+		}
+	}
+
+	private SubGroum copy() {
+		SubGroum clone = new SubGroum(parent);
+		clone.nodes.addAll(nodes);
+		return clone;
 	}
 }
