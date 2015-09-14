@@ -13,7 +13,7 @@ import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
-public class Groum implements Comparable<Groum>, Cloneable {
+public class Groum implements Cloneable {
 	DirectedGraph<Node, DefaultEdge> groum;
 	Node root;
 	Boolean dirty;
@@ -32,7 +32,7 @@ public class Groum implements Comparable<Groum>, Cloneable {
 			for (Node node : getAllNodes()) {
 				clone.groum.addVertex(node);
 			}
-			for (DefaultEdge edge : getAllEdges()) {
+			for (DefaultEdge edge : groum.edgeSet()) {
 				clone.groum.addEdge(groum.getEdgeSource(edge), groum.getEdgeTarget(edge));
 			}
 			return clone;
@@ -41,12 +41,22 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		}
 	}
 
-	public Set<DefaultEdge> getAllEdges() {
-		return groum.edgeSet();
+	public void addNode(Node node) {
+		groum.addVertex(node);
+		if (root == null)
+			root = node;
 	}
 
 	public boolean containsNode(Node node) {
 		return groum.containsVertex(node);
+	}
+
+	public int getNodeCount() {
+		return groum.vertexSet().size();
+	}
+
+	public Set<Node> getAllNodes() {
+		return groum.vertexSet();
 	}
 
 	public void addEdge(Node source, Node target) {
@@ -54,10 +64,8 @@ public class Groum implements Comparable<Groum>, Cloneable {
 		dirty = true;
 	}
 
-	public void addNode(Node node) {
-		groum.addVertex(node);
-		if (root == null)
-			root = node;
+	public int getEdgeCount() {
+		return groum.edgeSet().size();
 	}
 
 	public Set<Node> getSuccessors(Node node) {
@@ -73,27 +81,6 @@ public class Groum implements Comparable<Groum>, Cloneable {
 	@Override
 	public String toString() {
 		return groum.toString();
-	}
-
-	public int getNodeCount() {
-		return groum.vertexSet().size();
-	}
-
-	public int getEdgeCount() {
-		return groum.edgeSet().size();
-	}
-
-	public Set<Node> getAllNodes() {
-		return groum.vertexSet();
-	}
-
-	public int compareTo(Groum o) {
-		if (o == null)
-			return 1;
-		else if (this.equals(o))
-			return 0;
-		else
-			return toString().compareTo(o.toString());
 	}
 
 	public Node getRoot() {

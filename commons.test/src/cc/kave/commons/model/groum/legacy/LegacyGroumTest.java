@@ -155,68 +155,6 @@ public class LegacyGroumTest {
 	}
 
 	@Test
-	public void comparesEqualGroums() {
-		Groum a = Fixture.getExampleGroum();
-		Groum b = Fixture.getExampleGroum();
-		assertTrue(a.compareTo(b) == 0);
-	}
-
-	@Test
-	public void comparesEqualGroumsWithDifferentSorting() {
-		ActionNode a = new ActionNode("A", "1");
-		ActionNode b = new ActionNode("B", "2");
-		ActionNode c = new ActionNode("C", "3");
-		ActionNode d = new ActionNode("D", "4");
-
-		Groum groum = new Groum();
-		groum.addNode(a);
-		groum.addNode(b);
-		groum.addNode(c);
-		groum.addNode(d);
-
-		groum.addEdge(a, b);
-		groum.addEdge(b, c);
-		groum.addEdge(b, d);
-
-		Groum groum2 = new Groum();
-		groum2.addNode(a);
-		groum2.addNode(c);
-		groum2.addNode(b);
-		groum2.addNode(d);
-
-		groum2.addEdge(b, c);
-		groum2.addEdge(a, b);
-		groum2.addEdge(b, d);
-		assertTrue(groum.compareTo(groum2) == 0);
-	}
-
-	@Test
-	public void sortsDifferentGroum() {
-		ActionNode a = new ActionNode("A", "1");
-		ActionNode b = new ActionNode("A", "1");
-		ActionNode c = new ActionNode("A", "2");
-		ActionNode d = new ActionNode("A", "2");
-
-		Groum groum = new Groum();
-		groum.addNode(a);
-		groum.addNode(b);
-		groum.addNode(c);
-
-		groum.addEdge(a, b);
-		groum.addEdge(b, c);
-
-		Groum groum2 = new Groum();
-		groum2.addNode(b);
-		groum2.addNode(c);
-		groum2.addNode(d);
-
-		groum2.addEdge(b, c);
-		groum2.addEdge(c, d);
-
-		assertTrue(groum.compareTo(groum2) == -1);
-	}
-
-	@Test
 	public void canBeCloned() {
 		ActionNode a = new ActionNode("A", "1");
 		ActionNode b = new ActionNode("A", "1");
