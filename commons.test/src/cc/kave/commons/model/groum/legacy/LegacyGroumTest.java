@@ -155,33 +155,6 @@ public class LegacyGroumTest {
 	}
 
 	@Test
-	public void canBeCloned() {
-		ActionNode a = new ActionNode("A", "1");
-		ActionNode b = new ActionNode("A", "1");
-
-		Groum groum = new Groum();
-		groum.addNode(a);
-		groum.addNode(b);
-		groum.addEdge(a, b);
-
-		Groum groum3 = (Groum) groum.clone();
-
-		List<Node> list = new LinkedList<>();
-		list.addAll(groum.getAllNodes());
-		int i = 0;
-		boolean success = true;
-		for (Node node : groum3.getAllNodes()) {
-			if (node != list.get(i)) {
-				success = false;
-				break;
-			}
-			i++;
-		}
-
-		assertTrue(success);
-	}
-
-	@Test
 	public void groumsCanBeGenerated() {
 		Groum groum = Fixture.createConnectedGroumOfSize(10);
 		assertTrue(groum.getAllNodes().size() == 10 && groum.getEdgeCount() == 9);

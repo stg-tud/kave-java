@@ -13,7 +13,7 @@ import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
-public class Groum implements Cloneable {
+public class Groum {
 	DirectedGraph<Node, DefaultEdge> groum;
 	Node root;
 	Boolean dirty;
@@ -21,24 +21,6 @@ public class Groum implements Cloneable {
 	public Groum() {
 		groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
 		dirty = true;
-	}
-
-	@Override
-	public Object clone() {
-		Groum clone;
-		try {
-			clone = (Groum) super.clone();
-			clone.groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
-			for (Node node : getAllNodes()) {
-				clone.groum.addVertex(node);
-			}
-			for (DefaultEdge edge : groum.edgeSet()) {
-				clone.groum.addEdge(groum.getEdgeSource(edge), groum.getEdgeTarget(edge));
-			}
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	public void addNode(Node node) {
