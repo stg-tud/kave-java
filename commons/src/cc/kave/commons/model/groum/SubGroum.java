@@ -17,6 +17,13 @@ public class SubGroum extends Groum {
 		this.parent = null;
 	}
 
+	@Override
+	public void addNode(Node node) {
+		if (!parent.containsNode(node))
+			throw new IllegalArgumentException("cannot add a node that is not part of the parent");
+		super.addNode(node);
+	}
+
 	public List<SubGroum> computeExtensions(Node extendingNode) {
 		List<SubGroum> extendedGroums = new LinkedList<>();
 		List<Node> extendingNodes = new LinkedList<>();
