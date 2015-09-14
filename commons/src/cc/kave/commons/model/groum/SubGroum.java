@@ -17,14 +17,6 @@ public class SubGroum extends Groum {
 		this.parent = null;
 	}
 
-	public void setParent(Groum parent) {
-		this.parent = parent;
-	}
-
-	public Groum getParent() {
-		return parent;
-	}
-
 	public List<SubGroum> extensibleWith(SubGroum groum) {
 		Node extendingNode = groum.getAllNodes().iterator().next();
 
@@ -79,40 +71,5 @@ public class SubGroum extends Groum {
 			return null;
 		else
 			return extendedGroums;
-	}
-
-	@Deprecated
-	public SubGroum extensibleWithOneNodeMultipleEdge(SubGroum groum) {
-		Node extendingNode = groum.getAllNodes().iterator().next();
-
-		if (extendingNode == null)
-			return null;
-
-		SubGroum extendedSubgroum = (SubGroum) this.clone();
-		boolean extended = false;
-		for (Node node : this.getAllNodes()) {
-
-			Set<Node> successors = parent.getSuccessors(node);
-			if (successors.size() == 0)
-				continue;
-			else {
-				for (Node candidate : successors) {
-					if (!(this.containsNode(candidate)))
-						if (candidate.equals(extendingNode)) {
-							if (!extendedSubgroum.containsNode(candidate)) {
-								extendedSubgroum.addNode(candidate);
-								extended = true;
-							}
-							extendedSubgroum.addEdge(node, candidate);
-						} else {
-							continue;
-						}
-				}
-			}
-		}
-		if (extended)
-			return extendedSubgroum;
-		else
-			return null;
 	}
 }
