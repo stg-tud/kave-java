@@ -20,7 +20,7 @@ public class PatternAssert {
 	}
 
 	static List<SubGroum> filterBySize(List<SubGroum> actuals, int size) {
-		return actuals.stream().filter(g -> (g.getAllNodes().size() == size)).collect(Collectors.toList());
+		return actuals.stream().filter(g -> (g.getNodeCount() == size)).collect(Collectors.toList());
 	}
 
 }

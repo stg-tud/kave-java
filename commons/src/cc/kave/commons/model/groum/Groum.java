@@ -35,7 +35,6 @@ public class Groum implements IGroum {
 		return groum.vertexSet().size();
 	}
 
-	@Override
 	public Set<Node> getAllNodes() {
 		return groum.vertexSet();
 	}

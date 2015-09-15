@@ -21,11 +21,6 @@ public class SubGroum implements IGroum {
 	}
 
 	@Override
-	public Set<Node> getAllNodes() {
-		return nodes;
-	}
-
-	@Override
 	public int getNodeCount() {
 		return nodes.size();
 	}
@@ -55,7 +50,7 @@ public class SubGroum implements IGroum {
 
 	private Set<Node> getAllNodesReachableInOneHop() {
 		Set<Node> neighborNodes = new HashSet<>();
-		for (Node node : getAllNodes()) {
+		for (Node node : nodes) {
 			neighborNodes.addAll(parent.getSuccessors(node));
 		}
 		neighborNodes.removeAll(nodes);

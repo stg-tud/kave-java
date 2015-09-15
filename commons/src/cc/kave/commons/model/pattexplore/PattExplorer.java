@@ -58,11 +58,11 @@ public class PattExplorer {
 		patterns.putAll(L);
 
 		for (IGroum U : L.keySet()) {
-			if (U.getAllNodes().size() == 1) {
+			if (U.getNodeCount() == 1) {
 				TreeMultimap<SubGroum, SubGroum> Q = createGroumMap();
 
 				for (SubGroum occurrence : patterns.get(P)) {
-					List<SubGroum> candidates = occurrence.computeExtensions(U.getAllNodes().iterator().next());
+					List<SubGroum> candidates = occurrence.computeExtensions(U.getRoot());
 					for (SubGroum candidate : candidates) {
 						Q.put(candidate, candidate);
 					}
