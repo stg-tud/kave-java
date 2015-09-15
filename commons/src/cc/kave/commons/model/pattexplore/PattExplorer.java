@@ -16,16 +16,19 @@ public class PattExplorer {
 	}
 
 	public Set<IGroum> explorePatterns(Iterable<Groum> D) {
-		SubGroumMultiSet L = getAllAtomicSubGroums(D);
-		SubGroumMultiSet L2 = L.getFrequentSubSet(threshold);
+		SubGroumMultiSet atoms = getFrequentAtomicSubGroums(D);
 
 		SubGroumMultiSet explored = new SubGroumMultiSet();
-		for (IGroum pattern : L2.getPatterns()) {
-			explored.addAll(explore(pattern, L2));
+		for (IGroum pattern : atoms.getPatterns()) {
+			explored.addAll(explore(pattern, atoms));
 		}
-		L2.addAll(explored);
+		explored.addAll(atoms);
 
-		return L2.getPatterns();
+		return explored.getPatterns();
+	}
+
+	private SubGroumMultiSet getFrequentAtomicSubGroums(Iterable<Groum> D) {
+		return getAllAtomicSubGroums(D).getFrequentSubSet(threshold);
 	}
 
 	private SubGroumMultiSet getAllAtomicSubGroums(Iterable<Groum> D) {
