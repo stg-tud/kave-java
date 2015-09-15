@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public class SubGroum implements IGroum {
 	private final Groum parent;
 	private final Set<Node> nodes = new HashSet<>();
@@ -85,8 +87,21 @@ public class SubGroum implements IGroum {
 		return extension;
 	}
 
+	private Set<Pair<Node, Node>> getAllEdges() {
+		Set<Pair<Node, Node>> edges = new HashSet<>();
+		for (Node node : nodes) {
+			Set<Node> successors = parent.getSuccessors(node);
+			for (Node suc : successors) {
+				if (nodes.contains(suc)) {
+					edges.add(Pair.of(node, suc));
+				}
+			}
+		}
+		return edges;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("(%s <= %s)", nodes, parent);
+		return String.format("(%s, %s)", nodes, getAllEdges());
 	}
 }
