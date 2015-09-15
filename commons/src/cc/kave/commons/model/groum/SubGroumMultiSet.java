@@ -34,14 +34,14 @@ public class SubGroumMultiSet {
 		return new HashSet<>(data.keySet());
 	}
 
-	public Set<IGroum> getFrequentPatterns(int threshold) {
-		Set<IGroum> frequentPatterns = new HashSet<>();
+	public SubGroumMultiSet getFrequentSubSet(int threshold) {
+		SubGroumMultiSet subset = new SubGroumMultiSet();
 		for (IGroum pattern : getPatterns()) {
 			if (getPatternFrequency(pattern) >= threshold) {
-				frequentPatterns.add(pattern);
+				subset.addAll(getPatternInstances(pattern));
 			}
 		}
-		return frequentPatterns;
+		return subset;
 	}
 
 	private int getPatternFrequency(IGroum pattern) {
