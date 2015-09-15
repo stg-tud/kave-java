@@ -1,22 +1,22 @@
 package cc.kave.commons.model.groum;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 public class GroumBuilder {
 
-	private List<Node> nodes;
-	private List<Pair<Node, Node>> edges;
+	private Set<Node> nodes;
+	private Set<Pair<Node, Node>> edges;
 
 	public static GroumBuilder buildGroum(Node... nodes) {
 		return new GroumBuilder().withNodes(nodes);
 	}
 
 	public GroumBuilder() {
-		this.nodes = new ArrayList<>();
-		this.edges = new ArrayList<>();
+		this.nodes = new HashSet<>();
+		this.edges = new HashSet<>();
 	}
 
 	public GroumBuilder withNode(Node node) {
@@ -37,13 +37,6 @@ public class GroumBuilder {
 	}
 
 	public Groum build() {
-		Groum groum = new Groum();
-		for (Node node : nodes) {
-			groum.addNode(node);
-		}
-		for (Pair<Node, Node> edge : edges) {
-			groum.addEdge(edge.getLeft(), edge.getRight());
-		}
-		return groum;
+		return new Groum(nodes, edges);
 	}
 }

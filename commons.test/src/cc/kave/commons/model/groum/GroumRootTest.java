@@ -4,14 +4,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-import static cc.kave.commons.model.groum.GroumTestUtils.*;
+import static cc.kave.commons.model.groum.GroumBuilder.*;
 
 public class GroumRootTest {
 
 	@Test
 	public void singleNodeIsRoot() {
 		TestNode node = new TestNode("A");
-		Groum groum = createGroum(node);
+		Groum groum = buildGroum(node).build();
 
 		assertRoot(node, groum);
 	}
@@ -21,17 +21,16 @@ public class GroumRootTest {
 		TestNode node1 = new TestNode("A");
 		TestNode node2 = new TestNode("B");
 		TestNode node3 = new TestNode("C");
-		Groum groum = createGroum(node2, node1, node3);
-		groum.addEdge(node1, node2);
-		groum.addEdge(node1, node3);
-		
+		Groum groum = buildGroum(node2, node1, node3).withEdge(node1, node2)
+				.withEdge(node1, node3).build();
+
 		assertRoot(node1, groum);
 	}
-	
-	@Test(expected=IllegalStateException.class)
+
+	@Test(expected = IllegalStateException.class)
 	public void multipleRootsFails() {
-		Groum groum = createGroum(new TestNode("A"), new TestNode("B"));
-		
+		Groum groum = buildGroum(new TestNode("A"), new TestNode("B")).build();
+
 		groum.getRoot();
 	}
 

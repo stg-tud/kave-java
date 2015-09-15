@@ -1,8 +1,10 @@
 package cc.kave.commons.model.groum;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -18,15 +20,10 @@ public class Groum {
 	Node root;
 	Boolean dirty;
 
-	public Groum() {
+	public Groum(Set<Node> nodes, Set<Pair<Node, Node>> edges) {
 		groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
-		dirty = true;
-	}
-
-	public void addNode(Node node) {
-		groum.addVertex(node);
-		if (root == null)
-			root = node;
+		nodes.forEach(node -> groum.addVertex(node));
+		edges.forEach(edge -> groum.addEdge(edge.getLeft(), edge.getRight()));
 	}
 
 	public boolean containsNode(Node node) {
@@ -39,11 +36,6 @@ public class Groum {
 
 	public Set<Node> getAllNodes() {
 		return groum.vertexSet();
-	}
-
-	public void addEdge(Node source, Node target) {
-		groum.addEdge(source, target);
-		dirty = true;
 	}
 
 	public int getEdgeCount() {
@@ -87,8 +79,8 @@ public class Groum {
 		TreeMultimap<SubGroum, SubGroum> atomics = TreeMultimap.create(new DFSGroumComparator(),
 				new HashCodeComparator());
 		for (Node node : getAllNodes()) {
-			SubGroum subGroum = new SubGroum(this);
-			subGroum.addNode(node);
+			Set<Node> nodes = Collections.singleton(node);
+			SubGroum subGroum = new SubGroum(this, nodes);
 			atomics.put(subGroum, subGroum);
 		}
 		return atomics;

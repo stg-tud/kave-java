@@ -9,18 +9,13 @@ public class SubGroum extends Groum {
 	private final Groum parent;
 	private final Set<Node> nodes = new HashSet<>();
 
-	public SubGroum(Groum parent) {
-		super();
+	public SubGroum(Groum parent, Set<Node> nodes) {
+		super(nodes, new HashSet<>());
 		this.parent = parent;
+		nodes.forEach(node -> addNode(node));
 	}
 
-	public SubGroum() {
-		super();
-		this.parent = null;
-	}
-
-	@Override
-	public void addNode(Node node) {
+	private void addNode(Node node) {
 		if (!parent.containsNode(node))
 			throw new IllegalArgumentException("cannot add a node that is not part of the parent");
 		nodes.add(node);
@@ -29,13 +24,6 @@ public class SubGroum extends Groum {
 	@Override
 	public Set<Node> getAllNodes() {
 		return nodes;
-	}
-
-	@Override
-	public void addEdge(Node source, Node target) {
-		if (!parent.getSuccessors(source).contains(target)) {
-			throw new IllegalArgumentException("cannot add an edge that is not part of the parent");
-		}
 	}
 
 	@Override
@@ -85,9 +73,8 @@ public class SubGroum extends Groum {
 	}
 
 	private SubGroum createExtension(Node extnode) {
-		SubGroum extension = new SubGroum(parent);
-		extension.nodes.addAll(nodes);
-		extension.addNode(extnode);
+		SubGroum extension = new SubGroum(parent, nodes);
+		extension.nodes.add(extnode);
 		return extension;
 	}
 }

@@ -1,6 +1,7 @@
 package cc.kave.commons.model.groum;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import org.junit.Test;
@@ -12,13 +13,13 @@ import com.google.common.collect.Multimap;
 import static org.junit.Assert.assertEquals;
 
 import static cc.kave.commons.model.groum.GroumTestUtils.*;
-
+import static cc.kave.commons.model.groum.GroumBuilder.*;
 public class GroumTest {
 	
 	@Test
 	public void producesSubGroumsOfSizeOne() {
 		Node[] nodes = createNodes("A", "B");
-		Groum groum = createGroum(nodes);
+		Groum groum = buildGroum(nodes).build();
 		
 		Multimap<SubGroum, SubGroum> atomicSubGroums = groum.getAtomicSubGroums();
 		
@@ -30,7 +31,7 @@ public class GroumTest {
 	@Test
 	public void producesMultipleSubGroumsForEqualNodes() {
 		Node[] nodes = createNodes("A", "A");
-		Groum groum = createGroum(nodes);
+		Groum groum = buildGroum(nodes).build();
 		
 		Multimap<SubGroum, SubGroum> atomicSubGroums = groum.getAtomicSubGroums();
 		
@@ -40,9 +41,7 @@ public class GroumTest {
 	}
 
 	private SubGroum createSubGroum(Groum groum, Node node) {
-		SubGroum subGroum = new SubGroum(groum);
-		subGroum.addNode(node);
-		return subGroum;
+		return new SubGroum(groum, Collections.singleton(node));
 	}
 	
 	static void assertContainsAll(Multimap<SubGroum, SubGroum> actuals, Groum... expecteds) {

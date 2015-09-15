@@ -6,36 +6,33 @@ import static org.junit.Assert.assertEquals;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.Node;
-import cc.kave.commons.model.groum.TestNode;
 import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
 
 import static cc.kave.commons.model.groum.GroumTestUtils.*;
-
+import static cc.kave.commons.model.groum.GroumBuilder.*;
 public class DFSGroumComparatorTest {
 
 	@Test
 	public void singleEqualNode() {
-		assertEqualGroums(createGroum(new TestNode("A")),
-				createGroum(new TestNode("A")));
+		assertEqualGroums(createGroum("A"), createGroum("A"));
 	}
 
 	@Test
 	public void singleUnequalNode() {
-		assertSmallerGroum(createGroum(new TestNode("A")),
-				createGroum(new TestNode("B")));
+		assertSmallerGroum(createGroum("A"), createGroum("B"));
 	}
 	
 	@Test
 	public void threeNodesEqual() {
 		Node[] nodes1 = createNodes("A", "B", "C");
-		Groum groum1 = createGroum(nodes1);
-		groum1.addEdge(nodes1[0], nodes1[1]);
-		groum1.addEdge(nodes1[0], nodes1[2]);
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2]).build();
 
 		Node[] nodes2 = createNodes("A", "B", "C");
-		Groum groum2 = createGroum(nodes2);
-		groum2.addEdge(nodes2[0], nodes2[1]);
-		groum2.addEdge(nodes2[0], nodes2[2]);
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[0], nodes2[2]).build();
 		
 		assertEqualGroums(groum1, groum2);
 	}
@@ -51,14 +48,14 @@ public class DFSGroumComparatorTest {
 	@Test
 	public void threeNodesDifferentNodes() {
 		Node[] nodes1 = createNodes("A", "B", "C");
-		Groum groum1 = createGroum(nodes1);
-		groum1.addEdge(nodes1[0], nodes1[1]);
-		groum1.addEdge(nodes1[0], nodes1[2]);
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2]).build();
 
 		Node[] nodes2 = createNodes("A", "B", "D");
-		Groum groum2 = createGroum(nodes2);
-		groum2.addEdge(nodes2[0], nodes2[1]);
-		groum2.addEdge(nodes2[0], nodes2[2]);
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[0], nodes2[2]).build();
 		
 		assertSmallerGroum(groum1, groum2);
 	}
@@ -74,14 +71,14 @@ public class DFSGroumComparatorTest {
 	@Test
 	public void threeNodesDifferentEdges() {
 		Node[] nodes1 = createNodes("A", "B", "C");
-		Groum groum1 = createGroum(nodes1);
-		groum1.addEdge(nodes1[0], nodes1[1]);
-		groum1.addEdge(nodes1[0], nodes1[2]);
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2]).build();
 
 		Node[] nodes2 = createNodes("A", "B", "C");
-		Groum groum2 = createGroum(nodes2);
-		groum2.addEdge(nodes2[0], nodes2[1]);
-		groum2.addEdge(nodes2[1], nodes2[2]);
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[1], nodes2[2]).build();
 		
 		assertSmallerGroum(groum1, groum2);
 	}
@@ -94,16 +91,16 @@ public class DFSGroumComparatorTest {
 	@Test
 	public void indistinguishable() {
 		Node[] nodes1 = createNodes("A", "B", "C");
-		Groum groum1 = createGroum(nodes1);
-		groum1.addEdge(nodes1[0], nodes1[1]);
-		groum1.addEdge(nodes1[0], nodes1[2]);
-		groum1.addEdge(nodes1[1], nodes1[2]);
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2])
+				.withEdge(nodes1[1], nodes1[2]).build();
 
 		Node[] nodes2 = createNodes("A", "B", "C", "C");
-		Groum groum2 = createGroum(nodes2);
-		groum2.addEdge(nodes2[0], nodes2[1]);
-		groum2.addEdge(nodes2[0], nodes2[2]);
-		groum2.addEdge(nodes2[1], nodes2[3]);
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[0], nodes2[2])
+				.withEdge(nodes2[1], nodes2[3]).build();
 		
 		assertEqualGroums(groum1, groum2);
 	}

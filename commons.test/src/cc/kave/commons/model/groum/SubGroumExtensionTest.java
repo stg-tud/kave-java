@@ -1,5 +1,6 @@
 package cc.kave.commons.model.groum;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hamcrest.BaseMatcher;
@@ -13,14 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import static cc.kave.commons.model.groum.GroumTestUtils.*;
+import static cc.kave.commons.model.groum.GroumBuilder.*;
 public class SubGroumExtensionTest {
 
 	@Test
 	public void noExtension() {
 		Node[] nodes = createNodes("A");
-		Groum groum = createGroum(nodes);
-		SubGroum uut = new SubGroum(groum);
-		uut.addNode(nodes[0]);
+		Groum groum = buildGroum(nodes).build();
+		SubGroum uut = createSubGroum(groum, nodes[0]);
 		
 		List<SubGroum> extensions = uut.computeExtensions(createNodes("B")[0]);
 		
@@ -30,85 +31,57 @@ public class SubGroumExtensionTest {
 	@Test
 	public void oneExtension() {
 		Node[] nodes = createNodes("A", "B");
-		Groum groum = createGroum(nodes);
-		groum.addEdge(nodes[0], nodes[1]);
-		SubGroum uut = new SubGroum(groum);
-		uut.addNode(nodes[0]);
+		Groum groum = buildGroum(nodes).withEdge(nodes[0], nodes[1]).build();
+		SubGroum uut = new SubGroum(groum, Collections.singleton(nodes[0]));
 		
 		List<SubGroum> extensions = uut.computeExtensions(nodes[1]);
 		
-		SubGroum extension = new SubGroum(groum);
-		extension.addNode(nodes[0]);
-		extension.addNode(nodes[1]);
-		extension.addEdge(nodes[0], nodes[1]);
-		
+		SubGroum extension = createSubGroum(groum, nodes[0], nodes[1]);
 		assertThat(extensions, containsSubGroum(extension));
 	}
 	
 	@Test
 	public void oneExtensionOneRelevantEdge() {
 		Node[] nodes = createNodes("A", "B", "C");
-		Groum groum = createGroum(nodes);
-		groum.addEdge(nodes[0], nodes[1]);
-		groum.addEdge(nodes[0], nodes[2]);
-		groum.addEdge(nodes[2], nodes[1]);
-		SubGroum uut = new SubGroum(groum);
-		uut.addNode(nodes[0]);
+		Groum groum = buildGroum(nodes)
+				.withEdge(nodes[0], nodes[1])
+				.withEdge(nodes[0], nodes[2])
+				.withEdge(nodes[2], nodes[1]).build();
+		SubGroum uut = createSubGroum(groum, nodes[0]);
 		
 		List<SubGroum> extensions = uut.computeExtensions(nodes[1]);
 		
-		SubGroum extension = new SubGroum(groum);
-		extension.addNode(nodes[0]);
-		extension.addNode(nodes[1]);
-		extension.addEdge(nodes[0], nodes[1]);
-		
+		SubGroum extension = createSubGroum(groum, nodes[0], nodes[1]);
 		assertThat(extensions, containsSubGroum(extension));
 	}
 	
 	@Test
 	public void oneExtensionWithMultipeEdges() {
 		Node[] nodes = createNodes("A", "B", "C");
-		Groum groum = createGroum(nodes);
-		groum.addEdge(nodes[0], nodes[1]);
-		groum.addEdge(nodes[0], nodes[2]);
-		groum.addEdge(nodes[2], nodes[1]);
-		SubGroum uut = new SubGroum(groum);
-		uut.addNode(nodes[0]);
-		uut.addNode(nodes[2]);
-		uut.addEdge(nodes[0], nodes[2]);
+		Groum groum = buildGroum(nodes)
+				.withEdge(nodes[0], nodes[1])
+				.withEdge(nodes[0], nodes[2])
+				.withEdge(nodes[2], nodes[1]).build();
+		SubGroum uut = createSubGroum(groum, nodes[0], nodes[2]);
 		
 		List<SubGroum> extensions = uut.computeExtensions(nodes[1]);
 		
-		SubGroum extension = new SubGroum(groum);
-		extension.addNode(nodes[0]);
-		extension.addNode(nodes[1]);
-		extension.addNode(nodes[2]);
-		extension.addEdge(nodes[0], nodes[1]);
-		extension.addEdge(nodes[0], nodes[2]);
-		extension.addEdge(nodes[2], nodes[1]);
-		
+		SubGroum extension = createSubGroum(groum, nodes[0], nodes[1], nodes[2]);
 		assertThat(extensions, containsSubGroum(extension));
 	}
 	
 	@Test
 	public void multipleExtensions() {
 		Node[] nodes = createNodes("A", "B", "B");
-		Groum groum = createGroum(nodes);
-		groum.addEdge(nodes[0], nodes[1]);
-		groum.addEdge(nodes[0], nodes[2]);
-		SubGroum uut = new SubGroum(groum);
-		uut.addNode(nodes[0]);
+		Groum groum = buildGroum(nodes)
+				.withEdge(nodes[0], nodes[1])
+				.withEdge(nodes[0], nodes[2]).build();
+		SubGroum uut = createSubGroum(groum, nodes[0]);
 		
 		List<SubGroum> extensions = uut.computeExtensions(nodes[1]);
 		
-		SubGroum extension1 = new SubGroum(groum);
-		extension1.addNode(nodes[0]);
-		extension1.addNode(nodes[1]);
-		extension1.addEdge(nodes[0], nodes[1]);		
-		SubGroum extension2 = new SubGroum(groum);
-		extension2.addNode(nodes[0]);
-		extension2.addNode(nodes[2]);
-		extension2.addEdge(nodes[0], nodes[2]);
+		SubGroum extension1 = createSubGroum(groum, nodes[0], nodes[1]);
+		SubGroum extension2 = createSubGroum(groum, nodes[0], nodes[2]);
 		
 		assertThat(extensions, containsSubGroums(extension1, extension2));
 	}
