@@ -76,4 +76,9 @@ public class SubGroum implements IGroum {
 		extension.nodes.add(extnode);
 		return extension;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("(%s <= %s)", nodes, parent);
+	}
 }
