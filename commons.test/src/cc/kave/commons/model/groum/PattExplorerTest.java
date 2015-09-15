@@ -18,7 +18,8 @@ public class PattExplorerTest {
 
 		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
-		assertContainsPatterns(patterns, createGroum("A"), createGroum("B"));
+		List<SubGroum> patternsOfSize1 = filterBySize(patterns, 1);
+		assertContainsPatterns(patternsOfSize1, createGroum("A"), createGroum("B"));
 	}
 
 	@Test

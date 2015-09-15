@@ -10,7 +10,12 @@ import static cc.kave.commons.model.groum.GroumBuilder.*;
 public class GroumTestUtils {
 
 	public static Groum createGroum(String... nodeIds) {
-		return buildGroum(createNodes(nodeIds)).build();
+		Node[] nodes = createNodes(nodeIds);
+		GroumBuilder builder = buildGroum(nodes);
+		for (int i = 0; i < nodes.length - 1; i++) {
+			builder.withEdge(nodes[i], nodes[i+1]);
+		}
+		return builder.build();
 	}
 
 	public static Node[] createNodes(String... nodeIds) {
