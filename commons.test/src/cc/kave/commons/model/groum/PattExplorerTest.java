@@ -5,7 +5,6 @@ import java.util.List;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.DFSGroumComparatorTest;
 import static cc.kave.commons.model.groum.GroumTestUtils.*;
 import static cc.kave.commons.model.groum.PatternAssert.*;
@@ -17,9 +16,9 @@ public class PattExplorerTest {
 	public void findsSingeNodePatterns() {
 		Groum groum = createGroum("A", "B");
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
+		List<IGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
-		List<SubGroum> patternsOfSize1 = filterBySize(patterns, 1);
+		List<IGroum> patternsOfSize1 = filterBySize(patterns, 1);
 		assertContainsPatterns(patternsOfSize1, createGroum("A"), createGroum("B"));
 	}
 
@@ -28,7 +27,7 @@ public class PattExplorerTest {
 		Groum groum1 = createGroum("A", "B");
 		Groum groum2 = createGroum("A");
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum1,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2, groum1,
 				groum2);
 
 		assertContainsPatterns(patterns, createGroum("A"));
@@ -39,9 +38,9 @@ public class PattExplorerTest {
 		Node[] nodes = createNodes("A", "B");
 		Groum groum = buildGroum(nodes).withEdge(nodes[0], nodes[1]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
+		List<IGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
-		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		List<IGroum> patternsOfSize2 = filterBySize(patterns, 2);
 		assertContainsPatterns(patternsOfSize2, groum);
 	}
 
@@ -54,10 +53,10 @@ public class PattExplorerTest {
 		Node[] nodes3 = createNodes("A", "B");
 		Groum groum3 = buildGroum(nodes3).withEdge(nodes3[0], nodes3[1]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum1,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2, groum1,
 				groum2, groum3);
 
-		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		List<IGroum> patternsOfSize2 = filterBySize(patterns, 2);
 		assertContainsPatterns(patternsOfSize2, groum1);
 	}
 
@@ -81,7 +80,7 @@ public class PattExplorerTest {
 				.withEdge(nodes[0], nodes[2])
 				.withEdge(nodes[1], nodes[3]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
+		List<IGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
 		Node[] nodes2 = createNodes("1", "2", "3");
 		Groum pattern1 = buildGroum(nodes2)
@@ -93,7 +92,7 @@ public class PattExplorerTest {
 				.withEdge(nodes3[0], nodes3[1])
 				.withEdge(nodes3[1], nodes3[2]).build();
 
-		List<SubGroum> patternsOfSize3 = filterBySize(patterns, 3);
+		List<IGroum> patternsOfSize3 = filterBySize(patterns, 3);
 		assertContainsPatterns(patternsOfSize3, pattern1, pattern2);
 	}
 
@@ -107,10 +106,10 @@ public class PattExplorerTest {
 		Node[] nodes2 = createNodes("A", "B");
 		Groum groum2 = buildGroum(nodes2).withEdge(nodes2[1], nodes2[0]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum1,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2, groum1,
 				groum2);
 
-		List<SubGroum> patternsOfSize2 = filterBySize(patterns, 2);
+		List<IGroum> patternsOfSize2 = filterBySize(patterns, 2);
 		assertContainsPatterns(patternsOfSize2);
 	}
 
@@ -122,7 +121,7 @@ public class PattExplorerTest {
 				.withEdge(nodes[0], nodes[1])
 				.withEdge(nodes[1], nodes[2]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2,
 				overlappingGroum);
 
 		Groum pattern1 = createGroum("2");
@@ -139,7 +138,7 @@ public class PattExplorerTest {
 				.withEdge(nodes[0], nodes[1])
 				.withEdge(nodes[0], nodes[2]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2,
 				overlappingGroum);
 
 		Groum pattern1 = createGroum("2");
@@ -157,7 +156,7 @@ public class PattExplorerTest {
 				.withEdge(nodes[0], nodes[2])
 				.withEdge(nodes[1], nodes[3]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum);
+		List<IGroum> patterns = findPatternsWithMinFrequency(2, groum);
 
 		Node[] nodes2 = createNodes("1", "2");
 		Groum pattern1 = buildGroum(nodes2).withEdge(nodes2[0], nodes2[1]).build();
@@ -196,7 +195,7 @@ public class PattExplorerTest {
 				.withEdge(nodes2[0], nodes2[2])
 				.withEdge(nodes2[1], nodes2[3]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(2, groum1,
+		List<IGroum> patterns = findPatternsWithMinFrequency(2, groum1,
 				groum2);
 
 		patterns = filterBySize(patterns, 3);
@@ -211,7 +210,7 @@ public class PattExplorerTest {
 				.withEdge(nodes[0], nodes[2])
 				.withEdge(nodes[1], nodes[2]).build();
 
-		List<SubGroum> patterns = findPatternsWithMinFrequency(1, groum);
+		List<IGroum> patterns = findPatternsWithMinFrequency(1, groum);
 
 		patterns = filterBySize(patterns, 3);
 		assertContainsPatterns(patterns, groum);

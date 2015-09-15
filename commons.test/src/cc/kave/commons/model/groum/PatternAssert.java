@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PatternAssert {
 	
-	static void assertContainsPatterns(List<SubGroum> actuals, IGroum... expecteds) {
+	static void assertContainsPatterns(List<IGroum> actuals, IGroum... expecteds) {
 		TreeSet<IGroum> actual = new TreeSet<IGroum>(new DFSGroumComparator());
 		actual.addAll(actuals);
 		TreeSet<IGroum> expected = new TreeSet<IGroum>(new DFSGroumComparator());
@@ -19,7 +19,7 @@ public class PatternAssert {
 		assertEquals(expected, actual);
 	}
 
-	static List<SubGroum> filterBySize(List<SubGroum> actuals, int size) {
+	static List<IGroum> filterBySize(List<IGroum> actuals, int size) {
 		return actuals.stream().filter(g -> (g.getNodeCount() == size)).collect(Collectors.toList());
 	}
 

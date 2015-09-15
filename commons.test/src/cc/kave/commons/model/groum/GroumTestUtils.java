@@ -26,7 +26,7 @@ public class GroumTestUtils {
 		return nodes;
 	}
 
-	public static List<SubGroum> findPatternsWithMinFrequency(int threshold,
+	public static List<IGroum> findPatternsWithMinFrequency(int threshold,
 			Groum... groums) {
 		PattExplorer uut = new PattExplorer(threshold);
 		return uut.explorePatterns(Arrays.asList(groums));

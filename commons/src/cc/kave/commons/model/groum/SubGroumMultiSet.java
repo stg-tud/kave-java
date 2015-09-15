@@ -9,7 +9,7 @@ import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import com.google.common.collect.TreeMultimap;
 
 public class SubGroumMultiSet {
-	private TreeMultimap<SubGroum, SubGroum> data = TreeMultimap.create(new DFSGroumComparator(),
+	private TreeMultimap<IGroum, SubGroum> data = TreeMultimap.create(new DFSGroumComparator(),
 			new HashCodeComparator());
 
 	public void add(SubGroum instance) {
@@ -30,7 +30,7 @@ public class SubGroumMultiSet {
 		return clone;
 	}
 
-	public Set<SubGroum> getPatterns() {
+	public Set<IGroum> getPatterns() {
 		return new HashSet<>(data.keySet());
 	}
 
@@ -38,11 +38,11 @@ public class SubGroumMultiSet {
 		return new HashSet<>(data.values());
 	}
 
-	public int getPatternFrequency(SubGroum pattern) {
+	public int getPatternFrequency(IGroum pattern) {
 		return data.get(pattern).size();
 	}
 
-	public Set<SubGroum> getPatternInstances(SubGroum pattern) {
+	public Set<SubGroum> getPatternInstances(IGroum pattern) {
 		return new HashSet<>(data.get(pattern));
 	}
 }
