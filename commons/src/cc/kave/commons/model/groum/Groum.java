@@ -18,7 +18,6 @@ import com.google.common.collect.TreeMultimap;
 public class Groum implements IGroum {
 	DirectedGraph<Node, DefaultEdge> groum;
 	Node root;
-	Boolean dirty;
 
 	public Groum(Set<Node> nodes, Set<Pair<Node, Node>> edges) {
 		groum = new DefaultDirectedGraph<Node, DefaultEdge>(DefaultEdge.class);
