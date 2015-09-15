@@ -8,41 +8,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.groum.Groum;
-import cc.kave.commons.model.groum.Node;
-import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
-import cc.kave.commons.model.groum.comparator.GroumIdentComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.HashCodeComparator;
-import cc.kave.commons.model.groum.nodes.ActionNode;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.SortedMultiset;
-import com.google.common.collect.TreeMultimap;
 import com.google.common.collect.TreeMultiset;
 
 public class GroumMultimapTest {
-
-	@Test
-	public void comparatorWorksForGroums() {
-
-		TreeMultimap<Groum, Groum> treemap = TreeMultimap.create(new GroumComparator(), new GroumIdentComparator());
-
-		Groum groum1 = Fixture.createConnectedGroumOfSize(1);
-		Groum groum2 = Fixture.createConnectedGroumOfSize(2);
-		Groum groum3 = Fixture.createConnectedGroumOfSize(3);
-		Groum groum4 = Fixture.createConnectedGroumOfSize(1);
-		Groum groum5 = Fixture.createConnectedGroumOfSize(2);
-		Groum groum6 = Fixture.createConnectedGroumOfSize(3);
-		treemap.put(groum1, groum1);
-		treemap.put(groum2, groum2);
-		treemap.put(groum3, groum3);
-		treemap.put(groum4, groum4);
-		treemap.put(groum5, groum5);
-		treemap.put(groum6, groum6);
-		assertTrue(treemap.size() == 6 && treemap.get(groum2).size() == 2);
-
-	}
 
 	@Test
 	public void removesSubset() {
@@ -143,37 +115,6 @@ public class GroumMultimapTest {
 		SortedMultiset<Groum> subMultiset = treeset.subMultiset(groum5, BoundType.CLOSED, groum5, BoundType.CLOSED);
 		int size = subMultiset.size();
 		assertTrue(size == 3);
-
-	}
-
-	@Test
-	public void putsUnorderedGroumIntoSameBucket() {
-		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
-				new HashCodeComparator());
-
-		Node node1 = new ActionNode("1", "1");
-		Node node2 = new ActionNode("2", "2");
-		Node node3 = new ActionNode("3", "3");
-		SubGroum a = new SubGroum(null);
-		a.addNode(node1);
-		a.addNode(node2);
-		a.addNode(node3);
-		a.addEdge(node1, node2);
-		a.addEdge(node1, node3);
-
-		Node node1b = new ActionNode("1", "1");
-		Node node2b = new ActionNode("2", "2");
-		Node node3b = new ActionNode("3", "3");
-		SubGroum b = new SubGroum(null);
-		b.addNode(node1b);
-		b.addNode(node3b);
-		b.addEdge(node1b, node3b);
-		b.addNode(node2b);
-		b.addEdge(node1b, node2b);
-
-		treemap.putAll(a, Arrays.asList(a));
-		treemap.putAll(b, Arrays.asList(b));
-		assertTrue(treemap.keySet().size() == 1);
 
 	}
 }

@@ -1,9 +1,6 @@
 package cc.kave.commons.model.groum.legacy;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -11,46 +8,9 @@ import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.GroumComparator;
-import cc.kave.commons.model.groum.comparator.SubGroumComparator;
-import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import cc.kave.commons.model.groum.nodes.ActionNode;
 
-import com.google.common.collect.TreeMultimap;
-
 public class GroumComparatorTest {
-
-	@Test
-	public void comparatorProblem() {
-		ActionNode node1 = new ActionNode("1", "1");
-		ActionNode node2 = new ActionNode("2", "2");
-		SubGroum groum1 = new SubGroum();
-		groum1.addNode(node1);
-		groum1.addNode(node2);
-		groum1.addEdge(node1, node2);
-
-		ActionNode node1a = new ActionNode("1", "1");
-		ActionNode node2a = new ActionNode("2", "2");
-		SubGroum groum2 = new SubGroum();
-		groum2.addNode(node2a);
-		groum2.addNode(node1a);
-		groum2.addEdge(node1a, node2a);
-
-		ActionNode node1b = new ActionNode("1", "1");
-		ActionNode node2b = new ActionNode("3", "3");
-		SubGroum groum3 = new SubGroum();
-		groum3.addNode(node1b);
-		groum3.addNode(node2b);
-		groum3.addEdge(node1b, node2b);
-
-		TreeMultimap<SubGroum, SubGroum> treemap = TreeMultimap.create(new SubGroumComparator(),
-				new HashCodeComparator());
-		treemap.put(groum3, groum3);
-		treemap.put(groum1, groum1);
-		treemap.put(groum2, groum2);
-
-		assertEquals(2, treemap.keySet().size());
-		assertTrue(treemap.keySet().containsAll(Arrays.asList(groum1, groum3)));
-	}
 	
 	@Test
 	public void NonemptyGroumIsGreaterThanEmptyGroum() {
