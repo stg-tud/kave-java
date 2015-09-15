@@ -26,6 +26,11 @@ public class SubGroum implements IGroum {
 	}
 
 	@Override
+	public int getNodeCount() {
+		return nodes.size();
+	}
+
+	@Override
 	public Set<Node> getSuccessors(Node node) {
 		Set<Node> successors = new HashSet<Node>();
 		Set<Node> parentSuccessors = parent.getSuccessors(node);

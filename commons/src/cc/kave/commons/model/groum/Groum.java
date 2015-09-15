@@ -30,6 +30,7 @@ public class Groum implements IGroum {
 		return groum.containsVertex(node);
 	}
 
+	@Override
 	public int getNodeCount() {
 		return groum.vertexSet().size();
 	}
