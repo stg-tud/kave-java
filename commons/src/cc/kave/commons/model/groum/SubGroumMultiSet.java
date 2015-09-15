@@ -34,12 +34,22 @@ public class SubGroumMultiSet {
 		return new HashSet<>(data.keySet());
 	}
 
-	public Set<SubGroum> getAllInstances() {
-		return new HashSet<>(data.values());
+	public Set<IGroum> getFrequentPatterns(int threshold) {
+		Set<IGroum> frequentPatterns = new HashSet<>();
+		for (IGroum pattern : getPatterns()) {
+			if (getPatternFrequency(pattern) >= threshold) {
+				frequentPatterns.add(pattern);
+			}
+		}
+		return frequentPatterns;
 	}
 
-	public int getPatternFrequency(IGroum pattern) {
+	private int getPatternFrequency(IGroum pattern) {
 		return data.get(pattern).size();
+	}
+
+	public Set<SubGroum> getAllInstances() {
+		return new HashSet<>(data.values());
 	}
 
 	public Set<SubGroum> getPatternInstances(IGroum pattern) {
