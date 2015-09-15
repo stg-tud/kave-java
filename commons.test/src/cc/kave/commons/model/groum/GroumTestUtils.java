@@ -2,7 +2,7 @@ package cc.kave.commons.model.groum;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.pattexplore.PattExplorer;
 import static cc.kave.commons.model.groum.GroumBuilder.*;
@@ -26,7 +26,7 @@ public class GroumTestUtils {
 		return nodes;
 	}
 
-	public static List<IGroum> findPatternsWithMinFrequency(int threshold,
+	public static Set<IGroum> findPatternsWithMinFrequency(int threshold,
 			Groum... groums) {
 		PattExplorer uut = new PattExplorer(threshold);
 		return uut.explorePatterns(Arrays.asList(groums));

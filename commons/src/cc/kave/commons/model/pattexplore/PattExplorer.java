@@ -1,7 +1,7 @@
 package cc.kave.commons.model.pattexplore;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.IGroum;
@@ -15,7 +15,7 @@ public class PattExplorer {
 		this.threshold = threshold;
 	}
 
-	public List<IGroum> explorePatterns(List<Groum> D) {
+	public Set<IGroum> explorePatterns(List<Groum> D) {
 		SubGroumMultiSet L = new SubGroumMultiSet();
 
 		for (Groum groum : D) {
@@ -35,7 +35,7 @@ public class PattExplorer {
 		}
 		L2.addAll(explored);
 
-		return new ArrayList<>(L2.getPatterns());
+		return L2.getPatterns();
 	}
 
 	private SubGroumMultiSet explore(IGroum P, SubGroumMultiSet L, List<Groum> D) {
