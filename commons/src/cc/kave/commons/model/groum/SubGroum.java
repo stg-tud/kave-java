@@ -8,6 +8,7 @@ import java.util.Set;
 public class SubGroum implements IGroum {
 	private final Groum parent;
 	private final Set<Node> nodes = new HashSet<>();
+	private Node root;
 
 	public SubGroum(Groum parent, Set<Node> nodes) {
 		this.parent = parent;
@@ -59,6 +60,13 @@ public class SubGroum implements IGroum {
 
 	@Override
 	public Node getRoot() {
+		if (root == null) {
+			root = findRoot();
+		}
+		return root;
+	}
+
+	private Node findRoot() {
 		HashSet<Node> candidates = new HashSet<>(nodes);
 		for (Node node : nodes) {
 			Set<Node> successors = getSuccessors(node);

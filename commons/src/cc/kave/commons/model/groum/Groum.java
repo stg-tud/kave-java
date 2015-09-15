@@ -60,8 +60,13 @@ public class Groum implements IGroum {
 
 	@Override
 	public Node getRoot() {
-		// TODO this is potentially used very frequently. The result should be
-		// cached and invalidated when the Groum is changed.
+		if (root == null) {
+			root = findRoot();
+		}
+		return root;
+	}
+
+	private Node findRoot() {
 		Node root = null;
 		for (Node node : getAllNodes()) {
 			if (groum.inDegreeOf(node) == 0) {
