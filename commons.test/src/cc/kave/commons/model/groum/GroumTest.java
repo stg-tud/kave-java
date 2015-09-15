@@ -44,10 +44,10 @@ public class GroumTest {
 		return new SubGroum(groum, Collections.singleton(node));
 	}
 	
-	static void assertContainsAll(Multimap<SubGroum, SubGroum> actuals, Groum... expecteds) {
-		TreeSet<Groum> actual = new TreeSet<Groum>(new DFSGroumComparator());
+	static void assertContainsAll(Multimap<SubGroum, SubGroum> actuals, SubGroum... expecteds) {
+		TreeSet<SubGroum> actual = new TreeSet<SubGroum>(new DFSGroumComparator());
 		actual.addAll(actuals.values());
-		TreeSet<Groum> expected = new TreeSet<Groum>(new DFSGroumComparator());
+		TreeSet<SubGroum> expected = new TreeSet<SubGroum>(new DFSGroumComparator());
 		expected.addAll(Arrays.asList(expecteds));
 		assertEquals(expected, actual);
 	}

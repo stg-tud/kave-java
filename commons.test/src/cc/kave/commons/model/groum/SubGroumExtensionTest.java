@@ -107,7 +107,7 @@ public class SubGroumExtensionTest {
 			}
 
 			private boolean contains(Iterable<SubGroum> others, SubGroum subgroum) {
-				for (SubGroum element : others) {
+				for (IGroum element : others) {
 						SubGroum other = (SubGroum) element;
 						if (new DFSGroumComparator().compare(subgroum, other) == 0)
 							return true;

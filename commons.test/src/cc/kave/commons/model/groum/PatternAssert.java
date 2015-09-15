@@ -11,10 +11,10 @@ import static org.junit.Assert.assertEquals;
 
 public class PatternAssert {
 	
-	static void assertContainsPatterns(List<SubGroum> actuals, Groum... expecteds) {
-		TreeSet<Groum> actual = new TreeSet<Groum>(new DFSGroumComparator());
+	static void assertContainsPatterns(List<SubGroum> actuals, IGroum... expecteds) {
+		TreeSet<IGroum> actual = new TreeSet<IGroum>(new DFSGroumComparator());
 		actual.addAll(actuals);
-		TreeSet<Groum> expected = new TreeSet<Groum>(new DFSGroumComparator());
+		TreeSet<IGroum> expected = new TreeSet<IGroum>(new DFSGroumComparator());
 		expected.addAll(Arrays.asList(expecteds));
 		assertEquals(expected, actual);
 	}

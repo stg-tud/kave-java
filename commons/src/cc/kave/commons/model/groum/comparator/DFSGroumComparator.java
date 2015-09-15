@@ -5,19 +5,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import cc.kave.commons.model.groum.Groum;
+import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.Node;
 
-public class DFSGroumComparator implements Comparator<Groum> {
+public class DFSGroumComparator implements Comparator<IGroum> {
 
 	@Override
-	public int compare(Groum groum1, Groum groum2) {
+	public int compare(IGroum groum1, IGroum groum2) {
 		Node root1 = groum1.getRoot();
 		Node root2 = groum2.getRoot();
 		return compare(root1, groum1, root2, groum2);
 	}
 
-	private int compare(Node node1, Groum groum1, Node node2, Groum groum2) {
+	private int compare(Node node1, IGroum groum1, Node node2, IGroum groum2) {
 		int equalNodes = node1.compareTo(node2);
 		if (equalNodes != 0) {
 			return equalNodes;

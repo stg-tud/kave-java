@@ -5,12 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SubGroum extends Groum {
+public class SubGroum implements IGroum {
 	private final Groum parent;
 	private final Set<Node> nodes = new HashSet<>();
 
 	public SubGroum(Groum parent, Set<Node> nodes) {
-		super(nodes, new HashSet<>());
 		this.parent = parent;
 		nodes.forEach(node -> addNode(node));
 	}

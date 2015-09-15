@@ -15,7 +15,7 @@ import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
-public class Groum {
+public class Groum implements IGroum {
 	DirectedGraph<Node, DefaultEdge> groum;
 	Node root;
 	Boolean dirty;
@@ -34,6 +34,7 @@ public class Groum {
 		return groum.vertexSet().size();
 	}
 
+	@Override
 	public Set<Node> getAllNodes() {
 		return groum.vertexSet();
 	}
@@ -42,6 +43,7 @@ public class Groum {
 		return groum.edgeSet().size();
 	}
 
+	@Override
 	public Set<Node> getSuccessors(Node node) {
 		Set<Node> successors = new HashSet<>();
 		Set<DefaultEdge> outgoingEdges = groum.outgoingEdgesOf(node);
@@ -57,6 +59,7 @@ public class Groum {
 		return groum.toString();
 	}
 
+	@Override
 	public Node getRoot() {
 		// TODO this is potentially used very frequently. The result should be
 		// cached and invalidated when the Groum is changed.

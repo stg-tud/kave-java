@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cc.kave.commons.model.groum.Groum;
+import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
 import cc.kave.commons.model.groum.comparator.HashCodeComparator;
@@ -56,7 +57,7 @@ public class PattExplorer {
 
 		patterns.putAll(L);
 
-		for (SubGroum U : L.keySet()) {
+		for (IGroum U : L.keySet()) {
 			if (U.getAllNodes().size() == 1) {
 				TreeMultimap<SubGroum, SubGroum> Q = createGroumMap();
 
