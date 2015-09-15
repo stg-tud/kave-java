@@ -15,7 +15,7 @@ public class PattExplorer {
 		this.threshold = threshold;
 	}
 
-	public Set<IGroum> explorePatterns(List<Groum> D) {
+	public Set<IGroum> explorePatterns(Iterable<Groum> D) {
 		SubGroumMultiSet L = new SubGroumMultiSet();
 		for (Groum groum : D) {
 			L.addAll(groum.getAtomicSubGroums());
@@ -28,14 +28,14 @@ public class PattExplorer {
 
 		SubGroumMultiSet explored = new SubGroumMultiSet();
 		for (IGroum pattern : L2.getPatterns()) {
-			explored.addAll(explore(pattern, L2, D));
+			explored.addAll(explore(pattern, L2));
 		}
 		L2.addAll(explored);
 
 		return L2.getPatterns();
 	}
 
-	private SubGroumMultiSet explore(IGroum P, SubGroumMultiSet L, List<Groum> D) {
+	private SubGroumMultiSet explore(IGroum P, SubGroumMultiSet L) {
 		SubGroumMultiSet patterns = L.copy();
 		SubGroumMultiSet newPatterns = new SubGroumMultiSet();
 
@@ -53,7 +53,7 @@ public class PattExplorer {
 				for (IGroum candidate : Q.getFrequentPatterns(threshold)) {
 					patterns.addAll(Q.getPatternInstances(candidate));
 
-					SubGroumMultiSet explored = explore(candidate, patterns, D);
+					SubGroumMultiSet explored = explore(candidate, patterns);
 
 					newPatterns.addAll(Q.getPatternInstances(candidate));
 					newPatterns.addAll(explored);
