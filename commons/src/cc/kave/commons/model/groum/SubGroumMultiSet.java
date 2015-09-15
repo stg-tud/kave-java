@@ -12,6 +12,13 @@ public class SubGroumMultiSet {
 	private TreeMultimap<IGroum, SubGroum> data = TreeMultimap.create(new DFSGroumComparator(),
 			new HashCodeComparator());
 
+	public SubGroumMultiSet() {
+	}
+
+	public SubGroumMultiSet(SubGroumMultiSet other) {
+		data.putAll(other.data);
+	}
+
 	public void add(SubGroum instance) {
 		data.put(instance, instance);
 	}
@@ -21,13 +28,7 @@ public class SubGroumMultiSet {
 	}
 
 	public void addAll(SubGroumMultiSet other) {
-		addAll(other.data.values());
-	}
-
-	public SubGroumMultiSet copy() {
-		SubGroumMultiSet clone = new SubGroumMultiSet();
-		clone.data.putAll(data);
-		return clone;
+		data.putAll(other.data);
 	}
 
 	public Set<IGroum> getPatterns() {

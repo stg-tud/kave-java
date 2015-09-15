@@ -1,10 +1,12 @@
 package cc.kave.commons.model.pattexplore;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.IGroum;
+import cc.kave.commons.model.groum.Node;
 import cc.kave.commons.model.groum.SubGroum;
 import cc.kave.commons.model.groum.SubGroumMultiSet;
 
@@ -15,15 +17,10 @@ public class PattExplorer {
 		this.threshold = threshold;
 	}
 
-	public Set<IGroum> explorePatterns(Iterable<Groum> D) {
+	public Set<IGroum> explore(Iterable<Groum> D) {
 		SubGroumMultiSet atoms = getFrequentAtomicSubGroums(D);
-
-		SubGroumMultiSet explored = new SubGroumMultiSet();
-		for (IGroum pattern : atoms.getPatterns()) {
-			explored.addAll(explore(pattern, atoms));
-		}
-		explored.addAll(atoms);
-
+		Set<Node> atomNodes = getPatternRoots(atoms);
+		SubGroumMultiSet explored = explore(atoms, atomNodes);
 		return explored.getPatterns();
 	}
 
@@ -39,31 +36,46 @@ public class PattExplorer {
 		return L;
 	}
 
-	private SubGroumMultiSet explore(IGroum P, SubGroumMultiSet L) {
-		SubGroumMultiSet patterns = L.copy();
+	private Set<Node> getPatternRoots(SubGroumMultiSet s) {
+		Set<Node> roots = new HashSet<>();
+		for (IGroum pattern : s.getPatterns()) {
+			roots.add(pattern.getRoot());
+		}
+		return roots;
+	}
+
+	private SubGroumMultiSet explore(SubGroumMultiSet extensiblePatterns, Set<Node> atomNodes) {
+		SubGroumMultiSet explored = new SubGroumMultiSet(extensiblePatterns);
+		for (IGroum pattern : extensiblePatterns.getPatterns()) {
+			explored.addAll(explore(pattern, extensiblePatterns, atomNodes));
+		}
+		return explored;
+	}
+
+	private SubGroumMultiSet explore(IGroum base, SubGroumMultiSet patterns, Set<Node> atomNodes) {
+		Set<SubGroum> baseInstances = patterns.getPatternInstances(base);
 		SubGroumMultiSet newPatterns = new SubGroumMultiSet();
-
-		for (IGroum U : L.getPatterns()) {
-			if (U.getNodeCount() == 1) {
-				SubGroumMultiSet Q = new SubGroumMultiSet();
-
-				for (SubGroum occurrence : patterns.getPatternInstances(P)) {
-					List<SubGroum> candidates = occurrence.computeExtensions(U.getRoot());
-					for (SubGroum candidate : candidates) {
-						Q.add(candidate);
-					}
-				}
-
-				for (IGroum candidate : Q.getFrequentSubSet(threshold).getPatterns()) {
-					patterns.addAll(Q.getPatternInstances(candidate));
-
-					SubGroumMultiSet explored = explore(candidate, patterns);
-
-					newPatterns.addAll(Q.getPatternInstances(candidate));
-					newPatterns.addAll(explored);
-				}
-			}
+		for (Node atomNode : atomNodes) {
+			SubGroumMultiSet frequentExtensions = computeFrequentExtensions(baseInstances, atomNode);
+			newPatterns.addAll(frequentExtensions);
+			newPatterns.addAll(explore(frequentExtensions, atomNodes));
 		}
 		return newPatterns;
+	}
+
+	private SubGroumMultiSet computeFrequentExtensions(Set<SubGroum> baseInstances, Node atomNode) {
+		SubGroumMultiSet extensions = computeExtensions(baseInstances, atomNode);
+		return extensions.getFrequentSubSet(threshold);
+	}
+
+	private SubGroumMultiSet computeExtensions(Set<SubGroum> instances, Node extension) {
+		SubGroumMultiSet extensions = new SubGroumMultiSet();
+		for (SubGroum occurrence : instances) {
+			List<SubGroum> candidates = occurrence.computeExtensions(extension);
+			for (SubGroum candidate : candidates) {
+				extensions.add(candidate);
+			}
+		}
+		return extensions;
 	}
 }

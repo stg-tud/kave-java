@@ -29,7 +29,7 @@ public class GroumTestUtils {
 	public static Set<IGroum> findPatternsWithMinFrequency(int threshold,
 			Groum... groums) {
 		PattExplorer uut = new PattExplorer(threshold);
-		return uut.explorePatterns(Arrays.asList(groums));
+		return uut.explore(Arrays.asList(groums));
 	}
 
 	public static SubGroum createSubGroum(Groum parent, Node... nodes) {
