@@ -9,12 +9,6 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
-import cc.kave.commons.model.groum.comparator.HashCodeComparator;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-
 public class Groum implements IGroum {
 	DirectedGraph<Node, DefaultEdge> groum;
 	Node root;
@@ -82,13 +76,12 @@ public class Groum implements IGroum {
 		return root;
 	}
 
-	public Multimap<SubGroum, SubGroum> getAtomicSubGroums() {
-		TreeMultimap<SubGroum, SubGroum> atomics = TreeMultimap.create(new DFSGroumComparator(),
-				new HashCodeComparator());
+	public SubGroumMultiSet getAtomicSubGroums() {
+		SubGroumMultiSet atomics = new SubGroumMultiSet();
 		for (Node node : getAllNodes()) {
 			Set<Node> nodes = Collections.singleton(node);
 			SubGroum subGroum = new SubGroum(this, nodes);
-			atomics.put(subGroum, subGroum);
+			atomics.add(subGroum);
 		}
 		return atomics;
 	}

@@ -1,17 +1,12 @@
 package cc.kave.commons.model.pattexplore;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.SubGroum;
-import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
-import cc.kave.commons.model.groum.comparator.HashCodeComparator;
-
-import com.google.common.collect.TreeMultimap;
+import cc.kave.commons.model.groum.SubGroumMultiSet;
 
 public class PattExplorer {
 	int threshold;
@@ -20,47 +15,11 @@ public class PattExplorer {
 		this.threshold = threshold;
 	}
 
-	private static class SubGroumMultiSet {
-		private TreeMultimap<SubGroum, SubGroum> data = TreeMultimap.create(new DFSGroumComparator(),
-				new HashCodeComparator());
-
-		public void add(SubGroum instance) {
-			data.put(instance, instance);
-		}
-
-		public void addAll(Iterable<SubGroum> instances) {
-			instances.forEach(instance -> add(instance));
-		}
-
-		public void addAll(SubGroumMultiSet other) {
-			addAll(other.data.values());
-		}
-
-		public SubGroumMultiSet copy() {
-			SubGroumMultiSet clone = new SubGroumMultiSet();
-			clone.data.putAll(data);
-			return clone;
-		}
-
-		public Set<SubGroum> getPatterns() {
-			return new HashSet<>(data.keySet());
-		}
-
-		public int getPatternFrequency(SubGroum pattern) {
-			return data.get(pattern).size();
-		}
-
-		public Set<SubGroum> getPatternInstances(SubGroum pattern) {
-			return new HashSet<>(data.get(pattern));
-		}
-	}
-
 	public List<SubGroum> explorePatterns(List<Groum> D) {
 		SubGroumMultiSet L = new SubGroumMultiSet();
 
 		for (Groum groum : D) {
-			// TODO make getAtomicSubGroums return a SubGroumMultiSet
-			L.addAll(groum.getAtomicSubGroums().values());
+			L.addAll(groum.getAtomicSubGroums());
 		}
 
 		SubGroumMultiSet L2 = new SubGroumMultiSet();
