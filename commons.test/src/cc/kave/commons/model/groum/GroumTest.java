@@ -20,7 +20,7 @@ public class GroumTest {
 		Node[] nodes = createNodes("A", "B");
 		Groum groum = buildGroum(nodes).build();
 
-		SubGroumMultiSet atomicSubGroums = groum.getAtomicSubGroums();
+		SubGroumMultiSet atomicSubGroums = SubGroum.getAtomicSubGroums(groum);
 
 		assertContainsAll(atomicSubGroums, createSubGroum(groum, nodes[0]),
 				createSubGroum(groum, nodes[1]));
@@ -31,7 +31,7 @@ public class GroumTest {
 		Node[] nodes = createNodes("A", "A");
 		Groum groum = buildGroum(nodes).build();
 
-		SubGroumMultiSet atomicSubGroums = groum.getAtomicSubGroums();
+		SubGroumMultiSet atomicSubGroums = SubGroum.getAtomicSubGroums(groum);
 
 		assertContainsAll(atomicSubGroums, createSubGroum(groum, nodes[0]),
 				createSubGroum(groum, nodes[1]));

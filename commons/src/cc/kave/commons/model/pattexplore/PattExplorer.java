@@ -31,7 +31,7 @@ public class PattExplorer {
 	private SubGroumMultiSet getAllAtomicSubGroums(Iterable<Groum> D) {
 		SubGroumMultiSet L = new SubGroumMultiSet();
 		for (Groum groum : D) {
-			L.addAll(groum.getAtomicSubGroums());
+			L.addAll(SubGroum.getAtomicSubGroums(groum));
 		}
 		return L;
 	}

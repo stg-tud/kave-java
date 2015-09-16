@@ -1,6 +1,5 @@
 package cc.kave.commons.model.groum;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,15 +73,5 @@ public class Groum implements IGroum {
 			throw new IllegalStateException("groum has no root: " + toString());
 		}
 		return root;
-	}
-
-	public SubGroumMultiSet getAtomicSubGroums() {
-		SubGroumMultiSet atomics = new SubGroumMultiSet();
-		for (Node node : getAllNodes()) {
-			Set<Node> nodes = Collections.singleton(node);
-			SubGroum subGroum = new SubGroum(this, nodes);
-			atomics.add(subGroum);
-		}
-		return atomics;
 	}
 }

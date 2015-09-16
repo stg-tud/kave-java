@@ -1,6 +1,7 @@
 package cc.kave.commons.model.groum;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,16 @@ public class SubGroum implements IGroum {
 	private final Groum parent;
 	private final Set<Node> nodes = new HashSet<>();
 	private Node root;
+
+	public static SubGroumMultiSet getAtomicSubGroums(Groum groum) {
+		SubGroumMultiSet atomics = new SubGroumMultiSet();
+		for (Node node : groum.getAllNodes()) {
+			Set<Node> nodes = Collections.singleton(node);
+			SubGroum subGroum = new SubGroum(groum, nodes);
+			atomics.add(subGroum);
+		}
+		return atomics;
+	}
 
 	public SubGroum(Groum parent, Set<Node> nodes) {
 		this.parent = parent;
