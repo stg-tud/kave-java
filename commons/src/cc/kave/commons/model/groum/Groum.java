@@ -10,11 +10,17 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 public class Groum implements IGroum {
 	DirectedGraph<Node, BasicEdge> groum;
 	Node root;
+	private String methodSignature;
 
-	public Groum(Set<Node> nodes, Set<Pair<Node, Node>> edges) {
+	public Groum(String methodSignature, Set<Node> nodes, Set<Pair<Node, Node>> edges) {
+		this.methodSignature = methodSignature;
 		groum = new DefaultDirectedGraph<Node, BasicEdge>(BasicEdge.class);
 		nodes.forEach(node -> groum.addVertex(node));
 		edges.forEach(edge -> groum.addEdge(edge.getLeft(), edge.getRight()));
+	}
+
+	public String getMethodSignature() {
+		return methodSignature;
 	}
 
 	public boolean containsNode(Node node) {

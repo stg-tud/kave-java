@@ -9,12 +9,18 @@ public class GroumBuilder {
 
 	private Set<Node> nodes;
 	private Set<Pair<Node, Node>> edges;
-
-	public static GroumBuilder buildGroum(Node... nodes) {
-		return new GroumBuilder().withNodes(nodes);
+	private String methodSignature;
+	
+	public static GroumBuilder buildGroum(String methodSignature, Node... nodes) {
+		return new GroumBuilder(methodSignature).withNodes(nodes);
 	}
 
-	public GroumBuilder() {
+	public static GroumBuilder buildGroum(Node... nodes) {
+		return new GroumBuilder("<unknown>").withNodes(nodes);
+	}
+
+	public GroumBuilder(String methodSignature) {
+		this.methodSignature = methodSignature;
 		this.nodes = new HashSet<>();
 		this.edges = new HashSet<>();
 	}
@@ -37,6 +43,6 @@ public class GroumBuilder {
 	}
 
 	public Groum build() {
-		return new Groum(nodes, edges);
+		return new Groum(methodSignature, nodes, edges);
 	}
 }
