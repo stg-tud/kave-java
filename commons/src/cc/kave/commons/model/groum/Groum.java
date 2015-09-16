@@ -8,13 +8,13 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 public class Groum implements IGroum {
-	DirectedGraph<Node, BasicEdge> groum;
+	DirectedGraph<Node, LabelledEdge> groum;
 	Node root;
 	private String methodSignature;
 
 	public Groum(String methodSignature, Set<Node> nodes, Set<Pair<Node, Node>> edges) {
 		this.methodSignature = methodSignature;
-		groum = new DefaultDirectedGraph<Node, BasicEdge>(BasicEdge.class);
+		groum = new DefaultDirectedGraph<Node, LabelledEdge>(LabelledEdge.class);
 		nodes.forEach(node -> groum.addVertex(node));
 		edges.forEach(edge -> groum.addEdge(edge.getLeft(), edge.getRight()));
 	}
@@ -43,9 +43,9 @@ public class Groum implements IGroum {
 	@Override
 	public Set<Node> getSuccessors(Node node) {
 		Set<Node> successors = new HashSet<>();
-		Set<BasicEdge> outgoingEdges = groum.outgoingEdgesOf(node);
+		Set<LabelledEdge> outgoingEdges = groum.outgoingEdgesOf(node);
 
-		for (BasicEdge edge : outgoingEdges) {
+		for (LabelledEdge edge : outgoingEdges) {
 			successors.add(groum.getEdgeTarget(edge));
 		}
 		return successors;
