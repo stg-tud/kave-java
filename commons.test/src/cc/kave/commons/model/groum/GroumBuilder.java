@@ -45,4 +45,26 @@ public class GroumBuilder {
 	public Groum build() {
 		return new Groum(methodSignature, nodes, edges);
 	}
+
+	public boolean containsNode(Node node) {
+		return nodes.contains(node);
+	}
+
+	public Set<Node> getPredecessors(Node node) {
+		Set<Node> predecessors = new HashSet<>();
+		for (Pair<Node, Node> edge : edges) {
+			if (edge.getRight() == node) {
+				predecessors.add(edge.getLeft());
+			}
+		}
+		return predecessors;
+	}
+
+	public void removeEdge(Node source, Node target) {
+		edges.remove(Pair.of(source, target));
+	}
+
+	public void removeNode(Node node) {
+		nodes.remove(node);
+	}
 }
