@@ -58,7 +58,12 @@ public class MethodVisitor extends ASTVisitor {
 			sb.append(", ");
 		}
 
-		sb.replace(sb.length() - 2, sb.length(), ")");
+		if (sb.toString().endsWith(", ")) {
+			sb.replace(sb.length() - 2, sb.length(), ")");
+		}
+		else{
+			sb.append(")");
+		}
 
 		return sb.toString();
 	}

@@ -35,62 +35,55 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
 
+import visitors.FieldVisitor;
+import visitors.ImportVisitor;
 import visitors.MethodVisitor;
+import visitors.PackageVisitor;
 
 public class PluginAstParser {
 
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private CompilationUnit parsed;
+	private List<IJavaProject> javaProjects;
+	private FieldVisitor fieldVisitor;
+	private MethodVisitor methodVisitor;
+	private PackageVisitor packageVisitor;
+	private ImportVisitor importVisitor;
 
-	// @Override
-	public PluginAstParser()	{
-//		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-//		IWorkspaceRoot root = workspace.getRoot();
-//		// Get all projects in the workspace
-//		IProject[] projects = root.getProjects();
-//		// Loop over all projects
-//		for (IProject project : projects) {
-//			try {
-//				if (project.isNatureEnabled(JDT_NATURE)) {
-//					analyseMethods(project);
-//				}
-//			} catch (CoreException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		ICompilationUnit compilationunit = getCompilationunit("A", "a", "Activator.java");
-		parsed = parse(compilationunit);
-		
-		MethodVisitor methodVisitor = new MethodVisitor();
-		parsed.accept(methodVisitor);
-		System.out.println(methodVisitor.getMethods().toString());
+	/**
+	 * Creates an AST and passes some visitors for retrieving some AST data.
+	 * 
+	 * @param projectName
+	 *            The name of the java project
+	 * @param packageName
+	 *            The packagename which contains the compilationunit
+	 * @param cuName
+	 *            The name of the compilationunit which get parsed, for example
+	 *            "Test.java"
+	 */
+	public PluginAstParser(String projectName, String packageName, String cuName) {
+		javaProjects = getJavaProjects();
+		initializeAst(projectName, packageName, cuName);
 	}
 
-//	private void analyseMethods(IProject project) throws JavaModelException {
-//		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
-//		 parse(JavaCore.create(project));
-//		for (IPackageFragment mypackage : packages) {
-//			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
-//				createAST(mypackage);
-//			}
-//
-//		}
-//	}
+	private void initializeAst(String projectName, String packageName, String cuName) {
+		ICompilationUnit compilationUnit = getCompilationunit(projectName, packageName, cuName);
+		parsed = parse(compilationUnit);
 
-	private void createAST(IPackageFragment mypackage) throws JavaModelException {
-		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-			// now create the AST for the ICompilationUnits
-			CompilationUnit parse = parse(unit);
-			MethodVisitor visitor = new MethodVisitor();
-			parse.accept(visitor);
+		fieldVisitor = new FieldVisitor();
+		methodVisitor = new MethodVisitor();
+		packageVisitor = new PackageVisitor();
+		importVisitor = new ImportVisitor();
 
-			for (MethodDeclaration method : visitor.getMethods()) {
-				System.out.print("Method name: " + method.getName() + " Return type: " + method.getReturnType2());
-			}
-
-		}
+		parsed.accept(methodVisitor);
+		parsed.accept(fieldVisitor);
+		parsed.accept(packageVisitor);
+		parsed.accept(importVisitor);
 	}
 
 	/**
@@ -100,7 +93,6 @@ public class PluginAstParser {
 	 * @param unit
 	 * @return
 	 */
-
 	private static CompilationUnit parse(ICompilationUnit unit) {
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
@@ -109,9 +101,14 @@ public class PluginAstParser {
 		return (CompilationUnit) parser.createAST(null); // parse
 	}
 
+	/**
+	 * 
+	 * @return A complete list of all java projects in the current workspace.
+	 */
 	private List<IJavaProject> getJavaProjects() {
 		List<IJavaProject> javaProjects = new ArrayList<IJavaProject>();
 		IWorkspaceRoot myWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+
 		for (IProject project : myWorkspaceRoot.getProjects()) {
 			try {
 				if (project.isNatureEnabled(JDT_NATURE)) {
@@ -126,25 +123,32 @@ public class PluginAstParser {
 		return javaProjects;
 	}
 
-	public ICompilationUnit getCompilationunit(String project, String packageFragment, String cu) {
-		List<IJavaProject> javaProjects = getJavaProjects();
-		
+	private ICompilationUnit getCompilationunit(String project, String packageName, String cu) {
 		for (IJavaProject iJavaProject : javaProjects) {
-			try {
-				if (iJavaProject.getElementName().equals(project)) {
-					IPackageFragmentRoot[] fragmentRoot = iJavaProject.getPackageFragmentRoots();
-					for (int i = 0; i < fragmentRoot.length; i++) {
-						IPackageFragment fragment = fragmentRoot[i].getPackageFragment(packageFragment);
-						String elementName = fragment.getElementName();
-						if (fragment.getElementName().equals(packageFragment)) {
-							return fragment.getCompilationUnit(cu);
-						}
-					}
+			if (iJavaProject.getElementName().equals(project)) {
+				try {
+					return iJavaProject.findType(packageName, cu).getCompilationUnit();
+				} catch (JavaModelException e) {
+					e.printStackTrace();
 				}
-			} catch (JavaModelException e) {
-				e.printStackTrace();
 			}
 		}
 		return null;
+	}
+
+	public MethodDeclaration getMethod(String signature) {
+		return methodVisitor.getMethod(signature);
+	}
+
+	public FieldDeclaration getField(String name) {
+		return fieldVisitor.getField(name);
+	}
+
+	public PackageDeclaration getPackage() {
+		return packageVisitor.getPackage();
+	}
+
+	public ImportDeclaration getImport(String name) {
+		return importVisitor.getImport(name);
 	}
 }
