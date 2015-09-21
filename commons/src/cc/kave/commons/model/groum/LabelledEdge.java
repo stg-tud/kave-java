@@ -7,6 +7,13 @@ public class LabelledEdge extends DefaultEdge {
 
 	String label = "";
 
+	/**
+	 * For internal use only
+	 */
+	@Deprecated
+	public LabelledEdge() {
+	}
+
 	public LabelledEdge(String label) {
 		this.label = label;
 	}
