@@ -42,6 +42,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -332,6 +333,12 @@ public class NameScopeVisitor extends AbstractNodeVisitor<Set<IVariableReference
 
 	@Override
 	public Void visit(IUnknownStatement unknownStmt, Set<IVariableReference> context) {
+		return null;
+	}
+
+	public Void visit(IEventSubscriptionStatement stmt, Set<IVariableReference> context) {
+		stmt.getReference().accept(this, context);
+		stmt.getExpression().accept(this, context);
 		return null;
 	}
 }

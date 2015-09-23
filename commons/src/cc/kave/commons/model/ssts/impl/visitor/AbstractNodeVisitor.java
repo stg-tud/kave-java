@@ -37,6 +37,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -258,6 +259,11 @@ public abstract class AbstractNodeVisitor<TContext, TReturn> implements ISSTNode
 
 	@Override
 	public TReturn visit(IUnknownStatement unknownStmt, TContext context) {
+		throw new RuntimeException();
+	}
+
+	@Override
+	public TReturn visit(IEventSubscriptionStatement stmt, TContext context) {
 		throw new RuntimeException();
 	}
 }

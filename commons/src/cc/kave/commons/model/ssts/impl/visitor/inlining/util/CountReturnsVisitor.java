@@ -39,6 +39,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -286,6 +287,11 @@ public class CountReturnsVisitor extends AbstractNodeVisitor<CountReturnContext,
 		for (IStatement statement : body) {
 			statement.accept(this, context);
 		}
+	}
+
+	public Void visit(IEventSubscriptionStatement stmt, CountReturnContext context) {
+		stmt.getExpression().accept(this, context);
+		return null;
 	}
 
 }

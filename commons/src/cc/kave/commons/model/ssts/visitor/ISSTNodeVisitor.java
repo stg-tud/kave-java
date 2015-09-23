@@ -37,6 +37,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -77,6 +78,8 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 	TReturn visit(IReturnStatement stmt, TContext context);
 
 	TReturn visit(IThrowStatement stmt, TContext context);
+
+	TReturn visit(IEventSubscriptionStatement stmt, TContext context);
 
 	// blocks
 	TReturn visit(IDoLoop block, TContext context);

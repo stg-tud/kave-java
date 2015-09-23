@@ -44,6 +44,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.statements.EventSubscriptionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
@@ -58,6 +59,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -331,6 +333,18 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(IThrowStatement stmt, InliningContext context) {
 		ThrowStatement statement = new ThrowStatement();
 		statement.setException(stmt.getException());
+		context.addStatement(statement);
+		return null;
+	}
+
+	@Override
+	public Void visit(IEventSubscriptionStatement stmt, InliningContext context) {
+		EventSubscriptionStatement statement = new EventSubscriptionStatement();
+		statement.setExpression(
+				(IAssignableExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
+		statement.setOperation(stmt.getOperation());
+		statement.setReference(
+				(IAssignableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
 		context.addStatement(statement);
 		return null;
 	}
