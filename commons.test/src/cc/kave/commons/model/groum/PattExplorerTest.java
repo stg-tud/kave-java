@@ -167,7 +167,7 @@ public class PattExplorerTest {
 
 	/**
 	 * Even though both groum1 and groum2 are equal, according to our comparator
-	 * (see {@link GroumComparatorConstractTest#indistinguishable()}), we do not
+	 * (see {@link GroumComparatorConstractTest#samePathsDifferentStructure()}), we do not
 	 * detect them as two occurrences of the same pattern. This is because they
 	 * are generated in subsequent iterations of the algorithm (different number
 	 * of nodes) and we filter by frequency after every iteration. I believe we

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import cc.kave.commons.model.groum.Groum;
 import cc.kave.commons.model.groum.IGroum;
@@ -20,7 +21,7 @@ public abstract class GroumComparatorConstractTest {
 
 	@Test
 	public void singleUnequalNode() {
-		assertSmallerGroum(createGroum("A"), createGroum("B"));
+		assertDifferentGroums(createGroum("A"), createGroum("B"));
 	}
 	
 	@Test
@@ -58,7 +59,7 @@ public abstract class GroumComparatorConstractTest {
 				.withEdge(nodes2[0], nodes2[1])
 				.withEdge(nodes2[0], nodes2[2]).build();
 		
-		assertSmallerGroum(groum1, groum2);
+		assertDifferentGroums(groum1, groum2);
 	}
 	
 	/*
@@ -81,7 +82,7 @@ public abstract class GroumComparatorConstractTest {
 				.withEdge(nodes2[0], nodes2[1])
 				.withEdge(nodes2[1], nodes2[2]).build();
 		
-		assertSmallerGroum(groum1, groum2);
+		assertDifferentGroums(groum1, groum2);
 	}
 	
 	/*
@@ -90,7 +91,7 @@ public abstract class GroumComparatorConstractTest {
 	 *  B -> C                            B -> C
 	 */
 	@Test
-	public void indistinguishable() {
+	public void samePathsDifferentStructure() {
 		Node[] nodes1 = createNodes("A", "B", "C");
 		Groum groum1 = buildGroum(nodes1)
 				.withEdge(nodes1[0], nodes1[1])
@@ -103,7 +104,7 @@ public abstract class GroumComparatorConstractTest {
 				.withEdge(nodes2[0], nodes2[2])
 				.withEdge(nodes2[1], nodes2[3]).build();
 		
-		assertEqualGroums(groum1, groum2);
+		assertDifferentGroums(groum2, groum1);
 	}
 	
 	/*
@@ -132,10 +133,64 @@ public abstract class GroumComparatorConstractTest {
 
 		assertEqualGroums(groum1, groum2);
 	}
+	
+	/*
+	 * A -> B -> C                   A -> B -> C
+	 * |			is not equal to  |    |
+	 * B -> D                        B    D
+	 */
+	@Test
+	public void successorsOnDifferentEqualNodes() {
+		Node[] nodes1 = createNodes("A", "B", "B", "C", "D");
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2])
+				.withEdge(nodes1[1], nodes1[3])
+				.withEdge(nodes1[2], nodes1[4]).build();
+		
 
-	private void assertSmallerGroum(Groum groum1, Groum groum2) {
+		Node[] nodes2 = createNodes("A", "B", "B", "C", "D");
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[0], nodes2[2])
+				.withEdge(nodes2[1], nodes2[3])
+				.withEdge(nodes2[1], nodes2[4]).build();
+		
+		assertDifferentGroums(groum1, groum2);
+	}
+	
+	/*
+	 * A -> B -> C                   A -> B -> C
+	 * |			is not equal to  |    |
+	 * B -> D                        B    D
+	 * |                             |
+	 * E                             E
+	 */
+	@Test
+	public void successorsOnDifferentEqualNodes2() {
+		Node[] nodes1 = createNodes("A", "B", "B", "C", "D", "E");
+		Groum groum1 = buildGroum(nodes1)
+				.withEdge(nodes1[0], nodes1[1])
+				.withEdge(nodes1[0], nodes1[2])
+				.withEdge(nodes1[1], nodes1[3])
+				.withEdge(nodes1[2], nodes1[4])
+				.withEdge(nodes1[2], nodes1[5]).build();
+		
+
+		Node[] nodes2 = createNodes("A", "B", "B", "C", "D", "E");
+		Groum groum2 = buildGroum(nodes2)
+				.withEdge(nodes2[0], nodes2[1])
+				.withEdge(nodes2[0], nodes2[2])
+				.withEdge(nodes2[1], nodes2[3])
+				.withEdge(nodes2[1], nodes2[4])
+				.withEdge(nodes2[2], nodes2[5]).build();
+		
+		assertDifferentGroums(groum1, groum2);
+	}
+
+	private void assertDifferentGroums(Groum groum1, Groum groum2) {
 		int comparison = createComparator().compare(groum1, groum2);
-		assertEquals(-1, comparison);
+		assertNotEquals(0, comparison);
 	}
 
 	private void assertEqualGroums(Groum groum1, Groum groum2) {

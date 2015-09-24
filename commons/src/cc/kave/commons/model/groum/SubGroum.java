@@ -40,6 +40,18 @@ public class SubGroum implements IGroum {
 	}
 
 	@Override
+	public Set<Node> getPredecessors(Node node) {
+		Set<Node> predecessors = new HashSet<Node>();
+		Set<Node> parentPredecessors = parent.getPredecessors(node);
+		for (Node predecessor : parentPredecessors) {
+			if (nodes.contains(predecessor)) {
+				predecessors.add(predecessor);
+			}
+		}
+		return predecessors;
+	}
+
+	@Override
 	public Set<Node> getSuccessors(Node node) {
 		Set<Node> successors = new HashSet<Node>();
 		Set<Node> parentSuccessors = parent.getSuccessors(node);

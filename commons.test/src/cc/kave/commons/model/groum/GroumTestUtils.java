@@ -21,9 +21,13 @@ public class GroumTestUtils {
 	public static Node[] createNodes(String... nodeIds) {
 		Node[] nodes = new Node[nodeIds.length];
 		for (int i = 0; i < nodeIds.length; i++) {
-			nodes[i] = new TestNode(nodeIds[i]);
+			nodes[i] = createNode(nodeIds[i]);
 		}
 		return nodes;
+	}
+
+	public static TestNode createNode(String id) {
+		return new TestNode(id);
 	}
 
 	public static Set<IGroum> findPatternsWithMinFrequency(int threshold,

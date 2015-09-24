@@ -41,6 +41,17 @@ public class Groum implements IGroum {
 	}
 
 	@Override
+	public Set<Node> getPredecessors(Node node) {
+		Set<Node> predecessors = new HashSet<>();
+		Set<LabelledEdge> incomingEdges = groum.incomingEdgesOf(node);
+
+		for (LabelledEdge edge : incomingEdges) {
+			predecessors.add(groum.getEdgeSource(edge));
+		}
+		return predecessors;
+	}
+
+	@Override
 	public Set<Node> getSuccessors(Node node) {
 		Set<Node> successors = new HashSet<>();
 		Set<LabelledEdge> outgoingEdges = groum.outgoingEdgesOf(node);

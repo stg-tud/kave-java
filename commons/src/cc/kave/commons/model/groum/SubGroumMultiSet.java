@@ -3,13 +3,13 @@ package cc.kave.commons.model.groum;
 import java.util.HashSet;
 import java.util.Set;
 
-import cc.kave.commons.model.groum.comparator.DFSGroumComparator;
+import cc.kave.commons.model.groum.comparator.ExasGroumComparator;
 import cc.kave.commons.model.groum.comparator.HashCodeComparator;
 
 import com.google.common.collect.TreeMultimap;
 
 public class SubGroumMultiSet {
-	private TreeMultimap<IGroum, SubGroum> data = TreeMultimap.create(new DFSGroumComparator(),
+	private TreeMultimap<IGroum, SubGroum> data = TreeMultimap.create(new ExasGroumComparator(),
 			new HashCodeComparator());
 
 	public SubGroumMultiSet() {
