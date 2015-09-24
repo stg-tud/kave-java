@@ -8,6 +8,7 @@ import java.util.List;
 import cc.kave.commons.model.groum.IGroum;
 import cc.kave.commons.model.groum.Node;
 
+@Deprecated
 public class DFSGroumComparator implements Comparator<IGroum> {
 
 	@Override
