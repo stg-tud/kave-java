@@ -58,7 +58,7 @@ public class CsMethodName extends CsMemberName implements MethodName {
 
 	@Override
 	public TypeName getReturnType() {
-		return CsTypeName.newTypeName(identifier.substring(identifier.indexOf("[") + 1, identifier.indexOf("]")));
+		return getValueType();
 	}
 
 	// TODO:

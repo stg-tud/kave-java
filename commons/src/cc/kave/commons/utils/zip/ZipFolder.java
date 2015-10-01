@@ -74,6 +74,9 @@ public class ZipFolder {
 	}
 
 	private ZipReader open(String absolutePath) {
+		if (absolutePath.contains("\\")) {
+			absolutePath = absolutePath.replace("\\", "/");
+		}
 		return new ZipReader(absolutePath);
 	}
 
