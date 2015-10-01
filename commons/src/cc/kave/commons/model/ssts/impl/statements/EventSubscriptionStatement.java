@@ -16,6 +16,7 @@ public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 	public EventSubscriptionStatement() {
 		reference = new UnknownReference();
 		expression = new UnknownExpression();
+		operation = EventSubscriptionOperation.Add;
 	}
 
 	public IAssignableReference getReference() {
@@ -24,6 +25,40 @@ public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 
 	public void setReference(IAssignableReference reference) {
 		this.reference = reference;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
+		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EventSubscriptionStatement other = (EventSubscriptionStatement) obj;
+		if (expression == null) {
+			if (other.expression != null)
+				return false;
+		} else if (!expression.equals(other.expression))
+			return false;
+		if (operation != other.operation)
+			return false;
+		if (reference == null) {
+			if (other.reference != null)
+				return false;
+		} else if (!reference.equals(other.reference))
+			return false;
+		return true;
 	}
 
 	public EventSubscriptionOperation getOperation() {
