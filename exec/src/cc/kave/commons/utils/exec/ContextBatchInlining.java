@@ -56,18 +56,12 @@ public class ContextBatchInlining {
 			int index = 1;
 			log("Inlining %d Contexts: ", contexts.size());
 			log("");
-			int count = 0;
 			for(Context context : contexts){
 				if(context != null && !isIgnored(zipIndex, index)){
 					append(" %d ", index);
 					inlinedContexts.add(inline(context));
 				}else if(context != null && isIgnored(zipIndex, index)){
-					if(count > 0){
-						System.out.println("BREAK BREAK BREAK");
-						System.exit(0);
-					}
 					inlinedContexts.add(context);
-					count++;
 				}
 				index++;
 				if(index % 10 == 0){
@@ -123,7 +117,7 @@ public class ContextBatchInlining {
 	
 	private static void log(String msg, Object... args) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss");
-		String date = LocalDateTime.now().format(formatter);
+		String date = LocalDateTime.now().format(formatter);ups 
 		System.out.printf("\n[%s] %s", date, String.format(msg, args));
 	}
 	
