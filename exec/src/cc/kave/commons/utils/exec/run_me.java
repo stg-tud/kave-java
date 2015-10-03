@@ -21,18 +21,33 @@ import org.apache.commons.io.FileUtils;
 
 public class run_me {
 
-	private static String root = "/Users/seb/evaluation/csharp/";
-	private static String dirCompletionEvents = root + "Events/OnlyCompletion/";
-	private static String dirCompletionEventsInlined = root + "Events/OnlyCompletion-inlined/";
-	private static String dirContexts = root + "Context/Github";
-	private static String dirContextsInlined = root + "Context/Github-inlined";
+	private static String root = "/Volumes/Data/";
+	private static String dirEventsCompletion = root + "Events/OnlyCompletion/";
+	private static String dirEventsCompletionInlined = root + "Events/OnlyCompletion-inlined/";
+	private static String dirContexts = root + "Contexts/";
+	private static String dirContextsInlined = root + "Contexts-inlined/";
 	private static String zipTestCases = root + "AnalysisTestCases.sln-contexts.zip";
 
 	public static void main(String[] args) {
-		cleanDirs(dirCompletionEventsInlined);
-		// new BatchInlining().run(dirContexts, dirContextsInlined);
-		// new CompletionEventProcessor(dirCompletionEvents,
-		// dirCompletionEventsInlined).run();
+		/* data preparation */
+		runContextBatchInlining();
+		// runConmpletionEventBatchInlining();
+
+		/* evaluation results */
+		// runSSTComparison();
+	}
+
+	private static void runContextBatchInlining() {
+		cleanDirs(dirContextsInlined);
+		new ContextBatchInlining(dirContexts, dirContextsInlined).run();
+	}
+
+	private static void runConmpletionEventBatchInlining() {
+		cleanDirs(dirEventsCompletionInlined);
+		new CompletionEventProcessor(dirEventsCompletion, dirEventsCompletionInlined).run();
+	}
+
+	private static void runSSTComparison() {
 		new SSTComparison(zipTestCases).run();
 	}
 

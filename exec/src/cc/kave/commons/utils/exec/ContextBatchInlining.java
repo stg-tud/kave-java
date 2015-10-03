@@ -4,33 +4,27 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.utils.zip.ZipFolder;
 import cc.kave.commons.utils.zip.ZipReader;
-import cc.kave.commons.utils.zip.ZipUtils;
 import cc.kave.commons.utils.zip.ZipWriter;
 import cc.recommenders.assertions.Asserts;
 
 public class ContextBatchInlining {
-	
+
 	private String inDir;
 	private String outDir;
 	private List<Integer> ignoreZipList;
 	private List<Integer> ignoreContextList;
-	public ContextBatchInlining(String inDir, String outDir){
+
+	public ContextBatchInlining(String inDir, String outDir) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.ignoreZipList = new ArrayList<>();
@@ -47,8 +41,8 @@ public class ContextBatchInlining {
 		List<String> zipFiles = findAllZips(inDir);
 		log("Processing %d zips...", zipFiles.size());
 		int zipIndex = 1;
-		for(String zipFile : zipFiles){
-			log("Reading Zip %d/%d, %s ",zipIndex++, zipFiles.size(), zipFile);
+		for (String zipFile : zipFiles) {
+			log("Reading Zip %d/%d, %s ", zipIndex++, zipFiles.size(), zipFile);
 			ZipReader reader = new ZipReader(zipFile);
 			String outFile = getOutName(zipFile);
 			List<Context> contexts = reader.getAll(Context.class);
@@ -56,21 +50,21 @@ public class ContextBatchInlining {
 			int index = 1;
 			log("Inlining %d Contexts: ", contexts.size());
 			log("");
-			for(Context context : contexts){
-				if(context != null && !isIgnored(zipIndex, index)){
+			for (Context context : contexts) {
+				if (context != null && !isIgnored(zipIndex, index)) {
 					append(" %d ", index);
 					inlinedContexts.add(inline(context));
-				}else if(context != null && isIgnored(zipIndex, index)){
+				} else if (context != null && isIgnored(zipIndex, index)) {
 					inlinedContexts.add(context);
 				}
 				index++;
-				if(index % 10 == 0){
+				if (index % 10 == 0) {
 					append("\n");
 				}
 			}
 			log("Writing to %s", outFile);
 			ZipWriter writer = new ZipWriter(outFile);
-			for(Context context : inlinedContexts){
+			for (Context context : inlinedContexts) {
 				writer.add(context, Context.class);
 			}
 			writer.dispose();
@@ -79,8 +73,9 @@ public class ContextBatchInlining {
 	}
 
 	private boolean isIgnored(int zipIndex, int index) {
-		for(int i = 0; i < ignoreZipList.size(); i++){
-			if(ignoreZipList.get(i).equals(Integer.valueOf(zipIndex)) && ignoreContextList.get(i).equals(Integer.valueOf(index))){
+		for (int i = 0; i < ignoreZipList.size(); i++) {
+			if (ignoreZipList.get(i).equals(Integer.valueOf(zipIndex))
+					&& ignoreContextList.get(i).equals(Integer.valueOf(index))) {
 				return true;
 			}
 		}
@@ -99,7 +94,7 @@ public class ContextBatchInlining {
 		sst.accept(context.getStatementVisitor(), context);
 		return context.getSST();
 	}
-	
+
 	private List<String> findAllZips(String dir) {
 		List<String> zips = Lists.newLinkedList();
 		for (File f : FileUtils.listFiles(new File(dir), new String[] { "zip" }, true)) {
@@ -107,20 +102,20 @@ public class ContextBatchInlining {
 		}
 		return zips;
 	}
-	
+
 	private String getOutName(String inName) {
 		Asserts.assertTrue(inName.startsWith(inDir));
 		String relativeName = inName.substring(inDir.length());
 		String outName = outDir + relativeName;
 		return outName;
 	}
-	
+
 	private static void log(String msg, Object... args) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss");
-		String date = LocalDateTime.now().format(formatter);ups 
+		String date = LocalDateTime.now().format(formatter);
 		System.out.printf("\n[%s] %s", date, String.format(msg, args));
 	}
-	
+
 	private static void append(String msg, Object... args) {
 		System.out.printf(msg, args);
 	}
