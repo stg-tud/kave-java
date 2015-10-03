@@ -1,0 +1,133 @@
+package cc.kave.commons.utils.exec;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import org.apache.commons.io.FileUtils;
+
+import com.google.common.collect.Lists;
+
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
+import cc.kave.commons.utils.zip.ZipFolder;
+import cc.kave.commons.utils.zip.ZipReader;
+import cc.kave.commons.utils.zip.ZipUtils;
+import cc.kave.commons.utils.zip.ZipWriter;
+import cc.recommenders.assertions.Asserts;
+
+public class ContextBatchInlining {
+	
+	private String inDir;
+	private String outDir;
+	private List<Integer> ignoreZipList;
+	private List<Integer> ignoreContextList;
+	public ContextBatchInlining(String inDir, String outDir){
+		this.inDir = inDir;
+		this.outDir = outDir;
+		this.ignoreZipList = new ArrayList<>();
+		this.ignoreContextList = new ArrayList<>();
+		addIgnore(195, 2405);
+	}
+
+	private void addIgnore(int i, int j) {
+		this.ignoreZipList.add(i);
+		this.ignoreContextList.add(j);
+	}
+
+	public void run() {
+		List<String> zipFiles = findAllZips(inDir);
+		log("Processing %d zips...", zipFiles.size());
+		int zipIndex = 1;
+		for(String zipFile : zipFiles){
+			log("Reading Zip %d/%d, %s ",zipIndex++, zipFiles.size(), zipFile);
+			ZipReader reader = new ZipReader(zipFile);
+			String outFile = getOutName(zipFile);
+			List<Context> contexts = reader.getAll(Context.class);
+			List<Context> inlinedContexts = new ArrayList<>();
+			int index = 1;
+			log("Inlining %d Contexts: ", contexts.size());
+			log("");
+			int count = 0;
+			for(Context context : contexts){
+				if(context != null && !isIgnored(zipIndex, index)){
+					append(" %d ", index);
+					inlinedContexts.add(inline(context));
+				}else if(context != null && isIgnored(zipIndex, index)){
+					if(count > 0){
+						System.out.println("BREAK BREAK BREAK");
+						System.exit(0);
+					}
+					inlinedContexts.add(context);
+					count++;
+				}
+				index++;
+				if(index % 10 == 0){
+					append("\n");
+				}
+			}
+			log("Writing to %s", outFile);
+			ZipWriter writer = new ZipWriter(outFile);
+			for(Context context : inlinedContexts){
+				writer.add(context, Context.class);
+			}
+			writer.dispose();
+			log("####################\n");
+		}
+	}
+
+	private boolean isIgnored(int zipIndex, int index) {
+		for(int i = 0; i < ignoreZipList.size(); i++){
+			if(ignoreZipList.get(i).equals(Integer.valueOf(zipIndex)) && ignoreContextList.get(i).equals(Integer.valueOf(index))){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private Context inline(Context orig) {
+		Context inlined = new Context();
+		inlined.setTypeShape(orig.getTypeShape());
+		inlined.setSST(inline(orig.getSST()));
+		return inlined;
+	}
+
+	private ISST inline(ISST sst) {
+		InliningContext context = new InliningContext();
+		sst.accept(context.getStatementVisitor(), context);
+		return context.getSST();
+	}
+	
+	private List<String> findAllZips(String dir) {
+		List<String> zips = Lists.newLinkedList();
+		for (File f : FileUtils.listFiles(new File(dir), new String[] { "zip" }, true)) {
+			zips.add(f.getAbsolutePath());
+		}
+		return zips;
+	}
+	
+	private String getOutName(String inName) {
+		Asserts.assertTrue(inName.startsWith(inDir));
+		String relativeName = inName.substring(inDir.length());
+		String outName = outDir + relativeName;
+		return outName;
+	}
+	
+	private static void log(String msg, Object... args) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss");
+		String date = LocalDateTime.now().format(formatter);
+		System.out.printf("\n[%s] %s", date, String.format(msg, args));
+	}
+	
+	private static void append(String msg, Object... args) {
+		System.out.printf(msg, args);
+	}
+}
