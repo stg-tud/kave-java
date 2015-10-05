@@ -42,6 +42,8 @@ Export-Package: cc.kave.commons.model.episodes,
  cc.kave.commons.utils.zip,
  cc.recommenders.assertions,
  cc.recommenders.collections,
+ cc.recommenders.datastructures,
+ cc.recommenders.evaluation.data,
  cc.recommenders.exceptions,
  cc.recommenders.io
 Require-Bundle: com.google.gson,
