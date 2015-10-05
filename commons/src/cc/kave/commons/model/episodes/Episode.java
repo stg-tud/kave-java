@@ -28,9 +28,9 @@ public class Episode {
 
 	private int numEvents;
 
-	private List<String> facts = Lists.newLinkedList();
+	private List<Fact> facts = Lists.newLinkedList();
 
-	public Iterable<String> getFacts() {
+	public Iterable<Fact> getFacts() {
 		return facts;
 	}
 
@@ -42,13 +42,13 @@ public class Episode {
 		this.numEvents = numEvents;
 	}
 
-	public void addFact(String fact) {
-		facts.add(fact);
+	public void addFact(String rawFact) {
+		facts.add(new Fact(rawFact));
 	}
 
 	public void addFacts(String... rawFacts) {
 		for (String rawFact : rawFacts) {
-			this.facts.add(rawFact);
+			addFact(rawFact);
 		}
 	}
 

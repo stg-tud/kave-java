@@ -43,13 +43,13 @@ public class EpisodeTest {
 		sut.setNumEvents(2);
 		assertEquals(2, sut.getNumEvents());
 		sut.addFact("f");
-		assertEquals(Lists.newArrayList("f"), sut.getFacts());
+		assertEquals(Lists.newArrayList(new Fact("f")), sut.getFacts());
 	}
 
 	@Test
 	public void addMultipleFacts() {
 		sut.addFacts("f", "g");
-		assertEquals(Lists.newArrayList("f", "g"), sut.getFacts());
+		assertEquals(Lists.newArrayList(new Fact("f"), new Fact("g")), sut.getFacts());
 	}
 
 	@Test
