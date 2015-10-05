@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: episodes
+Bundle-SymbolicName: cc.kave.episodes
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: commons,
+ org.apache.commons.lang3,
+ com.google.guava
+Export-Package: cc.kave.episodes
