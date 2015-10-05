@@ -17,8 +17,6 @@ package cc.kave.commons.model.episodes;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import cc.recommenders.assertions.Asserts;
 
@@ -45,7 +43,7 @@ public class Fact {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return String.format("[%s]", rawFact);
 	}
 
 	@Override

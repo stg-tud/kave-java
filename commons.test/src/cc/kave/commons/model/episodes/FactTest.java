@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.exceptions.AssertionException;
 
 public class FactTest {
@@ -64,5 +63,12 @@ public class FactTest {
 		Fact b = new Fact("b");
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		String actual = new Fact("a").toString();
+		String expected = "[a]";
+		assertEquals(expected, actual);
 	}
 }
