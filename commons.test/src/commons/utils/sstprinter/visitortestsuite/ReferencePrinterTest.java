@@ -1,5 +1,6 @@
 package commons.utils.sstprinter.visitortestsuite;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.csharp.CsEventName;
@@ -14,6 +15,7 @@ import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
+@Ignore
 public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void VariableReference() {

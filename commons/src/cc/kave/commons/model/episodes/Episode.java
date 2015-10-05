@@ -30,7 +30,7 @@ public class Episode {
 
 	private List<String> facts = Lists.newLinkedList();
 
-	public List<String> getFacts() {
+	public Iterable<String> getFacts() {
 		return facts;
 	}
 
@@ -44,6 +44,12 @@ public class Episode {
 
 	public void addFact(String fact) {
 		facts.add(fact);
+	}
+
+	public void addFacts(String... rawFacts) {
+		for (String rawFact : rawFacts) {
+			this.facts.add(rawFact);
+		}
 	}
 
 	@Override

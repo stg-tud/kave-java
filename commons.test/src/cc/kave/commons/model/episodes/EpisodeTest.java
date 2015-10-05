@@ -23,8 +23,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.episodes.Episode;
-
 public class EpisodeTest {
 
 	private Episode sut;
@@ -46,6 +44,12 @@ public class EpisodeTest {
 		assertEquals(2, sut.getNumEvents());
 		sut.addFact("f");
 		assertEquals(Lists.newArrayList("f"), sut.getFacts());
+	}
+
+	@Test
+	public void addMultipleFacts() {
+		sut.addFacts("f", "g");
+		assertEquals(Lists.newArrayList("f", "g"), sut.getFacts());
 	}
 
 	@Test
