@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes;
+package cc.kave.commons.model.episodes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.episodes.Episode;
+import cc.kave.commons.model.episodes.Episode;
 
 public class EpisodeTest {
 

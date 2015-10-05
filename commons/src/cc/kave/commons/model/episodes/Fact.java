@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes;
-
-import java.util.List;
+package cc.kave.commons.model.episodes;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.google.common.collect.Lists;
+import cc.recommenders.assertions.Asserts;
 
-public class Episode {
+public class Fact {
 
-	private int numEvents;
+	private String rawFact = "";
 
-	private List<String> facts = Lists.newLinkedList();
-
-	public List<String> getFacts() {
-		return facts;
+	public Fact(String rawFact) {
+		Asserts.assertNotNull(rawFact);
+		this.rawFact = rawFact;
 	}
 
-	public int getNumEvents() {
-		return numEvents;
+	public Fact() {
+		rawFact = null;
 	}
 
-	public void setNumEvents(int numEvents) {
-		this.numEvents = numEvents;
+	public void setFact(String rawFact) {
+		this.rawFact = rawFact;
 	}
 
-	public void addFact(String fact) {
-		facts.add(fact);
+	public String getRawFact() {
+		return this.rawFact;
 	}
 
 	@Override

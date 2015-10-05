@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes;
+package cc.kave.commons.model.episodes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
-import cc.kave.episodes.Fact;
+import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.exceptions.AssertionException;
 
 public class FactTest {

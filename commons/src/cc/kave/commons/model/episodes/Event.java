@@ -25,13 +25,33 @@ import cc.kave.commons.model.names.TypeName;
 
 public class Event {
 
-	public EventKind Kind;
-	public TypeName Type;
-	public MethodName Method;
+	// capital letters are necessary for JSON compatibility!
+	private EventKind Kind = EventKind.STOP;
+	private TypeName Type;
+	private MethodName Method;
 
-	int getEventName() {
-		int hashCode = Kind.hashCode() + Type.hashCode() + Method.hashCode();
-		return hashCode;
+	public EventKind getKind() {
+		return Kind;
+	}
+
+	public TypeName getType() {
+		return Type;
+	}
+
+	public MethodName getMethod() {
+		return Method;
+	}
+
+	public void setKind(EventKind invocation) {
+		this.Kind = invocation;
+	}
+
+	public void setType(TypeName typeName) {
+		this.Type = typeName;
+	}
+
+	public void setMethod(MethodName methodName) {
+		this.Method = methodName;
 	}
 
 	@Override
