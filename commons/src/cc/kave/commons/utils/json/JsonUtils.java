@@ -15,6 +15,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -258,6 +259,7 @@ public abstract class JsonUtils {
 
 		// enums
 		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
+		gb.registerTypeAdapter(EventKind.class, EnumDeSerializer.create(EventKind.values()));
 		gb.registerTypeAdapter(TerminationState.class, EnumDeSerializer.create(TerminationState.values()));
 		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
 		gb.registerTypeAdapter(EventSubscriptionOperation.class,
