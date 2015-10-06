@@ -41,12 +41,11 @@ import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
-
 public class NodeFactory {
 
 	public static Name getNodeName(ASTNode node) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		switch (node.getNodeType()) {
 		case ASTNode.METHOD_DECLARATION:
 			MethodDeclaration methodNode = (MethodDeclaration) node;
@@ -56,8 +55,7 @@ public class NodeFactory {
 			sb.append("[");
 
 			if (method.isConstructor()) {
-				sb.append(BindingFactory.getBindingName(method
-						.getDeclaringClass()));
+				sb.append(BindingFactory.getBindingName(method.getDeclaringClass()));
 			} else {
 				sb.append(BindingFactory.getBindingName(method.getReturnType()));
 			}
@@ -81,8 +79,7 @@ public class NodeFactory {
 				param.append("[");
 				param.append(BindingFactory.getBindingName(parameterTypes[i]));
 				param.append("] ");
-				param.append(((SingleVariableDeclaration) methodNode
-						.parameters().get(i)).getName().getIdentifier());
+				param.append(((SingleVariableDeclaration) methodNode.parameters().get(i)).getName().getIdentifier());
 
 				CsParameterName.newParameterName(param.toString());
 				sb.append(param.toString());
@@ -100,33 +97,26 @@ public class NodeFactory {
 
 			Object o = fieldNode.fragments().get(0);
 			if (o instanceof VariableDeclarationFragment) {
-				BindingFactory.modifierHelper(sb,
-						((VariableDeclarationFragment) o).resolveBinding());
+				BindingFactory.modifierHelper(sb, ((VariableDeclarationFragment) o).resolveBinding());
 				sb.append("[");
-				sb.append(BindingFactory
-						.getBindingName(((VariableDeclarationFragment) o)
-								.resolveBinding().getType()));
+				sb.append(BindingFactory.getBindingName(((VariableDeclarationFragment) o).resolveBinding().getType()));
 				sb.append("] ");
 				sb.append("[ ].");
-				sb.append(((VariableDeclarationFragment) o).getName()
-						.getIdentifier());
+				sb.append(((VariableDeclarationFragment) o).getName().getIdentifier());
 			}
 			return CsFieldName.newFieldName(sb.toString());
 
 		case ASTNode.IMPORT_DECLARATION:
 			ImportDeclaration importNode = (ImportDeclaration) node;
-			return CsAssemblyName.newAssemblyName(importNode.getName()
-					.getFullyQualifiedName());
+			return CsAssemblyName.newAssemblyName(importNode.getName().getFullyQualifiedName());
 
 		case ASTNode.TYPE_DECLARATION:
 			TypeDeclaration typeNode = (TypeDeclaration) node;
-			return CsTypeName.newTypeName(BindingFactory
-					.getBindingName(typeNode.resolveBinding()));
+			return CsTypeName.newTypeName(BindingFactory.getBindingName(typeNode.resolveBinding()));
 
 		case ASTNode.PACKAGE_DECLARATION:
 			PackageDeclaration packageNode = (PackageDeclaration) node;
-			return CsNamespaceName.newNamespaceName(packageNode
-					.resolveBinding().getName());
+			return CsNamespaceName.newNamespaceName(packageNode.resolveBinding().getName());
 		}
 		return null;
 	}
@@ -148,8 +138,7 @@ public class NodeFactory {
 				String qualifiedName = type.getQualifiedName();
 
 				if (type.isParameterizedType()) {
-					sb.append(qualifiedName.substring(0,
-							qualifiedName.indexOf("<")));
+					sb.append(qualifiedName.substring(0, qualifiedName.indexOf("<")));
 					sb.append("`");
 					sb.append(type.getTypeArguments().length);
 					sb.append("[");
@@ -180,7 +169,7 @@ public class NodeFactory {
 
 				return sb.toString();
 
-				// IVariableBinding
+			// IVariableBinding
 			case 3:
 				((IVariableBinding) binding).getType().getQualifiedName();
 				break;
@@ -190,8 +179,7 @@ public class NodeFactory {
 				break;
 			// IAnnotationBinding
 			case 5:
-				((IAnnotationBinding) binding).getAnnotationType()
-						.getQualifiedName();
+				((IAnnotationBinding) binding).getAnnotationType().getQualifiedName();
 				break;
 			// IMemberValuePair
 			case 6:
@@ -203,8 +191,7 @@ public class NodeFactory {
 			return null;
 		}
 
-		public static StringBuilder modifierHelper(StringBuilder sb,
-				IBinding binding) {
+		public static StringBuilder modifierHelper(StringBuilder sb, IBinding binding) {
 			int modifier = binding.getModifiers();
 
 			if (Modifier.isStatic(modifier))
@@ -219,31 +206,29 @@ public class NodeFactory {
 			return sb;
 		}
 
-		
 		public static String getAssemblyName(String qualifiedName) {
 			Class c = null;
 
 			try {
 				c = Class.forName(qualifiedName);
+				System.out.println(c.getPackage().getImplementationVersion());
+				System.out.println(c.getPackage().getSpecificationVersion());
 			} catch (ClassNotFoundException e) {
 				// e.printStackTrace();
 				return "?";
-			} 
+			}
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
 				return "rt.jar";
 			}
 
-			String path = c.getProtectionDomain().getCodeSource().getLocation()
-					.getPath();
+			String path = c.getProtectionDomain().getCodeSource().getLocation().getPath();
 
 			if (path.endsWith(".jar")) {
 				return path.substring(path.lastIndexOf("/") + 1);
 			} else if (path.endsWith("/bin/")) {
 				String project = path.substring(0, path.length() - 5);
-				return project.substring(project.lastIndexOf("/") + 1,
-						project.length());
-			} else {
+				return project.substring(project.lastIndexOf("/") + 1, project.length());
 			}
 			return path;
 		}

@@ -38,7 +38,9 @@ public class MethodVisitor extends ASTVisitor {
 
 	public MethodDeclaration getMethod(String signature) {
 		for (MethodDeclaration m : methods) {
-			if (getMethodSignature(m).equals(signature)) {
+			if (!signature.endsWith(")") && m.getName().getIdentifier().equals(signature)) {
+				return m;
+			} else if (getMethodSignature(m).equals(signature)) {
 				return m;
 			}
 		}
@@ -60,8 +62,7 @@ public class MethodVisitor extends ASTVisitor {
 
 		if (sb.toString().endsWith(", ")) {
 			sb.replace(sb.length() - 2, sb.length(), ")");
-		}
-		else{
+		} else {
 			sb.append(")");
 		}
 

@@ -66,13 +66,13 @@ public class PluginAstParser {
 	 *            The name of the compilationunit which get parsed, for example
 	 *            "Test.java"
 	 */
-	public PluginAstParser(String projectName, String packageName, String cuName) {
+	public PluginAstParser(String projectName, String qualifiedName) {
 		javaProjects = getJavaProjects();
-		initializeAst(projectName, packageName, cuName);
+		initializeAst(projectName, qualifiedName);
 	}
 
-	private void initializeAst(String projectName, String packageName, String cuName) {
-		ICompilationUnit compilationUnit = getCompilationunit(projectName, packageName, cuName);
+	private void initializeAst(String projectName, String qualifiedName) {
+		ICompilationUnit compilationUnit = getCompilationunit(projectName, qualifiedName);
 		parsed = parse(compilationUnit);
 
 		fieldVisitor = new FieldVisitor();
@@ -123,11 +123,13 @@ public class PluginAstParser {
 		return javaProjects;
 	}
 
-	private ICompilationUnit getCompilationunit(String project, String packageName, String cu) {
+	private ICompilationUnit getCompilationunit(String project, String qualifiedName) {
+		String[] split = qualifiedName.split(";");
+		
 		for (IJavaProject iJavaProject : javaProjects) {
 			if (iJavaProject.getElementName().equals(project)) {
 				try {
-					return iJavaProject.findType(packageName, cu).getCompilationUnit();
+					return iJavaProject.findType(split[0], split[1]).getCompilationUnit();
 				} catch (JavaModelException e) {
 					e.printStackTrace();
 				}
@@ -136,6 +138,13 @@ public class PluginAstParser {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param signature
+	 *            Expects a method signature or only the name of the method but
+	 *            returns only the first match.
+	 * @return	The method with a matching signature.
+	 */
 	public MethodDeclaration getMethod(String signature) {
 		return methodVisitor.getMethod(signature);
 	}
