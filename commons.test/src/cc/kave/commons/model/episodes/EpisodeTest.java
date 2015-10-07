@@ -15,8 +15,7 @@
  */
 package cc.kave.commons.model.episodes;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,18 +65,10 @@ public class EpisodeTest {
 	@Test
 	public void equality_reallyTheSame() {
 		Episode a = new Episode();
-		a.addFact("1");
-		a.addFact("2");
-		a.addFact("3");
-		a.addFact("1>2");
-		a.addFact("1>3");
+		a.addFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFact("1");
-		b.addFact("2");
-		b.addFact("3");
-		b.addFact("1>2");
-		b.addFact("1>3");
+		b.addFacts("1", "2", "3", "1>2", "1>3");
 
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
@@ -87,16 +78,10 @@ public class EpisodeTest {
 	@Test
 	public void equality_diffEvents() {
 		Episode a = new Episode();
-		a.addFact("1");
-		a.addFact("2");
-		a.addFact("3");
-		a.addFact("1>2");
-		a.addFact("1>3");
+		a.addFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFact("3");
-		b.addFact("4");
-		b.addFact("3>4");
+		b.addFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
@@ -106,20 +91,38 @@ public class EpisodeTest {
 	@Test
 	public void equality_sameEventsDiffRelations() {
 		Episode a = new Episode();
-		a.addFact("1");
-		a.addFact("2");
-		a.addFact("3");
-		a.addFact("1>2");
-		a.addFact("1>3");
+		a.addFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFact("1");
-		b.addFact("2");
-		b.addFact("3");
-		b.addFact("1>2");
+		b.addFacts("1", "2", "3", "1>2");
 
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
 		assertNotEquals(a.getFacts(), b.getFacts());
+	}
+	
+	@Test 
+	public void getIndexTest() {
+		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		
+		Fact expected = new Fact("1>2");
+		Fact actual = sut.get(3);
+		assertEquals(expected, actual);
+	}
+	
+	@Test 
+	public void containFactTest() {
+		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		
+		boolean actual = sut.containsFact(new Fact("2"));
+		assertTrue(actual);
+	}
+	
+	@Test 
+	public void notContainFactTest() {
+		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		
+		boolean actual = sut.containsFact(new Fact("4"));
+		assertFalse(actual);
 	}
 }

@@ -35,8 +35,7 @@ public class Episode {
 	}
 
 	public Fact get(int i) {
-		// return facts.get(i);
-		throw new RuntimeException("to be tested");
+		return facts.get(i);
 	}
 
 	public int getNumEvents() {
@@ -81,6 +80,9 @@ public class Episode {
 	}
 
 	public boolean containsFact(Fact fact1) {
-		throw new RuntimeException("to be tested");
+		if (facts.contains(fact1)) {
+			return true;
+		}
+		return false;
 	}
 }
