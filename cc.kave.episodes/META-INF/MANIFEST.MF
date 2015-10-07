@@ -5,5 +5,8 @@ Bundle-SymbolicName: cc.kave.episodes
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: commons,
  org.apache.commons.lang3,
- com.google.guava
-Export-Package: cc.kave.episodes
+ com.google.guava,
+ org.apache.commons.io,
+ com.google.inject
+Export-Package: cc.kave.episodes,
+ cc.recommenders.mining.episodes

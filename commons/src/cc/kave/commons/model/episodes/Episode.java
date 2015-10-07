@@ -34,6 +34,11 @@ public class Episode {
 		return facts;
 	}
 
+	public Fact get(int i) {
+		// return facts.get(i);
+		throw new RuntimeException("to be tested");
+	}
+
 	public int getNumEvents() {
 		return numEvents;
 	}
@@ -73,5 +78,9 @@ public class Episode {
 	@Override
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+
+	public boolean containsFact(Fact fact1) {
+		throw new RuntimeException("to be tested");
 	}
 }

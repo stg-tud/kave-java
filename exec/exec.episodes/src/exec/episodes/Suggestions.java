@@ -10,49 +10,35 @@
  */
 package exec.episodes;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import cc.kave.commons.model.episodes.Episode;
-import cc.kave.episodes.EpisodeRecommender;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
-import cc.recommenders.mining.episodes.EpisodeReader;
-import cc.recommenders.mining.episodes.MaxFreqEpisodes;
-import cc.recommenders.mining.episodes.QueryGenerator;
-
-import com.google.inject.Inject;
-
 public class Suggestions {
 
-	private EpisodeReader ereader;
-	private MaxFreqEpisodes episodeLearned;
-	private QueryGenerator queryGenerator;
-	private EpisodeRecommender proposals;
-
-	@Inject
-	public Suggestions(MaxFreqEpisodes episodeLearned, QueryGenerator queryGenerator, EpisodeRecommender proposals) {
-		this.episodeLearned = episodeLearned;
-		this.queryGenerator = queryGenerator;
-		this.proposals = proposals;
-	}
+	// private EpisodeReader ereader;
+	// private MaxFreqEpisodes episodeLearned;
+	// private QueryGenerator queryGenerator;
+	// private EpisodeRecommender proposals;
+	//
+	// @Inject
+	// public Suggestions(MaxFreqEpisodes episodeLearned, QueryGenerator
+	// queryGenerator, EpisodeRecommender proposals) {
+	// this.episodeLearned = episodeLearned;
+	// this.queryGenerator = queryGenerator;
+	// this.proposals = proposals;
+	// }
 	
 	public void run() throws Exception {
-		Map<Integer, List<Episode>> allEpisodes = ereader.read();
-		Map<Integer, List<Episode>> maxEpisodes = episodeLearned.getMaxFreqEpisodes(allEpisodes);
-		Tuple<Episode, Episode> query = queryGenerator.oneEventSkipped(maxEpisodes);
-		Set<Tuple<Episode, Double>> recommendations = proposals.getProposals(query.getFirst(), maxEpisodes);
-		
-		Logger.log("Initial episode: " +  query.getSecond().toString());
-		Logger.log("Generated query: " + query.getFirst().toString());
-		Logger.log("List of proposals: ");
-		
-		Iterator<Tuple<Episode, Double>> iterator = recommendations.iterator();
-		while (iterator.hasNext()) {
-			Tuple<Episode, Double> proposal = iterator.next();
-			Logger.log(proposal.getFirst().toString() + ", " + proposal.getSecond().toString());
-		}
+//		Map<Integer, List<Episode>> allEpisodes = ereader.read();
+//		Map<Integer, List<Episode>> maxEpisodes = episodeLearned.getMaxFreqEpisodes(allEpisodes);
+//		Tuple<Episode, Episode> query = queryGenerator.oneEventSkipped(maxEpisodes);
+//		Set<Tuple<Episode, Double>> recommendations = proposals.getProposals(query.getFirst(), maxEpisodes);
+//		
+//		Logger.log("Initial episode: " +  query.getSecond().toString());
+//		Logger.log("Generated query: " + query.getFirst().toString());
+//		Logger.log("List of proposals: ");
+//		
+//		Iterator<Tuple<Episode, Double>> iterator = recommendations.iterator();
+//		while (iterator.hasNext()) {
+//			Tuple<Episode, Double> proposal = iterator.next();
+//			Logger.log(proposal.getFirst().toString() + ", " + proposal.getSecond().toString());
+//		}
 	}
 }

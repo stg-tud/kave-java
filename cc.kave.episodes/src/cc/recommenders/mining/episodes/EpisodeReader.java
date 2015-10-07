@@ -24,32 +24,32 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Episode;
 
 public class EpisodeReader {
-	
+
 	private File rootFolder;
 	private Parser episodeParser;
-	
+
 	@Inject
 	public EpisodeReader(@Named("episode") File directory, Parser parser) {
-		assertTrue(directory.exists(), "Home folder does not exist");
-		assertTrue(directory.isDirectory(), "Home is not a folder, but a file");
+		assertTrue(directory.exists(), "Frequent episode folder does not exist");
+		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
 		this.rootFolder = directory;
 		this.episodeParser = parser;
 	}
-	
+
 	public Map<Integer, List<Episode>> read() {
-		
+
 		File filePath = getFilePath();
-		
+
 		List<String> lines = episodeParser.parse(filePath);
-		
-		Map<Integer, List<Episode>> results = new HashMap<Integer,List<Episode>>();
+
+		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
 
 		int totalLines = lines.size();
 		List<Episode> episodeList = new LinkedList<Episode>();
-			
+
 		int numNodes = 0;
 		int lineNumber = 0;
-			
+
 		for (String line : lines) {
 			String[] rawValues = line.split("\\s+");
 			if (rawValues.length == 4 && rawValues[1].equalsIgnoreCase("Episodes")) {
@@ -62,16 +62,18 @@ public class EpisodeReader {
 					episodeList = new LinkedList<Episode>();
 				}
 			} else {
+				String[] episodeElements = line.split(":");
 				Episode episode = new Episode();
-				episode.facts = new LinkedList<String>();
-				episode.numEvents = numNodes;
+				episode.setNumEvents(numNodes);
+				int episodeFrequency = Integer.parseInt(episodeElements[1].trim());
+				episode.setFrequency(episodeFrequency);
 				for (int i = 0; i < numNodes; i++) {
-					episode.facts.add(rawValues[i]);
+					episode.addFact(rawValues[i]);
 				}
 				if (rawValues[rawValues.length - 1].contains(",")) {
 					String[] order = rawValues[rawValues.length - 1].split(",");
 					for (int i = 0; i < order.length; i++) {
-						episode.facts.add(order[i]);
+						episode.addFact(order[i]);
 					}
 				}
 				episodeList.add(episode);
@@ -80,10 +82,10 @@ public class EpisodeReader {
 			if ((lineNumber == totalLines) && (!episodeList.isEmpty())) {
 				results.put(numNodes, episodeList);
 			}
-		} 
+		}
 		return results;
 	}
-	
+
 	private File getFilePath() {
 		String fileName = rootFolder.getAbsolutePath() + "/output.txt";
 		File file = new File(fileName);

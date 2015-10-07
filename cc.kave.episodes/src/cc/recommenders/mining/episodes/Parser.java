@@ -21,13 +21,13 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 public class Parser {
-	
+
 	public List<String> parse(File file) {
-		assertTrue(file.exists(), "Frequent episode file does not exist");
-		assertFalse(file.isDirectory(), "Frequent episode file is not a file, but a directory");
-		
+		assertTrue(file.exists(), "File does not exist");
+		assertFalse(file.isDirectory(), "File is not a file, but a directory");
+
 		List<String> lines = new LinkedList<String>();
-		
+
 		try {
 			lines = FileUtils.readLines(file);
 		} catch (IOException e) {

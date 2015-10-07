@@ -4,7 +4,9 @@ Bundle-Name: Test
 Bundle-SymbolicName: cc.kave.episodes.test
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.junit,
- org.mockito,
  cc.kave.episodes,
  com.google.guava,
- commons
+ commons,
+ org.mockito.mockito-core,
+ org.objenesis,
+ org.apache.commons.io

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.model.episodes.Fact;
 
 public class MaxFreqEpisodes {
 	
@@ -54,8 +55,8 @@ public class MaxFreqEpisodes {
 	}
 
 	private boolean subEpisode(Episode episode1, Episode episode2) {
-		for (String fact1 : episode1.facts) {
-			if (episode2.facts.contains(fact1)) {
+		for (Fact fact1 : episode1.getFacts()) {
+			if (episode2.containsFact(fact1)) {
 				continue;
 			} else {
 				return false;

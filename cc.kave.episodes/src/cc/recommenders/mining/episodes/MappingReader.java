@@ -22,9 +22,9 @@ import com.google.inject.name.Named;
 
 public class MappingReader {
 
-private File rootFolder;
-private Parser mappParser;
-	
+	private File rootFolder;
+	private Parser mappParser;
+
 	@Inject
 	public MappingReader(@Named("mapping") File directory, Parser parser) {
 		assertTrue(directory.exists(), "Home folder does not exist");
@@ -32,22 +32,22 @@ private Parser mappParser;
 		this.rootFolder = directory;
 		this.mappParser = parser;
 	}
-	
+
 	public Map<Integer, String> reader() {
 		File filePath = getFilePath();
 		List<String> lines = mappParser.parse(filePath);
 		Map<Integer, String> mapping = new HashMap<Integer, String>();
-		
+
 		for (String line : lines) {
 			int idx = line.indexOf("{");
 			String str = line.substring(0, idx - 2);
 			int eventID = Integer.parseInt(str);
 			String event = line.substring(idx);
 			mapping.put(eventID, event);
-		}	
+		}
 		return mapping;
 	}
-	
+
 	private File getFilePath() {
 		String fileName = rootFolder.getAbsolutePath() + "/eventMapping.txt";
 		File file = new File(fileName);

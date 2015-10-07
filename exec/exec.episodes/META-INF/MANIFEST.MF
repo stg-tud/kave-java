@@ -9,4 +9,5 @@ Require-Bundle: commons,
  org.apache.commons.io,
  com.google.guava,
  org.junit,
- org.mockito
+ org.mockito,
+ com.google.inject
