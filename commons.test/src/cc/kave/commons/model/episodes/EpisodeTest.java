@@ -35,6 +35,7 @@ public class EpisodeTest {
 	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getNumEvents());
+		assertEquals(0, sut.getFrequency());
 		assertEquals(Lists.newLinkedList(), sut.getFacts());
 	}
 
@@ -42,6 +43,8 @@ public class EpisodeTest {
 	public void valuesCanBeSet() {
 		sut.setNumEvents(2);
 		assertEquals(2, sut.getNumEvents());
+		sut.setFrequency(3);
+		assertEquals(3, sut.getFrequency());
 		sut.addFact("f");
 		assertEquals(Lists.newArrayList(new Fact("f")), sut.getFacts());
 	}
