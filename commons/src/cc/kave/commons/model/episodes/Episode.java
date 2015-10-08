@@ -64,6 +64,13 @@ public class Episode {
 		}
 	}
 
+	public boolean containsFact(Fact fact1) {
+		if (facts.contains(fact1)) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -77,12 +84,5 @@ public class Episode {
 	@Override
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
-	}
-
-	public boolean containsFact(Fact fact1) {
-		if (facts.contains(fact1)) {
-			return true;
-		}
-		return false;
 	}
 }

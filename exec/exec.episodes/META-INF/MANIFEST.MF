@@ -11,3 +11,4 @@ Require-Bundle: commons,
  org.junit,
  org.mockito,
  com.google.inject
+Import-Package: cc.recommenders.mining.episodes

@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import cc.kave.commons.mining.episodes.EpisodeParser;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -30,26 +31,17 @@ public class Module extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		File episodeFile = new File(rootFolder);
+		File episodeFile = new File(rootFolder + "n-graph-miner/");
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File mappingFile = new File(rootFolder + "Episodes/");
-		Directory mappingDir = new Directory(mappingFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
-		dirs.put("mapping", mappingDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
-		bind(File.class).annotatedWith(Names.named("mapping")).toInstance(mappingFile);
 
-		// Parser parser = new Parser();
 		File episodeRoot = episodeFile;
-		// bind(EpisodeReader.class).toInstance(new EpisodeReader(episodeRoot,
-		// parser));
-		File mappingRoot = mappingFile;
-		// bind(MappingReader.class).toInstance(new MappingReader(mappingRoot,
-		// parser));
+		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

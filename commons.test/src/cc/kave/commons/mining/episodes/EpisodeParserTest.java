@@ -8,12 +8,9 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.recommenders.mining.episodes;
+package cc.kave.commons.mining.episodes;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,34 +25,30 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
+import cc.kave.commons.mining.episodes.EpisodeParser;
 import cc.kave.commons.model.episodes.Episode;
 import cc.recommenders.exceptions.AssertionException;
 
-public class EpisodeReaderTest {
+public class EpisodeParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private EpisodeReader sut;
-	@Mock
-	public Parser parser;
+	private EpisodeParser sut;
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		sut = new EpisodeReader(rootFolder.getRoot(), parser);
+		sut = new EpisodeParser(rootFolder.getRoot());
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder does not exist");
-		sut = new EpisodeReader(new File("does not exist"), parser);
+		sut = new EpisodeParser(new File("does not exist"));
 	}
 
 	@Test
@@ -63,7 +56,7 @@ public class EpisodeReaderTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder is not a folder, but a file");
-		sut = new EpisodeReader(file, parser);
+		sut = new EpisodeParser(file);
 	}
 
 	@Test
@@ -83,35 +76,30 @@ public class EpisodeReaderTest {
 		}
 
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-
+		List<Episode> episodeList = new LinkedList<Episode>();
+		
 		Episode episode = new Episode();
 		episode.addFact("1");
 		episode.setNumEvents(1);
-		;
-		episode.setFrequency(2);
+		episode.setFrequency(3);
 
-		List<Episode> episodeList = new LinkedList<Episode>();
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
 
-		doCallRealMethod().when(parser).parse(eq(file));
-
-		Map<Integer, List<Episode>> actual = sut.read();
-
-		verify(parser).parse(eq(file));
+		Map<Integer, List<Episode>> actual = sut.parse();
 
 		assertEquals(expected, actual);
-
-		file.delete();
 	}
 
 	@Test
-	public void moreEventsTest() throws IOException {
+	public void emptyNNodeEpisodesTest() throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("1-NOde Episodes = 6\n");
 		sb.append("1 .	: 3	: 1	:. \n");
-		sb.append("2-NOde Episodes = 12\n");
+		sb.append("2-NOde Episodes = 0\n");
+		sb.append("3-NOde Episodes = 0\n");
+		sb.append("4-NOde Episodes = 0\n");
 
 		String content = sb.toString();
 
@@ -124,27 +112,20 @@ public class EpisodeReaderTest {
 		}
 
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-
+		List<Episode> episodeList = new LinkedList<Episode>();
+		
 		Episode episode = new Episode();
 		episode.addFact("1");
 		episode.setNumEvents(1);
-		;
 		episode.setFrequency(3);
 
-		List<Episode> episodeList = new LinkedList<Episode>();
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
 
-		doCallRealMethod().when(parser).parse(eq(file));
-
-		Map<Integer, List<Episode>> actual = sut.read();
-
-		verify(parser).parse(eq(file));
+		Map<Integer, List<Episode>> actual = sut.parse();
 
 		assertEquals(expected, actual);
-
-		file.delete();
 	}
 
 	@Test
@@ -155,6 +136,7 @@ public class EpisodeReaderTest {
 		sb.append("2 .	: 3	: 1	:. \n");
 		sb.append("2-NOde Episodes = 1\n");
 		sb.append("1 2 .	: 3	: 1	:. 1>2,\n");
+		sb.append("3-NOde Episodes = 0\n");
 
 		String content = sb.toString();
 
@@ -172,7 +154,6 @@ public class EpisodeReaderTest {
 		Episode episode = new Episode();
 		episode.addFact("1");
 		episode.setNumEvents(1);
-		;
 		episode.setFrequency(3);
 
 		episodeList.add(episode);
@@ -180,7 +161,6 @@ public class EpisodeReaderTest {
 		episode = new Episode();
 		episode.addFact("2");
 		episode.setNumEvents(1);
-		;
 		episode.setFrequency(3);
 
 		episodeList.add(episode);
@@ -192,22 +172,15 @@ public class EpisodeReaderTest {
 		episode = new Episode();
 		episode.addFacts("1", "2", "1>2");
 		episode.setNumEvents(2);
-		;
 		episode.setFrequency(3);
 
 		episodeList.add(episode);
 
 		expected.put(2, episodeList);
 
-		doCallRealMethod().when(parser).parse(eq(file));
-
-		Map<Integer, List<Episode>> actual = sut.read();
-
-		verify(parser).parse(eq(file));
+		Map<Integer, List<Episode>> actual = sut.parse();
 
 		assertEquals(expected, actual);
-
-		file.delete();
 	}
 
 	private File getFilePath() {
