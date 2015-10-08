@@ -10,3 +10,4 @@ Require-Bundle: commons,
  com.google.inject
 Export-Package: cc.kave.episodes,
  cc.recommenders.mining.episodes
+Import-Package: org.apache.commons.math.util
