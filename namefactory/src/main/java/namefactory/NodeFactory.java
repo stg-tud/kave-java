@@ -18,6 +18,8 @@ package namefactory;
 
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -32,10 +34,13 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsInterfaceTypeName;
+import cc.kave.commons.model.names.csharp.CsLocalVariableName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
@@ -55,14 +60,17 @@ public class NodeFactory {
 			sb.append("[");
 
 			if (method.isConstructor()) {
-				sb.append(BindingFactory.getBindingName(method.getDeclaringClass()));
+				sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass()))
+						.getIdentifier());
 			} else {
-				sb.append(BindingFactory.getBindingName(method.getReturnType()));
+				sb.append(
+						CsTypeName.newTypeName(BindingFactory.getBindingName(method.getReturnType())).getIdentifier());
 			}
 
 			sb.append("] ");
 			sb.append("[");
-			sb.append(BindingFactory.getBindingName(method.getDeclaringClass()));
+			sb.append(
+					CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass())).getIdentifier());
 			sb.append("].");
 
 			if (method.isConstructor()) {
@@ -95,20 +103,51 @@ public class NodeFactory {
 		case ASTNode.FIELD_DECLARATION:
 			FieldDeclaration fieldNode = (FieldDeclaration) node;
 
-			Object o = fieldNode.fragments().get(0);
-			if (o instanceof VariableDeclarationFragment) {
-				BindingFactory.modifierHelper(sb, ((VariableDeclarationFragment) o).resolveBinding());
+			Object field = fieldNode.fragments().get(0);
+			if (field instanceof VariableDeclarationFragment) {
+				BindingFactory.modifierHelper(sb, ((VariableDeclarationFragment) field).resolveBinding());
 				sb.append("[");
-				sb.append(BindingFactory.getBindingName(((VariableDeclarationFragment) o).resolveBinding().getType()));
+				sb.append(BindingFactory
+						.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
 				sb.append("] ");
 				sb.append("[ ].");
-				sb.append(((VariableDeclarationFragment) o).getName().getIdentifier());
+				sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
 			}
 			return CsFieldName.newFieldName(sb.toString());
 
+		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+			VariableDeclarationStatement variableStatementNode = (VariableDeclarationStatement) node;
+
+			Object variableStatement = variableStatementNode.fragments().get(0);
+			if (variableStatement instanceof VariableDeclarationFragment) {
+				sb.append("[");
+				sb.append(BindingFactory
+						.getBindingName(((VariableDeclarationFragment) variableStatement).resolveBinding().getType()));
+				sb.append("] ");
+				sb.append(((VariableDeclarationFragment) variableStatement).getName().getIdentifier());
+				return CsLocalVariableName.newLocalVariableName(sb.toString());
+			}
+
+			return CsLocalVariableName.newLocalVariableName("");
+
+		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+			VariableDeclarationStatement variableExpressionNode = (VariableDeclarationStatement) node;
+
+			Object variableExpression = variableExpressionNode.fragments().get(0);
+			if (variableExpression instanceof VariableDeclarationFragment) {
+				sb.append("[");
+				sb.append(BindingFactory
+						.getBindingName(((VariableDeclarationFragment) variableExpression).resolveBinding().getType()));
+				sb.append("] ");
+				sb.append(((VariableDeclarationFragment) variableExpression).getName().getIdentifier());
+				return CsLocalVariableName.newLocalVariableName(sb.toString());
+			}
+
+			return CsLocalVariableName.newLocalVariableName("");
+
 		case ASTNode.IMPORT_DECLARATION:
 			ImportDeclaration importNode = (ImportDeclaration) node;
-			return CsAssemblyName.newAssemblyName(importNode.getName().getFullyQualifiedName());
+			return CsTypeName.newTypeName(BindingFactory.getBindingName(importNode.resolveBinding()));
 
 		case ASTNode.TYPE_DECLARATION:
 			TypeDeclaration typeNode = (TypeDeclaration) node;
@@ -119,6 +158,28 @@ public class NodeFactory {
 			return CsNamespaceName.newNamespaceName(packageNode.resolveBinding().getName());
 		}
 		return null;
+	}
+
+	private void addPrefix(ASTNode node, StringBuilder sb) {
+
+		if (node instanceof TypeDeclaration && ((TypeDeclaration) node).isInterface()) {
+			sb.append("i: ");
+		} else if (node instanceof EnumDeclaration) {
+			sb.append("e: ");
+		}
+
+		switch ("node") {
+		case "interface":
+			sb.append("i:");
+			break;
+		case "struct":
+			sb.append("s:");
+			break;
+		case "enum":
+			sb.append("e:");
+			break;
+		}
+
 	}
 
 	public static class BindingFactory {
@@ -164,9 +225,6 @@ public class NodeFactory {
 				// + type.getName();
 				sb.append(getAssemblyName(qualifiedName));
 
-				// version has to be implemented
-				// sb.append(", VersionPlaceholder");
-
 				return sb.toString();
 
 			// IVariableBinding
@@ -206,16 +264,16 @@ public class NodeFactory {
 			return sb;
 		}
 
+		// TODO: Change returntype
 		public static String getAssemblyName(String qualifiedName) {
-			Class c = null;
+			Class<?> c = null;
 
 			try {
 				c = Class.forName(qualifiedName);
 				System.out.println(c.getPackage().getImplementationVersion());
 				System.out.println(c.getPackage().getSpecificationVersion());
 			} catch (ClassNotFoundException e) {
-				// e.printStackTrace();
-				return "?";
+				return "Unknown_Assembly";
 			}
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
@@ -230,6 +288,11 @@ public class NodeFactory {
 				String project = path.substring(0, path.length() - 5);
 				return project.substring(project.lastIndexOf("/") + 1, project.length());
 			}
+			
+
+			// TODO: version has to be implemented
+			CsAssemblyName.newAssemblyName(path);
+			
 			return path;
 		}
 	}
