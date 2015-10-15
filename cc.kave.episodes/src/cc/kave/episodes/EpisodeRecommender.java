@@ -18,6 +18,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.mining.episodes.ProposalHelper;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.datastructures.Tuple;
@@ -49,7 +50,7 @@ public class EpisodeRecommender {
 
 	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals) {
 
-		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createSortedSetNonAlphabet();
+		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
 
 		for (Episode episode : proposals.keySet()) {
 			Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
