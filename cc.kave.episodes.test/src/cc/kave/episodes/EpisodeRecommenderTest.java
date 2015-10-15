@@ -45,21 +45,21 @@ public class EpisodeRecommenderTest {
 		expectedProposals = Sets.newLinkedHashSet();
 
 		learnedEpisodes = new HashMap<Integer, List<Episode>>();
-		learnedEpisodes.put(1, newArrayList(newEpisode("1"), newEpisode("2"), newEpisode("3")));
-		learnedEpisodes.put(2, newArrayList(newEpisode("1", "2", "1>2")));
-		learnedEpisodes.put(3, newArrayList(newEpisode("1", "2", "3", "1>2")));
+		learnedEpisodes.put(1, newArrayList(newEpisode(3, 1, "1"), newEpisode(3, 1, "2"), newEpisode(3, 1, "3")));
+		learnedEpisodes.put(2, newArrayList(newEpisode(2, 2, "1", "2", "1>2")));
+		learnedEpisodes.put(3, newArrayList(newEpisode(1, 3, "1", "2", "3", "1>2")));
 	}
 
 	@Test
 	public void oneEventQuery() {
 
-		queryWith("1");
+		queryWith(1, "1");
 
-		addProposal(newEpisode("1"), 1.0);
-		addProposal(newEpisode("1", "2", "1>2"), 0.5);
-		addProposal(newEpisode("1", "2", "3", "1>2"), 0.4);
-		addProposal(newEpisode("2"), 0.0);
-		addProposal(newEpisode("3"), 0.0);
+		addProposal(newEpisode(3, 1, "1"), 1.0);
+		addProposal(newEpisode(2, 2, "1", "2", "1>2"), 0.5);
+		addProposal(newEpisode(1, 3, "1", "2", "3", "1>2"), 0.4);
+		addProposal(newEpisode(3, 1, "2"), 0.0);
+		addProposal(newEpisode(3, 1, "3"), 0.0);
 
 		assertProposals(actualProposals);
 	}
@@ -68,13 +68,13 @@ public class EpisodeRecommenderTest {
 	public void twoEventQuery() {
 
 		// order relation is not counted in size
-		queryWith("1", "2", "1>2");
+		queryWith(2, "1", "2", "1>2");
 
-		addProposal(newEpisode("1", "2", "1>2"), 1.0);
-		addProposal(newEpisode("1", "2", "3", "1>2"), 6.0 / 7.0);
-		addProposal(newEpisode("2"), 0.5);
-		addProposal(newEpisode("1"), 0.5);
-		addProposal(newEpisode("3"), 0.0);
+		addProposal(newEpisode(2, 2, "1", "2", "1>2"), 1.0);
+		addProposal(newEpisode(1, 3, "1", "2", "3", "1>2"), 6.0 / 7.0);
+		addProposal(newEpisode(3, 1, "2"), 0.5);
+		addProposal(newEpisode(3, 1, "1"), 0.5);
+		addProposal(newEpisode(3, 1, "3"), 0.0);
 
 		assertProposals(actualProposals);
 	}
@@ -83,15 +83,13 @@ public class EpisodeRecommenderTest {
 	@Ignore
 	public void oneNodeQuery() {
 
-		Episode query = newEpisode("2");
+		queryWith(1, "2");
 
-		Map<Integer, List<Episode>> learnedEpisodes = new HashMap<Integer, List<Episode>>();
-
-		Episode e1 = newEpisode("1");
-		learnedEpisodes.put(1, Lists.newArrayList(e1));
-
-		Episode e2 = newEpisode("1", "2", "1>2");
-		learnedEpisodes.put(2, Lists.newArrayList(e2));
+		addProposal(newEpisode(3, 1, "2"), 1.0);
+		addProposal(newEpisode(2, 2, "1", "2", "1>2"), 0.5);
+		addProposal(newEpisode(1, 3, "1", "2", "3", "1>2"), 0.4);
+		addProposal(newEpisode(3, 1, "1"), 0.0);
+		addProposal(newEpisode(3, 1, "3"), 0.0);
 
 		assertProposals(actualProposals);
 	}
@@ -100,44 +98,27 @@ public class EpisodeRecommenderTest {
 	@Ignore
 	public void twoNodeQuery() {
 
-		Episode query = new Episode();
-		query.addFacts("1", "2", "1>2");
-
-		Map<Integer, List<Episode>> episodes = new HashMap<Integer, List<Episode>>();
-
-		Episode e1 = newEpisode("1");
-		Episode e2 = newEpisode("2");
-		List<Episode> episodeList = new LinkedList<Episode>();
-		episodeList.add(e1);
-		episodeList.add(e2);
-		episodes.put(1, episodeList);
-
-		Episode e3 = newEpisode("1", "2");
-		Episode e4 = newEpisode("1", "2", "1>2");
-		Episode e5 = newEpisode("1", "2", "2>1");
-		episodeList = new LinkedList<Episode>();
-		episodeList.add(e3);
-		episodeList.add(e4);
-		episodeList.add(e5);
-		episodes.put(2, episodeList);
-
-		addProposal(e4, 1.0);
-		addProposal(e3, 0.8);
-		addProposal(e5, 2.0 / 3.0);
-		addProposal(e1, 0.5);
-		addProposal(e1, 0.5);
+		queryWith(2, "1", "2", "1>2");
+		
+		addProposal(newEpisode(2, 2, "1", "2", "1>2"), 1.0);
+		addProposal(newEpisode(1, 3, "1", "2", "3", "1>2"), 6.0 / 7.0);
+		addProposal(newEpisode(3, 1, "1"), 0.5);
+		addProposal(newEpisode(3, 1, "2"), 0.5);
+		addProposal(newEpisode(3, 1, "3"), 0.0);
 
 		assertProposals(actualProposals);
 	}
 
-	private Episode newEpisode(String... facts) {
+	private Episode newEpisode(int frequency, int numberOfEvents, String... facts) {
 		Episode episode = new Episode();
 		episode.addFacts(facts);
+		episode.setFrequency(frequency);
+		episode.setNumEvents(numberOfEvents);
 		return episode;
 	}
 
-	private void queryWith(String... facts) {
-		actualProposals = sut.getProposals(newEpisode(facts), learnedEpisodes);
+	private void queryWith(int numberOfEvents, String... facts) {
+		actualProposals = sut.getProposals(newEpisode(1, numberOfEvents, facts), learnedEpisodes, 3);
 	}
 
 	private void addProposal(Episode e, double probability) {

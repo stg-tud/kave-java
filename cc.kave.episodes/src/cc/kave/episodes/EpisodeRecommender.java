@@ -26,18 +26,29 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
 
-	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes) {
-
-		Map<Episode, Double> results = new HashMap<Episode, Double>();
-		int[] numEvents = getNumberOfEvents(episodes);
-
-		for (int idx = 0; idx < numEvents.length; idx++) {
-			List<Episode> episodeList = episodes.get(numEvents[idx]);
-			for (Episode e : episodeList) {
-				results.put(e, calcF1(query, e));
+	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes, int numberOfProposalsToShow) {
+		Map<Episode, Double> episodesWithF1Value = new HashMap<Episode, Double>();
+		
+		for (Map.Entry<Integer, List<Episode>> entry : episodes.entrySet()) {
+			for (Episode e : entry.getValue()) {
+				episodesWithF1Value.put(e, calcF1(query, e));
 			}
 		}
-		return sortedProposals(results);
+		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value, numberOfProposalsToShow);
+		Set<Tuple<Episode, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
+		
+		if (sortedEpisodes.size() <= numberOfProposalsToShow) {
+			return sortedEpisodes;
+		} else {
+			int idx = 0;
+			for (Tuple<Episode, Double> tuple : sortedEpisodes) {
+				while (idx < numberOfProposalsToShow) {
+					finalProposals.add(tuple);
+					idx++;
+				}
+			}
+		}
+		return finalProposals;
 	}
 
 	private double calcF1(Episode query, Episode e) {
@@ -48,13 +59,15 @@ public class EpisodeRecommender {
 		return f1;
 	}
 
-	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals) {
+	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals, int numberOFProposals) {
 
 		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
 
-		for (Episode episode : proposals.keySet()) {
-			Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
-			sortedProposals.add(tuple);
+		for (int number = 0; number < numberOFProposals; number++) {
+			for (Episode episode : proposals.keySet()) {
+				Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
+				sortedProposals.add(tuple);
+			}
 		}
 		return sortedProposals;
 	}
@@ -64,28 +77,8 @@ public class EpisodeRecommender {
 		Iterator<Tuple<Episode, Double>> iterator = listOfProposals.iterator();
 		while (iterator.hasNext()) {
 			Tuple<Episode, Double> proposal = iterator.next();
-			result += proposal.getFirst().toString() + ", " + proposal.getSecond().toString() + "\n";
+			result += proposal.getFirst().toString() + ": " + proposal.getSecond() + "\n";
 		}
 		return result;
 	}
-
-	private int[] getNumberOfEvents(Map<Integer, List<Episode>> episodes) {
-		Set<Integer> nodes = Sets.newTreeSet(episodes.keySet());
-		Iterator<Integer> itr = nodes.iterator();
-		int[] numEvents = new int[episodes.size()];
-		int idx = 0;
-		while (itr.hasNext()) {
-			numEvents[idx] = itr.next();
-			idx++;
-		}
-		return numEvents;
-	}
-
-	// public void queryValidation(int queryEvents, Map<Integer,
-	// List<EpisodeFacts>> episodes) throws Exception {
-	// if (queryEvents > episodes.size()) {
-	// throw new Exception("Invalid query, " + queryEvents + "different events
-	// in the query");
-	// }
-	// }
 }
