@@ -14,6 +14,7 @@ import static cc.recommenders.assertions.Asserts.assertLessOrEqual;
 import static cc.recommenders.assertions.Asserts.assertNotNegative;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,8 @@ public class Measure {
 
 	private double precision = 0.0;
 	private double recall = 0.0;
+
+	private DecimalFormat df = new DecimalFormat("#.###");
 
 	public double getPrecision() {
 		return precision;
@@ -39,7 +42,8 @@ public class Measure {
 		assertLessOrEqual(beta, 1.0);
 
 		if (isPrecisionOrRecallSet()) {
-			return (1.0 + beta * beta) * precision * recall / (beta * beta * precision + recall);
+			return Double
+					.valueOf(df.format((1.0 + beta * beta) * precision * recall / (beta * beta * precision + recall)));
 		} else {
 			return 0.0;
 		}

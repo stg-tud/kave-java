@@ -8,17 +8,15 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.episodes;
+package cc.kave.commons.mining.episodes;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.mining.episodes.ProposalHelper;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.datastructures.Tuple;
@@ -26,26 +24,30 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
 
-	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes, int numberOfProposalsToShow) {
+	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes, int numberOfProposalsToShow) throws Exception {
 		Map<Episode, Double> episodesWithF1Value = new HashMap<Episode, Double>();
+		
+		if (episodes.isEmpty()) {
+			throw new Exception("The list of learned episodes is empty");
+		}
+		
+		if (numberOfProposalsToShow <= 0) {
+			throw new Exception("Request a miningful number of proposals to show");
+		}
 		
 		for (Map.Entry<Integer, List<Episode>> entry : episodes.entrySet()) {
 			for (Episode e : entry.getValue()) {
 				episodesWithF1Value.put(e, calcF1(query, e));
 			}
 		}
-		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value, numberOfProposalsToShow);
+		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value);
 		Set<Tuple<Episode, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
 		
-		if (sortedEpisodes.size() <= numberOfProposalsToShow) {
-			return sortedEpisodes;
-		} else {
-			int idx = 0;
-			for (Tuple<Episode, Double> tuple : sortedEpisodes) {
-				while (idx < numberOfProposalsToShow) {
-					finalProposals.add(tuple);
-					idx++;
-				}
+		int idx = 0;
+		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
+			if (idx < numberOfProposalsToShow && tuple.getSecond() > 0.0) {
+				finalProposals.add(tuple);
+				idx++;
 			}
 		}
 		return finalProposals;
@@ -59,26 +61,14 @@ public class EpisodeRecommender {
 		return f1;
 	}
 
-	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals, int numberOFProposals) {
+	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals) {
 
 		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
 
-		for (int number = 0; number < numberOFProposals; number++) {
-			for (Episode episode : proposals.keySet()) {
-				Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
-				sortedProposals.add(tuple);
-			}
+		for (Episode episode : proposals.keySet()) {
+			Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
+			sortedProposals.add(tuple);
 		}
 		return sortedProposals;
-	}
-
-	public String toString(Set<Tuple<Episode, Double>> listOfProposals) {
-		String result = "";
-		Iterator<Tuple<Episode, Double>> iterator = listOfProposals.iterator();
-		while (iterator.hasNext()) {
-			Tuple<Episode, Double> proposal = iterator.next();
-			result += proposal.getFirst().toString() + ": " + proposal.getSecond() + "\n";
-		}
-		return result;
 	}
 }

@@ -26,7 +26,7 @@ public class ProposalHelper {
 		});
 		return res;
 	}
-
+	
 	public static TreeSet<Tuple<Episode, Double>> createEpisodesSortedSet() {
 		final TreeSet<Tuple<Episode, Double>> res = Sets.newTreeSet(new Comparator<Tuple<Episode, Double>>() {
 			@Override
@@ -37,9 +37,14 @@ public class ProposalHelper {
 					int frequencyOrdering = Integer.compare(o2.getFirst().getFrequency(), o1.getFirst().getFrequency());
 					boolean areFrequenciesEqual = frequencyOrdering == 0;
 					if (areFrequenciesEqual) {
-						int numberOfEventsOrdering = Integer.compare(o2.getFirst().getNumEvents(),
-								o1.getFirst().getNumEvents());
-						return numberOfEventsOrdering;
+						int numberOfEventsOrdering = Integer.compare(o2.getFirst().getNumEvents(), o1.getFirst().getNumEvents());
+						boolean areNumberOfEventsEqual = numberOfEventsOrdering == 0;
+						if (areNumberOfEventsEqual) {
+							int eventsOrdering = o1.getFirst().getFacts().toString().compareTo(o2.getFirst().getFacts().toString());
+							return eventsOrdering;
+						} else {
+							return numberOfEventsOrdering;
+						}
 					} else {
 						return frequencyOrdering;
 					}

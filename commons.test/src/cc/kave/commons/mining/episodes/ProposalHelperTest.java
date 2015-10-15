@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.mining.episodes.ProposalHelper;
 import cc.kave.commons.model.episodes.Episode;
 import cc.recommenders.datastructures.Tuple;
 
@@ -115,6 +116,19 @@ public class ProposalHelperTest {
 		expecteds.add(Tuple.newTuple(episode2, 0.9));
 		expecteds.add(Tuple.newTuple(episode1, 0.9));
 
+		assertSets();
+	}
+	
+	@Test 
+	public void eventSorting() {
+		actuals.add(Tuple.newTuple(episode7, 0.9));
+		actuals.add(Tuple.newTuple(episode5, 0.9));
+		actuals.add(Tuple.newTuple(episode6, 0.9));
+		
+		expecteds.add(Tuple.newTuple(episode5, 0.9));
+		expecteds.add(Tuple.newTuple(episode6, 0.9));
+		expecteds.add(Tuple.newTuple(episode7, 0.9));
+		
 		assertSets();
 	}
 

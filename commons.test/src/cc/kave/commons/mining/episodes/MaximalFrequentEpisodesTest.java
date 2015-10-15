@@ -43,35 +43,12 @@ public class MaximalFrequentEpisodesTest {
 	public void setup() {
 		sut = new MaximalFrequentEpisodes();
 
-		episode1 = new Episode();
-		episode1.addFact("1");
-		episode1.setNumEvents(1);
-		episode1.setFrequency(3);
-
-		episode2 = new Episode();
-		episode2.addFact("2");
-		episode2.setNumEvents(1);
-		episode2.setFrequency(3);
-
-		episode3 = new Episode();
-		episode3.addFact("3");
-		episode3.setNumEvents(1);
-		episode3.setFrequency(3);
-
-		episode4 = new Episode();
-		episode4.addFacts("1", "2", "1>2");
-		episode4.setNumEvents(2);
-		episode4.setFrequency(3);
-
-		episode5 = new Episode();
-		episode5.addFacts("1", "3", "1>3");
-		episode5.setNumEvents(2);
-		episode5.setFrequency(4);
-		
-		episode6 = new Episode();
-		episode6.addFacts("2", "3", "2>3");
-		episode6.setNumEvents(2);
-		episode6.setFrequency(2);
+		episode1 = newEpisode(3, 1, "1");
+		episode2 = newEpisode(3, 1, "2");
+		episode3 = newEpisode(3, 1, "3");
+		episode4 = newEpisode(3, 2, "1", "2", "1>2");
+		episode5 = newEpisode(4, 2, "1", "3", "1>3");
+		episode6 = newEpisode(2, 2, "2", "3", "2>3");
 	}
 	
 	@Test(expected=Exception.class)
@@ -239,5 +216,13 @@ public class MaximalFrequentEpisodesTest {
 		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
 
 		assertEquals(expected, actuals);
+	}
+	
+	private Episode newEpisode(int frequency, int numberOfEvents, String... facts) {
+		Episode episode = new Episode();
+		episode.addFacts(facts);
+		episode.setFrequency(frequency);
+		episode.setNumEvents(numberOfEvents);
+		return episode;
 	}
 }
