@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.recommenders.mining.episodes;
+package cc.kave.commons.mining.episodes;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
 import cc.kave.commons.model.episodes.Episode;
 
 public class MaximalFrequentEpisodesTest {
@@ -77,6 +78,62 @@ public class MaximalFrequentEpisodesTest {
 	public void cannotBeUsedWithEmptyEpisodeLists() throws Exception {
 		Map<Integer, List<Episode>> emptyEpisodeLists = new HashMap<Integer, List<Episode>>();
 		sut.getMaximalFrequentEpisodes(emptyEpisodeLists);
+	}
+	
+	@Test
+	public void oneLevelNodeEpisodes() throws Exception {
+		Map<Integer, List<Episode>> initialEpisodes = new HashMap<Integer, List<Episode>>();
+		List<Episode> episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode4);
+		episodeList.add(episode5);
+		episodeList.add(episode6);
+		
+		initialEpisodes.put(2, episodeList);
+		
+		Map<Integer, List<Episode>> expecteds = new HashMap<Integer, List<Episode>>();
+		episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode4);
+		episodeList.add(episode5);
+		episodeList.add(episode6);
+		
+		expecteds.put(2, episodeList);
+		
+		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		
+		assertEquals(expecteds, actuals);
+	}
+	
+	@Test
+	public void reduceOneNodeLevelEpisode() throws Exception {
+		Map<Integer, List<Episode>> initialEpisodes = new HashMap<Integer, List<Episode>>();
+		List<Episode> episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode1);
+		episodeList.add(episode2);
+		episodeList.add(episode3);
+		
+		initialEpisodes.put(1, episodeList);
+		
+		episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode4);
+		episodeList.add(episode5);
+		
+		initialEpisodes.put(2, episodeList);
+		
+		Map<Integer, List<Episode>> expecteds = new HashMap<Integer, List<Episode>>();
+		episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode4);
+		episodeList.add(episode5);
+		
+		expecteds.put(2, episodeList);
+		
+		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		
+		assertEquals(expecteds, actuals);
 	}
 
 	@Test

@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.recommenders.mining.episodes;
+package cc.kave.commons.mining.episodes;
 
 import java.util.HashMap;
 import java.util.LinkedList;
