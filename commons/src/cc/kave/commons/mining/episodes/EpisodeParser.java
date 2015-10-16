@@ -10,38 +10,37 @@
  */
 package cc.kave.commons.mining.episodes;
 
-import static cc.recommenders.assertions.Asserts.assertFalse;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.reader.FileReader;
 
 public class EpisodeParser {
 
 	private File rootFolder;
+	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(@Named("episode") File directory) {
+	public EpisodeParser(@Named("episode") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Frequent episode folder does not exist");
 		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
 		this.rootFolder = directory;
+		this.reader = reader;
 	}
 
 	public Map<Integer, List<Episode>> parse() {
 
 		File filePath = getFilePath();
-		List<String> lines = readFile(filePath);
+		List<String> lines = reader.readFile(filePath);
 
 		Map<Integer, List<Episode>> episodeLearned = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
@@ -85,20 +84,6 @@ public class EpisodeParser {
 			}
 		}
 		return episode;
-	}
-
-	private List<String> readFile(File file) {
-		assertTrue(file.exists(), "Episode file does not exist");
-		assertFalse(file.isDirectory(), "Episodes file is not a file, but a directory");
-
-		List<String> lines = new LinkedList<String>();
-
-		try {
-			lines = FileUtils.readLines(file);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return lines;
 	}
 
 	private File getFilePath() {

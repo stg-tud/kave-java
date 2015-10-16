@@ -11,6 +11,10 @@
 package cc.kave.commons.mining.episodes;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +32,7 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.mining.episodes.EpisodeParser;
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.reader.FileReader;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeParserTest {
@@ -37,18 +42,20 @@ public class EpisodeParserTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private FileReader reader;
 	private EpisodeParser sut;
 
 	@Before
 	public void setup() {
-		sut = new EpisodeParser(rootFolder.getRoot());
+		reader = mock(FileReader.class);
+		sut = new EpisodeParser(rootFolder.getRoot(), reader);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder does not exist");
-		sut = new EpisodeParser(new File("does not exist"));
+		sut = new EpisodeParser(new File("does not exist"), reader);
 	}
 
 	@Test
@@ -56,7 +63,7 @@ public class EpisodeParserTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder is not a folder, but a file");
-		sut = new EpisodeParser(file);
+		sut = new EpisodeParser(file, reader);
 	}
 
 	@Test
@@ -86,14 +93,18 @@ public class EpisodeParserTest {
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
-
+		
+		doCallRealMethod().when(reader).readFile(eq(file)); 
+		
 		Map<Integer, List<Episode>> actual = sut.parse();
+		
+		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void emptyNNodeEpisodesTest() throws IOException {
+	public void emptyNodeEpisodesTest() throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("1-NOde Episodes = 6\n");
 		sb.append("1 .	: 3	: 1	:. \n");
@@ -123,7 +134,11 @@ public class EpisodeParserTest {
 
 		expected.put(1, episodeList);
 
+		doCallRealMethod().when(reader).readFile(eq(file)); 
+		
 		Map<Integer, List<Episode>> actual = sut.parse();
+		
+		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
@@ -178,7 +193,11 @@ public class EpisodeParserTest {
 
 		expected.put(2, episodeList);
 
+		doCallRealMethod().when(reader).readFile(eq(file)); 
+		
 		Map<Integer, List<Episode>> actual = sut.parse();
+		
+		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
