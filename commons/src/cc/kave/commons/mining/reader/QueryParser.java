@@ -17,7 +17,7 @@ public class QueryParser {
 	private FileReader reader;
 
 	@Inject
-	public QueryParser(@Named("eventStream") File directory, FileReader reader) {
+	public QueryParser(@Named("events") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Event stream folder does not exist!");
 		assertTrue(directory.isDirectory(), "Event stream folder is not a folder, but a file!");
 		this.rootFolder = directory;

@@ -17,6 +17,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import com.sun.javafx.event.EventHandlerManager;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.FileReader;
@@ -40,11 +41,11 @@ public class Module extends AbstractModule {
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
-		dirs.put("eventStream", eventStreamDir);
+		dirs.put("events", eventStreamDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
-		bind(File.class).annotatedWith(Names.named("eventStream")).toInstance(eventStreamFile);
+		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamFile);
 
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();

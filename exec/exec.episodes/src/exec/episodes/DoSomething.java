@@ -77,7 +77,7 @@ public class DoSomething {
 
 		System.out.printf("found %s events:\n", events.size());
 		int i = 1;
-//		events[4]
+//		events.get(2)
 		for (Event e : events) {
 			System.out.println("--- " + (i++) + " ---------------------");
 			System.out.println(e);
