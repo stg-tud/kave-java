@@ -220,7 +220,7 @@ public class MaximalFrequentEpisodesTest {
 	
 	private Episode newEpisode(int frequency, int numberOfEvents, String... facts) {
 		Episode episode = new Episode();
-		episode.addFacts(facts);
+		episode.addStringsOfFacts(facts);
 		episode.setFrequency(frequency);
 		episode.setNumEvents(numberOfEvents);
 		return episode;

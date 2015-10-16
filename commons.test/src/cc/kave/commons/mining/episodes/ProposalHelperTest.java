@@ -35,32 +35,32 @@ public class ProposalHelperTest {
 		episode1.setFrequency(3);
 
 		episode2 = new Episode();
-		episode2.addFacts("1", "2", "1>2");
+		episode2.addStringsOfFacts("1", "2", "1>2");
 		episode2.setNumEvents(2);
 		episode2.setFrequency(3);
 
 		episode3 = new Episode();
-		episode3.addFacts("1", "3", "1>3");
+		episode3.addStringsOfFacts("1", "3", "1>3");
 		episode3.setNumEvents(2);
 		episode3.setFrequency(4);
 		
 		episode4 = new Episode();
-		episode4.addFacts("2", "3", "2>3");
+		episode4.addStringsOfFacts("2", "3", "2>3");
 		episode4.setNumEvents(2);
 		episode4.setFrequency(2);
 		
 		episode5 = new Episode();
-		episode5.addFacts("1", "2", "3", "1>2");
+		episode5.addStringsOfFacts("1", "2", "3", "1>2");
 		episode5.setNumEvents(3);
 		episode5.setFrequency(3);
 		
 		episode6 = new Episode();
-		episode6.addFacts("1", "2", "4", "2>4");
+		episode6.addStringsOfFacts("1", "2", "4", "2>4");
 		episode6.setNumEvents(3);
 		episode6.setFrequency(3);
 		
 		episode7 = new Episode();
-		episode7.addFacts("1", "3", "4", "1>3");
+		episode7.addStringsOfFacts("1", "3", "4", "1>3");
 		episode7.setNumEvents(3);
 		episode7.setFrequency(3);
 		

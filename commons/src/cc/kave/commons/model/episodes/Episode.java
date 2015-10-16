@@ -58,7 +58,13 @@ public class Episode {
 		facts.add(new Fact(rawFact));
 	}
 
-	public void addFacts(String... rawFacts) {
+	public void addStringsOfFacts(String... rawFacts) {
+		for (String rawFact : rawFacts) {
+			addFact(rawFact);
+		}
+	}
+
+	public void addListOfFacts(List<String> rawFacts) {
 		for (String rawFact : rawFacts) {
 			addFact(rawFact);
 		}

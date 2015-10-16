@@ -50,7 +50,7 @@ public class EpisodeTest {
 
 	@Test
 	public void addMultipleFacts() {
-		sut.addFacts("f", "g");
+		sut.addStringsOfFacts("f", "g");
 		assertEquals(Lists.newArrayList(new Fact("f"), new Fact("g")), sut.getFacts());
 	}
 
@@ -65,10 +65,10 @@ public class EpisodeTest {
 	@Test
 	public void equality_reallyTheSame() {
 		Episode a = new Episode();
-		a.addFacts("1", "2", "3", "1>2", "1>3");
+		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFacts("1", "2", "3", "1>2", "1>3");
+		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
@@ -78,10 +78,10 @@ public class EpisodeTest {
 	@Test
 	public void equality_diffEvents() {
 		Episode a = new Episode();
-		a.addFacts("1", "2", "3", "1>2", "1>3");
+		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFacts("3", "4", "3>4");
+		b.addStringsOfFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
@@ -91,10 +91,10 @@ public class EpisodeTest {
 	@Test
 	public void equality_sameEventsDiffRelations() {
 		Episode a = new Episode();
-		a.addFacts("1", "2", "3", "1>2", "1>3");
+		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
-		b.addFacts("1", "2", "3", "1>2");
+		b.addStringsOfFacts("1", "2", "3", "1>2");
 
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
@@ -103,7 +103,7 @@ public class EpisodeTest {
 	
 	@Test 
 	public void getIndexTest() {
-		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		
 		Fact expected = new Fact("1>2");
 		Fact actual = sut.get(3);
@@ -112,7 +112,7 @@ public class EpisodeTest {
 	
 	@Test 
 	public void containFactTest() {
-		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		
 		boolean actual = sut.containsFact(new Fact("2"));
 		assertTrue(actual);
@@ -120,7 +120,7 @@ public class EpisodeTest {
 	
 	@Test 
 	public void notContainFactTest() {
-		sut.addFacts("1", "2", "3", "1>2", "1>3");
+		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		
 		boolean actual = sut.containsFact(new Fact("4"));
 		assertFalse(actual);

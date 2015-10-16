@@ -185,7 +185,7 @@ public class EpisodeParserTest {
 		episodeList = new LinkedList<Episode>();
 
 		episode = new Episode();
-		episode.addFacts("1", "2", "1>2");
+		episode.addStringsOfFacts("1", "2", "1>2");
 		episode.setNumEvents(2);
 		episode.setFrequency(3);
 

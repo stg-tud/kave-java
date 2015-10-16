@@ -20,7 +20,7 @@ import com.google.inject.name.Names;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.FileReader;
-import cc.kave.commons.mining.reader.QueryReader;
+import cc.kave.commons.mining.reader.QueryParser;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -50,7 +50,7 @@ public class Module extends AbstractModule {
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		File eventStreamRoot = eventStreamFile;
-		bind(QueryReader.class).toInstance(new QueryReader(eventStreamRoot));
+		bind(QueryParser.class).toInstance(new QueryParser(eventStreamRoot, reader));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {
