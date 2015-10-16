@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.commons.mining.episodes;
+package cc.kave.commons.mining.reader;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Episode;
-import cc.kave.commons.reader.FileReader;
 
 public class EpisodeParser {
 

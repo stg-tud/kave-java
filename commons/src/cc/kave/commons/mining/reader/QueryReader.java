@@ -1,4 +1,4 @@
-package cc.kave.commons.mining.episodes;
+package cc.kave.commons.mining.reader;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -10,12 +10,12 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Episode;
 
-public class QueryBuilder {
+public class QueryReader {
 
 	private File rootFolder;
 
 	@Inject
-	public QueryBuilder(@Named("eventStream") File directory) {
+	public QueryReader(@Named("eventStream") File directory) {
 		assertTrue(directory.exists(), "Event stream folder does not exist");
 		assertTrue(directory.isDirectory(), "Event stream folder is not a folder, but a file");
 		this.rootFolder = directory;

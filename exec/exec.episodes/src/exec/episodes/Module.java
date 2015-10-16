@@ -18,9 +18,9 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import cc.kave.commons.mining.episodes.EpisodeParser;
-import cc.kave.commons.mining.episodes.QueryBuilder;
-import cc.kave.commons.reader.FileReader;
+import cc.kave.commons.mining.reader.EpisodeParser;
+import cc.kave.commons.mining.reader.FileReader;
+import cc.kave.commons.mining.reader.QueryReader;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -50,7 +50,7 @@ public class Module extends AbstractModule {
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		File eventStreamRoot = eventStreamFile;
-		bind(QueryBuilder.class).toInstance(new QueryBuilder(eventStreamRoot));
+		bind(QueryReader.class).toInstance(new QueryReader(eventStreamRoot));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

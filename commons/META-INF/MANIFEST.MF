@@ -4,6 +4,7 @@ Bundle-Name: commons
 Bundle-SymbolicName: commons
 Bundle-Version: 1.0.0.qualifier
 Export-Package: cc.kave.commons.mining.episodes,
+ cc.kave.commons.mining.reader,
  cc.kave.commons.model.episodes,
  cc.kave.commons.model.events,
  cc.kave.commons.model.events.completionevents,
@@ -38,7 +39,6 @@ Export-Package: cc.kave.commons.mining.episodes,
  cc.kave.commons.model.ssts.statements,
  cc.kave.commons.model.ssts.visitor,
  cc.kave.commons.model.typeshapes,
- cc.kave.commons.reader,
  cc.kave.commons.utils.json,
  cc.kave.commons.utils.sstprinter,
  cc.kave.commons.utils.zip,

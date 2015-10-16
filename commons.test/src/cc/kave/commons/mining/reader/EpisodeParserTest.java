@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.commons.mining.episodes;
+package cc.kave.commons.mining.reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -30,9 +30,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.commons.mining.episodes.EpisodeParser;
+import cc.kave.commons.mining.reader.EpisodeParser;
+import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.episodes.Episode;
-import cc.kave.commons.reader.FileReader;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeParserTest {

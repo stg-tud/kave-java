@@ -1,4 +1,4 @@
-package cc.kave.commons.reader;
+package cc.kave.commons.mining.reader;
 
 import static cc.recommenders.assertions.Asserts.assertFalse;
 import static cc.recommenders.assertions.Asserts.assertTrue;

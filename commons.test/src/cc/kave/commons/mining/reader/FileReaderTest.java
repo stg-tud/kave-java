@@ -1,4 +1,4 @@
-package cc.kave.commons.reader;
+package cc.kave.commons.mining.reader;
 
 import static org.junit.Assert.*;
 
@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.mining.reader.FileReader;
 import cc.recommenders.exceptions.AssertionException;
 import junit.framework.Assert;
 
