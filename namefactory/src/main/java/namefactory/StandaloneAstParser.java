@@ -33,12 +33,12 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import visitors.InformationVisitor;
-import visitors.MethodVisitor;
+import visitors.MethodDeclarationVisitor;
 
 public class StandaloneAstParser {
 
 	private InformationVisitor visitor = new InformationVisitor();
-	private MethodVisitor methodVisitor = new MethodVisitor();
+	private MethodDeclarationVisitor methodVisitor = new MethodDeclarationVisitor();
 	private CompilationUnit cu;
 
 	public StandaloneAstParser() {

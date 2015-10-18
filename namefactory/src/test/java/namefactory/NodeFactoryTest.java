@@ -32,9 +32,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import visitors.FieldVisitor;
+import visitors.FieldDeclarationVisitor;
 import visitors.ImportVisitor;
-import visitors.MethodVisitor;
+import visitors.MethodDeclarationVisitor;
 import visitors.PackageVisitor;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
@@ -44,8 +44,8 @@ public class NodeFactoryTest {
 
 	private static StandaloneAstParser astCreator;
 	// private static InformationVisitor visitor;
-	private static MethodVisitor methodVisitor;
-	private static FieldVisitor fieldVisitor;
+	private static MethodDeclarationVisitor methodVisitor;
+	private static FieldDeclarationVisitor fieldVisitor;
 	private static ImportVisitor importVisitor;
 	private static PackageVisitor packageVisitor;
 
@@ -56,8 +56,8 @@ public class NodeFactoryTest {
 
 	@Before
 	public void setup() {
-		methodVisitor = new MethodVisitor();
-		fieldVisitor = new FieldVisitor();
+		methodVisitor = new MethodDeclarationVisitor();
+		fieldVisitor = new FieldDeclarationVisitor();
 		importVisitor = new ImportVisitor();
 		packageVisitor = new PackageVisitor();
 
@@ -80,8 +80,8 @@ public class NodeFactoryTest {
 	public void runAllTests() throws IllegalAccessException, InvocationTargetException {
 		setupClass();
 
-		methodVisitor = new MethodVisitor();
-		fieldVisitor = new FieldVisitor();
+		methodVisitor = new MethodDeclarationVisitor();
+		fieldVisitor = new FieldDeclarationVisitor();
 		importVisitor = new ImportVisitor();
 		packageVisitor = new PackageVisitor();
 

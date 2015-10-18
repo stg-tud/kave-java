@@ -16,10 +16,13 @@
 
 package namefactory;
 
+import java.awt.Window.Type;
+
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -29,14 +32,17 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsInterfaceTypeName;
@@ -54,95 +60,73 @@ public class NodeFactory {
 		switch (node.getNodeType()) {
 		case ASTNode.METHOD_DECLARATION:
 			MethodDeclaration methodNode = (MethodDeclaration) node;
-			IMethodBinding method = methodNode.resolveBinding();
-			BindingFactory.modifierHelper(sb, method);
-
-			sb.append("[");
-
-			if (method.isConstructor()) {
-				sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass()))
-						.getIdentifier());
-			} else {
-				sb.append(
-						CsTypeName.newTypeName(BindingFactory.getBindingName(method.getReturnType())).getIdentifier());
-			}
-
-			sb.append("] ");
-			sb.append("[");
-			sb.append(
-					CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass())).getIdentifier());
-			sb.append("].");
-
-			if (method.isConstructor()) {
-				sb.append(".ctor");
-			} else {
-				sb.append(method.getName());
-			}
-
-			sb.append("(");
-
-			ITypeBinding[] parameterTypes = method.getParameterTypes();
-			for (int i = 0; i < parameterTypes.length; i++) {
-				StringBuilder param = new StringBuilder();
-				param.append("[");
-				param.append(BindingFactory.getBindingName(parameterTypes[i]));
-				param.append("] ");
-				param.append(((SingleVariableDeclaration) methodNode.parameters().get(i)).getName().getIdentifier());
-
-				CsParameterName.newParameterName(param.toString());
-				sb.append(param.toString());
-
-				if (i < parameterTypes.length - 1) {
-					sb.append(", ");
-				}
-			}
-			sb.append(")");
+			IMethodBinding methodBinding = methodNode.resolveBinding();
+			methodHelper(sb, methodNode, methodBinding);
 
 			return CsMethodName.newMethodName(sb.toString());
 
-		case ASTNode.FIELD_DECLARATION:
-			FieldDeclaration fieldNode = (FieldDeclaration) node;
+		case ASTNode.METHOD_INVOCATION:
+			MethodInvocation invocation = (MethodInvocation) node;
+			IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
+			// TODO: Useless?
+			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
+			methodHelper(sb, null, methodInvBinding);
+			return null;
 
-			Object field = fieldNode.fragments().get(0);
-			if (field instanceof VariableDeclarationFragment) {
-				BindingFactory.modifierHelper(sb, ((VariableDeclarationFragment) field).resolveBinding());
-				sb.append("[");
-				sb.append(BindingFactory
-						.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
-				sb.append("] ");
-				sb.append("[ ].");
-				sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
+		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+			node = node.getParent();
+
+			switch (node.getNodeType()) {
+			
+			case ASTNode.FIELD_DECLARATION:
+				FieldDeclaration fieldNode = (FieldDeclaration) node;
+
+				Object field = fieldNode.fragments().get(0);
+				if (field instanceof VariableDeclarationFragment) {
+					BindingFactory.modifierHelper(sb, ((VariableDeclarationFragment) field).resolveBinding());
+					sb.append("[");
+					sb.append(BindingFactory
+							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
+					sb.append("] ");
+					sb.append("[ ].");
+					sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
+				}
+				return CsFieldName.newFieldName(sb.toString());
+
+			case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+				VariableDeclarationStatement variableStatementNode = (VariableDeclarationStatement) node;
+
+				Object variableStatement = variableStatementNode.fragments().get(0);
+				if (variableStatement instanceof VariableDeclarationFragment) {
+					sb.append("[");
+					sb.append(BindingFactory.getBindingName(
+							((VariableDeclarationFragment) variableStatement).resolveBinding().getType()));
+					sb.append("] ");
+					sb.append(((VariableDeclarationFragment) variableStatement).getName().getIdentifier());
+					return CsLocalVariableName.newLocalVariableName(sb.toString());
+				}
+
+				return CsLocalVariableName.newLocalVariableName("");
+
+			case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+				VariableDeclarationStatement variableExpressionNode = (VariableDeclarationStatement) node;
+
+				Object variableExpression = variableExpressionNode.fragments().get(0);
+				if (variableExpression instanceof VariableDeclarationFragment) {
+					sb.append("[");
+					sb.append(BindingFactory.getBindingName(
+							((VariableDeclarationFragment) variableExpression).resolveBinding().getType()));
+					sb.append("] ");
+					sb.append(((VariableDeclarationFragment) variableExpression).getName().getIdentifier());
+					return CsLocalVariableName.newLocalVariableName(sb.toString());
+				}
+
+				return CsLocalVariableName.newLocalVariableName("");
 			}
-			return CsFieldName.newFieldName(sb.toString());
 
-		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-			VariableDeclarationStatement variableStatementNode = (VariableDeclarationStatement) node;
-
-			Object variableStatement = variableStatementNode.fragments().get(0);
-			if (variableStatement instanceof VariableDeclarationFragment) {
-				sb.append("[");
-				sb.append(BindingFactory
-						.getBindingName(((VariableDeclarationFragment) variableStatement).resolveBinding().getType()));
-				sb.append("] ");
-				sb.append(((VariableDeclarationFragment) variableStatement).getName().getIdentifier());
-				return CsLocalVariableName.newLocalVariableName(sb.toString());
-			}
-
-			return CsLocalVariableName.newLocalVariableName("");
-
-		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-			VariableDeclarationStatement variableExpressionNode = (VariableDeclarationStatement) node;
-
-			Object variableExpression = variableExpressionNode.fragments().get(0);
-			if (variableExpression instanceof VariableDeclarationFragment) {
-				sb.append("[");
-				sb.append(BindingFactory
-						.getBindingName(((VariableDeclarationFragment) variableExpression).resolveBinding().getType()));
-				sb.append("] ");
-				sb.append(((VariableDeclarationFragment) variableExpression).getName().getIdentifier());
-				return CsLocalVariableName.newLocalVariableName(sb.toString());
-			}
-
+		case ASTNode.SINGLE_VARIABLE_DECLARATION:
+			SingleVariableDeclaration singleVariable = (SingleVariableDeclaration) node;
+			
 			return CsLocalVariableName.newLocalVariableName("");
 
 		case ASTNode.IMPORT_DECLARATION:
@@ -156,30 +140,66 @@ public class NodeFactory {
 		case ASTNode.PACKAGE_DECLARATION:
 			PackageDeclaration packageNode = (PackageDeclaration) node;
 			return CsNamespaceName.newNamespaceName(packageNode.resolveBinding().getName());
+		default:
+			return null;
 		}
-		return null;
 	}
 
-	private void addPrefix(ASTNode node, StringBuilder sb) {
+	private static void methodHelper(StringBuilder sb, MethodDeclaration methodNode, IMethodBinding method) {
+		BindingFactory.modifierHelper(sb, method);
 
+		sb.append("[");
+
+		if (method.isConstructor()) {
+			sb.append(
+					CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass())).getIdentifier());
+		} else {
+			sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getReturnType())).getIdentifier());
+		}
+
+		sb.append("] ");
+		sb.append("[");
+		sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass())).getIdentifier());
+		sb.append("].");
+
+		if (method.isConstructor()) {
+			sb.append(".ctor");
+		} else {
+			sb.append(method.getName());
+		}
+
+		sb.append("(");
+
+		ITypeBinding[] parameterTypes = method.getParameterTypes();
+		for (int i = 0; i < parameterTypes.length; i++) {
+			StringBuilder param = new StringBuilder();
+
+			param.append("[");
+			param.append(BindingFactory.getBindingName(parameterTypes[i]));
+			param.append("] ");
+
+			if (methodNode != null) {
+				param.append(((SingleVariableDeclaration) methodNode.parameters().get(i)).getName().getIdentifier());
+			} else {
+				param.append("?");
+			}
+			String parameterName = CsParameterName.newParameterName(param.toString()).getIdentifier();
+			sb.append(parameterName);
+
+			if (i < parameterTypes.length - 1) {
+				sb.append(", ");
+			}
+		}
+		sb.append(")");
+	}
+
+	// TODO: node.resolveBinding().getType.is(Interface or Enum)
+	private void addPrefix(ASTNode node, StringBuilder sb) {
 		if (node instanceof TypeDeclaration && ((TypeDeclaration) node).isInterface()) {
 			sb.append("i: ");
 		} else if (node instanceof EnumDeclaration) {
 			sb.append("e: ");
 		}
-
-		switch ("node") {
-		case "interface":
-			sb.append("i:");
-			break;
-		case "struct":
-			sb.append("s:");
-			break;
-		case "enum":
-			sb.append("e:");
-			break;
-		}
-
 	}
 
 	public static class BindingFactory {
@@ -220,9 +240,6 @@ public class NodeFactory {
 
 				sb.append(", ");
 
-				// String temp = type.getDeclaringClass().getQualifiedName() +
-				// "."
-				// + type.getName();
 				sb.append(getAssemblyName(qualifiedName));
 
 				return sb.toString();
@@ -264,20 +281,31 @@ public class NodeFactory {
 			return sb;
 		}
 
+		private static boolean isPrimitivType(String name) {
+			String[] primitiveTypes = { "byte", "short", "char", "int", "long", "float", "double", "boolean", "void" };
+			for (String type : primitiveTypes) {
+				if (type.equals(name))
+					return true;
+			}
+			return false;
+		}
+
 		// TODO: Change returntype
 		public static String getAssemblyName(String qualifiedName) {
 			Class<?> c = null;
 
+			if (isPrimitivType(qualifiedName)) {
+				return "rt.jar, " + String.class.getPackage().getImplementationVersion();
+			}
+
 			try {
 				c = Class.forName(qualifiedName);
-				System.out.println(c.getPackage().getImplementationVersion());
-				System.out.println(c.getPackage().getSpecificationVersion());
 			} catch (ClassNotFoundException e) {
 				return "Unknown_Assembly";
 			}
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
-				return "rt.jar";
+				return "rt.jar, " + c.getPackage().getImplementationVersion();
 			}
 
 			String path = c.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -288,11 +316,10 @@ public class NodeFactory {
 				String project = path.substring(0, path.length() - 5);
 				return project.substring(project.lastIndexOf("/") + 1, project.length());
 			}
-			
 
 			// TODO: version has to be implemented
 			CsAssemblyName.newAssemblyName(path);
-			
+
 			return path;
 		}
 	}

@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-public class FieldVisitor extends ASTVisitor{
+public class FieldDeclarationVisitor extends ASTVisitor{
 	
 	private List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 

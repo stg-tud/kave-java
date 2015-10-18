@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
-public class MethodVisitor extends ASTVisitor {
+public class MethodDeclarationVisitor extends ASTVisitor {
 	private List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
 
 	@Override
