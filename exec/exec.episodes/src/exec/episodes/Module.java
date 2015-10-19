@@ -17,9 +17,9 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import com.sun.javafx.event.EventHandlerManager;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
+import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.mining.reader.QueryParser;
 import cc.recommenders.io.Directory;
@@ -36,7 +36,7 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "n-graph-miner/");
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File eventStreamFile = new File(rootFolder + "Episodes/");
+		File eventStreamFile = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
 		Directory eventStreamDir = new Directory(eventStreamFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
@@ -52,6 +52,7 @@ public class Module extends AbstractModule {
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		File eventStreamRoot = eventStreamFile;
 		bind(QueryParser.class).toInstance(new QueryParser(eventStreamRoot, reader));
+		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

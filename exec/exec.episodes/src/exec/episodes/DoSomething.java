@@ -35,7 +35,7 @@ import cc.recommenders.io.ReadingArchive;
 public class DoSomething {
 
 	public void run(String fileEventStream, String fileEventMapping, String dirContexts) throws IOException {
-		readAllContexts(dirContexts);
+//		readAllContexts(dirContexts);
 		readMapping(fileEventMapping);
 	}
 
@@ -77,10 +77,15 @@ public class DoSomething {
 
 		System.out.printf("found %s events:\n", events.size());
 		int i = 1;
-//		events.get(2)
+//		events.indexOf(event)
 		for (Event e : events) {
+			if (i == 4978 || i == 8698 || i == 8708 || i == 8718 || i == 8725) {
+				i++;
+				continue;
+			}
 			System.out.println("--- " + (i++) + " ---------------------");
 			System.out.println(e);
+			System.out.println(e.getMethod().getName());
 		}
 	}
 }
