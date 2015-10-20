@@ -44,7 +44,6 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import visitors.FieldDeclarationVisitor;
 import visitors.ImportVisitor;
 import visitors.MethodDeclarationVisitor;
 import visitors.MethodInvocationVisitor;
@@ -56,7 +55,6 @@ public class PluginAstParser {
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private CompilationUnit parsed;
 	private List<IJavaProject> javaProjects;
-	private FieldDeclarationVisitor fieldVisitor;
 	private VariableDeclarationVisitor variableDeclarationVisitor;
 	private MethodDeclarationVisitor methodDeclarationVisitor;
 	private MethodInvocationVisitor methodInvocationVisitor;
@@ -83,14 +81,12 @@ public class PluginAstParser {
 		ICompilationUnit compilationUnit = getCompilationunit(projectName, qualifiedName);
 		parsed = parse(compilationUnit);
 
-		fieldVisitor = new FieldDeclarationVisitor();
 		variableDeclarationVisitor = new VariableDeclarationVisitor();
 		methodDeclarationVisitor = new MethodDeclarationVisitor();
 		methodInvocationVisitor = new MethodInvocationVisitor();
 		packageVisitor = new PackageVisitor();
 		importVisitor = new ImportVisitor();
 
-		parsed.accept(fieldVisitor);
 		parsed.accept(variableDeclarationVisitor);
 		parsed.accept(methodDeclarationVisitor);
 		parsed.accept(methodInvocationVisitor);
@@ -165,8 +161,8 @@ public class PluginAstParser {
 		return methodInvocationVisitor.getMethod(signature);
 	}
 
-	public FieldDeclaration getField(String name) {
-		return fieldVisitor.getField(name);
+	public ASTNode getField(String name) {
+		return variableDeclarationVisitor.getField(name);
 	}
 	
 	public ASTNode getVariable(String name) {

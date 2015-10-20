@@ -56,7 +56,7 @@ public class VariableDeclarationVisitor extends ASTVisitor {
 
 	public ASTNode getVariable(String name) {
 		for (ASTNode variable : variables) {
-			if (variable instanceof VariableDeclarationFragment) {
+			if (variable instanceof VariableDeclarationFragment && !(variable.getParent() instanceof FieldDeclaration)) {
 				if (name.equals(((VariableDeclarationFragment) variable).getName().getIdentifier())
 						|| name.endsWith(((VariableDeclarationFragment) variable).getName().getIdentifier())) {
 					return variable;
@@ -67,67 +67,17 @@ public class VariableDeclarationVisitor extends ASTVisitor {
 			}
 		}
 		return null;
-
 	}
 
-	// private List<ASTNode> variables = new ArrayList<ASTNode>();
-	//
-	// @Override
-	// public boolean visit(VariableDeclarationStatement node) {
-	// variables.add(node);
-	// return super.visit(node);
-	// }
-	//
-	// @Override
-	// public boolean visit(VariableDeclarationExpression node) {
-	// variables.add(node);
-	// return super.visit(node);
-	// }
-	//
-	// @Override
-	// public boolean visit(SingleVariableDeclaration node) {
-	// variables.add(node);
-	// return super.visit(node);
-	// }
-	//
-	// /**
-	// *
-	// * @return A list of VariableDeclarationStatement,
-	// * VariableDeclarationExpression and SingleVariableDeclaration
-	// * nodes.
-	// */
-	// public List<ASTNode> getVariables() {
-	// return variables;
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// public ASTNode getVariable(String name) {
-	// for (ASTNode variable : variables) {
-	// if (variable instanceof VariableDeclarationStatement) {
-	// List<VariableDeclarationFragment> fragments =
-	// ((VariableDeclarationStatement) variable).fragments();
-	// return findVariable(name, fragments);
-	// } else if (variable instanceof VariableDeclarationExpression) {
-	// List<VariableDeclarationFragment> fragments =
-	// ((VariableDeclarationExpression) variable).fragments();
-	// return findVariable(name, fragments);
-	// } else if (variable instanceof SingleVariableDeclaration) {
-	// if(((SingleVariableDeclaration)
-	// variable).getName().getIdentifier().equals(name))
-	// return variable;
-	// }
-	// }
-	// return null;
-	// }
-	//
-	// private ASTNode findVariable(String name,
-	// List<VariableDeclarationFragment> fragments) {
-	// for (VariableDeclarationFragment v : fragments) {
-	// if (name.equals(v.getName().getIdentifier()) ||
-	// name.endsWith(v.getName().getIdentifier())) {
-	// return v;
-	// }
-	// }
-	// return null;
-	// }
+	public ASTNode getField(String name) {
+		for (ASTNode variable : variables) {
+			if (variable instanceof VariableDeclarationFragment && variable.getParent() instanceof FieldDeclaration) {
+				if (name.equals(((VariableDeclarationFragment) variable).getName().getIdentifier())
+						|| name.endsWith(((VariableDeclarationFragment) variable).getName().getIdentifier())) {
+					return variable;
+				}
+			}
+		}
+		return null;
+	}
 }
