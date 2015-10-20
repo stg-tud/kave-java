@@ -17,23 +17,20 @@
 package namefactory;
 
 
-import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
@@ -48,7 +45,7 @@ import cc.kave.commons.model.names.csharp.CsTypeName;
 
 public class NodeFactory {
 
-	public static Name getNodeName(ASTNode node) {
+	public static Name createNodeName(ASTNode node) {
 		StringBuilder sb = new StringBuilder();
 
 		switch (node.getNodeType()) {
@@ -63,8 +60,16 @@ public class NodeFactory {
 			MethodInvocation invocation = (MethodInvocation) node;
 			IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
 			// TODO: Useless?
-			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
+//			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
 			methodHelper(sb, null, methodInvBinding);
+			return null;
+			
+		case ASTNode.SUPER_METHOD_INVOCATION:
+			SuperMethodInvocation superInvocation = (SuperMethodInvocation) node;
+			IMethodBinding superMethodInvBinding = superInvocation.resolveMethodBinding();
+			// TODO: Useless?
+//			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
+			methodHelper(sb, null, superMethodInvBinding);
 			return null;
 
 		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
@@ -74,7 +79,6 @@ public class NodeFactory {
 
 			case ASTNode.FIELD_DECLARATION:
 				FieldDeclaration fieldNode = (FieldDeclaration) node;
-				// ((CompilationUnit) node.getRoot()).;
 
 				Object field = fieldNode.fragments().get(0);
 				if (field instanceof VariableDeclarationFragment) {
@@ -82,8 +86,10 @@ public class NodeFactory {
 					sb.append("[");
 					sb.append(BindingFactory
 							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
-					sb.append("] ");
-					sb.append("[ ].");
+					sb.append("] [");
+					sb.append(BindingFactory
+							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getDeclaringClass()));
+					sb.append("].");
 					sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
 					return CsFieldName.newFieldName(sb.toString());
 				}
@@ -105,7 +111,7 @@ public class NodeFactory {
 				return null;
 
 			case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-				VariableDeclarationStatement variableExpressionNode = (VariableDeclarationStatement) node;
+				VariableDeclarationExpression variableExpressionNode = (VariableDeclarationExpression) node;
 
 				Object variableExpression = variableExpressionNode.fragments().get(0);
 				if (variableExpression instanceof VariableDeclarationFragment) {
@@ -210,7 +216,6 @@ public class NodeFactory {
 
 			// IPackageBinding
 			case 1:
-				((IPackageBinding) binding).getName();
 				break;
 			// ITypeBinding
 			case 2:
@@ -241,24 +246,20 @@ public class NodeFactory {
 				sb.append(", ");
 
 				sb.append(getAssemblyName(qualifiedName));
-
+				
 				return sb.toString();
 
 			// IVariableBinding
 			case 3:
-				((IVariableBinding) binding).getType().getQualifiedName();
 				break;
 			// IMethodBinding
 			case 4:
-				((IMethodBinding) binding).getName();
 				break;
 			// IAnnotationBinding
 			case 5:
-				((IAnnotationBinding) binding).getAnnotationType().getQualifiedName();
 				break;
 			// IMemberValuePair
 			case 6:
-				((IMemberValuePair) binding).getMemberName();
 				break;
 			default:
 				return null;
@@ -293,7 +294,7 @@ public class NodeFactory {
 		private static void addPrefix(ITypeBinding type, StringBuilder sb) {
 			if (type.isInterface()) {
 				sb.append("i: ");
-			} else if (type.isInterface()) {
+			} else if (type.isEnum()) {
 				sb.append("e: ");
 			}
 		}

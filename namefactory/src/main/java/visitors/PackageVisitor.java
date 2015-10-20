@@ -19,6 +19,8 @@ package visitors;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 
+import namefactory.NodeFactory;
+
 public class PackageVisitor extends ASTVisitor {
 
 	private PackageDeclaration packageName;
@@ -26,6 +28,7 @@ public class PackageVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(PackageDeclaration node) {
 		packageName = node;
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 

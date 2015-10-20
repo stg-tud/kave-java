@@ -23,10 +23,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+
+import namefactory.NodeFactory;
 
 public class VariableDeclarationVisitor extends ASTVisitor {
 
@@ -35,12 +34,14 @@ public class VariableDeclarationVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
 		variables.add(node);
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
 		variables.add(node);
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 

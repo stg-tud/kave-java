@@ -22,25 +22,36 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+
+import namefactory.NodeFactory;
 
 public class MethodInvocationVisitor extends ASTVisitor {
-	private List<MethodInvocation> methods = new ArrayList<MethodInvocation>();
+	private List<Expression> methods = new ArrayList<Expression>();
 
 	@Override
 	public boolean visit(MethodInvocation node) {
 		methods.add(node);
+		NodeFactory.createNodeName(node);
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(SuperMethodInvocation node) {
+		methods.add(node);
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 
-	public List<MethodInvocation> getMethods() {
+	public List<Expression> getMethods() {
 		return methods;
 	}
 
-	public MethodInvocation getMethod(String signature) {
-		for (MethodInvocation m : methods) {
-			if (!signature.endsWith(")") && m.getName().getIdentifier().equals(signature)) {
+	public Expression getMethod(String signature) {
+		for (Expression m : methods) {
+			if (!signature.endsWith(")") && ((MethodInvocation) m).getName().getIdentifier().equals(signature)) {
 				return m;
-			} else if (getMethodSignature(m).equals(signature)) {
+			} else if (getMethodSignature((MethodInvocation) m).equals(signature)) {
 				return m;
 			}
 		}

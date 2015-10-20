@@ -23,12 +23,15 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
+import namefactory.NodeFactory;
+
 public class MethodDeclarationVisitor extends ASTVisitor {
 	private List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		methods.add(node);
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 

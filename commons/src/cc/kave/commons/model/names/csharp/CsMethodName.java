@@ -19,8 +19,6 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	private static final Pattern signatureSyntax = Pattern
 			.compile(".*\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\)).*");
 
-	// "\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$"
-
 	public static MethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new CsMethodName(identifier));
@@ -61,7 +59,6 @@ public class CsMethodName extends CsMemberName implements MethodName {
 		return getValueType();
 	}
 
-	// TODO:
 	public String getFullName() {
 		Matcher matcher = signatureSyntax.matcher(identifier);
 		if (!matcher.matches()) {

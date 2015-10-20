@@ -22,6 +22,8 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 
+import namefactory.NodeFactory;
+
 public class ImportVisitor extends ASTVisitor {
 	
 	private List<ImportDeclaration> imports = new ArrayList<ImportDeclaration>();
@@ -29,6 +31,7 @@ public class ImportVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ImportDeclaration node) {
 		imports.add(node);
+		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
 
