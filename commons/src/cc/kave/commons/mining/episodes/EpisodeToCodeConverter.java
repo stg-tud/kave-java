@@ -13,24 +13,26 @@ public class EpisodeToCodeConverter {
 		if (!episode.getPartialOrderList().isEmpty()) {
 			for (String eventID : episode.getPartialOrderList()) {
 				try {
-					codeRepresentation += mappingList.get(Integer.getInteger(eventID)).getMethod().getName();
+					codeRepresentation += mappingList.get(Integer.getInteger(eventID)).getMethod().getName() + "\n";
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
+		codeRepresentation += "\n";
 		if (!episode.getSequentialOrderList().isEmpty()) {
-			for (String eventIDs : episode.getSequentialOrderList()) {
-				if (eventIDs.length() == 1) {
+			for (String partialEventIDs : episode.getSequentialOrderList()) {
+				String[] eventIds = partialEventIDs.split(" ");
+				if (eventIds.length == 1) {
 					try {
-						codeRepresentation += mappingList.get(Integer.getInteger(eventIDs)).getMethod().getName();
+						codeRepresentation += mappingList.get(Integer.getInteger(eventIds[0])).getMethod().getName();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				} else {
-					for (int i = 0; i < eventIDs.length(); i++) {
-						char id = eventIDs.charAt(i);
-					}
+					// for (int i = 0; i < eventIDs.length(); i++) {
+					// char id = eventIDs.charAt(i);
+					// }
 				}
 			}
 		}
