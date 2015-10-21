@@ -37,9 +37,9 @@ public class OrderedEventsInEpisode {
 	public void addPartialEventsIDInSequentialOrderList(String... events) {
 		String partialEvents = "";
 		for (String event : events) {
-			partialEvents += event;
+			partialEvents += event + " ";
 		}
-		this.sequentialOrderList.add(partialEvents);
+		this.sequentialOrderList.add(partialEvents.substring(0, partialEvents.length() - 1));
 	}
 
 	public boolean eventInSequentialOrderList(String event) {

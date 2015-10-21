@@ -27,8 +27,8 @@ public class OrderedEventsInEpisodeTest {
 	public void valuesCanBeSet() {	
 		sut.setPartialOrderList(Lists.newArrayList("a"));;
 		assertEquals(Lists.newArrayList("a"), sut.getPartialOrderList());
-		sut.setSequentialOrderList(Lists.newArrayList("bc"));
-		assertEquals(Lists.newArrayList("bc"), sut.getSequentialOrderList());
+		sut.setSequentialOrderList(Lists.newArrayList("b c"));
+		assertEquals(Lists.newArrayList("b c"), sut.getSequentialOrderList());
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ public class OrderedEventsInEpisodeTest {
 	@Test
 	public void addPartialEventsInSequentialList() {
 		sut.addPartialEventsIDInSequentialOrderList("a", "b", "c");
-		assertEquals(Lists.newArrayList("abc"), sut.getSequentialOrderList());
+		assertEquals(Lists.newArrayList("a b c"), sut.getSequentialOrderList());
 	}
 	
 	@Test

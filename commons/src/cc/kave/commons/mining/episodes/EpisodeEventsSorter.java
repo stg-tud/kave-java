@@ -26,10 +26,10 @@ public class EpisodeEventsSorter {
 					String eventsRow = "";
 					for (Map.Entry<String, Integer> entry : countSuccessorsPerEvent.entrySet()) {
 						if (entry.getValue() == counter) {
-							eventsRow += entry.getKey();
+							eventsRow += entry.getKey() + " ";
 						}
 					}
-					orderedEvents.addEventIDInSequentialOrderList(eventsRow);
+					orderedEvents.addEventIDInSequentialOrderList(eventsRow.substring(0, eventsRow.length() - 1));
 				}
 			}
 		}
