@@ -16,7 +16,6 @@
 
 package namefactory;
 
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -59,18 +58,14 @@ public class NodeFactory {
 		case ASTNode.METHOD_INVOCATION:
 			MethodInvocation invocation = (MethodInvocation) node;
 			IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
-			// TODO: Useless?
-//			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
 			methodHelper(sb, null, methodInvBinding);
-			return null;
-			
+			return CsMethodName.newMethodName(sb.toString());
+
 		case ASTNode.SUPER_METHOD_INVOCATION:
 			SuperMethodInvocation superInvocation = (SuperMethodInvocation) node;
 			IMethodBinding superMethodInvBinding = superInvocation.resolveMethodBinding();
-			// TODO: Useless?
-//			ITypeBinding resolveTypeBinding = ((Expression) invocation.arguments().get(0)).resolveTypeBinding();
 			methodHelper(sb, null, superMethodInvBinding);
-			return null;
+			return CsMethodName.newMethodName(sb.toString());
 
 		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
 			node = node.getParent();
@@ -87,8 +82,8 @@ public class NodeFactory {
 					sb.append(BindingFactory
 							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
 					sb.append("] [");
-					sb.append(BindingFactory
-							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getDeclaringClass()));
+					sb.append(BindingFactory.getBindingName(
+							((VariableDeclarationFragment) field).resolveBinding().getDeclaringClass()));
 					sb.append("].");
 					sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
 					return CsFieldName.newFieldName(sb.toString());
@@ -204,8 +199,6 @@ public class NodeFactory {
 		}
 		sb.append(")");
 	}
-	
-			
 
 	public static class BindingFactory {
 
@@ -246,7 +239,7 @@ public class NodeFactory {
 				sb.append(", ");
 
 				sb.append(getAssemblyName(qualifiedName));
-				
+
 				return sb.toString();
 
 			// IVariableBinding
@@ -290,7 +283,7 @@ public class NodeFactory {
 			}
 			return false;
 		}
-		
+
 		private static void addPrefix(ITypeBinding type, StringBuilder sb) {
 			if (type.isInterface()) {
 				sb.append("i: ");
@@ -298,7 +291,7 @@ public class NodeFactory {
 				sb.append("e: ");
 			}
 		}
-		
+
 		// TODO: Change returntype
 		public static String getAssemblyName(String qualifiedName) {
 			Class<?> c = null;

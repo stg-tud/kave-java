@@ -35,7 +35,7 @@ public class MethodInvocationVisitor extends ASTVisitor {
 		NodeFactory.createNodeName(node);
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(SuperMethodInvocation node) {
 		methods.add(node);
@@ -49,25 +49,45 @@ public class MethodInvocationVisitor extends ASTVisitor {
 
 	public Expression getMethod(String signature) {
 		for (Expression m : methods) {
-			if (!signature.endsWith(")") && ((MethodInvocation) m).getName().getIdentifier().equals(signature)) {
-				return m;
-			} else if (getMethodSignature((MethodInvocation) m).equals(signature)) {
-				return m;
+			if (m instanceof MethodInvocation) {
+				if (!signature.endsWith(")") && ((MethodInvocation) m).getName().getIdentifier().equals(signature)) {
+					return m;
+				} else if (getMethodSignature((MethodInvocation) m).equals(signature)) {
+					return m;
+				}
+			} else if (m instanceof SuperMethodInvocation) {
+				String identifier = ((SuperMethodInvocation) m).getName().getIdentifier();
+				if (!signature.endsWith(")")
+						&& ((SuperMethodInvocation) m).getName().getIdentifier().equals(signature)) {
+					return m;
+				} else if (getMethodSignature((SuperMethodInvocation) m).equals(signature)) {
+					return m;
+				}
 			}
 		}
 		return null;
 	}
 
-	private String getMethodSignature(MethodInvocation invocation) {
+	@SuppressWarnings("unchecked")
+	private String getMethodSignature(Expression invocation) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(invocation.getName().getIdentifier());
+
+		List<Expression> arguments = new ArrayList<Expression>();
+
+		if (invocation instanceof MethodInvocation) {
+			sb.append(((MethodInvocation) invocation).getName().getIdentifier());
+			arguments = ((MethodInvocation) invocation).arguments();
+		} else if (invocation instanceof SuperMethodInvocation) {
+			sb.append(((SuperMethodInvocation) invocation).getName().getIdentifier());
+			arguments = ((SuperMethodInvocation) invocation).arguments();
+		}
 		sb.append("(");
 
-		for (Object variable : invocation.arguments()) {
-			
+		for (Object variable : arguments) {
+
 			Expression v = (Expression) variable;
 			v.resolveTypeBinding().getName();
-			
+
 			sb.append(v.resolveTypeBinding().getName());
 			sb.append(" ?, ");
 		}
