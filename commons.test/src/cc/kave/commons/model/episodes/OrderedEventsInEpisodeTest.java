@@ -1,7 +1,6 @@
 package cc.kave.commons.model.episodes;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +47,12 @@ public class OrderedEventsInEpisodeTest {
 	public void eventContainedInSequentialList() {
 		sut.addEventIDInSequentialOrderList("a");
 		assertTrue(sut.eventInSequentialOrderList("a"));
+	}
+	
+	@Test
+	public void eventNotContainedInSequentialList() {
+		sut.addEventIDInSequentialOrderList("a");
+		assertFalse(sut.eventInSequentialOrderList("b"));
 	}
 	
 	@Test
