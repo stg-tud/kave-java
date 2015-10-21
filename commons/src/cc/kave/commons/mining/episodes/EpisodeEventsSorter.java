@@ -35,8 +35,8 @@ public class EpisodeEventsSorter {
 		}
 		if (numberOfSequentialEvents < episode.getNumEvents()) {
 			for (Fact fact : episode.getFacts()) {
-				if (!countSuccessorsPerEvent.containsKey(fact.getRawFact()) && (fact.getRawFact().length() > 1)) {
-					orderedEvents.addPartialEventsIDInSequentialOrderList(fact.getRawFact());
+				if (!countSuccessorsPerEvent.containsKey(fact.getRawFact()) && (fact.getRawFact().length() == 1)) {
+					orderedEvents.addEventIDInPartialOrderList(fact.getRawFact());
 				}
 			}
 		}
