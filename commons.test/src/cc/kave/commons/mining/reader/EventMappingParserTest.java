@@ -86,7 +86,7 @@ public class EventMappingParserTest {
 //		Type writeType = JsonUtils.toJson(content, file);
 //			FileUtils.writeStringToFile(file, content, true);
 		
-		doCallRealMethod().when(json).toJson(expected);
+		doCallRealMethod().when(json).toJson(expected, listType);
 		
 		String jsonWrite = json.toJson(expected);
 		FileUtils.writeStringToFile(file, jsonWrite);

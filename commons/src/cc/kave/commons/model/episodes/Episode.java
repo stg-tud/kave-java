@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 public class Episode {
 
 	private int frequency;
-	private int numEvents;
+	private int numberOfEvents;
 	private List<Fact> facts = Lists.newLinkedList();
 
 	public Iterable<Fact> getFacts() {
@@ -39,7 +39,7 @@ public class Episode {
 	}
 
 	public int getNumEvents() {
-		return numEvents;
+		return numberOfEvents;
 	}
 
 	public int getFrequency() {
@@ -47,7 +47,7 @@ public class Episode {
 	}
 
 	public void setNumEvents(int numEvents) {
-		this.numEvents = numEvents;
+		this.numberOfEvents = numEvents;
 	}
 
 	public void setFrequency(int frequency) {
