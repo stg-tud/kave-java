@@ -10,4 +10,6 @@ Require-Bundle: commons,
  com.google.guava,
  org.junit,
  org.mockito,
- com.google.inject
+ com.google.inject,
+ jgraph,
+ net.sf.jgrapht

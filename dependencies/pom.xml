@@ -60,6 +60,9 @@
 								<artifact>
 									<id>org.jgrapht:jgrapht-core:0.9.1</id>
 								</artifact>
+								<artifact>
+									<id>net.sf.jgrapht:jgrapht:0.8.3</id>
+								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>
