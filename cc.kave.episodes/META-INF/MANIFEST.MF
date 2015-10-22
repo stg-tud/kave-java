@@ -9,5 +9,4 @@ Require-Bundle: commons,
  org.apache.commons.io,
  com.google.inject,
  org.jgrapht.core
-Export-Package: cc.recommenders.mining.episodes
 Import-Package: org.apache.commons.math.util

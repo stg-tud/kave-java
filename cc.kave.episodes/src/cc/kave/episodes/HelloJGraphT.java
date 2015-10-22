@@ -19,7 +19,7 @@
  * (b) the terms of the Eclipse Public License v1.0 as published by
  * the Eclipse Foundation.
  */
-package cc.recommenders.mining.episodes;
+package cc.kave.episodes;
 
 import java.net.*;
 
