@@ -15,4 +15,6 @@ Require-Bundle: commons,
  org.apache.commons.lang3,
  org.jgrapht.core
 Import-Package: com.google.inject;version="1.3.0",
- com.google.inject.name
+ com.google.inject.name,
+ org.jgrapht;version="0.9.1",
+ org.jgrapht.graph
