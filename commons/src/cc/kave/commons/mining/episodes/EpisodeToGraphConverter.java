@@ -1,6 +1,7 @@
 package cc.kave.commons.mining.episodes;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -11,6 +12,7 @@ public class EpisodeToGraphConverter {
 
 	public DirectedGraph<Fact, DefaultEdge> convert(Episode episode) {
 		DirectedGraph<Fact, DefaultEdge> graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
+		VertexNameProvider<Fact> vertex;
 
 		for (Fact fact : episode.getFacts()) {
 			if (fact.getRawFact().length() == 1) {
