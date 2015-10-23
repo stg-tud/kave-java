@@ -23,14 +23,30 @@ import cc.recommenders.assertions.Asserts;
 public class Fact {
 
 	private String rawFact = "";
+	private boolean relationshipFact;
 
 	public Fact(String rawFact) {
 		Asserts.assertNotNull(rawFact);
 		this.rawFact = rawFact;
+		this.relationshipFact = false;
+	}
+
+	public Fact(String rawFact, boolean isRelationshipFact) {
+		Asserts.assertNotNull(rawFact);
+		this.rawFact = rawFact;
+		this.relationshipFact = isRelationshipFact;
 	}
 
 	public Fact() {
 		rawFact = null;
+	}
+
+	public boolean isRelationship() {
+		return relationshipFact;
+	}
+
+	public void setRelationshipFact(boolean isRelationshipFact) {
+		relationshipFact = isRelationshipFact;
 	}
 
 	public void setFact(String rawFact) {
