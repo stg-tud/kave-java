@@ -52,11 +52,10 @@ public class MethodInvocationVisitor extends ASTVisitor {
 			if (m instanceof MethodInvocation) {
 				if (!signature.endsWith(")") && ((MethodInvocation) m).getName().getIdentifier().equals(signature)) {
 					return m;
-				} else if (getMethodSignature((MethodInvocation) m).equals(signature)) {
+				} else if (getMethodSignature(m).equals(signature)) {
 					return m;
 				}
 			} else if (m instanceof SuperMethodInvocation) {
-				String identifier = ((SuperMethodInvocation) m).getName().getIdentifier();
 				if (!signature.endsWith(")")
 						&& ((SuperMethodInvocation) m).getName().getIdentifier().equals(signature)) {
 					return m;

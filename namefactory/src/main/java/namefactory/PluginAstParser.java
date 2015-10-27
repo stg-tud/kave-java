@@ -35,11 +35,13 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.QualifiedName;
 
 import visitors.ImportVisitor;
 import visitors.MethodDeclarationVisitor;
 import visitors.MethodInvocationVisitor;
 import visitors.PackageVisitor;
+import visitors.QualifiedNameVisitor;
 import visitors.VariableDeclarationVisitor;
 
 public class PluginAstParser {
@@ -52,6 +54,7 @@ public class PluginAstParser {
 	private MethodInvocationVisitor methodInvocationVisitor;
 	private PackageVisitor packageVisitor;
 	private ImportVisitor importVisitor;
+	private QualifiedNameVisitor qualifiedNameVisitor;
 
 	/**
 	 * Creates an AST and passes some visitors for retrieving some AST data.
@@ -78,12 +81,14 @@ public class PluginAstParser {
 		methodInvocationVisitor = new MethodInvocationVisitor();
 		packageVisitor = new PackageVisitor();
 		importVisitor = new ImportVisitor();
+		qualifiedNameVisitor = new QualifiedNameVisitor();
 
 		parsed.accept(variableDeclarationVisitor);
 		parsed.accept(methodDeclarationVisitor);
 		parsed.accept(methodInvocationVisitor);
 		parsed.accept(packageVisitor);
 		parsed.accept(importVisitor);
+		parsed.accept(qualifiedNameVisitor);
 	}
 
 	/**
@@ -125,7 +130,7 @@ public class PluginAstParser {
 
 	private ICompilationUnit getCompilationunit(String project, String qualifiedName) {
 		String[] split = qualifiedName.split(";");
-		
+
 		for (IJavaProject iJavaProject : javaProjects) {
 			if (iJavaProject.getElementName().equals(project)) {
 				try {
@@ -143,12 +148,12 @@ public class PluginAstParser {
 	 * @param signature
 	 *            Expects a method signature or only the name of the method but
 	 *            returns only the first match.
-	 * @return	The method with a matching signature.
+	 * @return The method with a matching signature.
 	 */
 	public MethodDeclaration getMethod(String signature) {
 		return methodDeclarationVisitor.getMethod(signature);
 	}
-	
+
 	public Expression getMethodInvocation(String signature) {
 		return methodInvocationVisitor.getMethod(signature);
 	}
@@ -156,16 +161,20 @@ public class PluginAstParser {
 	public ASTNode getField(String name) {
 		return variableDeclarationVisitor.getField(name);
 	}
-	
+
 	public ASTNode getVariable(String name) {
 		return variableDeclarationVisitor.getVariable(name);
 	}
-	
+
 	public PackageDeclaration getPackage() {
 		return packageVisitor.getPackage();
 	}
 
 	public ImportDeclaration getImport(String name) {
 		return importVisitor.getImport(name);
+	}
+
+	public QualifiedName getName(String name) {
+		return qualifiedNameVisitor.getName(name);
 	}
 }

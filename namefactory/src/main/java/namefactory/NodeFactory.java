@@ -16,8 +16,13 @@
 
 package namefactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -26,6 +31,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -51,20 +57,20 @@ public class NodeFactory {
 		case ASTNode.METHOD_DECLARATION:
 			MethodDeclaration methodNode = (MethodDeclaration) node;
 			IMethodBinding methodBinding = methodNode.resolveBinding();
-			methodHelper(sb, methodNode, methodBinding);
+			sb.append(methodHelper(methodNode, methodBinding, true));
 
 			return CsMethodName.newMethodName(sb.toString());
 
 		case ASTNode.METHOD_INVOCATION:
 			MethodInvocation invocation = (MethodInvocation) node;
 			IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
-			methodHelper(sb, null, methodInvBinding);
+			sb.append(methodHelper(null, methodInvBinding, true));
 			return CsMethodName.newMethodName(sb.toString());
 
 		case ASTNode.SUPER_METHOD_INVOCATION:
 			SuperMethodInvocation superInvocation = (SuperMethodInvocation) node;
 			IMethodBinding superMethodInvBinding = superInvocation.resolveMethodBinding();
-			methodHelper(sb, null, superMethodInvBinding);
+			sb.append(methodHelper(null, superMethodInvBinding, true));
 			return CsMethodName.newMethodName(sb.toString());
 
 		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
@@ -82,8 +88,7 @@ public class NodeFactory {
 					sb.append(BindingFactory
 							.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
 					sb.append("] [");
-					sb.append(BindingFactory.getBindingName(
-							((VariableDeclarationFragment) field).resolveBinding().getDeclaringClass()));
+					sb.append(getDeclaringType(fieldNode));
 					sb.append("].");
 					sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
 					return CsFieldName.newFieldName(sb.toString());
@@ -102,7 +107,6 @@ public class NodeFactory {
 					sb.append(((VariableDeclarationFragment) variableStatement).getName().getIdentifier());
 					return CsLocalVariableName.newLocalVariableName(sb.toString());
 				}
-
 				return null;
 
 			case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
@@ -117,9 +121,19 @@ public class NodeFactory {
 					sb.append(((VariableDeclarationFragment) variableExpression).getName().getIdentifier());
 					return CsLocalVariableName.newLocalVariableName(sb.toString());
 				}
-
 				return null;
 			}
+
+		case ASTNode.QUALIFIED_NAME:
+			QualifiedName qualifiedNameNode = (QualifiedName) node;
+			sb.append("[");
+			sb.append(BindingFactory.getBindingName(qualifiedNameNode.resolveTypeBinding()));
+			sb.append("] [");
+			sb.append(getDeclaringType(qualifiedNameNode));
+			sb.append("] ");
+			sb.append(qualifiedNameNode.getName().getIdentifier());
+
+			return CsFieldName.newFieldName(sb.toString());
 
 		case ASTNode.SINGLE_VARIABLE_DECLARATION:
 			SingleVariableDeclaration singleVariable = (SingleVariableDeclaration) node;
@@ -149,10 +163,19 @@ public class NodeFactory {
 		default:
 			return null;
 		}
-
 	}
 
-	private static void methodHelper(StringBuilder sb, MethodDeclaration methodNode, IMethodBinding method) {
+	private static String getDeclaringType(ASTNode node) {
+		return BindingFactory
+				.getBindingName(((TypeDeclaration) ((CompilationUnit) node.getRoot()).types().get(0)).resolveBinding());
+	}
+
+	private static String methodHelper(MethodDeclaration methodNode, IMethodBinding method, boolean override) {
+		if (override && hasOverrideAnnotation(method.getAnnotations())) {
+			createOverriddenNames(method);
+		}
+		StringBuilder sb = new StringBuilder();
+		
 		BindingFactory.modifierHelper(sb, method);
 
 		sb.append("[");
@@ -164,8 +187,7 @@ public class NodeFactory {
 			sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getReturnType())).getIdentifier());
 		}
 
-		sb.append("] ");
-		sb.append("[");
+		sb.append("] [");
 		sb.append(CsTypeName.newTypeName(BindingFactory.getBindingName(method.getDeclaringClass())).getIdentifier());
 		sb.append("].");
 
@@ -198,6 +220,50 @@ public class NodeFactory {
 			}
 		}
 		sb.append(")");
+		
+		return sb.toString();
+	}
+
+	private static void createOverriddenNames(IMethodBinding method) {
+
+		IMethodBinding firstMethod = null, topLevelMethod = null;
+
+		List<ITypeBinding> types = new ArrayList<ITypeBinding>();
+		ITypeBinding current = method.getDeclaringClass();
+		types.add(current);
+
+		while (current.getSuperclass() != null) {
+			types.add(current.getSuperclass());
+			current = current.getSuperclass();
+		}
+
+		for (int i = 0; i < types.size(); i++) {
+			IMethodBinding[] declaredMethods = types.get(i).getDeclaredMethods();
+			for (int j = 0; j < declaredMethods.length; j++) {
+				if (declaredMethods[j].getName().equals(method.getName()) && method.overrides(declaredMethods[j])) {
+					if (firstMethod == null) {
+						firstMethod = declaredMethods[j];
+					} else {
+						topLevelMethod = declaredMethods[j];
+					}
+				}
+			}
+
+		}
+		
+		CsMethodName.newMethodName(methodHelper(null, firstMethod, false));
+		
+		if(topLevelMethod != null){
+			CsMethodName.newMethodName(methodHelper(null, topLevelMethod, false));
+		}
+	}
+
+	private static boolean hasOverrideAnnotation(IAnnotationBinding[] annoations) {
+		for (IAnnotationBinding iAnnotationBinding : annoations) {
+			if (iAnnotationBinding.getName().equals("Override"))
+				return true;
+		}
+		return false;
 	}
 
 	public static class BindingFactory {
@@ -223,12 +289,11 @@ public class NodeFactory {
 					sb.append("[");
 
 					// TODO: generics for later work
-					// for (ITypeBinding t : type.getTypeArguments()) {
-					// sb.append("[T -> ");
-					// sb.append(t.getQualifiedName());
-					// sb.append("],");
-					// }
-					sb.append("GenericsPlaceholder");
+					for (ITypeBinding t : type.getTypeArguments()) {
+						sb.append("[T -> ");
+						sb.append(getBindingName(t));
+						sb.append("],");
+					}
 
 					sb.deleteCharAt(sb.toString().length() - 1);
 					sb.append("]");
@@ -292,8 +357,7 @@ public class NodeFactory {
 			}
 		}
 
-		// TODO: Change returntype
-		public static String getAssemblyName(String qualifiedName) {
+		private static String getAssemblyName(String qualifiedName) {
 			Class<?> c = null;
 
 			if (isPrimitivType(qualifiedName)) {
