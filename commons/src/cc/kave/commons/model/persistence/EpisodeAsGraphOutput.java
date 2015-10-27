@@ -3,11 +3,8 @@ package cc.kave.commons.model.persistence;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.ext.ComponentAttributeProvider;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -26,23 +23,9 @@ public class EpisodeAsGraphOutput {
 
 		DirectedGraph<Fact, DefaultEdge> graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 
-		VertexNameProvider<Fact> vertexId = new VertexNameProvider<Fact>() {
-			public String getVertexName(Fact fact) {
-				return fact.getRawFact();
-			}
-		};
-
 		VertexNameProvider<Fact> vertexName = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
-				return fact.getRawFact() + "";
-			}
-		};
-
-		ComponentAttributeProvider<Fact> legend = new ComponentAttributeProvider<Fact>() {
-			public Map<String, String> getComponentAttributes(Fact fact) {
-				Map<String, String> map = new HashMap<String, String>();
-				map.put(fact.getRawFact(), "ec");
-				return map;
+				return fact.getRawFact();
 			}
 		};
 
@@ -51,31 +34,50 @@ public class EpisodeAsGraphOutput {
 		Fact f3 = new Fact("30");
 		Fact f4 = new Fact("40");
 
+		Fact f5 = new Fact("50");
+		Fact f6 = new Fact("60");
+		Fact f7 = new Fact("70");
+		Fact f8 = new Fact("80");
+
 		// add some sample data (graph manipulated via JGraphT)
 		graph.addVertex(f1);
 		graph.addVertex(f2);
 		graph.addVertex(f3);
 		graph.addVertex(f4);
+		
+		graph.addVertex(f5);
+		graph.addVertex(f6);
+		graph.addVertex(f7);
+		graph.addVertex(f8);
 
 		graph.addEdge(f1, f2);
 		graph.addEdge(f1, f3);
 		graph.addEdge(f1, f4);
 		graph.addEdge(f2, f4);
 		graph.addEdge(f3, f4);
+		
+		graph.addEdge(f5, f6);
+		graph.addEdge(f6, f7);
+		graph.addEdge(f7, f8);
+		
 
-		FileStructure graphWithLabels = new FileStructure();
-		graphWithLabels.graph = graph;
-
-		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexName, null, null, legend,
-				null);
+		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexName, null, null);
 
 		String targetDirectory = "/Users/ervinacergani/Documents/PhD_work/episode-miner/graphs/";
 		new File(targetDirectory).mkdirs();
 		exporter.export(new FileWriter(targetDirectory + "initial-graph.dot"), graph);
-	}
 
-	private static class FileStructure {
-		private DirectedGraph<Fact, DefaultEdge> graph;
-		private String labels;
+		// BufferedWriter bw = new BufferedWriter(new FileWriter(targetDirectory
+		// + "initial-graph.dot", true));
+		// bw.newLine();
+		// bw.newLine();
+		// bw.newLine();
+		// bw.write("Show graph legend!");
+		// bw.close();
+
+		// PrintWriter writer = new PrintWriter(targetDirectory +
+		// "initial-graph.dot");
+		// writer.println("Show graph legend!");
+		// writer.close();
 	}
 }
