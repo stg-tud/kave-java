@@ -12,4 +12,5 @@ Require-Bundle: commons,
  org.mockito,
  com.google.inject,
  jgraph,
- net.sf.jgrapht
+ net.sf.jgrapht,
+ javax.inject

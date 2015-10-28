@@ -22,7 +22,13 @@ public class EpisodeToGraphConverter {
 			if (!fact.getRawFact().contains(">")) {
 				graph.addVertex(fact);
 				String methodName = eventMapping.get(Integer.parseInt(fact.getRawFact())).getMethod().getName();
-				String vertexLabel = fact.getRawFact() + ". " + methodName;
+				if (methodName.contains(".")) {
+					methodName = methodName.replace(".", "");
+				}
+				if (methodName.contains("?")) {
+					methodName = methodName.replace("?", "");
+				}
+				String vertexLabel = "n" + fact.getRawFact() + methodName;
 				Fact f = new Fact(vertexLabel);
 				labelList.add(f);
 			} else {
@@ -31,9 +37,11 @@ public class EpisodeToGraphConverter {
 			}
 		}
 		graph.addVertex(labelList.get(0));
-		for (int i = 1; i < labelList.size(); i++) {
-			graph.addVertex(labelList.get(i));
-			graph.addEdge(labelList.get(i - 1), labelList.get(i));
+		if (labelList.size() > 1) {
+			for (int i = 1; i < labelList.size(); i++) {
+				graph.addVertex(labelList.get(i));
+				graph.addEdge(labelList.get(i - 1), labelList.get(i));
+			}
 		}
 		return graph;
 	}

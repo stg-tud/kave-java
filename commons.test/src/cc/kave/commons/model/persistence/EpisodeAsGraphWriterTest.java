@@ -68,8 +68,11 @@ public class EpisodeAsGraphWriterTest {
 	@Test
 	public void writerDirectoryTest() throws IOException {
 		sut.write(graph, 1);
-		assertTrue(getFilePath(1).getParentFile().exists());
-		assertTrue(getFilePath(1).exists());
+		File file = getFilePath(1);
+		assertTrue(file.getParentFile().exists());
+		assertTrue(file.exists());
+		System.out.println(file.getAbsolutePath());
+		file.delete();
 	}
 	
 	private File getFilePath(int index) {

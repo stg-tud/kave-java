@@ -20,11 +20,6 @@ public class EpisodeAsGraphWriter {
 
 	private File rootFolder;
 
-	// private EpisodeParser parser;
-	// private MaximalFrequentEpisodes episodeLearned;
-	// private EpisodeToGraphConverter graphConverter;
-	// private EventMappingParser mappingParser;
-
 	@Inject
 	public EpisodeAsGraphWriter(@Named("graph") File directory) {
 		assertTrue(directory.exists(), "Episode-miner folder does not exist");
@@ -32,20 +27,13 @@ public class EpisodeAsGraphWriter {
 		this.rootFolder = directory;
 	}
 
-	// public void run() throws Exception {
-	// Map<Integer, List<Episode>> allEpisodes = parser.parse();
-	// Map<Integer, List<Episode>> maxEpisodes =
-	// episodeLearned.getMaximalFrequentEpisodes(allEpisodes);
-	// List<Event> eventMapping = mappingParser.parse(file)
-	//
-	// for (Map.Entry<Integer, List<Episode>> entry : maxEpisodes.entrySet()) {
-	// for (Episode e : entry.getValue()) {
-	// graphConverter.convert(e, eventMapping)
-	// }
-	// }
-	// }
-
 	public void write(DirectedGraph<Fact, DefaultEdge> graph, int fileIndex) throws IOException {
+
+		VertexNameProvider<Fact> vertexId = new VertexNameProvider<Fact>() {
+			public String getVertexName(Fact fact) {
+				return fact.getRawFact();
+			}
+		};
 
 		VertexNameProvider<Fact> vertexName = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
@@ -53,14 +41,16 @@ public class EpisodeAsGraphWriter {
 			}
 		};
 
-		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexName, null, null);
+		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexId, vertexName, null);
 
 		exporter.export(new FileWriter(getFilePath(fileIndex)), graph);
 	}
 
 	private String getFilePath(int fileNumber) {
 		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
-		new File(targetDirectory).mkdirs();
+		if (!(new File(targetDirectory).isDirectory())) {
+			new File(targetDirectory).mkdirs();
+		}
 		String fileName = targetDirectory + "/graph" + fileNumber + ".dot";
 		return fileName;
 	}
