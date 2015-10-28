@@ -19,8 +19,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
+import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.mining.reader.QueryParser;
+import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -37,20 +39,32 @@ public class Module extends AbstractModule {
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
 		File eventStreamFile = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
 		Directory eventStreamDir = new Directory(eventStreamFile.getAbsolutePath());
+		File mappingFile = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
+		Directory mappingDir = new Directory(mappingFile.getAbsolutePath());
+		File graphFile = new File(rootFolder);
+		Directory graphDir = new Directory(graphFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
+		dirs.put("mapping", mappingDir);
+		dirs.put("graph", graphDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamFile);
+		bind(File.class).annotatedWith(Names.named("mapping")).toInstance(mappingFile);
+		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
 
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		File eventStreamRoot = eventStreamFile;
 		bind(QueryParser.class).toInstance(new QueryParser(eventStreamRoot, reader));
+		File mappingRoot = mappingFile;
+		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
+		File graphRoot = graphFile;
+		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

@@ -26,7 +26,7 @@ public class EventMappingParserTest {
 	
 	@Before
 	public void setup() {
-		sut = new EventMappingParser();
+		sut = new EventMappingParser(rootFolder.getRoot());
 	}
 	
 	@Test
@@ -44,7 +44,7 @@ public class EventMappingParserTest {
 
 		FileUtils.writeStringToFile(file, jsonString);
 		
-		List<Event> actuals = sut.parse(file);
+		List<Event> actuals = sut.parse();
 		
 		assertEquals(expected, actuals);
 	}
