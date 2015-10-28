@@ -44,7 +44,7 @@ public class EpisodeAsGraphOutput {
 		graph.addVertex(f2);
 		graph.addVertex(f3);
 		graph.addVertex(f4);
-		
+
 		graph.addVertex(f5);
 		graph.addVertex(f6);
 		graph.addVertex(f7);
@@ -55,29 +55,15 @@ public class EpisodeAsGraphOutput {
 		graph.addEdge(f1, f4);
 		graph.addEdge(f2, f4);
 		graph.addEdge(f3, f4);
-		
+
 		graph.addEdge(f5, f6);
 		graph.addEdge(f6, f7);
 		graph.addEdge(f7, f8);
-		
 
 		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexName, null, null);
 
 		String targetDirectory = "/Users/ervinacergani/Documents/PhD_work/episode-miner/graphs/";
 		new File(targetDirectory).mkdirs();
 		exporter.export(new FileWriter(targetDirectory + "initial-graph.dot"), graph);
-
-		// BufferedWriter bw = new BufferedWriter(new FileWriter(targetDirectory
-		// + "initial-graph.dot", true));
-		// bw.newLine();
-		// bw.newLine();
-		// bw.newLine();
-		// bw.write("Show graph legend!");
-		// bw.close();
-
-		// PrintWriter writer = new PrintWriter(targetDirectory +
-		// "initial-graph.dot");
-		// writer.println("Show graph legend!");
-		// writer.close();
 	}
 }
