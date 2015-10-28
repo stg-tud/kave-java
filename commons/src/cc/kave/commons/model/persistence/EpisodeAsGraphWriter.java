@@ -61,7 +61,7 @@ public class EpisodeAsGraphWriter {
 	private String getFilePath(int fileNumber) {
 		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
 		new File(targetDirectory).mkdirs();
-		String fileName = targetDirectory + "graph" + fileNumber + ".dot";
+		String fileName = targetDirectory + "/graph" + fileNumber + ".dot";
 		return fileName;
 	}
 }
