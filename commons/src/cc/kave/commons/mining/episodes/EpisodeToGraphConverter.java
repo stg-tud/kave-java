@@ -10,6 +10,8 @@ import org.jgrapht.graph.DefaultEdge;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.ParameterName;
 
 public class EpisodeToGraphConverter {
 
@@ -21,14 +23,13 @@ public class EpisodeToGraphConverter {
 		for (Fact fact : episode.getFacts()) {
 			if (!fact.getRawFact().contains(">")) {
 				graph.addVertex(fact);
-				String methodName = eventMapping.get(Integer.parseInt(fact.getRawFact())).getMethod().getName();
-				if (methodName.contains(".")) {
-					methodName = methodName.replace(".", "");
-				}
-				if (methodName.contains("?")) {
-					methodName = methodName.replace("?", "");
-				}
-				String vertexLabel = "n" + fact.getRawFact() + methodName;
+
+				int index = Integer.parseInt(fact.getRawFact());
+				MethodName method = eventMapping.get(index).getMethod();
+
+				String out = toLabel(method);
+				String vertexLabel = "<" + fact.getRawFact() + ". " + out + ">";
+				System.out.println(out);
 				Fact f = new Fact(vertexLabel);
 				labelList.add(f);
 			} else {
@@ -44,5 +45,29 @@ public class EpisodeToGraphConverter {
 			}
 		}
 		return graph;
+	}
+
+	private String toLabel(MethodName method) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(method.getDeclaringType().getName());
+		sb.append('.');
+		sb.append(method.getName());
+		sb.append('(');
+		boolean isFirst = true;
+		for (ParameterName p : method.getParameters()) {
+			if (!isFirst) {
+				sb.append(", ");
+			}
+			isFirst = false;
+			sb.append(p.getValueType().getName());
+			sb.append(' ');
+			sb.append(p.getName());
+		}
+		sb.append(')');
+		sb.append(" : ");
+		sb.append(method.getReturnType().getName());
+
+		return sb.toString();
 	}
 }

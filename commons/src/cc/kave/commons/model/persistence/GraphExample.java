@@ -19,10 +19,10 @@ public class GraphExample {
 		Fact fact3 = new Fact("300");
 		Fact fact4 = new Fact("400");
 
-		Fact fact5 = new Fact("n100getText");
-		Fact fact6 = new Fact("n200setText");
-		Fact fact7 = new Fact("n300Visitor");
-		Fact fact8 = new Fact("n400setLocation");
+		Fact fact5 = new Fact("\"100. getText\"");
+		Fact fact6 = new Fact("\"200. setText\"");
+		Fact fact7 = new Fact("\"300. Visitor\"");
+		Fact fact8 = new Fact("\"400. setLocation\"");
 
 		DirectedGraph<Fact, DefaultEdge> graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 
