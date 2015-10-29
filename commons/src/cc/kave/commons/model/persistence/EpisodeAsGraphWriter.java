@@ -5,8 +5,11 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.ext.ComponentAttributeProvider;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultEdge;
@@ -31,7 +34,7 @@ public class EpisodeAsGraphWriter {
 
 		VertexNameProvider<Fact> vertexId = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
-				if (fact.getRawFact().contains("\n")) {
+				if (fact.getRawFact().contains("\\l")) {
 					return "<LabelNode>";
 				} else {
 					return fact.getRawFact();
@@ -45,7 +48,19 @@ public class EpisodeAsGraphWriter {
 			}
 		};
 
-		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexId, vertexName, null);
+		ComponentAttributeProvider<Fact> vertexFormat = new ComponentAttributeProvider<Fact>() {
+			public Map<String, String> getComponentAttributes(Fact fact) {
+				Map<String, String> map = new LinkedHashMap<String, String>();
+				if (fact.getRawFact().contains("\\l")) {
+					map.put("shape", "rectangular");
+				}
+				return map;
+			}
+
+		};
+
+		DOTExporter<Fact, DefaultEdge> exporter = new DOTExporter<Fact, DefaultEdge>(vertexId, vertexName, null,
+				vertexFormat, null);
 
 		exporter.export(new FileWriter(getFilePath(fileIndex)), graph);
 	}

@@ -27,7 +27,7 @@ public class EpisodeToGraphConverter {
 				MethodName method = eventMapping.get(index).getMethod();
 
 				String out = toLabel(method);
-				labels += fact.getRawFact() + ". " + out + "\n";
+				labels += fact.getRawFact() + ". " + out + "\\l";
 			} else {
 				String[] events = fact.getRawFact().split(">");
 				graph.addEdge(new Fact(events[0]), new Fact(events[1]));

@@ -71,7 +71,6 @@ public class EpisodeAsGraphWriterTest {
 		File file = getFilePath(1);
 		assertTrue(file.getParentFile().exists());
 		assertTrue(file.exists());
-		System.out.println(file.getAbsolutePath());
 		file.delete();
 	}
 	
