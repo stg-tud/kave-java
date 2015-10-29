@@ -31,7 +31,11 @@ public class EpisodeAsGraphWriter {
 
 		VertexNameProvider<Fact> vertexId = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
-				return fact.getRawFact();
+				if (fact.getRawFact().contains("\n")) {
+					return "<LabelNode>";
+				} else {
+					return fact.getRawFact();
+				}
 			}
 		};
 
