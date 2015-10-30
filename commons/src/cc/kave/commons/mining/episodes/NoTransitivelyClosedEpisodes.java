@@ -10,73 +10,76 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class NoTransitivelyClosedEpisodes {
 
-	public Map<Integer, List<Episode>> skipTransitivelyClosure(Map<Integer, List<Episode>> learnedEpisodes) {
+	public Map<Integer, List<Episode>> removeTransitivelyClosure(Map<Integer, List<Episode>> maximalEpisodes) {
 
 		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
-		List<List<String>> paths = new LinkedList<List<String>>();
 
-		for (Map.Entry<Integer, List<Episode>> entry : learnedEpisodes.entrySet()) {
-			if (entry.getKey() > 2) {
+		for (Map.Entry<Integer, List<Episode>> entry : maximalEpisodes.entrySet()) {
+			if (entry.getKey() < 3) {
+				results.put(entry.getKey(), entry.getValue());
+			} else {
+				List<Episode> updatedEpisodes = new LinkedList<Episode>();
 				for (Episode episode : entry.getValue()) {
 					Episode newEpisode = simplifyEpisode(episode);
+					updatedEpisodes.add(newEpisode);
 				}
+				results.put(entry.getKey(), updatedEpisodes);
 			}
 		}
-
-		return null;
+		return results;
 	}
 
 	private Episode simplifyEpisode(Episode episode) {
-		List<List<String>> paths = new LinkedList<List<String>>();
+		List<List<String>> allPaths = new LinkedList<List<String>>();
 		Episode episodeResult = new Episode();
 		for (Fact fact : episode.getFacts()) {
 			if (fact.getRawFact().length() > 1) {
-				String[] events = fact.getRawFact().split(">");
-				boolean pathFound = false;
-				for (List<String> list : paths) {
-					if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
-						list.add(events[1]);
-						pathFound = true;
-					}
-				}
-				if (!pathFound) {
-					List<String> newPaths = new LinkedList<String>();
-					newPaths.add(events[0]);
-					newPaths.add(events[1]);
-					paths.add(newPaths);
-				}
+				addPath(fact, allPaths);
 			} else {
 				episodeResult.addFact(fact.getRawFact());
 			}
 		}
-		for (int outerIdx = 0; outerIdx < paths.size(); outerIdx++) {
-			if (paths.get(outerIdx).size() > 2) {
-				for (int idx = 0; idx < paths.get(outerIdx).size() - 1; idx++) {
-					episodeResult.addFact(paths.get(outerIdx).get(idx) + ">" + paths.get(outerIdx).get(idx + 1));
-				}
-			}
-			removeClosures(paths, outerIdx);
-		}
-		return null;
+		List<String> simplifiedRelations = removeClosureRelations(allPaths);
+		episodeResult.addListOfFacts(simplifiedRelations);
+		return episodeResult;
 	}
 
-	private void removeClosures(List<List<String>> paths, int outerIdx) {
-		List<String> currentList = paths.get(outerIdx);
-		for (int currIdx = 0; currIdx < currentList.size() - 2; currIdx++) {
-			for (int pathsIdx = outerIdx + 1; pathsIdx < paths.size(); pathsIdx++) {
-				if (paths.get(pathsIdx).contains(currentList.get(currIdx))
-						&& paths.get(pathsIdx).contains(currentList.get(currIdx))) {
-					int firstEventIdx = paths.indexOf(currentList.get(currIdx));
-					int secondEventIndex = paths.indexOf(currentList.get(currIdx + 2));
-					if ((firstEventIdx + 1) == secondEventIndex) {
-						if (paths.get(pathsIdx).size() == 2) {
-							paths.remove(pathsIdx);
-						} else {
-							paths.get(pathsIdx).remove(firstEventIdx);
-						}
+	private List<String> removeClosureRelations(List<List<String>> allPaths) {
+		List<String> positiveRelations = new LinkedList<String>();
+		List<String> negativeRelations = new LinkedList<String>();
+		for (List<String> list : allPaths) {
+			for (int idx = 0; idx < list.size() - 1; idx++) {
+				String relation = list.get(idx) + ">" + list.get(idx + 1);
+				if (!(positiveRelations.contains(relation) || negativeRelations.contains(relation))) {
+					positiveRelations.add(relation);
+				}
+			}
+			if (list.size() > 2) {
+				for (int idx = 0; idx < list.size() - 2; idx++) {
+					String relation = list.get(idx) + ">" + list.get(idx + 2);
+					if (!negativeRelations.contains(relation)) {
+						negativeRelations.add(relation);
 					}
 				}
 			}
+		}
+		return positiveRelations;
+	}
+
+	private void addPath(Fact fact, List<List<String>> allPaths) {
+		String[] events = fact.getRawFact().split(">");
+		boolean pathFound = false;
+		for (List<String> list : allPaths) {
+			if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
+				list.add(events[1]);
+				pathFound = true;
+			}
+		}
+		if (!pathFound) {
+			List<String> newPaths = new LinkedList<String>();
+			newPaths.add(events[0]);
+			newPaths.add(events[1]);
+			allPaths.add(newPaths);
 		}
 	}
 }
