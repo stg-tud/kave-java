@@ -36,7 +36,7 @@ public class ToFactsVisitor extends AbstractNodeVisitor<Set<Fact>, Void> {
 	public Void visit(IMethodDeclaration stmt, Set<Fact> facts) {
 
 		Event methodStartEvent = new Event();
-		methodStartEvent.setKind(EventKind.METHOD_START);
+		methodStartEvent.setKind(EventKind.METHOD_DECLARATION);
 		methodStartEvent.setMethod(stmt.getName());
 		methodStartEvent.setType(EVENT_TYPE_NAME);
 		facts.add(new Fact(String.valueOf(events.indexOf(methodStartEvent))));

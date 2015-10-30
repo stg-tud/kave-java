@@ -26,7 +26,7 @@ import cc.kave.commons.model.names.TypeName;
 public class Event {
 
 	// capital letters are necessary for JSON compatibility!
-	private EventKind Kind = EventKind.STOP;
+	private EventKind Kind = EventKind.METHOD_DECLARATION;
 	private TypeName Type;
 	private MethodName Method;
 

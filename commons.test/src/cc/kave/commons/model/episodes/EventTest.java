@@ -30,7 +30,7 @@ public class EventTest {
 	@Test
 	public void defaultValues() {
 		Event sut = new Event();
-		assertEquals(EventKind.STOP, sut.getKind());
+		assertEquals(EventKind.METHOD_DECLARATION, sut.getKind());
 		assertNull(sut.getType());
 		assertNull(sut.getMethod());
 	}

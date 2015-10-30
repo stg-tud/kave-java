@@ -16,5 +16,5 @@
 package cc.kave.commons.model.episodes;
 
 public enum EventKind {
-	STOP, METHOD_START, INVOCATION
+	METHOD_DECLARATION, INVOCATION
 }

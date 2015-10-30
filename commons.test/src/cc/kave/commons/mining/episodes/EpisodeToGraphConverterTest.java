@@ -54,7 +54,7 @@ public class EpisodeToGraphConverterTest {
 
 	private static Event eventMethodDecl(String method) {
 		Event e = new Event();
-		e.setKind(EventKind.METHOD_START);
+		e.setKind(EventKind.METHOD_DECLARATION);
 		e.setMethod(method(method));
 		return e;
 	}
