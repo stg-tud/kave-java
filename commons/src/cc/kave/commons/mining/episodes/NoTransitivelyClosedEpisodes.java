@@ -10,7 +10,12 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class NoTransitivelyClosedEpisodes {
 
-	public Map<Integer, List<Episode>> removeTransitivelyClosure(Map<Integer, List<Episode>> maximalEpisodes) {
+	public Map<Integer, List<Episode>> removeTransitivelyClosure(Map<Integer, List<Episode>> maximalEpisodes)
+			throws Exception {
+
+		if (maximalEpisodes.isEmpty()) {
+			throw new Exception("You passed an empty list of maximal episode!");
+		}
 
 		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
 
@@ -32,9 +37,11 @@ public class NoTransitivelyClosedEpisodes {
 	private Episode simplifyEpisode(Episode episode) {
 		List<List<String>> allPaths = new LinkedList<List<String>>();
 		Episode episodeResult = new Episode();
+		episodeResult.setFrequency(episode.getFrequency());
+		episodeResult.setNumEvents(episode.getNumEvents());
 		for (Fact fact : episode.getFacts()) {
 			if (fact.getRawFact().length() > 1) {
-				addPath(fact, allPaths);
+				allPaths = addPath(fact, allPaths);
 			} else {
 				episodeResult.addFact(fact.getRawFact());
 			}
@@ -66,13 +73,24 @@ public class NoTransitivelyClosedEpisodes {
 		return positiveRelations;
 	}
 
-	private void addPath(Fact fact, List<List<String>> allPaths) {
+	private List<List<String>> addPath(Fact fact, List<List<String>> allPaths) {
+		List<List<String>> newPathsList = new LinkedList<List<String>>();
 		String[] events = fact.getRawFact().split(">");
 		boolean pathFound = false;
-		for (List<String> list : allPaths) {
-			if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
-				list.add(events[1]);
-				pathFound = true;
+		if (!allPaths.isEmpty()) {
+			for (List<String> list : allPaths) {
+				if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
+					list.add(events[1]);
+					pathFound = true;
+				} else if (list.get(0).equalsIgnoreCase(events[1])) {
+					int listIdx = allPaths.indexOf(list);
+					List<String> addToNewPathsList = allPaths.get(listIdx);
+					newPathsList.add(addToNewPathsList);
+					pathFound = true;
+				}
+			}
+			if (!newPathsList.isEmpty()) {
+				return recreateList(allPaths, events);
 			}
 		}
 		if (!pathFound) {
@@ -81,5 +99,19 @@ public class NoTransitivelyClosedEpisodes {
 			newPaths.add(events[1]);
 			allPaths.add(newPaths);
 		}
+		return allPaths;
+	}
+
+	private List<List<String>> recreateList(List<List<String>> allPaths, String[] events) {
+		List<List<String>> newList = new LinkedList<List<String>>();
+		for (List<String> path : allPaths) {
+			List<String> newPath = new LinkedList<>();
+			newPath.add(events[0]);
+			for (String s : path) {
+				newPath.add(s);
+			}
+			newList.add(newPath);
+		}
+		return newList;
 	}
 }
