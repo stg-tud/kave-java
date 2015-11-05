@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package namefactory;
+package cc.kave.eclipse.namefactory;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -27,7 +27,7 @@ import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
-import namefactory.NodeFactory.BindingFactory;
+import cc.kave.eclipse.namefactory.NodeFactory.BindingFactory;
 
 public class NodeNameFinder {
 
