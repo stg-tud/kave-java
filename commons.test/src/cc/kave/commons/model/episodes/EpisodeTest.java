@@ -60,6 +60,7 @@ public class EpisodeTest {
 		Episode b = new Episode();
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
+		assertTrue(a.equals(b));
 	}
 
 	@Test
@@ -71,6 +72,7 @@ public class EpisodeTest {
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertEquals(a, b);
+		assertTrue(a.equals(b));
 		assertEquals(a.hashCode(), b.hashCode());
 		assertEquals(a.getFacts(), b.getFacts());
 	}
@@ -84,6 +86,7 @@ public class EpisodeTest {
 		b.addStringsOfFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
 		assertNotEquals(a.getFacts(), b.getFacts());
 	}
@@ -97,6 +100,7 @@ public class EpisodeTest {
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 
 		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
 		assertNotEquals(a.getFacts(), b.getFacts());
 	}

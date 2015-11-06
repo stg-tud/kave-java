@@ -91,4 +91,22 @@ public class Episode {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
+
+	public boolean equals(Episode episode) {
+		if (this.numberOfEvents != episode.numberOfEvents) {
+			return false;
+		}
+		if (this.frequency != episode.frequency) {
+			return false;
+		}
+		if (this.facts.size() != episode.facts.size()) {
+			return false;
+		}
+		for (Fact fact : this.facts) {
+			if (!episode.facts.contains(fact)) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
