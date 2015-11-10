@@ -2,5 +2,7 @@
 **/bin
 **/*.jar
 **/test-site
+dependencies/*.target
+.metadata
 
 
