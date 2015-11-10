@@ -225,6 +225,7 @@ public class NodeFactory {
 		sb.append("(");
 
 		String[] parameterNames = createParameterNames(methodNode, method);
+		
 		for (int i = 0; i < parameterNames.length; i++) {
 			sb.append(parameterNames[i]);
 
@@ -440,7 +441,7 @@ public class NodeFactory {
 			Class<?> c = null;
 
 			if (isPrimitivType(qualifiedName)) {
-				return "rt.jar, " + String.class.getPackage().getImplementationVersion();
+				return "rt.jar, " + String.class.getPackage().getSpecificationVersion();
 			}
 
 			try {
@@ -450,7 +451,7 @@ public class NodeFactory {
 			}
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
-				return "rt.jar, " + c.getPackage().getImplementationVersion();
+				return "rt.jar, " + c.getPackage().getSpecificationVersion();
 			}
 
 			String path = c.getProtectionDomain().getCodeSource().getLocation().getPath();
