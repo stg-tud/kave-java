@@ -45,5 +45,5 @@ Require-Bundle: com.google.gson,
  com.google.guava,
  org.apache.commons.lang3,
  org.apache.commons.io,
- org.eclipse.jdt.annotation
+ org.eclipse.jdt.annotation,
  org.jgrapht.core
