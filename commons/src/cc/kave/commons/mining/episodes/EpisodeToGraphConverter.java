@@ -24,7 +24,7 @@ public class EpisodeToGraphConverter {
 				graph.addVertex(fact);
 
 				int index = Integer.parseInt(fact.getRawFact());
-				MethodName method = eventMapping.get(index).getMethod();
+				MethodName method = eventMapping.get(index - 1).getMethod();
 
 				String out = toLabel(method);
 				labels += fact.getRawFact() + ". " + out + "\\l";

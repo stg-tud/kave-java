@@ -86,13 +86,13 @@ public class EpisodeToGraphConverterTest {
 
 		String labels = "";
 
-		MethodName method1 = eventMapping.get(1).getMethod();
+		MethodName method1 = eventMapping.get(0).getMethod();
 		String out1 = toLabel(method1);
-		MethodName method2 = eventMapping.get(2).getMethod();
+		MethodName method2 = eventMapping.get(1).getMethod();
 		String out2 = toLabel(method2);
-		MethodName method3 = eventMapping.get(3).getMethod();
+		MethodName method3 = eventMapping.get(2).getMethod();
 		String out3 = toLabel(method3);
-		MethodName method4 = eventMapping.get(4).getMethod();
+		MethodName method4 = eventMapping.get(3).getMethod();
 		String out4 = toLabel(method4);
 
 		labels += "1. " + out1 + "\\l";
