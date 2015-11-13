@@ -25,7 +25,7 @@ public class NoTransitivelyClosedEpisodes {
 			} else {
 				List<Episode> updatedEpisodes = new LinkedList<Episode>();
 				for (Episode episode : entry.getValue()) {
-					Episode newEpisode = simplifyEpisode(episode);
+					Episode newEpisode = reduceNumberOfFacts(episode);
 					updatedEpisodes.add(newEpisode);
 				}
 				results.put(entry.getKey(), updatedEpisodes);
@@ -34,14 +34,14 @@ public class NoTransitivelyClosedEpisodes {
 		return results;
 	}
 
-	private Episode simplifyEpisode(Episode episode) {
+	private Episode reduceNumberOfFacts(Episode episode) {
 		List<List<String>> allPaths = new LinkedList<List<String>>();
 		Episode episodeResult = new Episode();
 		episodeResult.setFrequency(episode.getFrequency());
 		episodeResult.setNumEvents(episode.getNumEvents());
 		for (Fact fact : episode.getFacts()) {
-			if (fact.getRawFact().length() > 1) {
-				allPaths = addPath(fact, allPaths);
+			if (fact.getRawFact().contains(",")) {
+				addFactPath(fact, allPaths);
 			} else {
 				episodeResult.addFact(fact.getRawFact());
 			}
@@ -73,8 +73,8 @@ public class NoTransitivelyClosedEpisodes {
 		return positiveRelations;
 	}
 
-	private List<List<String>> addPath(Fact fact, List<List<String>> allPaths) {
-		List<List<String>> newPathsList = new LinkedList<List<String>>();
+	private void addFactPath(Fact fact, List<List<String>> allPaths) {
+		// List<List<String>> newPathsList = new LinkedList<List<String>>();
 		String[] events = fact.getRawFact().split(">");
 		boolean pathFound = false;
 		if (!allPaths.isEmpty()) {
@@ -82,24 +82,27 @@ public class NoTransitivelyClosedEpisodes {
 				if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
 					list.add(events[1]);
 					pathFound = true;
+					break;
 				} else if (list.get(0).equalsIgnoreCase(events[1])) {
-					int listIdx = allPaths.indexOf(list);
-					List<String> addToNewPathsList = allPaths.get(listIdx);
-					newPathsList.add(addToNewPathsList);
+					list.add(0, events[0]);
+					// int listIdx = allPaths.indexOf(list);
+					// List<String> addToNewPathsList = allPaths.get(listIdx);
+					// newPathsList.add(addToNewPathsList);
 					pathFound = true;
+					break;
 				}
 			}
-			if (!newPathsList.isEmpty()) {
-				return recreateList(allPaths, events);
-			}
+			// if (!newPathsList.isEmpty()) {
+			// return recreateList(allPaths, events);
+			// }
 		}
 		if (!pathFound) {
-			List<String> newPaths = new LinkedList<String>();
-			newPaths.add(events[0]);
-			newPaths.add(events[1]);
-			allPaths.add(newPaths);
+			List<String> factPaths = new LinkedList<String>();
+			factPaths.add(events[0]);
+			factPaths.add(events[1]);
+			allPaths.add(factPaths);
 		}
-		return allPaths;
+		// return allPaths;
 	}
 
 	private List<List<String>> recreateList(List<List<String>> allPaths, String[] events) {
