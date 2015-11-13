@@ -1,6 +1,6 @@
 package cc.kave.commons.mining.episodes;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,8 +45,12 @@ public class NoTransitivelyClosedEpisodesTest {
 		Map<Integer, List<Episode>> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
 		
 		for (Map.Entry<Integer, List<Episode>> entry : expected.entrySet()) {
+			List<Episode> expectedList = expected.get(entry.getKey());
 			List<Episode> actualsList = actuals.get(entry.getKey());
-//			assertEquals(expected, actuals);
+			assertTrue(expectedList.size() == actualsList.size());
+			for (int idx = 0; idx < expectedList.size(); idx++) {
+				assertTrue(expectedList.get(idx).equals(actualsList.get(idx)));
+			}
 		}
 	}
 	

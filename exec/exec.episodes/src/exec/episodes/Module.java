@@ -20,9 +20,11 @@ import com.google.inject.name.Names;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
+import cc.kave.commons.mining.reader.EventStreamParser;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.mining.reader.QueryParser;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
+import cc.kave.commons.model.persistence.EventStreamModifier;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -63,6 +65,9 @@ public class Module extends AbstractModule {
 		bind(QueryParser.class).toInstance(new QueryParser(eventStreamRoot, reader));
 		File mappingRoot = mappingFile;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
+		EventMappingParser mappingParser = new EventMappingParser(mappingRoot);
+		bind(EventStreamParser.class).toInstance(new EventStreamParser(eventStreamRoot, reader, mappingParser));
+		bind(EventStreamModifier.class).toInstance(new EventStreamModifier(eventStreamRoot, reader));
 		File graphRoot = graphFile;
 		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
 	}

@@ -9,7 +9,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
+import cc.kave.commons.model.persistence.EventStreamModifier;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -29,7 +29,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		load(EpisodeGraphGenerator.class).generate();
+//		load(EpisodeGraphGenerator.class).generate();
+		load(EventStreamModifier.class).modify();
 		
 		Logger.log("done");
 	}

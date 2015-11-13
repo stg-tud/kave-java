@@ -14,15 +14,15 @@ import cc.kave.commons.model.episodes.Fact;
 public class GraphExample {
 
 	public static void main(String[] args) throws IOException {
-		Fact fact1 = new Fact("100");
-		Fact fact2 = new Fact("200");
-		Fact fact3 = new Fact("300");
-		Fact fact4 = new Fact("400");
 
-		Fact fact5 = new Fact("\"100. getText\"");
-		Fact fact6 = new Fact("\"200. setText\"");
-		Fact fact7 = new Fact("\"300. Visitor\"");
-		Fact fact8 = new Fact("\"400. setLocation\"");
+		Fact fact1 = new Fact("1");
+		Fact fact2 = new Fact("2");
+		Fact fact3 = new Fact("3");
+		Fact fact4 = new Fact("4");
+		Fact fact5 = new Fact("5");
+		Fact fact6 = new Fact("6");
+		Fact fact7 = new Fact("7");
+		Fact fact8 = new Fact("8");
 
 		DirectedGraph<Fact, DefaultEdge> graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 
@@ -31,20 +31,19 @@ public class GraphExample {
 		graph.addVertex(fact3);
 		graph.addVertex(fact4);
 
-		graph.addEdge(fact1, fact2);
-		graph.addEdge(fact1, fact3);
-		graph.addEdge(fact1, fact4);
-		graph.addEdge(fact2, fact4);
-		graph.addEdge(fact3, fact4);
-
 		graph.addVertex(fact5);
 		graph.addVertex(fact6);
 		graph.addVertex(fact7);
 		graph.addVertex(fact8);
 
-		graph.addEdge(fact5, fact6);
-		graph.addEdge(fact6, fact7);
-		graph.addEdge(fact7, fact8);
+		graph.addEdge(fact2, fact3);
+		graph.addEdge(fact3, fact4);
+		graph.addEdge(fact1, fact5);
+		graph.addEdge(fact4, fact5);
+		graph.addEdge(fact1, fact6);
+		graph.addEdge(fact1, fact7);
+		graph.addEdge(fact3, fact8);
+		graph.addEdge(fact4, fact8);
 
 		VertexNameProvider<Fact> vertexName = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
