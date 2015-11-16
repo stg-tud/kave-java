@@ -1,4 +1,4 @@
-package commons.model.ssts.transformation;
+package commons.model.ssts.transformation.constants;
 
 import static org.junit.Assert.assertTrue;
 
@@ -15,7 +15,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
-import cc.kave.commons.model.ssts.impl.transformation.ConstantCollectorVisitor;
+import cc.kave.commons.model.ssts.impl.transformation.constants.ConstantCollectorVisitor;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
 
