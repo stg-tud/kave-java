@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.impl.transformation;
+package cc.kave.commons.model.ssts.impl.transformation.constants;
 
 import java.util.ArrayList;
 import java.util.List;
