@@ -18,11 +18,11 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import cc.kave.commons.mining.episodes.QueryGenerator;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.mining.reader.EventStreamParser;
 import cc.kave.commons.mining.reader.FileReader;
-import cc.kave.commons.mining.reader.QueryParser;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
 import cc.kave.commons.model.persistence.EventStreamModifier;
 import cc.recommenders.io.Directory;
@@ -62,7 +62,7 @@ public class Module extends AbstractModule {
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		File eventStreamRoot = eventStreamFile;
-		bind(QueryParser.class).toInstance(new QueryParser(eventStreamRoot, reader));
+		bind(QueryGenerator.class).toInstance(new QueryGenerator(eventStreamRoot, reader));
 		File mappingRoot = mappingFile;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
 		EventMappingParser mappingParser = new EventMappingParser(mappingRoot);

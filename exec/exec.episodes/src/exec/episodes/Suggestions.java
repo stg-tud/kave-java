@@ -14,7 +14,7 @@ public class Suggestions {
 
 	// private EpisodeReader ereader;
 	// private MaxFreqEpisodes episodeLearned;
-	// private QueryGenerator queryGenerator;
+//	 private QueryGenerator queryGenerator;
 	// private EpisodeRecommender proposals;
 	//
 	// @Inject

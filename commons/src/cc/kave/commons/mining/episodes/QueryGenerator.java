@@ -1,4 +1,4 @@
-package cc.kave.commons.mining.reader;
+package cc.kave.commons.mining.episodes;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -9,15 +9,16 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.episodes.Episode;
 
-public class QueryParser {
+public class QueryGenerator {
 
 	private File rootFolder;
 	private FileReader reader;
 
 	@Inject
-	public QueryParser(@Named("events") File directory, FileReader reader) {
+	public QueryGenerator(@Named("events") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Event stream folder does not exist!");
 		assertTrue(directory.isDirectory(), "Event stream folder is not a folder, but a file!");
 		this.rootFolder = directory;
@@ -28,35 +29,31 @@ public class QueryParser {
 		List<String> eventStream = reader.readFile(getFilePath());
 		List<Episode> queryStream = new LinkedList<Episode>();
 		List<String> facts = new LinkedList<String>();
+		double previousEventTimestamp = 0.000;
 
 		for (String line : eventStream) {
 			String[] rowValues = line.split(",");
-			if (rowValues[0].equalsIgnoreCase("1")) {
-				if (facts.isEmpty()) {
-					continue;
-				}
-				Episode episode = createEpisode(facts);
-				queryStream.add(episode);
+			double currentEventTimestamp = Double.parseDouble(rowValues[1]);
+			if ((currentEventTimestamp - previousEventTimestamp) >= 0.5) {
+				Episode query = createQuery(facts);
+				queryStream.add(query);
 				facts = new LinkedList<String>();
-			} else {
+			}
+			if (!facts.contains(rowValues[0])) {
 				facts.add(rowValues[0]);
 			}
+			previousEventTimestamp = currentEventTimestamp;
 		}
-		if (!facts.isEmpty()) {
-			Episode episode = createEpisode(facts);
-			queryStream.add(episode);
-		}
+		Episode query = createQuery(facts);
+		queryStream.add(query);
 		return queryStream;
 	}
 
-	private Episode createEpisode(List<String> events) {
+	private Episode createQuery(List<String> events) {
 		Episode episode = new Episode();
-		events.add("1");
 		episode.addListOfFacts(events);
-		for (int firstIdx = 0; firstIdx < (events.size() - 1); firstIdx++) {
-			for (int secondIdx = (firstIdx + 1); secondIdx < events.size(); secondIdx++) {
-				episode.addFact(events.get(firstIdx) + ">" + events.get(secondIdx));
-			}
+		for (int idx = 0; idx < (events.size() - 1); idx++) {
+			episode.addFact(events.get(idx) + ">" + events.get(idx + 1));
 		}
 		episode.setFrequency(1);
 		episode.setNumEvents(events.size());
@@ -64,7 +61,7 @@ public class QueryParser {
 	}
 
 	private File getFilePath() {
-		String fileName = rootFolder.getAbsolutePath() + "/eventstream.txt";
+		String fileName = rootFolder.getAbsolutePath() + "/eventstreamModified.txt";
 		File file = new File(fileName);
 		return file;
 	}

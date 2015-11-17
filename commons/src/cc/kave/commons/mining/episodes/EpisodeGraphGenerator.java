@@ -25,7 +25,7 @@ public class EpisodeGraphGenerator {
 	private EpisodeToGraphConverter graphConverter;
 	private NoTransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
-	private EventStreamParser eventStrammer;
+	private EventStreamParser eventStreammer;
 
 	@Inject
 	public EpisodeGraphGenerator(EpisodeParser episodeParser, MaximalFrequentEpisodes episodeLearned,
@@ -36,11 +36,11 @@ public class EpisodeGraphGenerator {
 		this.mappingParser = mappingParser;
 		this.graphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
-		this.eventStrammer = eventStrammer;
+		this.eventStreammer = eventStrammer;
 		this.writer = writer;
 	}
 
-	public void generate() throws Exception {
+	public void generateGraphs() throws Exception {
 		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse();
 		Map<Integer, List<Episode>> maxEpisodes = episodeLearned.getMaximalFrequentEpisodes(allEpisodes);
 		Map<Integer, List<Episode>> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(maxEpisodes);

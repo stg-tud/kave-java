@@ -29,7 +29,7 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		load(EpisodeGraphGenerator.class).generate();
+		load(EpisodeGraphGenerator.class).generateGraphs();
 //		load(EventStreamModifier.class).modify();
 		
 		Logger.log("done");
