@@ -18,6 +18,10 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
+import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
+import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
+import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
 import cc.kave.commons.mining.episodes.QueryGenerator;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
@@ -61,15 +65,25 @@ public class Module extends AbstractModule {
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
+		
 		File eventStreamRoot = eventStreamFile;
 		bind(QueryGenerator.class).toInstance(new QueryGenerator(eventStreamRoot, reader));
+		
 		File mappingRoot = mappingFile;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
 		EventMappingParser mappingParser = new EventMappingParser(mappingRoot);
 		bind(EventStreamParser.class).toInstance(new EventStreamParser(eventStreamRoot, reader, mappingParser));
 		bind(EventStreamModifier.class).toInstance(new EventStreamModifier(eventStreamRoot, reader));
 		File graphRoot = graphFile;
-		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
+		
+		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
+		MaximalFrequentEpisodes episodeLearned = new MaximalFrequentEpisodes();
+		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
+		EventStreamParser eventStrammer = new EventStreamParser(eventStreamRoot, reader, mappingParser);
+		EpisodeAsGraphWriter writer = new EpisodeAsGraphWriter();
+		NoTransitivelyClosedEpisodes transitivityClosure = new NoTransitivelyClosedEpisodes();
+		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser , episodeLearned, mappingParser, transitivityClosure , writer , graphConverter , eventStrammer ));
+//		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

@@ -1,5 +1,8 @@
 package cc.kave.commons.mining.episodes;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +10,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
@@ -27,10 +31,18 @@ public class EpisodeGraphGenerator {
 	private EpisodeAsGraphWriter writer;
 	private EventStreamParser eventStreammer;
 
+	private File rootFolder;
+
 	@Inject
-	public EpisodeGraphGenerator(EpisodeParser episodeParser, MaximalFrequentEpisodes episodeLearned,
-			EventMappingParser mappingParser, NoTransitivelyClosedEpisodes transitivityClosure,
-			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter, EventStreamParser eventStrammer) {
+	public EpisodeGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
+			MaximalFrequentEpisodes episodeLearned, EventMappingParser mappingParser,
+			NoTransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
+			EpisodeToGraphConverter graphConverter, EventStreamParser eventStrammer) {
+
+		assertTrue(directory.exists(), "Episode-miner folder does not exist");
+		assertTrue(directory.isDirectory(), "Episode-miner folder is not a folder, but a file");
+
+		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.episodeLearned = episodeLearned;
 		this.mappingParser = mappingParser;
@@ -52,11 +64,20 @@ public class EpisodeGraphGenerator {
 			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
 			Logger.append("\n");
 			for (Episode e : entry.getValue()) {
-				Logger.log("Writting episode number %d.\n", graphIndex);
+				Logger.log("Writting episode number %s.\n", graphIndex);
 				DirectedGraph<Fact, DefaultEdge> graph = graphConverter.convert(e, eventMapping);
-				writer.write(graph, graphIndex);
+				writer.write(graph, getFilePath(graphIndex));
 				graphIndex++;
 			}
 		}
+	}
+
+	private String getFilePath(int fileNumber) {
+		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
+		if (!(new File(targetDirectory).isDirectory())) {
+			new File(targetDirectory).mkdirs();
+		}
+		String fileName = targetDirectory + "/graph" + fileNumber + ".dot";
+		return fileName;
 	}
 }

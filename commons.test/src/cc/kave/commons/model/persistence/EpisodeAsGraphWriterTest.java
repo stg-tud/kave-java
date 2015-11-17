@@ -15,21 +15,20 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.episodes.Fact;
-import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeAsGraphWriterTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+//	@Rule
+//	public ExpectedException thrown = ExpectedException.none();
 
 	private DirectedGraph<Fact, DefaultEdge> graph;
 	private EpisodeAsGraphWriter sut;
 
 	@Before
 	public void setup() {
-		sut = new EpisodeAsGraphWriter(rootFolder.getRoot());
+		sut = new EpisodeAsGraphWriter();
 		
 		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 		
@@ -50,34 +49,35 @@ public class EpisodeAsGraphWriterTest {
 		graph.addEdge(f3, f4);
 	}
 	
-	@Test
-	public void cannotBeInitializedWithNonExistingFolder() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Episode-miner folder does not exist");
-		sut = new EpisodeAsGraphWriter(new File("does not exist"));
-	}
-
-	@Test
-	public void cannotBeInitializedWithFile() throws IOException {
-		File file = rootFolder.newFile("a");
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
-		sut = new EpisodeAsGraphWriter(file);
-	}
+//	@Test
+//	public void cannotBeInitializedWithNonExistingFolder() {
+//		thrown.expect(AssertionException.class);
+//		thrown.expectMessage("Episode-miner folder does not exist");
+//		sut = new EpisodeAsGraphWriter(new File("does not exist"));
+//	}
+//
+//	@Test
+//	public void cannotBeInitializedWithFile() throws IOException {
+//		File file = rootFolder.newFile("a");
+//		thrown.expect(AssertionException.class);
+//		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
+//		sut = new EpisodeAsGraphWriter(file);
+//	}
 
 	@Test
 	public void writerDirectoryTest() throws IOException {
-		sut.write(graph, 1);
-		File file = getFilePath(1);
+		String filePath = getFilePath(1);
+		sut.write(graph, filePath);
+		File file = new File(filePath);
 		assertTrue(file.getParentFile().exists());
 		assertTrue(file.exists());
 		file.delete();
 	}
 	
-	private File getFilePath(int index) {
+	private String getFilePath(int index) {
 		String dirPath = rootFolder.getRoot().getAbsolutePath() + "/graphs/";
 		new File(dirPath).mkdirs();
-		File fileName = new File(dirPath + "/graph" + index + ".dot");
+		String fileName = dirPath + "/graph" + index + ".dot";
 		return fileName;
 	}
 }
