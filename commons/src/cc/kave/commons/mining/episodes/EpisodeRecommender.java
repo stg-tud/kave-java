@@ -24,17 +24,18 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
 
-	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes, int numberOfProposalsToShow) throws Exception {
+	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, List<Episode>> episodes,
+			int numberOfProposalsToShow) throws Exception {
 		Map<Episode, Double> episodesWithF1Value = new HashMap<Episode, Double>();
-		
+
 		if (episodes.isEmpty()) {
 			throw new Exception("The list of learned episodes is empty");
 		}
-		
+
 		if (numberOfProposalsToShow <= 0) {
 			throw new Exception("Request a miningful number of proposals to show");
 		}
-		
+
 		for (Map.Entry<Integer, List<Episode>> entry : episodes.entrySet()) {
 			for (Episode e : entry.getValue()) {
 				episodesWithF1Value.put(e, calcF1(query, e));
@@ -42,7 +43,7 @@ public class EpisodeRecommender {
 		}
 		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value);
 		Set<Tuple<Episode, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
-		
+
 		int idx = 0;
 		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
 			if (idx < numberOfProposalsToShow && tuple.getSecond() > 0.0) {

@@ -10,11 +10,23 @@
  */
 package exec.episodes;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import cc.kave.commons.mining.episodes.EpisodeMapping;
+import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
+import cc.kave.commons.mining.episodes.QueryGenerator;
+import cc.kave.commons.mining.reader.EpisodeParser;
+import cc.kave.commons.model.episodes.Episode;
+
 public class Suggestions {
 
-	// private EpisodeReader ereader;
-	// private MaxFreqEpisodes episodeLearned;
-//	 private QueryGenerator queryGenerator;
+	private EpisodeParser episodeParser;
+	private MaximalFrequentEpisodes episodeLearned;
+	private QueryGenerator queryGenerator;
+	private EpisodeMapping episodeMapping;
 	// private EpisodeRecommender proposals;
 	//
 	// @Inject
@@ -24,11 +36,20 @@ public class Suggestions {
 	// this.queryGenerator = queryGenerator;
 	// this.proposals = proposals;
 	// }
+	 
+	@Inject
+	public Suggestions(EpisodeParser episodeParser, MaximalFrequentEpisodes episodeLearned, QueryGenerator queryGenerator, EpisodeMapping episodeMapping) {
+		this.episodeParser = episodeParser;
+		this.episodeLearned = episodeLearned;
+		this.queryGenerator = queryGenerator;
+		this.episodeMapping = episodeMapping;
+	}
 	
 	public void run() throws Exception {
-//		Map<Integer, List<Episode>> allEpisodes = ereader.read();
-//		Map<Integer, List<Episode>> maxEpisodes = episodeLearned.getMaxFreqEpisodes(allEpisodes);
-//		Tuple<Episode, Episode> query = queryGenerator.oneEventSkipped(maxEpisodes);
+		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse();
+		Map<Integer, List<Episode>> maxEpisodes = episodeLearned.getMaximalFrequentEpisodes(allEpisodes);
+		Map<Episode, Integer> episodeIds = episodeMapping.generateEpisodeIds(maxEpisodes);
+		List<Episode> listOfQueries = queryGenerator.parse();
 //		Set<Tuple<Episode, Double>> recommendations = proposals.getProposals(query.getFirst(), maxEpisodes);
 //		
 //		Logger.log("Initial episode: " +  query.getSecond().toString());
