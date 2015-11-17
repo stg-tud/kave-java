@@ -15,8 +15,7 @@
  */
 package cc.kave.commons.model.episodes;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -39,6 +38,12 @@ public class FactTest {
 	@Test(expected = AssertionException.class)
 	public void specialConstructorHandlesNull() {
 		new Fact(null);
+	}
+	
+	@Test
+	public void scontainsEventId() {
+		Fact sut = new Fact("fgj");
+		assertTrue(sut.getRawFact().contains("gj"));
 	}
 
 	@Test

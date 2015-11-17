@@ -45,6 +45,13 @@ public class Fact {
 		return this.rawFact;
 	}
 
+	public boolean containsEvent(String eventId) {
+		if (rawFact.contains(eventId)) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("[%s]", rawFact);

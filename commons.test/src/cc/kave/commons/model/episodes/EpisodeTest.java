@@ -52,6 +52,7 @@ public class EpisodeTest {
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("f", "g");
 		assertEquals(Lists.newArrayList(new Fact("f"), new Fact("g")), sut.getFacts());
+		assertTrue(sut.getNumberOfFacts() == 2);
 	}
 
 	@Test

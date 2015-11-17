@@ -77,6 +77,10 @@ public class Episode {
 		return false;
 	}
 
+	public int getNumberOfFacts() {
+		return facts.size();
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);

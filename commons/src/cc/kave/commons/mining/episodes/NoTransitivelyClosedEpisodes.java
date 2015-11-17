@@ -47,8 +47,41 @@ public class NoTransitivelyClosedEpisodes {
 			}
 		}
 		List<String> simplifiedRelations = removeClosureRelations(allPaths);
-		episodeResult.addListOfFacts(simplifiedRelations);
+		List<String> finalRelations = doubleCheckClosureRemoval(simplifiedRelations);
+		episodeResult.addListOfFacts(finalRelations);
 		return episodeResult;
+
+	}
+
+	private List<String> doubleCheckClosureRemoval(List<String> simplifiedRelations) {
+		List<String> positiveRelations = new LinkedList<String>();
+		List<String> negativeRelations = new LinkedList<String>();
+		for (int idStart = 0; idStart < simplifiedRelations.size() - 1; idStart++) {
+			String relation = simplifiedRelations.get(idStart);
+			if (!(positiveRelations.contains(relation) || negativeRelations.contains(relation))) {
+				positiveRelations.add(relation);
+			}
+			String[] eventsStart = relation.split(">");
+			for (int idContinue = idStart + 1; idContinue < simplifiedRelations.size(); idContinue++) {
+				String[] eventsContinue = simplifiedRelations.get(idContinue).split(">");
+				if (eventsStart[1].equalsIgnoreCase(eventsContinue[0])) {
+					negativeRelations.add(eventsStart[0] + ">" + eventsContinue[1]);
+				}
+				if (eventsStart[0].equalsIgnoreCase(eventsContinue[1])) {
+					negativeRelations.add(eventsContinue[0] + ">" + eventsStart[1]);
+				}
+			}
+		}
+		String lastRelation = simplifiedRelations.get(simplifiedRelations.size() - 1);
+		if (!(negativeRelations.contains(lastRelation) || positiveRelations.contains(lastRelation))) {
+			positiveRelations.add(lastRelation);
+		}
+		for (String relation : negativeRelations) {
+			if (positiveRelations.contains(relation)) {
+				positiveRelations.remove(relation);
+			}
+		}
+		return positiveRelations;
 	}
 
 	private List<String> removeClosureRelations(List<List<String>> allPaths) {

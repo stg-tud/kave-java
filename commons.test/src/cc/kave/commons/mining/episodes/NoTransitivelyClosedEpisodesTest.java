@@ -43,6 +43,8 @@ public class NoTransitivelyClosedEpisodesTest {
 		expected.put(5, createListOfEpisodes(5, false));
 		
 		Map<Integer, List<Episode>> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		
+//		assertEquals(expected, actuals);
 				
 		for (Map.Entry<Integer, List<Episode>> entry : expected.entrySet()) {
 			List<Episode> expectedList = expected.get(entry.getKey());
