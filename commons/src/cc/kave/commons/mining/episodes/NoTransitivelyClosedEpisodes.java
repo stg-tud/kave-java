@@ -50,7 +50,6 @@ public class NoTransitivelyClosedEpisodes {
 		List<String> finalRelations = doubleCheckClosureRemoval(simplifiedRelations);
 		episodeResult.addListOfFacts(finalRelations);
 		return episodeResult;
-
 	}
 
 	private List<String> doubleCheckClosureRemoval(List<String> simplifiedRelations) {
