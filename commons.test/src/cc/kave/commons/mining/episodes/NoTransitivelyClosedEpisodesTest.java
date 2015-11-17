@@ -80,10 +80,10 @@ public class NoTransitivelyClosedEpisodesTest {
 		} else if (i == 5) {
 			if (closure) {
 				episodes.add(createEpisode("a", "b", "c", "d", "e", "a>d", "a>e", "b>a", "b>c", "b>d", "b>e"));
-				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "f>h", "f>i", "f>j", "g>h", "g>i", "g>j", "h>i", "h>j", "i>j"));
+				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "f>h", "f>i", "f>j", "g>h", "g>i", "g>j", "h>j", "i>h", "i>j"));
 			} else {
 				episodes.add(createEpisode("a", "b", "c", "d", "e", "a>d", "a>e", "b>a", "b>c"));
-				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "g>h", "h>i", "i>j"));
+				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "g>i", "i>h", "h>j"));
 			}
 		}
 		return episodes;
