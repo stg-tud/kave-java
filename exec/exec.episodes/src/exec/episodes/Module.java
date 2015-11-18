@@ -19,6 +19,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
+import cc.kave.commons.mining.episodes.EpisodeMapping;
+import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
 import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
 import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
@@ -79,10 +81,13 @@ public class Module extends AbstractModule {
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
 		MaximalFrequentEpisodes episodeLearned = new MaximalFrequentEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
-		EpisodeAsGraphWriter writer = new EpisodeAsGraphWriter();
+		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 		NoTransitivelyClosedEpisodes transitivityClosure = new NoTransitivelyClosedEpisodes();
-		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter));
-//		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
+		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		QueryGenerator query = new QueryGenerator(eventStreamRoot, reader);
+		EpisodeMapping episodeMapping = new EpisodeMapping();
+		EpisodeRecommender recommender = new EpisodeRecommender();
+		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, query, episodeMapping, mappingParser, recommender, graphConverter, graphWriter));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

@@ -15,16 +15,6 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class EpisodeAsGraphWriter {
 
-	// private File rootFolder;
-	//
-	// @Inject
-	// public EpisodeAsGraphWriter(@Named("graph") File directory) {
-	// assertTrue(directory.exists(), "Episode-miner folder does not exist");
-	// assertTrue(directory.isDirectory(), "Episode-miner folder is not a
-	// folder, but a file");
-	// this.rootFolder = directory;
-	// }
-
 	public void write(DirectedGraph<Fact, DefaultEdge> graph, String fileName) throws IOException {
 
 		VertexNameProvider<Fact> vertexId = new VertexNameProvider<Fact>() {

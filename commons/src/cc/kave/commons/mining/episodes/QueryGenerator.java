@@ -51,12 +51,12 @@ public class QueryGenerator {
 
 	private Episode createQuery(List<String> events) {
 		Episode episode = new Episode();
+		episode.setFrequency(1);
+		episode.setNumEvents(events.size());
 		episode.addListOfFacts(events);
 		for (int idx = 0; idx < (events.size() - 1); idx++) {
 			episode.addFact(events.get(idx) + ">" + events.get(idx + 1));
 		}
-		episode.setFrequency(1);
-		episode.setNumEvents(events.size());
 		return episode;
 	}
 
