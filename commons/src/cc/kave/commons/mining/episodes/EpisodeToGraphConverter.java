@@ -8,6 +8,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
@@ -25,9 +26,10 @@ public class EpisodeToGraphConverter {
 
 				int index = Integer.parseInt(fact.getRawFact());
 				MethodName method = eventMapping.get(index - 1).getMethod();
+				EventKind kind = eventMapping.get(index - 1).getKind();
 
 				String out = toLabel(method);
-				labels += fact.getRawFact() + ". " + out + "\\l";
+				labels += fact.getRawFact() + ". " + kind.toString() + ": " + out + "\\l";
 			} else {
 				String[] events = fact.getRawFact().split(">");
 				graph.addEdge(new Fact(events[0]), new Fact(events[1]));

@@ -74,13 +74,13 @@ public class Suggestions {
 		int queryIndex = 0;
 		
 		for (Episode query : listOfQueries) {
-//			if (queryIndex == 1459) {
-//				queryIndex++;
-//				continue;
-//			}
+			if (queryIndex == 1460) {
+				queryIndex++;
+				continue;
+			}
 			int proposalIndex = 0;
 			Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, learnedEpisodes, 3); 
-			if (proposals.size() == 0) {
+			if (proposals.size() > 0) {
 				continue;
 			}
 			DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(query, eventMapper);

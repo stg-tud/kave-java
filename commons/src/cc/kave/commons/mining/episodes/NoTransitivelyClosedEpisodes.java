@@ -25,8 +25,12 @@ public class NoTransitivelyClosedEpisodes {
 			} else {
 				List<Episode> updatedEpisodes = new LinkedList<Episode>();
 				for (Episode episode : entry.getValue()) {
-					Episode newEpisode = reduceRelations(episode);
-					updatedEpisodes.add(newEpisode);
+					if (episode.getNumberOfFacts() != episode.getNumEvents()) {
+						Episode newEpisode = reduceRelations(episode);
+						updatedEpisodes.add(newEpisode);
+					} else {
+						updatedEpisodes.add(episode);
+					}
 				}
 				results.put(entry.getKey(), updatedEpisodes);
 			}

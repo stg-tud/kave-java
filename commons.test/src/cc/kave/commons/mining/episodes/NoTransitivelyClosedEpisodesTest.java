@@ -20,12 +20,6 @@ public class NoTransitivelyClosedEpisodesTest {
 	@Before
 	public void setup() {
 		sut = new NoTransitivelyClosedEpisodes();
-		maximalEpisodes = new HashMap<Integer, List<Episode>>();
-		maximalEpisodes.put(1, createListOfEpisodes(1, true));
-		maximalEpisodes.put(2, createListOfEpisodes(2, true));
-		maximalEpisodes.put(3, createListOfEpisodes(3, true));
-		maximalEpisodes.put(4, createListOfEpisodes(4, true));
-		maximalEpisodes.put(5, createListOfEpisodes(5, true));
 	}
 
 	@Test(expected=Exception.class)
@@ -34,7 +28,48 @@ public class NoTransitivelyClosedEpisodesTest {
 	}
 	
 	@Test
+	public void sameEpisode() throws Exception {
+		
+		maximalEpisodes = new HashMap<Integer, List<Episode>>();
+		List<Episode> listOfEpisodes = new LinkedList<Episode>();
+		Episode episode = new Episode();
+		episode.setFrequency(3);
+		episode.setNumEvents(3);
+		episode.addStringsOfFacts("a", "b", "c");
+		listOfEpisodes.add(episode);
+		maximalEpisodes.put(3, listOfEpisodes);
+		
+		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
+		listOfEpisodes = new LinkedList<Episode>();
+		episode = new Episode();
+		episode.setFrequency(3);
+		episode.setNumEvents(3);
+		episode.addStringsOfFacts("a", "b", "c");
+		listOfEpisodes.add(episode);
+		expected.put(3, listOfEpisodes);
+		
+		Map<Integer, List<Episode>> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		
+				
+		for (Map.Entry<Integer, List<Episode>> entry : expected.entrySet()) {
+			List<Episode> expectedList = expected.get(entry.getKey());
+			List<Episode> actualsList = actuals.get(entry.getKey());
+			assertTrue(expectedList.size() == actualsList.size());
+			for (int idx = 0; idx < expectedList.size(); idx++) {
+				assertTrue(expectedList.get(idx).equals(actualsList.get(idx)));
+			}
+		}
+	}
+	
+	@Test
 	public void removeClosures() throws Exception {
+		maximalEpisodes = new HashMap<Integer, List<Episode>>();
+		maximalEpisodes.put(1, createListOfEpisodes(1, true));
+		maximalEpisodes.put(2, createListOfEpisodes(2, true));
+		maximalEpisodes.put(3, createListOfEpisodes(3, true));
+		maximalEpisodes.put(4, createListOfEpisodes(4, true));
+		maximalEpisodes.put(5, createListOfEpisodes(5, true));
+		
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
 		expected.put(1, createListOfEpisodes(1, false));
 		expected.put(2, createListOfEpisodes(2, false));

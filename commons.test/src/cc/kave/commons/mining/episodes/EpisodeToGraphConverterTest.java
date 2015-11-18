@@ -87,18 +87,22 @@ public class EpisodeToGraphConverterTest {
 		String labels = "";
 
 		MethodName method1 = eventMapping.get(0).getMethod();
+		String kind1 = eventMapping.get(0).getKind().toString();
 		String out1 = toLabel(method1);
 		MethodName method2 = eventMapping.get(1).getMethod();
+		String kind2 = eventMapping.get(1).getKind().toString();
 		String out2 = toLabel(method2);
 		MethodName method3 = eventMapping.get(2).getMethod();
+		String kind3 = eventMapping.get(2).getKind().toString();
 		String out3 = toLabel(method3);
 		MethodName method4 = eventMapping.get(3).getMethod();
+		String kind4 = eventMapping.get(3).getKind().toString();
 		String out4 = toLabel(method4);
 
-		labels += "1. " + out1 + "\\l";
-		labels += "2. " + out2 + "\\l";
-		labels += "3. " + out3 + "\\l";
-		labels += "4. " + out4 + "\\l";
+		labels += "1. " + kind1 + ": " + out1 + "\\l";
+		labels += "2. " + kind2 + ": " + out2 + "\\l";
+		labels += "3. " + kind3 + ": " + out3 + "\\l";
+		labels += "4. " + kind4 + ": " + out4 + "\\l";
 
 		Fact labelNode = new Fact(labels);
 		expected.addVertex(labelNode);
