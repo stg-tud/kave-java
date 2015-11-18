@@ -45,6 +45,7 @@ public class EpisodeRecommenderTest {
 	public void setup() {
 		sut = new EpisodeRecommender();
 		expectedProposals = Sets.newLinkedHashSet();
+		actualProposals = Sets.newLinkedHashSet();
 		emptyEpisodes = new HashMap<Integer, List<Episode>>();
 
 		learnedEpisodes = new HashMap<Integer, List<Episode>>();
@@ -64,8 +65,16 @@ public class EpisodeRecommenderTest {
 	}
 	
 	@Test
+	public void queryBiggerThenEpisode() throws Exception {
+		queryWith(4, "4", "5", "6", "9", "4>5", "4>6");
+		
+		addProposal(newEpisode(1, 3, "6", "7", "8", "7>8"), Double.valueOf(df.format(1.0 / 5.0)));
+		
+		assertProposals(actualProposals);
+	}
+	
+	@Test
 	public void oneEventQuery() throws Exception {
-
 		queryWith(1, "1");
 
 		addProposal(newEpisode(3, 1, "1"), 1.0);
@@ -100,9 +109,6 @@ public class EpisodeRecommenderTest {
 	public void twoNodeQuery() throws Exception {
 
 		queryWith(2, "1", "2", "1>2");
-		
-		addProposal(newEpisode(3, 1, "1"), 0.5);
-		addProposal(newEpisode(3, 1, "2"), 0.5);
 
 		assertProposals(actualProposals);
 	}

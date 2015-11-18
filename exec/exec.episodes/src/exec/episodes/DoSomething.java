@@ -79,13 +79,18 @@ public class DoSomething {
 		int i = 1;
 //		events.indexOf(event)
 		for (Event e : events) {
-			if (i == 4978 || i == 8698 || i == 8708 || i == 8718 || i == 8725) {
-				i++;
-				continue;
-			}
+//			if (i == 4978 || i == 8698 || i == 8708 || i == 8718 || i == 8725) {
+//				i++;
+//				continue;
+//			}
+//			if (i == 4641) {
+//				i++;
+//				continue;
+//			}
 			System.out.println("--- " + (i++) + " ---------------------");
 			System.out.println(e);
 			System.out.println(e.getMethod().getName());
 		}
+		System.out.println(events.size());
 	}
 }

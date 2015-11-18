@@ -23,10 +23,10 @@ import org.jgrapht.graph.DefaultEdge;
 
 import com.google.inject.name.Named;
 
-import cc.kave.commons.mining.episodes.EpisodeMapping;
 import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
 import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
+import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
 import cc.kave.commons.mining.episodes.QueryGenerator;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
@@ -40,32 +40,24 @@ import cc.recommenders.io.Logger;
 public class Suggestions {
 
 	private EpisodeParser episodeParser;
-	private MaximalFrequentEpisodes episodeLearned;
+	private MaximalFrequentEpisodes maximalEpisodes;
+	private NoTransitivelyClosedEpisodes transitivityClosure;
 	private QueryGenerator queryGenerator;
-	private EpisodeMapping episodeMapping;
 	private EventMappingParser eventMappingParser;
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 	
 	private File rootFolder;
-	//
-	// @Inject
-	// public Suggestions(MaxFreqEpisodes episodeLearned, QueryGenerator
-	// queryGenerator, EpisodeRecommender proposals) {
-	// this.episodeLearned = episodeLearned;
-	// this.queryGenerator = queryGenerator;
-	// this.proposals = proposals;
-	// }
 	 
 	@Inject
-	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalFrequentEpisodes episodeLearned, QueryGenerator queryGenerator, 
-			EpisodeMapping episodeMapping, EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
+	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalFrequentEpisodes maximalEpisodes, NoTransitivelyClosedEpisodes transitivityClosure,
+			QueryGenerator queryGenerator, EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
-		this.episodeLearned = episodeLearned;
+		this.maximalEpisodes = maximalEpisodes;
+		this.transitivityClosure = transitivityClosure;
 		this.queryGenerator = queryGenerator;
-		this.episodeMapping = episodeMapping;
 		this.eventMappingParser = eventMapping;
 		this.recommender = recommender;
 		this.graphConverter = graphConverter;
@@ -74,18 +66,25 @@ public class Suggestions {
 	
 	public void run() throws Exception {
 		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse();
-		Map<Integer, List<Episode>> learnedEpisodes = episodeLearned.getMaximalFrequentEpisodes(allEpisodes);
-//		Map<Episode, Integer> episodeIds = episodeMapping.generateEpisodeIds(learnedEpisodes);
+		Map<Integer, List<Episode>> maxEpisodes = maximalEpisodes.getMaximalFrequentEpisodes(allEpisodes);
+		Map<Integer, List<Episode>> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(maxEpisodes);
 		List<Event> eventMapper = eventMappingParser.parse();
 		List<Episode> listOfQueries = queryGenerator.parse();
 		
 		int queryIndex = 0;
 		
 		for (Episode query : listOfQueries) {
+//			if (queryIndex == 1459) {
+//				queryIndex++;
+//				continue;
+//			}
 			int proposalIndex = 0;
+			Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, learnedEpisodes, 3); 
+			if (proposals.size() == 0) {
+				continue;
+			}
 			DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(query, eventMapper);
 			graphWriter.write(queryGraph, getFilePath("query", queryIndex, proposalIndex));
-			Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, learnedEpisodes, 3); 
 			Iterator<Tuple<Episode, Double>> iterator = proposals.iterator();
 			while (iterator.hasNext()) {
 				Tuple<Episode, Double> p = iterator.next();
@@ -96,18 +95,6 @@ public class Suggestions {
 			Logger.log("Finished writting query%d", queryIndex);
 			queryIndex++;
 		}
-		
-//		Set<Tuple<Episode, Double>> recommendations = proposals.getProposals(query.getFirst(), maxEpisodes);
-//		
-//		Logger.log("Initial episode: " +  query.getSecond().toString());
-//		Logger.log("Generated query: " + query.getFirst().toString());
-//		Logger.log("List of proposals: ");
-//		
-//		Iterator<Tuple<Episode, Double>> iterator = recommendations.iterator();
-//		while (iterator.hasNext()) {
-//			Tuple<Episode, Double> proposal = iterator.next();
-//			Logger.log(proposal.getFirst().toString() + ", " + proposal.getSecond().toString());
-//		}
 	}
 	
 	private String getFilePath(String fileName, int queryIndex, int proposalIndex) {

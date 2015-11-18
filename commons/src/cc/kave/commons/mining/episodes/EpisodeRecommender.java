@@ -46,12 +46,27 @@ public class EpisodeRecommender {
 
 		int idx = 0;
 		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
-			if (idx < numberOfProposalsToShow && tuple.getSecond() > 0.0) {
+			if (idx < numberOfProposalsToShow && tuple.getSecond() > 0.0
+					&& !EpisodeIsPartOfQuery(query, tuple.getFirst())) {
 				finalProposals.add(tuple);
 				idx++;
 			}
 		}
 		return finalProposals;
+	}
+
+	private boolean EpisodeIsPartOfQuery(Episode query, Episode episode) {
+		if (query.getNumEvents() <= episode.getNumEvents()) {
+			return false;
+		}
+		for (Fact fact : episode.getFacts()) {
+			if (query.containsFact(fact)) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private double calcF1(Episode query, Episode e) {

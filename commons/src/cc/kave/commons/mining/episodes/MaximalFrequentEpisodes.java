@@ -31,15 +31,15 @@ public class MaximalFrequentEpisodes {
 			return freqEpisodes;
 		}		
 		
-		int[] nodeEpisodes = getNodeEpisodes(freqEpisodes);
+		int[] nodeLevelEpisodes = getNodeEpisodes(freqEpisodes);
 		
-		for (int idx = 1; idx < nodeEpisodes.length; idx++) {
-			List<Episode> reducedEpisodeList = reduceToMaximalEpisodes(freqEpisodes.get(nodeEpisodes[idx - 1]), freqEpisodes.get(nodeEpisodes[idx]));
+		for (int idx = 1; idx < nodeLevelEpisodes.length; idx++) {
+			List<Episode> reducedEpisodeList = reduceToMaximalEpisodes(freqEpisodes.get(nodeLevelEpisodes[idx - 1]), freqEpisodes.get(nodeLevelEpisodes[idx]));
 			if (!reducedEpisodeList.isEmpty()) {
-				maximalFrequentEpisodes.put((nodeEpisodes[idx - 1]), reducedEpisodeList);
+				maximalFrequentEpisodes.put((nodeLevelEpisodes[idx - 1]), reducedEpisodeList);
 			}
 		}
-		maximalFrequentEpisodes.put(nodeEpisodes[nodeEpisodes.length - 1], freqEpisodes.get(nodeEpisodes[nodeEpisodes.length - 1]));
+		maximalFrequentEpisodes.put(nodeLevelEpisodes[nodeLevelEpisodes.length - 1], freqEpisodes.get(nodeLevelEpisodes[nodeLevelEpisodes.length - 1]));
 		return maximalFrequentEpisodes;
 	}
 	
