@@ -79,10 +79,9 @@ public class Module extends AbstractModule {
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
 		MaximalFrequentEpisodes episodeLearned = new MaximalFrequentEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
-		EventStreamParser eventStrammer = new EventStreamParser(eventStreamRoot, reader, mappingParser);
 		EpisodeAsGraphWriter writer = new EpisodeAsGraphWriter();
 		NoTransitivelyClosedEpisodes transitivityClosure = new NoTransitivelyClosedEpisodes();
-		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser , episodeLearned, mappingParser, transitivityClosure , writer , graphConverter , eventStrammer ));
+		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter));
 //		bind(EpisodeAsGraphWriter.class).toInstance(new EpisodeAsGraphWriter(graphRoot));
 	}
 

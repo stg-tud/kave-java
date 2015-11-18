@@ -14,7 +14,6 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
-import cc.kave.commons.mining.reader.EventStreamParser;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
@@ -29,7 +28,6 @@ public class EpisodeGraphGenerator {
 	private EpisodeToGraphConverter graphConverter;
 	private NoTransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
-	private EventStreamParser eventStreammer;
 
 	private File rootFolder;
 
@@ -37,7 +35,7 @@ public class EpisodeGraphGenerator {
 	public EpisodeGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
 			MaximalFrequentEpisodes episodeLearned, EventMappingParser mappingParser,
 			NoTransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
-			EpisodeToGraphConverter graphConverter, EventStreamParser eventStrammer) {
+			EpisodeToGraphConverter graphConverter) {
 
 		assertTrue(directory.exists(), "Episode-miner folder does not exist");
 		assertTrue(directory.isDirectory(), "Episode-miner folder is not a folder, but a file");
@@ -48,7 +46,6 @@ public class EpisodeGraphGenerator {
 		this.mappingParser = mappingParser;
 		this.graphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
-		this.eventStreammer = eventStrammer;
 		this.writer = writer;
 	}
 

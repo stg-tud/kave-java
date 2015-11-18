@@ -12,7 +12,6 @@ import org.mockito.Mock;
 
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
-import cc.kave.commons.mining.reader.EventStreamParser;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
 import cc.recommenders.exceptions.AssertionException;
 
@@ -34,21 +33,19 @@ public class EpisodeGraphGeneratorTest {
 	private NoTransitivelyClosedEpisodes transitivityClosure;
 	@Mock
 	private EpisodeAsGraphWriter writer;
-	@Mock
-	private EventStreamParser eventStreammer;
 	
 	private EpisodeGraphGenerator sut;
 	
 	@Before
 	public void setup() {
-		sut = new EpisodeGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter, eventStreammer);
+		sut = new EpisodeGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter);
 	}
 	
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder does not exist");
-		sut = new EpisodeGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter, eventStreammer);
+		sut = new EpisodeGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter);
 	}
 
 	@Test
@@ -56,6 +53,6 @@ public class EpisodeGraphGeneratorTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
-		sut = new EpisodeGraphGenerator(file, episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter, eventStreammer);
+		sut = new EpisodeGraphGenerator(file, episodeParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter);
 	}
 }
