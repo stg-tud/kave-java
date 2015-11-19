@@ -51,7 +51,8 @@ public class EpisodeRecommenderTest {
 		learnedEpisodes = new HashMap<Integer, List<Episode>>();
 		learnedEpisodes.put(1, newArrayList(newEpisode(3, 1, "1"), newEpisode(3, 1, "2"), newEpisode(3, 1, "3")));
 		learnedEpisodes.put(2, newArrayList(newEpisode(3, 2, "4", "5", "4>5"), newEpisode(2, 2, "4", "6", "4>6")));
-		learnedEpisodes.put(3, newArrayList(newEpisode(1, 3, "6", "7", "8", "7>8")));
+		learnedEpisodes.put(3, newArrayList(newEpisode(1, 3, "6", "7", "8", "7>8"), newEpisode(3, 3, "10", "11", "12", "11>12")));
+		learnedEpisodes.put(4, newArrayList(newEpisode(3, 4, "10", "11", "12", "13")));
 	}
 
 	@Test(expected=Exception.class)
@@ -69,6 +70,16 @@ public class EpisodeRecommenderTest {
 		queryWith(4, "4", "5", "6", "9", "4>5", "4>6");
 		
 		addProposal(newEpisode(1, 3, "6", "7", "8", "7>8"), Double.valueOf(df.format(1.0 / 5.0)));
+		
+		assertProposals(actualProposals);
+	}
+	
+	@Test
+	public void sameProbabilityDifferentEventsNumber() throws Exception {
+		queryWith(2, "10", "11");
+		
+		addProposal(newEpisode(3, 4, "10", "11", "12", "13"), Double.valueOf(df.format(2.0 / 3.0)));
+		addProposal(newEpisode(3, 3, "10", "11", "12", "11>12"), Double.valueOf(df.format(2.0 / 3.0)));
 		
 		assertProposals(actualProposals);
 	}

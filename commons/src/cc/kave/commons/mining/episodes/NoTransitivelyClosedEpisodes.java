@@ -52,6 +52,9 @@ public class NoTransitivelyClosedEpisodes {
 		}
 		List<String> simplifiedRelations = removeClosureRelations(allPaths);
 		List<String> finalRelations = doubleCheckClosureRemoval(simplifiedRelations);
+		for (int numItr = 0; numItr < episode.getNumEvents() - 3; numItr++) {
+			finalRelations = doubleCheckClosureRemoval(finalRelations);
+		}
 		episodeResult.addListOfFacts(finalRelations);
 		return episodeResult;
 	}
