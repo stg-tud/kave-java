@@ -5,6 +5,7 @@ import java.util.List;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
@@ -24,19 +25,37 @@ public class EpisodeToGraphConverter {
 			if (!fact.getRawFact().contains(">")) {
 				graph.addVertex(fact);
 
-				int index = Integer.parseInt(fact.getRawFact());
-				MethodName method = eventMapping.get(index - 1).getMethod();
-				EventKind kind = eventMapping.get(index - 1).getKind();
-
-				String out = toLabel(method);
-				labels += fact.getRawFact() + ". " + kind.toString() + ": " + out + "\\l";
+				// int index = Integer.parseInt(fact.getRawFact());
+				// MethodName method = eventMapping.get(index - 1).getMethod();
+				// EventKind kind = eventMapping.get(index - 1).getKind();
+				//
+				// String out = toLabel(method);
+				// labels += fact.getRawFact() + ". " + kind.toString() + ": " +
+				// out + "\\l";
 			} else {
 				String[] events = fact.getRawFact().split(">");
 				graph.addEdge(new Fact(events[0]), new Fact(events[1]));
 			}
 		}
+
+		// Fact labelFact = new Fact(labels);
+		// graph.addVertex(labelFact);
+
+		TopologicalOrderIterator<Fact, DefaultEdge> toi = new TopologicalOrderIterator<>(graph);
+		// BreadthFirstIterator<Fact, DefaultEdge> bf = new
+		// BreadthFirstIterator<Fact, DefaultEdge>(graph);
+		while (toi.hasNext()) {
+			Fact fact = toi.next();
+			int index = Integer.parseInt(fact.getRawFact());
+			MethodName method = eventMapping.get(index - 1).getMethod();
+			EventKind kind = eventMapping.get(index - 1).getKind();
+
+			String out = toLabel(method);
+			labels += fact.getRawFact() + ". " + kind.toString() + ": " + out + "\\l";
+		}
 		Fact labelFact = new Fact(labels);
 		graph.addVertex(labelFact);
+
 		return graph;
 	}
 
