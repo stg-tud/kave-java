@@ -3,6 +3,12 @@ package cc.kave.commons.model.ssts.impl.transformation.loops;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
+import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -22,8 +28,13 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
@@ -52,14 +63,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IMethodDeclaration method, LoopNormalizationContext context) {
 		List<IStatement> body = method.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		method.getBody().clear();
 		method.getBody().addAll(bodyNormalized);
 		return null;
@@ -113,14 +117,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IDoLoop block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
 		return null;
@@ -128,55 +125,69 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 
 	@Override
 	public List<IStatement> visit(IForEachLoop block, LoopNormalizationContext context) {
-		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
-		block.getBody().clear();
-		block.getBody().addAll(bodyNormalized);
-		return null;
+		// normalize inner loops
+		List<IStatement> bodyNormalized = visit(block.getBody(), context);
+
+		// create condition
+		LoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
+		String loopedReference = block.getLoopedReference().getIdentifier();
+		MethodName method = CsMethodName.newMethodName("hasNext");
+		condition.setBody(Lists.newArrayList(
+				SSTUtil.invocationStatement(loopedReference, method, new ArrayList<ISimpleExpression>().iterator())));
+
+		IVariableDeclaration varDecl = block.getDeclaration();
+		IVariableReference varRef = varDecl.getReference();
+		TypeName varType = varDecl.getType();
+
+		// declare iterator
+		// TODO: fix typename? (type parameters correct?)
+		TypeName iteratorTypeName = CsTypeName
+				.newTypeName("Iterator`1[[T -> " + varType.getIdentifier() + "]], package, 1.0.0.0");
+		IVariableDeclaration iteratorDecl = SSTUtil.declareVar("iterator", iteratorTypeName);
+
+		// assign iterator
+		InvocationExpression invokeIterator = new InvocationExpression();
+		invokeIterator.setMethodName(CsMethodName.newMethodName("iterator"));
+		invokeIterator.setReference(varRef);
+		IStatement iteratorInit = SSTUtil.assign(iteratorDecl.getReference(), invokeIterator);
+
+		// declare element
+		IVariableDeclaration elemDecl = SSTUtil.declareVar("elem", varType);
+
+		// assign next element
+		InvocationExpression invokeNext = new InvocationExpression();
+		invokeNext.setMethodName(CsMethodName.newMethodName("next"));
+		invokeNext.setReference(iteratorDecl.getReference());
+		IStatement elemAssign = SSTUtil.assign(elemDecl.getReference(), invokeNext);
+
+		// assemble while loop
+		List<IStatement> whileBody = new ArrayList(); // TODO
+		whileBody.addAll(bodyNormalized);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setBody(whileBody);
+		whileLoop.setCondition(condition);
+
+		List<IStatement> normalized = new ArrayList<IStatement>();
+		normalized.add(iteratorDecl);
+		normalized.add(iteratorInit);
+		normalized.add(whileLoop);
+		return normalized;
 	}
 
 	@Override
 	public List<IStatement> visit(IForLoop block, LoopNormalizationContext context) {
 		ILoopHeaderExpression condition = block.getCondition();
 
-		List<IStatement> init = block.getInit();
-		List<IStatement> initNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : init) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				initNormalized.add(stmt);
-			else
-				initNormalized.addAll(stmtNormalized);
-		}
+		// normalize inner loops
+		List<IStatement> initNormalized = visit(block.getInit(), context);
+		List<IStatement> stepNormalized = visit(block.getStep(), context);
+		List<IStatement> bodyNormalized = visit(block.getBody(), context);
 
-		List<IStatement> step = block.getStep();
-		List<IStatement> stepNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : step) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				stepNormalized.add(stmt);
-			else
-				stepNormalized.addAll(stmtNormalized);
-		}
-
-		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		// TODO: put in some kind of block statement? (to limit scope of 'init'
+		// part)
+		// TODO: handle 'continue' inside loop body?
 		List<IStatement> whileBody = bodyNormalized;
-		whileBody.addAll(step);
+		whileBody.addAll(stepNormalized);
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(whileBody);
 		whileLoop.setCondition(condition);
@@ -184,53 +195,29 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 		List<IStatement> normalized = new ArrayList<IStatement>();
 		normalized.addAll(initNormalized);
 		normalized.add(whileLoop);
-
 		return normalized;
 	}
 
 	@Override
 	public List<IStatement> visit(IIfElseBlock block, LoopNormalizationContext context) {
 		List<IStatement> thenBranch = block.getThen();
-		List<IStatement> thenBranchNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : thenBranch) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				thenBranchNormalized.add(stmt);
-			else
-				thenBranchNormalized.addAll(stmtNormalized);
-		}
-		thenBranch.clear();
-		thenBranch.addAll(thenBranchNormalized);
+		List<IStatement> thenBranchNormalized = visit(thenBranch, context);
+		block.getThen().clear();
+		block.getThen().addAll(thenBranchNormalized);
 
 		List<IStatement> elseBranch = block.getElse();
-		List<IStatement> elseBranchNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : elseBranch) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				elseBranchNormalized.add(stmt);
-			else
-				elseBranchNormalized.addAll(stmtNormalized);
-		}
-		elseBranch.clear();
-		elseBranch.addAll(elseBranchNormalized);
-
+		List<IStatement> elseBranchNormalized = visit(elseBranch, context);
+		block.getElse().clear();
+		block.getElse().addAll(elseBranchNormalized);
 		return null;
 	}
 
 	@Override
 	public List<IStatement> visit(ILockBlock block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
-
 		return null;
 	}
 
@@ -238,72 +225,34 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	public List<IStatement> visit(ISwitchBlock block, LoopNormalizationContext context) {
 		for (ICaseBlock caseBlock : block.getSections()) {
 			List<IStatement> body = caseBlock.getBody();
-			List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-			for (IStatement stmt : body) {
-				List<IStatement> stmtNormalized = stmt.accept(this, context);
-				if (stmtNormalized == null)
-					bodyNormalized.add(stmt);
-				else
-					bodyNormalized.addAll(stmtNormalized);
-			}
+			List<IStatement> bodyNormalized = visit(body, context);
 			caseBlock.getBody().clear();
 			caseBlock.getBody().addAll(bodyNormalized);
 		}
 
 		List<IStatement> defaultSection = block.getDefaultSection();
-		List<IStatement> defaultSectionNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : defaultSection) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				defaultSectionNormalized.add(stmt);
-			else
-				defaultSectionNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> defaultSectionNormalized = visit(defaultSection, context);
 		block.getDefaultSection().clear();
 		block.getDefaultSection().addAll(defaultSectionNormalized);
-
 		return null;
 	}
 
 	@Override
 	public List<IStatement> visit(ITryBlock block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			List<IStatement> catchBody = catchBlock.getBody();
-			List<IStatement> catchBodyNormalized = new ArrayList<IStatement>();
-			for (IStatement stmt : catchBody) {
-				List<IStatement> stmtNormalized = stmt.accept(this, context);
-				if (stmtNormalized == null)
-					catchBodyNormalized.add(stmt);
-				else
-					catchBodyNormalized.addAll(stmtNormalized);
-			}
+			List<IStatement> catchBodyNormalized = visit(catchBody, context);
 			catchBlock.getBody().clear();
 			catchBlock.getBody().addAll(catchBodyNormalized);
 		}
-		for (IStatement stmt : block.getFinally()) {
-			stmt.accept(this, context);
-		}
+
 		List<IStatement> finallyStmt = block.getFinally();
-		List<IStatement> finallyStmtNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : finallyStmt) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				finallyStmtNormalized.add(stmt);
-			else
-				finallyStmtNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> finallyStmtNormalized = visit(finallyStmt, context);
 		block.getFinally().clear();
 		block.getFinally().addAll(finallyStmtNormalized);
 		return null;
@@ -312,14 +261,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IUncheckedBlock block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
 		return null;
@@ -333,14 +275,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IUsingBlock block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
 		return null;
@@ -349,14 +284,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IWhileLoop block, LoopNormalizationContext context) {
 		List<IStatement> body = block.getBody();
-		List<IStatement> bodyNormalized = new ArrayList<IStatement>();
-		for (IStatement stmt : body) {
-			List<IStatement> stmtNormalized = stmt.accept(this, context);
-			if (stmtNormalized == null)
-				bodyNormalized.add(stmt);
-			else
-				bodyNormalized.addAll(stmtNormalized);
-		}
+		List<IStatement> bodyNormalized = visit(body, context);
 		block.getBody().clear();
 		block.getBody().addAll(bodyNormalized);
 		return null;
@@ -370,5 +298,20 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 	@Override
 	public List<IStatement> visit(IEventSubscriptionStatement stmt, LoopNormalizationContext context) {
 		return null;
+	}
+
+	/**
+	 * Helper method to visit list of statements.
+	 */
+	public List<IStatement> visit(List<IStatement> statements, LoopNormalizationContext context) {
+		List<IStatement> normalized = new ArrayList<IStatement>();
+		for (IStatement stmt : statements) {
+			List<IStatement> stmtNormalized = stmt.accept(this, context);
+			if (stmtNormalized == null)
+				normalized.add(stmt);
+			else
+				normalized.addAll(stmtNormalized);
+		}
+		return normalized;
 	}
 }
