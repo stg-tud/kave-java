@@ -80,6 +80,15 @@ public class NodeFactory {
 		case ASTNode.PACKAGE_DECLARATION:
 			PackageDeclaration packageNode = (PackageDeclaration) node;
 			return CsNamespaceName.newNamespaceName(packageNode.resolveBinding().getName());
+			
+		case ASTNode.FIELD_DECLARATION:
+			return createVariableName(node);
+			
+		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+			return createVariableName(node);
+			
+		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+			return createVariableName(node);
 
 		default:
 			return null;

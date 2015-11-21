@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: eclipse.commons.test
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: namefactory,
+ org.junit,
+ org.eclipse.jdt.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ commons,
+ eclipse.commons
