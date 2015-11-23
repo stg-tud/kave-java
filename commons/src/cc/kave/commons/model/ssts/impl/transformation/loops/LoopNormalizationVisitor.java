@@ -3,9 +3,6 @@ package cc.kave.commons.model.ssts.impl.transformation.loops;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
@@ -28,11 +25,10 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
-import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -125,34 +121,35 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 
 	@Override
 	public List<IStatement> visit(IForEachLoop block, LoopNormalizationContext context) {
+
+		IVariableReference loopedReference = block.getLoopedReference();
+		IVariableDeclaration variableDeclaration = block.getDeclaration();
+		String variableName = variableDeclaration.getReference().getIdentifier();
+		TypeName variableType = variableDeclaration.getType();
+
 		// normalize inner loops
 		List<IStatement> bodyNormalized = visit(block.getBody(), context);
 
-		// create condition
-		LoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
-		String loopedReference = block.getLoopedReference().getIdentifier();
-		MethodName method = CsMethodName.newMethodName("hasNext");
-		condition.setBody(Lists.newArrayList(
-				SSTUtil.invocationStatement(loopedReference, method, new ArrayList<ISimpleExpression>().iterator())));
-
-		IVariableDeclaration varDecl = block.getDeclaration();
-		IVariableReference varRef = varDecl.getReference();
-		TypeName varType = varDecl.getType();
-
 		// declare iterator
-		// TODO: fix typename? (type parameters correct?)
+		// TODO: fix typename? (type parameter correct?)
 		TypeName iteratorTypeName = CsTypeName
-				.newTypeName("Iterator`1[[T -> " + varType.getIdentifier() + "]], package, 1.0.0.0");
+				.newTypeName("Iterator`1[[T -> " + variableType.getIdentifier() + "]], mscorlib, 4.0.0.0");
 		IVariableDeclaration iteratorDecl = SSTUtil.declareVar("iterator", iteratorTypeName);
 
-		// assign iterator
+		// initialize iterator
 		InvocationExpression invokeIterator = new InvocationExpression();
 		invokeIterator.setMethodName(CsMethodName.newMethodName("iterator"));
-		invokeIterator.setReference(varRef);
+		invokeIterator.setReference(loopedReference);
 		IStatement iteratorInit = SSTUtil.assign(iteratorDecl.getReference(), invokeIterator);
 
+		// create condition
+		InvocationExpression invokeHasNext = new InvocationExpression();
+		invokeHasNext.setMethodName(CsMethodName.newMethodName("hasNext"));
+		invokeHasNext.setReference(iteratorDecl.getReference());
+		ILoopHeaderBlockExpression condition = SSTUtil.loopHeader(SSTUtil.expr(invokeHasNext));
+
 		// declare element
-		IVariableDeclaration elemDecl = SSTUtil.declareVar("elem", varType);
+		IVariableDeclaration elemDecl = SSTUtil.declareVar(variableName, variableType);
 
 		// assign next element
 		InvocationExpression invokeNext = new InvocationExpression();
@@ -161,7 +158,8 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 		IStatement elemAssign = SSTUtil.assign(elemDecl.getReference(), invokeNext);
 
 		// assemble while loop
-		List<IStatement> whileBody = new ArrayList(); // TODO
+		List<IStatement> whileBody = new ArrayList<IStatement>();
+		whileBody.add(elemAssign);
 		whileBody.addAll(bodyNormalized);
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(whileBody);
@@ -170,6 +168,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 		List<IStatement> normalized = new ArrayList<IStatement>();
 		normalized.add(iteratorDecl);
 		normalized.add(iteratorInit);
+		normalized.add(elemDecl);
 		normalized.add(whileLoop);
 		return normalized;
 	}
@@ -183,10 +182,10 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 		List<IStatement> stepNormalized = visit(block.getStep(), context);
 		List<IStatement> bodyNormalized = visit(block.getBody(), context);
 
-		// TODO: put in some kind of block statement? (to limit scope of 'init'
-		// part)
-		// TODO: handle 'continue' inside loop body?
-		List<IStatement> whileBody = bodyNormalized;
+		// TODO: limit scope of 'init' part?
+
+		// handle 'continue' inside loop body
+		List<IStatement> whileBody = context.replicateLoopStep(bodyNormalized, stepNormalized);
 		whileBody.addAll(stepNormalized);
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(whileBody);
