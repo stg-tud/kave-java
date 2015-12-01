@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package eclipse.commons.test;
+package eclipse.commons.test.parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -28,18 +29,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.QualifiedName;
-
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.kave.rs.commons.analysis.transformer.DeclarationVisitor;
+import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.eclipse.commons.analysis.transformer.DeclarationVisitor;
+import cc.kave.eclipse.commons.analysis.completiontarget.*;
 
 public class PluginAstParser {
 
@@ -67,8 +62,8 @@ public class PluginAstParser {
 	private void initializeAst(String projectName, String qualifiedName) {
 		ICompilationUnit compilationUnit = getCompilationunit(projectName, qualifiedName);
 		parsed = parse(compilationUnit);
-		
-		DeclarationVisitor declVisitor = new DeclarationVisitor(context);
+
+		DeclarationVisitor declVisitor = new DeclarationVisitor(context, new HashSet<>(), null);
 		
 		parsed.accept(declVisitor);
 	}
@@ -123,5 +118,9 @@ public class PluginAstParser {
 			}
 		}
 		return null;
+	}
+	
+	public boolean containsField(FieldDeclaration decl){
+		return context.getFields().contains(decl);
 	}
 }

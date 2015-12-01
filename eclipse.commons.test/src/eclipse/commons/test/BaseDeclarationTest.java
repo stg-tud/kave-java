@@ -16,28 +16,15 @@
 
 package eclipse.commons.test;
 
-import static org.junit.Assert.assertTrue;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
-import eclipse.commons.test.parser.PluginAstParser;
 
-public class DeclarationVisitorTest extends BaseDeclarationTest{
-	
-	private static PluginAstParser parser;
-	
-	@BeforeClass
-	public static void initialize(){
-		parser = new PluginAstParser("test.project.a", "example.classes;TestClass.java");
-	}
+public class BaseDeclarationTest {
 
-	@Test
-	public void name() {
-		FieldDeclaration expected = getFieldDeclaration("[%int, rt.jar, 1.8] [example.classes.TestClass, ?].intTest");
+	public FieldDeclaration getFieldDeclaration(String fieldName){
+		FieldDeclaration decl = new FieldDeclaration();
+		decl.setName(CsFieldName.newFieldName(fieldName));
 		
-		assertTrue(parser.containsField(expected));
+		return decl;
 	}
 }
