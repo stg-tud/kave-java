@@ -74,7 +74,7 @@ public class Suggestions {
 		int queryIndex = 0;
 		
 		for (Episode query : listOfQueries) {
-			if (queryIndex == 1460) {
+			if (queryIndex == 1489) {
 				queryIndex++;
 				continue;
 			}
