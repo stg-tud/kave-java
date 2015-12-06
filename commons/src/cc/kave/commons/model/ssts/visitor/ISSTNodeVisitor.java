@@ -18,11 +18,14 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -30,6 +33,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -123,6 +127,12 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 
 	TReturn visit(IReferenceExpression expr, TContext context);
 
+	TReturn visit(ICastExpression expr, TContext context);
+
+	TReturn visit(IIndexAccessExpression expr, TContext context);
+
+	TReturn visit(ITypeCheckExpression expr, TContext context);
+
 	// References
 	TReturn visit(IEventReference eventRef, TContext context);
 
@@ -133,6 +143,8 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 	TReturn visit(IPropertyReference methodRef, TContext context);
 
 	TReturn visit(IVariableReference varRef, TContext context);
+
+	TReturn visit(IIndexAccessReference indexAccessRef, TContext context);
 
 	// unknowns
 	TReturn visit(IUnknownReference unknownRef, TContext context);
