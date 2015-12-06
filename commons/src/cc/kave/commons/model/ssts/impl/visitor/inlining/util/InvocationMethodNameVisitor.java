@@ -49,7 +49,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class RecursiveCallVisitor extends AbstractNodeVisitor<Set<MethodName>, Void> {
+public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<MethodName>, Void> {
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, Set<MethodName> context) {

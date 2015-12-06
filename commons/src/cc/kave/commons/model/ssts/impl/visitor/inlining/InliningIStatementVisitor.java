@@ -53,7 +53,7 @@ import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.util.RecursiveCallVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.InvocationMethodNameVisitor;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -89,7 +89,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 				notInlinedMethods.add(method);
 				context.addMethod(method);
 				Set<MethodName> invokes = new HashSet<>();
-				method.accept(new RecursiveCallVisitor(), invokes);
+				method.accept(new InvocationMethodNameVisitor(), invokes);
 				calls.addAll(invokes);
 			}
 		}
@@ -105,7 +105,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 
 	public Void visit(IMethodDeclaration stmt, InliningContext context) {
 		MethodDeclaration method = new MethodDeclaration();
-		InliningUtil.visitScope(stmt.getBody(), context);
+		context.visitScope(stmt.getBody());
 		method.getBody().addAll(context.getBody());
 		method.setEntryPoint(true);
 		method.setName(CsMethodName.newMethodName(stmt.getName().getIdentifier()));
@@ -175,9 +175,9 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(IForLoop block, InliningContext context) {
 		ForLoop loop = new ForLoop();
 		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		InliningUtil.visitBlock(block.getInit(), loop.getInit(), context);
-		InliningUtil.visitBlock(block.getStep(), loop.getStep(), context);
-		InliningUtil.visitBlock(block.getBody(), loop.getBody(), context);
+		context.visitBlock(block.getInit(), loop.getInit());
+		context.visitBlock(block.getStep(), loop.getStep());
+		context.visitBlock(block.getBody(), loop.getBody());
 		context.addStatement(loop);
 		return null;
 	}
@@ -186,7 +186,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(IWhileLoop block, InliningContext context) {
 		WhileLoop loop = new WhileLoop();
 		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		InliningUtil.visitBlock(block.getBody(), loop.getBody(), context);
+		context.visitBlock(block.getBody(), loop.getBody());
 		context.addStatement(loop);
 		return null;
 	}
@@ -195,8 +195,8 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(IIfElseBlock block, InliningContext context) {
 		IfElseBlock ifelse = new IfElseBlock();
 		ifelse.setCondition((ISimpleExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		InliningUtil.visitBlock(block.getElse(), ifelse.getElse(), context);
-		InliningUtil.visitBlock(block.getThen(), ifelse.getThen(), context);
+		context.visitBlock(block.getElse(), ifelse.getElse());
+		context.visitBlock(block.getThen(), ifelse.getThen());
 		context.addStatement(ifelse);
 		return null;
 	}
@@ -205,7 +205,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(IDoLoop block, InliningContext context) {
 		DoLoop loop = new DoLoop();
 		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		InliningUtil.visitBlock(block.getBody(), loop.getBody(), context);
+		context.visitBlock(block.getBody(), loop.getBody());
 		context.addStatement(loop);
 		return null;
 	}
@@ -213,10 +213,10 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	@Override
 	public Void visit(IForEachLoop block, InliningContext context) {
 		ForEachLoop loop = new ForEachLoop();
-		loop.setDeclaration((IVariableDeclaration) InliningUtil.visit(block.getDeclaration(), context));
+		loop.setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
 		loop.setLoopedReference(
 				(IVariableReference) block.getLoopedReference().accept(context.getReferenceVisitor(), context));
-		InliningUtil.visitBlock(block.getBody(), loop.getBody(), context);
+		context.visitBlock(block.getBody(), loop.getBody());
 		context.addStatement(loop);
 		return null;
 	}
@@ -226,10 +226,10 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		SwitchBlock switchBlock = new SwitchBlock();
 		switchBlock
 				.setReference((IVariableReference) block.getReference().accept(context.getReferenceVisitor(), context));
-		InliningUtil.visitBlock(block.getDefaultSection(), switchBlock.getDefaultSection(), context);
+		context.visitBlock(block.getDefaultSection(), switchBlock.getDefaultSection());
 		for (ICaseBlock caseBlock : block.getSections()) {
 			CaseBlock newCase = new CaseBlock();
-			InliningUtil.visitBlock(caseBlock.getBody(), newCase.getBody(), context);
+			context.visitBlock(caseBlock.getBody(), newCase.getBody());
 			newCase.setLabel(caseBlock.getLabel());
 			switchBlock.getSections().add(newCase);
 		}
@@ -241,7 +241,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(ILockBlock stmt, InliningContext context) {
 		LockBlock block = new LockBlock();
 		block.setReference((IVariableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
-		InliningUtil.visitBlock(stmt.getBody(), block.getBody(), context);
+		context.visitBlock(stmt.getBody(), block.getBody());
 		context.addStatement(block);
 		return null;
 	}
@@ -251,7 +251,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		UsingBlock usingBlock = new UsingBlock();
 		usingBlock
 				.setReference((IVariableReference) block.getReference().accept(context.getReferenceVisitor(), context));
-		InliningUtil.visitBlock(block.getBody(), usingBlock.getBody(), context);
+		context.visitBlock(block.getBody(), usingBlock.getBody());
 		context.addStatement(usingBlock);
 		return null;
 	}
@@ -264,10 +264,10 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 			statement.accept(this, context);
 		}
 		context.leaveBlock(tryBlock.getBody());
-		InliningUtil.visitBlock(block.getFinally(), tryBlock.getFinally(), context);
+		context.visitBlock(block.getFinally(), tryBlock.getFinally());
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			CatchBlock newCatch = new CatchBlock();
-			InliningUtil.visitBlock(catchBlock.getBody(), newCatch.getBody(), context);
+			context.visitBlock(catchBlock.getBody(), newCatch.getBody());
 			newCatch.setKind(catchBlock.getKind());
 			newCatch.setParameter(catchBlock.getParameter());
 			tryBlock.getCatchBlocks().add(newCatch);
@@ -279,7 +279,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	@Override
 	public Void visit(IUncheckedBlock block, InliningContext context) {
 		UncheckedBlock unchecked = new UncheckedBlock();
-		InliningUtil.visitBlock(block.getBody(), unchecked.getBody(), context);
+		context.visitBlock(block.getBody(), unchecked.getBody());
 		context.addStatement(unchecked);
 		return null;
 	}
@@ -316,7 +316,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	public Void visit(ILabelledStatement stmt, InliningContext context) {
 		LabelledStatement statement = new LabelledStatement();
 		statement.setLabel(stmt.getLabel());
-		statement.setStatement(InliningUtil.visit(stmt.getStatement(), context));
+		statement.setStatement(context.visit(stmt.getStatement(), context));
 		context.addStatement(statement);
 		return null;
 	}

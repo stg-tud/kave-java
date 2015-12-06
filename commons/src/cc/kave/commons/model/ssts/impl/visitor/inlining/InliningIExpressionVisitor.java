@@ -83,7 +83,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 					statement.accept(context.getStatementVisitor(), context);
 				}
 			} else {
-				InliningUtil.visitBlock(body, context.getBody(), context);
+				context.visitBlock(body, context.getBody());
 				context.leaveScope();
 				context.setInline(false);
 				if (!context.isVoid())
@@ -113,7 +113,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 			IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
 			body.add(variable);
 		}
-		body.add(SSTUtil.declare(context.getGotResultName(), InliningUtil.GOT_RESULT_TYPE));
+		body.add(SSTUtil.declare(context.getGotResultName(), context.GOT_RESULT_TYPE));
 		ConstantValueExpression constant = new ConstantValueExpression();
 		constant.setValue("true");
 		body.add(SSTUtil.assignmentToLocal(context.getGotResultName(), constant));
@@ -197,7 +197,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	@Override
 	public IExpression visit(ILoopHeaderBlockExpression expr, InliningContext context) {
 		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		InliningUtil.visitBlock(expr.getBody(), loopHeader.getBody(), context);
+		context.visitBlock(expr.getBody(), loopHeader.getBody());
 		return loopHeader;
 	}
 
@@ -229,7 +229,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 	public IExpression visit(ILambdaExpression expr, InliningContext context) {
 		LambdaExpression expression = new LambdaExpression();
 		expression.setName(expr.getName());
-		InliningUtil.visitBlock(expr.getBody(), expression.getBody(), context);
+		context.visitBlock(expr.getBody(), expression.getBody());
 		return expression;
 	}
 

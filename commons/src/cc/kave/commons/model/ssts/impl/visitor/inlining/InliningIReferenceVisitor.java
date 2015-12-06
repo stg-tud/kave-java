@@ -17,7 +17,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 public class InliningIReferenceVisitor extends AbstractNodeVisitor<InliningContext, IReference> {
 
 	public IReference visit(IVariableReference ref, InliningContext context) {
-		return context.resolveRef(ref);
+		return context.resolve(ref);
 	}
 
 	@Override
