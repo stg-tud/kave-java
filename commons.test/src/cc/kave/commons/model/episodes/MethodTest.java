@@ -111,4 +111,13 @@ public class MethodTest {
 		assertTrue(a.getMethodName().equalsIgnoreCase(b.getMethodName()));
 		assertNotEquals(a.getNumberOfInvocations(), b.getNumberOfInvocations());
 	}
+	
+	@Test
+	public void containsInvocationTest() {
+		Method a = new Method();
+		a.addStringsOfFacts("a", "b", "c");
+		
+		assertTrue(a.containsInvocations(new Fact("b")));
+		assertFalse(a.containsInvocations(new Fact("e")));
+	}
 }

@@ -20,7 +20,7 @@ public class Method {
 	}
 
 	public int getNumberOfInvocations() {
-		return numberOfInvocations;
+		return facts.size();
 	}
 
 	public void setNumberOfInvocations(int numberOfEvents) {
@@ -43,6 +43,13 @@ public class Method {
 
 	public void addFact(String rawFact) {
 		facts.add(new Fact(rawFact));
+	}
+
+	public boolean containsInvocations(Fact fact1) {
+		if (facts.contains(fact1)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override

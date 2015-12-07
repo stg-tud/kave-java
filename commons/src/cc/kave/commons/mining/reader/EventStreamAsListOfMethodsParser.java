@@ -9,7 +9,8 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.model.episodes.Fact;
+import cc.kave.commons.model.episodes.Method;
 
 public class EventStreamAsListOfMethodsParser {
 
@@ -24,39 +25,32 @@ public class EventStreamAsListOfMethodsParser {
 		this.reader = reader;
 	}
 
-	public List<Episode> parse() {
+	public List<Method> parse() {
 		List<String> eventStream = reader.readFile(getFilePath());
-		List<Episode> methodsStream = new LinkedList<Episode>();
-		List<String> facts = new LinkedList<String>();
+		List<Method> methodsStream = new LinkedList<Method>();
+		Method method = new Method();
 		double previousEventTimestamp = 0.000;
 
 		for (String line : eventStream) {
 			String[] rowValues = line.split(",");
 			double currentEventTimestamp = Double.parseDouble(rowValues[1]);
-			if ((currentEventTimestamp - previousEventTimestamp) >= 0.5) {
-				Episode method = createMethod(facts);
+			if (currentEventTimestamp == 0.000) {
+				method.setMethodName(rowValues[0]);
+			} else if ((currentEventTimestamp - previousEventTimestamp) >= 0.5) {
+				method.setNumberOfInvocations(method.getNumberOfInvocations());
 				methodsStream.add(method);
-				facts = new LinkedList<String>();
-			}
-			if (!facts.contains(rowValues[0])) {
-				facts.add(rowValues[0]);
+				method = new Method();
+				method.setMethodName(rowValues[0]);
+			} else {
+				if (!method.containsInvocations(new Fact(rowValues[0]))) {
+					method.addFact(rowValues[0]);
+				}
 			}
 			previousEventTimestamp = currentEventTimestamp;
 		}
-		Episode lastMethod = createMethod(facts);
-		methodsStream.add(lastMethod);
+		method.setNumberOfInvocations(method.getNumberOfInvocations());
+		methodsStream.add(method);
 		return methodsStream;
-	}
-
-	private Episode createMethod(List<String> events) {
-		Episode episode = new Episode();
-		episode.setFrequency(1);
-		episode.setNumEvents(events.size());
-		episode.addListOfFacts(events);
-		for (int idx = 0; idx < (events.size() - 1); idx++) {
-			episode.addFact(events.get(idx) + ">" + events.get(idx + 1));
-		}
-		return episode;
 	}
 
 	private File getFilePath() {

@@ -21,6 +21,7 @@ import org.junit.rules.TemporaryFolder;
 import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.model.episodes.Method;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EventStreamAsListOfMethodsParserTest {
@@ -77,17 +78,17 @@ public class EventStreamAsListOfMethodsParserTest {
 			throw new RuntimeException(e);
 		}
 
-		List<Episode> expected = new LinkedList<Episode>();		
-		Episode episode = new Episode();
-		episode.addStringsOfFacts("1", "2", "3", "4", "5", "6", "7", "8", "1>2", "2>3", "3>4", "4>5", "5>6", "6>7", "7>8");
-		episode.setFrequency(1);
-		episode.setNumEvents(8);
+		List<Method> expected = new LinkedList<Method>();		
+		Method method = new Method();
+		method.setMethodName("1");
+		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
+		method.setNumberOfInvocations(7);
 		
-		expected.add(episode);
+		expected.add(method);
 		
 		doCallRealMethod().when(reader).readFile(eq(file)); 
 		
-		List<Episode> actual = sut.parse();
+		List<Method> actual = sut.parse();
 		
 		verify(reader).readFile(file);
 
@@ -122,22 +123,22 @@ public class EventStreamAsListOfMethodsParserTest {
 			throw new RuntimeException(e);
 		}
 
-		List<Episode> expected = new LinkedList<Episode>();		
-		Episode episode = new Episode();
-		episode.addStringsOfFacts("1", "2", "3", "4", "5", "6", "7", "8", "1>2", "2>3", "3>4", "4>5", "5>6", "6>7", "7>8");
-		episode.setFrequency(1);
-		episode.setNumEvents(8);
-		expected.add(episode);
+		List<Method> expected = new LinkedList<Method>();		
+		Method method = new Method();
+		method.setMethodName("1");
+		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
+		method.setNumberOfInvocations(7);
+		expected.add(method);
 		
-		episode = new Episode();
-		episode.addStringsOfFacts("9", "10", "8", "11", "9>10", "10>8", "8>11");
-		episode.setFrequency(1);
-		episode.setNumEvents(4);
-		expected.add(episode);
+		method = new Method();
+		method.setMethodName("9");
+		method.addStringsOfFacts("10", "8", "11");
+		method.setNumberOfInvocations(3);
+		expected.add(method);
 		
 		doCallRealMethod().when(reader).readFile(eq(file)); 
 		
-		List<Episode> actual = sut.parse();
+		List<Method> actual = sut.parse();
 		
 		verify(reader).readFile(file);
 
@@ -174,28 +175,27 @@ public class EventStreamAsListOfMethodsParserTest {
 			throw new RuntimeException(e);
 		}
 
-		List<Episode> expected = new LinkedList<Episode>();		
-		Episode episode = new Episode();
-		episode.addStringsOfFacts("1", "2", "3", "4", "5", "6", "7", "8", "1>2", "2>3", "3>4", "4>5", "5>6", "6>7", "7>8");
-		episode.setFrequency(1);
-		episode.setNumEvents(8);
-		expected.add(episode);
+		List<Method> expected = new LinkedList<Method>();		
+		Method method = new Method();
+		method.setMethodName("1");
+		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
+		method.setNumberOfInvocations(7);
+		expected.add(method);
 		
-		episode = new Episode();
-		episode.addStringsOfFacts("9", "10", "8", "11", "9>10", "10>8", "8>11");
-		episode.setFrequency(1);
-		episode.setNumEvents(4);
-		expected.add(episode);
+		method = new Method();
+		method.setMethodName("9");
+		method.addStringsOfFacts("10", "8", "11");
+		method.setNumberOfInvocations(3);
+		expected.add(method);
 		
-		episode = new Episode();
-		episode.addStringsOfFacts("5");
-		episode.setFrequency(1);
-		episode.setNumEvents(1);
-		expected.add(episode);
+		method = new Method();
+		method.setMethodName("5");
+		method.setNumberOfInvocations(0);
+		expected.add(method);
 		
 		doCallRealMethod().when(reader).readFile(eq(file)); 
 		
-		List<Episode> actual = sut.parse();
+		List<Method> actual = sut.parse();
 		
 		verify(reader).readFile(file);
 
