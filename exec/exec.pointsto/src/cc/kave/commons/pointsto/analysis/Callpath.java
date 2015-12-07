@@ -12,6 +12,47 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-public class Callpath {
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
 
+import cc.kave.commons.model.names.MethodName;
+
+public class Callpath implements Iterable<MethodName> {
+
+	private Deque<MethodName> path = new ArrayDeque<>();
+
+	public Callpath(MethodName root) {
+		path.addLast(root);
+	}
+
+	public void enterMethod(MethodName method) {
+		path.addLast(method);
+	}
+
+	public void leaveMethod() {
+		path.removeLast();
+		if (path.isEmpty()) {
+			throw new IllegalStateException("Path must not be empty");
+		}
+	}
+
+	/**
+	 * Retrieves the method at the start of this path.
+	 */
+	public MethodName getFirst() {
+		return path.getFirst();
+	}
+
+	/**
+	 * Retrieves the method at the end of this path.
+	 */
+	public MethodName getLast() {
+		return path.getLast();
+	}
+
+	@Override
+	public Iterator<MethodName> iterator() {
+		return path.iterator();
+	}
 }

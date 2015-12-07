@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
 import cc.recommenders.usages.Usage;
 
 public class PointsToEvaluation {
@@ -34,7 +35,8 @@ public class PointsToEvaluation {
 	private static final Path USAGE_DEST = Paths.get("E:\\Coding\\MT\\Usages");
 	
 	public static void main(String[] args) {
-		new PointsToEvaluation().generateUsages(Arrays.asList(new TypeAliasedAnalysisFactory()));
+		new PointsToEvaluation()
+				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(TypeAliasedAnalysis.class)));
 
 	}
 	
