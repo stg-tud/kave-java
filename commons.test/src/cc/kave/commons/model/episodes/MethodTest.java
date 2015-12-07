@@ -30,6 +30,7 @@ public class MethodTest {
 		sut.addFact("a");
 		assertEquals(Lists.newArrayList(new Fact("a")), sut.getFacts());
 		sut.setNumberOfInvocations(1);
+		assertEquals(1, sut.getNumberOfInvocations());
 	}
 	
 	@Test
