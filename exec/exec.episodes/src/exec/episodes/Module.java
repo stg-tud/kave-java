@@ -23,9 +23,9 @@ import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
 import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
 import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
-import cc.kave.commons.mining.episodes.QueryGenerator;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
+import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
 import cc.kave.commons.mining.reader.EventStreamParser;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
@@ -68,7 +68,7 @@ public class Module extends AbstractModule {
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		
 		File eventStreamRoot = eventStreamFile;
-		bind(QueryGenerator.class).toInstance(new QueryGenerator(eventStreamRoot, reader));
+		bind(EventStreamAsListOfMethodsParser.class).toInstance(new EventStreamAsListOfMethodsParser(eventStreamRoot, reader));
 		
 		File mappingRoot = mappingFile;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
@@ -83,7 +83,7 @@ public class Module extends AbstractModule {
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 		NoTransitivelyClosedEpisodes transitivityClosure = new NoTransitivelyClosedEpisodes();
 		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		QueryGenerator query = new QueryGenerator(eventStreamRoot, reader);
+		EventStreamAsListOfMethodsParser query = new EventStreamAsListOfMethodsParser(eventStreamRoot, reader);
 		EpisodeRecommender recommender = new EpisodeRecommender();
 		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, transitivityClosure, query, mappingParser, recommender, graphConverter, graphWriter));
 	}

@@ -27,9 +27,9 @@ import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
 import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
 import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
-import cc.kave.commons.mining.episodes.QueryGenerator;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
+import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
@@ -42,7 +42,7 @@ public class Suggestions {
 	private EpisodeParser episodeParser;
 	private MaximalFrequentEpisodes maximalEpisodes;
 	private NoTransitivelyClosedEpisodes transitivityClosure;
-	private QueryGenerator queryGenerator;
+	private EventStreamAsListOfMethodsParser queryGenerator;
 	private EventMappingParser eventMappingParser;
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
@@ -52,7 +52,7 @@ public class Suggestions {
 	 
 	@Inject
 	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalFrequentEpisodes maximalEpisodes, NoTransitivelyClosedEpisodes transitivityClosure,
-			QueryGenerator queryGenerator, EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
+			EventStreamAsListOfMethodsParser queryGenerator, EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.maximalEpisodes = maximalEpisodes;
