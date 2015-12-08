@@ -5,13 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Method;
 import cc.kave.commons.model.episodes.Query;
 
-public class QueryPartialBuilder {
+public class QueryGenerator {
 
-	public Map<Method, List<Query>> createQuery(List<Method> allMethods, int invocationsRemoved) {
-		Map<Method, List<Query>> generatedQueries = new HashMap<Method, List<Query>>();
+	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Method> allMethods, int invocationsRemoved) {
+		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
+		// Map<Integer, List<>>
 		List<Query> currentGeneratedQueries = new LinkedList<Query>();
 		for (Method method : allMethods) {
 			if (method.getNumberOfInvocations() > invocationsRemoved) {
