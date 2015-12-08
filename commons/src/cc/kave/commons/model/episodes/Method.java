@@ -19,6 +19,10 @@ public class Method {
 		return facts;
 	}
 
+	public Fact get(int i) {
+		return facts.get(i);
+	}
+
 	public int getNumberOfInvocations() {
 		return facts.size();
 	}

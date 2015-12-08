@@ -112,6 +112,17 @@ public class MethodTest {
 		assertNotEquals(a.getNumberOfInvocations(), b.getNumberOfInvocations());
 	}
 	
+	@Test 
+	public void getIndexTest() {
+		sut.addStringsOfFacts("1", "2", "3");
+		sut.setMethodName("MethodName");
+		sut.setNumberOfInvocations(3);
+		
+		Fact expected = new Fact("2");
+		Fact actual = sut.get(1);
+		assertEquals(expected, actual);
+	}
+	
 	@Test
 	public void containsInvocationTest() {
 		Method a = new Method();

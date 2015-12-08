@@ -30,10 +30,11 @@ public class EventStreamAsListOfMethodsParser {
 		List<Method> methodsStream = new LinkedList<Method>();
 		Method method = new Method();
 		double previousEventTimestamp = 0.000;
+		double currentEventTimestamp;
 
 		for (String line : eventStream) {
 			String[] rowValues = line.split(",");
-			double currentEventTimestamp = Double.parseDouble(rowValues[1]);
+			currentEventTimestamp = Double.parseDouble(rowValues[1]);
 			if (currentEventTimestamp == 0.000) {
 				method.setMethodName(rowValues[0]);
 			} else if ((currentEventTimestamp - previousEventTimestamp) >= 0.5) {

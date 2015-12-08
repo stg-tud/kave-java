@@ -1,4 +1,4 @@
-package cc.kave.commons.mining.episodes;
+package cc.kave.commons.mining.reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -18,9 +18,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
-import cc.kave.commons.mining.reader.FileReader;
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Method;
 import cc.recommenders.exceptions.AssertionException;
 
