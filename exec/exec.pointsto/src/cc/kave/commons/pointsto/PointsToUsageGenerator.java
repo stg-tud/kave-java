@@ -30,10 +30,10 @@ import com.google.common.collect.Iterables;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
 import cc.recommenders.io.WritingArchive;
-import cc.recommenders.usages.Usage;
 
 public class PointsToUsageGenerator {
 
@@ -54,8 +54,8 @@ public class PointsToUsageGenerator {
 		this.usagesDestDir = usagesDestDir;
 	}
 
-	public Map<PointerAnalysisFactory, List<Usage>> getUsages() {
-		Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
+	public Map<PointerAnalysisFactory, List<DummyUsage>> getUsages() {
+		Map<PointerAnalysisFactory, List<DummyUsage>> usages = new HashMap<>();
 
 		for (Path zipFile : sources) {
 			try {
@@ -68,8 +68,8 @@ public class PointsToUsageGenerator {
 		return usages;
 	}
 
-	private Map<PointerAnalysisFactory, List<Usage>> processZipFile(Path path) throws IOException {
-		final Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
+	private Map<PointerAnalysisFactory, List<DummyUsage>> processZipFile(Path path) throws IOException {
+		final Map<PointerAnalysisFactory, List<DummyUsage>> usages = new HashMap<>();
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
 		final Map<PointerAnalysisFactory, WritingArchive> annotatedContextWriters = new HashMap<>(factories.size());
@@ -101,8 +101,8 @@ public class PointsToUsageGenerator {
 							"Failed to serialize an annotated context from " + inputFilename.toString(), e);
 				}
 
-				List<Usage> extractedUsages = extractor.extract(ptContext);
-				for (Usage usage : extractedUsages) {
+				List<DummyUsage> extractedUsages = extractor.extract(ptContext);
+				for (DummyUsage usage : extractedUsages) {
 					try {
 						//usageWriters.get(factory).add(usage);
 					} catch (Exception e) {

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
-import cc.recommenders.usages.Usage;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class PointsToEvaluation {
 	
@@ -39,8 +39,8 @@ public class PointsToEvaluation {
 				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(TypeAliasedAnalysis.class)));
 
 	}
-	
-	private Map<PointerAnalysisFactory, List<Usage>> generateUsages(List<PointerAnalysisFactory> factories) {
+
+	private Map<PointerAnalysisFactory, List<DummyUsage>> generateUsages(List<PointerAnalysisFactory> factories) {
 		try {
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST, USAGE_DEST);
 			

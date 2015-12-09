@@ -13,7 +13,7 @@
 package cc.kave.commons.pointsto.extraction;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.recommenders.usages.Usage;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public interface UsageStatisticsCollector {
 
@@ -25,6 +25,6 @@ public interface UsageStatisticsCollector {
 
 	void onProcessContext(Context context);
 
-	void onUsageExtracted(Usage usage);
+	void onUsageExtracted(DummyUsage usage);
 
 }

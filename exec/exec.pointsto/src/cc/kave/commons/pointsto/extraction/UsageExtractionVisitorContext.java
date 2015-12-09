@@ -23,20 +23,19 @@ import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
-import cc.kave.commons.pointsto.DummyUsage;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.recommenders.usages.Usage;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class UsageExtractionVisitorContext {
 	
 	private PointerAnalysis pointerAnalysis;
 	private TypeName enclosingClass;
-	
-	private Map<AbstractLocation, Usage> locationUsages = new HashMap<>();
-	
+
+	private Map<AbstractLocation, DummyUsage> locationUsages = new HashMap<>();
+
 	private Callpath currentCallpath;
 	private MethodName enclosingMethod;
 	
@@ -50,8 +49,8 @@ public class UsageExtractionVisitorContext {
 			enclosingMethod = methodDecl.getName();
 		}
 	}
-	
-	private Usage initializeUsage() {
+
+	private DummyUsage initializeUsage() {
 		DummyUsage usage = new DummyUsage();
 		
 		usage.setClassContext(enclosingClass);

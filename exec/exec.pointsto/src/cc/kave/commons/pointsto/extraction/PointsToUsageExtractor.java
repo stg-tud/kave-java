@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.recommenders.usages.Usage;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class PointsToUsageExtractor {
 
@@ -26,7 +26,7 @@ public class PointsToUsageExtractor {
 		this.collector = new UsageStatisticsCollector() {
 
 			@Override
-			public void onUsageExtracted(Usage usage) {
+			public void onUsageExtracted(DummyUsage usage) {
 
 			}
 
@@ -50,7 +50,7 @@ public class PointsToUsageExtractor {
 		return collector;
 	}
 
-	public List<Usage> extract(Context context) {
+	public List<DummyUsage> extract(Context context) {
 		collector.onProcessContext(context);
 
 		return Collections.emptyList();
