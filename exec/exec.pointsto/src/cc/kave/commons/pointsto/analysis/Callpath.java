@@ -16,6 +16,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
+import com.google.common.collect.Iterators;
+
 import cc.kave.commons.model.names.MethodName;
 
 public class Callpath implements Iterable<MethodName> {
@@ -55,4 +57,54 @@ public class Callpath implements Iterable<MethodName> {
 	public Iterator<MethodName> iterator() {
 		return path.iterator();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+
+		Iterator<MethodName> iter = path.iterator();
+		while (iter.hasNext()) {
+			builder.append(iter.next().toString());
+			if (iter.hasNext()) {
+				builder.append(", ");
+			}
+		}
+
+		builder.append(']');
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		for (MethodName method : path) {
+			result = prime * result + method.hashCode();
+		}
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Callpath other = (Callpath) obj;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (path.size() != other.path.size()) {
+			return false;
+		} else if (!Iterators.elementsEqual(path.iterator(), other.path.iterator())) {
+			return false;
+		}
+
+		return true;
+	}
+
 }

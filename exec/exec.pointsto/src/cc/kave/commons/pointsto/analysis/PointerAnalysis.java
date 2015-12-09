@@ -15,11 +15,10 @@ package cc.kave.commons.pointsto.analysis;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.ssts.IReference;
 
 public interface PointerAnalysis {
 
 	PointsToContext compute(Context context);
 
-	Set<AbstractLocation> query(IReference reference, Callpath callpath);
+	Set<AbstractLocation> query(QueryContextKey query);
 }

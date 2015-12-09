@@ -27,29 +27,34 @@ import cc.kave.commons.model.ssts.IReference;
  * A {@link PointerAnalysis} that assumes that all variables of a specific type point to one {@link AbstractLocation}.
  *
  */
-public class TypeAliasedAnalysis implements PointerAnalysis {
-	
+public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
+
 	private static final Logger LOGGER = Logger.getLogger(TypeAliasedAnalysis.class.getName());
 
 	private IdentityHashMap<IReference, AbstractLocation> referenceLocations;
-	
+
 	public TypeAliasedAnalysis() {
 		referenceLocations = new IdentityHashMap<>();
 	}
-	
+
 	@Override
 	public PointsToContext compute(Context context) {
 		TypeAliasedVisitor visitor = new TypeAliasedVisitor();
 		TypeAliasedVisitorContext visitorContext = new TypeAliasedVisitorContext();
-		
+
 		visitorContext.initializeSymbolTable(context);
 		visitor.visit(context.getSST(), visitorContext);
-		
+
 		referenceLocations = visitorContext.getReferenceLocations();
 		return new PointsToContext(context, this);
 	}
 
 	@Override
+	public Set<AbstractLocation> query(QueryContextKey query) {
+		// lower query to used format
+		return super.query(new QueryContextKey(null, null, query.getType(), null));
+	}
+
 	public Set<AbstractLocation> query(IReference reference, Callpath callpath) {
 		AbstractLocation location = referenceLocations.get(reference);
 		if (location == null) {
