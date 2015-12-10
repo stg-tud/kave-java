@@ -26,7 +26,7 @@ public class MappingReader {
 			}
 			System.out.println("--- " + (counter++) + " ---------------------");
 			System.out.println(e);
-			System.out.println(e.getMethod().getDeclaringType().toString());
+			System.out.println(e.getMethod().getDeclaringType().getFullName().toString());
 		}
 		System.out.println(events.size());
 	}

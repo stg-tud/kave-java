@@ -3,6 +3,7 @@ package cc.kave.commons.mining.episodes;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,6 @@ import com.google.inject.name.Named;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.model.episodes.Episode;
-import cc.kave.commons.model.episodes.EpisodeKind;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
@@ -31,7 +31,6 @@ public class EpisodeGraphGenerator {
 	private EpisodeAsGraphWriter writer;
 
 	private File rootFolder;
-	private DirectoryStructure folderStructure = new DirectoryStructure();
 
 	@Inject
 	public EpisodeGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
@@ -57,7 +56,7 @@ public class EpisodeGraphGenerator {
 		Map<Integer, List<Episode>> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(maxEpisodes);
 		List<Event> eventMapping = mappingParser.parse();
 
-		createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
+		String directory = createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
 
 		int graphIndex = 0;
 
@@ -65,66 +64,57 @@ public class EpisodeGraphGenerator {
 			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
 			Logger.append("\n");
 			for (Episode e : entry.getValue()) {
+				if (e.getNumberOfFacts() == 1) {
+					continue;
+				}
 				Logger.log("Writting episode number %s.\n", graphIndex);
 				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
-				writer.write(graph, getFilePath(getEpisodeKind(e, eventMapping), graphIndex));
+				List<String> types = getAPIType(e, eventMapping);
+				for (String t : types) {
+					writer.write(graph, getFilePath(directory, t, graphIndex));
+				}
 				graphIndex++;
 			}
 		}
 	}
 
-	private EpisodeKind getEpisodeKind(Episode frequentEpisode, List<Event> eventMapper) {
+	private List<String> getAPIType(Episode frequentEpisode, List<Event> eventMapper) {
+		List<String> apiTypes = new LinkedList<String>();
 		for (Fact fact : frequentEpisode.getFacts()) {
 			if (fact.getRawFact().contains(">")) {
 				continue;
 			}
-			int index = Integer.parseInt(fact.getRawFact()) - 1;
-			if (!eventMapper.get(index).getMethod().getDeclaringType().toString().startsWith("System")) {
-				return EpisodeKind.PROJECT_SPECIFIC;
+			int index = Integer.parseInt(fact.getRawFact());
+			String type = eventMapper.get(index).getMethod().getDeclaringType().getFullName().toString().replace(".",
+					"/");
+			if (!apiTypes.contains(type)) {
+				apiTypes.add(type);
 			}
 		}
-		return EpisodeKind.GENERAL;
+		return apiTypes;
 	}
 
-	private void createDirectoryStructure(int frequencyThreshold, double bidirectionalThreshold) {
+	private String createDirectoryStructure(int frequencyThreshold, double bidirectionalThreshold) {
 		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
 		if (!(new File(targetDirectory).isDirectory())) {
-			new File(targetDirectory).mkdirs();
+			new File(targetDirectory).mkdir();
 		}
 
 		String configurationFolder = targetDirectory + "/configurationF" + frequencyThreshold + "B"
 				+ bidirectionalThreshold + "/";
 		if (!(new File(configurationFolder).isDirectory())) {
-			new File(configurationFolder).mkdirs();
+			new File(configurationFolder).mkdir();
 		}
-
-		String generalAPIDirectory = configurationFolder + "/generalAPI/";
-		if (!(new File(generalAPIDirectory).isDirectory())) {
-			new File(generalAPIDirectory).mkdirs();
-		}
-		folderStructure.generalAPIStructure = generalAPIDirectory;
-
-		String specificAPIDirectory = configurationFolder + "/specificAPI/";
-		if (!(new File(specificAPIDirectory).isDirectory())) {
-			new File(specificAPIDirectory).mkdirs();
-		}
-		folderStructure.specificAPIStructure = specificAPIDirectory;
+		return configurationFolder;
 	}
 
-	private class DirectoryStructure {
-		private String generalAPIStructure;
-		private String specificAPIStructure;
-	}
-
-	private String getFilePath(EpisodeKind episodeKind, int fileNumber) throws Exception {
-		String fileName = "";
-		if (episodeKind.equals(EpisodeKind.GENERAL)) {
-			fileName = folderStructure.generalAPIStructure + "/graph" + fileNumber + ".dot";
-		} else if (episodeKind.equals(EpisodeKind.PROJECT_SPECIFIC)) {
-			fileName = folderStructure.specificAPIStructure + "/graph" + fileNumber + ".dot";
-		} else {
-			throw new Exception("Invalid folder structure for graph generation!");
+	private String getFilePath(String folderPath, String apiType, int fileNumber) throws Exception {
+		String typeFolder = folderPath + "/" + apiType + "/";
+		if (!(new File(typeFolder).isDirectory())) {
+			new File(typeFolder).mkdirs();
 		}
+		String fileName = typeFolder + "/graph" + fileNumber + ".dot";
+
 		return fileName;
 	}
 }

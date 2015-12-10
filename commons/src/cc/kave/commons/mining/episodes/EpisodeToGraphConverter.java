@@ -33,8 +33,8 @@ public class EpisodeToGraphConverter {
 		while (toi.hasNext()) {
 			Fact fact = toi.next();
 			int index = Integer.parseInt(fact.getRawFact());
-			MethodName method = eventMapping.get(index - 1).getMethod();
-			EventKind kind = eventMapping.get(index - 1).getKind();
+			MethodName method = eventMapping.get(index).getMethod();
+			EventKind kind = eventMapping.get(index).getKind();
 
 			String out = toLabel(method);
 			labels += fact.getRawFact() + ". " + kind.toString() + ": " + out + "\\l";

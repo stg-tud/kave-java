@@ -1,30 +1,28 @@
 package c.kave.commons.evaluation.queries;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import cc.kave.commons.model.episodes.Episode;
-import cc.kave.commons.model.episodes.Method;
-import cc.kave.commons.model.episodes.Query;
 
 public class QueryGenerator {
 
-	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Method> allMethods, int invocationsRemoved) {
-		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
-		// Map<Integer, List<>>
-		List<Query> currentGeneratedQueries = new LinkedList<Query>();
-		for (Method method : allMethods) {
-			if (method.getNumberOfInvocations() > invocationsRemoved) {
-				Query query = new Query();
-				query.addFact(method.getMethodName());
-				query.setNumberOfFacts(method.getNumberOfInvocations() + 1 - invocationsRemoved);
-			}
-		}
-
-		return generatedQueries;
-	}
+	// public Map<Method, Map<Integer, List<Query>>> createQuery(List<Method>
+	// allMethods, String configuration) {
+	// Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new
+	// HashMap<Episode, Map<Integer, List<Episode>>>();
+	// Map<Integer, List<Episode>> skipedEventsAndQueryPair = new
+	// HashMap<Integer, List<Episode>>();
+	// List<Episode> currentueries = new LinkedList<Episode>();
+	// for (Method method : allMethods) {
+	// if (method.getNumberOfInvocations() > invocationsRemoved) {
+	// Query query = new Query();
+	// query.addFact(method.getMethodName());
+	// query.setNumberOfFacts(method.getNumberOfInvocations() + 1 -
+	// invocationsRemoved);
+	// }
+	// }
+	//
+	// return generatedQueries;
+	// }
 
 	private List<int[]> subsetsGenerator(int[] array, int subsetLength) {
 		int N = array.length;

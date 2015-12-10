@@ -26,7 +26,7 @@ import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
-import cc.kave.commons.mining.reader.EventStreamParser;
+import cc.kave.commons.mining.reader.EventStreamReader;
 import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
 import cc.kave.commons.model.persistence.EventStreamModifier;
@@ -44,36 +44,31 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "n-graph-miner/");
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File eventStreamFile = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
-		Directory eventStreamDir = new Directory(eventStreamFile.getAbsolutePath());
-		File mappingFile = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
-		Directory mappingDir = new Directory(mappingFile.getAbsolutePath());
+		File eventStreamData = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
+		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
 		File graphFile = new File(rootFolder);
 		Directory graphDir = new Directory(graphFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
-		dirs.put("mapping", mappingDir);
 		dirs.put("graph", graphDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
-		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamFile);
-		bind(File.class).annotatedWith(Names.named("mapping")).toInstance(mappingFile);
+		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
 		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
 
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		
-		File eventStreamRoot = eventStreamFile;
+		File eventStreamRoot = eventStreamData;
 		bind(EventStreamAsListOfMethodsParser.class).toInstance(new EventStreamAsListOfMethodsParser(eventStreamRoot, reader));
+		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
 		
-		File mappingRoot = mappingFile;
-		bind(EventMappingParser.class).toInstance(new EventMappingParser(mappingRoot));
-		EventMappingParser mappingParser = new EventMappingParser(mappingRoot);
-		bind(EventStreamParser.class).toInstance(new EventStreamParser(eventStreamRoot, reader, mappingParser));
+		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
+		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
 		bind(EventStreamModifier.class).toInstance(new EventStreamModifier(eventStreamRoot, reader));
 		File graphRoot = graphFile;
 		

@@ -32,6 +32,8 @@ public class run_ervina {
 		load(EpisodeGraphGenerator.class).generateGraphs(12, 0.7);
 //		load(Suggestions.class).run();
 //		load(EventStreamModifier.class).modify();
+//		load(EventStreamReader.class).read();
+//		load(MappingReader.class).read();
 		
 		Logger.log("done");
 	}
