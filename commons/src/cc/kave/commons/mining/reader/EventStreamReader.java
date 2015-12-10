@@ -10,14 +10,14 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 
-public class EventStreamParser {
+public class EventStreamReader {
 
 	private File rootFolder;
 	private FileReader reader;
 	private EventMappingParser eventMapper;
 
 	@Inject
-	public EventStreamParser(@Named("eventStream") File directory, FileReader reader, EventMappingParser eventMapping) {
+	public EventStreamReader(@Named("events") File directory, FileReader reader, EventMappingParser eventMapping) {
 		assertTrue(directory.exists(), "Event Stream folder does not exist");
 		assertTrue(directory.isDirectory(), "Event Stream folder is not a folder, but a file");
 		this.rootFolder = directory;
@@ -25,7 +25,7 @@ public class EventStreamParser {
 		this.eventMapper = eventMapping;
 	}
 
-	public void eventStreamming() {
+	public void read() {
 		File filePath = getFilePath();
 		List<Event> allEvents = eventMapper.parse();
 		List<String> lines = reader.readFile(filePath);
@@ -34,10 +34,17 @@ public class EventStreamParser {
 
 		for (String line : lines) {
 			String[] lineValues = line.split(",");
-			counter++;
-			System.out.println(counter + ".");
-			System.out.println(allEvents.get(Integer.parseInt(lineValues[0])));
+			int eventIndex = Integer.parseInt(lineValues[0]);
+			if (eventIndex == 0 || eventIndex == 2293 || eventIndex == 6457 || eventIndex == 6461 || eventIndex == 6465
+					|| eventIndex == 7400) {
+				counter++;
+				continue;
+			}
+			System.out.println("--- " + (counter++) + " ---------------------");
+			System.out.println(allEvents.get(eventIndex));
+			System.out.println(allEvents.get(eventIndex).getMethod().getDeclaringType().toString());
 		}
+		System.out.printf("found %s events:\n", allEvents.size());
 	}
 
 	private File getFilePath() {
