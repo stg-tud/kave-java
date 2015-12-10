@@ -29,7 +29,10 @@ public class VariableReference implements IVariableReference {
 
 	@Override
 	public int hashCode() {
-		return 724584 + this.identifier.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
+		return result;
 	}
 
 	@Override
@@ -38,7 +41,7 @@ public class VariableReference implements IVariableReference {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof VariableReference))
+		if (getClass() != obj.getClass())
 			return false;
 		VariableReference other = (VariableReference) obj;
 		if (identifier == null) {

@@ -41,7 +41,7 @@ public class MethodReference implements IMethodReference {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof MethodReference))
+		if (getClass() != obj.getClass())
 			return false;
 		MethodReference other = (MethodReference) obj;
 		if (methodName == null) {

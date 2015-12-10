@@ -14,10 +14,8 @@ import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExp
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
@@ -231,9 +229,4 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 		AssertPrint(sst, "() => { }");
 	}
 
-	private static IVariableReference varRef(String id) {
-		VariableReference ref = new VariableReference();
-		ref.setIdentifier(id);
-		return ref;
-	}
 }

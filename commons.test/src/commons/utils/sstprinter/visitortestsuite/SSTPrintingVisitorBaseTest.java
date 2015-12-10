@@ -5,6 +5,7 @@ import org.junit.Assert;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
@@ -65,5 +66,11 @@ public class SSTPrintingVisitorBaseTest {
 		ConstantValueExpression expr = new ConstantValueExpression();
 		expr.setValue(value);
 		return expr;
+	}
+
+	protected VariableReference varRef(String identifier) {
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier(identifier);
+		return ref;
 	}
 }

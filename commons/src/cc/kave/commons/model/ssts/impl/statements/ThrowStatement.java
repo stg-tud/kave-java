@@ -1,30 +1,38 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ThrowStatement implements IThrowStatement {
 
-	private TypeName exception;
+	private IVariableReference reference;
 
 	public ThrowStatement() {
-		this.exception = CsTypeName.UNKNOWN_NAME;
+		this.reference = new VariableReference();
 	}
 
 	@Override
-	public TypeName getException() {
-		return this.exception;
+	public IVariableReference getReference() {
+		return this.reference;
 	}
 
-	public void setException(TypeName exception) {
-		this.exception = exception;
+	public void setReference(IVariableReference reference) {
+		this.reference = reference;
+	}
+
+	@Override
+	public boolean isReThrow() {
+		return reference.isMissing();
 	}
 
 	@Override
 	public int hashCode() {
-		return 18 + this.exception.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -33,13 +41,13 @@ public class ThrowStatement implements IThrowStatement {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof ThrowStatement))
+		if (getClass() != obj.getClass())
 			return false;
 		ThrowStatement other = (ThrowStatement) obj;
-		if (exception == null) {
-			if (other.exception != null)
+		if (reference == null) {
+			if (other.reference != null)
 				return false;
-		} else if (!exception.equals(other.exception))
+		} else if (!reference.equals(other.reference))
 			return false;
 		return true;
 	}

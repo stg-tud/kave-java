@@ -6,18 +6,24 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
-
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import commons.model.ssts.impl.SSTTestHelper;
 
 public class ThrowStatementTest {
+
+	public IVariableReference someVarRef(String s) {
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier(s);
+		return ref;
+	}
 
 	@Test
 	public void testDefaultValues() {
 		ThrowStatement sut = new ThrowStatement();
 
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getException()));
+		assertThat(new VariableReference(), equalTo(sut.getReference()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}
@@ -25,8 +31,8 @@ public class ThrowStatementTest {
 	@Test
 	public void testSettingValues() {
 		ThrowStatement sut = new ThrowStatement();
-		sut.setException(CsTypeName.UNKNOWN_NAME);
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getException()));
+		sut.setReference(someVarRef("e"));
+		assertThat(someVarRef("e"), equalTo(sut.getReference()));
 	}
 
 	@Test
@@ -42,8 +48,8 @@ public class ThrowStatementTest {
 	public void testEqualityReallyTheSame() {
 		ThrowStatement a = new ThrowStatement();
 		ThrowStatement b = new ThrowStatement();
-		a.setException(CsTypeName.UNKNOWN_NAME);
-		b.setException(CsTypeName.UNKNOWN_NAME);
+		a.setReference(someVarRef("e"));
+		b.setReference(someVarRef("e"));
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -53,8 +59,8 @@ public class ThrowStatementTest {
 	public void testEqualityDifferentException() {
 		ThrowStatement a = new ThrowStatement();
 		ThrowStatement b = new ThrowStatement();
-		a.setException(CsTypeName.UNKNOWN_NAME);
-		b.setException(CsTypeName.newTypeName("System.Int32, mscore, 4.0.0.0"));
+		a.setReference(someVarRef("e1"));
+		b.setReference(someVarRef("e2"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

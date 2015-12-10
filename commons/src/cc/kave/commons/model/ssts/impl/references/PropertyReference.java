@@ -36,7 +36,11 @@ public class PropertyReference implements IPropertyReference {
 
 	@Override
 	public int hashCode() {
-		return 505239 + this.propertyName.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((propertyName == null) ? 0 : propertyName.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class PropertyReference implements IPropertyReference {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof PropertyReference))
+		if (getClass() != obj.getClass())
 			return false;
 		PropertyReference other = (PropertyReference) obj;
 		if (propertyName == null) {

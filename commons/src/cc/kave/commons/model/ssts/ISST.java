@@ -38,4 +38,8 @@ public interface ISST extends ISSTNode {
 	@NonNull
 	Set<IMethodDeclaration> getNonEntryPoints();
 
+	@Nonnull
+	String getPartialClassIdentifier();
+
+	boolean isPartialClass();
 }

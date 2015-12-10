@@ -36,7 +36,11 @@ public class FieldReference implements IFieldReference {
 
 	@Override
 	public int hashCode() {
-		return 345 + this.fieldName.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class FieldReference implements IFieldReference {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof FieldReference))
+		if (getClass() != obj.getClass())
 			return false;
 		FieldReference other = (FieldReference) obj;
 		if (fieldName == null) {

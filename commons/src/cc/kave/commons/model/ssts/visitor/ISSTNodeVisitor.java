@@ -18,6 +18,7 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -26,6 +27,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -132,6 +134,10 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 	TReturn visit(IIndexAccessExpression expr, TContext context);
 
 	TReturn visit(ITypeCheckExpression expr, TContext context);
+
+	TReturn visit(IBinaryExpression indexAccessRef, TContext context);
+
+	TReturn visit(IUnaryExpression indexAccessRef, TContext context);
 
 	// References
 	TReturn visit(IEventReference eventRef, TContext context);

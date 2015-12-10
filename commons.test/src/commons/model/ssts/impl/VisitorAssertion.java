@@ -22,11 +22,16 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -35,6 +40,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -42,6 +48,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -148,5 +155,22 @@ public class VisitorAssertion {
 			Mockito.verify(visitor).visit((IUnknownExpression) obj, _context);
 		else if (obj instanceof IUnknownStatement)
 			Mockito.verify(visitor).visit((IUnknownStatement) obj, _context);
+		else if (obj instanceof ICastExpression)
+			Mockito.verify(visitor).visit((ICastExpression) obj, _context);
+		else if (obj instanceof IIndexAccessExpression)
+			Mockito.verify(visitor).visit((IIndexAccessExpression) obj, _context);
+		else if (obj instanceof ITypeCheckExpression)
+			Mockito.verify(visitor).visit((ITypeCheckExpression) obj, _context);
+		else if (obj instanceof IIndexAccessReference)
+			Mockito.verify(visitor).visit((IIndexAccessReference) obj, _context);
+		else if (obj instanceof IEventSubscriptionStatement)
+			Mockito.verify(visitor).visit((IEventSubscriptionStatement) obj, _context);
+		else if (obj instanceof IBinaryExpression)
+			Mockito.verify(visitor).visit((IBinaryExpression) obj, _context);
+		else if (obj instanceof IUnaryExpression)
+			Mockito.verify(visitor).visit((IUnaryExpression) obj, _context);
+		else
+			throw new RuntimeException();
+
 	}
 }

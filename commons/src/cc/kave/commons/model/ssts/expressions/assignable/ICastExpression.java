@@ -14,4 +14,6 @@ public interface ICastExpression extends IAssignableExpression {
 	@Nonnull
 	IVariableReference getReference();
 
+	CastOperator getOperator();
+
 }

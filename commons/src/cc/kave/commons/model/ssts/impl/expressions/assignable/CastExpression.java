@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -13,11 +14,13 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class CastExpression implements ICastExpression {
 
 	private TypeName targetType;
+	private CastOperator operator;
 	private IVariableReference reference;
 
 	public CastExpression() {
 		this.reference = new VariableReference();
 		this.targetType = CsTypeName.UNKNOWN_NAME;
+		this.operator = CastOperator.Unknown;
 	}
 
 	@Override
@@ -38,6 +41,15 @@ public class CastExpression implements ICastExpression {
 		this.targetType = targetType;
 	}
 
+	@Override
+	public CastOperator getOperator() {
+		return this.operator;
+	}
+
+	public void setOperator(CastOperator operator) {
+		this.operator = operator;
+	}
+
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
@@ -51,6 +63,7 @@ public class CastExpression implements ICastExpression {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((operator == null) ? 0 : operator.hashCode());
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		result = prime * result + ((targetType == null) ? 0 : targetType.hashCode());
 		return result;
@@ -65,6 +78,8 @@ public class CastExpression implements ICastExpression {
 		if (getClass() != obj.getClass())
 			return false;
 		CastExpression other = (CastExpression) obj;
+		if (operator != other.operator)
+			return false;
 		if (reference == null) {
 			if (other.reference != null)
 				return false;

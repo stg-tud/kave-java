@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class SST implements ISST {
 
 	private TypeName enclosingType;
+	private String partialClassIdentifier;
 	private Set<IFieldDeclaration> fields;
 	private Set<IPropertyDeclaration> properties;
 	private Set<IMethodDeclaration> methods;
@@ -29,12 +30,27 @@ public class SST implements ISST {
 	private Set<IDelegateDeclaration> delegates;
 
 	public SST() {
+		this.partialClassIdentifier = "";
 		this.enclosingType = CsTypeName.UNKNOWN_NAME;
 		this.fields = new HashSet<IFieldDeclaration>();
 		this.properties = new HashSet<IPropertyDeclaration>();
 		this.methods = new HashSet<IMethodDeclaration>();
 		this.events = new HashSet<IEventDeclaration>();
 		this.delegates = new HashSet<IDelegateDeclaration>();
+	}
+
+	@Override
+	public String getPartialClassIdentifier() {
+		return this.partialClassIdentifier;
+	}
+
+	public void setPartialClassIdentifier(String identifier) {
+		this.partialClassIdentifier = identifier;
+	}
+
+	@Override
+	public boolean isPartialClass() {
+		return !this.partialClassIdentifier.equals("");
 	}
 
 	@Override
@@ -101,14 +117,18 @@ public class SST implements ISST {
 		return Sets.newHashSet(methods.stream().filter(m -> !m.isEntryPoint()).collect(Collectors.toSet()));
 	}
 
+	@Override
 	public int hashCode() {
-		int hashCode = this.enclosingType.hashCode();
-		hashCode = (hashCode * 397) ^ this.fields.hashCode();
-		hashCode = (hashCode * 397) ^ this.methods.hashCode();
-		hashCode = (hashCode * 397) ^ this.properties.hashCode();
-		hashCode = (hashCode * 397) ^ this.events.hashCode();
-		hashCode = (hashCode * 397) ^ this.delegates.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((delegates == null) ? 0 : delegates.hashCode());
+		result = prime * result + ((enclosingType == null) ? 0 : enclosingType.hashCode());
+		result = prime * result + ((events == null) ? 0 : events.hashCode());
+		result = prime * result + ((fields == null) ? 0 : fields.hashCode());
+		result = prime * result + ((methods == null) ? 0 : methods.hashCode());
+		result = prime * result + ((partialClassIdentifier == null) ? 0 : partialClassIdentifier.hashCode());
+		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+		return result;
 	}
 
 	@Override
@@ -117,7 +137,7 @@ public class SST implements ISST {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof SST))
+		if (getClass() != obj.getClass())
 			return false;
 		SST other = (SST) obj;
 		if (delegates == null) {
@@ -144,6 +164,11 @@ public class SST implements ISST {
 			if (other.methods != null)
 				return false;
 		} else if (!methods.equals(other.methods))
+			return false;
+		if (partialClassIdentifier == null) {
+			if (other.partialClassIdentifier != null)
+				return false;
+		} else if (!partialClassIdentifier.equals(other.partialClassIdentifier))
 			return false;
 		if (properties == null) {
 			if (other.properties != null)

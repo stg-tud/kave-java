@@ -280,7 +280,8 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IThrowStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("throw").space().keyword("new").space().text(stmt.getException().getName()).text("();");
+		c.indentation().keyword("throw").space().keyword("new").space().text(stmt.getReference().getIdentifier())
+				.text("();");
 		return null;
 	}
 

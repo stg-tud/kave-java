@@ -73,6 +73,9 @@ import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -92,11 +95,16 @@ import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
@@ -104,6 +112,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
@@ -180,7 +189,9 @@ public abstract class JsonUtils {
 				.registerSubtype(IfElseExpression.class).registerSubtype(InvocationExpression.class)
 				.registerSubtype(LambdaExpression.class).registerSubtype(UnknownExpression.class)
 				.registerSubtype(ConstantValueExpression.class).registerSubtype(NullExpression.class)
-				.registerSubtype(ReferenceExpression.class));
+				.registerSubtype(ReferenceExpression.class).registerSubtype(UnaryExpression.class)
+				.registerSubtype(BinaryExpression.class).registerSubtype(CastExpression.class)
+				.registerSubtype(IndexAccessExpression.class).registerSubtype(TypeCheckExpression.class));
 		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISST.class, "$type").registerSubtype(SST.class));
 		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMemberDeclaration.class, "$type")
 				.registerSubtype(IMemberDeclaration.class));
@@ -197,10 +208,10 @@ public abstract class JsonUtils {
 						.registerSubtype(UnknownReference.class).registerSubtype(EventReference.class)
 						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
 						.registerSubtype(MethodReference.class).registerSubtype(VariableReference.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type").registerSubtype(EventReference.class)
-						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
-						.registerSubtype(UnknownReference.class).registerSubtype(VariableReference.class));
+		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type")
+				.registerSubtype(EventReference.class).registerSubtype(FieldReference.class)
+				.registerSubtype(PropertyReference.class).registerSubtype(UnknownReference.class)
+				.registerSubtype(VariableReference.class).registerSubtype(IndexAccessReference.class));
 		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableReference.class, "$type")
 				.registerSubtype(VariableReference.class));
 		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISimpleExpression.class, "$type")
@@ -251,7 +262,9 @@ public abstract class JsonUtils {
 		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
 		gb.registerTypeAdapter(EventSubscriptionOperation.class,
 				EnumDeSerializer.create(EventSubscriptionOperation.values()));
-
+		gb.registerTypeAdapter(CastOperator.class, EnumDeSerializer.create(CastOperator.values()));
+		gb.registerTypeAdapter(BinaryOperator.class, EnumDeSerializer.create(BinaryOperator.values()));
+		gb.registerTypeAdapter(UnaryOperator.class, EnumDeSerializer.create(UnaryOperator.values()));
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
 		gson = gb.create();

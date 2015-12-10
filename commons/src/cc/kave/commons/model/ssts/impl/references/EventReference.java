@@ -36,7 +36,11 @@ public class EventReference implements IEventReference {
 
 	@Override
 	public int hashCode() {
-		return 175 + this.eventName.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class EventReference implements IEventReference {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof EventReference))
+		if (getClass() != obj.getClass())
 			return false;
 		EventReference other = (EventReference) obj;
 		if (eventName == null) {

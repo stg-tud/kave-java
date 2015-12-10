@@ -78,7 +78,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testTryBlock() {
 		TryBlock sst = new TryBlock();
 		ThrowStatement s = new ThrowStatement();
-		s.setException(CsTypeName.newTypeName("ExceptionType,P"));
+		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
 		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
@@ -94,7 +94,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testTryBlock_NoFinallyBlock() {
 		TryBlock sst = new TryBlock();
 		ThrowStatement s = new ThrowStatement();
-		s.setException(CsTypeName.newTypeName("ExceptionType,P"));
+		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
 		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
@@ -109,7 +109,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testTryBlock_GeneralCatchBlock() {
 		TryBlock sst = new TryBlock();
 		ThrowStatement s = new ThrowStatement();
-		s.setException(CsTypeName.newTypeName("ExceptionType,P"));
+		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
 		catch1.setKind(CatchBlockKind.General);
 		catch1.getBody().add(new BreakStatement());
@@ -123,7 +123,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testTryBlock_UnnamedCatchBlock() {
 		TryBlock sst = new TryBlock();
 		ThrowStatement s = new ThrowStatement();
-		s.setException(CsTypeName.newTypeName("ExceptionType,P"));
+		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
 		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.setKind(CatchBlockKind.Unnamed);

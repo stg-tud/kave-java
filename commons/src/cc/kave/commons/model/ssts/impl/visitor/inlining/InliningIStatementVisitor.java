@@ -332,7 +332,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 	@Override
 	public Void visit(IThrowStatement stmt, InliningContext context) {
 		ThrowStatement statement = new ThrowStatement();
-		statement.setException(stmt.getException());
+		statement.setReference(stmt.getReference());
 		context.addStatement(statement);
 		return null;
 	}

@@ -18,6 +18,7 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -26,6 +27,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -287,4 +289,13 @@ public abstract class AbstractNodeVisitor<TContext, TReturn> implements ISSTNode
 		throw new RuntimeException();
 	}
 
+	@Override
+	public TReturn visit(IBinaryExpression indexAccessRef, TContext context) {
+		throw new RuntimeException();
+	}
+
+	@Override
+	public TReturn visit(IUnaryExpression indexAccessRef, TContext context) {
+		throw new RuntimeException();
+	}
 }

@@ -3,10 +3,13 @@ package commons.model.ssts.impl;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -21,8 +24,6 @@ import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 
-import com.google.common.collect.Sets;
-
 public class SSTTest {
 
 	@Test
@@ -30,6 +31,7 @@ public class SSTTest {
 		SST sut = new SST();
 
 		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getEnclosingType()));
+		assertThat("", equalTo(sut.getPartialClassIdentifier()));
 		assertThat(new HashSet<IDelegateDeclaration>(), equalTo(sut.getDelegates()));
 		assertThat(new HashSet<IEventDeclaration>(), equalTo(sut.getEvents()));
 		assertThat(new HashSet<IFieldDeclaration>(), equalTo(sut.getFields()));
@@ -50,8 +52,11 @@ public class SSTTest {
 		sut.getEvents().add(new EventDeclaration());
 		sut.getMethods().add(new MethodDeclaration());
 		sut.getProperties().add(new PropertyDeclaration());
+		sut.setPartialClassIdentifier("abc");
 
 		assertThat(CsTypeName.newTypeName("T1, P1"), equalTo(sut.getEnclosingType()));
+		assertThat("abc", equalTo(sut.getPartialClassIdentifier()));
+		assertTrue(sut.isPartialClass());
 		assertThat(Sets.newHashSet(new DelegateDeclaration()), equalTo(sut.getDelegates()));
 		assertThat(Sets.newHashSet(new FieldDeclaration()), equalTo(sut.getFields()));
 		assertThat(Sets.newHashSet(new EventDeclaration()), equalTo(sut.getEvents()));
@@ -73,12 +78,14 @@ public class SSTTest {
 		SST a = new SST();
 		SST b = new SST();
 		a.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		a.setPartialClassIdentifier("abc");
 		a.getDelegates().add(new DelegateDeclaration());
 		a.getFields().add(new FieldDeclaration());
 		a.getEvents().add(new EventDeclaration());
 		a.getMethods().add(new MethodDeclaration());
 		a.getProperties().add(new PropertyDeclaration());
 		b.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		b.setPartialClassIdentifier("abc");
 		b.getDelegates().add(new DelegateDeclaration());
 		b.getFields().add(new FieldDeclaration());
 		b.getEvents().add(new EventDeclaration());
@@ -94,6 +101,16 @@ public class SSTTest {
 		SST a = new SST();
 		SST b = new SST();
 		a.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+
+		assertThat(a, not(equalTo(b)));
+		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
+	public void testEqualityPartialClassIdentifier() {
+		SST a = new SST();
+		SST b = new SST();
+		a.setPartialClassIdentifier("abc");
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

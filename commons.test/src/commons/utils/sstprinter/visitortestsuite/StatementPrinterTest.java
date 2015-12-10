@@ -3,9 +3,9 @@ package commons.utils.sstprinter.visitortestsuite;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
@@ -60,7 +60,9 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void ThrowStatement() {
 		ThrowStatement sst = new ThrowStatement();
-		sst.setException(CsTypeName.newTypeName("T,P"));
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier("T");
+		sst.setReference(ref);
 
 		// note: we can ignore exception constructors and throwing existing
 		// objects

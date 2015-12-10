@@ -16,9 +16,8 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningUtil;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -501,18 +500,18 @@ public class InliningVisitorTest extends InliningBaseTest {
 						assign(ref("b"), invocationExpr("m2", ref("b")))));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("m1", //
-						declareVar(InliningUtil.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
-						declareVar(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
-						assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
+						declareVar(InliningContext.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
+						declareVar(InliningContext.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
+						assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
 						simpleIf(
 								Lists.newArrayList(
-										assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("5")),
-										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
+										assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("5")),
+										assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false"))),
 								constant("true"),
-								assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
-								assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
-						assign(ref("b"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
+								assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
+								assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
+						assign(ref("b"), refExpr(InliningContext.RESULT_NAME + "[Integer] [?].m2()"))));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -533,22 +532,23 @@ public class InliningVisitorTest extends InliningBaseTest {
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
-						declareVar(InliningUtil.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
-						declareVar(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
-						assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
+						declareVar(InliningContext.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
+						declareVar(InliningContext.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
+						assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
 						declareVar("$0_a"), //
 						simpleIf(Lists.newArrayList(), constant("true"), //
 								simpleIf(Lists.newArrayList(), constant("false"), //
-										assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
-										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
+										assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
+										assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false"))), //
-								simpleIf(Lists.newArrayList(), refExpr(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), //
+								simpleIf(Lists.newArrayList(),
+										refExpr(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), //
 										declareVar("b"), //
 										declareVar("c"), //
-										assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("7")),
-										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
+										assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("7")),
+										assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false")))),
-						assign(ref("a"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
+						assign(ref("a"), refExpr(InliningContext.RESULT_NAME + "[Integer] [?].m2()"))));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -572,27 +572,28 @@ public class InliningVisitorTest extends InliningBaseTest {
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
-						declareVar(InliningUtil.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
-						declareVar(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
-						assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
+						declareVar(InliningContext.RESULT_NAME + "[Integer] [?].m2()", INTEGER), //
+						declareVar(InliningContext.RESULT_FLAG + "[Integer] [?].m2()", BOOLEAN), //
+						assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), constant("true")), //
 						declareVar("$0_a"), //
 						simpleIf(Lists.newArrayList(), constant("true"), //
 								simpleIf(Lists.newArrayList(), constant("false"), //
-										assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
-										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
+										assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("6")),
+										assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false"))), //
-								simpleIf(Lists.newArrayList(), refExpr(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), //
+								simpleIf(Lists.newArrayList(),
+										refExpr(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), //
 										declareVar("b"), //
 										declareVar("c"), //
-										assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("7")),
-										assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"),
+										assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("7")),
+										assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"),
 												constant("false")))),
-						simpleIf(Lists.newArrayList(), refExpr(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), //
+						simpleIf(Lists.newArrayList(), refExpr(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), //
 								declareVar("d"), //
 								declareVar("e"), //
-								assign(ref(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"), constant("8")),
-								assign(ref(InliningUtil.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
-						assign(ref("a"), refExpr(InliningUtil.RESULT_NAME + "[Integer] [?].m2()"))));
+								assign(ref(InliningContext.RESULT_NAME + "[Integer] [?].m2()"), constant("8")),
+								assign(ref(InliningContext.RESULT_FLAG + "[Integer] [?].m2()"), constant("false"))),
+						assign(ref("a"), refExpr(InliningContext.RESULT_NAME + "[Integer] [?].m2()"))));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -858,9 +859,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a")));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testCompletionExprInlining(){
+	public void testCompletionExprInlining() {
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -873,9 +874,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 						expr(completionExpr("$0_a"))));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testNullCompletionExprInlining(){
+	public void testNullCompletionExprInlining() {
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -888,9 +889,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 						expr(new CompletionExpression())));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testMultipleNonEntryPoints(){
+	public void testMultipleNonEntryPoints() {
 		ISST sst = buildSST( //
 				declareEntryPoint("ep1", //
 						invocationStatement("p1")), //
@@ -903,9 +904,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a")));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testMultipleNonEntryPoints2(){
+	public void testMultipleNonEntryPoints2() {
 		ISST sst = buildSST( //
 				declareEntryPoint("ep1", //
 						invocationStatement("p1")), //
@@ -922,33 +923,34 @@ public class InliningVisitorTest extends InliningBaseTest {
 						declareVar("a")));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testMultipleReturns(){
+	public void testMultipleReturns() {
 		MethodName name = CsMethodName.newMethodName("[Void] [?].p1()");
 		ISST sst = buildSST( //
-				declareEntryPoint("ep1", // 
+				declareEntryPoint("ep1", //
 						declareVar("a"), //
 						invocationStatement(name)), //
 				declareMethod(name, false, //
-						simpleIf(new ArrayList<IStatement>(), new UnknownExpression(), returnStatement(new UnknownExpression(), true)), //
+						simpleIf(new ArrayList<IStatement>(), new UnknownExpression(),
+								returnStatement(new UnknownExpression(), true)), //
 						declareVar("a")));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //
-						declareVar(InliningUtil.RESULT_FLAG + "[Void] [?].p1()", BOOLEAN), //
-						assign(ref(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), constant("true")), //
+						declareVar(InliningContext.RESULT_FLAG + "[Void] [?].p1()", BOOLEAN), //
+						assign(ref(InliningContext.RESULT_FLAG + "[Void] [?].p1()"), constant("true")), //
 						simpleIf(new ArrayList<IStatement>(), new UnknownExpression(),
-								assign(ref(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), constant("false"))), //
-						simpleIf(new ArrayList<IStatement>(), refExpr(InliningUtil.RESULT_FLAG + "[Void] [?].p1()"), declareVar("$0_a"))));
+								assign(ref(InliningContext.RESULT_FLAG + "[Void] [?].p1()"), constant("false"))), //
+						simpleIf(new ArrayList<IStatement>(), refExpr(InliningContext.RESULT_FLAG + "[Void] [?].p1()"),
+								declareVar("$0_a"))));
 		assertSSTs(sst, inlinedSST);
 	}
-	
-	
-	public static void assertSSTs(ISST sst, ISST inlinedSST){
+
+	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
-		//System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		// System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }
