@@ -8,7 +8,6 @@
 package cc.kave.commons.externalserializationtests;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
