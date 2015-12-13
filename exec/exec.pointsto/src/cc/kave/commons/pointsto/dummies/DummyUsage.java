@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.dummies;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
@@ -30,7 +31,7 @@ public class DummyUsage {
 	private TypeName classContext;
 	private MethodName methodContext;
 	private DummyDefinitionSite definitionSite;
-	private Set<DummyCallsite> callsites;
+	private Set<DummyCallsite> callsites = new HashSet<>();
 
 	public void setType(TypeName typeName) {
 		this.type = typeName;

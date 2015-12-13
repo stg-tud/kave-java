@@ -12,23 +12,24 @@
  */
 package cc.kave.commons.pointsto.extraction;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class PointsToUsageExtractor {
+
+	private static final Logger LOGGER = Logger.getLogger(PointsToUsageExtractor.class.getName());
 
 	private UsageStatisticsCollector collector;
 
 	public PointsToUsageExtractor() {
 		this.collector = new UsageStatisticsCollector() {
-
-			@Override
-			public void onUsageExtracted(DummyUsage usage) {
-
-			}
 
 			@Override
 			public void onProcessContext(Context context) {
@@ -37,6 +38,11 @@ public class PointsToUsageExtractor {
 
 			@Override
 			public void merge(UsageStatisticsCollector other) {
+
+			}
+
+			@Override
+			public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
 
 			}
 		};
@@ -50,9 +56,23 @@ public class PointsToUsageExtractor {
 		return collector;
 	}
 
-	public List<DummyUsage> extract(Context context) {
+	public List<DummyUsage> extract(PointsToContext context) {
 		collector.onProcessContext(context);
 
-		return Collections.emptyList();
+		List<DummyUsage> contextUsages = new ArrayList<>();
+		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
+		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context);
+		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
+			visitor.visitEntryPoint(methodDecl, visitorContext);
+
+			List<DummyUsage> entryPointUsages = visitorContext.getUsages();
+			contextUsages.addAll(entryPointUsages);
+
+			LOGGER.log(Level.INFO,
+					"Extracted " + entryPointUsages.size() + " usages from " + methodDecl.getName().getIdentifier());
+			collector.onEntryPointUsagesExtracted(methodDecl, entryPointUsages);
+		}
+
+		return contextUsages;
 	}
 }

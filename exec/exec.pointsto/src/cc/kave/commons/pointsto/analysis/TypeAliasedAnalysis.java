@@ -12,7 +12,11 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
@@ -22,6 +26,8 @@ import cc.kave.commons.pointsto.analysis.types.TypeCollector;
  *
  */
 public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
+	
+	private static final Logger LOGGER = Logger.getLogger(TypeAliasedAnalysis.class.getName());
 
 	@Override
 	public PointsToContext compute(Context context) {
@@ -36,6 +42,12 @@ public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
+		// assume that unknown types may point to any known location
+		if (query.getType().isUnknown()) {
+			LOGGER.log(Level.FINE, "Queried for an unknown type");
+			return new HashSet<>(contextToLocations.values());
+		}
+
 		// lower query to used format
 		return super.query(new QueryContextKey(null, null, query.getType(), null));
 	}

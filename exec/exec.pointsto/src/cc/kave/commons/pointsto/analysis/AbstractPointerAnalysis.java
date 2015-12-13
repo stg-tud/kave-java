@@ -30,7 +30,7 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 		Collection<AbstractLocation> locations = contextToLocations.get(query);
 		if (locations.isEmpty()) {
 			// conservative assumption: may point to any known location
-			Logger.getLogger(getClass().getName()).log(Level.INFO,
+			Logger.getLogger(getClass().getName()).log(Level.WARNING,
 					"Failed to find any matching entries for " + query.toString());
 			locations = contextToLocations.values();
 		}

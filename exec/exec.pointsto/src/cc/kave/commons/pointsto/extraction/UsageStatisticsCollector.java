@@ -12,7 +12,10 @@
  */
 package cc.kave.commons.pointsto.extraction;
 
+import java.util.List;
+
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public interface UsageStatisticsCollector {
@@ -24,7 +27,7 @@ public interface UsageStatisticsCollector {
 	void merge(UsageStatisticsCollector other);
 
 	void onProcessContext(Context context);
-
-	void onUsageExtracted(DummyUsage usage);
+	
+	void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages);
 
 }
