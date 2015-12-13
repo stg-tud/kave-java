@@ -12,7 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis.types;
 
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,21 +32,24 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.ScopedMap;
 
 public class TypeCollectorVisitorContext {
-
-	private static final String THIS_NAME = "this";
-	private static final String SUPER_NAME = "base";
 
 	private static final Logger LOGGER = Logger.getLogger(TypeCollectorVisitorContext.class.getName());
 
 	private ScopedMap<String, TypeName> symbolTable = new ScopedMap<>();
 
 	private IdentityHashMap<IReference, TypeName> referenceTypes = new IdentityHashMap<>();
+	private Set<TypeName> allTypes = new HashSet<>();
 
 	public IdentityHashMap<IReference, TypeName> getReferenceTypes() {
 		return referenceTypes;
+	}
+
+	public Set<TypeName> getTypes() {
+		return allTypes;
 	}
 
 	public void initializeSymbolTable(Context context) {
@@ -52,28 +57,28 @@ public class TypeCollectorVisitorContext {
 
 		// add implicitly available variables
 		ITypeHierarchy typeHierarchy = context.getTypeShape().getTypeHierarchy();
-		declare(THIS_NAME, typeHierarchy.getElement());
-		if (typeHierarchy.hasSuperclass()) {
-			declare(SUPER_NAME, typeHierarchy.getExtends().getElement());
-		}
+		LanguageOptions languageOptions = LanguageOptions.getInstance();
+		declare(languageOptions.getThisName(), typeHierarchy.getElement());
+		declare(languageOptions.getSuperName(), languageOptions.getSuperType(typeHierarchy));
 
 		// TODO this might not be necessary as property and field references contain a type
 
 		// add fields
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
 			FieldName field = fieldDecl.getName();
-			declare(field.getIdentifier(), field.getValueType());
+			declare(field.getName(), field.getValueType());
 		}
 
 		// add properties
 		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
 			PropertyName property = propertyDecl.getName();
-			declare(property.getIdentifier(), property.getValueType());
+			declare(property.getName(), property.getValueType());
 		}
 	}
 
 	private void declare(String identifier, TypeName type) {
 		symbolTable.create(identifier, type);
+		allTypes.add(type);
 	}
 
 	public void enterMethod(IMethodDeclaration method) {
@@ -120,7 +125,7 @@ public class TypeCollectorVisitorContext {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to a missing variable");
 			return;
 		}
-		
+
 		TypeName type = symbolTable.get(reference.getIdentifier());
 		if (type == null) {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown variable");
@@ -135,6 +140,7 @@ public class TypeCollectorVisitorContext {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown field");
 		} else {
 			referenceTypes.put(reference, field.getValueType());
+			allTypes.add(field.getValueType());
 		}
 	}
 
@@ -144,6 +150,7 @@ public class TypeCollectorVisitorContext {
 			LOGGER.log(Level.WARNING, "Skipping a reference to an unknown property");
 		} else {
 			referenceTypes.put(reference, property.getValueType());
+			allTypes.add(property.getValueType());
 		}
 	}
 

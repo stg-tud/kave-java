@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.types;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
@@ -23,6 +24,7 @@ import cc.kave.commons.model.ssts.IReference;
 public class TypeCollector {
 
 	private IdentityHashMap<IReference, TypeName> referenceTypes = new IdentityHashMap<>();
+	private Set<TypeName> allTypes = new HashSet<>();
 
 	public TypeCollector(Context context) {
 		 TypeCollectorVisitor visitor = new TypeCollectorVisitor();
@@ -32,6 +34,7 @@ public class TypeCollector {
 		 visitor.visit(context.getSST(), visitorContext);
 		
 		 referenceTypes = visitorContext.getReferenceTypes();
+		 allTypes = visitorContext.getTypes();
 	}
 
 	public TypeName getType(IReference reference) {
@@ -39,6 +42,6 @@ public class TypeCollector {
 	}
 
 	public Set<TypeName> getTypes() {
-		return new HashSet<>(referenceTypes.values());
+		return Collections.unmodifiableSet(allTypes);
 	}
 }

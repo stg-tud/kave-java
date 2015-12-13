@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.analysis.TraversingVisitor;
 
@@ -125,7 +126,7 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IDoLoop block, TypeCollectorVisitorContext context) {
 		context.enterScope();
@@ -135,23 +136,23 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IWhileLoop block, TypeCollectorVisitorContext context) {
 		block.getCondition().accept(this, context);
 		context.enterScope();
 		visitStatements(block.getBody(), context);
 		context.leaveScope();
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IUncheckedBlock block, TypeCollectorVisitorContext context) {
 		context.enterScope();
 		visitStatements(block.getBody(), context);
 		context.leaveScope();
-		
+
 		return null;
 	}
 
@@ -170,6 +171,12 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 	@Override
 	public Void visit(IVariableReference varRef, TypeCollectorVisitorContext context) {
 		context.useVariableReference(varRef);
+		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyReference propertyRef, TypeCollectorVisitorContext context) {
+		context.usePropertyReference(propertyRef);
 		return null;
 	}
 
