@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package eclipse.commons.test.parser;
+package eclipse.commons.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -31,10 +31,16 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+
+import cc.kave.commons.model.names.FieldName;
+import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.eclipse.commons.analysis.completiontarget.CompletionTargetMarker;
 import cc.kave.eclipse.commons.analysis.transformer.DeclarationVisitor;
-import cc.kave.eclipse.commons.analysis.completiontarget.*;
 
 public class PluginAstParser {
 
@@ -63,8 +69,8 @@ public class PluginAstParser {
 		ICompilationUnit compilationUnit = getCompilationunit(projectName, qualifiedName);
 		parsed = parse(compilationUnit);
 
-		DeclarationVisitor declVisitor = new DeclarationVisitor(context, new HashSet<>(), null);
-		
+		DeclarationVisitor declVisitor = new DeclarationVisitor(context, new HashSet<>(), new CompletionTargetMarker());
+
 		parsed.accept(declVisitor);
 	}
 
@@ -119,8 +125,8 @@ public class PluginAstParser {
 		}
 		return null;
 	}
-	
-	public boolean containsField(FieldDeclaration decl){
-		return context.getFields().contains(decl);
+
+	public SST getContext() {
+		return context;
 	}
 }

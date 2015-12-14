@@ -16,6 +16,7 @@
 
 package cc.kave.eclipse.commons.analysis.transformer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,9 @@ import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.MemberName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
@@ -61,7 +64,7 @@ public class DeclarationVisitor extends ASTVisitor {
 				FieldName name = (FieldName) NodeFactory.createNodeName(fragment);
 
 				// if (isNestedDeclaration(name, context)) {
-				// TODO: return super.visit(node);
+				// return super.visit(node);
 				// }
 
 				cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration fieldDeclaration = new cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration();
@@ -87,15 +90,12 @@ public class DeclarationVisitor extends ASTVisitor {
 		return super.visit(decl);
 	}
 
+	// TODO: Tests
 	private void methodDeclHelper(MethodDeclaration decl) {
 		if (decl != null) {
 			MethodName methodName = (MethodName) NodeFactory.createNodeName(decl);
 
-			// if (isNestedDeclaration(methodName, context))
-			// {
-			// return;
-			// }
-
+			// if (!isNestedDeclaration(methodName, context)) {
 			cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration sstDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 			sstDecl.setName(methodName);
 			sstDecl.setEntryPoint(entryPoints.contains(methodName));
@@ -109,25 +109,22 @@ public class DeclarationVisitor extends ASTVisitor {
 			}
 
 			if (!Modifier.isAbstract(decl.getModifiers())) {
-				BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), marker);
+				BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), marker,
+						new ArrayList<IStatement>());
 				decl.accept(bodyVisitor);
-				// Execute.AndSupressExceptions(
-				// delegate { decl.Accept(bodyVisitor, sstDecl.Body); });
 			}
 		}
+		// }
 	}
 
 	private void constructorHelper(MethodDeclaration decl) {
 		UniqueVariableNameGenerator nameGen = new UniqueVariableNameGenerator();
-		ExpressionVisitor exprVisit = new ExpressionVisitor(nameGen);
+		ExpressionVisitor exprVisit = new ExpressionVisitor(nameGen, marker);
 
 		if (decl != null) {
 			MethodName methodName = (MethodName) NodeFactory.createNodeName(decl);
 
-			// if (isNestedDeclaration(methodName, context))
-			// {
-			// TODO: return super.visit(decl);
-			// }
+			// if (!isNestedDeclaration(methodName, context)) {
 
 			cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration sstDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 			sstDecl.setName(methodName);
@@ -140,62 +137,21 @@ public class DeclarationVisitor extends ASTVisitor {
 				expStatement.setExpression(new CompletionExpression());
 				sstDecl.getBody().add(expStatement);
 			}
-
-			// if (decl.Initializer != null)
-			// {
-			// Name name = CsMethodName.getUnknownName();
-			//
-			// var substitution = decl.DeclaredElement.IdSubstitution;
-			// var resolvedRef = decl.Initializer.Reference.Resolve();
-			// if (resolvedRef.DeclaredElement != null)
-			// {
-			// name =
-			// resolvedRef.DeclaredElement.GetName<IMethodName>(substitution);
-			// }
-			//
-			// var args = Lists.NewList<ISimpleExpression>();
-			// foreach (var p in decl.Initializer.Arguments)
-			// {
-			// var expr = exprVisit.ToSimpleExpression(p.Value, sstDecl.Body);
-			// args.Add(expr);
-			// }
-			//
-			// var varId = new VariableReference().Identifier; // default value
-			// if (decl.Initializer.Instance != null)
-			// {
-			// var tokenType = decl.Initializer.Instance.GetTokenType();
-			// var isThis = CSharpTokenType.THIS_KEYWORD == tokenType;
-			// var isBase = CSharpTokenType.BASE_KEYWORD == tokenType;
-			//
-			// varId = isThis ? "this" : isBase ? "base" : varId;
-			// }
-			//
-			// sstDecl.Body.Add(
-			// new ExpressionStatement
-			// {
-			// Expression = new InvocationExpression
-			// {
-			// Reference = new VariableReference {Identifier = varId},
-			// MethodName = name,
-			// Parameters = args
-			// }
-			// });
-			// }
-			//
-			// if (!Modifier.isAbstract(decl.getModifiers())) {
-			// BodyVisitor bodyVisitor = new BodyVisitor(nameGen, marker);
-			// decl.accept(bodyVisitor);
-			// Execute.AndSupressExceptions(
-			// delegate { decl.Accept(bodyVisitor, sstDecl.Body); });
 			// }
 		}
 	}
 
+	// TODO: Test für hilfsmethode
 	private static boolean isNestedDeclaration(DelegateTypeName name, SST context) {
-		return !name.getDeclaringType().equals(context.getEnclosingType());
+		TypeName declaringType = name.getDeclaringType();
+		System.out.println(declaringType.getIdentifier());
+		System.out.println(context.getEnclosingType().getIdentifier());
+		return !declaringType.equals(context.getEnclosingType());
 	}
 
 	private static boolean isNestedDeclaration(MemberName name, SST context) {
+		// System.out.println(name.getDeclaringType().getIdentifier());
+		// System.out.println(context.getEnclosingType().getIdentifier());
 		return !name.getDeclaringType().equals(context.getEnclosingType());
 	}
 }

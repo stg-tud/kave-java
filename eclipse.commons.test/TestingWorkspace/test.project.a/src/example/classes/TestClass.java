@@ -18,8 +18,7 @@ public class TestClass extends TestSuperClass{
 
 	}
 
-	public int method() {
-		return 2;
+	public void method() {
 	}
 
 	public int method(int a) {

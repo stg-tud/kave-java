@@ -97,7 +97,6 @@ public class CsTypeName extends CsName implements TypeName {
 				: CsNamespaceName.newNamespaceName(id.substring(0, endIndexOfNamespaceIdentifier));
 	}
 
-	// TODO: Siehe C# implementation
 	@Override
 	public TypeName getDeclaringType() {
 

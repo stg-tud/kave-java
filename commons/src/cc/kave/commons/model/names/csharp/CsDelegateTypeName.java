@@ -46,11 +46,6 @@ public class CsDelegateTypeName extends CsTypeName implements DelegateTypeName {
 
 	@Override
 	public String getSignature() {
-		// int start = identifier.indexOf("[");
-		// start = identifier.indexOf("[",
-		// CsNameUtils.getClosingBracketIndex(identifier, start));
-		// start = CsNameUtils.getClosingBracketIndex(identifier, start);
-		// return getName() + identifier.substring(start + 1);
 		int endOfValueType = CsNameUtils.endOfNextTypeIdentifier(identifier, 2);
 		int endOfDelegateType = CsNameUtils.endOfNextTypeIdentifier(identifier, endOfValueType);
 		return getName() + identifier.substring(endOfDelegateType + 1);
@@ -128,5 +123,10 @@ public class CsDelegateTypeName extends CsTypeName implements DelegateTypeName {
 	@Override
 	public NamespaceName getNamespace() {
 		return getDelegateType().getNamespace();
+	}
+
+	@Override
+	public TypeName getDeclaringType() {
+		return getDelegateType().getDeclaringType();
 	}
 }
