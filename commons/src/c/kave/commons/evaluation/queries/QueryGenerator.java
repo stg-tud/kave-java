@@ -11,33 +11,112 @@ import cc.kave.commons.model.episodes.QueryConfigurations;
 public class QueryGenerator {
 
 	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Episode> allMethods,
-			QueryConfigurations configuration) {
+			QueryConfigurations configuration) throws Exception {
+		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
 
 		for (Episode episode : allMethods) {
-		}
-		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
-		if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEONEBYONE)) {
-			// generatedQueries =
-		}
+			Map<Integer, List<Episode>> queries = new HashMap<Integer, List<Episode>>();
+			List<Integer> sublistLengths = new LinkedList<Integer>();
+			boolean md = false;
 
-		// Map<Integer, List<Episode>> skipedEventsAndQueryPair = new
-		// HashMap<Integer, List<Episode>>();
-		// List<Episode> currentueries = new LinkedList<Episode>();
-		// for (Method method : allMethods) {
-		// if (method.getNumberOfInvocations() > invocationsRemoved) {
-		// Query query = new Query();
-		// query.addFact(method.getMethodName());
-		// query.setNumberOfFacts(method.getNumberOfInvocations() + 1 -
-		// invocationsRemoved);
-		// }
-		// }
-
+			if (episode.getNumberOfFacts() > 1) {
+				if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEONEBYONE)) {
+					md = true;
+					sublistLengths = removeOneByOne(episode.getNumEvents() - 1);
+					queries = removeInvocations(episode, sublistLengths, md);
+				} else if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEBYPERCENTAGE)) {
+					md = true;
+					sublistLengths = removeByPercentage(episode.getNumEvents() - 1);
+					queries = removeInvocations(episode, sublistLengths, md);
+				} else if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEONEBYONE)) {
+					sublistLengths = removeOneByOne(episode.getNumEvents() - 1);
+					queries = removeInvocations(episode, sublistLengths, md);
+				} else if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEBYPERCENTAGE)) {
+					sublistLengths = removeByPercentage(episode.getNumEvents() - 1);
+					queries = removeInvocations(episode, sublistLengths, md);
+				} else {
+					throw new Exception("Specify valid query configuration porameter!");
+				}
+				generatedQueries.put(episode, queries);
+			}
+		}
 		return generatedQueries;
 	}
 
-	private List<int[]> subsetsGenerator(int[] array, int subsetLength) {
-		int N = array.length;
-		List<int[]> results = new LinkedList<int[]>();
+	private Episode createQuery(Episode episode, List<String> list, boolean md) {
+		Episode query = new Episode();
+		query.setNumEvents(list.size() + 1);
+		query.setFrequency(1);
+		if (md) {
+			query.addFact(episode.get(0).getRawFact());
+		}
+		query.addListOfFacts(list);
+		for (int idx1 = 0; idx1 < list.size(); idx1++) {
+			for (int idx2 = idx1; idx2 < list.size() + 1; idx2++) {
+				query.addFact(list.get(idx1) + ">" + list.get(idx2));
+			}
+		}
+		return query;
+	}
+
+	private List<String> getInvocations(Episode episode) {
+		List<String> invocations = new LinkedList<String>();
+		for (int idx = 1; idx < episode.getNumEvents(); idx++) {
+			invocations.add(episode.get(idx).getRawFact());
+		}
+		return invocations;
+	}
+
+	private Map<Integer, List<Episode>> removeInvocations(Episode episode, List<Integer> subsets, boolean md) {
+		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
+		List<String> invocations = getInvocations(episode);
+		for (int remove : subsets) {
+			List<List<String>> allQueries = subsetsGenerator(invocations, invocations.size() - remove);
+			List<Episode> queryLevel = new LinkedList<Episode>();
+			for (List<String> list : allQueries) {
+				Episode query = createQuery(episode, list, md);
+				queryLevel.add(query);
+			}
+			results.put(remove, queryLevel);
+		}
+		if (md) {
+			List<Episode> removeAllInvocations = new LinkedList<Episode>();
+			Episode lastQuery = new Episode();
+			lastQuery.setFrequency(1);
+			lastQuery.setNumEvents(1);
+			lastQuery.addFact(episode.get(0).getRawFact());
+			removeAllInvocations.add(lastQuery);
+			results.put(invocations.size(), removeAllInvocations);
+		}
+		return results;
+	}
+
+	private List<Integer> removeOneByOne(int NumberOfInvocations) {
+		List<Integer> result = new LinkedList<Integer>();
+		for (int remove = 1; remove < NumberOfInvocations; remove++) {
+			result.add(remove);
+		}
+		return result;
+	}
+
+	private List<Integer> removeByPercentage(int numberInvocations) {
+		List<Integer> removeInvocations = new LinkedList<Integer>();
+		List<Double> percentages = new LinkedList<Double>();
+		percentages.add(0.25);
+		percentages.add(0.50);
+		percentages.add(0.75);
+		for (double p : percentages) {
+			int remove = (int) Math.ceil(p * numberInvocations);
+			if (!removeInvocations.contains(remove)) {
+				removeInvocations.add(remove);
+			}
+		}
+		return removeInvocations;
+	}
+
+	private static List<List<String>> subsetsGenerator(List<String> array, int subsetLength) {
+		int N = array.size();
+		List<List<String>> results = new LinkedList<List<String>>();
 
 		int[] binary = new int[(int) Math.pow(2, N)];
 		for (int i = 0; i < Math.pow(2, N); i++) {
@@ -53,12 +132,10 @@ public class QueryGenerator {
 			}
 
 			if (count == subsetLength) {
-				int subsetIdx = 0;
-				int[] subset = new int[subsetLength];
+				List<String> subset = new LinkedList<>();
 				for (int j = 0; j < N; j++) {
 					if (binary[i] % 10 == 1) {
-						subset[subsetIdx] = array[j];
-						subsetIdx++;
+						subset.add(array.get(j));
 					}
 					binary[i] /= 10;
 				}
