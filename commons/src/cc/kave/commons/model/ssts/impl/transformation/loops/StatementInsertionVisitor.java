@@ -25,11 +25,13 @@ import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
+import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
 public class StatementInsertionVisitor extends AbstractNodeVisitor<StatementInsertionContext, List<IStatement>> {
 
@@ -199,6 +201,16 @@ public class StatementInsertionVisitor extends AbstractNodeVisitor<StatementInse
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
 		update(block.getBody(), bodyNormalized);
+		return null;
+	}
+
+	@Override
+	public List<IStatement> visit(IUnknownStatement unknownStmt, StatementInsertionContext context) {
+		return null;
+	}
+
+	@Override
+	public List<IStatement> visit(IEventSubscriptionStatement stmt, StatementInsertionContext context) {
 		return null;
 	}
 
