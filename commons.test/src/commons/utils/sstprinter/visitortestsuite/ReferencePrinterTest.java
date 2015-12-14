@@ -25,36 +25,36 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	public void EventReference() {
 		EventReference sst = new EventReference();
 		sst.setEventName(CsEventName.newEventName("[EventType,P] [DeclaringType,P].E"));
-		sst.setReference(SSTUtil.variableReference("e"));
+		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "e");
+		AssertPrint(sst, "o.E");
 	}
 
 	@Test
 	public void FieldReference() {
 		FieldReference sst = new FieldReference();
 		sst.setFieldName(CsFieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
-		sst.setReference(SSTUtil.variableReference("f"));
+		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "f");
+		AssertPrint(sst, "o.F");
 	}
 
 	@Test
 	public void MethodReference() {
 		MethodReference sst = new MethodReference();
 		sst.setMethodName(CsMethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
-		sst.setReference(SSTUtil.variableReference("m"));
+		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "m");
+		AssertPrint(sst, "o.M");
 	}
 
 	@Test
 	public void PropertyReference() {
 		PropertyReference sst = new PropertyReference();
 		sst.setPropertyName(CsPropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.setReference(SSTUtil.variableReference("p"));
+		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "p");
+		AssertPrint(sst, "o.P");
 	}
 
 	@Test

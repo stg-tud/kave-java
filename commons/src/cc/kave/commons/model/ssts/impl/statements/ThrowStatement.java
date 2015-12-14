@@ -56,5 +56,4 @@ public class ThrowStatement implements IThrowStatement {
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
 	}
-
 }
