@@ -16,13 +16,11 @@ import java.util.List;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.blocks.ISwitchBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
-import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -51,7 +49,7 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 		MethodName method = methodDecl.getName();
 		List<ParameterName> parameters = method.getParameters();
 		for (int i = 0; i < parameters.size(); ++i) {
-			context.declareParameter(method, parameters.get(i), i);
+			context.registerParameter(method, parameters.get(i), i);
 		}
 
 		visitStatements(methodDecl.getBody(), context);
@@ -73,7 +71,7 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
 		MethodName method = entity.getMethodName();
 
-		// TODO ignore static methods?
+		// static methods and constructors do not have any receiver objects
 		if (!method.isStatic() && !method.isConstructor()) {
 			context.registerReceiverCallsite(method, entity.getReference());
 		}

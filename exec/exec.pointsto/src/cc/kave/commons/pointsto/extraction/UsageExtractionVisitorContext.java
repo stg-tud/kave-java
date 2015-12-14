@@ -32,15 +32,10 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.references.FieldReference;
-import cc.kave.commons.model.ssts.impl.references.PropertyReference;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.pointsto.LanguageOptions;
+import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
@@ -73,31 +68,22 @@ public class UsageExtractionVisitorContext {
 		this.enclosingClass = context.getSST().getEnclosingType();
 		this.typeCollector = new TypeCollector(context);
 
+		this.currentStatement = null;
+		this.currentCallpath = null;
 		createImplicitDefinitions(context);
 	}
 
 	public List<DummyUsage> getUsages() {
-		return new ArrayList<>(locationUsages.values());
-	}
+		List<DummyUsage> usages = new ArrayList<>(locationUsages.size());
 
-	private IVariableReference buildVariableReference(String name) {
-		VariableReference varRef = new VariableReference();
-		varRef.setIdentifier(name);
-		return varRef;
-	}
+		// prune usages without any call sites
+		for (DummyUsage usage : locationUsages.values()) {
+			if (!usage.getAllCallsites().isEmpty()) {
+				usages.add(usage);
+			}
+		}
 
-	private IFieldReference buildFieldReference(FieldName field) {
-		FieldReference fieldRef = new FieldReference();
-		fieldRef.setReference(buildVariableReference(LanguageOptions.getInstance().getThisName()));
-		fieldRef.setFieldName(field);
-		return fieldRef;
-	}
-
-	private IPropertyReference buildPropertyReference(PropertyName property) {
-		PropertyReference propertyRef = new PropertyReference();
-		propertyRef.setReference(buildVariableReference(LanguageOptions.getInstance().getThisName()));
-		propertyRef.setPropertyName(property);
-		return propertyRef;
+		return usages;
 	}
 
 	public void setEntryPoint(MethodName method) {
@@ -120,8 +106,8 @@ public class UsageExtractionVisitorContext {
 		currentCallpath.leaveMethod();
 	}
 
-	private Set<AbstractLocation> queryPointsTo(IReference reference, IStatement stmt, TypeName type) {
-		QueryContextKey query = new QueryContextKey(reference, stmt, type, currentCallpath);
+	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, TypeName type) {
+		QueryContextKey query = new QueryContextKey(reference, currentStatement, type, currentCallpath);
 		return pointerAnalysis.query(query);
 	}
 
@@ -130,22 +116,24 @@ public class UsageExtractionVisitorContext {
 
 		// this
 		DummyDefinitionSite thisDefinition = DummyDefinitionSite.byThis();
-		for (AbstractLocation location : queryPointsTo(buildVariableReference(languageOptions.getThisName()), null,
-				enclosingClass)) {
+		IReference thisReference = SSTBuilder.variableReference(languageOptions.getThisName());
+		for (AbstractLocation location : queryPointerAnalysis(thisReference, enclosingClass)) {
 			implicitDefinitions.put(location, thisDefinition);
 		}
 
 		// super
 		DummyDefinitionSite superDefinition = DummyDefinitionSite.byThis();
-		for (AbstractLocation location : queryPointsTo(buildVariableReference(languageOptions.getSuperName()), null,
-				languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy()))) {
+		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
+		TypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
+		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
 			implicitDefinitions.put(location, superDefinition);
 		}
 
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
 			FieldName field = fieldDecl.getName();
 			DummyDefinitionSite fieldDefinition = DummyDefinitionSite.byField(field);
-			for (AbstractLocation location : queryPointsTo(buildFieldReference(field), null, field.getValueType())) {
+			IReference fieldReference = SSTBuilder.fieldReference(field);
+			for (AbstractLocation location : queryPointerAnalysis(fieldReference, field.getValueType())) {
 				// TODO we might overwrite definitions here if two fields share one location
 				implicitDefinitions.put(location, fieldDefinition);
 			}
@@ -159,8 +147,8 @@ public class UsageExtractionVisitorContext {
 
 			PropertyName property = propertyDecl.getName();
 			DummyDefinitionSite propertyDefinition = DummyDefinitionSite.byField(propertyToField(property));
-			for (AbstractLocation location : queryPointsTo(buildPropertyReference(property), null,
-					property.getValueType())) {
+			IReference propertyRefernce = SSTBuilder.propertyReference(property);
+			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
 				// do not overwrite an existing definition by a real field
 				if (!implicitDefinitions.containsKey(location)) {
 					implicitDefinitions.put(location, propertyDefinition);
@@ -224,8 +212,8 @@ public class UsageExtractionVisitorContext {
 		}
 	}
 
-	public void declareParameter(MethodName method, ParameterName parameter, int argIndex) {
-		QueryContextKey query = new QueryContextKey(buildVariableReference(parameter.getName()), null,
+	public void registerParameter(MethodName method, ParameterName parameter, int argIndex) {
+		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
 
