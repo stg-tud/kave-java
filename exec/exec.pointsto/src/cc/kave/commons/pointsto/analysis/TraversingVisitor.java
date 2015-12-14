@@ -36,11 +36,16 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -48,6 +53,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -65,7 +71,7 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TContext, TReturn> {
-	
+
 	protected void visitStatements(List<IStatement> statements, TContext context) {
 		for (IStatement stmt : statements) {
 			stmt.accept(this, context);
@@ -208,12 +214,12 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 	@Override
 	public TReturn visit(ISwitchBlock block, TContext context) {
 		block.getReference().accept(this, context);
-		
+
 		for (ICaseBlock caseBlock : block.getSections()) {
 			caseBlock.getLabel().accept(this, context);
 			visitStatements(caseBlock.getBody(), context);
 		}
-		
+
 		visitStatements(block.getDefaultSection(), context);
 
 		return null;
@@ -222,13 +228,13 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 	@Override
 	public TReturn visit(ITryBlock block, TContext context) {
 		visitStatements(block.getBody(), context);
-		
+
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			visitStatements(catchBlock.getBody(), context);
 		}
-		
+
 		visitStatements(block.getFinally(), context);
-		
+
 		return null;
 	}
 
@@ -350,6 +356,46 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 
 	@Override
 	public TReturn visit(IUnknownStatement unknownStmt, TContext context) {
+		return null;
+	}
+
+	@Override
+	public TReturn visit(ICastExpression expr, TContext context) {
+		expr.getReference().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IIndexAccessExpression expr, TContext context) {
+		expr.getReference().accept(this, context);
+		for (ISimpleExpression simpleExpr : expr.getIndices()) {
+			simpleExpr.accept(this, context);
+		}
+		return null;
+	}
+
+	@Override
+	public TReturn visit(ITypeCheckExpression expr, TContext context) {
+		expr.getReference().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IBinaryExpression expr, TContext context) {
+		expr.getLeftOperand().accept(this, context);
+		expr.getRightOperand().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IUnaryExpression expr, TContext context) {
+		expr.getOperand().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IIndexAccessReference indexAccessRef, TContext context) {
+		indexAccessRef.getExpression().accept(this, context);
 		return null;
 	}
 
