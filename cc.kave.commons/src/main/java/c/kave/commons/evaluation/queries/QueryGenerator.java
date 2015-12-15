@@ -49,8 +49,16 @@ public class QueryGenerator {
 		query.setFrequency(1);
 		if (md) {
 			query.addFact(episode.get(0).getRawFact());
+			if (list.size() > 0) {
+				query.addListOfFacts(list);
+				query.addFact(query.get(0) + ">" + list.get(0));
+			}
+			if (list.size() > 1) {
+				for (int idx = 0; idx < list.size() - 1; idx++) {
+					query.addFact(list.get(idx) + ">" + list.get(idx + 1));
+				}
+			}
 		}
-		query.addListOfFacts(list);
 		for (int idx1 = 0; idx1 < list.size(); idx1++) {
 			for (int idx2 = idx1; idx2 < list.size() + 1; idx2++) {
 				query.addFact(list.get(idx1) + ">" + list.get(idx2));

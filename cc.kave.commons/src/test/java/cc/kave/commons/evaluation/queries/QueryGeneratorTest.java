@@ -5,11 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import c.kave.commons.evaluation.queries.QueryGenerator;
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.commons.model.episodes.QueryConfigurations;
 
 public class QueryGeneratorTest {
 
@@ -25,7 +27,7 @@ public class QueryGeneratorTest {
 	}
 
 	@Test
-	public void configuration1Test() {
+	public void configuration1Test() throws Exception {
 		Map<Episode, Map<Integer, List<Episode>>> expected = new HashMap<Episode, Map<Integer, List<Episode>>>();
 		
 		Map<Integer, List<Episode>> episodeQueries = new HashMap<Integer, List<Episode>>();
@@ -53,7 +55,9 @@ public class QueryGeneratorTest {
 		
 		expected.put(createEpisode("a", "b", "c", "d", "a>b", "b>c", "c>d"), episodeQueries);
 		
-//		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, configuration)
+		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, QueryConfigurations.INCLUDEMD_REMOVEONEBYONE);
+		
+		Assert.assertEquals(expected, actuals);
 	}
 	
 	private Episode createEpisode(String ... strings) {
