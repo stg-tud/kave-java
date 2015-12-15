@@ -9,11 +9,12 @@ import org.junit.Test;
 import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
+import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-
+import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 
-public class PropertyReferenceTest {
+public class PropertyReferenceTest extends SSTBaseTest {
 
 	private static PropertyName someProperty() {
 		return CsPropertyName.newPropertyName("[T1,P1] [T2,P2].P");
@@ -63,6 +64,15 @@ public class PropertyReferenceTest {
 		PropertyReference b = new PropertyReference();
 		a.setPropertyName(someProperty());
 
+		assertThat(a, not(equalTo(b)));
+		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
+	public void testEqualityDifferentReference() {
+		PropertyReference a = new PropertyReference();
+		PropertyReference b = new PropertyReference();
+		a.setReference(someVarRef());
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
 	}

@@ -226,4 +226,32 @@ public class CsMethodNameTest {
 		List<ParameterName> ps = methodName.getParameters();
 	}
 
+	@Test
+	public void shouldBeExtensionMethod() {
+		String id = "static [T,P] [T,P].M(this [T,P] o)";
+		CsMethodName sut = (CsMethodName) CsMethodName.newMethodName(id);
+		assertTrue(sut.isExtensionMethod());
+	}
+
+	@Test
+	public void ShouldBeExtensionMethod_NotIfNotStatic() {
+		String id = "[T,P] [T,P].M(this [T,P] o)";
+		CsMethodName sut = (CsMethodName) CsMethodName.newMethodName(id);
+		assertFalse(sut.isExtensionMethod());
+	}
+
+	@Test
+	public void shouldBeExntesionMethod_NotWithoutParameters() {
+		String id = "static [T,P] [T,P].M()";
+		CsMethodName sut = (CsMethodName) CsMethodName.newMethodName(id);
+		assertFalse(sut.isExtensionMethod());
+	}
+
+	@Test
+	public void shouldBeExtensionMethod_NotWithoutThisMarker() {
+		String id = "static [T,P] [T,P].M([T,P] o)";
+		CsMethodName sut = (CsMethodName) CsMethodName.newMethodName(id);
+		assertFalse(sut.isExtensionMethod());
+	}
+
 }

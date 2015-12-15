@@ -9,11 +9,12 @@ import org.junit.Test;
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.csharp.CsEventName;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
+import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-
+import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 
-public class EventReferenceTest {
+public class EventReferenceTest extends SSTBaseTest {
 
 	private static EventName someEvent() {
 		return CsEventName.newEventName("[T1,P1] [T2,P2].E");
@@ -63,6 +64,15 @@ public class EventReferenceTest {
 		EventReference b = new EventReference();
 		a.setEventName(someEvent());
 
+		assertThat(a, not(equalTo(b)));
+		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
+	public void testEqualityDifferentReference() {
+		EventReference a = new EventReference();
+		EventReference b = new EventReference();
+		a.setReference(someVarRef());
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
 	}

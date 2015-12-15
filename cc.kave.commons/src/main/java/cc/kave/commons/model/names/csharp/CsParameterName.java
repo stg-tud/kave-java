@@ -13,6 +13,7 @@ public class CsParameterName extends CsName implements ParameterName {
 	public final String outputModifier = "out";
 	public final String varArgsModifier = "params";
 	public final String optionalModifier = "opt";
+	public final String ExtensionMethodModifier = "this";
 
 	private static final Map<String, CsParameterName> nameRegistry = new MapMaker().weakValues().makeMap();
 
@@ -73,5 +74,9 @@ public class CsParameterName extends CsName implements ParameterName {
 
 	private String getModifiers() {
 		return identifier.substring(0, identifier.indexOf('['));
+	}
+
+	public boolean isExtensionMethodParameter() {
+		return getModifiers().contains(ExtensionMethodModifier);
 	}
 }

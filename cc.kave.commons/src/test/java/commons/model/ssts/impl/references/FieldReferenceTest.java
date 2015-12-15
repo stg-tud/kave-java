@@ -10,10 +10,10 @@ import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-
+import commons.model.ssts.impl.SSTBaseTest;
 import commons.model.ssts.impl.SSTTestHelper;
 
-public class FieldReferenceTest {
+public class FieldReferenceTest extends SSTBaseTest {
 
 	private static FieldName someField() {
 		return CsFieldName.newFieldName("[T1,P1] [T2,P2].E");
@@ -68,6 +68,15 @@ public class FieldReferenceTest {
 	}
 
 	@Test
+	public void testEqualityDifferentReference() {
+		FieldReference a = new FieldReference();
+		FieldReference b = new FieldReference();
+		a.setReference(someVarRef());
+		assertThat(a, not(equalTo(b)));
+		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
 	public void testVisitorIsImplemented() {
 		FieldReference sut = new FieldReference();
 		SSTTestHelper.accept(sut, 23).verify(sut);
@@ -77,4 +86,5 @@ public class FieldReferenceTest {
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
 	}
+
 }

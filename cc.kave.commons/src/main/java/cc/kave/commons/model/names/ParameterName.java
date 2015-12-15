@@ -12,4 +12,6 @@ public interface ParameterName extends Name {
 	boolean isParameterArray();
 
 	boolean isOptional();
+
+	boolean isExtensionMethodParameter();
 }

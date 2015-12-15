@@ -12,4 +12,6 @@ public interface MethodName extends MemberName, GenericName {
 	boolean isConstructor();
 
 	TypeName getReturnType();
+
+	boolean isExtensionMethod();
 }

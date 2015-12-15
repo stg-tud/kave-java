@@ -89,4 +89,9 @@ public class CsMethodName extends CsMemberName implements MethodName {
 	public boolean isGenericEntity() {
 		return hasTypeParameters();
 	}
+
+	@Override
+	public boolean isExtensionMethod() {
+		return isStatic() && getParameters().size() > 0 && getParameters().get(0).isExtensionMethodParameter();
+	}
 }

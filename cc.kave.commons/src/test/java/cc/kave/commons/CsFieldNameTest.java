@@ -81,4 +81,5 @@ public class CsFieldNameTest {
 		assertEquals("fieldName", fieldName.getName());
 		assertEquals("d:[V,A] [D,A].()", fieldName.getValueType().getIdentifier());
 	}
+
 }

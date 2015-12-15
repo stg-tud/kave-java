@@ -42,6 +42,7 @@ public class CsParameterNameTest {
 		assertFalse(parameterName.isOptional());
 		assertFalse(parameterName.isOutput());
 		assertFalse(parameterName.isParameterArray());
+		assertFalse(parameterName.isExtensionMethodParameter());
 		assertTrue(parameterName.isPassedByReference());
 	}
 
@@ -88,6 +89,12 @@ public class CsParameterNameTest {
 		ParameterName parameterName = CsParameterName.newParameterName("opt [T, A, 4.3.2.1] p");
 
 		assertTrue(parameterName.isOptional());
+	}
+
+	@Test
+	public void shouldBeExtensionMethodParameter() {
+		ParameterName parameterName = CsParameterName.newParameterName("this [T, A, 4.3.2.1] p");
+		assertTrue(parameterName.isExtensionMethodParameter());
 	}
 
 	@Test
