@@ -19,7 +19,7 @@ public class QueryGenerator {
 			List<Integer> sublistLengths = new LinkedList<Integer>();
 			boolean md = false;
 
-			if (episode.getNumberOfFacts() > 1) {
+			if (episode.getNumEvents() > 1) {
 				if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEONEBYONE)) {
 					md = true;
 					sublistLengths = removeOneByOne(episode.getNumEvents() - 1);
@@ -45,24 +45,16 @@ public class QueryGenerator {
 
 	private Episode createQuery(Episode episode, List<String> list, boolean md) {
 		Episode query = new Episode();
-		query.setNumEvents(list.size() + 1);
 		query.setFrequency(1);
 		if (md) {
 			query.addFact(episode.get(0).getRawFact());
-			if (list.size() > 0) {
-				query.addListOfFacts(list);
-				query.addFact(query.get(0) + ">" + list.get(0));
-			}
-			if (list.size() > 1) {
-				for (int idx = 0; idx < list.size() - 1; idx++) {
-					query.addFact(list.get(idx) + ">" + list.get(idx + 1));
-				}
-			}
+			query.setNumEvents(list.size() + 1);
+		} else {
+			query.setNumEvents(list.size());
 		}
-		for (int idx1 = 0; idx1 < list.size(); idx1++) {
-			for (int idx2 = idx1; idx2 < list.size() + 1; idx2++) {
-				query.addFact(list.get(idx1) + ">" + list.get(idx2));
-			}
+		query.addListOfFacts(list);
+		for (int idx = 0; idx < query.getNumEvents() - 1; idx++) {
+			query.addFact(query.get(idx).getRawFact() + ">" + query.get(idx + 1).getRawFact());
 		}
 		return query;
 	}
@@ -78,6 +70,24 @@ public class QueryGenerator {
 	private Map<Integer, List<Episode>> removeInvocations(Episode episode, List<Integer> subsets, boolean md) {
 		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
 		List<String> invocations = getInvocations(episode);
+
+		if (!md) {
+			List<Episode> allInvocations = new LinkedList<Episode>();
+			Episode maximalQuery = new Episode();
+			maximalQuery.setFrequency(1);
+			maximalQuery.setNumEvents(episode.getNumEvents() - 1);
+			for (int idx = 1; idx < episode.getNumEvents(); idx++) {
+				maximalQuery.addFact(episode.get(idx).getRawFact());
+			}
+			if (maximalQuery.getNumEvents() > 1) {
+				for (int idx = 1; idx < maximalQuery.getNumEvents(); idx++) {
+					maximalQuery
+							.addFact(maximalQuery.get(idx - 1).getRawFact() + ">" + maximalQuery.get(idx).getRawFact());
+				}
+			}
+			allInvocations.add(maximalQuery);
+			results.put(0, allInvocations);
+		}
 		for (int remove : subsets) {
 			List<List<String>> allQueries = subsetsGenerator(invocations, invocations.size() - remove);
 			List<Episode> queryLevel = new LinkedList<Episode>();
@@ -89,11 +99,11 @@ public class QueryGenerator {
 		}
 		if (md) {
 			List<Episode> removeAllInvocations = new LinkedList<Episode>();
-			Episode lastQuery = new Episode();
-			lastQuery.setFrequency(1);
-			lastQuery.setNumEvents(1);
-			lastQuery.addFact(episode.get(0).getRawFact());
-			removeAllInvocations.add(lastQuery);
+			Episode minimalQuery = new Episode();
+			minimalQuery.setFrequency(1);
+			minimalQuery.setNumEvents(1);
+			minimalQuery.addFact(episode.get(0).getRawFact());
+			removeAllInvocations.add(minimalQuery);
 			results.put(invocations.size(), removeAllInvocations);
 		}
 		return results;
@@ -114,8 +124,8 @@ public class QueryGenerator {
 		percentages.add(0.50);
 		percentages.add(0.75);
 		for (double p : percentages) {
-			int remove = (int) Math.ceil(p * numberInvocations);
-			if (!removeInvocations.contains(remove)) {
+			int remove = (int) Math.ceil(p * (double) numberInvocations);
+			if (!removeInvocations.contains(remove) && remove != numberInvocations) {
 				removeInvocations.add(remove);
 			}
 		}
