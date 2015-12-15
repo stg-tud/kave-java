@@ -63,7 +63,7 @@ public class PointsToUsageExtractor {
 		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
 		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context);
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
-			visitor.visitEntryPoint(methodDecl, visitorContext);
+//			visitor.visitEntryPoint(methodDecl, visitorContext);
 
 			List<DummyUsage> entryPointUsages = visitorContext.getUsages();
 			contextUsages.addAll(entryPointUsages);

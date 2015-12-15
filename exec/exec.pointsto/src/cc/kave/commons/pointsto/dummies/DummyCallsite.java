@@ -13,55 +13,55 @@
 package cc.kave.commons.pointsto.dummies;
 
 import cc.kave.commons.model.names.MethodName;
-import cc.recommenders.usages.CallSiteKind;
+//import cc.recommenders.usages.CallSiteKind;
 
 public class DummyCallsite {
 
-	private CallSiteKind kind;
-	private MethodName method;
-	private int argIndex = 0;
-
-	private DummyCallsite() {
-
-	}
-
-	public static DummyCallsite parameterCallsite(MethodName method, int argIndex) {
-		DummyCallsite callsite = new DummyCallsite();
-		callsite.setKind(CallSiteKind.PARAMETER);
-		callsite.setMethod(method);
-		callsite.setArgIndex(argIndex);
-		return callsite;
-	}
-
-	public static DummyCallsite receiverCallsite(MethodName method) {
-		DummyCallsite callsite = new DummyCallsite();
-		callsite.setKind(CallSiteKind.RECEIVER);
-		callsite.setMethod(method);
-		return callsite;
-	}
-
-	public CallSiteKind getKind() {
-		return kind;
-	}
-
-	public void setKind(CallSiteKind kind) {
-		this.kind = kind;
-	}
-
-	public MethodName getMethod() {
-		return method;
-	}
-
-	public void setMethod(MethodName method) {
-		this.method = method;
-	}
-
-	public int getArgIndex() {
-		return argIndex;
-	}
-
-	public void setArgIndex(int argIndex) {
-		this.argIndex = argIndex;
-	}
+//	private CallSiteKind kind;
+//	private MethodName method;
+//	private int argIndex = 0;
+//
+//	private DummyCallsite() {
+//
+//	}
+//
+//	public static DummyCallsite parameterCallsite(MethodName method, int argIndex) {
+//		DummyCallsite callsite = new DummyCallsite();
+//		callsite.setKind(CallSiteKind.PARAMETER);
+//		callsite.setMethod(method);
+//		callsite.setArgIndex(argIndex);
+//		return callsite;
+//	}
+//
+//	public static DummyCallsite receiverCallsite(MethodName method) {
+//		DummyCallsite callsite = new DummyCallsite();
+//		callsite.setKind(CallSiteKind.RECEIVER);
+//		callsite.setMethod(method);
+//		return callsite;
+//	}
+//
+//	public CallSiteKind getKind() {
+//		return kind;
+//	}
+//
+//	public void setKind(CallSiteKind kind) {
+//		this.kind = kind;
+//	}
+//
+//	public MethodName getMethod() {
+//		return method;
+//	}
+//
+//	public void setMethod(MethodName method) {
+//		this.method = method;
+//	}
+//
+//	public int getArgIndex() {
+//		return argIndex;
+//	}
+//
+//	public void setArgIndex(int argIndex) {
+//		this.argIndex = argIndex;
+//	}
 
 }

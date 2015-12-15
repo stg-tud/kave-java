@@ -70,7 +70,7 @@ public class UsageExtractionVisitorContext {
 
 		this.currentStatement = null;
 		this.currentCallpath = null;
-		createImplicitDefinitions(context);
+//		createImplicitDefinitions(context);
 	}
 
 	public List<DummyUsage> getUsages() {
@@ -111,174 +111,174 @@ public class UsageExtractionVisitorContext {
 		return pointerAnalysis.query(query);
 	}
 
-	private void createImplicitDefinitions(Context context) {
-		LanguageOptions languageOptions = LanguageOptions.getInstance();
-
-		// this
-		DummyDefinitionSite thisDefinition = DummyDefinitionSite.byThis();
-		IReference thisReference = SSTBuilder.variableReference(languageOptions.getThisName());
-		for (AbstractLocation location : queryPointerAnalysis(thisReference, enclosingClass)) {
-			implicitDefinitions.put(location, thisDefinition);
-		}
-
-		// super
-		DummyDefinitionSite superDefinition = DummyDefinitionSite.byThis();
-		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
-		TypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
-		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
-			implicitDefinitions.put(location, superDefinition);
-		}
-
-		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
-			FieldName field = fieldDecl.getName();
-			DummyDefinitionSite fieldDefinition = DummyDefinitionSite.byField(field);
-			IReference fieldReference = SSTBuilder.fieldReference(field);
-			for (AbstractLocation location : queryPointerAnalysis(fieldReference, field.getValueType())) {
-				// TODO we might overwrite definitions here if two fields share one location
-				implicitDefinitions.put(location, fieldDefinition);
-			}
-		}
-
-		// treat properties as fields if they have no custom get code
-		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
-			if (!propertyDecl.getGet().isEmpty()) {
-				continue;
-			}
-
-			PropertyName property = propertyDecl.getName();
-			DummyDefinitionSite propertyDefinition = DummyDefinitionSite.byField(propertyToField(property));
-			IReference propertyRefernce = SSTBuilder.propertyReference(property);
-			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
-				// do not overwrite an existing definition by a real field
-				if (!implicitDefinitions.containsKey(location)) {
-					implicitDefinitions.put(location, propertyDefinition);
-				}
-			}
-		}
-
-	}
-
-	private FieldName propertyToField(PropertyName property) {
-		FieldName field = CsFieldName.newFieldName(property.getIdentifier());
-		return field;
-	}
-
-	private DummyUsage initializeUsage(TypeName type, AbstractLocation location) {
-		DummyUsage usage = new DummyUsage();
-
-		usage.setType(type);
-		usage.setClassContext(enclosingClass);
-		usage.setMethodContext(currentCallpath.getFirst());
-
-		if (location == null || !implicitDefinitions.containsKey(location)) {
-			usage.setDefinitionSite(DummyDefinitionSite.unknown());
-		} else {
-			usage.setDefinitionSite(implicitDefinitions.get(location));
-		}
-
-		return usage;
-	}
-
-	private DummyUsage getOrCreateUsage(AbstractLocation location, TypeName type) {
-		DummyUsage usage = locationUsages.get(location);
-		if (usage == null) {
-			usage = initializeUsage(type, location);
-			locationUsages.put(location, usage);
-		}
-
-		return usage;
-	}
-
-	private void updateDefinitions(QueryContextKey query, DummyDefinitionSite newDefinition) {
-		Set<AbstractLocation> locations = pointerAnalysis.query(query);
-
-		for (AbstractLocation location : locations) {
-			DummyUsage usage = getOrCreateUsage(location, query.getType());
-
-			DummyDefinitionSite currentDefinition = usage.getDefinitionSite();
-			if (definitionSiteComparator.compare(currentDefinition, newDefinition) < 0) {
-				usage.setDefinitionSite(newDefinition);
-			}
-		}
-	}
-
-	private void updateCallsites(QueryContextKey query, DummyCallsite callsite) {
-		Set<AbstractLocation> locations = pointerAnalysis.query(query);
-
-		for (AbstractLocation location : locations) {
-			DummyUsage usage = getOrCreateUsage(location, query.getType());
-
-			usage.addCallsite(callsite);
-		}
-	}
-
-	public void registerParameter(MethodName method, ParameterName parameter, int argIndex) {
-		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
-				parameter.getValueType(), currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
-
-		updateDefinitions(query, newDefinition);
-	}
-
-	public void registerConstant(IConstantValueExpression constExpr) {
-		if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register constant definition site: target is no assignment");
-			return;
-		}
-
-		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
-		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstant();
-
-		updateDefinitions(query, newDefinition);
-	}
-
-	public void registerConstructor(MethodName method) {
-		if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register constructor definition site: target is no assignment");
-			return;
-		}
-
-		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
-		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstructor(method);
-
-		updateDefinitions(query, newDefinition);
-	}
-
-	public void registerPotentialReturnDefinitionSite(MethodName method) {
-		if (currentStatement instanceof IExpressionStatement) {
-			// method called without saving returned value
-			return;
-		} else if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register return definition site: target is no assignment");
-			return;
-		}
-
-		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
-		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byReturn(method);
-
-		updateDefinitions(query, newDefinition);
-	}
-
-	public void registerParameterCallsite(MethodName method, IReference parameterExpr, int argIndex) {
-		TypeName type = typeCollector.getType(parameterExpr);
-		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
-		DummyCallsite callsite = DummyCallsite.parameterCallsite(method, argIndex);
-
-		updateCallsites(query, callsite);
-	}
-
-	public void registerReceiverCallsite(MethodName method, IReference receiver) {
-		TypeName type = typeCollector.getType(receiver);
-		QueryContextKey query = new QueryContextKey(receiver, currentStatement, type, currentCallpath);
-		DummyCallsite callsite = DummyCallsite.receiverCallsite(method);
-
-		updateCallsites(query, callsite);
-	}
+//	private void createImplicitDefinitions(Context context) {
+//		LanguageOptions languageOptions = LanguageOptions.getInstance();
+//
+//		// this
+//		DummyDefinitionSite thisDefinition = DummyDefinitionSite.byThis();
+//		IReference thisReference = SSTBuilder.variableReference(languageOptions.getThisName());
+//		for (AbstractLocation location : queryPointerAnalysis(thisReference, enclosingClass)) {
+//			implicitDefinitions.put(location, thisDefinition);
+//		}
+//
+//		// super
+//		DummyDefinitionSite superDefinition = DummyDefinitionSite.byThis();
+//		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
+//		TypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
+//		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
+//			implicitDefinitions.put(location, superDefinition);
+//		}
+//
+//		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
+//			FieldName field = fieldDecl.getName();
+//			DummyDefinitionSite fieldDefinition = DummyDefinitionSite.byField(field);
+//			IReference fieldReference = SSTBuilder.fieldReference(field);
+//			for (AbstractLocation location : queryPointerAnalysis(fieldReference, field.getValueType())) {
+//				// TODO we might overwrite definitions here if two fields share one location
+//				implicitDefinitions.put(location, fieldDefinition);
+//			}
+//		}
+//
+//		// treat properties as fields if they have no custom get code
+//		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
+//			if (!propertyDecl.getGet().isEmpty()) {
+//				continue;
+//			}
+//
+//			PropertyName property = propertyDecl.getName();
+//			DummyDefinitionSite propertyDefinition = DummyDefinitionSite.byField(propertyToField(property));
+//			IReference propertyRefernce = SSTBuilder.propertyReference(property);
+//			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
+//				// do not overwrite an existing definition by a real field
+//				if (!implicitDefinitions.containsKey(location)) {
+//					implicitDefinitions.put(location, propertyDefinition);
+//				}
+//			}
+//		}
+//
+//	}
+//
+//	private FieldName propertyToField(PropertyName property) {
+//		FieldName field = CsFieldName.newFieldName(property.getIdentifier());
+//		return field;
+//	}
+//
+//	private DummyUsage initializeUsage(TypeName type, AbstractLocation location) {
+//		DummyUsage usage = new DummyUsage();
+//
+//		usage.setType(type);
+//		usage.setClassContext(enclosingClass);
+//		usage.setMethodContext(currentCallpath.getFirst());
+//
+//		if (location == null || !implicitDefinitions.containsKey(location)) {
+//			usage.setDefinitionSite(DummyDefinitionSite.unknown());
+//		} else {
+//			usage.setDefinitionSite(implicitDefinitions.get(location));
+//		}
+//
+//		return usage;
+//	}
+//
+//	private DummyUsage getOrCreateUsage(AbstractLocation location, TypeName type) {
+//		DummyUsage usage = locationUsages.get(location);
+//		if (usage == null) {
+//			usage = initializeUsage(type, location);
+//			locationUsages.put(location, usage);
+//		}
+//
+//		return usage;
+//	}
+//
+//	private void updateDefinitions(QueryContextKey query, DummyDefinitionSite newDefinition) {
+//		Set<AbstractLocation> locations = pointerAnalysis.query(query);
+//
+//		for (AbstractLocation location : locations) {
+//			DummyUsage usage = getOrCreateUsage(location, query.getType());
+//
+//			DummyDefinitionSite currentDefinition = usage.getDefinitionSite();
+//			if (definitionSiteComparator.compare(currentDefinition, newDefinition) < 0) {
+//				usage.setDefinitionSite(newDefinition);
+//			}
+//		}
+//	}
+//
+//	private void updateCallsites(QueryContextKey query, DummyCallsite callsite) {
+//		Set<AbstractLocation> locations = pointerAnalysis.query(query);
+//
+//		for (AbstractLocation location : locations) {
+//			DummyUsage usage = getOrCreateUsage(location, query.getType());
+//
+//			usage.addCallsite(callsite);
+//		}
+//	}
+//
+//	public void registerParameter(MethodName method, ParameterName parameter, int argIndex) {
+//		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
+//				parameter.getValueType(), currentCallpath);
+//		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
+//
+//		updateDefinitions(query, newDefinition);
+//	}
+//
+//	public void registerConstant(IConstantValueExpression constExpr) {
+//		if (!(currentStatement instanceof IAssignment)) {
+//			LOGGER.log(Level.SEVERE, "Cannot register constant definition site: target is no assignment");
+//			return;
+//		}
+//
+//		IAssignment assignStmt = (IAssignment) currentStatement;
+//		TypeName type = typeCollector.getType(assignStmt.getReference());
+//		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
+//		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstant();
+//
+//		updateDefinitions(query, newDefinition);
+//	}
+//
+//	public void registerConstructor(MethodName method) {
+//		if (!(currentStatement instanceof IAssignment)) {
+//			LOGGER.log(Level.SEVERE, "Cannot register constructor definition site: target is no assignment");
+//			return;
+//		}
+//
+//		IAssignment assignStmt = (IAssignment) currentStatement;
+//		TypeName type = typeCollector.getType(assignStmt.getReference());
+//		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
+//		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstructor(method);
+//
+//		updateDefinitions(query, newDefinition);
+//	}
+//
+//	public void registerPotentialReturnDefinitionSite(MethodName method) {
+//		if (currentStatement instanceof IExpressionStatement) {
+//			// method called without saving returned value
+//			return;
+//		} else if (!(currentStatement instanceof IAssignment)) {
+//			LOGGER.log(Level.SEVERE, "Cannot register return definition site: target is no assignment");
+//			return;
+//		}
+//
+//		IAssignment assignStmt = (IAssignment) currentStatement;
+//		TypeName type = typeCollector.getType(assignStmt.getReference());
+//		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
+//		DummyDefinitionSite newDefinition = DummyDefinitionSite.byReturn(method);
+//
+//		updateDefinitions(query, newDefinition);
+//	}
+//
+//	public void registerParameterCallsite(MethodName method, IReference parameterExpr, int argIndex) {
+//		TypeName type = typeCollector.getType(parameterExpr);
+//		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
+//		DummyCallsite callsite = DummyCallsite.parameterCallsite(method, argIndex);
+//
+//		updateCallsites(query, callsite);
+//	}
+//
+//	public void registerReceiverCallsite(MethodName method, IReference receiver) {
+//		TypeName type = typeCollector.getType(receiver);
+//		QueryContextKey query = new QueryContextKey(receiver, currentStatement, type, currentCallpath);
+//		DummyCallsite callsite = DummyCallsite.receiverCallsite(method);
+//
+//		updateCallsites(query, callsite);
+//	}
 
 }
