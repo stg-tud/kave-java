@@ -2,16 +2,16 @@ package cc.kave.commons.model.ssts.blocks;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 
 public interface ICaseBlock {
 
-	@NonNull
+	@Nonnull
 	ISimpleExpression getLabel();
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getBody();
 }

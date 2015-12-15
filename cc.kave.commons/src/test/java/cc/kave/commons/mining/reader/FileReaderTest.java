@@ -22,35 +22,35 @@ public class FileReaderTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private FileReader sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new FileReader();
 	}
-	
+
 	@Test
 	public void nonExistingIntFilesThrowException() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("File does not exist");
 		sut.readFile(new File("does not exist"));
 	}
-	
+
 	@Test
 	public void nonExistingParentIntFilesThrowException() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("File does not exist");
 		sut.readFile(new File("folder/does not exist"));
 	}
-	
+
 	@Test
 	public void youCannotPassFoldersToReadInt() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("File is not a file, but a directory");
 		sut.readFile(rootFolder.getRoot());
 	}
-	
+
 	@Test
 	public void oneNodeEpisodes() throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -70,11 +70,11 @@ public class FileReaderTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		List<String> expected = new LinkedList<String>();
 		expected.add("1,0.001");
 		expected.add("2,0.002");
@@ -86,12 +86,12 @@ public class FileReaderTest {
 		expected.add("8,0.008");
 		expected.add("9,0.009");
 		expected.add("10,0.01");
-		
+
 		List<String> actuals = sut.readFile(file);
-		
+
 		assertEquals(expected, actuals);
 	}
-	
+
 	private File getFilePath() {
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/eventstream.txt");
 		return fileName;

@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: exec
-Bundle-SymbolicName: exec.pointsto
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: cc.kave.commons,
- com.google.guava,
- org.apache.commons.io,
- org.junit

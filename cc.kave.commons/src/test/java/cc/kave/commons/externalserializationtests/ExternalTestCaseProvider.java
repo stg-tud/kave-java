@@ -16,14 +16,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 public class ExternalTestCaseProvider {
 	private static final String settingsFile = "settings.ini";
 	private static final String expectedCompactFile = "expected-compact.json";
 	private static final String expectedFormattedFile = "expected-formatted.json";
 
-	@NonNull
+	@Nonnull
 	public static List<TestCase> getTestCases(Path baseDirectory) throws ClassNotFoundException, IOException {
 		return recursiveGetTestCases(baseDirectory.toFile(), baseDirectory.toString());
 	}

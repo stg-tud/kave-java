@@ -1,19 +1,19 @@
 package cc.kave.commons.model.ssts.expressions.assignable;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 
 public interface IIfElseExpression extends IAssignableExpression {
 
-	@NonNull
+	@Nonnull
 	ISimpleExpression getCondition();
 
-	@NonNull
+	@Nonnull
 	ISimpleExpression getThenExpression();
 
-	@NonNull
+	@Nonnull
 	ISimpleExpression getElseExpression();
 
 }

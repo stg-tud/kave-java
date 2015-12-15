@@ -2,23 +2,23 @@ package cc.kave.commons.model.ssts.blocks;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 
 public interface IForLoop extends IStatement {
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getInit();
 
-	@NonNull
+	@Nonnull
 	ILoopHeaderExpression getCondition();
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getStep();
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getBody();
 
 }

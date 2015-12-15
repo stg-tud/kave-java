@@ -30,8 +30,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.commons.mining.reader.EpisodeParser;
-import cc.kave.commons.mining.reader.FileReader;
 import cc.kave.commons.model.episodes.Episode;
 import cc.recommenders.exceptions.AssertionException;
 
@@ -77,14 +75,14 @@ public class EpisodeParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
-		
+
 		Episode episode = new Episode();
 		episode.addFact("1");
 		episode.setNumEvents(1);
@@ -93,11 +91,11 @@ public class EpisodeParserTest {
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
-		
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		Map<Integer, List<Episode>> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
@@ -117,14 +115,14 @@ public class EpisodeParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
-		
+
 		Episode episode = new Episode();
 		episode.addFact("1");
 		episode.setNumEvents(1);
@@ -134,10 +132,10 @@ public class EpisodeParserTest {
 
 		expected.put(1, episodeList);
 
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		Map<Integer, List<Episode>> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
@@ -158,7 +156,7 @@ public class EpisodeParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -193,10 +191,10 @@ public class EpisodeParserTest {
 
 		expected.put(2, episodeList);
 
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		Map<Integer, List<Episode>> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);

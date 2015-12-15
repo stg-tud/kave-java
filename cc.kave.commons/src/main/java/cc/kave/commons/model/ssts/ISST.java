@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts;
 
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -14,31 +14,31 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
 public interface ISST extends ISSTNode {
 
-	@NonNull
+	@Nonnull
 	TypeName getEnclosingType();
 
-	@NonNull
+	@Nonnull
 	Set<IFieldDeclaration> getFields();
 
-	@NonNull
+	@Nonnull
 	Set<IPropertyDeclaration> getProperties();
 
-	@NonNull
+	@Nonnull
 	Set<IMethodDeclaration> getMethods();
 
-	@NonNull
+	@Nonnull
 	Set<IEventDeclaration> getEvents();
 
-	@NonNull
+	@Nonnull
 	Set<IDelegateDeclaration> getDelegates();
 
-	@NonNull
+	@Nonnull
 	Set<IMethodDeclaration> getEntryPoints();
 
-	@NonNull
+	@Nonnull
 	Set<IMethodDeclaration> getNonEntryPoints();
 
-	@NonNull
+	@Nonnull
 	String getPartialClassIdentifier();
 
 	boolean isPartialClass();

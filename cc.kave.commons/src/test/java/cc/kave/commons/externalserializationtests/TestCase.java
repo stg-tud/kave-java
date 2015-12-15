@@ -7,20 +7,20 @@
  */
 package cc.kave.commons.externalserializationtests;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TestCase {
-	@NonNull
+	@Nonnull
 	public final String name;
 
-	@NonNull
+	@Nonnull
 	public final Class<?> serializedType;
 
-	@NonNull
+	@Nonnull
 	public final String input;
 
-	@NonNull
+	@Nonnull
 	public final String expectedCompact;
 
 	@Nullable

@@ -16,11 +16,12 @@
 
 package cc.kave.commons.model.events;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.eclipse.jdt.annotation.Nullable;
 
 // TODO use correct types instead of just "String"
 public abstract class IDEEvent {

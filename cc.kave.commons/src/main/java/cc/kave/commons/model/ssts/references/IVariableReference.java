@@ -1,10 +1,10 @@
 package cc.kave.commons.model.ssts.references;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 public interface IVariableReference extends IAssignableReference {
 
-	@NonNull
+	@Nonnull
 	String getIdentifier();
 
 	boolean isMissing();

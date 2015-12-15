@@ -1,6 +1,6 @@
 package cc.kave.commons.model.ssts.expressions.assignable;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -8,10 +8,10 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public interface ICastExpression extends IAssignableExpression {
 
-	@NonNull
+	@Nonnull
 	TypeName getTargetType();
 
-	@NonNull
+	@Nonnull
 	IVariableReference getReference();
 
 	CastOperator getOperator();

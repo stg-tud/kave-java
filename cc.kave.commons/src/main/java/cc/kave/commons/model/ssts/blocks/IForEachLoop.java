@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.blocks;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
@@ -10,13 +10,13 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public interface IForEachLoop extends IStatement {
 
-	@NonNull
+	@Nonnull
 	IVariableDeclaration getDeclaration();
 
-	@NonNull
+	@Nonnull
 	IVariableReference getLoopedReference();
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getBody();
 
 }

@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.expressions.assignable;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -15,6 +15,6 @@ public interface ICompletionExpression extends IAssignableExpression {
 	@Nullable
 	IVariableReference getObjectReference();
 
-	@NonNull
+	@Nonnull
 	String getToken();
 }

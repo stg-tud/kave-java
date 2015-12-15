@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import cc.kave.commons.mining.reader.FileReader;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-
-import cc.kave.commons.mining.reader.FileReader;
 
 public class EventStreamModifier {
 
@@ -39,7 +39,7 @@ public class EventStreamModifier {
 		}
 		String content = strbuild.toString();
 		try {
-			FileUtils.writeStringToFile(getWriterPath(), content, true);
+			FileUtils.writeStringToFile(getWriterPath(), content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

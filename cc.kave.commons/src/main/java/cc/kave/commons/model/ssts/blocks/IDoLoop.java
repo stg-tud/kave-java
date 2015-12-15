@@ -2,17 +2,17 @@ package cc.kave.commons.model.ssts.blocks;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 
 public interface IDoLoop extends IStatement {
 
-	@NonNull
+	@Nonnull
 	ILoopHeaderExpression getCondition();
 
-	@NonNull
+	@Nonnull
 	List<IStatement> getBody();
 
 }

@@ -11,17 +11,8 @@
 package exec.episodes;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
-import com.google.inject.name.Named;
 
 import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
@@ -30,12 +21,9 @@ import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
 import cc.kave.commons.mining.reader.EpisodeParser;
 import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
-import cc.kave.commons.model.episodes.Episode;
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
+
+import com.google.inject.name.Named;
 
 public class Suggestions {
 

@@ -1,13 +1,13 @@
 package cc.kave.commons.model.ssts.declarations;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 
 public interface IEventDeclaration extends IMemberDeclaration {
 
-	@NonNull
+	@Nonnull
 	EventName getName();
 
 }

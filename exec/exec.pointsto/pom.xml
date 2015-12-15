@@ -6,4 +6,11 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exec.pointsto</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>cc.kave</groupId>
+  		<artifactId>cc.kave.commons</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>

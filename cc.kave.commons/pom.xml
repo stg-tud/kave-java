@@ -6,4 +6,16 @@
   	<artifactId>cc.kave.root</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
   </parent>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.jgrapht</groupId>
+  		<artifactId>jgrapht-core</artifactId>
+  		<version>0.9.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jgrapht</groupId>
+  		<artifactId>jgrapht-demo</artifactId>
+  		<version>0.9.1</version>
+  	</dependency>
+  </dependencies>
 </project>

@@ -51,7 +51,7 @@ public class EventStreamAsListOfMethodsParserTest {
 		thrown.expectMessage("Event stream folder is not a folder, but a file!");
 		sut = new EventStreamAsListOfMethodsParser(file, reader);
 	}
-	
+
 	@Test
 	public void oneQuery() throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -70,28 +70,28 @@ public class EventStreamAsListOfMethodsParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		List<Method> expected = new LinkedList<Method>();		
+		List<Method> expected = new LinkedList<Method>();
 		Method method = new Method();
 		method.setMethodName("1");
 		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
 		method.setNumberOfInvocations(7);
-		
+
 		expected.add(method);
-		
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		List<Method> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void twoQuery() throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -104,7 +104,7 @@ public class EventStreamAsListOfMethodsParserTest {
 		sb.append("7,0.006\n");
 		sb.append("7,0.007\n");
 		sb.append("8,0.008\n");
-		
+
 		sb.append("9,0.509\n");
 		sb.append("10,0.510\n");
 		sb.append("8,0.511\n");
@@ -115,33 +115,33 @@ public class EventStreamAsListOfMethodsParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		List<Method> expected = new LinkedList<Method>();		
+		List<Method> expected = new LinkedList<Method>();
 		Method method = new Method();
 		method.setMethodName("1");
 		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
 		method.setNumberOfInvocations(7);
 		expected.add(method);
-		
+
 		method = new Method();
 		method.setMethodName("9");
 		method.addStringsOfFacts("10", "8", "11");
 		method.setNumberOfInvocations(3);
 		expected.add(method);
-		
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		List<Method> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void threeQuery() throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -154,12 +154,12 @@ public class EventStreamAsListOfMethodsParserTest {
 		sb.append("7,0.006\n");
 		sb.append("7,0.007\n");
 		sb.append("8,0.008\n");
-		
+
 		sb.append("9,0.509\n");
 		sb.append("10,0.510\n");
 		sb.append("8,0.511\n");
 		sb.append("11,0.512\n");
-		
+
 		sb.append("5,1.013\n");
 
 		String content = sb.toString();
@@ -167,38 +167,38 @@ public class EventStreamAsListOfMethodsParserTest {
 		File file = getFilePath();
 
 		try {
-			FileUtils.writeStringToFile(file, content, true);
+			FileUtils.writeStringToFile(file, content);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		List<Method> expected = new LinkedList<Method>();		
+		List<Method> expected = new LinkedList<Method>();
 		Method method = new Method();
 		method.setMethodName("1");
 		method.addStringsOfFacts("2", "3", "4", "5", "6", "7", "8");
 		method.setNumberOfInvocations(7);
 		expected.add(method);
-		
+
 		method = new Method();
 		method.setMethodName("9");
 		method.addStringsOfFacts("10", "8", "11");
 		method.setNumberOfInvocations(3);
 		expected.add(method);
-		
+
 		method = new Method();
 		method.setMethodName("5");
 		method.setNumberOfInvocations(0);
 		expected.add(method);
-		
-		doCallRealMethod().when(reader).readFile(eq(file)); 
-		
+
+		doCallRealMethod().when(reader).readFile(eq(file));
+
 		List<Method> actual = sut.parse();
-		
+
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	private File getFilePath() {
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/eventstreamModified.txt");
 		return fileName;

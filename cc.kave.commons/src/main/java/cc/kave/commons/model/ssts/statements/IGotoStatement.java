@@ -1,12 +1,12 @@
 package cc.kave.commons.model.ssts.statements;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.ssts.IStatement;
 
 public interface IGotoStatement extends IStatement {
 
-	@NonNull
+	@Nonnull
 	String getLabel();
 
 }

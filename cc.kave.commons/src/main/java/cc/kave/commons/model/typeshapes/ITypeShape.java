@@ -2,14 +2,14 @@ package cc.kave.commons.model.typeshapes;
 
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 public interface ITypeShape {
 	/// <summary>
 	/// A description of the enclosing class, including its parent class and
 	/// implemented interfaces.
 	/// </summary>
-	@NonNull
+	@Nonnull
 	ITypeHierarchy getTypeHierarchy();
 
 	void setTypeHierarchy(ITypeHierarchy typeHierarchy);
@@ -19,7 +19,7 @@ public interface ITypeShape {
 	/// information about the first and super
 	/// declaration).
 	/// </summary>
-	@NonNull
+	@Nonnull
 	Set<IMethodHierarchy> getMethodHierarchies();
 
 	void setMethodHierarchies(Set<IMethodHierarchy> methodHierarchies);

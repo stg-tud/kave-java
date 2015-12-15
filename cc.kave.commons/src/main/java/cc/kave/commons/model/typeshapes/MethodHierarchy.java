@@ -1,6 +1,6 @@
 package cc.kave.commons.model.typeshapes;
 
-import org.eclipse.jdt.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -18,7 +18,7 @@ public class MethodHierarchy implements IMethodHierarchy {
 		element = CsMethodName.UNKNOWN_NAME;
 	}
 
-	public MethodHierarchy(@NonNull MethodName m) {
+	public MethodHierarchy(@Nonnull MethodName m) {
 		this.element = m;
 	}
 

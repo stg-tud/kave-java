@@ -16,7 +16,7 @@
 
 package cc.kave.commons.model.events.completionevents;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
 
 import cc.kave.commons.model.names.Name;
 
