@@ -10,7 +10,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>cc.kave</groupId>
-			<artifactId>commons</artifactId>
+			<artifactId>cc.kave.commons</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
