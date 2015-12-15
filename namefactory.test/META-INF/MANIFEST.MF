@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.ui,
  namefactory,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- commons,
+ cc.kave.commons,
  org.junit
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: cc.kave.eclipse.namefactory.visitors

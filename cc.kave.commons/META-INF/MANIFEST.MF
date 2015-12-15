@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: commons
-Bundle-SymbolicName: commons
+Bundle-SymbolicName: cc.kave.commons
 Bundle-Version: 1.0.0.qualifier
 Export-Package: c.kave.commons.evaluation.queries,
  cc.kave.commons,

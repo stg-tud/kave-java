@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>cc.kave</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>cc.kave.root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>histories</artifactId>
+	<artifactId>cc.kave.histories</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>cc.kave</groupId>

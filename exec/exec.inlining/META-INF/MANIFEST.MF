@@ -3,6 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: exec
 Bundle-SymbolicName: exec.inlining
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: commons,
+Require-Bundle: cc.kave.commons,
  com.google.guava,
  org.apache.commons.io

@@ -4,7 +4,7 @@ Bundle-Name: Episode-mining
 Bundle-SymbolicName: exec.episodes
 Bundle-Version: 1.0.0.qualifier
 Export-Package: .
-Require-Bundle: commons,
+Require-Bundle: cc.kave.commons,
  org.apache.commons.lang3,
  org.apache.commons.io,
  com.google.guava,
