@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: commons
 Bundle-SymbolicName: commons
 Bundle-Version: 1.0.0.qualifier
-Export-Package: cc.kave.commons.mining.episodes,
+Export-Package: c.kave.commons.evaluation.queries,
+ cc.kave.commons.mining.episodes,
  cc.kave.commons.mining.reader,
  cc.kave.commons.model.episodes,
  cc.kave.commons.model.events,
