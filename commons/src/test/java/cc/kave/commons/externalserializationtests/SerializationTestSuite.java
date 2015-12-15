@@ -25,22 +25,23 @@ import org.junit.runners.Parameterized.Parameters;
 
 import cc.kave.commons.utils.json.JsonUtils;
 
+@Ignore
 @RunWith(Parameterized.class)
 public class SerializationTestSuite {
 	public static final Path TestCasesDirectory = Paths.get(System.getProperty("user.dir"), "src", "cc", "kave",
 			"commons", "externalserializationtests", "Data");
 
 	@Parameters(name = "{0}")
-	public static Collection<TestCase> testCases() throws ClassNotFoundException, IOException{
+	public static Collection<TestCase> testCases() throws ClassNotFoundException, IOException {
 		return ExternalTestCaseProvider.getTestCases(TestCasesDirectory);
 	}
-	
+
 	private final TestCase testCase;
-	
-	public SerializationTestSuite(TestCase testCase){
+
+	public SerializationTestSuite(TestCase testCase) {
 		this.testCase = testCase;
 	}
-	
+
 	@Test
 	public void sringEquality_Compact() {
 		String actual = JsonUtils.toJson(JsonUtils.fromJson(testCase.input, testCase.serializedType));

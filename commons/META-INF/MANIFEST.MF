@@ -4,6 +4,7 @@ Bundle-Name: commons
 Bundle-SymbolicName: commons
 Bundle-Version: 1.0.0.qualifier
 Export-Package: c.kave.commons.evaluation.queries,
+ cc.kave.commons,
  cc.kave.commons.mining.episodes,
  cc.kave.commons.mining.reader,
  cc.kave.commons.model.episodes,
