@@ -139,8 +139,9 @@ public class TypeCollectorVisitorContext {
 		if (field.isUnknown()) {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown field");
 		} else {
-			referenceTypes.put(reference, field.getValueType());
-			allTypes.add(field.getValueType());
+			TypeName type = field.getValueType();
+			referenceTypes.put(reference, type);
+			allTypes.add(type);
 		}
 	}
 
@@ -149,8 +150,9 @@ public class TypeCollectorVisitorContext {
 		if (property.isUnknown()) {
 			LOGGER.log(Level.WARNING, "Skipping a reference to an unknown property");
 		} else {
-			referenceTypes.put(reference, property.getValueType());
-			allTypes.add(property.getValueType());
+			TypeName type = property.getValueType();
+			referenceTypes.put(reference, type);
+			allTypes.add(type);
 		}
 	}
 
