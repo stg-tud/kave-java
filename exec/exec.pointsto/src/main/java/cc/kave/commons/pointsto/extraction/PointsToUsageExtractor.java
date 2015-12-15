@@ -16,11 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.usages.DefinitionSiteKind;
 
 public class PointsToUsageExtractor {
 
@@ -65,14 +68,56 @@ public class PointsToUsageExtractor {
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
 //			visitor.visitEntryPoint(methodDecl, visitorContext);
 
-			List<DummyUsage> entryPointUsages = visitorContext.getUsages();
-			contextUsages.addAll(entryPointUsages);
+			List<DummyUsage> rawUsages = visitorContext.getUsages();
+			List<DummyUsage> processedUsages = processUsages(rawUsages, context.getTypeShape());
+			contextUsages.addAll(processedUsages);
 
 			LOGGER.log(Level.INFO,
-					"Extracted " + entryPointUsages.size() + " usages from " + methodDecl.getName().getIdentifier());
-			collector.onEntryPointUsagesExtracted(methodDecl, entryPointUsages);
+					"Extracted " + processedUsages.size() + " usages from " + methodDecl.getName().getIdentifier());
+			collector.onEntryPointUsagesExtracted(methodDecl, processedUsages);
 		}
 
 		return contextUsages;
+	}
+	
+	private List<DummyUsage> processUsages(List<DummyUsage> rawUsages, ITypeShape typeShape) {
+		List<DummyUsage> processedUsages = pruneUsages(rawUsages);
+		rewriteUsages(processedUsages, typeShape);
+		return processedUsages;
+	}
+
+	private List<DummyUsage> pruneUsages(List<DummyUsage> usages) {
+		List<DummyUsage> retainedUsages = new ArrayList<>(usages.size());
+
+		for (DummyUsage usage : usages) {
+			// prune usages that have no call sites or have an unknown type
+			if (!usage.getAllCallsites().isEmpty() && !usage.getType().isUnknownType()) {
+				retainedUsages.add(usage);
+			}
+		}
+
+		return retainedUsages;
+	}
+
+	private void rewriteUsages(List<DummyUsage> usages, ITypeShape typeShape) {
+		rewriteThisUsages(usages, typeShape);
+	}
+
+	private void rewriteThisUsages(List<DummyUsage> usages, ITypeShape typeShape) {
+		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
+		if (typeHierarchy.hasSuperclass()) {
+			TypeName superType = typeHierarchy.getExtends().getElement();
+
+			for (DummyUsage usage : usages) {
+				// change type of usages referring to the enclosing class to the super class
+				if (usage.getDefinitionSite().getKind() == DefinitionSiteKind.THIS) {
+					if (superType != null) {
+						// TODO maybe add check whether this is safe (call sites do not refer to 'this')
+						usage.setType(superType);
+					}
+				}
+			}
+
+		}
 	}
 }
