@@ -24,13 +24,13 @@ public class ExternalTestCaseProvider {
 	private static final String expectedFormattedFile = "expected-formatted.json";
 
 	@Nonnull
-	public static List<TestCase> getTestCases(Path baseDirectory) throws ClassNotFoundException, IOException {
+	public static List<TestCase[]> getTestCases(Path baseDirectory) throws ClassNotFoundException, IOException {
 		return recursiveGetTestCases(baseDirectory.toFile(), baseDirectory.toString());
 	}
 
-	private static List<TestCase> recursiveGetTestCases(File currentDirectory, String rootPrefix)
+	private static List<TestCase[]> recursiveGetTestCases(File currentDirectory, String rootPrefix)
 			throws ClassNotFoundException, IOException {
-		List<TestCase> testCases = getTestCasesInCurrentFolder(currentDirectory, rootPrefix);
+		List<TestCase[]> testCases = getTestCasesInCurrentFolder(currentDirectory, rootPrefix);
 
 		for (File subdirectory : getSubdirectories(currentDirectory)) {
 			testCases.addAll(recursiveGetTestCases(subdirectory, rootPrefix));
@@ -39,9 +39,9 @@ public class ExternalTestCaseProvider {
 		return testCases;
 	}
 
-	private static List<TestCase> getTestCasesInCurrentFolder(File currentDirectory, String rootPrefix)
+	private static List<TestCase[]> getTestCasesInCurrentFolder(File currentDirectory, String rootPrefix)
 			throws ClassNotFoundException, IOException {
-		List<TestCase> testCases = new LinkedList<TestCase>();
+		List<TestCase[]> testCases = new LinkedList<TestCase[]>();
 
 		Class<?> serializedType = Object.class;
 		String expectedCompact = null;
@@ -64,7 +64,7 @@ public class ExternalTestCaseProvider {
 		}
 
 		if (expectedCompact == null) {
-			return new LinkedList<TestCase>();
+			return new LinkedList<TestCase[]>();
 		}
 
 		for (File file : currentDirectory.listFiles()) {
@@ -75,8 +75,8 @@ public class ExternalTestCaseProvider {
 			}
 
 			String input = new String(Files.readAllBytes(file.toPath()));
-			testCases.add(new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix), serializedType, input,
-					expectedCompact, expectedFormatted));
+			testCases.add(new TestCase[]{new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix), serializedType, input,
+					expectedCompact, expectedFormatted)});
 		}
 
 		return testCases;

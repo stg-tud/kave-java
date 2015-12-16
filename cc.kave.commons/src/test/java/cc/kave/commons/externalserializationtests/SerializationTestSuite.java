@@ -25,14 +25,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 import cc.kave.commons.utils.json.JsonUtils;
 
-@Ignore
 @RunWith(Parameterized.class)
 public class SerializationTestSuite {
-	public static final Path TestCasesDirectory = Paths.get(System.getProperty("user.dir"), "src", "cc", "kave",
-			"commons", "externalserializationtests", "Data");
+	public static final Path TestCasesDirectory = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "cc",
+			"kave", "commons", "externalserializationtests", "Data");
 
 	@Parameters(name = "{0}")
-	public static Collection<TestCase> testCases() throws ClassNotFoundException, IOException {
+	public static Collection<TestCase[]> testCases() throws ClassNotFoundException, IOException {
 		return ExternalTestCaseProvider.getTestCases(TestCasesDirectory);
 	}
 
@@ -43,16 +42,19 @@ public class SerializationTestSuite {
 	}
 
 	@Test
-	public void sringEquality_Compact() {
-		String actual = JsonUtils.toJson(JsonUtils.fromJson(testCase.input, testCase.serializedType));
-		assertEquals(testCase.expectedCompact, actual);
+	public void stringEquality_Compact() {
+		Object deserializedInput = JsonUtils.fromJson(testCase.input, testCase.serializedType);
+		String serializedInput = JsonUtils.toJson(deserializedInput);
+		assertEquals(testCase.expectedCompact, serializedInput);
 	}
 
 	@Test
 	public void objectEquality_Compact() {
 		Object actual = JsonUtils.fromJson(testCase.input, testCase.serializedType);
 		Object expected = JsonUtils.fromJson(testCase.expectedCompact, testCase.serializedType);
-		assertEquals(expected, actual);
+		if(!expected.equals(actual)) {
+			assertEquals(expected.toString(), actual.toString());
+		}
 	}
 
 	@Test

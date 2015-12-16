@@ -68,52 +68,56 @@ public class ExternalTestCaseProviderTest {
 
 	@Test
 	public void shouldFindTestCasesRecursively() throws ClassNotFoundException, IOException {
-		List<TestCase> testCases = ExternalTestCaseProvider.getTestCases(baseDirectory);
+		List<TestCase[]> testCases = ExternalTestCaseProvider.getTestCases(baseDirectory);
 		assertEquals(2, testCases.size());
 	}
 
 	@Test
 	public void shouldFindInput() throws ClassNotFoundException, IOException {
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(expectedFirstInput, firstTestCase.input);
 	}
 
 	@Test
 	public void shouldFindCompactExpected() throws ClassNotFoundException, IOException {
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(expectedCompact, firstTestCase.expectedCompact);
 	}
 
 	@Test
 	public void shouldFindFormattedExpected() throws ClassNotFoundException, IOException {
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(expectedFormatted, firstTestCase.expectedFormatted);
 	}
 
 	@Ignore
 	@Test
 	public void shouldFindName() throws ClassNotFoundException, IOException {
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(expectedFirstName, firstTestCase.name);
+	}
+
+	private TestCase getFirstTestCase() throws ClassNotFoundException, IOException {
+		return ExternalTestCaseProvider.getTestCases(baseDirectory).get(0)[0];
 	}
 
 	@Test
 	public void shouldFindSerializedType() throws ClassNotFoundException, IOException {
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(expectedSerializedType, firstTestCase.serializedType);
 	}
 
 	@Test
 	public void settingsFileShouldBeOptional() throws IOException, ClassNotFoundException {
 		Files.delete(settingsFile);
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertEquals(Object.class, firstTestCase.serializedType);
 	}
 
 	@Test
 	public void expectedFormattedFileShouldBeOptional() throws IOException, ClassNotFoundException {
 		Files.delete(expectedFormattedFile);
-		TestCase firstTestCase = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		TestCase firstTestCase = getFirstTestCase();
 		assertNull(firstTestCase.expectedFormatted);
 	}
 }
