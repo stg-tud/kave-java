@@ -30,8 +30,6 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
 	public List<IProposal> ProposalCollection;
 
-	public String Prefix;
-
 	public List<IProposalSelection> Selections;
 
 	public Trigger TerminatedBy;
@@ -46,11 +44,6 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 	@Override
 	public List<IProposal> getProposalCollection() {
 		return ProposalCollection;
-	}
-
-	@Override
-	public String getPrefix() {
-		return Prefix;
 	}
 
 	@Override

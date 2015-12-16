@@ -31,9 +31,6 @@ public interface ICompletionEvent {
 	public List<IProposal> getProposalCollection();
 
 	@Nonnull
-	public String getPrefix();
-
-	@Nonnull
 	public List<IProposalSelection> getSelections();
 
 	@Nonnull
