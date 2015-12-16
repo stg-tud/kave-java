@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -149,113 +147,87 @@ public abstract class JsonUtils {
 		GsonBuilder gb = new GsonBuilder();
 
 		// name interface types
-		gb.registerTypeAdapter(IAliasName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IBundleName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IEventName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IFieldName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(ILambdaName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(ILocalVariableName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IMethodName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(INamespaceName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IParameterName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IPropertyName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(ITypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(IDelegateTypeName.class, new GsonNameDeserializer());
+		registerName(gb, IAliasName.class);
+		registerName(gb, IBundleName.class);
+		registerName(gb, IEventName.class);
+		registerName(gb, IFieldName.class);
+		registerName(gb, ILambdaName.class);
+		registerName(gb, ILocalVariableName.class);
+		registerName(gb, IMethodName.class);
+		registerName(gb, IName.class);
+		registerName(gb, INamespaceName.class);
+		registerName(gb, IParameterName.class);
+		registerName(gb, IPropertyName.class);
+		registerName(gb, ITypeName.class);
+		registerName(gb, IDelegateTypeName.class);
 		// C# name types
-		gb.registerTypeAdapter(AliasName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(AssemblyName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(EventName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(FieldName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(LambdaName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(LocalVariableName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(MethodName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(Name.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(NamespaceName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(ParameterName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(PropertyName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(TypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(DelegateTypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(UnknownTypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(TypeParameterName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(StructTypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(InterfaceTypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(EnumTypeName.class, new GsonNameDeserializer());
-		gb.registerTypeAdapter(ArrayTypeName.class, new GsonNameDeserializer());
+		registerName(gb, AliasName.class);
+		registerName(gb, AssemblyName.class);
+		registerName(gb, EventName.class);
+		registerName(gb, FieldName.class);
+		registerName(gb, LambdaName.class);
+		registerName(gb, LocalVariableName.class);
+		registerName(gb, MethodName.class);
+		registerName(gb, Name.class);
+		registerName(gb, NamespaceName.class);
+		registerName(gb, ParameterName.class);
+		registerName(gb, PropertyName.class);
+		registerName(gb, TypeName.class);
+		registerName(gb, DelegateTypeName.class);
+		registerName(gb, UnknownTypeName.class);
+		registerName(gb, TypeParameterName.class);
+		registerName(gb, StructTypeName.class);
+		registerName(gb, InterfaceTypeName.class);
+		registerName(gb, EnumTypeName.class);
+		registerName(gb, ArrayTypeName.class);
 		// resharper names
-		gb.registerTypeAdapter(LiveTemplateName.class, new GsonNameDeserializer());
+		registerName(gb, LiveTemplateName.class);
 
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableExpression.class, "$type")
-				.registerSubtype(CompletionExpression.class).registerSubtype(ComposedExpression.class)
-				.registerSubtype(IfElseExpression.class).registerSubtype(InvocationExpression.class)
-				.registerSubtype(LambdaExpression.class).registerSubtype(UnknownExpression.class)
-				.registerSubtype(ConstantValueExpression.class).registerSubtype(NullExpression.class)
-				.registerSubtype(ReferenceExpression.class).registerSubtype(UnaryExpression.class)
-				.registerSubtype(BinaryExpression.class).registerSubtype(CastExpression.class)
-				.registerSubtype(IndexAccessExpression.class).registerSubtype(TypeCheckExpression.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISST.class, "$type").registerSubtype(SST.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMemberDeclaration.class, "$type")
-				.registerSubtype(IMemberDeclaration.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(IFieldDeclaration.class, "$type").registerSubtype(FieldDeclaration.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IDelegateDeclaration.class, "$type")
-				.registerSubtype(DelegateDeclaration.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IPropertyDeclaration.class, "$type")
-				.registerSubtype(PropertyDeclaration.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(IEventDeclaration.class, "$type").registerSubtype(EventDeclaration.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(IReference.class, "$type").registerSubtype(IReference.class)
-						.registerSubtype(UnknownReference.class).registerSubtype(EventReference.class)
-						.registerSubtype(FieldReference.class).registerSubtype(PropertyReference.class)
-						.registerSubtype(MethodReference.class).registerSubtype(VariableReference.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IAssignableReference.class, "$type")
-				.registerSubtype(EventReference.class).registerSubtype(FieldReference.class)
-				.registerSubtype(PropertyReference.class).registerSubtype(UnknownReference.class)
-				.registerSubtype(VariableReference.class).registerSubtype(IndexAccessReference.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableReference.class, "$type")
-				.registerSubtype(VariableReference.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISimpleExpression.class, "$type")
-				.registerSubtype(UnknownExpression.class).registerSubtype(ReferenceExpression.class)
-				.registerSubtype(NullExpression.class).registerSubtype(ConstantValueExpression.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IMethodDeclaration.class, "$type")
-				.registerSubtype(MethodDeclaration.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IVariableDeclaration.class, "$type")
-				.registerSubtype(VariableDeclaration.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ILoopHeaderExpression.class, "$type")
-				.registerSubtype(LoopHeaderBlockExpression.class).registerSubtype(UnknownExpression.class)
-				.registerSubtype(NullExpression.class).registerSubtype(ConstantValueExpression.class)
-				.registerSubtype(ReferenceExpression.class));
-		gb.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IStatement.class, "$type")
-				.registerSubtype(Assignment.class).registerSubtype(BreakStatement.class)
-				.registerSubtype(ContinueStatement.class).registerSubtype(DoLoop.class)
-				.registerSubtype(ExpressionStatement.class).registerSubtype(ForEachLoop.class)
-				.registerSubtype(ForLoop.class).registerSubtype(GotoStatement.class).registerSubtype(IfElseBlock.class)
-				.registerSubtype(LabelledStatement.class).registerSubtype(LockBlock.class)
-				.registerSubtype(ReturnStatement.class).registerSubtype(SwitchBlock.class)
-				.registerSubtype(ThrowStatement.class).registerSubtype(TryBlock.class)
-				.registerSubtype(UncheckedBlock.class).registerSubtype(UnknownStatement.class)
-				.registerSubtype(UnsafeBlock.class).registerSubtype(UsingBlock.class)
-				.registerSubtype(EventSubscriptionStatement.class).registerSubtype(VariableDeclaration.class)
-				.registerSubtype(WhileLoop.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(ICatchBlock.class, "$type").registerSubtype(CatchBlock.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(ICaseBlock.class, "$type").registerSubtype(CaseBlock.class));
+		// SST Model
+		registerHierarchy(gb, ISST.class, SST.class);
+		// Declarations
+		registerHierarchy(gb, IMemberDeclaration.class, IDelegateDeclaration.class, IEventDeclaration.class,
+				IFieldDeclaration.class, IMethodDeclaration.class, IPropertyDeclaration.class, IReference.class);
+		registerHierarchy(gb, IFieldDeclaration.class, FieldDeclaration.class);
+		registerHierarchy(gb, IDelegateDeclaration.class, DelegateDeclaration.class);
+		registerHierarchy(gb, IEventDeclaration.class, EventDeclaration.class);
+		registerHierarchy(gb, IPropertyDeclaration.class, PropertyDeclaration.class);
+		registerHierarchy(gb, IMethodDeclaration.class, MethodDeclaration.class);
+		registerHierarchy(gb, IVariableDeclaration.class, VariableDeclaration.class);
+		// References
+		registerHierarchy(gb, IReference.class, UnknownReference.class, EventReference.class, FieldReference.class,
+				PropertyReference.class, MethodReference.class, VariableReference.class);
+		registerHierarchy(gb, IAssignableReference.class, EventReference.class, FieldReference.class,
+				IndexAccessReference.class, PropertyReference.class, UnknownReference.class, VariableReference.class);
+		registerHierarchy(gb, IVariableReference.class, VariableReference.class);
+		// Expressions
+		registerHierarchy(gb, IAssignableExpression.class, CompletionExpression.class, ComposedExpression.class,
+				IfElseExpression.class, InvocationExpression.class, LambdaExpression.class, UnknownExpression.class,
+				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class, UnaryExpression.class,
+				BinaryExpression.class, CastExpression.class, IndexAccessExpression.class, TypeCheckExpression.class);
+		registerHierarchy(gb, ISimpleExpression.class, UnknownExpression.class, ReferenceExpression.class,
+				NullExpression.class, ConstantValueExpression.class);
+		registerHierarchy(gb, ILoopHeaderExpression.class, LoopHeaderBlockExpression.class, UnknownExpression.class,
+				NullExpression.class, ConstantValueExpression.class, ReferenceExpression.class);
+		// Statements
+		registerHierarchy(gb, IStatement.class, Assignment.class, BreakStatement.class, ContinueStatement.class,
+				DoLoop.class, ExpressionStatement.class, ForEachLoop.class, ForLoop.class, GotoStatement.class,
+				IfElseBlock.class, LabelledStatement.class, LockBlock.class, ReturnStatement.class, SwitchBlock.class,
+				ThrowStatement.class, TryBlock.class, UncheckedBlock.class, UnknownStatement.class, UnsafeBlock.class,
+				UsingBlock.class, EventSubscriptionStatement.class, WhileLoop.class); // VariableDeclaration
+		registerHierarchy(gb, ICatchBlock.class, CatchBlock.class);
+		registerHierarchy(gb, ICaseBlock.class, CaseBlock.class);
 
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(Context.class, "$type").registerSubtype(Context.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(ITypeShape.class, "$type").registerSubtype(TypeShape.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(IMethodHierarchy.class, "$type").registerSubtype(MethodHierarchy.class));
-		gb.registerTypeAdapterFactory(
-				RuntimeTypeAdapterFactory.of(ITypeHierarchy.class, "$type").registerSubtype(TypeHierarchy.class));
+		// Context
+		registerHierarchy(gb, Context.class, Context.class);
+		registerHierarchy(gb, ITypeShape.class, TypeShape.class);
+		registerHierarchy(gb, IMethodHierarchy.class, MethodHierarchy.class);
+		registerHierarchy(gb, ITypeHierarchy.class, TypeHierarchy.class);
 
 		// completion event
-		register(gb, ICompletionEvent.class, CompletionEvent.class);
-		register(gb, IProposal.class, Proposal.class);
-		register(gb, IProposalSelection.class, ProposalSelection.class);
+		registerHierarchy(gb, ICompletionEvent.class, CompletionEvent.class);
+		registerHierarchy(gb, IProposal.class, Proposal.class);
+		registerHierarchy(gb, IProposalSelection.class, ProposalSelection.class);
 
 		// enums
 		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
@@ -273,7 +245,7 @@ public abstract class JsonUtils {
 	}
 
 	@SafeVarargs
-	private static <T> void register(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
+	private static <T> void registerHierarchy(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
 		Asserts.assertTrue(subtypes.length > 0);
 
 		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
@@ -284,89 +256,23 @@ public abstract class JsonUtils {
 		gsonBuilder.registerTypeAdapterFactory(factory);
 	}
 
+	private static <T> void registerName(GsonBuilder gsonBuilder, Class<T> type) {
+		gsonBuilder.registerTypeAdapter(type, new GsonNameDeserializer());
+	}
+
 	public static <T> T fromJson(String json, Type targetType) {
-		json = toJavaTypeNames(json);
+		json = TypeUtil.toJavaTypeNames(json);
 		return gson.fromJson(json, targetType);
 	}
 
 	public static <T> String toJson(Object obj, Type targetType) {
 		String json = gson.toJsonTree(obj, targetType).toString();
-		return toCSharpTypeNames(json);
+		return TypeUtil.toCSharpTypeNames(json);
 	}
 
 	public static <T> String toJson(Object obj) {
 		String json = gson.toJson(obj);
-		return toCSharpTypeNames(json);
-	}
-
-	private static String toCSharpTypeNames(String json) {
-		StringBuffer resultString = new StringBuffer();
-		Pattern regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)");
-		Matcher regexMatcher = regex.matcher(json);
-		while (regexMatcher.find()) {
-			String replacement = "[SST:" + toUpperCaseNamespace(regexMatcher.group(1)) + "]";
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		regex = Pattern.compile("cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)");
-		regexMatcher = regex.matcher(resultString.toString());
-		resultString = new StringBuffer();
-		while (regexMatcher.find()) {
-			String replacement = "KaVE.Commons.Model." + toUpperCaseNamespace(regexMatcher.group(1)) + ", KaVE.Commons";
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		return resultString.toString();
-	}
-
-	private static String toJavaTypeNames(String json) {
-		StringBuffer resultString = new StringBuffer();
-		Pattern regex = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
-		Matcher regexMatcher = regex.matcher(json);
-		while (regexMatcher.find()) {
-			String replacement = "cc.kave.commons.model.ssts.impl." + toLowerCaseNamespace(regexMatcher.group(1));
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-
-		// cc.kave.commons.model.events.completionevents.CompletionEvent
-
-		regexMatcher.appendTail(resultString);
-		regex = Pattern.compile("\"\\$type\":[ ]?\"KaVE\\.Commons\\.Model\\.([.a-zA-Z0-9_]+), KaVE.Commons\"");
-		regexMatcher = regex.matcher(resultString.toString());
-		resultString = new StringBuffer();
-		while (regexMatcher.find()) {
-			String replacement = "\"\\$type\": \"" + "cc.kave.commons.model."
-					+ toLowerCaseNamespace(regexMatcher.group(1)) + "\"";
-			regexMatcher.appendReplacement(resultString, replacement);
-		}
-		regexMatcher.appendTail(resultString);
-		return resultString.toString();
-	}
-
-	private static String toLowerCaseNamespace(String string) {
-		if (string.contains(".")) {
-			return string.substring(0, string.lastIndexOf(".")).toLowerCase()
-					+ string.substring(string.lastIndexOf("."));
-		}
-		return string;
-	}
-
-	private static String toUpperCaseNamespace(String string) {
-		String[] path = string.split("[.]");
-		String type = "";
-		for (int i = 0; i < path.length; i++) {
-			if (i != path.length - 1) {
-				if (path[i].equals("loopheader"))
-					path[i] = "loopHeader";
-				else if (path[i].equals("completionevents"))
-					path[i] = "completionEvents";
-				else if (path[i].equals("typeshapes"))
-					path[i] = "typeShapes";
-				type += path[i].substring(0, 1).toUpperCase() + path[i].substring(1) + ".";
-			} else
-				type += path[i];
-		}
-		return type;
+		return TypeUtil.toCSharpTypeNames(json);
 	}
 
 	public static <T> T fromJson(File file, Type classOfT) {
