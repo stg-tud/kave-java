@@ -9,4 +9,4 @@ Export-Package: cc.kave.eclipse.commons.analysis.completiontarget,
 Require-Bundle: org.eclipse.jdt.core,
  cc.kave.eclipse.namefactory
 Bundle-ClassPath: .,
- ../3rd-party/cc.kave.commons-0.0.1-SNAPSHOT.jar
+ 3rd-party/cc.kave.commons-0.0.1-SNAPSHOT.jar
