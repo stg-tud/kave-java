@@ -2,8 +2,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -13,18 +13,18 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class CastExpression implements ICastExpression {
 
-	private TypeName targetType;
+	private ITypeName targetType;
 	private CastOperator operator;
 	private IVariableReference reference;
 
 	public CastExpression() {
 		this.reference = new VariableReference();
-		this.targetType = CsTypeName.UNKNOWN_NAME;
+		this.targetType = TypeName.UNKNOWN_NAME;
 		this.operator = CastOperator.Unknown;
 	}
 
 	@Override
-	public TypeName getTargetType() {
+	public ITypeName getTargetType() {
 		return this.targetType;
 	}
 
@@ -37,7 +37,7 @@ public class CastExpression implements ICastExpression {
 		this.reference = reference;
 	}
 
-	public void setTargetType(TypeName targetType) {
+	public void setTargetType(ITypeName targetType) {
 		this.targetType = targetType;
 	}
 

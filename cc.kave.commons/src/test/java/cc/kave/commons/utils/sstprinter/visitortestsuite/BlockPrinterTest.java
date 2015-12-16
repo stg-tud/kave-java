@@ -2,8 +2,8 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsParameterName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
@@ -30,7 +30,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testForEachLoop() {
 		ForEachLoop sst = new ForEachLoop();
-		sst.setDeclaration(SSTUtil.declare("e", CsTypeName.newTypeName("T,P")));
+		sst.setDeclaration(SSTUtil.declare("e", TypeName.newTypeName("T,P")));
 		sst.setLoopedReference(SSTUtil.variableReference("elements"));
 		sst.getBody().add(new ContinueStatement());
 
@@ -80,7 +80,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
 		sst.getFinally().add(new ContinueStatement());
@@ -96,7 +96,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
@@ -125,7 +125,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(CsParameterName.newParameterName("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.setKind(CatchBlockKind.Unnamed);
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
@@ -218,7 +218,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testForLoop() {
 		ForLoop sst = new ForLoop();
-		sst.getInit().add(SSTUtil.declare("i", CsTypeName.newTypeName("T,P")));
+		sst.getInit().add(SSTUtil.declare("i", TypeName.newTypeName("T,P")));
 		sst.getInit().add(SSTUtil.assignmentToLocal("i", constant("0")));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());

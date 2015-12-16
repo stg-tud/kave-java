@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import cc.kave.commons.model.names.DelegateTypeName;
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IDelegateTypeName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -132,7 +132,7 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 
 	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext c) {
 		c.indentation().keyword("delegate").space().type(stmt.getName())
-				.parameterList(((DelegateTypeName) stmt.getName()).getParameters()).text(";");
+				.parameterList(((IDelegateTypeName) stmt.getName()).getParameters()).text(";");
 		return null;
 	}
 
@@ -467,7 +467,7 @@ public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, 
 	}
 
 	public Void visit(IInvocationExpression expr, SSTPrintingContext c) {
-		MethodName methodName = expr.getMethodName();
+		IMethodName methodName = expr.getMethodName();
 
 		if (methodName.isConstructor()) {
 			c.keyword("new");

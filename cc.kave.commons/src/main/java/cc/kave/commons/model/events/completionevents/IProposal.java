@@ -18,11 +18,11 @@ package cc.kave.commons.model.events.completionevents;
 
 import javax.annotation.Nullable;
 
-import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.IName;
 
 public interface IProposal {
 	@Nullable
-	Name getName();
+	IName getName();
 
 	@Nullable
 	Integer getRelevance();

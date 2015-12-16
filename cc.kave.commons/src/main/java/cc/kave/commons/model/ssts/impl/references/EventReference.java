@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.impl.references;
 
-import cc.kave.commons.model.names.EventName;
-import cc.kave.commons.model.names.csharp.CsEventName;
+import cc.kave.commons.model.names.IEventName;
+import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -9,11 +9,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class EventReference implements IEventReference {
 
 	private IVariableReference reference;
-	private EventName eventName;
+	private IEventName eventName;
 
 	public EventReference() {
 		this.reference = new VariableReference();
-		this.eventName = CsEventName.UNKNOWN_NAME;
+		this.eventName = EventName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class EventReference implements IEventReference {
 	}
 
 	@Override
-	public EventName getEventName() {
+	public IEventName getEventName() {
 		return eventName;
 	}
 
@@ -30,7 +30,7 @@ public class EventReference implements IEventReference {
 		this.reference = reference;
 	}
 
-	public void setEventName(EventName eventName) {
+	public void setEventName(IEventName eventName) {
 		this.eventName = eventName;
 	}
 

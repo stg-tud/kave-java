@@ -10,13 +10,13 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
-import cc.kave.commons.model.names.csharp.CsEventName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsParameterName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.DelegateTypeName;
+import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -92,28 +92,28 @@ public class SSTSerializationTest {
 		SST sut = new SST();
 
 		FieldDeclaration fieldDeclaration = new FieldDeclaration();
-		fieldDeclaration.setName(CsFieldName.newFieldName("[T4,P] [T5,P].F"));
+		fieldDeclaration.setName(FieldName.newFieldName("[T4,P] [T5,P].F"));
 
 		PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
-		propertyDeclaration.setName(CsPropertyName.newPropertyName("[T10,P] [T11,P].P"));
+		propertyDeclaration.setName(PropertyName.newPropertyName("[T10,P] [T11,P].P"));
 		propertyDeclaration.setGet(Lists.newArrayList(new ReturnStatement()));
 		propertyDeclaration.setSet(Lists.newArrayList(new Assignment()));
 
 		EventDeclaration eventDeclaration = new EventDeclaration();
-		eventDeclaration.setName(CsEventName.newEventName("[T2,P] [T3,P].E"));
+		eventDeclaration.setName(EventName.newEventName("[T2,P] [T3,P].E"));
 
 		DelegateDeclaration delegateDeclaration = new DelegateDeclaration();
-		delegateDeclaration.setName(CsDelegateTypeName.newDelegateTypeName("d:[R,P] [T2,P].()"));
+		delegateDeclaration.setName(DelegateTypeName.newDelegateTypeName("d:[R,P] [T2,P].()"));
 
 		MethodDeclaration methodDeclaration = new MethodDeclaration();
-		methodDeclaration.setName(CsMethodName.newMethodName("[T6,P] [T7,P].M1()"));
+		methodDeclaration.setName(MethodName.newMethodName("[T6,P] [T7,P].M1()"));
 		methodDeclaration.setEntryPoint(false);
 		methodDeclaration.setBody(createBody(true));
 		MethodDeclaration methodDeclaration2 = new MethodDeclaration();
-		methodDeclaration2.setName(CsMethodName.newMethodName("[T8,P] [T9,P].M2()"));
+		methodDeclaration2.setName(MethodName.newMethodName("[T8,P] [T9,P].M2()"));
 		methodDeclaration2.setEntryPoint(true);
 
-		sut.setEnclosingType(CsTypeName.newTypeName("T,P"));
+		sut.setEnclosingType(TypeName.newTypeName("T,P"));
 		sut.setProperties(Sets.newHashSet(propertyDeclaration));
 		sut.setFields(Sets.newHashSet(fieldDeclaration));
 		sut.setDelegates(Sets.newHashSet(delegateDeclaration));
@@ -172,7 +172,7 @@ public class SSTSerializationTest {
 		tryBlock.setBody(Lists.newArrayList(new ContinueStatement()));
 		tryBlock.setFinally(Lists.newArrayList(new BreakStatement()));
 		CatchBlock catchBlock = new CatchBlock();
-		catchBlock.setParameter(CsParameterName.newParameterName("[T,P] p"));
+		catchBlock.setParameter(ParameterName.newParameterName("[T,P] p"));
 		catchBlock.setBody(Lists.newArrayList(new ContinueStatement()));
 		catchBlock.setKind(CatchBlockKind.Unnamed);
 		tryBlock.setCatchBlocks(Lists.newArrayList(catchBlock));

@@ -6,9 +6,9 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 
 public class CompletionExpressionTest extends SSTBaseTest {
@@ -28,12 +28,12 @@ public class CompletionExpressionTest extends SSTBaseTest {
 	public void testSettingValues() {
 		CompletionExpression sut = new CompletionExpression();
 		sut.setObjectReference(someVarRef("i"));
-		sut.setTypeReference(CsTypeName.UNKNOWN_NAME);
+		sut.setTypeReference(TypeName.UNKNOWN_NAME);
 		sut.setToken("t");
 
 		assertThat("t", equalTo(sut.getToken()));
 		assertThat(someVarRef("i"), equalTo(sut.getObjectReference()));
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getTypeReference()));
+		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getTypeReference()));
 	}
 
 	@Test
@@ -51,10 +51,10 @@ public class CompletionExpressionTest extends SSTBaseTest {
 		CompletionExpression b = new CompletionExpression();
 		a.setObjectReference(someVarRef("i"));
 		a.setToken("t");
-		a.setTypeReference(CsTypeName.UNKNOWN_NAME);
+		a.setTypeReference(TypeName.UNKNOWN_NAME);
 		b.setObjectReference(someVarRef("i"));
 		b.setToken("t");
-		b.setTypeReference(CsTypeName.UNKNOWN_NAME);
+		b.setTypeReference(TypeName.UNKNOWN_NAME);
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -86,8 +86,8 @@ public class CompletionExpressionTest extends SSTBaseTest {
 	public void testEqualityDifferentTypeReference() {
 		CompletionExpression a = new CompletionExpression();
 		CompletionExpression b = new CompletionExpression();
-		a.setTypeReference(CsTypeName.UNKNOWN_NAME);
-		b.setTypeReference(CsTypeName.newTypeName("System.Int32, mscore, 4.0.0.0"));
+		a.setTypeReference(TypeName.UNKNOWN_NAME);
+		b.setTypeReference(TypeName.newTypeName("System.Int32, mscore, 4.0.0.0"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

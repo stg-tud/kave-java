@@ -16,11 +16,11 @@ import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 
 public class EpisodeToGraphConverterTest {
 
@@ -59,15 +59,15 @@ public class EpisodeToGraphConverterTest {
 		return e;
 	}
 
-	private static MethodName method(String name) {
-		TypeName declType = type("T");
-		TypeName retType = type("R");
+	private static IMethodName method(String name) {
+		ITypeName declType = type("T");
+		ITypeName retType = type("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
-	private static TypeName type(String name) {
-		return CsTypeName.newTypeName("some.namespace." + name + ", P");
+	private static ITypeName type(String name) {
+		return TypeName.newTypeName("some.namespace." + name + ", P");
 	}
 
 	@Test
@@ -86,16 +86,16 @@ public class EpisodeToGraphConverterTest {
 
 		String labels = "";
 
-		MethodName method1 = eventMapping.get(1).getMethod();
+		IMethodName method1 = eventMapping.get(1).getMethod();
 		String kind1 = eventMapping.get(1).getKind().toString();
 		String out1 = toLabel(method1);
-		MethodName method2 = eventMapping.get(2).getMethod();
+		IMethodName method2 = eventMapping.get(2).getMethod();
 		String kind2 = eventMapping.get(2).getKind().toString();
 		String out2 = toLabel(method2);
-		MethodName method3 = eventMapping.get(3).getMethod();
+		IMethodName method3 = eventMapping.get(3).getMethod();
 		String kind3 = eventMapping.get(3).getKind().toString();
 		String out3 = toLabel(method3);
-		MethodName method4 = eventMapping.get(4).getMethod();
+		IMethodName method4 = eventMapping.get(4).getMethod();
 		String kind4 = eventMapping.get(4).getKind().toString();
 		String out4 = toLabel(method4);
 
@@ -112,7 +112,7 @@ public class EpisodeToGraphConverterTest {
 		assertEquals(expected.toString(), actuals.toString());
 	}
 
-	private String toLabel(MethodName method) {
+	private String toLabel(IMethodName method) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(method.getDeclaringType().getName());
@@ -120,7 +120,7 @@ public class EpisodeToGraphConverterTest {
 		sb.append(method.getName());
 		sb.append('(');
 		boolean isFirst = true;
-		for (ParameterName p : method.getParameters()) {
+		for (IParameterName p : method.getParameters()) {
 			if (!isFirst) {
 				sb.append(", ");
 			}

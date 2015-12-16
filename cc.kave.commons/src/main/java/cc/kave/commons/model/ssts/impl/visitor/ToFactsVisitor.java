@@ -6,8 +6,8 @@ import java.util.Set;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -15,7 +15,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 
 public class ToFactsVisitor extends AbstractNodeVisitor<Set<Fact>, Void> {
 
-	private static TypeName EVENT_TYPE_NAME = CsTypeName
+	private static ITypeName EVENT_TYPE_NAME = TypeName
 			.newTypeName("KaVE.RS.SolutionAnalysis.Episodes.Event, KaVE.RS.SolutionAnalysis");
 	private ArrayList<Event> events;
 

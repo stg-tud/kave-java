@@ -4,51 +4,51 @@ import javax.annotation.Nonnull;
 
 import com.google.gson.annotations.SerializedName;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 
 public class MethodHierarchy implements IMethodHierarchy {
 
-	private MethodName element;
+	private IMethodName element;
 	@SerializedName("Super")
-	private MethodName _super;
-	private MethodName first;
+	private IMethodName _super;
+	private IMethodName first;
 
 	public MethodHierarchy() {
-		element = CsMethodName.UNKNOWN_NAME;
+		element = MethodName.UNKNOWN_NAME;
 	}
 
-	public MethodHierarchy(@Nonnull MethodName m) {
+	public MethodHierarchy(@Nonnull IMethodName m) {
 		this.element = m;
 	}
 
 	@Override
-	public MethodName getElement() {
+	public IMethodName getElement() {
 		return element;
 	}
 
 	@Override
-	public void setElement(MethodName name) {
+	public void setElement(IMethodName name) {
 		this.element = name;
 	}
 
 	@Override
-	public MethodName getSuper() {
+	public IMethodName getSuper() {
 		return _super;
 	}
 
 	@Override
-	public void setSuper(MethodName name) {
+	public void setSuper(IMethodName name) {
 		this._super = name;
 	}
 
 	@Override
-	public MethodName getFirst() {
+	public IMethodName getFirst() {
 		return first;
 	}
 
 	@Override
-	public void setFirst(MethodName name) {
+	public void setFirst(IMethodName name) {
 		this.first = name;
 	}
 

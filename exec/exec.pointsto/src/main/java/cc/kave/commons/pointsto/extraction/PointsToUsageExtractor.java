@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
@@ -106,7 +106,7 @@ public class PointsToUsageExtractor {
 	private void rewriteThisUsages(List<DummyUsage> usages, ITypeShape typeShape) {
 		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 		if (typeHierarchy.hasSuperclass()) {
-			TypeName superType = typeHierarchy.getExtends().getElement();
+			ITypeName superType = typeHierarchy.getExtends().getElement();
 
 			for (DummyUsage usage : usages) {
 				// change type of usages referring to the enclosing class to the super class

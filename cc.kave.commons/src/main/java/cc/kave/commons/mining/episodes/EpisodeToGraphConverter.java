@@ -11,8 +11,8 @@ import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 
 public class EpisodeToGraphConverter {
 
@@ -33,7 +33,7 @@ public class EpisodeToGraphConverter {
 		while (toi.hasNext()) {
 			Fact fact = toi.next();
 			int index = Integer.parseInt(fact.getRawFact());
-			MethodName method = eventMapping.get(index).getMethod();
+			IMethodName method = eventMapping.get(index).getMethod();
 			EventKind kind = eventMapping.get(index).getKind();
 
 			String out = toLabel(method);
@@ -45,7 +45,7 @@ public class EpisodeToGraphConverter {
 		return graph;
 	}
 
-	private String toLabel(MethodName method) {
+	private String toLabel(IMethodName method) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(method.getDeclaringType().getName());
@@ -53,7 +53,7 @@ public class EpisodeToGraphConverter {
 		sb.append(method.getName());
 		sb.append('(');
 		boolean isFirst = true;
-		for (ParameterName p : method.getParameters()) {
+		for (IParameterName p : method.getParameters()) {
 			if (!isFirst) {
 				sb.append(", ");
 			}

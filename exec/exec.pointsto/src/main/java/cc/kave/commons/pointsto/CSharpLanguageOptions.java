@@ -12,9 +12,9 @@
  */
 package cc.kave.commons.pointsto;
 
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -33,12 +33,12 @@ public class CSharpLanguageOptions extends LanguageOptions {
 	}
 
 	@Override
-	public TypeName getTopClass() {
-		return CsTypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
+	public ITypeName getTopClass() {
+		return TypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
 	}
 
 	@Override
-	public TypeName getSuperType(ITypeHierarchy typeHierarchy) {
+	public ITypeName getSuperType(ITypeHierarchy typeHierarchy) {
 		if (typeHierarchy.hasSuperclass()) {
 			return typeHierarchy.getExtends().getElement();
 		} else {

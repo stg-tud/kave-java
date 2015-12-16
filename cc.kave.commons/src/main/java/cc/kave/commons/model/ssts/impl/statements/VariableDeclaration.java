@@ -3,8 +3,8 @@ package cc.kave.commons.model.ssts.impl.statements;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -13,11 +13,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class VariableDeclaration implements IVariableDeclaration {
 
 	private IVariableReference reference;
-	private TypeName type;
+	private ITypeName type;
 
 	public VariableDeclaration() {
 		this.reference = new VariableReference();
-		this.type = CsTypeName.UNKNOWN_NAME;
+		this.type = TypeName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class VariableDeclaration implements IVariableDeclaration {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return this.type;
 	}
 
@@ -39,7 +39,7 @@ public class VariableDeclaration implements IVariableDeclaration {
 		this.reference = reference;
 	}
 
-	public void setType(TypeName type) {
+	public void setType(ITypeName type) {
 		this.type = type;
 	}
 

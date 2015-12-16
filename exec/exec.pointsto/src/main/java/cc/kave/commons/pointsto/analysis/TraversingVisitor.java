@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -291,7 +291,7 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 			simpleExpr.accept(this, context);
 		}
 
-		MethodName method = entity.getMethodName();
+		IMethodName method = entity.getMethodName();
 
 		// static methods and constructors do not have a sensible reference
 		if (!method.isStatic() && !method.isConstructor()) {

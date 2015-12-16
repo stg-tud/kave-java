@@ -1,25 +1,25 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
-import cc.kave.commons.model.names.DelegateTypeName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsDelegateTypeName;
+import cc.kave.commons.model.names.IDelegateTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class DelegateDeclaration implements IDelegateDeclaration {
 
-	private DelegateTypeName name;
+	private IDelegateTypeName name;
 
 	public DelegateDeclaration() {
-		this.name = CsDelegateTypeName.UNKNOWN_NAME;
+		this.name = DelegateTypeName.UNKNOWN_NAME;
 	}
 
 	@Override
-	public TypeName getName() {
+	public ITypeName getName() {
 		return this.name;
 	}
 
-	public void setName(DelegateTypeName name) {
+	public void setName(IDelegateTypeName name) {
 		this.name = name;
 	}
 

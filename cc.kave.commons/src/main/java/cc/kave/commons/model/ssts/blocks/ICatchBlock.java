@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.IStatement;
 
 public interface ICatchBlock {
@@ -12,7 +12,7 @@ public interface ICatchBlock {
 	CatchBlockKind getKind();
 
 	@Nonnull
-	ParameterName getParameter();
+	IParameterName getParameter();
 
 	@Nonnull
 	List<IStatement> getBody();

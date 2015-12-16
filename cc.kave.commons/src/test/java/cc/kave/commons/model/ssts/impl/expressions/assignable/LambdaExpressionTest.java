@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsLambdaName;
+import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
@@ -23,7 +23,7 @@ public class LambdaExpressionTest extends SSTBaseTest {
 	public void testDefaulValues() {
 		LambdaExpression sut = new LambdaExpression();
 
-		assertThat(CsLambdaName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(LambdaName.UNKNOWN_NAME, equalTo(sut.getName()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getBody()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));

@@ -10,68 +10,68 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cc.kave.commons.model.names.Name;
-import cc.kave.commons.model.names.csharp.CsAliasName;
-import cc.kave.commons.model.names.csharp.CsAssemblyName;
-import cc.kave.commons.model.names.csharp.CsEventName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsLambdaName;
-import cc.kave.commons.model.names.csharp.CsLocalVariableName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsName;
-import cc.kave.commons.model.names.csharp.CsNamespaceName;
-import cc.kave.commons.model.names.csharp.CsParameterName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.names.csharp.AliasName;
+import cc.kave.commons.model.names.csharp.AssemblyName;
+import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.LambdaName;
+import cc.kave.commons.model.names.csharp.LocalVariableName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.Name;
+import cc.kave.commons.model.names.csharp.NamespaceName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.names.resharper.LiveTemplateName;
 
-public class GsonNameDeserializer implements JsonDeserializer<Name>, JsonSerializer<Name> {
+public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerializer<IName> {
 
 	@Override
-	public Name deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+	public IName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		String[] nameInfo = json.getAsString().split(":", 2);
 		String discriminator = nameInfo[0];
 		final String identifier = nameInfo[1];
 		switch (discriminator) {
 		case "CSharp.AliasName":
-			return CsAliasName.newAliasName(identifier);
+			return AliasName.newAliasName(identifier);
 		case "CSharp.AssemblyName":
-			return CsAssemblyName.newAssemblyName(identifier);
+			return AssemblyName.newAssemblyName(identifier);
 		case "CSharp.EventName":
-			return CsEventName.newEventName(identifier);
+			return EventName.newEventName(identifier);
 		case "CSharp.FieldName":
-			return CsFieldName.newFieldName(identifier);
+			return FieldName.newFieldName(identifier);
 		case "CSharp.LambdaName":
-			return CsLambdaName.newLambdaName(identifier);
+			return LambdaName.newLambdaName(identifier);
 		case "CSharp.LocalVariableName":
-			return CsLocalVariableName.newLocalVariableName(identifier);
+			return LocalVariableName.newLocalVariableName(identifier);
 		case "CSharp.MethodName":
-			return CsMethodName.newMethodName(identifier);
+			return MethodName.newMethodName(identifier);
 		case "CSharp.Name":
-			return CsName.newName(identifier);
+			return Name.newName(identifier);
 		case "CSharp.NamespaceName":
-			return CsNamespaceName.newNamespaceName(identifier);
+			return NamespaceName.newNamespaceName(identifier);
 		case "CSharp.ParameterName":
-			return CsParameterName.newParameterName(identifier);
+			return ParameterName.newParameterName(identifier);
 		case "CSharp.PropertyName":
-			return CsPropertyName.newPropertyName(identifier);
+			return PropertyName.newPropertyName(identifier);
 		case "CSharp.TypeName":
-			return CsTypeName.newTypeName(identifier);
+			return TypeName.newTypeName(identifier);
 		/* resharper name */
 		case "ReSharper.LiveTemplateName":
 			return LiveTemplateName.newLiveTemplateName(identifier);
 		default:
 			if ((discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName"))
 					|| discriminator.equals("CSharp.TypeParameterName")) {
-				return CsTypeName.newTypeName(identifier);
+				return TypeName.newTypeName(identifier);
 			}
 			throw new JsonParseException("Not a valid serialized name: '" + json + "'");
 		}
 	}
 
 	@Override
-	public JsonElement serialize(Name src, Type typeOfSrc, JsonSerializationContext context) {
+	public JsonElement serialize(IName src, Type typeOfSrc, JsonSerializationContext context) {
 		return new JsonPrimitive((src.getClass() != LiveTemplateName.class ? "CSharp." : "ReSharper.")
 				+ src.getClass().getSimpleName().replaceFirst("Cs", "") + ":" + src.getIdentifier());
 	}

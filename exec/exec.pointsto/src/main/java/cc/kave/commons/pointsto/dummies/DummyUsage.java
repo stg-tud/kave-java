@@ -18,8 +18,8 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
 //import cc.recommenders.usages.CallSiteKind;
 
 /**
@@ -27,33 +27,33 @@ import cc.kave.commons.model.names.TypeName;
  */
 public class DummyUsage {
 
-	private TypeName type;
-	private TypeName classContext;
-	private MethodName methodContext;
+	private ITypeName type;
+	private ITypeName classContext;
+	private IMethodName methodContext;
 	private DummyDefinitionSite definitionSite;
 	private Set<DummyCallsite> callsites = new HashSet<>();
 
-	public void setType(TypeName typeName) {
+	public void setType(ITypeName typeName) {
 		this.type = typeName;
 	}
 
-	public TypeName getType() {
+	public ITypeName getType() {
 		return type;
 	}
 
-	public void setClassContext(TypeName typeName) {
+	public void setClassContext(ITypeName typeName) {
 		this.classContext = typeName;
 	}
 
-	public TypeName getClassContext() {
+	public ITypeName getClassContext() {
 		return classContext;
 	}
 
-	public void setMethodContext(MethodName methodName) {
+	public void setMethodContext(IMethodName methodName) {
 		this.methodContext = methodName;
 	}
 
-	public MethodName getMethodContext() {
+	public IMethodName getMethodContext() {
 
 		return methodContext;
 	}

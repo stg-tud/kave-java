@@ -6,18 +6,15 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.references.PropertyReference;
-import cc.kave.commons.model.ssts.impl.references.PropertyReference;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
 
 public class PropertyReferenceTest extends SSTBaseTest {
 
-	private static PropertyName someProperty() {
-		return CsPropertyName.newPropertyName("[T1,P1] [T2,P2].P");
+	private static IPropertyName someProperty() {
+		return PropertyName.newPropertyName("[T1,P1] [T2,P2].P");
 	}
 
 	@Test
@@ -25,7 +22,7 @@ public class PropertyReferenceTest extends SSTBaseTest {
 		PropertyReference sut = new PropertyReference();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(CsPropertyName.UNKNOWN_NAME, equalTo(sut.getPropertyName()));
+		assertThat(PropertyName.UNKNOWN_NAME, equalTo(sut.getPropertyName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}

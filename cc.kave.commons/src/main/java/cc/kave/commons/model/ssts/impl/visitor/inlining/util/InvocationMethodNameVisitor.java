@@ -3,7 +3,7 @@ package cc.kave.commons.model.ssts.impl.visitor.inlining.util;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -49,77 +49,77 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<MethodName>, Void> {
+public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<IMethodName>, Void> {
 
 	@Override
-	public Void visit(IMethodDeclaration stmt, Set<MethodName> context) {
+	public Void visit(IMethodDeclaration stmt, Set<IMethodName> context) {
 		visit(stmt.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IVariableDeclaration stmt, Set<MethodName> context) {
+	public Void visit(IVariableDeclaration stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IAssignment stmt, Set<MethodName> context) {
+	public Void visit(IAssignment stmt, Set<IMethodName> context) {
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IBreakStatement stmt, Set<MethodName> context) {
+	public Void visit(IBreakStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IContinueStatement stmt, Set<MethodName> context) {
+	public Void visit(IContinueStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IExpressionStatement stmt, Set<MethodName> context) {
+	public Void visit(IExpressionStatement stmt, Set<IMethodName> context) {
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IGotoStatement stmt, Set<MethodName> context) {
+	public Void visit(IGotoStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(ILabelledStatement stmt, Set<MethodName> context) {
+	public Void visit(ILabelledStatement stmt, Set<IMethodName> context) {
 		stmt.getStatement().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IReturnStatement stmt, Set<MethodName> context) {
+	public Void visit(IReturnStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IThrowStatement stmt, Set<MethodName> context) {
+	public Void visit(IThrowStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IDoLoop block, Set<MethodName> context) {
+	public Void visit(IDoLoop block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		block.getCondition().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IForEachLoop block, Set<MethodName> context) {
+	public Void visit(IForEachLoop block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IForLoop block, Set<MethodName> context) {
+	public Void visit(IForLoop block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		visit(block.getInit(), context);
 		visit(block.getStep(), context);
@@ -128,20 +128,20 @@ public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<MethodN
 	}
 
 	@Override
-	public Void visit(IIfElseBlock block, Set<MethodName> context) {
+	public Void visit(IIfElseBlock block, Set<IMethodName> context) {
 		visit(block.getElse(), context);
 		visit(block.getThen(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ILockBlock stmt, Set<MethodName> context) {
+	public Void visit(ILockBlock stmt, Set<IMethodName> context) {
 		visit(stmt.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ISwitchBlock block, Set<MethodName> context) {
+	public Void visit(ISwitchBlock block, Set<IMethodName> context) {
 		visit(block.getDefaultSection(), context);
 		for (ICaseBlock caseBlock : block.getSections())
 			visit(caseBlock.getBody(), context);
@@ -149,7 +149,7 @@ public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<MethodN
 	}
 
 	@Override
-	public Void visit(ITryBlock block, Set<MethodName> context) {
+	public Void visit(ITryBlock block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		visit(block.getFinally(), context);
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
@@ -159,124 +159,124 @@ public class InvocationMethodNameVisitor extends AbstractNodeVisitor<Set<MethodN
 	}
 
 	@Override
-	public Void visit(IUncheckedBlock block, Set<MethodName> context) {
+	public Void visit(IUncheckedBlock block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnsafeBlock block, Set<MethodName> context) {
+	public Void visit(IUnsafeBlock block, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUsingBlock block, Set<MethodName> context) {
+	public Void visit(IUsingBlock block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IWhileLoop block, Set<MethodName> context) {
+	public Void visit(IWhileLoop block, Set<IMethodName> context) {
 		visit(block.getBody(), context);
 		block.getCondition().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ICompletionExpression entity, Set<MethodName> context) {
+	public Void visit(ICompletionExpression entity, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IComposedExpression expr, Set<MethodName> context) {
+	public Void visit(IComposedExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IIfElseExpression expr, Set<MethodName> context) {
+	public Void visit(IIfElseExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IInvocationExpression entity, Set<MethodName> context) {
+	public Void visit(IInvocationExpression entity, Set<IMethodName> context) {
 		context.add(entity.getMethodName());
 		return null;
 	}
 
 	@Override
-	public Void visit(ILambdaExpression expr, Set<MethodName> context) {
+	public Void visit(ILambdaExpression expr, Set<IMethodName> context) {
 		visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ILoopHeaderBlockExpression expr, Set<MethodName> context) {
+	public Void visit(ILoopHeaderBlockExpression expr, Set<IMethodName> context) {
 		visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IConstantValueExpression expr, Set<MethodName> context) {
+	public Void visit(IConstantValueExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(INullExpression expr, Set<MethodName> context) {
+	public Void visit(INullExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IReferenceExpression expr, Set<MethodName> context) {
+	public Void visit(IReferenceExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IEventReference eventRef, Set<MethodName> context) {
+	public Void visit(IEventReference eventRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IFieldReference fieldRef, Set<MethodName> context) {
+	public Void visit(IFieldReference fieldRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IMethodReference methodRef, Set<MethodName> context) {
+	public Void visit(IMethodReference methodRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IPropertyReference methodRef, Set<MethodName> context) {
+	public Void visit(IPropertyReference methodRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IVariableReference varRef, Set<MethodName> context) {
+	public Void visit(IVariableReference varRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnknownReference unknownRef, Set<MethodName> context) {
+	public Void visit(IUnknownReference unknownRef, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnknownExpression unknownExpr, Set<MethodName> context) {
+	public Void visit(IUnknownExpression unknownExpr, Set<IMethodName> context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnknownStatement unknownStmt, Set<MethodName> context) {
+	public Void visit(IUnknownStatement unknownStmt, Set<IMethodName> context) {
 		return null;
 	}
 
-	public void visit(List<IStatement> body, Set<MethodName> context) {
+	public void visit(List<IStatement> body, Set<IMethodName> context) {
 		for (IStatement statement : body) {
 			statement.accept(this, context);
 		}
 	}
 
-	public Void visit(IEventSubscriptionStatement stmt, Set<MethodName> context) {
+	public Void visit(IEventSubscriptionStatement stmt, Set<IMethodName> context) {
 		return null;
 	}
 }

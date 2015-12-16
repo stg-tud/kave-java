@@ -3,8 +3,8 @@ package cc.kave.commons.model.ssts.impl.visitor.inlining;
 import java.util.HashSet;
 import java.util.Set;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -83,12 +83,12 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 			}
 		}
 		Set<IMethodDeclaration> notInlinedMethods = new HashSet<>();
-		Set<MethodName> calls = new HashSet<>();
+		Set<IMethodName> calls = new HashSet<>();
 		for (IMethodDeclaration method : context.getNonEntryPoints()) {
 			if (!context.getInlinedMethods().contains(method)) {
 				notInlinedMethods.add(method);
 				context.addMethod(method);
-				Set<MethodName> invokes = new HashSet<>();
+				Set<IMethodName> invokes = new HashSet<>();
 				method.accept(new InvocationMethodNameVisitor(), invokes);
 				calls.addAll(invokes);
 			}
@@ -108,7 +108,7 @@ public class InliningIStatementVisitor extends AbstractNodeVisitor<InliningConte
 		context.visitScope(stmt.getBody());
 		method.getBody().addAll(context.getBody());
 		method.setEntryPoint(true);
-		method.setName(CsMethodName.newMethodName(stmt.getName().getIdentifier()));
+		method.setName(MethodName.newMethodName(stmt.getName().getIdentifier()));
 		context.addMethod(method);
 
 		// Clear body for next Method

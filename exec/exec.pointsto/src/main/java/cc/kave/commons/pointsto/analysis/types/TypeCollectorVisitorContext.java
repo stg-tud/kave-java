@@ -19,10 +19,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -39,16 +39,16 @@ public class TypeCollectorVisitorContext {
 
 	private static final Logger LOGGER = Logger.getLogger(TypeCollectorVisitorContext.class.getName());
 
-	private ScopedMap<String, TypeName> symbolTable = new ScopedMap<>();
+	private ScopedMap<String, ITypeName> symbolTable = new ScopedMap<>();
 
-	private IdentityHashMap<IReference, TypeName> referenceTypes = new IdentityHashMap<>();
-	private Set<TypeName> allTypes = new HashSet<>();
+	private IdentityHashMap<IReference, ITypeName> referenceTypes = new IdentityHashMap<>();
+	private Set<ITypeName> allTypes = new HashSet<>();
 
-	public IdentityHashMap<IReference, TypeName> getReferenceTypes() {
+	public IdentityHashMap<IReference, ITypeName> getReferenceTypes() {
 		return referenceTypes;
 	}
 
-	public Set<TypeName> getTypes() {
+	public Set<ITypeName> getTypes() {
 		return allTypes;
 	}
 
@@ -65,25 +65,25 @@ public class TypeCollectorVisitorContext {
 
 		// add fields
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
-			FieldName field = fieldDecl.getName();
+			IFieldName field = fieldDecl.getName();
 			declare(field.getName(), field.getValueType());
 		}
 
 		// add properties
 		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
-			PropertyName property = propertyDecl.getName();
+			IPropertyName property = propertyDecl.getName();
 			declare(property.getName(), property.getValueType());
 		}
 	}
 
-	private void declare(String identifier, TypeName type) {
+	private void declare(String identifier, ITypeName type) {
 		symbolTable.create(identifier, type);
 		allTypes.add(type);
 	}
 
 	public void enterMethod(IMethodDeclaration method) {
 		symbolTable.enter();
-		for (ParameterName parameter : method.getName().getParameters()) {
+		for (IParameterName parameter : method.getName().getParameters()) {
 			declareParameter(parameter);
 		}
 	}
@@ -104,7 +104,7 @@ public class TypeCollectorVisitorContext {
 		if (varDecl.isMissing()) {
 			LOGGER.log(Level.SEVERE, "Cannot declare a missing variable");
 		} else {
-			TypeName type = varDecl.getType();
+			ITypeName type = varDecl.getType();
 			declare(varDecl.getReference().getIdentifier(), type);
 
 			// TODO
@@ -112,7 +112,7 @@ public class TypeCollectorVisitorContext {
 		}
 	}
 
-	public void declareParameter(ParameterName parameter) {
+	public void declareParameter(IParameterName parameter) {
 		if (parameter.isUnknown()) {
 			LOGGER.log(Level.SEVERE, "Cannot declare an unknown parameter");
 		} else {
@@ -126,7 +126,7 @@ public class TypeCollectorVisitorContext {
 			return;
 		}
 
-		TypeName type = symbolTable.get(reference.getIdentifier());
+		ITypeName type = symbolTable.get(reference.getIdentifier());
 		if (type == null) {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown variable");
 		} else {
@@ -135,22 +135,22 @@ public class TypeCollectorVisitorContext {
 	}
 
 	public void useFieldReference(IFieldReference reference) {
-		FieldName field = reference.getFieldName();
+		IFieldName field = reference.getFieldName();
 		if (field.isUnknown()) {
 			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown field");
 		} else {
-			TypeName type = field.getValueType();
+			ITypeName type = field.getValueType();
 			referenceTypes.put(reference, type);
 			allTypes.add(type);
 		}
 	}
 
 	public void usePropertyReference(IPropertyReference reference) {
-		PropertyName property = reference.getPropertyName();
+		IPropertyName property = reference.getPropertyName();
 		if (property.isUnknown()) {
 			LOGGER.log(Level.WARNING, "Skipping a reference to an unknown property");
 		} else {
-			TypeName type = property.getValueType();
+			ITypeName type = property.getValueType();
 			referenceTypes.put(reference, type);
 			allTypes.add(type);
 		}

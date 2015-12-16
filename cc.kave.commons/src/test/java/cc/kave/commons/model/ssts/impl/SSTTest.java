@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -30,7 +30,7 @@ public class SSTTest {
 	public void testDefaultValues() {
 		SST sut = new SST();
 
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getEnclosingType()));
+		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getEnclosingType()));
 		assertThat("", equalTo(sut.getPartialClassIdentifier()));
 		assertThat(new HashSet<IDelegateDeclaration>(), equalTo(sut.getDelegates()));
 		assertThat(new HashSet<IEventDeclaration>(), equalTo(sut.getEvents()));
@@ -46,7 +46,7 @@ public class SSTTest {
 	@Test
 	public void testSettingValues() {
 		SST sut = new SST();
-		sut.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		sut.setEnclosingType(TypeName.newTypeName("T1, P1"));
 		sut.getDelegates().add(new DelegateDeclaration());
 		sut.getFields().add(new FieldDeclaration());
 		sut.getEvents().add(new EventDeclaration());
@@ -54,7 +54,7 @@ public class SSTTest {
 		sut.getProperties().add(new PropertyDeclaration());
 		sut.setPartialClassIdentifier("abc");
 
-		assertThat(CsTypeName.newTypeName("T1, P1"), equalTo(sut.getEnclosingType()));
+		assertThat(TypeName.newTypeName("T1, P1"), equalTo(sut.getEnclosingType()));
 		assertThat("abc", equalTo(sut.getPartialClassIdentifier()));
 		assertTrue(sut.isPartialClass());
 		assertThat(Sets.newHashSet(new DelegateDeclaration()), equalTo(sut.getDelegates()));
@@ -77,14 +77,14 @@ public class SSTTest {
 	public void testEqualityReallyTheSame() {
 		SST a = new SST();
 		SST b = new SST();
-		a.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		a.setEnclosingType(TypeName.newTypeName("T1, P1"));
 		a.setPartialClassIdentifier("abc");
 		a.getDelegates().add(new DelegateDeclaration());
 		a.getFields().add(new FieldDeclaration());
 		a.getEvents().add(new EventDeclaration());
 		a.getMethods().add(new MethodDeclaration());
 		a.getProperties().add(new PropertyDeclaration());
-		b.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		b.setEnclosingType(TypeName.newTypeName("T1, P1"));
 		b.setPartialClassIdentifier("abc");
 		b.getDelegates().add(new DelegateDeclaration());
 		b.getFields().add(new FieldDeclaration());
@@ -100,7 +100,7 @@ public class SSTTest {
 	public void testEqualityDifferentType() {
 		SST a = new SST();
 		SST b = new SST();
-		a.setEnclosingType(CsTypeName.newTypeName("T1, P1"));
+		a.setEnclosingType(TypeName.newTypeName("T1, P1"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

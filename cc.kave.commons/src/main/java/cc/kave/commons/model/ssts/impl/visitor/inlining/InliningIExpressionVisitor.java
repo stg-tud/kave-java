@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -107,7 +107,7 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 		}
 	}
 
-	private void setupGuardVariables(MethodName methodName, List<IStatement> body, InliningContext context) {
+	private void setupGuardVariables(IMethodName methodName, List<IStatement> body, InliningContext context) {
 		context.setGuardVariableNames(methodName.getIdentifier());
 		if (!context.isVoid()) {
 			IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
@@ -120,10 +120,10 @@ public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningCont
 
 	}
 
-	private void createParameterVariables(List<IStatement> body, List<ParameterName> parameters,
+	private void createParameterVariables(List<IStatement> body, List<IParameterName> parameters,
 			List<ISimpleExpression> expressions, Map<IVariableReference, IVariableReference> preChangedNames) {
 		for (int i = 0; i < parameters.size(); i++) {
-			ParameterName parameter = parameters.get(i);
+			IParameterName parameter = parameters.get(i);
 			// TODO what to do when parameter has out/ref keyWord but is
 			// no ReferenceExpression ?
 			if (!parameter.isOptional() || expressions.size() == parameters.size()) {

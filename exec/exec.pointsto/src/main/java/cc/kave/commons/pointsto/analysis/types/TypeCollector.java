@@ -18,13 +18,13 @@ import java.util.IdentityHashMap;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 
 public class TypeCollector {
 
-	private IdentityHashMap<IReference, TypeName> referenceTypes = new IdentityHashMap<>();
-	private Set<TypeName> allTypes = new HashSet<>();
+	private IdentityHashMap<IReference, ITypeName> referenceTypes = new IdentityHashMap<>();
+	private Set<ITypeName> allTypes = new HashSet<>();
 
 	public TypeCollector(Context context) {
 		 TypeCollectorVisitor visitor = new TypeCollectorVisitor();
@@ -37,11 +37,11 @@ public class TypeCollector {
 		 allTypes = visitorContext.getTypes();
 	}
 
-	public TypeName getType(IReference reference) {
+	public ITypeName getType(IReference reference) {
 		return referenceTypes.get(reference);
 	}
 
-	public Set<TypeName> getTypes() {
+	public Set<ITypeName> getTypes() {
 		return Collections.unmodifiableSet(allTypes);
 	}
 }

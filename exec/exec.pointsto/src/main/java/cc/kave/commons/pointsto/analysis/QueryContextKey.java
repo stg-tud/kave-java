@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis;
 
 import com.google.common.base.Objects;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 
@@ -22,10 +22,10 @@ public class QueryContextKey {
 
 	private IReference reference;
 	private IStatement stmt;
-	private TypeName type;
+	private ITypeName type;
 	private Callpath callpath;
 
-	public QueryContextKey(IReference reference, IStatement stmt, TypeName type, Callpath callpath) {
+	public QueryContextKey(IReference reference, IStatement stmt, ITypeName type, Callpath callpath) {
 		this.reference = reference;
 		this.stmt = stmt;
 		this.type = type;
@@ -48,11 +48,11 @@ public class QueryContextKey {
 		this.stmt = stmt;
 	}
 
-	public TypeName getType() {
+	public ITypeName getType() {
 		return type;
 	}
 
-	public void setType(TypeName type) {
+	public void setType(ITypeName type) {
 		this.type = type;
 	}
 

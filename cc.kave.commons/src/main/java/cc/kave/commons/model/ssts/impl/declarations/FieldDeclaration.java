@@ -1,24 +1,24 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class FieldDeclaration implements IFieldDeclaration {
 
-	private FieldName name;
+	private IFieldName name;
 
 	public FieldDeclaration() {
-		this.name = CsFieldName.UNKNOWN_NAME;
+		this.name = FieldName.UNKNOWN_NAME;
 	}
 
 	@Override
-	public FieldName getName() {
+	public IFieldName getName() {
 		return this.name;
 	}
 
-	public void setName(FieldName name) {
+	public void setName(IFieldName name) {
 		this.name = name;
 	}
 

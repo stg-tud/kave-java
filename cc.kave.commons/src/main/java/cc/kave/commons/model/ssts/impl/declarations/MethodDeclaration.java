@@ -6,25 +6,25 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class MethodDeclaration implements IMethodDeclaration {
 
-	private MethodName name;
+	private IMethodName name;
 	private boolean isEntryPoint;
 	private List<IStatement> body;
 
 	public MethodDeclaration() {
-		name = CsMethodName.UNKNOWN_NAME;
+		name = MethodName.UNKNOWN_NAME;
 		body = new ArrayList<>();
 	}
 
 	@Override
-	public MethodName getName() {
+	public IMethodName getName() {
 		return this.name;
 	}
 
@@ -38,7 +38,7 @@ public class MethodDeclaration implements IMethodDeclaration {
 		return this.body;
 	}
 
-	public void setName(MethodName name) {
+	public void setName(IMethodName name) {
 		this.name = name;
 	}
 

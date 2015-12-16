@@ -29,8 +29,8 @@ import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.utils.json.JsonUtils;
 
@@ -75,7 +75,7 @@ public class CompletionEventSerializationTest {
 		// CompletionEvent
 
 		SST sst = new SST();
-		sst.setEnclosingType(CsTypeName.newTypeName("T,P"));
+		sst.setEnclosingType(TypeName.newTypeName("T,P"));
 		e.Context = new Context();
 		e.Context.setSST(sst);
 
@@ -105,7 +105,7 @@ public class CompletionEventSerializationTest {
 
 	private static IProposal createProposal(String methodName) {
 		Proposal p = new Proposal();
-		p.Name = CsMethodName.newMethodName(methodName);
+		p.Name = MethodName.newMethodName(methodName);
 		p.Relevance = 42;
 		return p;
 	}

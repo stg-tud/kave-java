@@ -2,9 +2,9 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsLambdaName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.LambdaName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
@@ -70,7 +70,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void InvocationExpression_ConstantValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
-		sst.setMethodName(CsMethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(constant("1"));
 
 		AssertPrint(sst, "this.M(1)");
@@ -81,7 +81,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void InvocationExpression_NullValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
-		sst.setMethodName(CsMethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
 		AssertPrint(sst, "this.M(null)");
@@ -92,7 +92,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void InvocationExpression_Static() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("should be ignored anyways"));
-		sst.setMethodName(CsMethodName.newMethodName("static [R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(MethodName.newMethodName("static [R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
 		AssertPrint(sst, "D.M(null)");
@@ -181,7 +181,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void CompletionExpression_OnTypeReference() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(CsTypeName.newTypeName("T,P"));
+		sst.setTypeReference(TypeName.newTypeName("T,P"));
 		AssertPrint(sst, "T.$");
 	}
 
@@ -189,7 +189,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void CompletionExpression_OnTypeReferenceWithToken() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(CsTypeName.newTypeName("T,P"));
+		sst.setTypeReference(TypeName.newTypeName("T,P"));
 		sst.setToken("t");
 		AssertPrint(sst, "T.t$");
 	}
@@ -198,7 +198,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void CompletionExpression_OnTypeReference_GenericType() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(CsTypeName.newTypeName("T`1[[G -> A,P]],P"));
+		sst.setTypeReference(TypeName.newTypeName("T`1[[G -> A,P]],P"));
 		AssertPrint(sst, "T<A>.$");
 	}
 
@@ -206,7 +206,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void CompletionExpression_OnTypeReference_UnresolvedGenericType() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(CsTypeName.newTypeName("T`1[[G]],P"));
+		sst.setTypeReference(TypeName.newTypeName("T`1[[G]],P"));
 		AssertPrint(sst, "T<?>.$");
 	}
 
@@ -214,7 +214,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	public void LambdaExpression() {
 		LambdaExpression sst = new LambdaExpression();
-		sst.setName(CsLambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
+		sst.setName(LambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 

@@ -9,8 +9,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.testutils.model.names.TestNameFactory;
 
@@ -19,7 +19,7 @@ public class MethodHierarchyTest {
 	@Test
 	public void testDefaultValues() {
 		MethodHierarchy sut = new MethodHierarchy();
-		assertThat(CsMethodName.UNKNOWN_NAME, equalTo(sut.getElement()));
+		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getElement()));
 		assertNull(sut.getSuper());
 		assertNull(sut.getFirst());
 		assertFalse(sut.isDeclaredInParentHierarchy());
@@ -102,7 +102,7 @@ public class MethodHierarchyTest {
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
 	}
 
-	private static MethodName m(String s) {
-		return CsMethodName.newMethodName("[T1,P1] [T2,P2]." + s + "()");
+	private static IMethodName m(String s) {
+		return MethodName.newMethodName("[T1,P1] [T2,P2]." + s + "()");
 	}
 }

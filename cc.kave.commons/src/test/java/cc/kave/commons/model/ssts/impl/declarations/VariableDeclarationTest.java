@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -19,7 +19,7 @@ public class VariableDeclarationTest {
 		VariableDeclaration sut = new VariableDeclaration();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getType()));
+		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getType()));
 		assertThat(true, equalTo(sut.isMissing()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
@@ -29,11 +29,11 @@ public class VariableDeclarationTest {
 	public void testSettingValues() {
 		VariableDeclaration sut = new VariableDeclaration();
 		sut.setReference(SSTUtil.variableReference("a"));
-		sut.setType(CsTypeName.UNKNOWN_NAME);
+		sut.setType(TypeName.UNKNOWN_NAME);
 
 		assertThat(false, equalTo(sut.isMissing()));
 		assertThat(SSTUtil.variableReference("a"), equalTo(sut.getReference()));
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getType()));
+		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getType()));
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class VariableDeclarationTest {
 		VariableDeclaration a = new VariableDeclaration();
 		VariableDeclaration b = new VariableDeclaration();
 		a.setReference(SSTUtil.variableReference("a"));
-		a.setType(CsTypeName.newTypeName("T1,P1"));
+		a.setType(TypeName.newTypeName("T1,P1"));
 		b.setReference(SSTUtil.variableReference("a"));
-		b.setType(CsTypeName.newTypeName("T1,P1"));
+		b.setType(TypeName.newTypeName("T1,P1"));
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -72,7 +72,7 @@ public class VariableDeclarationTest {
 	public void testEqualityDifferentType() {
 		VariableDeclaration a = new VariableDeclaration();
 		VariableDeclaration b = new VariableDeclaration();
-		a.setType(CsTypeName.newTypeName("T1,P1"));
+		a.setType(TypeName.newTypeName("T1,P1"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

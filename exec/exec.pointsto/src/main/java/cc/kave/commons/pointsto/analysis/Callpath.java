@@ -18,17 +18,17 @@ import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 
-public class Callpath implements Iterable<MethodName> {
+public class Callpath implements Iterable<IMethodName> {
 
-	private Deque<MethodName> path = new ArrayDeque<>();
+	private Deque<IMethodName> path = new ArrayDeque<>();
 
-	public Callpath(MethodName root) {
+	public Callpath(IMethodName root) {
 		path.addLast(root);
 	}
 
-	public void enterMethod(MethodName method) {
+	public void enterMethod(IMethodName method) {
 		path.addLast(method);
 	}
 
@@ -42,19 +42,19 @@ public class Callpath implements Iterable<MethodName> {
 	/**
 	 * Retrieves the method at the start of this path.
 	 */
-	public MethodName getFirst() {
+	public IMethodName getFirst() {
 		return path.getFirst();
 	}
 
 	/**
 	 * Retrieves the method at the end of this path.
 	 */
-	public MethodName getLast() {
+	public IMethodName getLast() {
 		return path.getLast();
 	}
 
 	@Override
-	public Iterator<MethodName> iterator() {
+	public Iterator<IMethodName> iterator() {
 		return path.iterator();
 	}
 
@@ -63,7 +63,7 @@ public class Callpath implements Iterable<MethodName> {
 		StringBuilder builder = new StringBuilder();
 		builder.append('[');
 
-		Iterator<MethodName> iter = path.iterator();
+		Iterator<IMethodName> iter = path.iterator();
 		while (iter.hasNext()) {
 			builder.append(iter.next().toString());
 			if (iter.hasNext()) {
@@ -79,7 +79,7 @@ public class Callpath implements Iterable<MethodName> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		for (MethodName method : path) {
+		for (IMethodName method : path) {
 			result = prime * result + method.hashCode();
 		}
 

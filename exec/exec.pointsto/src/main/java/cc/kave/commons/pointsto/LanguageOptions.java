@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public abstract class LanguageOptions {
@@ -27,8 +27,8 @@ public abstract class LanguageOptions {
 
 	public abstract String getSuperName();
 	
-	public abstract TypeName getSuperType(ITypeHierarchy typeHierarchy);
+	public abstract ITypeName getSuperType(ITypeHierarchy typeHierarchy);
 	
-	public abstract TypeName getTopClass();
+	public abstract ITypeName getTopClass();
 
 }

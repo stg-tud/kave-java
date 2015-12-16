@@ -3,26 +3,26 @@ package cc.kave.commons.model.ssts.impl.declarations;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class PropertyDeclaration implements IPropertyDeclaration {
 
-	private PropertyName name;
+	private IPropertyName name;
 	private List<IStatement> get;
 	private List<IStatement> set;
 
 	public PropertyDeclaration() {
-		this.name = CsPropertyName.UNKNOWN_NAME;
+		this.name = PropertyName.UNKNOWN_NAME;
 		this.get = new ArrayList<>();
 		this.set = new ArrayList<>();
 	}
 
 	@Override
-	public PropertyName getName() {
+	public IPropertyName getName() {
 		return name;
 	}
 
@@ -36,7 +36,7 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 		return set;
 	}
 
-	public void setName(PropertyName name) {
+	public void setName(IPropertyName name) {
 		this.name = name;
 	}
 

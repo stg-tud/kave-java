@@ -8,9 +8,9 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -85,7 +85,7 @@ import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 
 public class SSTUtil {
 
-	public static IVariableDeclaration declare(String identifier, TypeName type) {
+	public static IVariableDeclaration declare(String identifier, ITypeName type) {
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setReference(variableReference(identifier));
 		variable.setType(type);
@@ -120,30 +120,30 @@ public class SSTUtil {
 		return assignment;
 	}
 
-	public static IExpressionStatement invocationStatement(MethodName name, Iterator<ISimpleExpression> parameters) {
+	public static IExpressionStatement invocationStatement(IMethodName name, Iterator<ISimpleExpression> parameters) {
 		ExpressionStatement expressionStatement = new ExpressionStatement();
 		expressionStatement.setExpression(invocationExpression(name, parameters));
 		return expressionStatement;
 	}
 
-	public static IExpressionStatement invocationStatement(String id, MethodName name) {
+	public static IExpressionStatement invocationStatement(String id, IMethodName name) {
 		ArrayList<ISimpleExpression> simpleExpr = new ArrayList<>();
 		return invocationStatement(id, name, simpleExpr.iterator());
 	}
 
-	public static IExpressionStatement invocationStatement(String id, MethodName name,
+	public static IExpressionStatement invocationStatement(String id, IMethodName name,
 			Iterator<ISimpleExpression> parameters) {
 		ExpressionStatement exprStatement = new ExpressionStatement();
 		exprStatement.setExpression(invocationExpression(id, name, parameters));
 		return exprStatement;
 	}
 
-	public static IInvocationExpression invocationExpression(String id, MethodName name) {
+	public static IInvocationExpression invocationExpression(String id, IMethodName name) {
 		ArrayList<ISimpleExpression> parameters = new ArrayList<>();
 		return invocationExpression(id, name, parameters.iterator());
 	}
 
-	public static IInvocationExpression invocationExpression(MethodName name, Iterator<ISimpleExpression> parameters) {
+	public static IInvocationExpression invocationExpression(IMethodName name, Iterator<ISimpleExpression> parameters) {
 		// assert (name.isStatic() || name.isConstructor());
 		InvocationExpression invoExpr = new InvocationExpression();
 		invoExpr.setMethodName(name);
@@ -151,7 +151,7 @@ public class SSTUtil {
 		return invoExpr;
 	}
 
-	public static IInvocationExpression invocationExpression(String id, MethodName name,
+	public static IInvocationExpression invocationExpression(String id, IMethodName name,
 			Iterator<ISimpleExpression> parameters) {
 		// assert (name.isStatic() || name.isConstructor());
 		InvocationExpression invocationExpression = new InvocationExpression();
@@ -184,11 +184,11 @@ public class SSTUtil {
 		return labelled;
 	}
 
-	public static IStatement invocationStatement(MethodName name, ISimpleExpression... parameters) {
+	public static IStatement invocationStatement(IMethodName name, ISimpleExpression... parameters) {
 		return expr(invocationExpr(name, parameters));
 	}
 
-	public static IInvocationExpression invocationExpr(MethodName name, ISimpleExpression... parameters) {
+	public static IInvocationExpression invocationExpr(IMethodName name, ISimpleExpression... parameters) {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setParameters(Lists.newArrayList(parameters));
 		invocation.setMethodName(name);
@@ -208,7 +208,7 @@ public class SSTUtil {
 		return statement;
 	}
 
-	public static IMethodDeclaration declareMethod(MethodName name, boolean entryPoint, IStatement... statements) {
+	public static IMethodDeclaration declareMethod(IMethodName name, boolean entryPoint, IStatement... statements) {
 		MethodDeclaration method = new MethodDeclaration();
 		method.setName(name);
 		method.setEntryPoint(entryPoint);
@@ -372,7 +372,7 @@ public class SSTUtil {
 
 	public static IFieldReference fieldReference(String identifier) {
 		FieldReference ref = new FieldReference();
-		ref.setFieldName(CsFieldName.newFieldName(identifier));
+		ref.setFieldName(FieldName.newFieldName(identifier));
 		ref.setReference(variableReference(identifier));
 		return ref;
 	}
@@ -449,7 +449,7 @@ public class SSTUtil {
 		return variable;
 	}
 
-	public static IVariableDeclaration declareVar(String identifier, TypeName type) {
+	public static IVariableDeclaration declareVar(String identifier, ITypeName type) {
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setType(type);
 		variable.setReference(variableReference(identifier));
@@ -460,7 +460,7 @@ public class SSTUtil {
 		Set<IFieldDeclaration> fields = new HashSet<>();
 		for (String name : fieldNames) {
 			FieldDeclaration fieldDeclaration = new FieldDeclaration();
-			fieldDeclaration.setName(CsFieldName.newFieldName(name));
+			fieldDeclaration.setName(FieldName.newFieldName(name));
 			fields.add(fieldDeclaration);
 		}
 		return fields;

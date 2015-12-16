@@ -19,9 +19,9 @@ import java.util.Map;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.IName;
 
-public class LiveTemplateName implements Name {
+public class LiveTemplateName implements IName {
 	private static final Map<String, LiveTemplateName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static LiveTemplateName newLiveTemplateName(String identifier) {

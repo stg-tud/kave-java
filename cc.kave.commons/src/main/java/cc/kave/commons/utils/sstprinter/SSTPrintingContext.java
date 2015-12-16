@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.NamespaceName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.INamespaceName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.commons.model.typeshapes.ITypeShape;
@@ -30,14 +30,14 @@ public class SSTPrintingContext {
 	/// Collection of namespaces that have been seen by the context while
 	/// processing an SST.
 	/// </summary>
-	public Iterator<NamespaceName> SeenNamespaces;
+	public Iterator<INamespaceName> SeenNamespaces;
 
 	private StringBuilder _sb;
-	private Set<NamespaceName> _seenNamespaces;
+	private Set<INamespaceName> _seenNamespaces;
 
 	public SSTPrintingContext() {
 		_sb = new StringBuilder();
-		_seenNamespaces = new HashSet<NamespaceName>();
+		_seenNamespaces = new HashSet<INamespaceName>();
 	}
 
 	/// <summary>
@@ -66,11 +66,11 @@ public class SSTPrintingContext {
 		this.typeShape = typeShape;
 	}
 
-	public Iterator<NamespaceName> getSeenNamespaces() {
+	public Iterator<INamespaceName> getSeenNamespaces() {
 		return _seenNamespaces.iterator();
 	}
 
-	public void setSeenNamespaces(Iterator<NamespaceName> seenNamespaces) {
+	public void setSeenNamespaces(Iterator<INamespaceName> seenNamespaces) {
 		SeenNamespaces = seenNamespaces;
 	}
 
@@ -170,7 +170,7 @@ public class SSTPrintingContext {
 	/// </summary>
 	/// <param name="typeName">The type name to append.</param>
 	/// <returns>The context after appending.</returns>
-	public SSTPrintingContext typeNameOnly(TypeName typeName) {
+	public SSTPrintingContext typeNameOnly(ITypeName typeName) {
 		if (typeName != null)
 			return text(typeName.getName());
 		return this;
@@ -186,7 +186,7 @@ public class SSTPrintingContext {
 	/// </summary>
 	/// <param name="typeName">The type name to append.</param>
 	/// <returns>The context after appending.</returns>
-	public SSTPrintingContext type(TypeName typeName) {
+	public SSTPrintingContext type(ITypeName typeName) {
 
 		typeNameOnly(typeName);
 
@@ -197,12 +197,12 @@ public class SSTPrintingContext {
 		return this;
 	}
 
-	public SSTPrintingContext typeParameters(List<TypeName> typeParameters) {
+	public SSTPrintingContext typeParameters(List<ITypeName> typeParameters) {
 		leftAngleBracket();
 
-		for (TypeName p : typeParameters) {
+		for (ITypeName p : typeParameters) {
 			if (p.isUnknownType() || (p.getTypeParameterType() != null && p.getTypeParameterType().isUnknownType())) {
-				typeParameterShortName(CsTypeName.UNKNOWN_NAME.getIdentifier());
+				typeParameterShortName(TypeName.UNKNOWN_NAME.getIdentifier());
 			} else {
 				type(p.getTypeParameterType());
 			}
@@ -222,10 +222,10 @@ public class SSTPrintingContext {
 	/// </summary>
 	/// <param name="parameters">The list of parameters to append.</param>
 	/// <returns>The context after appending.</returns>
-	public SSTPrintingContext parameterList(List<ParameterName> list) {
+	public SSTPrintingContext parameterList(List<IParameterName> list) {
 		text("(");
 
-		for (ParameterName parameter : list) {
+		for (IParameterName parameter : list) {
 			if (parameter.isPassedByReference() && parameter.getValueType().isValueType()) {
 				keyword("ref").space();
 			}

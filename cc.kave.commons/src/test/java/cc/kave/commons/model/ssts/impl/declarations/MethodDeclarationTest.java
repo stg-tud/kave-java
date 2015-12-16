@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -20,14 +20,14 @@ import com.google.common.collect.Lists;
 
 public class MethodDeclarationTest {
 
-	private MethodName _mA = CsMethodName.newMethodName("[T1,P1] [T2,P2].A()");
-	private MethodName _mB = CsMethodName.newMethodName("[T1,P1] [T2,P2].B()");
+	private IMethodName _mA = MethodName.newMethodName("[T1,P1] [T2,P2].A()");
+	private IMethodName _mB = MethodName.newMethodName("[T1,P1] [T2,P2].B()");
 
 	@Test
 	public void testDefaultValues() {
 		MethodDeclaration sut = new MethodDeclaration();
 
-		assertThat(CsMethodName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getName()));
 		assertThat(false, equalTo(sut.isEntryPoint()));
 		assertThat(new ArrayList<IMethodDeclaration>(), equalTo(sut.getBody()));
 		assertThat(0, not(equalTo(sut.hashCode())));

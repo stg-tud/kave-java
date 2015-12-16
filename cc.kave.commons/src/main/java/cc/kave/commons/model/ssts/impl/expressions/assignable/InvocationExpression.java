@@ -3,8 +3,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -14,12 +14,12 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class InvocationExpression implements IInvocationExpression {
 
 	private IVariableReference reference;
-	private MethodName methodName;
+	private IMethodName methodName;
 	private List<ISimpleExpression> parameters;
 
 	public InvocationExpression() {
 		this.reference = new VariableReference();
-		this.methodName = CsMethodName.UNKNOWN_NAME;
+		this.methodName = MethodName.UNKNOWN_NAME;
 		this.parameters = new ArrayList<>();
 	}
 
@@ -29,7 +29,7 @@ public class InvocationExpression implements IInvocationExpression {
 	}
 
 	@Override
-	public MethodName getMethodName() {
+	public IMethodName getMethodName() {
 		return this.methodName;
 	}
 
@@ -42,7 +42,7 @@ public class InvocationExpression implements IInvocationExpression {
 		this.reference = reference;
 	}
 
-	public void setMethodName(MethodName methodName) {
+	public void setMethodName(IMethodName methodName) {
 		this.methodName = methodName;
 	}
 

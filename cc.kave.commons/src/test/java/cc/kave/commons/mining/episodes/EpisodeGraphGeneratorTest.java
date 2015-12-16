@@ -26,10 +26,10 @@ import cc.kave.commons.mining.reader.EventMappingParser;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
@@ -215,25 +215,25 @@ public class EpisodeGraphGeneratorTest {
 		return e;
 	}
 
-	private static MethodName methodGeneralAPI(String name) {
-		TypeName declType = typeGeneralAPI("T");
-		TypeName retType = typeGeneralAPI("R");
+	private static IMethodName methodGeneralAPI(String name) {
+		ITypeName declType = typeGeneralAPI("T");
+		ITypeName retType = typeGeneralAPI("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
-	private static MethodName methodSpecificAPI(String name) {
-		TypeName declType = typeSpecificAPI("T");
-		TypeName retType = typeSpecificAPI("R");
+	private static IMethodName methodSpecificAPI(String name) {
+		ITypeName declType = typeSpecificAPI("T");
+		ITypeName retType = typeSpecificAPI("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
-	private static TypeName typeGeneralAPI(String name) {
-		return CsTypeName.newTypeName("System.namespace." + name + ", P");
+	private static ITypeName typeGeneralAPI(String name) {
+		return TypeName.newTypeName("System.namespace." + name + ", P");
 	}
 
-	private static TypeName typeSpecificAPI(String name) {
-		return CsTypeName.newTypeName("some.namespace." + name + ", P");
+	private static ITypeName typeSpecificAPI(String name) {
+		return TypeName.newTypeName("some.namespace." + name + ", P");
 	}
 }

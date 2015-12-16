@@ -6,9 +6,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.csharp.CsParameterName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -19,7 +19,7 @@ public class SSTPrintingContextTest {
 
 	private static void AssertTypeFormat(String expected, String typeIdentifier) {
 		SSTPrintingContext sut = new SSTPrintingContext();
-		Assert.assertEquals(expected, sut.type(CsTypeName.newTypeName(typeIdentifier)).toString());
+		Assert.assertEquals(expected, sut.type(TypeName.newTypeName(typeIdentifier)).toString());
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class SSTPrintingContextTest {
 
 	@Test
 	public void testParameterList_NoParameters() {
-		List<ParameterName> parameters = new ArrayList<>();
+		List<IParameterName> parameters = new ArrayList<>();
 		SSTPrintingContext sut = new SSTPrintingContext();
 		sut.parameterList(parameters);
 		Assert.assertEquals("()", sut.toString());
@@ -113,8 +113,8 @@ public class SSTPrintingContextTest {
 
 	@Test
 	public void testParameterList_OneParameter() {
-		List<ParameterName> parameters = new ArrayList<>();
-		parameters.add(CsParameterName.newParameterName("[A,P] p1"));
+		List<IParameterName> parameters = new ArrayList<>();
+		parameters.add(ParameterName.newParameterName("[A,P] p1"));
 		SSTPrintingContext sut = new SSTPrintingContext();
 		sut.parameterList(parameters);
 		Assert.assertEquals("(A p1)", sut.toString());
@@ -122,9 +122,9 @@ public class SSTPrintingContextTest {
 
 	@Test
 	public void testParameterList_MultipleParameters() {
-		List<ParameterName> parameters = new ArrayList<>();
-		parameters.add(CsParameterName.newParameterName("[A,P] p1"));
-		parameters.add(CsParameterName.newParameterName("[B,P] p2"));
+		List<IParameterName> parameters = new ArrayList<>();
+		parameters.add(ParameterName.newParameterName("[A,P] p1"));
+		parameters.add(ParameterName.newParameterName("[B,P] p2"));
 		SSTPrintingContext sut = new SSTPrintingContext();
 		sut.parameterList(parameters);
 		Assert.assertEquals("(A p1, B p2)", sut.toString());

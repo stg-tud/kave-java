@@ -5,9 +5,9 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
@@ -26,9 +26,9 @@ import com.google.common.collect.Lists;
 public class SSTUtilTest {
 	@Test
 	public void testDeclare() {
-		VariableDeclaration actual = (VariableDeclaration) SSTUtil.declare("a", CsTypeName.UNKNOWN_NAME);
+		VariableDeclaration actual = (VariableDeclaration) SSTUtil.declare("a", TypeName.UNKNOWN_NAME);
 		VariableDeclaration expected = new VariableDeclaration();
-		expected.setType(CsTypeName.UNKNOWN_NAME);
+		expected.setType(TypeName.UNKNOWN_NAME);
 		expected.setReference(ref("a"));
 
 		assertThat(expected, equalTo(actual));
@@ -165,15 +165,15 @@ public class SSTUtilTest {
 		return ref;
 	}
 
-	private static MethodName getMethod(String simpleName) {
+	private static IMethodName getMethod(String simpleName) {
 		String methodName = "[System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]." + simpleName + "()";
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
-	private static MethodName getStaticMethod(String simpleName) {
+	private static IMethodName getStaticMethod(String simpleName) {
 		String methodName = "static [System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]" + simpleName
 				+ "()";
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
 	private static ISimpleExpression varRefExpr(String id) {

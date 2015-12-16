@@ -1,24 +1,24 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
-import cc.kave.commons.model.names.EventName;
-import cc.kave.commons.model.names.csharp.CsEventName;
+import cc.kave.commons.model.names.IEventName;
+import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class EventDeclaration implements IEventDeclaration {
 
-	private EventName name;
+	private IEventName name;
 
 	public EventDeclaration() {
-		this.name = CsEventName.UNKNOWN_NAME;
+		this.name = EventName.UNKNOWN_NAME;
 	}
 
 	@Override
-	public EventName getName() {
+	public IEventName getName() {
 		return name;
 	}
 
-	public void setName(EventName name) {
+	public void setName(IEventName name) {
 		this.name = name;
 	}
 

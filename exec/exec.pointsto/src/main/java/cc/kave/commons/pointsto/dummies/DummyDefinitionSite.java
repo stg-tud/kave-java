@@ -12,42 +12,42 @@
  */
 package cc.kave.commons.pointsto.dummies;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.recommenders.usages.DefinitionSiteKind;
 
 public class DummyDefinitionSite {
 
 	private DefinitionSiteKind kind;
-	private MethodName method;
-	private FieldName field;
+	private IMethodName method;
+	private IFieldName field;
 	private int argIndex = -1;
 
 	private DummyDefinitionSite() {
 	}
 
-	public static DummyDefinitionSite byConstructor(MethodName method) {
+	public static DummyDefinitionSite byConstructor(IMethodName method) {
 		DummyDefinitionSite defSite = new DummyDefinitionSite();
 		defSite.setKind(DefinitionSiteKind.NEW);
 		defSite.setMethod(method);
 		return defSite;
 	}
 
-	public static DummyDefinitionSite byReturn(MethodName method) {
+	public static DummyDefinitionSite byReturn(IMethodName method) {
 		DummyDefinitionSite defSite = new DummyDefinitionSite();
 		defSite.setKind(DefinitionSiteKind.RETURN);
 		defSite.setMethod(method);
 		return defSite;
 	}
 
-	public static DummyDefinitionSite byField(FieldName field) {
+	public static DummyDefinitionSite byField(IFieldName field) {
 		DummyDefinitionSite defSite = new DummyDefinitionSite();
 		defSite.setKind(DefinitionSiteKind.FIELD);
 		defSite.setField(field);
 		return defSite;
 	}
 
-	public static DummyDefinitionSite byParam(MethodName method, int argIndex) {
+	public static DummyDefinitionSite byParam(IMethodName method, int argIndex) {
 		DummyDefinitionSite defSite = new DummyDefinitionSite();
 		defSite.setKind(DefinitionSiteKind.PARAM);
 		defSite.setMethod(method);
@@ -81,19 +81,19 @@ public class DummyDefinitionSite {
 		this.kind = kind;
 	}
 
-	public MethodName getMethod() {
+	public IMethodName getMethod() {
 		return method;
 	}
 
-	public void setMethod(MethodName method) {
+	public void setMethod(IMethodName method) {
 		this.method = method;
 	}
 
-	public FieldName getField() {
+	public IFieldName getField() {
 		return field;
 	}
 
-	public void setField(FieldName field) {
+	public void setField(IFieldName field) {
 		this.field = field;
 	}
 

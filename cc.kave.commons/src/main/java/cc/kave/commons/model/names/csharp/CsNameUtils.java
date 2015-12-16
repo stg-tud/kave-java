@@ -19,7 +19,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IParameterName;
 
 public class CsNameUtils {
 
@@ -79,8 +79,8 @@ public class CsNameUtils {
 		return (startOfParameters > 0 && identifier.charAt(startOfParameters + 1) != ')');
 	}
 
-	public static List<ParameterName> getParameterNames(String identifier) {
-		ArrayList<ParameterName> parameters = new ArrayList<ParameterName>();
+	public static List<IParameterName> getParameterNames(String identifier) {
+		ArrayList<IParameterName> parameters = new ArrayList<IParameterName>();
 		int endOfParameters = identifier.lastIndexOf(')');
 		boolean hasNoBrackets = endOfParameters == -1;
 
@@ -108,7 +108,7 @@ public class CsNameUtils {
 
 			int lengthOfSubstring = endOfParam - startOfParam;
 			String paramSubstring = identifier.substring(startOfParam, endOfParam);
-			parameters.add(CsParameterName.newParameterName(paramSubstring.trim()));
+			parameters.add(ParameterName.newParameterName(paramSubstring.trim()));
 		}
 
 		return parameters;

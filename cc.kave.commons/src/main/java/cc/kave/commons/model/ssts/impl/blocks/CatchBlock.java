@@ -3,19 +3,19 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.csharp.CsParameterName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 
 public class CatchBlock implements ICatchBlock {
 	private CatchBlockKind kind;
-	private ParameterName parameter;
+	private IParameterName parameter;
 	private List<IStatement> body;
 
 	public CatchBlock() {
-		this.parameter = CsParameterName.UNKNOWN_NAME;
+		this.parameter = ParameterName.UNKNOWN_NAME;
 		this.body = new ArrayList<>();
 		this.kind = CatchBlockKind.Default;
 	}
@@ -30,11 +30,11 @@ public class CatchBlock implements ICatchBlock {
 	}
 
 	@Override
-	public ParameterName getParameter() {
+	public IParameterName getParameter() {
 		return this.parameter;
 	}
 
-	public void setParameter(ParameterName parameter) {
+	public void setParameter(IParameterName parameter) {
 		this.parameter = parameter;
 	}
 

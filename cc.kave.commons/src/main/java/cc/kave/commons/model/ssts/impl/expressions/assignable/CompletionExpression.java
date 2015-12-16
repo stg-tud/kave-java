@@ -1,13 +1,13 @@
 package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class CompletionExpression implements ICompletionExpression {
 
-	private TypeName typeReference;
+	private ITypeName typeReference;
 	private IVariableReference objectReference;
 	private String token;
 
@@ -16,7 +16,7 @@ public class CompletionExpression implements ICompletionExpression {
 	}
 
 	@Override
-	public TypeName getTypeReference() {
+	public ITypeName getTypeReference() {
 		return this.typeReference;
 	}
 
@@ -30,7 +30,7 @@ public class CompletionExpression implements ICompletionExpression {
 		return token;
 	}
 
-	public void setTypeReference(TypeName typeReference) {
+	public void setTypeReference(ITypeName typeReference) {
 		this.typeReference = typeReference;
 	}
 

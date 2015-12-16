@@ -5,24 +5,24 @@ import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 
 public class TypeHierarchy implements ITypeHierarchy {
 
-	private TypeName element;
+	private ITypeName element;
 	@SerializedName("Extends")
 	private ITypeHierarchy _extends;
 	@SerializedName("Implements")
 	private Set<ITypeHierarchy> _implements;
 
 	public TypeHierarchy() {
-		this.element = CsTypeName.UNKNOWN_NAME;
+		this.element = TypeName.UNKNOWN_NAME;
 		this._implements = new HashSet<>();
 	}
 
 	public TypeHierarchy(String elementQualifiedName) {
-		this.element = CsTypeName.newTypeName(elementQualifiedName);
+		this.element = TypeName.newTypeName(elementQualifiedName);
 	}
 
 	public void setExtends(ITypeHierarchy _extends) {
@@ -33,12 +33,12 @@ public class TypeHierarchy implements ITypeHierarchy {
 		this._implements = _implements;
 	}
 
-	public void setElement(TypeName element) {
+	public void setElement(ITypeName element) {
 		this.element = element;
 	}
 
 	@Override
-	public TypeName getElement() {
+	public ITypeName getElement() {
 		return this.element;
 	}
 

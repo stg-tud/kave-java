@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.extraction;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;

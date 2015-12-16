@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.impl.references;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -9,11 +9,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class FieldReference implements IFieldReference {
 
 	private IVariableReference reference;
-	private FieldName fieldName;
+	private IFieldName fieldName;
 
 	public FieldReference() {
 		this.reference = new VariableReference();
-		this.fieldName = CsFieldName.UNKNOWN_NAME;
+		this.fieldName = FieldName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class FieldReference implements IFieldReference {
 	}
 
 	@Override
-	public FieldName getFieldName() {
+	public IFieldName getFieldName() {
 		return this.fieldName;
 	}
 
@@ -30,7 +30,7 @@ public class FieldReference implements IFieldReference {
 		this.reference = reference;
 	}
 
-	public void setFieldName(FieldName fieldName) {
+	public void setFieldName(IFieldName fieldName) {
 		this.fieldName = fieldName;
 	}
 

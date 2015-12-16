@@ -3,16 +3,16 @@ package cc.kave.commons.model.typeshapes;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 
 public interface IMethodHierarchy {
 	/// <summary>
 	/// The name of a method.
 	/// </summary>
 	@Nonnull
-	MethodName getElement();
+	IMethodName getElement();
 
-	void setElement(@Nonnull MethodName name);
+	void setElement(@Nonnull IMethodName name);
 
 	/// <summary>
 	/// The implementation of the enclosing method that is referred to by
@@ -20,9 +20,9 @@ public interface IMethodHierarchy {
 	/// <code>super.'methodName'(...)</code>.
 	/// </summary>
 	@Nullable
-	MethodName getSuper();
+	IMethodName getSuper();
 
-	void setSuper(MethodName name);
+	void setSuper(IMethodName name);
 
 	/// <summary>
 	/// The declarations of the enclosing method, i.e., the method names
@@ -31,9 +31,9 @@ public interface IMethodHierarchy {
 	/// </summary>
 
 	@Nullable
-	MethodName getFirst();
+	IMethodName getFirst();
 
-	void setFirst(MethodName name);
+	void setFirst(IMethodName name);
 
 	/// <summary>
 	/// Whether or not this is a hierarchy of a method that overrides or

@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.impl.references;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -9,11 +9,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class MethodReference implements IMethodReference {
 
 	private IVariableReference reference;
-	private MethodName methodName;
+	private IMethodName methodName;
 
 	public MethodReference() {
 		this.reference = new VariableReference();
-		this.methodName = CsMethodName.UNKNOWN_NAME;
+		this.methodName = MethodName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class MethodReference implements IMethodReference {
 	}
 
 	@Override
-	public MethodName getMethodName() {
+	public IMethodName getMethodName() {
 		return this.methodName;
 	}
 
@@ -57,7 +57,7 @@ public class MethodReference implements IMethodReference {
 		return true;
 	}
 
-	public void setMethodName(MethodName name) {
+	public void setMethodName(IMethodName name) {
 		this.methodName = name;
 	}
 

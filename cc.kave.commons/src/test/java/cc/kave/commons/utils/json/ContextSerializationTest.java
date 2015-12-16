@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.utils.json.JsonUtils;
 
@@ -35,7 +35,7 @@ public class ContextSerializationTest {
 	private static Context getExampleContext() {
 		Context context = new Context();
 		SST sst = new SST();
-		sst.setEnclosingType(CsTypeName.newTypeName("T,P"));
+		sst.setEnclosingType(TypeName.newTypeName("T,P"));
 		context.setSST(sst);
 		return context;
 	}

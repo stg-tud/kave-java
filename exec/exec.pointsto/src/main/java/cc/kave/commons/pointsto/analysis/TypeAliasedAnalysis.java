@@ -18,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 
 /**
@@ -32,7 +32,7 @@ public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
 	@Override
 	public PointsToContext compute(Context context) {
 		TypeCollector typeCollector = new TypeCollector(context);
-		for (TypeName type : typeCollector.getTypes()) {
+		for (ITypeName type : typeCollector.getTypes()) {
 			QueryContextKey key = new QueryContextKey(null, null, type, null);
 			contextToLocations.put(key, new AbstractLocation());
 		}

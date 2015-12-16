@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
@@ -26,7 +26,7 @@ public class InvocationExpressionTest extends SSTBaseTest {
 		InvocationExpression sut = new InvocationExpression();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(CsMethodName.UNKNOWN_NAME, equalTo(sut.getMethodName()));
+		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getMethodName()));
 		assertThat(new ArrayList<ISimpleExpression>(), equalTo(sut.getParameters()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));

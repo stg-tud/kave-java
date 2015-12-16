@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -29,14 +29,14 @@ public class SSTBuilder {
 		return varRef;
 	}
 
-	public static IFieldReference fieldReference(FieldName field) {
+	public static IFieldReference fieldReference(IFieldName field) {
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setReference(variableReference(LanguageOptions.getInstance().getThisName()));
 		fieldRef.setFieldName(field);
 		return fieldRef;
 	}
 
-	public static IPropertyReference propertyReference(PropertyName property) {
+	public static IPropertyReference propertyReference(IPropertyName property) {
 		PropertyReference propertyRef = new PropertyReference();
 		propertyRef.setReference(variableReference(LanguageOptions.getInstance().getThisName()));
 		propertyRef.setPropertyName(property);

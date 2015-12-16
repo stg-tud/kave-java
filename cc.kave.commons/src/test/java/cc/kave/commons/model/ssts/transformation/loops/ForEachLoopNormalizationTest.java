@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
@@ -43,7 +43,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 	public void testIteratorDeclaration() {
 		IVariableReference loopedReference = SSTUtil.variableReference("collection");
 		VariableDeclaration declaration = new VariableDeclaration();
-		TypeName elementType = CsTypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
+		ITypeName elementType = TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
 		declaration.setType(elementType);
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setDeclaration(declaration);
@@ -55,9 +55,9 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		assertTrue(normalized.get(0) instanceof IVariableDeclaration);
 
 		IVariableDeclaration iteratorDecl = (IVariableDeclaration) normalized.get(0);
-		TypeName iteratorType = iteratorDecl.getType();
+		ITypeName iteratorType = iteratorDecl.getType();
 		assertTrue(iteratorType.hasTypeParameters());
-		List<TypeName> typeParameters = iteratorType.getTypeParameters();
+		List<ITypeName> typeParameters = iteratorType.getTypeParameters();
 		assertEquals(1, typeParameters.size());
 		assertEquals(elementType, typeParameters.get(0).getTypeParameterType());
 	}
@@ -86,7 +86,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 	@Test
 	public void testElementDeclaration() {
 		VariableDeclaration declaration = new VariableDeclaration();
-		TypeName elementType = CsTypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
+		ITypeName elementType = TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
 		declaration.setType(elementType);
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setDeclaration(declaration);

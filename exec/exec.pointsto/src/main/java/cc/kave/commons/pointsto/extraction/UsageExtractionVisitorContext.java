@@ -21,12 +21,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -54,7 +54,7 @@ public class UsageExtractionVisitorContext {
 
 	private PointerAnalysis pointerAnalysis;
 	private TypeCollector typeCollector;
-	private TypeName enclosingClass;
+	private ITypeName enclosingClass;
 
 	private Map<AbstractLocation, DummyUsage> locationUsages = new HashMap<>();
 
@@ -77,7 +77,7 @@ public class UsageExtractionVisitorContext {
 		return new ArrayList<>(locationUsages.values());
 	}
 
-	public void setEntryPoint(MethodName method) {
+	public void setEntryPoint(IMethodName method) {
 		currentCallpath = new Callpath(method);
 		currentStatement = null;
 
@@ -89,7 +89,7 @@ public class UsageExtractionVisitorContext {
 		this.currentStatement = stmt;
 	}
 
-	public void enterNonEntryPoint(MethodName method) {
+	public void enterNonEntryPoint(IMethodName method) {
 		currentCallpath.enterMethod(method);
 	}
 
@@ -97,7 +97,7 @@ public class UsageExtractionVisitorContext {
 		currentCallpath.leaveMethod();
 	}
 
-	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, TypeName type) {
+	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, ITypeName type) {
 		QueryContextKey query = new QueryContextKey(reference, currentStatement, type, currentCallpath);
 		return pointerAnalysis.query(query);
 	}
@@ -115,13 +115,13 @@ public class UsageExtractionVisitorContext {
 		// super
 		DummyDefinitionSite superDefinition = DummyDefinitionSite.byThis();
 		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
-		TypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
+		ITypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
 		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
 			implicitDefinitions.put(location, superDefinition);
 		}
 
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
-			FieldName field = fieldDecl.getName();
+			IFieldName field = fieldDecl.getName();
 			DummyDefinitionSite fieldDefinition = DummyDefinitionSite.byField(field);
 			IReference fieldReference = SSTBuilder.fieldReference(field);
 			for (AbstractLocation location : queryPointerAnalysis(fieldReference, field.getValueType())) {
@@ -136,7 +136,7 @@ public class UsageExtractionVisitorContext {
 				continue;
 			}
 
-			PropertyName property = propertyDecl.getName();
+			IPropertyName property = propertyDecl.getName();
 			DummyDefinitionSite propertyDefinition = DummyDefinitionSite.byField(propertyToField(property));
 			IReference propertyRefernce = SSTBuilder.propertyReference(property);
 			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
@@ -149,12 +149,12 @@ public class UsageExtractionVisitorContext {
 
 	}
 
-	private FieldName propertyToField(PropertyName property) {
-		FieldName field = CsFieldName.newFieldName(property.getIdentifier());
+	private IFieldName propertyToField(IPropertyName property) {
+		IFieldName field = FieldName.newFieldName(property.getIdentifier());
 		return field;
 	}
 
-	private DummyUsage initializeUsage(TypeName type, AbstractLocation location) {
+	private DummyUsage initializeUsage(ITypeName type, AbstractLocation location) {
 		DummyUsage usage = new DummyUsage();
 
 		usage.setType(type);
@@ -170,7 +170,7 @@ public class UsageExtractionVisitorContext {
 		return usage;
 	}
 
-	private DummyUsage getOrCreateUsage(AbstractLocation location, TypeName type) {
+	private DummyUsage getOrCreateUsage(AbstractLocation location, ITypeName type) {
 		DummyUsage usage = locationUsages.get(location);
 		if (usage == null) {
 			usage = initializeUsage(type, location);
@@ -203,7 +203,7 @@ public class UsageExtractionVisitorContext {
 		}
 	}
 
-	public void registerParameter(MethodName method, ParameterName parameter, int argIndex) {
+	public void registerParameter(IMethodName method, IParameterName parameter, int argIndex) {
 		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
@@ -218,28 +218,28 @@ public class UsageExtractionVisitorContext {
 		}
 
 		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
+		ITypeName type = typeCollector.getType(assignStmt.getReference());
 		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstant();
 
 		updateDefinitions(query, newDefinition);
 	}
 
-	public void registerConstructor(MethodName method) {
+	public void registerConstructor(IMethodName method) {
 		if (!(currentStatement instanceof IAssignment)) {
 			LOGGER.log(Level.SEVERE, "Cannot register constructor definition site: target is no assignment");
 			return;
 		}
 
 		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
+		ITypeName type = typeCollector.getType(assignStmt.getReference());
 		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstructor(method);
 
 		updateDefinitions(query, newDefinition);
 	}
 
-	public void registerPotentialReturnDefinitionSite(MethodName method) {
+	public void registerPotentialReturnDefinitionSite(IMethodName method) {
 		if (currentStatement instanceof IExpressionStatement) {
 			// method called without saving returned value
 			return;
@@ -249,23 +249,23 @@ public class UsageExtractionVisitorContext {
 		}
 
 		IAssignment assignStmt = (IAssignment) currentStatement;
-		TypeName type = typeCollector.getType(assignStmt.getReference());
+		ITypeName type = typeCollector.getType(assignStmt.getReference());
 		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byReturn(method);
 
 		updateDefinitions(query, newDefinition);
 	}
 
-	public void registerParameterCallsite(MethodName method, IReference parameterExpr, int argIndex) {
-		TypeName type = typeCollector.getType(parameterExpr);
+	public void registerParameterCallsite(IMethodName method, IReference parameterExpr, int argIndex) {
+		ITypeName type = typeCollector.getType(parameterExpr);
 		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
 		DummyCallsite callsite = DummyCallsite.parameterCallsite(method, argIndex);
 
 		updateCallsites(query, callsite);
 	}
 
-	public void registerReceiverCallsite(MethodName method, IReference receiver) {
-		TypeName type = typeCollector.getType(receiver);
+	public void registerReceiverCallsite(IMethodName method, IReference receiver) {
+		ITypeName type = typeCollector.getType(receiver);
 		QueryContextKey query = new QueryContextKey(receiver, currentStatement, type, currentCallpath);
 		DummyCallsite callsite = DummyCallsite.receiverCallsite(method);
 

@@ -11,9 +11,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -28,7 +28,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class InliningContext {
 
-	public static final TypeName GOT_RESULT_TYPE = CsTypeName.newTypeName("Boolean");
+	public static final ITypeName GOT_RESULT_TYPE = TypeName.newTypeName("Boolean");
 	public static final String RESULT_NAME = "$result_";
 	public static final String RESULT_FLAG = "$gotNoResult_";
 
@@ -72,12 +72,12 @@ public class InliningContext {
 		scope.body.add(stmt);
 	}
 
-	private boolean checkCallTree(Set<MethodName> invocations, Map<MethodName, Set<MethodName>> calls,
-			HashSet<MethodName> met, IMethodDeclaration method) {
+	private boolean checkCallTree(Set<IMethodName> invocations, Map<IMethodName, Set<IMethodName>> calls,
+			HashSet<IMethodName> met, IMethodDeclaration method) {
 		if (met.size() == calls.size() || invocations == null) {
 			return false;
 		} else {
-			for (MethodName call : invocations) {
+			for (IMethodName call : invocations) {
 				if (met.contains(call)) {
 					continue;
 				}
@@ -175,9 +175,9 @@ public class InliningContext {
 
 	private Set<IMethodDeclaration> testForRecursiveCalls(Set<IMethodDeclaration> nonEntryPoints) {
 		Set<IMethodDeclaration> outputNonEntryPoints = new HashSet<>();
-		Map<MethodName, Set<MethodName>> calls = getMethodNamesOfInvocations(nonEntryPoints);
+		Map<IMethodName, Set<IMethodName>> calls = getMethodNamesOfInvocations(nonEntryPoints);
 		for (IMethodDeclaration method : nonEntryPoints) {
-			Set<MethodName> invocations = calls.get(method.getName());
+			Set<IMethodName> invocations = calls.get(method.getName());
 			if (invocations == null || invocations.contains(method.getName())
 					|| (!invocations.isEmpty() && checkCallTree(invocations, calls, Sets.newHashSet(), method))) {
 				addMethod(method);
@@ -188,11 +188,11 @@ public class InliningContext {
 		return outputNonEntryPoints;
 	}
 
-	private Map<MethodName, Set<MethodName>> getMethodNamesOfInvocations(Set<IMethodDeclaration> nonEntryPoints) {
-		Map<MethodName, Set<MethodName>> calls = new HashMap<>();
-		Set<MethodName> removeList = new HashSet<>();
+	private Map<IMethodName, Set<IMethodName>> getMethodNamesOfInvocations(Set<IMethodDeclaration> nonEntryPoints) {
+		Map<IMethodName, Set<IMethodName>> calls = new HashMap<>();
+		Set<IMethodName> removeList = new HashSet<>();
 		for (IMethodDeclaration method : nonEntryPoints) {
-			Set<MethodName> context = new HashSet<>();
+			Set<IMethodName> context = new HashSet<>();
 			method.accept(new InvocationMethodNameVisitor(), context);
 			if (calls.containsKey(method.getName())) {
 				// Remove MethodDeclarations with duplicated names
@@ -200,7 +200,7 @@ public class InliningContext {
 			}
 			calls.put(method.getName(), context);
 		}
-		for (MethodName name : removeList) {
+		for (IMethodName name : removeList) {
 			calls.remove(name);
 		}
 		return calls;
@@ -304,7 +304,7 @@ public class InliningContext {
 		return inlinedMethods;
 	}
 
-	public IMethodDeclaration getNonEntryPoint(MethodName methodName) {
+	public IMethodDeclaration getNonEntryPoint(IMethodName methodName) {
 		for (IMethodDeclaration method : nonEntryPoints)
 			if (method.getName().equals(methodName))
 				return method;

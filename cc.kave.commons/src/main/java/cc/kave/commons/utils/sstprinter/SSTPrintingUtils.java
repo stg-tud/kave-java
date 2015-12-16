@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.NamespaceName;
-import cc.kave.commons.model.names.csharp.CsNamespaceName;
+import cc.kave.commons.model.names.INamespaceName;
+import cc.kave.commons.model.names.csharp.NamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 
 public class SSTPrintingUtils {
-	public static void formatAsUsingList(Set<NamespaceName> namespaces, SSTPrintingContext context) {
+	public static void formatAsUsingList(Set<INamespaceName> namespaces, SSTPrintingContext context) {
 		List<String> filteredNamespaceStrings = new ArrayList();
-		for (NamespaceName name : namespaces) {
-			if (!name.equals(CsNamespaceName.UNKNOWN_NAME)) {
+		for (INamespaceName name : namespaces) {
+			if (!name.equals(NamespaceName.UNKNOWN_NAME)) {
 				String s = name.getIdentifier().trim();
 				if (!s.isEmpty()) {
 					filteredNamespaceStrings.add(s);

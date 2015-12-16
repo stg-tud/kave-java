@@ -1,7 +1,7 @@
 package cc.kave.commons.model.ssts.impl.references;
 
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -9,11 +9,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class PropertyReference implements IPropertyReference {
 
 	private IVariableReference reference;
-	private PropertyName propertyName;
+	private IPropertyName propertyName;
 
 	public PropertyReference() {
 		this.reference = new VariableReference();
-		this.propertyName = CsPropertyName.UNKNOWN_NAME;
+		this.propertyName = PropertyName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class PropertyReference implements IPropertyReference {
 	}
 
 	@Override
-	public PropertyName getPropertyName() {
+	public IPropertyName getPropertyName() {
 		return this.propertyName;
 	}
 
@@ -30,7 +30,7 @@ public class PropertyReference implements IPropertyReference {
 		this.reference = reference;
 	}
 
-	public void setPropertyName(PropertyName propertyName) {
+	public void setPropertyName(IPropertyName propertyName) {
 		this.propertyName = propertyName;
 	}
 

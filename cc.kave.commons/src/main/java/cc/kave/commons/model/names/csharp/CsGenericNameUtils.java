@@ -19,7 +19,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 
 class CsGenericNameUtils {
 
@@ -29,8 +29,8 @@ class CsGenericNameUtils {
 	/// </summary>
 	/// <param name="fullNameOrSignature">Expected to contain a type-parameter
 	/// list.</param>
-	public static List<TypeName> parseTypeParameters(String fullNameOrSignature) {
-		ArrayList<TypeName> parameters = new ArrayList<TypeName>();
+	public static List<ITypeName> parseTypeParameters(String fullNameOrSignature) {
+		ArrayList<ITypeName> parameters = new ArrayList<ITypeName>();
 		int openBraces = 0;
 		int startIndex = fullNameOrSignature.indexOf('[') + 1;
 		for (int currentIndex = startIndex; currentIndex < fullNameOrSignature.length(); currentIndex++) {
@@ -43,7 +43,7 @@ class CsGenericNameUtils {
 
 				if (openBraces == 0) {
 					String descriptor = fullNameOrSignature.substring(startIndex + 1, currentIndex);
-					TypeName parameterTypeName = CsTypeName.newTypeName(descriptor);
+					ITypeName parameterTypeName = TypeName.newTypeName(descriptor);
 					parameters.add(parameterTypeName);
 					startIndex = fullNameOrSignature.indexOf('[', currentIndex);
 				}

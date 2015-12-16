@@ -20,25 +20,25 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
 
 public class Event {
 
 	// capital letters are necessary for JSON compatibility!
 	private EventKind Kind = EventKind.METHOD_DECLARATION;
-	private TypeName Type;
-	private MethodName Method;
+	private ITypeName Type;
+	private IMethodName Method;
 
 	public EventKind getKind() {
 		return Kind;
 	}
 
-	public TypeName getType() {
+	public ITypeName getType() {
 		return Type;
 	}
 
-	public MethodName getMethod() {
+	public IMethodName getMethod() {
 		return Method;
 	}
 
@@ -46,11 +46,11 @@ public class Event {
 		this.Kind = invocation;
 	}
 
-	public void setType(TypeName typeName) {
+	public void setType(ITypeName typeName) {
 		this.Type = typeName;
 	}
 
-	public void setMethod(MethodName methodName) {
+	public void setMethod(IMethodName methodName) {
 		this.Method = methodName;
 	}
 

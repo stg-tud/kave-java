@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
@@ -23,7 +23,7 @@ public class PropertyDeclarationTest {
 	public void testDefaultValues() {
 		PropertyDeclaration sut = new PropertyDeclaration();
 
-		assertThat(CsPropertyName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(PropertyName.UNKNOWN_NAME, equalTo(sut.getName()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getGet()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getSet()));
 		assertThat(0, not(equalTo(sut.hashCode())));
@@ -33,11 +33,11 @@ public class PropertyDeclarationTest {
 	@Test
 	public void testSettingValues() {
 		PropertyDeclaration sut = new PropertyDeclaration();
-		sut.setName(CsPropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		sut.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
 		sut.setGet(Lists.newArrayList(new ReturnStatement()));
 		sut.setSet(Lists.newArrayList(new ContinueStatement()));
 
-		assertThat(CsPropertyName.newPropertyName("[T1,P1] [T2,P2].Property"), equalTo(sut.getName()));
+		assertThat(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"), equalTo(sut.getName()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getGet()));
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getSet()));
 	}
@@ -55,8 +55,8 @@ public class PropertyDeclarationTest {
 	public void testEqualityReallyTheSame() {
 		PropertyDeclaration a = new PropertyDeclaration();
 		PropertyDeclaration b = new PropertyDeclaration();
-		a.setName(CsPropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
-		b.setName(CsPropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		a.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		b.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -66,7 +66,7 @@ public class PropertyDeclarationTest {
 	public void testEqualityDifferentType() {
 		PropertyDeclaration a = new PropertyDeclaration();
 		PropertyDeclaration b = new PropertyDeclaration();
-		a.setName(CsPropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		a.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

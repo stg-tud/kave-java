@@ -3,19 +3,19 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.LambdaName;
-import cc.kave.commons.model.names.csharp.CsLambdaName;
+import cc.kave.commons.model.names.ILambdaName;
+import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class LambdaExpression implements ILambdaExpression {
-	private LambdaName name;
+	private ILambdaName name;
 	private List<IStatement> body;
 
 	public LambdaExpression() {
 		this.body = new ArrayList<>();
-		this.name = CsLambdaName.UNKNOWN_NAME;
+		this.name = LambdaName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class LambdaExpression implements ILambdaExpression {
 		this.body = body;
 	}
 
-	public void setName(LambdaName name) {
+	public void setName(ILambdaName name) {
 		this.name = name;
 	}
 
@@ -68,7 +68,7 @@ public class LambdaExpression implements ILambdaExpression {
 	}
 
 	@Override
-	public LambdaName getName() {
+	public ILambdaName getName() {
 		return this.name;
 	}
 

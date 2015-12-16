@@ -3,13 +3,13 @@ package cc.kave.commons.model.ssts.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.LambdaName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.csharp.CsLambdaName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsParameterName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ILambdaName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.csharp.LambdaName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -28,7 +28,7 @@ public abstract class SSTBaseTest {
 
 	protected IVariableDeclaration someDeclaration(String type) {
 		VariableDeclaration decl = new VariableDeclaration();
-		decl.setType(CsTypeName.newTypeName(type + ",P1"));
+		decl.setType(TypeName.newTypeName(type + ",P1"));
 		return decl;
 	}
 
@@ -53,9 +53,9 @@ public abstract class SSTBaseTest {
 		return varRefs;
 	}
 
-	protected MethodName getMethod(String simpleName) {
+	protected IMethodName getMethod(String simpleName) {
 		String methodName = "[T1, P1] [T2, P2]" + simpleName + "()";
-		return CsMethodName.newMethodName(methodName);
+		return MethodName.newMethodName(methodName);
 	}
 
 	protected List<ISimpleExpression> refExprs(String[] ids) {
@@ -70,11 +70,11 @@ public abstract class SSTBaseTest {
 		return exprs;
 	}
 
-	protected ParameterName someParameter() {
-		return CsParameterName.newParameterName("[T,P] n");
+	protected IParameterName someParameter() {
+		return ParameterName.newParameterName("[T,P] n");
 	}
 
-	protected LambdaName someLambdaName() {
-		return CsLambdaName.newLambdaName("[T,P] ([T2,P2] p)");
+	protected ILambdaName someLambdaName() {
+		return LambdaName.newLambdaName("[T,P] ([T2,P2] p)");
 	}
 }

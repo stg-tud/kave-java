@@ -22,8 +22,8 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
 
 public class EventTest {
 
@@ -37,8 +37,8 @@ public class EventTest {
 
 	@Test
 	public void settingValues() {
-		TypeName typeName = mock(TypeName.class);
-		MethodName methodName = mock(MethodName.class);
+		ITypeName typeName = mock(ITypeName.class);
+		IMethodName methodName = mock(IMethodName.class);
 
 		Event sut = new Event();
 		sut.setKind(EventKind.INVOCATION);
@@ -60,8 +60,8 @@ public class EventTest {
 
 	@Test
 	public void equalityReallyTheSame() {
-		TypeName typeName = mock(TypeName.class);
-		MethodName methodName = mock(MethodName.class);
+		ITypeName typeName = mock(ITypeName.class);
+		IMethodName methodName = mock(IMethodName.class);
 
 		Event a = new Event();
 		a.setKind(EventKind.INVOCATION);
@@ -89,7 +89,7 @@ public class EventTest {
 	@Test
 	public void equalityDifferentType() {
 		Event a = new Event();
-		a.setType(mock(TypeName.class));
+		a.setType(mock(ITypeName.class));
 		Event b = new Event();
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
@@ -98,7 +98,7 @@ public class EventTest {
 	@Test
 	public void equalityDifferentMethod() {
 		Event a = new Event();
-		a.setMethod(mock(MethodName.class));
+		a.setMethod(mock(IMethodName.class));
 		Event b = new Event();
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());

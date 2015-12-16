@@ -6,18 +6,15 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.references.MethodReference;
-import cc.kave.commons.model.ssts.impl.references.MethodReference;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
 
 public class MethodReferenceTest extends SSTBaseTest {
 
-	private static MethodName someMethod() {
-		return CsMethodName.newMethodName("[T1,P1] [T2,P2].E()");
+	private static IMethodName someMethod() {
+		return MethodName.newMethodName("[T1,P1] [T2,P2].E()");
 	}
 
 	@Test
@@ -25,7 +22,7 @@ public class MethodReferenceTest extends SSTBaseTest {
 		MethodReference sut = new MethodReference();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(CsMethodName.UNKNOWN_NAME, equalTo(sut.getMethodName()));
+		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getMethodName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}

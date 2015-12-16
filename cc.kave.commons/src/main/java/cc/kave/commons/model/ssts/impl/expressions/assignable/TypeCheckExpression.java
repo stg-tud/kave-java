@@ -2,8 +2,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -13,11 +13,11 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class TypeCheckExpression implements ITypeCheckExpression {
 
 	private IVariableReference reference;
-	private TypeName type;
+	private ITypeName type;
 
 	public TypeCheckExpression() {
 		this.reference = new VariableReference();
-		this.type = CsTypeName.UNKNOWN_NAME;
+		this.type = TypeName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -26,11 +26,11 @@ public class TypeCheckExpression implements ITypeCheckExpression {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return this.type;
 	}
 
-	public void setType(TypeName type) {
+	public void setType(ITypeName type) {
 		this.type = type;
 	}
 

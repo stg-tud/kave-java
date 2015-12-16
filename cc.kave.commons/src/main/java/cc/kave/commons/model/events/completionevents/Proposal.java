@@ -22,16 +22,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.annotation.Nullable;
 
-import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.IName;
 
 public class Proposal implements IProposal {
-	public Name Name;
+	public IName Name;
 
 	@Nullable
 	public Integer Relevance;
 
 	@Override
-	public Name getName() {
+	public IName getName() {
 		return Name;
 	}
 

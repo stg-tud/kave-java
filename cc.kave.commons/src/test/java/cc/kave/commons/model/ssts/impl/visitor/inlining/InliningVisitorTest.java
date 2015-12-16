@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
@@ -659,7 +659,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testRefMethodKeyWord() {
-		MethodName name = CsMethodName.newMethodName("[?] [?].m2(ref [Integer] b)");
+		IMethodName name = MethodName.newMethodName("[?] [?].m2(ref [Integer] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -675,7 +675,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testOutMethodKeyWord() {
-		MethodName name = CsMethodName.newMethodName("[?] [?].m2(ref [Integer] b)");
+		IMethodName name = MethodName.newMethodName("[?] [?].m2(ref [Integer] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -691,7 +691,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testParamsMethodKeyWord() {
-		MethodName name = CsMethodName.newMethodName("[?] [?].m2(params [Integer] b)");
+		IMethodName name = MethodName.newMethodName("[?] [?].m2(params [Integer] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -805,7 +805,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testPreChangedNameInvocationStatement() {
-		MethodName name = CsMethodName.newMethodName("[?] [?].m2([?] b)");
+		IMethodName name = MethodName.newMethodName("[?] [?].m2([?] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -823,7 +823,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testDeclareAndAssignParameters() {
-		MethodName name = CsMethodName.newMethodName("[?] [?].m2([?] b)");
+		IMethodName name = MethodName.newMethodName("[?] [?].m2([?] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -926,7 +926,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testMultipleReturns() {
-		MethodName name = CsMethodName.newMethodName("[Void] [?].p1()");
+		IMethodName name = MethodName.newMethodName("[Void] [?].p1()");
 		ISST sst = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //

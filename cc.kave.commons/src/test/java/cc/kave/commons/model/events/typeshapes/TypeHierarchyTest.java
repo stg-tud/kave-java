@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 
@@ -24,7 +24,7 @@ public class TypeHierarchyTest {
 	@Test
 	public void testDefaultValues() {
 		TypeHierarchy sut = new TypeHierarchy();
-		assertThat(CsTypeName.UNKNOWN_NAME, equalTo(sut.getElement()));
+		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getElement()));
 		assertNull(sut.getExtends());
 		assertThat(new HashSet<ITypeHierarchy>(), equalTo(sut.getImplements()));
 		assertFalse(sut.hasSuperclass());
@@ -37,16 +37,16 @@ public class TypeHierarchyTest {
 	@Test
 	public void testDefaultValues_CustomConstructor() {
 		TypeHierarchy sut = new TypeHierarchy("T,P");
-		assertThat(CsTypeName.newTypeName("T,P"), equalTo(sut.getElement()));
+		assertThat(TypeName.newTypeName("T,P"), equalTo(sut.getElement()));
 	}
 
 	@Test
 	public void testSettingValues() {
 		TypeHierarchy sut = new TypeHierarchy();
-		sut.setElement(CsTypeName.newTypeName("T1,P1"));
+		sut.setElement(TypeName.newTypeName("T1,P1"));
 		sut.setExtends(someHierarchy("x"));
 		sut.setImplements(Sets.newHashSet(someHierarchy("y")));
-		assertThat(CsTypeName.newTypeName("T1,P1"), equalTo(sut.getElement()));
+		assertThat(TypeName.newTypeName("T1,P1"), equalTo(sut.getElement()));
 		assertThat(someHierarchy("x"), equalTo(sut.getExtends()));
 		assertThat(Sets.newHashSet(someHierarchy("y")), equalTo(sut.getImplements()));
 		assertTrue(sut.hasSuperclass());
@@ -65,11 +65,11 @@ public class TypeHierarchyTest {
 	@Test
 	public void testEquality_ReallyTheSame() {
 		TypeHierarchy a = new TypeHierarchy();
-		a.setElement(CsTypeName.newTypeName("T1,P1"));
+		a.setElement(TypeName.newTypeName("T1,P1"));
 		a.setExtends(someHierarchy("x"));
 		a.setImplements(Sets.newHashSet(someHierarchy("y")));
 		TypeHierarchy b = new TypeHierarchy();
-		b.setElement(CsTypeName.newTypeName("T1,P1"));
+		b.setElement(TypeName.newTypeName("T1,P1"));
 		b.setExtends(someHierarchy("x"));
 		b.setImplements(Sets.newHashSet(someHierarchy("y")));
 		assertThat(a, equalTo(b));
@@ -79,7 +79,7 @@ public class TypeHierarchyTest {
 	@Test
 	public void testEquality_DifferentElement() {
 		TypeHierarchy a = new TypeHierarchy();
-		a.setElement(CsTypeName.newTypeName("T1,P1"));
+		a.setElement(TypeName.newTypeName("T1,P1"));
 		TypeHierarchy b = new TypeHierarchy();
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
@@ -105,7 +105,7 @@ public class TypeHierarchyTest {
 
 	private static TypeHierarchy someHierarchy(String string) {
 		TypeHierarchy typeHierarchy = new TypeHierarchy();
-		typeHierarchy.setElement(CsTypeName.newTypeName(string + ",P"));
+		typeHierarchy.setElement(TypeName.newTypeName(string + ",P"));
 		return typeHierarchy;
 	}
 }

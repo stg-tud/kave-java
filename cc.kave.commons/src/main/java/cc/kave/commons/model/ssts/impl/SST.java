@@ -9,8 +9,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
@@ -21,7 +21,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class SST implements ISST {
 
-	private TypeName enclosingType;
+	private ITypeName enclosingType;
 	private String partialClassIdentifier;
 	private Set<IFieldDeclaration> fields;
 	private Set<IPropertyDeclaration> properties;
@@ -31,7 +31,7 @@ public class SST implements ISST {
 
 	public SST() {
 		this.partialClassIdentifier = "";
-		this.enclosingType = CsTypeName.UNKNOWN_NAME;
+		this.enclosingType = TypeName.UNKNOWN_NAME;
 		this.fields = new HashSet<IFieldDeclaration>();
 		this.properties = new HashSet<IPropertyDeclaration>();
 		this.methods = new HashSet<IMethodDeclaration>();
@@ -54,7 +54,7 @@ public class SST implements ISST {
 	}
 
 	@Override
-	public TypeName getEnclosingType() {
+	public ITypeName getEnclosingType() {
 		return this.enclosingType;
 	}
 
@@ -83,7 +83,7 @@ public class SST implements ISST {
 		return this.delegates;
 	}
 
-	public void setEnclosingType(TypeName enclosingType) {
+	public void setEnclosingType(ITypeName enclosingType) {
 		this.enclosingType = enclosingType;
 	}
 

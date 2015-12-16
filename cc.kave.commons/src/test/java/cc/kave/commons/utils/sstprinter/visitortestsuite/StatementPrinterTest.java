@@ -2,7 +2,7 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -91,7 +91,7 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void ExpressionStatement() {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setReference(SSTUtil.variableReference("this"));
-		invocation.setMethodName(CsMethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		invocation.setMethodName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		invocation.getParameters().add(constant("1"));
 
 		ExpressionStatement sst = new ExpressionStatement();

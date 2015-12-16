@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
@@ -19,7 +19,7 @@ public class TypeShapeTest {
 
 	private static TypeHierarchy someTypeHierarchy() {
 		TypeHierarchy typeHierarchy = new TypeHierarchy();
-		typeHierarchy.setElement(CsTypeName.newTypeName("T,P"));
+		typeHierarchy.setElement(TypeName.newTypeName("T,P"));
 		return typeHierarchy;
 	}
 

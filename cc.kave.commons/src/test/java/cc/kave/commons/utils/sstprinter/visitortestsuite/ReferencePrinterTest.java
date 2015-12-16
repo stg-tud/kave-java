@@ -3,10 +3,10 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsEventName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
+import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
@@ -26,7 +26,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void EventReference() {
 		EventReference sst = new EventReference();
-		sst.setEventName(CsEventName.newEventName("[EventType,P] [DeclaringType,P].E"));
+		sst.setEventName(EventName.newEventName("[EventType,P] [DeclaringType,P].E"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
 		AssertPrint(sst, "o.E");
@@ -35,7 +35,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void FieldReference() {
 		FieldReference sst = new FieldReference();
-		sst.setFieldName(CsFieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+		sst.setFieldName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
 		AssertPrint(sst, "o.F");
@@ -44,7 +44,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodReference() {
 		MethodReference sst = new MethodReference();
-		sst.setMethodName(CsMethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setMethodName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
 		AssertPrint(sst, "o.M");
@@ -53,7 +53,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyReference() {
 		PropertyReference sst = new PropertyReference();
-		sst.setPropertyName(CsPropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setPropertyName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
 		AssertPrint(sst, "o.P");

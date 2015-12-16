@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsParameterName;
+import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -19,7 +19,7 @@ public class CatchBlockTest extends SSTBaseTest {
 	public void testDefaultValues() {
 		CatchBlock sut = new CatchBlock();
 
-		assertThat(CsParameterName.UNKNOWN_NAME, equalTo(sut.getParameter()));
+		assertThat(ParameterName.UNKNOWN_NAME, equalTo(sut.getParameter()));
 		assertThat(Lists.newArrayList(), equalTo(sut.getBody()));
 		assertThat(CatchBlockKind.Default, equalTo(sut.getKind()));
 		assertThat(0, not(equalTo(sut.hashCode())));

@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -151,26 +151,26 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 		IVariableReference loopedReference = block.getLoopedReference();
 		IVariableDeclaration variableDeclaration = block.getDeclaration();
 		String variableName = variableDeclaration.getReference().getIdentifier();
-		TypeName variableType = variableDeclaration.getType();
+		ITypeName variableType = variableDeclaration.getType();
 
 		// normalize inner loops
 		List<IStatement> bodyNormalized = visit(block.getBody(), context);
 
 		// TODO distinction between Java / C#
 		// declare iterator
-		TypeName iteratorTypeName = CsTypeName
+		ITypeName iteratorTypeName = TypeName
 				.newTypeName("java.util.Iterator`1[[T -> " + variableType.getIdentifier() + "]], jre, 1.6");
 		IVariableDeclaration iteratorDecl = SSTUtil.declareVar("iterator", iteratorTypeName);
 
 		// initialize iterator
 		InvocationExpression invokeIterator = new InvocationExpression();
-		invokeIterator.setMethodName(CsMethodName.newMethodName("iterator"));
+		invokeIterator.setMethodName(MethodName.newMethodName("iterator"));
 		invokeIterator.setReference(loopedReference);
 		IStatement iteratorInit = SSTUtil.assign(iteratorDecl.getReference(), invokeIterator);
 
 		// create condition
 		InvocationExpression invokeHasNext = new InvocationExpression();
-		invokeHasNext.setMethodName(CsMethodName.newMethodName("hasNext"));
+		invokeHasNext.setMethodName(MethodName.newMethodName("hasNext"));
 		invokeHasNext.setReference(iteratorDecl.getReference());
 		ILoopHeaderBlockExpression condition = SSTUtil.loopHeader(SSTUtil.expr(invokeHasNext));
 
@@ -179,7 +179,7 @@ public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizat
 
 		// assign next element
 		InvocationExpression invokeNext = new InvocationExpression();
-		invokeNext.setMethodName(CsMethodName.newMethodName("next"));
+		invokeNext.setMethodName(MethodName.newMethodName("next"));
 		invokeNext.setReference(iteratorDecl.getReference());
 		IStatement elemAssign = SSTUtil.assign(elemDecl.getReference(), invokeNext);
 

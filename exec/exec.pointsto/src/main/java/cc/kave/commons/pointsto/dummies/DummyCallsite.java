@@ -12,20 +12,20 @@
  */
 package cc.kave.commons.pointsto.dummies;
 
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.recommenders.usages.CallSiteKind;
 
 public class DummyCallsite {
 
 	private CallSiteKind kind;
-	private MethodName method;
+	private IMethodName method;
 	private int argIndex = 0;
 
 	private DummyCallsite() {
 
 	}
 
-	public static DummyCallsite parameterCallsite(MethodName method, int argIndex) {
+	public static DummyCallsite parameterCallsite(IMethodName method, int argIndex) {
 		DummyCallsite callsite = new DummyCallsite();
 		callsite.setKind(CallSiteKind.PARAMETER);
 		callsite.setMethod(method);
@@ -33,7 +33,7 @@ public class DummyCallsite {
 		return callsite;
 	}
 
-	public static DummyCallsite receiverCallsite(MethodName method) {
+	public static DummyCallsite receiverCallsite(IMethodName method) {
 		DummyCallsite callsite = new DummyCallsite();
 		callsite.setKind(CallSiteKind.RECEIVER);
 		callsite.setMethod(method);
@@ -48,11 +48,11 @@ public class DummyCallsite {
 		this.kind = kind;
 	}
 
-	public MethodName getMethod() {
+	public IMethodName getMethod() {
 		return method;
 	}
 
-	public void setMethod(MethodName method) {
+	public void setMethod(IMethodName method) {
 		this.method = method;
 	}
 
