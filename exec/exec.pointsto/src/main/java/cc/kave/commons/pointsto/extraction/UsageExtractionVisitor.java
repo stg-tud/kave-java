@@ -34,67 +34,67 @@ import cc.kave.commons.pointsto.analysis.TraversingVisitor;
 
 public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVisitorContext, Void> {
 
-//	@Override
-//	public Void visit(IMethodDeclaration stmt, UsageExtractionVisitorContext context) {
-//		if (stmt.isEntryPoint()) {
-//			visitEntryPoint(stmt, context);
-//		} else {
-//			visitNonEntryPoint(stmt, context);
-//		}
-//
-//		return null;
-//	}
-//
-//	private void visitMethod(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
-//		MethodName method = methodDecl.getName();
-//		List<ParameterName> parameters = method.getParameters();
-//		for (int i = 0; i < parameters.size(); ++i) {
-//			context.registerParameter(method, parameters.get(i), i);
-//		}
-//
-//		visitStatements(methodDecl.getBody(), context);
-//	}
-//
-//	public void visitEntryPoint(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
-//		context.setEntryPoint(methodDecl.getName());
-//
-//		visitMethod(methodDecl, context);
-//	}
-//
-//	public void visitNonEntryPoint(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
-//		context.enterNonEntryPoint(methodDecl.getName());
-//		visitMethod(methodDecl, context);
-//		context.leaveNonEntryPoint();
-//	}
-//
-//	@Override
-//	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
-//		MethodName method = entity.getMethodName();
-//
-//		// static methods and constructors do not have any receiver objects
-//		if (!method.isStatic() && !method.isConstructor()) {
-//			context.registerReceiverCallsite(method, entity.getReference());
-//		}
-//
-//		for (int i = 0; i < entity.getParameters().size(); ++i) {
-//			ISimpleExpression parameterExpr = entity.getParameters().get(i);
-//
-//			// TODO ignore constant, null and unknown parameters?
-//			if (parameterExpr instanceof IReferenceExpression) {
-//				IReferenceExpression refExpr = (IReferenceExpression) parameterExpr;
-//				context.registerParameterCallsite(method, refExpr.getReference(), i);
-//			}
-//		}
-//
-//		if (method.isConstructor()) {
-//			context.registerConstructor(method);
-//		} else {
-//			context.registerPotentialReturnDefinitionSite(method);
-//		}
-//		// TODO what about definition by ref/out parameters?
-//
-//		return null;
-//	}
+	@Override
+	public Void visit(IMethodDeclaration stmt, UsageExtractionVisitorContext context) {
+		if (stmt.isEntryPoint()) {
+			visitEntryPoint(stmt, context);
+		} else {
+			visitNonEntryPoint(stmt, context);
+		}
+
+		return null;
+	}
+
+	private void visitMethod(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
+		MethodName method = methodDecl.getName();
+		List<ParameterName> parameters = method.getParameters();
+		for (int i = 0; i < parameters.size(); ++i) {
+			context.registerParameter(method, parameters.get(i), i);
+		}
+
+		visitStatements(methodDecl.getBody(), context);
+	}
+
+	public void visitEntryPoint(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
+		context.setEntryPoint(methodDecl.getName());
+
+		visitMethod(methodDecl, context);
+	}
+
+	public void visitNonEntryPoint(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
+		context.enterNonEntryPoint(methodDecl.getName());
+		visitMethod(methodDecl, context);
+		context.leaveNonEntryPoint();
+	}
+
+	@Override
+	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
+		MethodName method = entity.getMethodName();
+
+		// static methods and constructors do not have any receiver objects
+		if (!method.isStatic() && !method.isConstructor()) {
+			context.registerReceiverCallsite(method, entity.getReference());
+		}
+
+		for (int i = 0; i < entity.getParameters().size(); ++i) {
+			ISimpleExpression parameterExpr = entity.getParameters().get(i);
+
+			// TODO ignore constant, null and unknown parameters?
+			if (parameterExpr instanceof IReferenceExpression) {
+				IReferenceExpression refExpr = (IReferenceExpression) parameterExpr;
+				context.registerParameterCallsite(method, refExpr.getReference(), i);
+			}
+		}
+
+		if (method.isConstructor()) {
+			context.registerConstructor(method);
+		} else {
+			context.registerPotentialReturnDefinitionSite(method);
+		}
+		// TODO what about definition by ref/out parameters?
+
+		return null;
+	}
 
 	@Override
 	public Void visit(IAssignment stmt, UsageExtractionVisitorContext context) {

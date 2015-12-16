@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
-//import cc.recommenders.usages.CallSiteKind;
+import cc.recommenders.usages.CallSiteKind;
 
 /**
  * Dummy class to act as temporary Usage implementation.
@@ -74,24 +74,24 @@ public class DummyUsage {
 		callsites.add(callsite);
 	}
 
-//	public Set<DummyCallsite> getReceiverCallsites() {
-//		return Sets.filter(callsites, new Predicate<DummyCallsite>() {
-//
-//			@Override
-//			public boolean apply(DummyCallsite input) {
-//				return input.getKind() == CallSiteKind.RECEIVER;
-//			}
-//		});
-//	}
-//
-//	public Set<DummyCallsite> getParameterCallsites() {
-//		return Sets.filter(callsites, new Predicate<DummyCallsite>() {
-//
-//			@Override
-//			public boolean apply(DummyCallsite input) {
-//				return input.getKind() == CallSiteKind.PARAMETER;
-//			}
-//		});
-//	}
+	public Set<DummyCallsite> getReceiverCallsites() {
+		return Sets.filter(callsites, new Predicate<DummyCallsite>() {
+
+			@Override
+			public boolean apply(DummyCallsite input) {
+				return input.getKind() == CallSiteKind.RECEIVER;
+			}
+		});
+	}
+
+	public Set<DummyCallsite> getParameterCallsites() {
+		return Sets.filter(callsites, new Predicate<DummyCallsite>() {
+
+			@Override
+			public boolean apply(DummyCallsite input) {
+				return input.getKind() == CallSiteKind.PARAMETER;
+			}
+		});
+	}
 
 }
