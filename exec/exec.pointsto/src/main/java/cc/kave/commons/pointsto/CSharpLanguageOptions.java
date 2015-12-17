@@ -15,9 +15,6 @@ package cc.kave.commons.pointsto;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public class CSharpLanguageOptions extends LanguageOptions {

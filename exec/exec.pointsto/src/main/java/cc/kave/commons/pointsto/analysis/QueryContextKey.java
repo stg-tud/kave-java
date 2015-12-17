@@ -12,8 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import com.google.common.base.Objects;
-
+import com.google.common.base.MoreObjects;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
@@ -66,8 +65,8 @@ public class QueryContextKey {
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("reference", reference).add("stmt", stmt).add("type", type)
-				.add("callpath", callpath).toString();
+		return MoreObjects.toStringHelper(QueryContextKey.class).add("reference", reference).add("stmt", stmt)
+				.add("type", type).add("callpath", callpath).toString();
 	}
 
 	@Override

@@ -15,6 +15,7 @@ package cc.kave.commons.pointsto.dummies;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
@@ -92,6 +93,12 @@ public class DummyUsage {
 				return input.getKind() == CallSiteKind.PARAMETER;
 			}
 		});
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DummyUsage.class).add("type", type).add("definitionSite", definitionSite)
+				.add("callsites", callsites).toString();
 	}
 
 }

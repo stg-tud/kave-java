@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.dummies;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.recommenders.usages.DefinitionSiteKind;
@@ -103,6 +105,11 @@ public class DummyDefinitionSite {
 
 	public void setArgIndex(int argIndex) {
 		this.argIndex = argIndex;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DummyDefinitionSite.class).add("kind", kind).toString();
 	}
 
 }

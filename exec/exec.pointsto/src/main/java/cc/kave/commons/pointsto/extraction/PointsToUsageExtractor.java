@@ -73,7 +73,7 @@ public class PointsToUsageExtractor {
 			contextUsages.addAll(processedUsages);
 
 			LOGGER.log(Level.INFO,
-					"Extracted " + processedUsages.size() + " usages from " + methodDecl.getName().getIdentifier());
+					"Extracted " + processedUsages.size() + " usages from " + methodDecl.getName().getSignature());
 			collector.onEntryPointUsagesExtracted(methodDecl, processedUsages);
 		}
 

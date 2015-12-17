@@ -12,7 +12,9 @@
  */
 package cc.kave.commons.pointsto.dummies;
 
+import com.google.common.base.MoreObjects;
 import cc.kave.commons.model.names.IMethodName;
+
 import cc.recommenders.usages.CallSiteKind;
 
 public class DummyCallsite {
@@ -62,6 +64,11 @@ public class DummyCallsite {
 
 	public void setArgIndex(int argIndex) {
 		this.argIndex = argIndex;
+	}
+	
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DummyCallsite.class).add("kind", kind).toString();
 	}
 
 }
