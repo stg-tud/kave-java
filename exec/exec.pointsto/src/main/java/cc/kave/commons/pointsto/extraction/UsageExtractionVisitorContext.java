@@ -65,7 +65,7 @@ public class UsageExtractionVisitorContext {
 
 	public UsageExtractionVisitorContext(PointsToContext context) {
 		this.pointerAnalysis = context.getPointerAnalysis();
-		this.enclosingClass = context.getSST().getEnclosingType();
+		this.enclosingClass = context.getTypeShape().getTypeHierarchy().getElement();
 		this.typeCollector = new TypeCollector(context);
 
 		this.currentStatement = null;
@@ -226,7 +226,10 @@ public class UsageExtractionVisitorContext {
 	}
 
 	public void registerConstructor(IMethodName method) {
-		if (!(currentStatement instanceof IAssignment)) {
+		if (currentStatement instanceof IExpressionStatement) {
+			// constructed object is not assigned to any variable
+			return;
+		} else if (!(currentStatement instanceof IAssignment)) {
 			LOGGER.log(Level.SEVERE, "Cannot register constructor definition site: target is no assignment");
 			return;
 		}

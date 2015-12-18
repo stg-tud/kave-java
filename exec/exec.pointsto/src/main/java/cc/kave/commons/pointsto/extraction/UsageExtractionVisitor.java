@@ -14,8 +14,12 @@ package cc.kave.commons.pointsto.extraction;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -33,6 +37,8 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.pointsto.analysis.TraversingVisitor;
 
 public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVisitorContext, Void> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UsageExtractionVisitorContext.class);
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, UsageExtractionVisitorContext context) {
@@ -70,6 +76,12 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 	@Override
 	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
 		MethodName method = entity.getMethodName();
+
+		// TODO replace with isUnknown once fixed
+		if (method.getIdentifier().equals("[?] [?].???()")) {
+			LOGGER.debug("Skipping unknown method call");
+			return null;
+		}
 
 		// static methods and constructors do not have any receiver objects
 		if (!method.isStatic() && !method.isConstructor()) {

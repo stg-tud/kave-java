@@ -28,6 +28,7 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
 		Collection<AbstractLocation> locations = contextToLocations.get(query);
+		
 		if (locations.isEmpty()) {
 			// conservative assumption: may point to any known location
 			Logger.getLogger(getClass().getName()).log(Level.WARNING,

@@ -43,7 +43,7 @@ public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
 		// assume that unknown types may point to any known location
-		if (query.getType().isUnknown()) {
+		if (query.getType() != null && query.getType().isUnknown()) {
 			LOGGER.log(Level.FINE, "Queried for an unknown type");
 			return new HashSet<>(contextToLocations.values());
 		}
