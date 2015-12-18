@@ -26,7 +26,7 @@ import cc.kave.commons.model.episodes.QueryConfigurations;
 public class QueryGenerator {
 
 	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Episode> allMethods,
-			QueryConfigurations configuration) throws Exception {
+			QueryConfigurations configuration) {
 		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
 
 		for (Episode episode : allMethods) {
@@ -39,20 +39,29 @@ public class QueryGenerator {
 					md = true;
 					sublistLengths = removeOneByOne(episode.getNumEvents() - 1);
 					queries = removeInvocations(episode, sublistLengths, md);
-				} else if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEBYPERCENTAGE)) {
+					generatedQueries.put(episode, queries);
+					continue;
+				}
+				if (configuration.equals(QueryConfigurations.INCLUDEMD_REMOVEBYPERCENTAGE)) {
 					md = true;
 					sublistLengths = removeByPercentage(episode.getNumEvents() - 1);
 					queries = removeInvocations(episode, sublistLengths, md);
-				} else if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEONEBYONE)) {
+					generatedQueries.put(episode, queries);
+					continue;
+				}
+			}
+			if (episode.getNumEvents() > 2) {
+				if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEONEBYONE)) {
 					sublistLengths = removeOneByOne(episode.getNumEvents() - 1);
 					queries = removeInvocations(episode, sublistLengths, md);
-				} else if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEBYPERCENTAGE)) {
+					generatedQueries.put(episode, queries);
+					continue;
+				}
+				if (configuration.equals(QueryConfigurations.REMOVEMD_REMOVEBYPERCENTAGE)) {
 					sublistLengths = removeByPercentage(episode.getNumEvents() - 1);
 					queries = removeInvocations(episode, sublistLengths, md);
-				} else {
-					throw new Exception("Specify valid query configuration porameter!");
+					generatedQueries.put(episode, queries);
 				}
-				generatedQueries.put(episode, queries);
 			}
 		}
 		return generatedQueries;
@@ -86,23 +95,6 @@ public class QueryGenerator {
 		Map<Integer, List<Episode>> results = new HashMap<Integer, List<Episode>>();
 		List<String> invocations = getInvocations(episode);
 
-		if (!md) {
-			List<Episode> allInvocations = new LinkedList<Episode>();
-			Episode maximalQuery = new Episode();
-			maximalQuery.setFrequency(1);
-			maximalQuery.setNumEvents(episode.getNumEvents() - 1);
-			for (int idx = 1; idx < episode.getNumEvents(); idx++) {
-				maximalQuery.addFact(episode.get(idx).getRawFact());
-			}
-			if (maximalQuery.getNumEvents() > 1) {
-				for (int idx = 1; idx < maximalQuery.getNumEvents(); idx++) {
-					maximalQuery
-							.addFact(maximalQuery.get(idx - 1).getRawFact() + ">" + maximalQuery.get(idx).getRawFact());
-				}
-			}
-			allInvocations.add(maximalQuery);
-			results.put(0, allInvocations);
-		}
 		for (int remove : subsets) {
 			List<List<String>> allQueries = subsetsGenerator(invocations, invocations.size() - remove);
 			List<Episode> queryLevel = new LinkedList<Episode>();
@@ -120,6 +112,17 @@ public class QueryGenerator {
 			minimalQuery.addFact(episode.get(0).getRawFact());
 			removeAllInvocations.add(minimalQuery);
 			results.put(invocations.size(), removeAllInvocations);
+		}
+		if (!md && (subsets.get(subsets.size() - 1) != episode.getNumEvents() - 2)) {
+			List<Episode> removeMost = new LinkedList<Episode>();
+			for (int idx = 1; idx < episode.getNumEvents(); idx++) {
+				Episode minimalQuery = new Episode();
+				minimalQuery.setFrequency(1);
+				minimalQuery.setNumEvents(1);
+				minimalQuery.addFact(episode.get(idx).getRawFact());
+				removeMost.add(minimalQuery);
+			}
+			results.put(episode.getNumEvents() - 2, removeMost);
 		}
 		return results;
 	}
@@ -147,7 +150,7 @@ public class QueryGenerator {
 		return removeInvocations;
 	}
 
-	private static List<List<String>> subsetsGenerator(List<String> array, int subsetLength) {
+	public List<List<String>> subsetsGenerator(List<String> array, int subsetLength) {
 		int N = array.size();
 		List<List<String>> results = new LinkedList<List<String>>();
 

@@ -35,41 +35,41 @@ public class QueryGeneratorTest {
 	
 	@Before
 	public void setup() {
-		allMethods.add(createEpisode("a", "b"));
-		allMethods.add(createEpisode("a"));
-		allMethods.add(createEpisode("a", "b", "c", "d"));
+		allMethods.add(createEpisodeFromStrings("a", "b"));
+		allMethods.add(createEpisodeFromStrings("a"));
+		allMethods.add(createEpisodeFromStrings("a", "b", "c", "d"));
 		
 		sut = new QueryGenerator();
 	}
 
 	@Test
-	public void configuration1Test() throws Exception {
+	public void configuration1Test() {
 		Map<Episode, Map<Integer, List<Episode>>> expected = new HashMap<Episode, Map<Integer, List<Episode>>>();
 		
 		Map<Integer, List<Episode>> episodeQueries = new HashMap<Integer, List<Episode>>();
 		List<Episode> queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a"));
+		queryLevel.add(createEpisodeFromStrings("a"));
 		episodeQueries.put(1, queryLevel);
-		expected.put(createEpisode("a", "b"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b"), episodeQueries);
 		
 		episodeQueries = new HashMap<Integer, List<Episode>>();
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b", "c"));
-		queryLevel.add(createEpisode("a", "b", "d"));
-		queryLevel.add(createEpisode("a", "c", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "d"));
 		episodeQueries.put(1, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b"));
-		queryLevel.add(createEpisode("a", "c"));
-		queryLevel.add(createEpisode("a", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b"));
+		queryLevel.add(createEpisodeFromStrings("a", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "d"));
 		episodeQueries.put(2, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a"));
+		queryLevel.add(createEpisodeFromStrings("a"));
 		episodeQueries.put(3, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d"), episodeQueries);
 		
 		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, QueryConfigurations.INCLUDEMD_REMOVEONEBYONE);
 		
@@ -77,33 +77,23 @@ public class QueryGeneratorTest {
 	}
 	
 	@Test
-	public void configuration3Test() throws Exception {
+	public void configuration3Test() {
 		Map<Episode, Map<Integer, List<Episode>>> expected = new HashMap<Episode, Map<Integer, List<Episode>>>();
 		
 		Map<Integer, List<Episode>> episodeQueries = new HashMap<Integer, List<Episode>>();
 		List<Episode> queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b"));
-		episodeQueries.put(0, queryLevel);
-		expected.put(createEpisode("a", "b"), episodeQueries);
-		
-		episodeQueries = new HashMap<Integer, List<Episode>>();
-		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c", "d"));
-		episodeQueries.put(0, queryLevel);
-		
-		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c"));
-		queryLevel.add(createEpisode("b", "d"));
-		queryLevel.add(createEpisode("c", "d"));
+		queryLevel.add(createEpisodeFromStrings("b", "c"));
+		queryLevel.add(createEpisodeFromStrings("b", "d"));
+		queryLevel.add(createEpisodeFromStrings("c", "d"));
 		episodeQueries.put(1, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b"));
-		queryLevel.add(createEpisode("c"));
-		queryLevel.add(createEpisode("d"));
+		queryLevel.add(createEpisodeFromStrings("b"));
+		queryLevel.add(createEpisodeFromStrings("c"));
+		queryLevel.add(createEpisodeFromStrings("d"));
 		episodeQueries.put(2, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d"), episodeQueries);
 		
 		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, QueryConfigurations.REMOVEMD_REMOVEONEBYONE);
 		
@@ -111,76 +101,76 @@ public class QueryGeneratorTest {
 	}
 	
 	@Test
-	public void configuration2Test() throws Exception {
-		allMethods.add(createEpisode("a", "b", "c", "d", "e", "f"));
+	public void configuration2Test() {
+		allMethods.add(createEpisodeFromStrings("a", "b", "c", "d", "e", "f"));
 		
 		Map<Episode, Map<Integer, List<Episode>>> expected = new HashMap<Episode, Map<Integer, List<Episode>>>();
 		
 		Map<Integer, List<Episode>> episodeQueries = new HashMap<Integer, List<Episode>>();
 		List<Episode> queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a"));
+		queryLevel.add(createEpisodeFromStrings("a"));
 		episodeQueries.put(1, queryLevel);
-		expected.put(createEpisode("a", "b"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b"), episodeQueries);
 		
 		episodeQueries = new HashMap<Integer, List<Episode>>();
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b", "c"));
-		queryLevel.add(createEpisode("a", "b", "d"));
-		queryLevel.add(createEpisode("a", "c", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "d"));
 		episodeQueries.put(1, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b"));
-		queryLevel.add(createEpisode("a", "c"));
-		queryLevel.add(createEpisode("a", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b"));
+		queryLevel.add(createEpisodeFromStrings("a", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "d"));
 		episodeQueries.put(2, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a"));
+		queryLevel.add(createEpisodeFromStrings("a"));
 		episodeQueries.put(3, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d"), episodeQueries);
 		
 		episodeQueries = new HashMap<Integer, List<Episode>>();
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b", "c", "d"));
-		queryLevel.add(createEpisode("a", "b", "c", "e"));
-		queryLevel.add(createEpisode("a", "b", "d", "e"));
-		queryLevel.add(createEpisode("a", "c", "d", "e"));
-		queryLevel.add(createEpisode("a", "b", "c", "f"));
-		queryLevel.add(createEpisode("a", "b", "d", "f"));
-		queryLevel.add(createEpisode("a", "c", "d", "f"));
-		queryLevel.add(createEpisode("a", "b", "e", "f"));
-		queryLevel.add(createEpisode("a", "c", "e", "f"));
-		queryLevel.add(createEpisode("a", "d", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "d", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "d", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "d", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "d", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "d", "e", "f"));
 		episodeQueries.put(2, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b", "c"));
-		queryLevel.add(createEpisode("a", "b", "d"));
-		queryLevel.add(createEpisode("a", "c", "d"));
-		queryLevel.add(createEpisode("a", "b", "e"));
-		queryLevel.add(createEpisode("a", "c", "e"));
-		queryLevel.add(createEpisode("a", "d", "e"));
-		queryLevel.add(createEpisode("a", "b", "f"));
-		queryLevel.add(createEpisode("a", "c", "f"));
-		queryLevel.add(createEpisode("a", "d", "f"));
-		queryLevel.add(createEpisode("a", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "d", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "b", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "c", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "d", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "e", "f"));
 		episodeQueries.put(3, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a", "b"));
-		queryLevel.add(createEpisode("a", "c"));
-		queryLevel.add(createEpisode("a", "d"));
-		queryLevel.add(createEpisode("a", "e"));
-		queryLevel.add(createEpisode("a", "f"));
+		queryLevel.add(createEpisodeFromStrings("a", "b"));
+		queryLevel.add(createEpisodeFromStrings("a", "c"));
+		queryLevel.add(createEpisodeFromStrings("a", "d"));
+		queryLevel.add(createEpisodeFromStrings("a", "e"));
+		queryLevel.add(createEpisodeFromStrings("a", "f"));
 		episodeQueries.put(4, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("a"));
+		queryLevel.add(createEpisodeFromStrings("a"));
 		episodeQueries.put(5, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d", "e", "f"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d", "e", "f"), episodeQueries);
 		
 		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, QueryConfigurations.INCLUDEMD_REMOVEBYPERCENTAGE);
 		
@@ -188,83 +178,130 @@ public class QueryGeneratorTest {
 	}
 	
 	@Test
-	public void configuration4Test() throws Exception {
-		allMethods.add(createEpisode("a", "b", "c", "d", "e", "f"));
+	public void configuration4Test() {
+		allMethods.add(createEpisodeFromStrings("a", "b", "c", "d", "e", "f"));
+		allMethods.add(createEpisodeFromStrings("a", "b", "c", "d", "e", "f", "g", "h", "i"));
 		
 		Map<Episode, Map<Integer, List<Episode>>> expected = new HashMap<Episode, Map<Integer, List<Episode>>>();
-		
 		Map<Integer, List<Episode>> episodeQueries = new HashMap<Integer, List<Episode>>();
 		List<Episode> queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b"));
-		episodeQueries.put(0, queryLevel);
-		expected.put(createEpisode("a", "b"), episodeQueries);
-		
-		episodeQueries = new HashMap<Integer, List<Episode>>();
-		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c", "d"));
-		episodeQueries.put(0, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c"));
-		queryLevel.add(createEpisode("b", "d"));
-		queryLevel.add(createEpisode("c", "d"));
+		queryLevel.add(createEpisodeFromStrings("b", "c"));
+		queryLevel.add(createEpisodeFromStrings("b", "d"));
+		queryLevel.add(createEpisodeFromStrings("c", "d"));
 		episodeQueries.put(1, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b"));
-		queryLevel.add(createEpisode("c"));
-		queryLevel.add(createEpisode("d"));
+		queryLevel.add(createEpisodeFromStrings("b"));
+		queryLevel.add(createEpisodeFromStrings("c"));
+		queryLevel.add(createEpisodeFromStrings("d"));
 		episodeQueries.put(2, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d"), episodeQueries);
 		
 		episodeQueries = new HashMap<Integer, List<Episode>>();
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c", "d", "e", "f"));
-		episodeQueries.put(0, queryLevel);
-		
-		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c", "d"));
-		queryLevel.add(createEpisode("b", "c", "e"));
-		queryLevel.add(createEpisode("b", "d", "e"));
-		queryLevel.add(createEpisode("c", "d", "e"));
-		queryLevel.add(createEpisode("b", "c", "f"));
-		queryLevel.add(createEpisode("b", "d", "f"));
-		queryLevel.add(createEpisode("c", "d", "f"));
-		queryLevel.add(createEpisode("b", "e", "f"));
-		queryLevel.add(createEpisode("c", "e", "f"));
-		queryLevel.add(createEpisode("d", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("b", "c", "d"));
+		queryLevel.add(createEpisodeFromStrings("b", "c", "e"));
+		queryLevel.add(createEpisodeFromStrings("b", "d", "e"));
+		queryLevel.add(createEpisodeFromStrings("c", "d", "e"));
+		queryLevel.add(createEpisodeFromStrings("b", "c", "f"));
+		queryLevel.add(createEpisodeFromStrings("b", "d", "f"));
+		queryLevel.add(createEpisodeFromStrings("c", "d", "f"));
+		queryLevel.add(createEpisodeFromStrings("b", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("c", "e", "f"));
+		queryLevel.add(createEpisodeFromStrings("d", "e", "f"));
 		episodeQueries.put(2, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b", "c"));
-		queryLevel.add(createEpisode("b", "d"));
-		queryLevel.add(createEpisode("c", "d"));
-		queryLevel.add(createEpisode("b", "e"));
-		queryLevel.add(createEpisode("c", "e"));
-		queryLevel.add(createEpisode("d", "e"));
-		queryLevel.add(createEpisode("b", "f"));
-		queryLevel.add(createEpisode("c", "f"));
-		queryLevel.add(createEpisode("d", "f"));
-		queryLevel.add(createEpisode("e", "f"));
+		queryLevel.add(createEpisodeFromStrings("b", "c"));
+		queryLevel.add(createEpisodeFromStrings("b", "d"));
+		queryLevel.add(createEpisodeFromStrings("c", "d"));
+		queryLevel.add(createEpisodeFromStrings("b", "e"));
+		queryLevel.add(createEpisodeFromStrings("c", "e"));
+		queryLevel.add(createEpisodeFromStrings("d", "e"));
+		queryLevel.add(createEpisodeFromStrings("b", "f"));
+		queryLevel.add(createEpisodeFromStrings("c", "f"));
+		queryLevel.add(createEpisodeFromStrings("d", "f"));
+		queryLevel.add(createEpisodeFromStrings("e", "f"));
 		episodeQueries.put(3, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queryLevel.add(createEpisode("b"));
-		queryLevel.add(createEpisode("c"));
-		queryLevel.add(createEpisode("d"));
-		queryLevel.add(createEpisode("e"));
-		queryLevel.add(createEpisode("f"));
+		queryLevel.add(createEpisodeFromStrings("b"));
+		queryLevel.add(createEpisodeFromStrings("c"));
+		queryLevel.add(createEpisodeFromStrings("d"));
+		queryLevel.add(createEpisodeFromStrings("e"));
+		queryLevel.add(createEpisodeFromStrings("f"));
 		episodeQueries.put(4, queryLevel);
 		
-		expected.put(createEpisode("a", "b", "c", "d", "e", "f"), episodeQueries);
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d", "e", "f"), episodeQueries);
+		
+		List<String> episodeAsList = createList("b", "c", "d", "e", "f", "g", "h", "i");
+		episodeQueries = new HashMap<Integer, List<Episode>>();
+		queryLevel = new LinkedList<Episode>();
+		List<List<String>> queries = sut.subsetsGenerator(episodeAsList, 6);
+		for (List<String> q : queries) {
+			queryLevel.add(createEpisodeFromList(q));
+		}
+		episodeQueries.put(2, queryLevel);
+		
+		queryLevel = new LinkedList<Episode>();
+		queries = sut.subsetsGenerator(episodeAsList, 4);
+		for (List<String> q : queries) {
+			queryLevel.add(createEpisodeFromList(q));
+		}
+		episodeQueries.put(4, queryLevel);
+		
+		queryLevel = new LinkedList<Episode>();
+		queries = sut.subsetsGenerator(episodeAsList, 2);
+		for (List<String> q : queries) {
+			queryLevel.add(createEpisodeFromList(q));
+		}
+		episodeQueries.put(6, queryLevel);
+		
+		queryLevel = new LinkedList<Episode>();
+		queries = sut.subsetsGenerator(episodeAsList, 1);
+		for (List<String> q : queries) {
+			queryLevel.add(createEpisodeFromList(q));
+		}
+		episodeQueries.put(7, queryLevel);
+		
+		expected.put(createEpisodeFromStrings("a", "b", "c", "d", "e", "f", "g", "h", "i"), episodeQueries);
 		
 		Map<Episode, Map<Integer, List<Episode>>> actuals = sut.createQuery(allMethods, QueryConfigurations.REMOVEMD_REMOVEBYPERCENTAGE);
 		
 		Assert.assertEquals(expected, actuals);
 	}
 	
-	private Episode createEpisode(String ... strings) {
+	private List<String> createList(String ...strings) {
+		List<String> result = new LinkedList<String>();
+		for (String s : strings) {
+			result.add(s);
+		}
+		return result;
+	}
+	
+	private Episode createEpisodeFromList(List<String> query) {
+		Episode episode = new Episode();
+		episode.setFrequency(1);
+		episode.setNumEvents(query.size());
+		episode.addListOfFacts(query);
+		
+		String previousEvent = "";
+		
+		for (String event : query) {
+			if (previousEvent.isEmpty()) {
+				previousEvent = event;
+			} else {
+				episode.addFact(previousEvent + ">" + event);
+				previousEvent = event;
+			}
+		}
+		return episode;
+	}
+
+	private Episode createEpisodeFromStrings(String ... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(1);
 		episode.setNumEvents(strings.length);
