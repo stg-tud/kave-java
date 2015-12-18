@@ -42,4 +42,10 @@ public class CSharpLanguageOptions extends LanguageOptions {
 			return this.getTopClass();
 		}
 	}
+
+	@Override
+	public String getPropertyParameterName() {
+		return "value";
+	}
+
 }

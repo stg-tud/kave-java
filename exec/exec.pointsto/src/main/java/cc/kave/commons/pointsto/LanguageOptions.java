@@ -26,9 +26,11 @@ public abstract class LanguageOptions {
 	public abstract String getThisName();
 
 	public abstract String getSuperName();
-	
+
 	public abstract ITypeName getSuperType(ITypeHierarchy typeHierarchy);
-	
+
 	public abstract ITypeName getTopClass();
+
+	public abstract String getPropertyParameterName();
 
 }

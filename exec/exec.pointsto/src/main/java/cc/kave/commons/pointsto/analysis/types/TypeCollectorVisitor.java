@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.types;
 
+import cc.kave.commons.model.names.LambdaName;
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
@@ -24,10 +26,14 @@ import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.TraversingVisitor;
 
 public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitorContext, Void> {
@@ -37,6 +43,39 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 		context.enterMethod(stmt);
 		super.visit(stmt, context);
 		context.leaveMethod();
+
+		return null;
+	}
+
+	@Override
+	public Void visit(ILambdaExpression expr, TypeCollectorVisitorContext context) {
+		context.enterScope();
+		LambdaName lambda = expr.getName();
+		for (ParameterName parameter : lambda.getParameters()) {
+			context.declareParameter(parameter);
+		}
+		visitStatements(expr.getBody(), context);
+		context.leaveScope();
+
+		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyDeclaration stmt, TypeCollectorVisitorContext context) {
+		if (!stmt.getGet().isEmpty()) {
+			context.enterScope();
+			visitStatements(stmt.getGet(), context);
+			context.leaveScope();
+		}
+
+		if (!stmt.getSet().isEmpty()) {
+			context.enterScope();
+			IVariableDeclaration parameter = SSTUtil.declareVar(
+					LanguageOptions.getInstance().getPropertyParameterName(), stmt.getName().getValueType());
+			context.declareVariable(parameter);
+			visitStatements(stmt.getSet(), context);
+			context.leaveScope();
+		}
 
 		return null;
 	}

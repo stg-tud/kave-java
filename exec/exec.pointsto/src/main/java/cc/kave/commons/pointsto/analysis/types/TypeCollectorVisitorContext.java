@@ -107,7 +107,6 @@ public class TypeCollectorVisitorContext {
 			ITypeName type = varDecl.getType();
 			declare(varDecl.getReference().getIdentifier(), type);
 
-			// TODO
 			referenceTypes.put(varDecl.getReference(), type);
 		}
 	}
