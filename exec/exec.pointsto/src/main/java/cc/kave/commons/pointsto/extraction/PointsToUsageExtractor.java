@@ -14,8 +14,10 @@ package cc.kave.commons.pointsto.extraction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -27,7 +29,7 @@ import cc.recommenders.usages.DefinitionSiteKind;
 
 public class PointsToUsageExtractor {
 
-	private static final Logger LOGGER = Logger.getLogger(PointsToUsageExtractor.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageExtractor.class);
 
 	private UsageStatisticsCollector collector;
 
@@ -65,6 +67,7 @@ public class PointsToUsageExtractor {
 		List<DummyUsage> contextUsages = new ArrayList<>();
 		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
 		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context);
+		String className = context.getSST().getEnclosingType().getName();
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
 			visitor.visitEntryPoint(methodDecl, visitorContext);
 
@@ -72,14 +75,14 @@ public class PointsToUsageExtractor {
 			List<DummyUsage> processedUsages = processUsages(rawUsages, context.getTypeShape());
 			contextUsages.addAll(processedUsages);
 
-			LOGGER.log(Level.INFO,
-					"Extracted " + processedUsages.size() + " usages from " + methodDecl.getName().getSignature());
+			LOGGER.info("Extracted {} usages from {}:{}", processedUsages.size(), className,
+					methodDecl.getName().getName());
 			collector.onEntryPointUsagesExtracted(methodDecl, processedUsages);
 		}
 
 		return contextUsages;
 	}
-	
+
 	private List<DummyUsage> processUsages(List<DummyUsage> rawUsages, ITypeShape typeShape) {
 		List<DummyUsage> processedUsages = pruneUsages(rawUsages);
 		rewriteUsages(processedUsages, typeShape);

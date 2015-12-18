@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
@@ -48,7 +49,7 @@ import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class UsageExtractionVisitorContext {
 
-	private static final Logger LOGGER = Logger.getLogger(UsageExtractionVisitorContext.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(UsageExtractionVisitorContext.class);
 
 	private DefinitionSitePriorityComparator definitionSiteComparator = new DefinitionSitePriorityComparator();
 
@@ -213,7 +214,7 @@ public class UsageExtractionVisitorContext {
 
 	public void registerConstant(IConstantValueExpression constExpr) {
 		if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register constant definition site: target is no assignment");
+			LOGGER.error("Cannot register constant definition site: target is no assignment");
 			return;
 		}
 
@@ -230,7 +231,7 @@ public class UsageExtractionVisitorContext {
 			// constructed object is not assigned to any variable
 			return;
 		} else if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register constructor definition site: target is no assignment");
+			LOGGER.error("Cannot register constructor definition site: target is no assignment");
 			return;
 		}
 
@@ -247,7 +248,7 @@ public class UsageExtractionVisitorContext {
 			// method called without saving returned value
 			return;
 		} else if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.log(Level.SEVERE, "Cannot register return definition site: target is no assignment");
+			LOGGER.error("Cannot register return definition site: target is no assignment");
 			return;
 		}
 

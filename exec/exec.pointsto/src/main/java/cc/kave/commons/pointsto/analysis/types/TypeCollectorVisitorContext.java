@@ -15,8 +15,9 @@ package cc.kave.commons.pointsto.analysis.types;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
@@ -37,7 +38,7 @@ import cc.kave.commons.pointsto.ScopedMap;
 
 public class TypeCollectorVisitorContext {
 
-	private static final Logger LOGGER = Logger.getLogger(TypeCollectorVisitorContext.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(TypeCollectorVisitorContext.class);
 
 	private ScopedMap<String, ITypeName> symbolTable = new ScopedMap<>();
 
@@ -102,7 +103,7 @@ public class TypeCollectorVisitorContext {
 
 	public void declareVariable(IVariableDeclaration varDecl) {
 		if (varDecl.isMissing()) {
-			LOGGER.log(Level.SEVERE, "Cannot declare a missing variable");
+			LOGGER.error("Cannot declare a missing variable");
 		} else {
 			ITypeName type = varDecl.getType();
 			declare(varDecl.getReference().getIdentifier(), type);
@@ -113,7 +114,7 @@ public class TypeCollectorVisitorContext {
 
 	public void declareParameter(IParameterName parameter) {
 		if (parameter.isUnknown()) {
-			LOGGER.log(Level.SEVERE, "Cannot declare an unknown parameter");
+			LOGGER.error("Cannot declare an unknown parameter");
 		} else {
 			declare(parameter.getName(), parameter.getValueType());
 		}
@@ -121,13 +122,13 @@ public class TypeCollectorVisitorContext {
 
 	public void useVariableReference(IVariableReference reference) {
 		if (reference.isMissing()) {
-			LOGGER.log(Level.SEVERE, "Skipping a reference to a missing variable");
+			LOGGER.error("Skipping a reference to a missing variable");
 			return;
 		}
 
 		ITypeName type = symbolTable.get(reference.getIdentifier());
 		if (type == null) {
-			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown variable");
+			LOGGER.error("Skipping a reference to an unknown variable");
 		} else {
 			referenceTypes.put(reference, type);
 		}
@@ -136,7 +137,7 @@ public class TypeCollectorVisitorContext {
 	public void useFieldReference(IFieldReference reference) {
 		IFieldName field = reference.getFieldName();
 		if (field.isUnknown()) {
-			LOGGER.log(Level.SEVERE, "Skipping a reference to an unknown field");
+			LOGGER.error("Skipping a reference to an unknown field");
 		} else {
 			ITypeName type = field.getValueType();
 			referenceTypes.put(reference, type);
@@ -147,7 +148,7 @@ public class TypeCollectorVisitorContext {
 	public void usePropertyReference(IPropertyReference reference) {
 		IPropertyName property = reference.getPropertyName();
 		if (property.isUnknown()) {
-			LOGGER.log(Level.WARNING, "Skipping a reference to an unknown property");
+			LOGGER.error("Skipping a reference to an unknown property");
 		} else {
 			ITypeName type = property.getValueType();
 			referenceTypes.put(reference, type);

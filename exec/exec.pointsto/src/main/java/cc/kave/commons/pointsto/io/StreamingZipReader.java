@@ -17,11 +17,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.utils.json.JsonUtils;
 
@@ -49,7 +49,7 @@ public class StreamingZipReader {
 						builder.append(line);
 					}
 				} catch (IOException e) {
-					Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to process zip entry sream", e);
+					LoggerFactory.getLogger(StreamingZipReader.class).error("Failed to process zip entry sream", e);
 				}
 
 				return JsonUtils.fromJson(builder.toString(), targetType);

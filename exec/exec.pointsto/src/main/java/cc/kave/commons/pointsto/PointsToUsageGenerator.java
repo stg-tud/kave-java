@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 
@@ -38,7 +39,7 @@ import cc.recommenders.io.WritingArchive;
 public class PointsToUsageGenerator {
 
 	private static final String ZIP_FILE_ENDING = ".zip";
-	private static final Logger LOGGER = Logger.getLogger(PointsToUsageGenerator.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageGenerator.class);
 
 	private List<PointerAnalysisFactory> factories;
 
@@ -61,7 +62,7 @@ public class PointsToUsageGenerator {
 			try {
 				processZipFile(zipFile);
 			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE, "Failed to process zip " + zipFile.toString(), e);
+				LOGGER.error("Failed to process zip " + zipFile.toString(), e);
 			}
 		}
 
@@ -81,7 +82,7 @@ public class PointsToUsageGenerator {
 			File contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(inputFilename).toFile();
 			com.google.common.io.Files.createParentDirs(contextsFile);
 			annotatedContextWriters.put(factory, new WritingArchive(contextsFile));
-			
+
 			File usagesFile = usagesDestDir.resolve(factory.getName()).resolve(inputFilename).toFile();
 			com.google.common.io.Files.createParentDirs(usagesFile);
 			usageWriters.put(factory, new WritingArchive(usagesFile));
@@ -93,28 +94,26 @@ public class PointsToUsageGenerator {
 			for (PointerAnalysisFactory factory : this.factories) {
 				PointerAnalysis pa = factory.create();
 				PointsToContext ptContext = pa.compute(context);
-				
+
 				try {
-					//annotatedContextWriters.get(factory).add(ptContext);
+					// annotatedContextWriters.get(factory).add(ptContext);
 				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE,
-							"Failed to serialize an annotated context from " + inputFilename.toString(), e);
+					LOGGER.error("Failed to serialize an annotated context from " + inputFilename.toString(), e);
 				}
 
 				List<DummyUsage> extractedUsages = extractor.extract(ptContext);
 				for (DummyUsage usage : extractedUsages) {
 					try {
-						//usageWriters.get(factory).add(usage);
+						// usageWriters.get(factory).add(usage);
 					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE,
-								"Failed to serialize an extracted usage from " + inputFilename.toString(), e);
+						LOGGER.error("Failed to serialize an extracted usage from " + inputFilename.toString(), e);
 					}
 				}
 
 				usages.getOrDefault(factory, new ArrayList<>()).addAll(extractedUsages);
 			}
 		});
-		
+
 		// close writers
 		for (WritingArchive writer : Iterables.concat(annotatedContextWriters.values(), usageWriters.values())) {
 			writer.close();

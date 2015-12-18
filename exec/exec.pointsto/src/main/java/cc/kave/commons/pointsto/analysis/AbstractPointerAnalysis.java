@@ -15,8 +15,7 @@ package cc.kave.commons.pointsto.analysis;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -28,11 +27,11 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
 		Collection<AbstractLocation> locations = contextToLocations.get(query);
-		
+
 		if (locations.isEmpty()) {
 			// conservative assumption: may point to any known location
-			Logger.getLogger(getClass().getName()).log(Level.WARNING,
-					"Failed to find any matching entries for " + query.toString());
+			LoggerFactory.getLogger(AbstractPointerAnalysis.class).warn("Failed to find any matching entries for {}",
+					query);
 			locations = contextToLocations.values();
 		}
 

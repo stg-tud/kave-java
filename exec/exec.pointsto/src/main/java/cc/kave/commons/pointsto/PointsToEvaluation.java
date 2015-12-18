@@ -19,21 +19,22 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class PointsToEvaluation {
-	
-	private static final Logger LOGGER = Logger.getLogger(PointsToEvaluation.class.getName());
 
-	private static final Path SRC_PATH = Paths.get("E:\\Coding\\MT\\TestContexts");
+	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToEvaluation.class);
+
+	private static final Path SRC_PATH = Paths.get("E:\\Coding\\MT\\Contexts");
 	private static final Path CONTEXT_DEST = Paths.get("E:\\Coding\\MT\\annotatedContexts");
 	private static final Path USAGE_DEST = Paths.get("E:\\Coding\\MT\\Usages");
-	
+
 	public static void main(String[] args) {
 		new PointsToEvaluation()
 				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(TypeAliasedAnalysis.class)));
@@ -42,13 +43,14 @@ public class PointsToEvaluation {
 
 	private Map<PointerAnalysisFactory, List<DummyUsage>> generateUsages(List<PointerAnalysisFactory> factories) {
 		try {
-			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST, USAGE_DEST);
-			
+			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST,
+					USAGE_DEST);
+
 			return generator.getUsages();
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Error during usage generation", e);
+			LOGGER.error("Error during usage generation", e);
 		}
-		
+
 		return new HashMap<>();
 	}
 
