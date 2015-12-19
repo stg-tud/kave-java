@@ -120,6 +120,12 @@ public class TypeCollectorVisitorContext {
 		}
 	}
 
+	public void collectType(TypeName type) {
+		if (!type.isTypeParameter() && !type.isVoidType()) {
+			allTypes.add(type);
+		}
+	}
+
 	public void useVariableReference(IVariableReference reference) {
 		if (reference.isMissing()) {
 			LOGGER.error("Skipping a reference to a missing variable");

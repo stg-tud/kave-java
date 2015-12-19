@@ -68,7 +68,7 @@ public class ScopedMap<K, V> {
 
 	public void create(K key, V value) {
 		if (keyStack.getFirst().contains(key)) {
-			throw new IllegalArgumentException("Key does already exit in the current scope");
+			throw new IllegalArgumentException("Key does already exist in the current scope");
 		}
 
 		keyStack.getFirst().add(key);

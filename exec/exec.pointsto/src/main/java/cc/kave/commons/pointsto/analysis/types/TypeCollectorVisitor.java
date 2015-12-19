@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.types;
 
 import cc.kave.commons.model.names.LambdaName;
+import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -27,6 +28,7 @@ import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -199,6 +201,19 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 	public Void visit(IVariableDeclaration stmt, TypeCollectorVisitorContext context) {
 		context.declareVariable(stmt);
 		return null;
+	}
+	
+	@Override
+	public Void visit(IInvocationExpression entity, TypeCollectorVisitorContext context) {
+		MethodName method = entity.getMethodName();
+		context.collectType(method.getDeclaringType());
+		context.collectType(method.getReturnType());
+		
+		for (ParameterName parameter : method.getParameters()) {
+			context.collectType(parameter.getValueType());
+		}
+		
+		return super.visit(entity, context);
 	}
 
 	@Override
