@@ -30,11 +30,16 @@ public class run_me {
 
 	public static void main(String[] args) {
 		/* data preparation */
-		runContextBatchInlining();
+//		runContextBatchInlining();
 		// runConmpletionEventBatchInlining();
 
 		/* evaluation results */
 		// runSSTComparison();
+		runReadAllContexts();
+	}
+
+	private static void runReadAllContexts() {
+		new ReadAllContextsRunner().run(null, null, dirContexts);
 	}
 
 	private static void runContextBatchInlining() {

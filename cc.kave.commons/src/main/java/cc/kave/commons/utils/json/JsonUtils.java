@@ -74,6 +74,7 @@ import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
@@ -200,21 +201,35 @@ public abstract class JsonUtils {
 		registerHierarchy(gb, IAssignableReference.class, EventReference.class, FieldReference.class,
 				IndexAccessReference.class, PropertyReference.class, UnknownReference.class, VariableReference.class);
 		registerHierarchy(gb, IVariableReference.class, VariableReference.class);
+		registerHierarchy(gb, IIndexAccessExpression.class, IndexAccessExpression.class);
+
 		// Expressions
-		registerHierarchy(gb, IAssignableExpression.class, CompletionExpression.class, ComposedExpression.class,
-				IfElseExpression.class, InvocationExpression.class, LambdaExpression.class, UnknownExpression.class,
-				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class, UnaryExpression.class,
-				BinaryExpression.class, CastExpression.class, IndexAccessExpression.class, TypeCheckExpression.class);
-		registerHierarchy(gb, ISimpleExpression.class, UnknownExpression.class, ReferenceExpression.class,
-				NullExpression.class, ConstantValueExpression.class);
-		registerHierarchy(gb, ILoopHeaderExpression.class, LoopHeaderBlockExpression.class, UnknownExpression.class,
-				NullExpression.class, ConstantValueExpression.class, ReferenceExpression.class);
+		registerHierarchy(gb, IAssignableExpression.class,
+				// assignable
+				BinaryExpression.class, CastExpression.class, CompletionExpression.class, ComposedExpression.class,
+				IfElseExpression.class, IndexAccessExpression.class, InvocationExpression.class, LambdaExpression.class,
+				TypeCheckExpression.class, UnaryExpression.class,
+				// simple
+				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
+				UnknownExpression.class);
+
+		registerHierarchy(gb, ISimpleExpression.class, ConstantValueExpression.class, NullExpression.class,
+				ReferenceExpression.class, UnknownExpression.class);
+
+		registerHierarchy(gb, ILoopHeaderExpression.class,
+				// loop header
+				LoopHeaderBlockExpression.class,
+				// simple
+				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
+				UnknownExpression.class);
+
 		// Statements
 		registerHierarchy(gb, IStatement.class, Assignment.class, BreakStatement.class, ContinueStatement.class,
 				DoLoop.class, ExpressionStatement.class, ForEachLoop.class, ForLoop.class, GotoStatement.class,
 				IfElseBlock.class, LabelledStatement.class, LockBlock.class, ReturnStatement.class, SwitchBlock.class,
 				ThrowStatement.class, TryBlock.class, UncheckedBlock.class, UnknownStatement.class, UnsafeBlock.class,
-				UsingBlock.class, EventSubscriptionStatement.class, WhileLoop.class); // VariableDeclaration
+				UsingBlock.class, EventSubscriptionStatement.class, VariableDeclaration.class, WhileLoop.class);
+
 		registerHierarchy(gb, ICatchBlock.class, CatchBlock.class);
 		registerHierarchy(gb, ICaseBlock.class, CaseBlock.class);
 
@@ -239,8 +254,10 @@ public abstract class JsonUtils {
 		gb.registerTypeAdapter(CastOperator.class, EnumDeSerializer.create(CastOperator.values()));
 		gb.registerTypeAdapter(BinaryOperator.class, EnumDeSerializer.create(BinaryOperator.values()));
 		gb.registerTypeAdapter(UnaryOperator.class, EnumDeSerializer.create(UnaryOperator.values()));
+
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
+
 		gson = gb.create();
 	}
 

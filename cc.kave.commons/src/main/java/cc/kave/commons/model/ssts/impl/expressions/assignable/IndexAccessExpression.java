@@ -17,7 +17,7 @@ public class IndexAccessExpression implements IIndexAccessExpression {
 
 	public IndexAccessExpression() {
 		this.reference = new VariableReference();
-		this.indices = new ArrayList<>();
+		this.indices = new ArrayList<ISimpleExpression>();
 	}
 
 	@Override
