@@ -65,10 +65,10 @@ public class DummyCallsite {
 	public void setArgIndex(int argIndex) {
 		this.argIndex = argIndex;
 	}
-	
+
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DummyCallsite.class).add("kind", kind).toString();
+		return MoreObjects.toStringHelper(DummyCallsite.class).add("kind", kind).add("method", method).toString();
 	}
 
 }

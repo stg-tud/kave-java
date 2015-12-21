@@ -31,6 +31,7 @@ import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -54,7 +55,10 @@ public class UsageExtractionVisitorContext {
 	private DefinitionSitePriorityComparator definitionSiteComparator = new DefinitionSitePriorityComparator();
 
 	private PointerAnalysis pointerAnalysis;
+	private DescentStrategy descentStrategy;
 	private TypeCollector typeCollector;
+	private DeclarationMapper declarationMapper;
+
 	private ITypeName enclosingClass;
 
 	private Map<AbstractLocation, DummyUsage> locationUsages = new HashMap<>();
@@ -64,10 +68,12 @@ public class UsageExtractionVisitorContext {
 	private IStatement currentStatement;
 	private Callpath currentCallpath;
 
-	public UsageExtractionVisitorContext(PointsToContext context) {
+	public UsageExtractionVisitorContext(PointsToContext context, DescentStrategy descentStrategy) {
 		this.pointerAnalysis = context.getPointerAnalysis();
+		this.descentStrategy = descentStrategy;
 		this.enclosingClass = context.getTypeShape().getTypeHierarchy().getElement();
 		this.typeCollector = new TypeCollector(context);
+		this.declarationMapper = new DeclarationMapper(context);
 
 		this.currentStatement = null;
 		this.currentCallpath = null;
@@ -205,6 +211,12 @@ public class UsageExtractionVisitorContext {
 	}
 
 	public void registerParameter(IMethodName method, IParameterName parameter, int argIndex) {
+		// skip parameter definition if we are descending into other methods: do not overwrite the definition of the top
+		// most entry point method
+		if (currentCallpath.size() > 1) {
+			return;
+		}
+
 		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
@@ -289,6 +301,25 @@ public class UsageExtractionVisitorContext {
 		DummyCallsite callsite = DummyCallsite.receiverCallsite(method);
 
 		updateCallsites(query, callsite);
+	}
+
+	public void processDescent(IMethodName method, UsageExtractionVisitor visitor) {
+		IMethodDeclaration methodDecl = declarationMapper.get(method);
+		if (methodDecl != null && descentStrategy.descent(methodDecl, currentCallpath)) {
+			LOGGER.debug("Descending into {}", method.getName());
+			methodDecl.accept(visitor, this);
+		}
+	}
+
+	public void processDescent(IPropertyName property) {
+		IPropertyDeclaration propertyDecl = declarationMapper.get(property);
+		if (propertyDecl != null) {
+			if (!propertyDecl.getGet().isEmpty() || !propertyDecl.getSet().isEmpty()) {
+				if (descentStrategy.descent(propertyDecl, currentCallpath)) {
+					// TODO get or set statements?
+				}
+			}
+		}
 	}
 
 }

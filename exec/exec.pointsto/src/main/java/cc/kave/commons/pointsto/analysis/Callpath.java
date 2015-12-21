@@ -52,6 +52,14 @@ public class Callpath implements Iterable<IMethodName> {
 	public IMethodName getLast() {
 		return path.getLast();
 	}
+	
+	public boolean contains(MethodName method) {
+		return path.contains(method);
+	}
+	
+	public int size() {
+		return path.size();
+	}
 
 	@Override
 	public Iterator<IMethodName> iterator() {

@@ -29,6 +29,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
@@ -105,7 +106,18 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 		}
 		// TODO what about definition by ref/out parameters?
 
+		// descend into method if applicable
+		context.processDescent(method, this);
+
 		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyReference propertyRef, UsageExtractionVisitorContext context) {
+		// descend into property if applicable
+		context.processDescent(propertyRef.getPropertyName());
+
+		return super.visit(propertyRef, context);
 	}
 
 	@Override
