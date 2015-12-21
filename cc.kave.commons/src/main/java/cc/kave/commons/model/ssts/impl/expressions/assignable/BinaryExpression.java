@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -42,11 +40,11 @@ public class BinaryExpression implements IBinaryExpression {
 		this.operator = operator;
 	}
 
-	public void setLeftOperand(ConstantValueExpression leftOperand) {
+	public void setLeftOperand(ISimpleExpression leftOperand) {
 		this.leftOperand = leftOperand;
 	}
 
-	public void setRightOperand(ReferenceExpression rightOperand) {
+	public void setRightOperand(ISimpleExpression rightOperand) {
 		this.rightOperand = rightOperand;
 	}
 

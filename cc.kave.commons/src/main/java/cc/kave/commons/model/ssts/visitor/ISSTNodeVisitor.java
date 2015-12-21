@@ -96,7 +96,7 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 
 	TReturn visit(IIfElseBlock block, TContext context);
 
-	TReturn visit(ILockBlock stmt, TContext context);
+	TReturn visit(ILockBlock block, TContext context);
 
 	TReturn visit(ISwitchBlock block, TContext context);
 
@@ -111,15 +111,25 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 	TReturn visit(IWhileLoop block, TContext context);
 
 	// Expressions
-	TReturn visit(ICompletionExpression entity, TContext context);
+	TReturn visit(IBinaryExpression expr, TContext context);
+
+	TReturn visit(ICastExpression expr, TContext context);
+
+	TReturn visit(ICompletionExpression expr, TContext context);
 
 	TReturn visit(IComposedExpression expr, TContext context);
 
 	TReturn visit(IIfElseExpression expr, TContext context);
 
+	TReturn visit(IIndexAccessExpression expr, TContext context);
+
 	TReturn visit(IInvocationExpression entity, TContext context);
 
 	TReturn visit(ILambdaExpression expr, TContext context);
+
+	TReturn visit(ITypeCheckExpression expr, TContext context);
+
+	TReturn visit(IUnaryExpression expr, TContext context);
 
 	TReturn visit(ILoopHeaderBlockExpression expr, TContext context);
 
@@ -129,33 +139,23 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 
 	TReturn visit(IReferenceExpression expr, TContext context);
 
-	TReturn visit(ICastExpression expr, TContext context);
-
-	TReturn visit(IIndexAccessExpression expr, TContext context);
-
-	TReturn visit(ITypeCheckExpression expr, TContext context);
-
-	TReturn visit(IBinaryExpression indexAccessRef, TContext context);
-
-	TReturn visit(IUnaryExpression indexAccessRef, TContext context);
-
 	// References
-	TReturn visit(IEventReference eventRef, TContext context);
+	TReturn visit(IEventReference ref, TContext context);
 
-	TReturn visit(IFieldReference fieldRef, TContext context);
+	TReturn visit(IFieldReference ref, TContext context);
 
-	TReturn visit(IMethodReference methodRef, TContext context);
+	TReturn visit(IIndexAccessReference ref, TContext context);
 
-	TReturn visit(IPropertyReference methodRef, TContext context);
+	TReturn visit(IMethodReference ref, TContext context);
 
-	TReturn visit(IVariableReference varRef, TContext context);
+	TReturn visit(IPropertyReference ref, TContext context);
 
-	TReturn visit(IIndexAccessReference indexAccessRef, TContext context);
+	TReturn visit(IVariableReference ref, TContext context);
 
 	// unknowns
-	TReturn visit(IUnknownReference unknownRef, TContext context);
+	TReturn visit(IUnknownReference ref, TContext context);
 
-	TReturn visit(IUnknownExpression unknownExpr, TContext context);
+	TReturn visit(IUnknownExpression expr, TContext context);
 
-	TReturn visit(IUnknownStatement unknownStmt, TContext context);
+	TReturn visit(IUnknownStatement stmt, TContext context);
 }
