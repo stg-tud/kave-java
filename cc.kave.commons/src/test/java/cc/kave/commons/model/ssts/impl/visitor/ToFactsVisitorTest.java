@@ -1,0 +1,94 @@
+package cc.kave.commons.model.ssts.impl.visitor;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.episodes.Fact;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+
+public class ToFactsVisitorTest {
+
+	private List<Event> eventMapping;
+	private ToFactsVisitor sut;
+	private MethodDeclaration decl;
+
+	@Before
+	public void setup() {
+		eventMapping = Lists.newArrayList();
+		decl = new MethodDeclaration();
+
+		Event e = new Event();
+		e.setKind(EventKind.METHOD_DECLARATION);
+		e.setMethod(decl.getName());
+		eventMapping.add(e);
+
+		sut = new ToFactsVisitor(eventMapping);
+	}
+
+	@Test
+	public void happyPath() {
+		IStatement stmt1 = stmt(inv(1));
+		IStatement stmt2 = stmt(inv(2));
+
+		decl.getBody().add(stmt1);
+		decl.getBody().add(stmt2);
+
+		assertFacts(f(0), f(1), f(2), f(0, 1), f(0, 2), f(1, 2));
+
+	}
+
+	private IStatement stmt(IAssignableExpression expr) {
+		ExpressionStatement stmt = new ExpressionStatement();
+		stmt.setExpression(expr);
+		return stmt;
+	}
+
+	private IInvocationExpression inv(int i) {
+		IMethodName m = MethodName.newMethodName(String.format("[T,P] [T,P].m%d()", i));
+
+		InvocationExpression expr = new InvocationExpression();
+		expr.setMethodName(m);
+
+		Event e = new Event();
+		e.setKind(EventKind.INVOCATION);
+		e.setMethod(m);
+		eventMapping.add(e);
+
+		return expr;
+	}
+
+	private void assertFacts(Fact... fs) {
+		Set<Fact> actuals = Sets.newLinkedHashSet();
+		Set<Fact> expecteds = Sets.newLinkedHashSet();
+		decl.accept(sut, actuals);
+		for (Fact f : fs) {
+			expecteds.add(f);
+		}
+		assertEquals(expecteds, actuals);
+	}
+
+	private static Fact f(int id) {
+		return new Fact(id);
+	}
+
+	private static Fact f(int a, int b) {
+		return new Fact(new Fact(a), new Fact(b));
+	}
+}

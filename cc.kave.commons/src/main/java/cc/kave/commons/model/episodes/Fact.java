@@ -24,9 +24,18 @@ public class Fact {
 
 	private String rawFact = "";
 
+	@Deprecated
 	public Fact(String rawFact) {
 		Asserts.assertNotNull(rawFact);
 		this.rawFact = rawFact;
+	}
+
+	public Fact(int num) {
+		rawFact = String.valueOf(num);
+	}
+
+	public Fact(Fact first, Fact after) {
+		rawFact = first.rawFact + ">" + after;
 	}
 
 	public Fact() {
@@ -37,16 +46,38 @@ public class Fact {
 		return rawFact.contains(">");
 	}
 
+	/**
+	 * this should not be used... use the "int" or the "Fact, Fact" version
+	 * instead
+	 */
+	@Deprecated
 	public void setFact(String rawFact) {
 		this.rawFact = rawFact;
 	}
 
+	/**
+	 * this should not be used... why do we have an abstraction, if we access
+	 * the string directly?
+	 */
+	@Deprecated
 	public String getRawFact() {
 		return this.rawFact;
 	}
 
+	/**
+	 * this should not be used... use the event number instead
+	 */
+	@Deprecated
 	public boolean containsEvent(String eventId) {
 		if (rawFact.contains(eventId)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean containsEvent(int eventId) {
+		String eventStr = String.valueOf(eventId);
+		if (rawFact.contains(eventStr)) {
 			return true;
 		}
 		return false;
