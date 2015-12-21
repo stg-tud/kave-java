@@ -182,6 +182,10 @@ public class UsageExtractionVisitorContext {
 		if (usage == null) {
 			usage = initializeUsage(type, location);
 			locationUsages.put(location, usage);
+		} else if (usage.getType().isUnknownType() && !type.isUnknownType()) {
+			// unknown types cause a lot of usages to be (wrongly) initialized with insufficient type information ->
+			// update these usages once we have a concrete type
+			usage.setType(type);
 		}
 
 		return usage;
