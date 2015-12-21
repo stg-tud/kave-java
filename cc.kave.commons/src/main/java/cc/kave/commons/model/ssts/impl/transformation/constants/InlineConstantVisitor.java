@@ -60,10 +60,10 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<InlineConstantContext, Void> {
+public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<IInlineConstantContext, Void> {
 
 	@Override
-	public Void visit(ISST sst, InlineConstantContext context) {
+	public Void visit(ISST sst, IInlineConstantContext context) {
 		context.collectConstants(sst);
 		for (IPropertyDeclaration property : sst.getProperties()) {
 			property.accept(this, context);
@@ -75,71 +75,64 @@ public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<InlineCon
 	}
 
 	@Override
-	public Void visit(IFieldDeclaration stmt, InlineConstantContext context) {
+	public Void visit(IFieldDeclaration stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IAssignment stmt, InlineConstantContext context) {
+	public Void visit(IAssignment stmt, IInlineConstantContext context) {
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IMethodDeclaration stmt, InlineConstantContext context) {
-		for (IStatement s : stmt.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(IMethodDeclaration stmt, IInlineConstantContext context) {
+		this.visit(stmt.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IPropertyDeclaration stmt, InlineConstantContext context) {
-		for (IStatement s : stmt.getGet()) {
-			s.accept(this, context);
-		}
-		for (IStatement s : stmt.getSet()) {
-			s.accept(this, context);
-		}
-
+	public Void visit(IPropertyDeclaration stmt, IInlineConstantContext context) {
+		this.visit(stmt.getGet(), context);
+		this.visit(stmt.getSet(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IVariableDeclaration stmt, InlineConstantContext context) {
+	public Void visit(IVariableDeclaration stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IBreakStatement stmt, InlineConstantContext context) {
+	public Void visit(IBreakStatement stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IContinueStatement stmt, InlineConstantContext context) {
+	public Void visit(IContinueStatement stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IExpressionStatement stmt, InlineConstantContext context) {
+	public Void visit(IExpressionStatement stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IGotoStatement stmt, InlineConstantContext context) {
+	public Void visit(IGotoStatement stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(ILabelledStatement stmt, InlineConstantContext context) {
+	public Void visit(ILabelledStatement stmt, IInlineConstantContext context) {
 		stmt.getStatement().accept(this, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IReturnStatement stmt, InlineConstantContext context) {
+	public Void visit(IReturnStatement stmt, IInlineConstantContext context) {
 		ISimpleExpression expr = stmt.getExpression();
-		if (expr.accept(context.getExprVisitor(), context.getConstants())) {
+		if (context.isConstant(expr)) {
 			if (stmt instanceof ReturnStatement) {
 				((ReturnStatement) stmt).setExpression(new ConstantValueExpression());
 			}
@@ -148,127 +141,99 @@ public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<InlineCon
 	}
 
 	@Override
-	public Void visit(IThrowStatement stmt, InlineConstantContext context) {
+	public Void visit(IThrowStatement stmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IDoLoop block, InlineConstantContext context) {
+	public Void visit(IDoLoop block, IInlineConstantContext context) {
 		block.getCondition().accept(this, context);
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IForEachLoop block, InlineConstantContext context) {
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(IForEachLoop block, IInlineConstantContext context) {
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IForLoop block, InlineConstantContext context) {
+	public Void visit(IForLoop block, IInlineConstantContext context) {
 		block.getCondition().accept(this, context);
-		for (IStatement s : block.getInit()) {
-			s.accept(this, context);
-		}
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+		this.visit(block.getInit(), context);
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IIfElseBlock block, InlineConstantContext context) {
+	public Void visit(IIfElseBlock block, IInlineConstantContext context) {
 		block.getCondition().accept(this, context);
-		for (IStatement s : block.getThen()) {
-			s.accept(this, context);
-		}
-		for (IStatement s : block.getElse()) {
-			s.accept(this, context);
-		}
+		this.visit(block.getThen(), context);
+		this.visit(block.getElse(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ILockBlock stmt, InlineConstantContext context) {
-		for (IStatement s : stmt.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(ILockBlock stmt, IInlineConstantContext context) {
+		this.visit(stmt.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ISwitchBlock block, InlineConstantContext context) {
-		for (IStatement s : block.getDefaultSection()) {
-			s.accept(this, context);
-		}
+	public Void visit(ISwitchBlock block, IInlineConstantContext context) {
+		this.visit(block.getDefaultSection(), context);
 		for (ICaseBlock caseBlock : block.getSections()) {
-			for (IStatement stm : caseBlock.getBody()) {
-				stm.accept(this, context);
-			}
+			this.visit(caseBlock.getBody(), context);
 		}
 		return null;
 	}
 
 	@Override
-	public Void visit(ITryBlock block, InlineConstantContext context) {
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(ITryBlock block, IInlineConstantContext context) {
+		this.visit(block.getBody(), context);
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			for (IStatement s : catchBlock.getBody()) {
-				s.accept(this, context);
-			}
+			this.visit(catchBlock.getBody(), context);
 		}
 		return null;
 	}
 
 	@Override
-	public Void visit(IUncheckedBlock block, InlineConstantContext context) {
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(IUncheckedBlock block, IInlineConstantContext context) {
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnsafeBlock block, InlineConstantContext context) {
+	public Void visit(IUnsafeBlock block, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUsingBlock block, InlineConstantContext context) {
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(IUsingBlock block, IInlineConstantContext context) {
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IWhileLoop block, InlineConstantContext context) {
+	public Void visit(IWhileLoop block, IInlineConstantContext context) {
 		block.getCondition().accept(this, context);
-		for (IStatement s : block.getBody()) {
-			s.accept(this, context);
-		}
+		this.visit(block.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ICompletionExpression entity, InlineConstantContext context) {
+	public Void visit(ICompletionExpression entity, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IComposedExpression expr, InlineConstantContext context) {
+	public Void visit(IComposedExpression expr, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IIfElseExpression expr, InlineConstantContext context) {
+	public Void visit(IIfElseExpression expr, IInlineConstantContext context) {
 		expr.getCondition().accept(this, context);
 		expr.getThenExpression().accept(this, context);
 		expr.getElseExpression().accept(this, context);
@@ -276,10 +241,10 @@ public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<InlineCon
 	}
 
 	@Override
-	public Void visit(IInvocationExpression entity, InlineConstantContext context) {
+	public Void visit(IInvocationExpression entity, IInlineConstantContext context) {
 		List<ISimpleExpression> parameters = new ArrayList<ISimpleExpression>();
 		for (ISimpleExpression expr : entity.getParameters()) {
-			if (expr.accept(context.getExprVisitor(), context.getConstants())) {
+			if (context.isConstant(expr)) {
 				parameters.add(new ConstantValueExpression());
 			} else {
 				parameters.add(expr);
@@ -292,34 +257,40 @@ public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<InlineCon
 	}
 
 	@Override
-	public Void visit(ILambdaExpression expr, InlineConstantContext context) {
-		for (IStatement s : expr.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(ILambdaExpression expr, IInlineConstantContext context) {
+		this.visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(ILoopHeaderBlockExpression expr, InlineConstantContext context) {
-		for (IStatement s : expr.getBody()) {
-			s.accept(this, context);
-		}
+	public Void visit(ILoopHeaderBlockExpression expr, IInlineConstantContext context) {
+		this.visit(expr.getBody(), context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnknownExpression unknownExpr, InlineConstantContext context) {
+	public Void visit(IUnknownExpression unknownExpr, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IUnknownStatement unknownStmt, InlineConstantContext context) {
+	public Void visit(IUnknownStatement unknownStmt, IInlineConstantContext context) {
 		return null;
 	}
 
 	@Override
-	public Void visit(IEventSubscriptionStatement stmt, InlineConstantContext context) {
+	public Void visit(IEventSubscriptionStatement stmt, IInlineConstantContext context) {
 		stmt.getExpression().accept(this, context);
+		return null;
+	}
+	
+	/**
+	 * Helper method to visit list of statements.
+	 */
+	public Void visit(List<IStatement> stmts, IInlineConstantContext context) {
+		for (IStatement s : stmts) {
+			s.accept(this, context);
+		}
 		return null;
 	}
 }

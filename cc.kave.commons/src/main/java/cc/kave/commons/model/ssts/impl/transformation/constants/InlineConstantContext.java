@@ -18,18 +18,19 @@ package cc.kave.commons.model.ssts.impl.transformation.constants;
 import java.util.HashSet;
 import java.util.Set;
 
-import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.references.IFieldReference;
 
-public class InlineConstantContext {
+public class InlineConstantContext implements IInlineConstantContext {
 	private ConstantCollectorVisitor collector;
-	private SimpleExpressionVisitor exprVisitor;
 	private Set<IFieldDeclaration> constants;
 
 	public InlineConstantContext() {
 		this.collector = new ConstantCollectorVisitor();
-		this.exprVisitor = new SimpleExpressionVisitor();
 		this.constants = new HashSet<IFieldDeclaration>();
 	}
 
@@ -41,16 +42,18 @@ public class InlineConstantContext {
 		return constants;
 	}
 
-	public boolean isConstant(IFieldName field) {
-		for (IFieldDeclaration constant : constants) {
-			if (constant.getName().equals(field))
-				return true;
+	@Override
+	public boolean isConstant(ISimpleExpression expr) {
+		if (expr instanceof IReferenceExpression) {
+			IReference reference = ((IReferenceExpression) expr).getReference();
+			if (reference instanceof IFieldReference) {
+				for (IFieldDeclaration constant : constants) {
+					if (constant.getName().equals(((IFieldReference) reference).getFieldName()))
+						return true;
+				}
+			}
 		}
 		return false;
-	}
-
-	public SimpleExpressionVisitor getExprVisitor() {
-		return exprVisitor;
 	}
 
 }
