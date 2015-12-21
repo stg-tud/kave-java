@@ -15,7 +15,8 @@
  */
 package cc.kave.commons.model.ssts.transformation.constants;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,8 @@ public class InlineConstantTest extends InliningBaseTest {
 		bodyInlined.add(returnStatement(new ConstantValueExpression(), false));
 
 		sst.accept(visitor, context);
-		assertEquals(sst.getFields(), fields);
-		assertEquals(sst.getMethods().size(), 1);
-		assertEquals(sst.getMethods().iterator().next().getBody(), bodyInlined);
+		assertThat(sst.getFields(), is(fields));
+		assertThat(sst.getMethods().size(), is(1));
+		assertThat(sst.getMethods().iterator().next().getBody(), is(bodyInlined));
 	}
 }

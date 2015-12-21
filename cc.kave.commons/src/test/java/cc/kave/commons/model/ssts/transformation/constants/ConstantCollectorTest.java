@@ -15,7 +15,9 @@
  */
 package cc.kave.commons.model.ssts.transformation.constants;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,8 +74,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.isEmpty());
+		assertThat(constants, is(empty()));
 	}
 
 	@Test
@@ -88,8 +89,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.isEmpty());
+		assertThat(constants, is(empty()));
 	}
 
 	@Test
@@ -101,9 +101,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.size() == 1);
-		assertTrue(constants.containsAll(fields));
+		assertThat(constants, is(fields));
 	}
 
 	@Test
@@ -115,8 +113,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 		
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.isEmpty());
+		assertThat(constants, is(empty()));
 	}
 
 	@Test
@@ -128,9 +125,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.size() == 2);
-		assertTrue(constants.containsAll(declareFields(fieldA, fieldB)));
+		assertThat(constants, is(declareFields(fieldA, fieldB)));
 	}
 
 	@Test
@@ -145,9 +140,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.size() == 1);
-		assertTrue(constants.containsAll(declareFields(fieldB)));
+		assertThat(constants, is(declareFields(fieldB)));
 	}
 
 	@Test
@@ -165,7 +158,6 @@ public class ConstantCollectorTest extends InliningBaseTest {
 
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
-
-		assertTrue(constants.isEmpty());
+		assertThat(constants, is(empty()));
 	}
 }

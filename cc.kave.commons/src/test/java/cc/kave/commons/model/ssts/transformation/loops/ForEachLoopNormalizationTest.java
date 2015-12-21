@@ -15,7 +15,10 @@
  */
 package cc.kave.commons.model.ssts.transformation.loops;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -47,11 +50,11 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		ForEachLoop forEachLoop = new ForEachLoop();
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(0) instanceof IVariableDeclaration);
-		assertTrue(normalized.get(1) instanceof IAssignment);
-		assertTrue(normalized.get(2) instanceof IVariableDeclaration);
-		assertTrue(normalized.get(3) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
+		assertThat(normalized.get(1), instanceOf(IAssignment.class));
+		assertThat(normalized.get(2), instanceOf(IVariableDeclaration.class));
+		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
 	}
 
 	@Test
@@ -66,15 +69,15 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(0) instanceof IVariableDeclaration);
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
 
 		IVariableDeclaration iteratorDecl = (IVariableDeclaration) normalized.get(0);
 		ITypeName iteratorType = iteratorDecl.getType();
 		assertTrue(iteratorType.hasTypeParameters());
 		List<ITypeName> typeParameters = iteratorType.getTypeParameters();
-		assertEquals(1, typeParameters.size());
-		assertEquals(elementType, typeParameters.get(0).getTypeParameterType());
+		assertThat(typeParameters.size(), is(1));
+		assertThat(typeParameters.get(0).getTypeParameterType(), is(elementType));
 	}
 
 	@Test
@@ -84,18 +87,18 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachLoop.setLoopedReference(loopedReference);
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(0) instanceof IVariableDeclaration);
-		assertTrue(normalized.get(1) instanceof IAssignment);
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
+		assertThat(normalized.get(1), instanceOf(IAssignment.class));
 		IVariableDeclaration declaration = (IVariableDeclaration) normalized.get(0);
 		IAssignment assignment = (IAssignment) normalized.get(1);
-		assertEquals(declaration.getReference(), assignment.getReference());
-		assertTrue(assignment.getExpression() instanceof IInvocationExpression);
+		assertThat(assignment.getReference(), is(declaration.getReference()));
+		assertThat(assignment.getExpression(), instanceOf(IInvocationExpression.class));
 
 		IInvocationExpression invocation = (IInvocationExpression) assignment.getExpression();
-		assertEquals(loopedReference, invocation.getReference());
-		assertEquals("iterator", invocation.getMethodName().getIdentifier());
-		assertTrue(invocation.getParameters().isEmpty());
+		assertThat(invocation.getReference(), is(loopedReference));
+		assertThat(invocation.getMethodName().getIdentifier(), is("iterator"));
+		assertThat(invocation.getParameters(), is(empty()));
 	}
 
 	@Test
@@ -107,9 +110,9 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachLoop.setDeclaration(declaration);
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(2) instanceof IVariableDeclaration);
-		assertEquals(elementType, ((IVariableDeclaration) normalized.get(2)).getType());
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(2), instanceOf(IVariableDeclaration.class));
+		assertThat(((IVariableDeclaration) normalized.get(2)).getType(), is(elementType));
 	}
 
 	@Test
@@ -119,23 +122,23 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachLoop.setLoopedReference(loopedReference);
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(0) instanceof IVariableDeclaration);
-		assertTrue(normalized.get(3) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
+		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
 		IVariableDeclaration iteratorDecl = (IVariableDeclaration) normalized.get(0);
 		IWhileLoop whileLoop = (IWhileLoop) normalized.get(3);
 
-		assertTrue(whileLoop.getCondition() instanceof LoopHeaderBlockExpression);
+		assertThat(whileLoop.getCondition(), instanceOf(LoopHeaderBlockExpression.class));
 		List<IStatement> conditionBlock = ((LoopHeaderBlockExpression) whileLoop.getCondition()).getBody();
-		assertEquals(1, conditionBlock.size());
-		assertTrue(conditionBlock.get(0) instanceof IExpressionStatement);
+		assertThat(conditionBlock.size(), is(1));
+		assertThat(conditionBlock.get(0), instanceOf(IExpressionStatement.class));
 		IAssignableExpression assignableExpression = ((IExpressionStatement) conditionBlock.get(0)).getExpression();
-		assertTrue(assignableExpression instanceof IInvocationExpression);
+		assertThat(assignableExpression, instanceOf(IInvocationExpression.class));
 
 		IInvocationExpression invocation = (IInvocationExpression) assignableExpression;
-		assertTrue(invocation.getParameters().isEmpty());
-		assertEquals(iteratorDecl.getReference(), invocation.getReference());
-		assertEquals("hasNext", invocation.getMethodName().getIdentifier());
+		assertThat(invocation.getParameters(), is(empty()));
+		assertThat(invocation.getReference(), is(iteratorDecl.getReference()));
+		assertThat(invocation.getMethodName().getIdentifier(), is("hasNext"));
 	}
 
 	public void testLoopBody() {
@@ -146,11 +149,11 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachLoop.setBody(forEachBody);
 		List<IStatement> normalized = forEachLoop.accept(visitor, context);
 
-		assertEquals(4, normalized.size());
-		assertTrue(normalized.get(3) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(4));
+		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
 		List<IStatement> whileBody = ((IWhileLoop) normalized.get(3)).getBody();
 		int whileBodySize = whileBody.size();
-		assertEquals(3, whileBodySize);
-		assertEquals(forEachBody, whileBody.subList(whileBodySize - 2, whileBodySize));
+		assertThat(whileBodySize, is(3));
+		assertThat(whileBody.subList(whileBodySize - 2, whileBodySize), is(forEachBody));
 	}
 }

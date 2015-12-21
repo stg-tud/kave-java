@@ -20,8 +20,9 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 
@@ -61,10 +62,10 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(3, normalized.size());
-		assertEquals(init.get(0), normalized.get(0));
-		assertEquals(init.get(1), normalized.get(1));
-		assertTrue(normalized.get(2) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(3));
+		assertThat(normalized.get(0), is(init.get(0)));
+		assertThat(normalized.get(1), is(init.get(1)));
+		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
 	}
 
 	@Test
@@ -72,8 +73,8 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		ForLoop forLoop = new ForLoop();
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(1, normalized.size());
-		assertTrue(normalized.get(0) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(1));
+		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
 	}
 
 	@Test
@@ -84,11 +85,10 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(1, normalized.size());
-		assertTrue(normalized.get(0) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(1));
+		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
 		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
-		assertEquals(step.size(), whileBody.size());
-		assertEquals(step, whileBody.subList(whileBody.size() - 1, whileBody.size()));
+		assertThat(whileBody, is(step));
 	}
 
 	@Test
@@ -108,12 +108,13 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(3, normalized.size());
-		assertEquals(varDecl, normalized.get(0));
-		assertEquals(assignment, normalized.get(1));
-		assertTrue(normalized.get(2) instanceof IWhileLoop);
-		assertEquals(condition, ((IWhileLoop) normalized.get(2)).getCondition());
-		assertEquals(Lists.newArrayList(stmt, assignment), ((IWhileLoop) normalized.get(2)).getBody());
+		assertThat(normalized.size(), is(3));
+		assertThat(normalized.get(0), is(varDecl));
+		assertThat(normalized.get(1), is(assignment));
+		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
+		IWhileLoop whileLoop = (IWhileLoop) normalized.get(2);
+		assertThat(whileLoop.getCondition(), is(condition));
+		assertThat(whileLoop.getBody(), is(Lists.newArrayList(stmt, assignment)));
 	}
 
 	@Test
@@ -127,14 +128,14 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(1, normalized.size());
-		assertTrue(normalized.get(0) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(1));
+		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
 		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
 		int whileBodySize = whileBody.size();
-		assertEquals(3, whileBodySize);
-		assertEquals(step, whileBody.subList(0, 1));
-		assertEquals(continueStmt, whileBody.get(1));
-		assertEquals(step, whileBody.subList(whileBodySize - 1, whileBodySize));
+		assertThat(whileBodySize, is(3));
+		assertThat(whileBody.subList(0, 1), is(step));
+		assertThat(whileBody.get(1), is(continueStmt));
+		assertThat(whileBody.subList(whileBodySize - step.size(), whileBodySize), is(step));
 	}
 	
 	@Test
@@ -151,20 +152,20 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		
 		List<IStatement> normalized = forLoop.accept(visitor, context);
 
-		assertEquals(1, normalized.size());
-		assertTrue(normalized.get(0) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(1));
+		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
 		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
 		int whileBodySize = whileBody.size();
-		assertEquals(2, whileBodySize);
-		assertTrue(whileBody.get(0) instanceof IIfElseBlock);
+		assertThat(whileBodySize, is(2));
+		assertThat(whileBody.get(0), instanceOf(IIfElseBlock.class));
 		
 		IIfElseBlock ifElseNormalized = (IIfElseBlock) whileBody.get(0);
 		List<IStatement> thenNormalized = ifElseNormalized.getThen();
 		List<IStatement> elseNormalized = ifElseNormalized.getElse();
-		assertEquals(2, thenNormalized.size());
-		assertEquals(step.get(0), thenNormalized.get(0));
-		assertEquals(continueStmt, thenNormalized.get(1));
-		assertEquals(ifElseBlock.getElse(), elseNormalized);
+		assertThat(thenNormalized.size(), is(2));
+		assertThat(thenNormalized.get(0), is(step.get(0)));
+		assertThat(thenNormalized.get(1), is(continueStmt));
+		assertThat(elseNormalized, is(ifElseBlock.getElse()));
 	}
 
 	@Test
@@ -195,17 +196,18 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 		List<IStatement> normalized = outerLoop.accept(visitor, context);
 
-		assertEquals(3, normalized.size());
-		assertEquals(varDeclB, normalized.get(0));
-		assertEquals(assignB, normalized.get(1));
-		assertTrue(normalized.get(2) instanceof IWhileLoop);
+		assertThat(normalized.size(), is(3));
+		assertThat(normalized.get(0), is(varDeclB));
+		assertThat(normalized.get(1), is(assignB));
+		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
 
 		IWhileLoop whileLoop = (IWhileLoop) normalized.get(2);
-		assertEquals(condition, whileLoop.getCondition());
-		assertEquals(4, whileLoop.getBody().size());
-		assertEquals(varDeclA, whileLoop.getBody().get(0));
-		assertEquals(assignA, whileLoop.getBody().get(1));
-		assertTrue(whileLoop.getBody().get(2) instanceof IWhileLoop);
-		assertEquals(assignB, whileLoop.getBody().get(3));
+		assertThat(whileLoop.getCondition(), is(condition));
+		List<IStatement> whileBody = whileLoop.getBody();
+		assertThat(whileBody.size(), is(4));
+		assertThat(whileBody.get(0), is(varDeclA));
+		assertThat(whileBody.get(1), is(assignA));
+		assertThat(whileBody.get(2), instanceOf(IWhileLoop.class));
+		assertThat(whileBody.get(3), is(assignB));
 	}
 }
