@@ -32,7 +32,7 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -50,7 +50,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class NameScopeVisitor extends AbstractNodeVisitor<Set<IVariableReference>, Void> {
+public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableReference>, Void> {
 	@Override
 	public Void visit(IAssignment stmt, Set<IVariableReference> context) {
 		stmt.getExpression().accept(this, context);

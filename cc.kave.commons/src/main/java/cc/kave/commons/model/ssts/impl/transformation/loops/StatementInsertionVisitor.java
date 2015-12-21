@@ -21,7 +21,7 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
@@ -33,7 +33,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class StatementInsertionVisitor extends AbstractNodeVisitor<StatementInsertionContext, List<IStatement>> {
+public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<StatementInsertionContext, List<IStatement>> {
 
 	@Override
 	public List<IStatement> visit(ISST sst, StatementInsertionContext context) {

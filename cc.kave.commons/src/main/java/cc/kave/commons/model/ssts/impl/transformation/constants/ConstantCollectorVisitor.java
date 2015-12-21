@@ -21,7 +21,7 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -39,7 +39,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class ConstantCollectorVisitor extends AbstractNodeVisitor<Set<IFieldDeclaration>, Set<IFieldDeclaration>> {
+public class ConstantCollectorVisitor extends AbstractThrowingNodeVisitor<Set<IFieldDeclaration>, Set<IFieldDeclaration>> {
 	@Override
 	public Set<IFieldDeclaration> visit(ISST sst, Set<IFieldDeclaration> constants) {
 

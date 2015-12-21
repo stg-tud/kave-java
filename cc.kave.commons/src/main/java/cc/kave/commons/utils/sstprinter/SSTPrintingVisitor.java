@@ -41,7 +41,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -59,7 +59,7 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
-public class SSTPrintingVisitor extends AbstractNodeVisitor<SSTPrintingContext, Void> {
+public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingContext, Void> {
 
 	public Void visit(ISST sst, SSTPrintingContext c) {
 		c.indentation();

@@ -158,5 +158,4 @@ public interface ISSTNodeVisitor<TContext, TReturn> {
 	TReturn visit(IUnknownExpression unknownExpr, TContext context);
 
 	TReturn visit(IUnknownStatement unknownStmt, TContext context);
-
 }

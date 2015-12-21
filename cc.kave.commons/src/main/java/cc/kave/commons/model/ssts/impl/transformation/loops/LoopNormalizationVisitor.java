@@ -34,7 +34,7 @@ import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
@@ -47,7 +47,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 
-public class LoopNormalizationVisitor extends AbstractNodeVisitor<LoopNormalizationContext, List<IStatement>> {
+public class LoopNormalizationVisitor extends AbstractThrowingNodeVisitor<LoopNormalizationContext, List<IStatement>> {
 
 	@Override
 	public List<IStatement> visit(ISST sst, LoopNormalizationContext context) {

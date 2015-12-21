@@ -8,12 +8,10 @@ import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 
-public class ToFactsVisitor extends AbstractNodeVisitor<Set<Fact>, Void> {
+public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Void> {
 
 	private static ITypeName EVENT_TYPE_NAME = TypeName
 			.newTypeName("KaVE.RS.SolutionAnalysis.Episodes.Event, KaVE.RS.SolutionAnalysis");
@@ -21,15 +19,6 @@ public class ToFactsVisitor extends AbstractNodeVisitor<Set<Fact>, Void> {
 
 	public ToFactsVisitor(ArrayList<Event> events) {
 		this.events = events;
-	}
-
-	@Override
-	public Void visit(ISST sst, Set<Fact> facts) {
-		for (IMethodDeclaration methodDeclaration : sst.getMethods())
-			methodDeclaration.accept(this, facts);
-
-		return null;
-
 	}
 
 	@Override
@@ -41,11 +30,7 @@ public class ToFactsVisitor extends AbstractNodeVisitor<Set<Fact>, Void> {
 		methodStartEvent.setType(EVENT_TYPE_NAME);
 		facts.add(new Fact(String.valueOf(events.indexOf(methodStartEvent))));
 
-		for (IStatement bodyStmt : stmt.getBody()) {
-			bodyStmt.accept(this, facts);
-		}
-
-		return null;
+		return super.visit(stmt, facts);
 
 	}
 

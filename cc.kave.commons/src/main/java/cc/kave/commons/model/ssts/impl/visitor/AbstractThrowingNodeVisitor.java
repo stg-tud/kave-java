@@ -52,7 +52,12 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
-public abstract class AbstractNodeVisitor<TContext, TReturn> implements ISSTNodeVisitor<TContext, TReturn> {
+/**
+ * extend this base class if you need to be informed about extensions to the SST
+ * model
+ */
+public abstract class AbstractThrowingNodeVisitor<TContext, TReturn> implements ISSTNodeVisitor<TContext, TReturn> {
+
 	@Override
 	public TReturn visit(IAssignment stmt, TContext context) {
 		throw new RuntimeException();

@@ -6,7 +6,7 @@ import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -14,7 +14,7 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
-public class InliningIReferenceVisitor extends AbstractNodeVisitor<InliningContext, IReference> {
+public class InliningIReferenceVisitor extends AbstractThrowingNodeVisitor<InliningContext, IReference> {
 
 	public IReference visit(IVariableReference ref, InliningContext context) {
 		return context.resolve(ref);

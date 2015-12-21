@@ -8,10 +8,10 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
-public class SimpleExpressionVisitor extends AbstractNodeVisitor<Set<IFieldDeclaration>, Boolean> {
+public class SimpleExpressionVisitor extends AbstractThrowingNodeVisitor<Set<IFieldDeclaration>, Boolean> {
 
 	@Override
 	public Boolean visit(IConstantValueExpression expr, Set<IFieldDeclaration> constants) {

@@ -34,14 +34,14 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 
-public class InliningIExpressionVisitor extends AbstractNodeVisitor<InliningContext, IExpression> {
+public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<InliningContext, IExpression> {
 
 	public IExpression visit(IInvocationExpression expr, InliningContext context) {
 		IMethodDeclaration method = context.getNonEntryPoint(expr.getMethodName());

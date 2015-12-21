@@ -37,7 +37,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -67,7 +67,7 @@ public class VisitorAssertion {
 	}
 
 	public void verify(Object obj) {
-		AbstractNodeVisitor<Integer, Void> visitor = mock(AbstractNodeVisitor.class);
+		AbstractThrowingNodeVisitor<Integer, Void> visitor = mock(AbstractThrowingNodeVisitor.class);
 		_node.accept(visitor, _context);
 		if (obj instanceof ISST)
 			Mockito.verify(visitor).visit((ISST) obj, _context);
