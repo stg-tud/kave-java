@@ -4,6 +4,8 @@ import java.util.List;
 
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.ICaseBlock;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -21,6 +23,7 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -110,62 +113,61 @@ public class AbstractTraversingNodeVisitor<TContext, TReturn> implements ISSTNod
 
 	@Override
 	public TReturn visit(IVariableDeclaration stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		stmt.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IAssignment stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		stmt.getReference().accept(this, context);
+		stmt.getExpression().accept(this, context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IBreakStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IContinueStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
-	}
-
-	@Override
-	public TReturn visit(IExpressionStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
-	}
-
-	@Override
-	public TReturn visit(IGotoStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
-	}
-
-	@Override
-	public TReturn visit(ILabelledStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
-	}
-
-	@Override
-	public TReturn visit(IReturnStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
-	}
-
-	@Override
-	public TReturn visit(IThrowStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IEventSubscriptionStatement stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		stmt.getReference().accept(this, context);
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
 
+	@Override
+	public TReturn visit(IExpressionStatement stmt, TContext context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IGotoStatement stmt, TContext context) {
+		return null;
+	}
+
+	@Override
+	public TReturn visit(ILabelledStatement stmt, TContext context) {
+		stmt.getStatement().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IReturnStatement stmt, TContext context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public TReturn visit(IThrowStatement stmt, TContext context) {
+		stmt.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
@@ -208,165 +210,196 @@ public class AbstractTraversingNodeVisitor<TContext, TReturn> implements ISSTNod
 
 	@Override
 	public TReturn visit(ILockBlock stmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		stmt.getReference().accept(this, context);
+		visit(stmt.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ISwitchBlock block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		block.getReference().accept(this, context);
+		for (ICaseBlock cb : block.getSections()) {
+			cb.getLabel().accept(this, context);
+			visit(cb.getBody(), context);
+		}
+		visit(block.getDefaultSection(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ITryBlock block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		visit(block.getBody(), context);
+		for (ICatchBlock cb : block.getCatchBlocks()) {
+			visit(cb.getBody(), context);
+		}
+		visit(block.getFinally(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IUncheckedBlock block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		visit(block.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IUnsafeBlock block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IUsingBlock block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		block.getReference().accept(this, context);
+		visit(block.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IWhileLoop block, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		block.getCondition().accept(this, context);
+		visit(block.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ICompletionExpression entity, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IComposedExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		for (IVariableReference varRef : expr.getReferences()) {
+			varRef.accept(this, context);
+		}
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IIfElseExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		expr.getCondition().accept(this, context);
+		expr.getThenExpression().accept(this, context);
+		expr.getElseExpression().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IInvocationExpression entity, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+	public TReturn visit(IInvocationExpression expr, TContext context) {
+		expr.getReference().accept(this, context);
+		for (ISimpleExpression p : expr.getParameters()) {
+			p.accept(this, context);
+		}
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ILambdaExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		visit(expr.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ILoopHeaderBlockExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
-
+		visit(expr.getBody(), context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IConstantValueExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		return null;
 	}
 
 	@Override
 	public TReturn visit(INullExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IReferenceExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		expr.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ICastExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		expr.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IIndexAccessExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		expr.getReference().accept(this, context);
+		for (ISimpleExpression idx : expr.getIndices()) {
+			idx.accept(this, context);
+		}
+		return null;
 	}
 
 	@Override
 	public TReturn visit(ITypeCheckExpression expr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		expr.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IBinaryExpression indexAccessRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IBinaryExpression expr, TContext context) {
+		expr.getLeftOperand().accept(this, context);
+		expr.getRightOperand().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IUnaryExpression indexAccessRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IUnaryExpression expr, TContext context) {
+		expr.getOperand().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IEventReference eventRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IEventReference ref, TContext context) {
+		ref.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IFieldReference fieldRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IFieldReference ref, TContext context) {
+		ref.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IMethodReference methodRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IMethodReference ref, TContext context) {
+		ref.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IPropertyReference methodRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IPropertyReference ref, TContext context) {
+		ref.getReference().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IVariableReference varRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IVariableReference ref, TContext context) {
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IIndexAccessReference indexAccessRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IIndexAccessReference ref, TContext context) {
+		ref.getExpression().accept(this, context);
+		return null;
 	}
 
 	@Override
-	public TReturn visit(IUnknownReference unknownRef, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+	public TReturn visit(IUnknownReference ref, TContext context) {
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IUnknownExpression unknownExpr, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		return null;
 	}
 
 	@Override
 	public TReturn visit(IUnknownStatement unknownStmt, TContext context) {
-		throw new RuntimeException("not implemented yet!");
+		return null;
 	}
-
 }
