@@ -18,6 +18,7 @@ package cc.kave.commons.model.ssts.impl.transformation.loops;
 import java.util.List;
 
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
 public abstract class StatementInsertionContext {
 	protected List<IStatement> statements;
@@ -31,6 +32,10 @@ public abstract class StatementInsertionContext {
 	}
 
 	public boolean insertAfter(IStatement stmt) {
+		return false;
+	}
+	
+	public boolean skip(ISSTNode node) {
 		return false;
 	}
 }

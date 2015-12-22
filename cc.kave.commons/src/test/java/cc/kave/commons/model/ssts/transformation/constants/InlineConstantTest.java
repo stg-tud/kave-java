@@ -30,19 +30,16 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.transformation.constants.InlineConstantContext;
 import cc.kave.commons.model.ssts.impl.transformation.constants.InlineConstantVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningBaseTest;
 
 public class InlineConstantTest extends InliningBaseTest {
-	private InlineConstantVisitor visitor;
-	private InlineConstantContext context;
+	private InlineConstantVisitor sut;
 	private String field;
 
 	@Before
 	public void setup() {
-		visitor = new InlineConstantVisitor();
-		context = new InlineConstantContext();
+		sut = new InlineConstantVisitor();
 		field = "[T1,P1,1] [System.Int32,P2,1].f";
 	}
 
@@ -58,7 +55,7 @@ public class InlineConstantTest extends InliningBaseTest {
 		List<IStatement> bodyInlined = new ArrayList<IStatement>();
 		bodyInlined.add(returnStatement(new ConstantValueExpression(), false));
 
-		sst.accept(visitor, context);
+		sst.accept(sut, null);
 		assertThat(sst.getFields(), is(fields));
 		assertThat(sst.getMethods().size(), is(1));
 		assertThat(sst.getMethods().iterator().next().getBody(), is(bodyInlined));

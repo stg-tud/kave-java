@@ -55,12 +55,12 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 	@Test
 	public void testLoopInit() {
-		List<IStatement> init = Lists.newArrayList(declareVar(loopVarA),
+		List<IStatement> init = list(declareVar(loopVarA),
 				assign(variableReference(loopVarA), constant("0")));
 		ForLoop forLoop = new ForLoop();
-		forLoop.setInit(init);
+		forLoop.setInit(copy(init));
 
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(3));
 		assertThat(normalized.get(0), is(init.get(0)));
@@ -71,7 +71,7 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 	@Test
 	public void testNoLoopInit() {
 		ForLoop forLoop = new ForLoop();
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(1));
 		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
@@ -79,11 +79,11 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 
 	@Test
 	public void testLoopStep() {
-		List<IStatement> step = Lists.newArrayList(assign(variableReference(loopVarA), constant("0")));
+		List<IStatement> step = list(assign(variableReference(loopVarA), constant("0")));
 		ForLoop forLoop = new ForLoop();
-		forLoop.setStep(step);
+		forLoop.setStep(copy(step));
 
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(1));
 		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
@@ -97,16 +97,16 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		IVariableDeclaration varDecl = declareVar(loopVarA);
 		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
 		IStatement stmt = new UnknownStatement();
-		List<IStatement> body = Lists.newArrayList(stmt);
-		List<IStatement> step = Lists.newArrayList(assignment);
+		List<IStatement> body = list(stmt);
+		List<IStatement> step = list(assignment);
 
 		ForLoop forLoop = new ForLoop();
-		forLoop.setInit(Lists.newArrayList(varDecl, assignment));
-		forLoop.setStep(step);
-		forLoop.setBody(body);
+		forLoop.setInit(list(varDecl, assignment));
+		forLoop.setStep(copy(step));
+		forLoop.setBody(copy(body));
 		forLoop.setCondition(condition);
 
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(3));
 		assertThat(normalized.get(0), is(varDecl));
@@ -114,19 +114,19 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
 		IWhileLoop whileLoop = (IWhileLoop) normalized.get(2);
 		assertThat(whileLoop.getCondition(), is(condition));
-		assertThat(whileLoop.getBody(), is(Lists.newArrayList(stmt, assignment)));
+		assertThat(whileLoop.getBody(), is(list(stmt, assignment)));
 	}
 
 	@Test
 	public void testContinueInsideLoopBody() {
 		ContinueStatement continueStmt = new ContinueStatement();
 		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
-		List<IStatement> step = Lists.newArrayList(assignment);
+		List<IStatement> step = list(assignment);
 		ForLoop forLoop = new ForLoop();
-		forLoop.setBody(Lists.newArrayList(continueStmt));
+		forLoop.setBody(list(continueStmt));
 		forLoop.setStep(step);
 
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(1));
 		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
@@ -143,14 +143,14 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		ContinueStatement continueStmt = new ContinueStatement();
 		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
 		IfElseBlock ifElseBlock = new IfElseBlock();
-		ifElseBlock.setThen(Lists.newArrayList(continueStmt));
+		ifElseBlock.setThen(list(continueStmt));
 		
-		List<IStatement> step = Lists.newArrayList(assignment);
+		List<IStatement> step = list(assignment);
 		ForLoop forLoop = new ForLoop();
-		forLoop.setBody(Lists.newArrayList(ifElseBlock));
+		forLoop.setBody(list(ifElseBlock));
 		forLoop.setStep(step);
 		
-		List<IStatement> normalized = forLoop.accept(visitor, context);
+		List<IStatement> normalized = forLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(1));
 		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
@@ -174,27 +174,27 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		IStatement stmt = new UnknownStatement();
 		IVariableDeclaration varDeclA = declareVar(loopVarA);
 		IAssignment assignA = assign(variableReference(loopVarA), constant("0"));
-		List<IStatement> body = Lists.newArrayList(stmt);
-		List<IStatement> step = Lists.newArrayList(assignA);
+		List<IStatement> body = list(stmt);
+		List<IStatement> step = list(assignA);
 
 		ForLoop innerLoop = new ForLoop();
-		innerLoop.setInit(Lists.newArrayList(varDeclA, assignA));
+		innerLoop.setInit(list(varDeclA, assignA));
 		innerLoop.setStep(step);
 		innerLoop.setBody(body);
 		innerLoop.setCondition(condition);
 
 		IVariableDeclaration varDeclB = declareVar(loopVarB);
 		IAssignment assignB = assign(variableReference(loopVarB), constant("0"));
-		List<IStatement> bodyB = Lists.newArrayList(innerLoop);
-		List<IStatement> stepB = Lists.newArrayList(assignB);
+		List<IStatement> bodyB = list(innerLoop);
+		List<IStatement> stepB = list(assignB);
 
 		ForLoop outerLoop = new ForLoop();
-		outerLoop.setInit(Lists.newArrayList(varDeclB, assignB));
+		outerLoop.setInit(list(varDeclB, assignB));
 		outerLoop.setStep(stepB);
 		outerLoop.setBody(bodyB);
 		outerLoop.setCondition(condition);
 
-		List<IStatement> normalized = outerLoop.accept(visitor, context);
+		List<IStatement> normalized = outerLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), is(3));
 		assertThat(normalized.get(0), is(varDeclB));
@@ -209,5 +209,14 @@ public class ForLoopNormalizationTest extends LoopNormalizationTest {
 		assertThat(whileBody.get(1), is(assignA));
 		assertThat(whileBody.get(2), instanceOf(IWhileLoop.class));
 		assertThat(whileBody.get(3), is(assignB));
+	}
+	
+	private <T> List<T> copy(List<T> l) {
+		return Lists.newArrayList(l);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T> List<T> list(T... elements) {
+		return Lists.newArrayList(elements);
 	}
 }

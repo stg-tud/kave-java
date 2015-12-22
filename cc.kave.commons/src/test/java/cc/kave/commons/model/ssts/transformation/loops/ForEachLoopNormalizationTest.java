@@ -48,7 +48,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 	@Test
 	public void testSimpleForEachToWhile() {
 		ForEachLoop forEachLoop = new ForEachLoop();
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
@@ -67,7 +67,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachLoop.setDeclaration(declaration);
 		forEachLoop.setLoopedReference(loopedReference);
 
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
@@ -85,12 +85,14 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		IVariableReference loopedReference = SSTUtil.variableReference("collection");
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setLoopedReference(loopedReference);
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
 		assertThat(normalized.get(1), instanceOf(IAssignment.class));
+		
 		IVariableDeclaration declaration = (IVariableDeclaration) normalized.get(0);
+		
 		IAssignment assignment = (IAssignment) normalized.get(1);
 		assertThat(assignment.getReference(), equalTo(declaration.getReference()));
 		assertThat(assignment.getExpression(), instanceOf(IInvocationExpression.class));
@@ -108,7 +110,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		declaration.setType(elementType);
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setDeclaration(declaration);
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(2), instanceOf(IVariableDeclaration.class));
@@ -120,7 +122,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		IVariableReference loopedReference = SSTUtil.variableReference("collection");
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setLoopedReference(loopedReference);
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
@@ -147,7 +149,7 @@ public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
 		forEachBody.add(new ReturnStatement());
 		ForEachLoop forEachLoop = new ForEachLoop();
 		forEachLoop.setBody(forEachBody);
-		List<IStatement> normalized = forEachLoop.accept(visitor, context);
+		List<IStatement> normalized = forEachLoop.accept(visitor, null);
 
 		assertThat(normalized.size(), equalTo(4));
 		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));

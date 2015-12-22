@@ -15,237 +15,77 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.constants;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.blocks.ICaseBlock;
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;
-import cc.kave.commons.model.ssts.blocks.IDoLoop;
-import cc.kave.commons.model.ssts.blocks.IForEachLoop;
-import cc.kave.commons.model.ssts.blocks.IForLoop;
-import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
-import cc.kave.commons.model.ssts.blocks.ILockBlock;
-import cc.kave.commons.model.ssts.blocks.ISwitchBlock;
-import cc.kave.commons.model.ssts.blocks.ITryBlock;
-import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
-import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
-import cc.kave.commons.model.ssts.blocks.IUsingBlock;
-import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
-import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
-import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
-import cc.kave.commons.model.ssts.statements.IAssignment;
-import cc.kave.commons.model.ssts.statements.IBreakStatement;
-import cc.kave.commons.model.ssts.statements.IContinueStatement;
-import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
-import cc.kave.commons.model.ssts.statements.IExpressionStatement;
-import cc.kave.commons.model.ssts.statements.IGotoStatement;
-import cc.kave.commons.model.ssts.statements.ILabelledStatement;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
+import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.model.ssts.statements.IThrowStatement;
-import cc.kave.commons.model.ssts.statements.IUnknownStatement;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
-public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<IInlineConstantContext, Void> {
+public class InlineConstantVisitor extends AbstractTraversingNodeVisitor<Void, Void> {
+	private Set<IFieldDeclaration> constants;
+	private AbstractConstantCollectorVisitor collector;
+
+	public InlineConstantVisitor() {
+		this.constants = new HashSet<IFieldDeclaration>();
+		this.collector = new ConstantCollectorVisitor();
+	}
+
+	public InlineConstantVisitor(AbstractConstantCollectorVisitor collector) {
+		this.constants = new HashSet<IFieldDeclaration>();
+		this.collector = collector;
+	}
+
+	private void collectConstants(ISSTNode node) {
+		constants.clear();
+		constants.addAll(node.accept(collector, new HashSet<IFieldDeclaration>()));
+	}
 
 	@Override
-	public Void visit(ISST sst, IInlineConstantContext context) {
-		context.collectConstants(sst);
-		for (IPropertyDeclaration property : sst.getProperties()) {
-			property.accept(this, context);
-		}
-		for (IMethodDeclaration method : sst.getMethods()) {
-			method.accept(this, context);
-		}
+	public Void visit(ISST sst, Void context) {
+		collectConstants(sst);
+		super.visit(sst, context);
 		return null;
 	}
 
 	@Override
-	public Void visit(IFieldDeclaration stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IAssignment stmt, IInlineConstantContext context) {
-		stmt.getExpression().accept(this, context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IMethodDeclaration stmt, IInlineConstantContext context) {
-		this.visit(stmt.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IPropertyDeclaration stmt, IInlineConstantContext context) {
-		this.visit(stmt.getGet(), context);
-		this.visit(stmt.getSet(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IVariableDeclaration stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IBreakStatement stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IContinueStatement stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IExpressionStatement stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IGotoStatement stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(ILabelledStatement stmt, IInlineConstantContext context) {
-		stmt.getStatement().accept(this, context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IReturnStatement stmt, IInlineConstantContext context) {
+	public Void visit(IReturnStatement stmt, Void context) {
 		ISimpleExpression expr = stmt.getExpression();
-		if (context.isConstant(expr)) {
+		if (isConstantExpression(expr)) {
 			if (stmt instanceof ReturnStatement) {
-				((ReturnStatement) stmt).setExpression(new ConstantValueExpression());
+				((ReturnStatement) stmt).setExpression(constant(null));
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public Void visit(IThrowStatement stmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IDoLoop block, IInlineConstantContext context) {
-		block.getCondition().accept(this, context);
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IForEachLoop block, IInlineConstantContext context) {
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IForLoop block, IInlineConstantContext context) {
-		block.getCondition().accept(this, context);
-		this.visit(block.getInit(), context);
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IIfElseBlock block, IInlineConstantContext context) {
-		block.getCondition().accept(this, context);
-		this.visit(block.getThen(), context);
-		this.visit(block.getElse(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(ILockBlock stmt, IInlineConstantContext context) {
-		this.visit(stmt.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(ISwitchBlock block, IInlineConstantContext context) {
-		this.visit(block.getDefaultSection(), context);
-		for (ICaseBlock caseBlock : block.getSections()) {
-			this.visit(caseBlock.getBody(), context);
-		}
-		return null;
-	}
-
-	@Override
-	public Void visit(ITryBlock block, IInlineConstantContext context) {
-		this.visit(block.getBody(), context);
-		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			this.visit(catchBlock.getBody(), context);
-		}
-		return null;
-	}
-
-	@Override
-	public Void visit(IUncheckedBlock block, IInlineConstantContext context) {
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnsafeBlock block, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IUsingBlock block, IInlineConstantContext context) {
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IWhileLoop block, IInlineConstantContext context) {
-		block.getCondition().accept(this, context);
-		this.visit(block.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(ICompletionExpression entity, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IComposedExpression expr, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IIfElseExpression expr, IInlineConstantContext context) {
-		expr.getCondition().accept(this, context);
-		expr.getThenExpression().accept(this, context);
-		expr.getElseExpression().accept(this, context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IInvocationExpression entity, IInlineConstantContext context) {
+	public Void visit(IInvocationExpression entity, Void context) {
 		List<ISimpleExpression> parameters = new ArrayList<ISimpleExpression>();
 		for (ISimpleExpression expr : entity.getParameters()) {
-			if (context.isConstant(expr)) {
-				parameters.add(new ConstantValueExpression());
+			if (isConstantExpression(expr)) {
+				parameters.add(constant(null));
 			} else {
 				parameters.add(expr);
 			}
@@ -257,40 +97,80 @@ public class InlineConstantVisitor extends AbstractThrowingNodeVisitor<IInlineCo
 	}
 
 	@Override
-	public Void visit(ILambdaExpression expr, IInlineConstantContext context) {
-		this.visit(expr.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(ILoopHeaderBlockExpression expr, IInlineConstantContext context) {
-		this.visit(expr.getBody(), context);
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnknownExpression unknownExpr, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnknownStatement unknownStmt, IInlineConstantContext context) {
-		return null;
-	}
-
-	@Override
-	public Void visit(IEventSubscriptionStatement stmt, IInlineConstantContext context) {
-		stmt.getExpression().accept(this, context);
-		return null;
-	}
-	
-	/**
-	 * Helper method to visit list of statements.
-	 */
-	public Void visit(List<IStatement> stmts, IInlineConstantContext context) {
-		for (IStatement s : stmts) {
-			s.accept(this, context);
+	public Void visit(IIfElseExpression expr, Void context) {
+		super.visit(expr, context);
+		if (expr instanceof IfElseExpression) {
+			if (isConstantExpression(expr.getCondition())) {
+				((IfElseExpression) expr).setCondition(constant(null));
+			}
+			if (isConstantExpression(expr.getThenExpression())) {
+				((IfElseExpression) expr).setThenExpression(constant(null));
+			}
+			if (isConstantExpression(expr.getElseExpression())) {
+				((IfElseExpression) expr).setElseExpression(constant(null));
+			}
 		}
 		return null;
 	}
+
+	@Override
+	public Void visit(IIndexAccessExpression expr, Void context) {
+		super.visit(expr, context);
+		if (expr instanceof IndexAccessExpression) {
+			List<ISimpleExpression> indices = new ArrayList<ISimpleExpression>();
+			for (ISimpleExpression idx : expr.getIndices()) {
+				if (isConstantExpression(idx))
+					indices.add(constant(null));
+				else
+					indices.add(idx);
+			}
+			((IndexAccessExpression) expr).setIndices(indices);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(IBinaryExpression expr, Void context) {
+		super.visit(expr, context);
+		if (expr instanceof BinaryExpression) {
+			if (isConstantExpression(expr.getLeftOperand())) {
+				((BinaryExpression) expr).setLeftOperand(constant(null));
+			}
+			if (isConstantExpression(expr.getRightOperand())) {
+				((BinaryExpression) expr).setRightOperand(constant(null));
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnaryExpression expr, Void context) {
+		super.visit(expr, context);
+		if (expr instanceof UnaryExpression) {
+			if (isConstantExpression(expr.getOperand())) {
+				((UnaryExpression) expr).setOperand(constant(null));
+			}
+		}
+		expr.getOperand().accept(this, context);
+		return null;
+	}
+
+	public boolean isConstantExpression(ISimpleExpression expr) {
+		if (expr instanceof IReferenceExpression) {
+			IReference reference = ((IReferenceExpression) expr).getReference();
+			if (reference instanceof IFieldReference) {
+				return isConstant((IFieldReference) reference);
+			}
+		}
+		return false;
+	}
+
+	public boolean isConstant(IFieldReference field) {
+		for (IFieldDeclaration constant : constants) {
+			if (constant.getName().equals(field.getFieldName()))
+				return true;
+		}
+		return false;
+	}
+
 }
