@@ -51,8 +51,10 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 	@Override
 	public Void visit(ILambdaExpression expr, TypeCollectorVisitorContext context) {
-		context.enterScope();
 		LambdaName lambda = expr.getName();
+		context.collectType(lambda.getReturnType());
+		
+		context.enterScope();
 		for (ParameterName parameter : lambda.getParameters()) {
 			context.declareParameter(parameter);
 		}
@@ -218,6 +220,7 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 	@Override
 	public Void visit(IFieldReference fieldRef, TypeCollectorVisitorContext context) {
+		fieldRef.getReference().accept(this, context);
 		context.useFieldReference(fieldRef);
 		return null;
 	}
@@ -230,6 +233,7 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 	@Override
 	public Void visit(IPropertyReference propertyRef, TypeCollectorVisitorContext context) {
+		propertyRef.getReference().accept(this, context);
 		context.usePropertyReference(propertyRef);
 		return null;
 	}

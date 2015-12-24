@@ -62,18 +62,17 @@ public class TypeCollectorVisitorContext {
 		declare(languageOptions.getThisName(), typeHierarchy.getElement());
 		declare(languageOptions.getSuperName(), languageOptions.getSuperType(typeHierarchy));
 
-		// TODO this might not be necessary as property and field references contain a type
-
-		// add fields
+		// collect the types of fields and properties
+		// note that these do not have to be added to the symbol table as FieldReference and PropertyReference contain
+		// the associated type
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
 			IFieldName field = fieldDecl.getName();
-			declare(field.getName(), field.getValueType());
+			collectType(field.getValueType());
 		}
 
-		// add properties
 		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
 			IPropertyName property = propertyDecl.getName();
-			declare(property.getName(), property.getValueType());
+			collectType(property.getValueType());
 		}
 	}
 
@@ -83,6 +82,7 @@ public class TypeCollectorVisitorContext {
 	}
 
 	public void enterMethod(IMethodDeclaration method) {
+		collectType(method.getName().getReturnType());
 		symbolTable.enter();
 		for (IParameterName parameter : method.getName().getParameters()) {
 			declareParameter(parameter);

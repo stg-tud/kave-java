@@ -31,7 +31,7 @@ public class CSharpLanguageOptions extends LanguageOptions {
 
 	@Override
 	public ITypeName getTopClass() {
-		return TypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
+		return TypeName.newTypeName("System.Object, mscorlib");
 	}
 
 	@Override
