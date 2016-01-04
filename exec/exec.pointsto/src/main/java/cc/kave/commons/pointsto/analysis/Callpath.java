@@ -65,6 +65,10 @@ public class Callpath implements Iterable<IMethodName> {
 	public Iterator<IMethodName> iterator() {
 		return path.iterator();
 	}
+	
+	public Iterator<MethodName> reverseIterator() {
+		return path.descendingIterator();
+	}
 
 	@Override
 	public String toString() {

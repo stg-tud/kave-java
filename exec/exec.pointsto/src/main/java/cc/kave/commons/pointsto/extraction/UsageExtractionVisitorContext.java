@@ -12,8 +12,11 @@
  */
 package cc.kave.commons.pointsto.extraction;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +56,7 @@ public class UsageExtractionVisitorContext {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UsageExtractionVisitorContext.class);
 
+	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 	private DefinitionSitePriorityComparator definitionSiteComparator = new DefinitionSitePriorityComparator();
 
 	private PointerAnalysis pointerAnalysis;
@@ -61,6 +65,7 @@ public class UsageExtractionVisitorContext {
 	private DeclarationMapper declarationMapper;
 
 	private ITypeName enclosingClass;
+	private Deque<TypeName> classContextStack = new ArrayDeque<>();
 
 	private Map<AbstractLocation, DummyUsage> locationUsages = new HashMap<>();
 
@@ -72,7 +77,10 @@ public class UsageExtractionVisitorContext {
 	public UsageExtractionVisitorContext(PointsToContext context, DescentStrategy descentStrategy) {
 		this.pointerAnalysis = context.getPointerAnalysis();
 		this.descentStrategy = descentStrategy;
+
 		this.enclosingClass = context.getTypeShape().getTypeHierarchy().getElement();
+		this.classContextStack.addFirst(enclosingClass);
+
 		this.typeCollector = new TypeCollector(context);
 		this.declarationMapper = new DeclarationMapper(context);
 
@@ -105,14 +113,39 @@ public class UsageExtractionVisitorContext {
 		currentCallpath.leaveMethod();
 	}
 
-	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, ITypeName type) {
+	public void enterLambda() {
+		IMethodName currentMethod = currentCallpath.getLast();
+		IMethodName lambdaMethod = languageOptions.addLambda(currentMethod);
+		currentCallpath.enterMethod(lambdaMethod);
+
+		ITypeName lambdaClassContext = languageOptions.addLambda(classContextStack.getFirst());
+		classContextStack.addFirst(lambdaClassContext);
+	}
+
+	public void leaveLambda() {
+		currentCallpath.leaveMethod();
+		classContextStack.removeFirst();
+	}
+
+	private IMethodName getCurrentEnclosingMethod() {
+		Iterator<IMethodName> iter = currentCallpath.reverseIterator();
+		while (iter.hasNext()) {
+			IMethodName method = iter.next();
+			IMethodDeclaration methodDecl = declarationMapper.get(method);
+
+			if (languageOptions.isLambdaName(method) || (methodDecl != null && methodDecl.isEntryPoint())) {
+				return method;
+			}
+		}
+
+		return currentCallpath.getFirst();
+	}
+
 		QueryContextKey query = new QueryContextKey(reference, currentStatement, type, currentCallpath);
 		return pointerAnalysis.query(query);
 	}
 
 	private void createImplicitDefinitions(Context context) {
-		LanguageOptions languageOptions = LanguageOptions.getInstance();
-
 		// this
 		DummyDefinitionSite thisDefinition = DummyDefinitionSite.byThis();
 		IReference thisReference = SSTBuilder.variableReference(languageOptions.getThisName());
@@ -166,8 +199,8 @@ public class UsageExtractionVisitorContext {
 		DummyUsage usage = new DummyUsage();
 
 		usage.setType(type);
-		usage.setClassContext(enclosingClass);
-		usage.setMethodContext(currentCallpath.getFirst());
+		usage.setClassContext(classContextStack.getFirst());
+		usage.setMethodContext(getCurrentEnclosingMethod());
 
 		if (location == null || !implicitDefinitions.containsKey(location)) {
 			usage.setDefinitionSite(DummyDefinitionSite.unknown());

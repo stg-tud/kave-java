@@ -12,7 +12,9 @@
  */
 package cc.kave.commons.pointsto;
 
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public abstract class LanguageOptions {
@@ -23,6 +25,8 @@ public abstract class LanguageOptions {
 		return instance;
 	}
 
+	protected static final String LAMBDA_KEYWORD = "$Lambda";
+
 	public abstract String getThisName();
 
 	public abstract String getSuperName();
@@ -32,5 +36,15 @@ public abstract class LanguageOptions {
 	public abstract ITypeName getTopClass();
 
 	public abstract String getPropertyParameterName();
+
+	public abstract IMethodName addLambda(IMethodName method);
+
+	public abstract IMethodName removeLambda(IMethodName method);
+
+	public abstract ITypeName addLambda(ITypeName type);
+
+	public boolean isLambdaName(Name name) {
+		return name.getIdentifier().contains(LAMBDA_KEYWORD);
+	}
 
 }

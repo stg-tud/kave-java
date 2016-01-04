@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.recommenders.usages.DefinitionSiteKind;
@@ -33,6 +34,8 @@ import cc.recommenders.usages.DefinitionSiteKind;
 public class PointsToUsageExtractor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageExtractor.class);
+
+	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 
 	private UsageStatisticsCollector collector;
 
@@ -113,7 +116,7 @@ public class PointsToUsageExtractor {
 
 	private void rewriteThisType(List<DummyUsage> usages, ITypeShape typeShape) {
 		// TODO what about the methods of the call sites?
-		
+
 		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 		if (typeHierarchy.hasSuperclass()) {
 			ITypeName superType = typeHierarchy.getExtends().getElement();
@@ -135,33 +138,53 @@ public class PointsToUsageExtractor {
 			usage.setMethodContext(getMethodContext(usage.getMethodContext(), typeShape.getMethodHierarchies()));
 		}
 	}
-	
+
 	private TypeName getClassContext(TypeName currentContext, ITypeHierarchy typeHierarchy) {
+		boolean wasLambdaContext = languageOptions.isLambdaName(currentContext);
+
 		if (typeHierarchy.hasSuperclass()) {
-			return typeHierarchy.getExtends().getElement();
+			TypeName superType = typeHierarchy.getExtends().getElement();
+
+			if (wasLambdaContext && !languageOptions.isLambdaName(superType)) {
+				return languageOptions.addLambda(superType);
+			} else {
+				return superType;
+			}
 		} else {
 			return currentContext;
 		}
 	}
-	
-	private MethodName getMethodContext(MethodName currentContext, Collection<IMethodHierarchy> hierarchies) {	
+
+	private MethodName getMethodContext(MethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
+		boolean wasLambdaContext = languageOptions.isLambdaName(currentContext);
+		MethodName restoredMethod = currentContext;
+		if (wasLambdaContext) {
+			// remove lambda qualifiers in order to find the fitting method hierarchy
+			restoredMethod = languageOptions.removeLambda(currentContext);
+		}
+
 		for (IMethodHierarchy methodHierarchy : hierarchies) {
 			MethodName method = methodHierarchy.getElement();
-			
-			if (currentContext.equals(method)) {
+
+			if (restoredMethod.equals(method)) {
 				MethodName firstMethod = methodHierarchy.getFirst();
 				MethodName superMethod = methodHierarchy.getSuper();
-				
+
+				MethodName newMethodContext = currentContext;
 				if (firstMethod != null) {
-					return firstMethod;
+					newMethodContext = firstMethod;
 				} else if (superMethod != null) {
-					return superMethod;
+					newMethodContext = superMethod;
 				} else {
 					return currentContext;
 				}
+
+				if (wasLambdaContext) {
+					return languageOptions.addLambda(newMethodContext);
+				}
 			}
 		}
-		
+
 		return currentContext;
 	}
 }

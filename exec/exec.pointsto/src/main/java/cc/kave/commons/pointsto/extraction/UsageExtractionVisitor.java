@@ -28,6 +28,7 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -72,6 +73,15 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 		context.enterNonEntryPoint(methodDecl.getName());
 		visitMethod(methodDecl, context);
 		context.leaveNonEntryPoint();
+	}
+
+	@Override
+	public Void visit(ILambdaExpression expr, UsageExtractionVisitorContext context) {
+		context.enterLambda();
+		super.visit(expr, context);
+		context.leaveLambda();
+
+		return null;
 	}
 
 	@Override
