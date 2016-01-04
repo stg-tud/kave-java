@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,6 +33,8 @@ public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
 
 	@Override
 	public PointsToContext compute(Context context) {
+		checkContextBinding();
+		
 		TypeCollector typeCollector = new TypeCollector(context);
 		for (ITypeName type : typeCollector.getTypes()) {
 			QueryContextKey key = new QueryContextKey(null, null, type, null);
@@ -43,10 +46,18 @@ public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
-		// assume that unknown types may point to any known location
-		if (query.getType() != null && query.getType().isUnknown()) {
-			LOGGER.debug("Queried for an unknown type");
-			return new HashSet<>(contextToLocations.values());
+		TypeName type = query.getType();
+		if (type != null) {
+			// querying for void types does not make any sense...
+			if (type.isVoidType()) {
+				return Collections.emptySet();
+			}
+
+			// assume that unknown types may point to any known location
+			if (type.isUnknown()) {
+				LOGGER.debug("Queried for an unknown type");
+				return new HashSet<>(contextToLocations.values());
+			}
 		}
 
 		// lower query to used format

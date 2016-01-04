@@ -20,9 +20,21 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import cc.kave.commons.model.events.completionevents.Context;
+
 public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 
 	protected Multimap<QueryContextKey, AbstractLocation> contextToLocations = HashMultimap.create();
+
+	/**
+	 * Checks whether this {@link PointerAnalysis} has already been bound to a {@link Context} and throws an
+	 * {@link IllegalStateException} accordingly.
+	 */
+	protected void checkContextBinding() {
+		if (!contextToLocations.isEmpty()) {
+			throw new IllegalStateException("Analysis has already been bound to a context");
+		}
+	}
 
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {

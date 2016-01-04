@@ -18,6 +18,10 @@ import cc.kave.commons.model.events.completionevents.Context;
 
 public interface PointerAnalysis {
 
+	/**
+	 * Computes the points-to information for the specified {@link Context} and stores a reference to this instance in
+	 * the returned {@link PointsToContext}. This method may only be called once.
+	 */
 	PointsToContext compute(Context context);
 
 	Set<AbstractLocation> query(QueryContextKey query);
