@@ -77,7 +77,17 @@ public class TypeCollectorVisitorContext {
 	}
 
 	private void declare(String identifier, ITypeName type) {
-		symbolTable.create(identifier, type);
+		declare(identifier, type, false);
+	}
+
+	private void declare(String identifier, ITypeName type, boolean allowUpdate) {
+		if (allowUpdate) {
+			if (symbolTable.createOrUpdate(identifier, type)) {
+				LOGGER.debug("Redeclared variable {}", identifier);
+			}
+		} else {
+			symbolTable.create(identifier, type);
+		}
 		allTypes.add(type);
 	}
 
@@ -106,7 +116,8 @@ public class TypeCollectorVisitorContext {
 			LOGGER.error("Cannot declare a missing variable");
 		} else {
 			ITypeName type = varDecl.getType();
-			declare(varDecl.getReference().getIdentifier(), type);
+			// SST lack a compound statement to handle scoping brackets -> allow a variable to be declared multiple times
+			declare(varDecl.getReference().getIdentifier(), type, true);
 
 			referenceTypes.put(varDecl.getReference(), type);
 		}
@@ -120,7 +131,7 @@ public class TypeCollectorVisitorContext {
 		}
 	}
 
-	public void collectType(TypeName type) {
+	public void collectType(ITypeName type) {
 		if (!type.isTypeParameter() && !type.isVoidType()) {
 			allTypes.add(type);
 		}

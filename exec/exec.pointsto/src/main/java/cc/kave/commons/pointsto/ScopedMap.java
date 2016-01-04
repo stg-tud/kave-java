@@ -79,4 +79,28 @@ public class ScopedMap<K, V> {
 		}
 		values.addFirst(value);
 	}
+
+	/**
+	 * @return {@code true} if an existing entry in the current scope has been updated, {@code false} if a new entry has
+	 *         been created
+	 */
+	public boolean createOrUpdate(K key, V value) {
+		boolean update = keyStack.getFirst().contains(key);
+
+		Deque<V> values = entries.get(key);
+		if (values == null) {
+			values = new ArrayDeque<>();
+			entries.put(key, values);
+		}
+
+		if (update) {
+			values.removeFirst();
+			values.addFirst(value);
+		} else {
+			keyStack.getFirst().add(key);
+			values.addFirst(value);
+		}
+
+		return update;
+	}
 }
