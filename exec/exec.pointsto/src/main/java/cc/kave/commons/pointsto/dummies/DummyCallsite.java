@@ -71,4 +71,35 @@ public class DummyCallsite {
 		return MoreObjects.toStringHelper(DummyCallsite.class).add("kind", kind).add("method", method).toString();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + argIndex;
+		result = prime * result + ((kind == null) ? 0 : kind.hashCode());
+		result = prime * result + ((method == null) ? 0 : method.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DummyCallsite other = (DummyCallsite) obj;
+		if (argIndex != other.argIndex)
+			return false;
+		if (kind != other.kind)
+			return false;
+		if (method == null) {
+			if (other.method != null)
+				return false;
+		} else if (!method.equals(other.method))
+			return false;
+		return true;
+	}
+
 }
