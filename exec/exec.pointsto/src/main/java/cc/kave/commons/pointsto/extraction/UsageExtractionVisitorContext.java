@@ -335,7 +335,18 @@ public class UsageExtractionVisitorContext {
 		ITypeName type = typeCollector.getType(parameterExpr);
 		// fall back to the type of the formal parameter if the type of the actual one is not available
 		if (type == null) {
-			type = method.getParameters().get(argIndex).getValueType();
+			// special case: last parameter is declared as parameter array (params)
+			List<ParameterName> formalParameters = method.getParameters();
+			if (argIndex >= formalParameters.size() - 1) {
+				ParameterName lastParameter = formalParameters.get(formalParameters.size() - 1);
+				if (lastParameter.isParameterArray()) {
+					type = lastParameter.getValueType().getArrayBaseType();
+				} else {
+					type = lastParameter.getValueType();
+				}
+			} else {
+				type = method.getParameters().get(argIndex).getValueType();
+			}
 		}
 
 		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
