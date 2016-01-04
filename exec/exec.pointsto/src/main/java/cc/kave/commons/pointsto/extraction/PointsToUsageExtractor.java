@@ -180,8 +180,10 @@ public class PointsToUsageExtractor {
 				}
 
 				if (wasLambdaContext) {
-					return languageOptions.addLambda(newMethodContext);
+					newMethodContext = languageOptions.addLambda(newMethodContext);
 				}
+
+				return newMethodContext;
 			}
 		}
 
