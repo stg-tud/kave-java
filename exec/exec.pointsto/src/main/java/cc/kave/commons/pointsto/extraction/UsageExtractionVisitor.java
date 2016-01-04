@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
-
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -79,23 +79,27 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 		MethodName method = entity.getMethodName();
 
 		// TODO replace with isUnknown once fixed
-		if (method.getIdentifier().equals("[?] [?].???()")) {
+		if (method.getIdentifier().equals(MethodName.UNKNOWN_NAME.getIdentifier())) {
 			LOGGER.debug("Skipping unknown method call");
 			return null;
 		}
 
-		// static methods and constructors do not have any receiver objects
-		if (!method.isStatic() && !method.isConstructor()) {
-			context.registerReceiverCallsite(method, entity.getReference());
-		}
+		// do not register call sites for non entry point (private) methods of the current class
+		if (!context.isNonEntryPointMethod(method)) {
 
-		for (int i = 0; i < entity.getParameters().size(); ++i) {
-			ISimpleExpression parameterExpr = entity.getParameters().get(i);
+			// static methods and constructors do not have any receiver objects
+			if (!method.isStatic() && !method.isConstructor()) {
+				context.registerReceiverCallsite(method, entity.getReference());
+			}
 
-			// TODO ignore constant, null and unknown parameters?
-			if (parameterExpr instanceof IReferenceExpression) {
-				IReferenceExpression refExpr = (IReferenceExpression) parameterExpr;
-				context.registerParameterCallsite(method, refExpr.getReference(), i);
+			for (int i = 0; i < entity.getParameters().size(); ++i) {
+				ISimpleExpression parameterExpr = entity.getParameters().get(i);
+
+				// TODO ignore constant, null and unknown parameters?
+				if (parameterExpr instanceof IReferenceExpression) {
+					IReferenceExpression refExpr = (IReferenceExpression) parameterExpr;
+					context.registerParameterCallsite(method, refExpr.getReference(), i);
+				}
 			}
 		}
 

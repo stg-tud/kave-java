@@ -47,6 +47,7 @@ import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.pointsto.dummies.DummyCallsite;
 import cc.kave.commons.pointsto.dummies.DummyDefinitionSite;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.usages.DefinitionSiteKind;
 
 public class UsageExtractionVisitorContext {
 
@@ -198,7 +199,17 @@ public class UsageExtractionVisitorContext {
 			DummyUsage usage = getOrCreateUsage(location, query.getType());
 
 			DummyDefinitionSite currentDefinition = usage.getDefinitionSite();
-			if (definitionSiteComparator.compare(currentDefinition, newDefinition) < 0) {
+
+			boolean currentDefinitionIsReturnOfNonEntryPoint = false;
+			if (currentDefinition.getKind() == DefinitionSiteKind.RETURN) {
+				IMethodDeclaration methodDecl = declarationMapper.get(currentDefinition.getMethod());
+				currentDefinitionIsReturnOfNonEntryPoint = methodDecl != null && !methodDecl.isEntryPoint();
+			}
+
+			boolean newDefinitionHasHigherPriority = definitionSiteComparator.compare(currentDefinition,
+					newDefinition) < 0;
+
+			if (currentDefinitionIsReturnOfNonEntryPoint || newDefinitionHasHigherPriority) {
 				usage.setDefinitionSite(newDefinition);
 			}
 		}
@@ -280,6 +291,11 @@ public class UsageExtractionVisitorContext {
 	public void registerPotentialReturnDefinitionSite(IMethodName method) {
 		DummyDefinitionSite newDefinition = DummyDefinitionSite.byReturn(method);
 		registerMethodDefinition(newDefinition, method.getReturnType());
+	}
+
+	public boolean isNonEntryPointMethod(MethodName method) {
+		IMethodDeclaration methodDecl = declarationMapper.get(method);
+		return methodDecl != null && !methodDecl.isEntryPoint();
 	}
 
 	public void registerParameterCallsite(IMethodName method, IReference parameterExpr, int argIndex) {
