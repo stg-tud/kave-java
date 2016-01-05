@@ -19,11 +19,19 @@ import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsPropertyName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
+import cc.kave.commons.model.ssts.blocks.ITryBlock;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -40,9 +48,12 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 /**
  * Provides functionality related to SST construction for tests.
@@ -176,6 +187,78 @@ public class TestSSTBuilder {
 		return createContext(sst);
 	}
 
+	public List<Context> createPaperTest() {
+		TypeName sType = CsTypeName.newTypeName("Test.PaperTest.S, Test");
+		TypeName aType = CsTypeName.newTypeName("Test.PaperTest.A, Test");
+		TypeName bType = CsTypeName.newTypeName("Test.PaperTest.B, Test");
+		TypeName cType = CsTypeName.newTypeName("Test.PaperTest.C, Test");
+		TypeName dType = CsTypeName.newTypeName("Test.PaperTest.D, Test");
+		SST sst = createEmptySST(aType);
+
+		sst.setFields(
+				declareFields(String.format(Locale.US, "[%s] [%s].b", bType.getIdentifier(), aType.getIdentifier())));
+		IFieldDeclaration bFieldDecl = sst.getFields().iterator().next();
+		MethodName helperName = CsMethodName.newMethodName(
+				String.format(Locale.US, "[%s] [%s].helper()", getVoidType().getIdentifier(), aType.getIdentifier()));
+		MethodName fromSName = CsMethodName.newMethodName(
+				String.format(Locale.US, "[%s] [%s].fromS()", cType.getIdentifier(), sType.getIdentifier()));
+		MethodName entry2Name = CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].entry2([%s] b)",
+				getVoidType().getIdentifier(), cType.getIdentifier(), bType.getIdentifier()));
+		IMethodDeclaration entry1Decl = declareMethod(
+				CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].entry1()", getVoidType().getIdentifier(),
+						aType.getIdentifier())),
+				true, declareVar("tmpB", bType),
+				assignmentToLocal("tmpB", refExpr(buildFieldReference(bFieldDecl.getName()))),
+				invocationStatement("tmpB",
+						CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m1()",
+								getVoidType().getIdentifier(), bType.getIdentifier()))),
+				invocationStatement("this", helperName), declareVar("c", cType),
+				assignmentToLocal("c", invocationExpression("this", fromSName)), invocationStatement("c", entry2Name,
+						Iterators.forArray(refExpr(buildFieldReference(bFieldDecl.getName())))));
+
+		IMethodDeclaration helperDecl = declareMethod(
+				CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].helper()", getVoidType().getIdentifier(),
+						aType.getIdentifier())),
+				false, declareVar("tmpB", bType),
+				assignmentToLocal("tmpB", refExpr(buildFieldReference(bFieldDecl.getName()))),
+				invocationStatement("tmpB", CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m2()",
+						getVoidType().getIdentifier(), bType.getIdentifier()))));
+
+		sst.setMethods(Sets.newHashSet(entry1Decl, helperDecl));
+
+		Context aContext = createContext(sst);
+		TypeHierarchy typeHierarchy = (TypeHierarchy) aContext.getTypeShape().getTypeHierarchy();
+		typeHierarchy.setExtends(new TypeHierarchy(sType.getIdentifier()));
+		MethodHierarchy methodHierarchy = (MethodHierarchy) aContext.getTypeShape().getMethodHierarchies().iterator()
+				.next();
+		methodHierarchy.setSuper(CsMethodName.newMethodName(
+				String.format(Locale.US, "[%s] [%s].entry1()", getVoidType().getIdentifier(), sType.getIdentifier())));
+
+		// C
+		sst = createEmptySST(cType);
+		MethodName entry3Name = CsMethodName.newMethodName(
+				String.format(Locale.US, "[%s] [%s].entry3()", getVoidType().getIdentifier(), cType.getIdentifier()));
+		MethodName dConstructor = CsMethodName.newMethodName(
+				String.format(Locale.US, "[%s] [%s]..ctor()", getVoidType().getIdentifier(), dType.getIdentifier()));
+		IMethodDeclaration entry2Decl = declareMethod(entry2Name, true,
+				invocationStatement("b",
+						CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m3()",
+								getVoidType().getIdentifier(), bType.getIdentifier()))),
+				invocationStatement("this", entry3Name));
+		IMethodDeclaration entry3Decl = declareMethod(entry3Name, true, declareVar("d", dType),
+				assignmentToLocal("d",
+						invocationExpr(dConstructor)),
+				buildTryBlock(invocationStatement("d",
+						CsMethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m4()",
+								getVoidType().getIdentifier(), dType.getIdentifier()))),
+						buildCatchBlock(invocationStatement("d", CsMethodName.newMethodName(String.format(Locale.US,
+								"[%s] [%s].m5()", getVoidType().getIdentifier(), dType.getIdentifier()))))));
+		sst.setMethods(Sets.newHashSet(entry2Decl, entry3Decl));
+		Context cContext = createContext(sst);
+
+		return Arrays.asList(aContext, cContext);
+	}
+
 	private IFieldReference buildFieldReference(FieldName field) {
 		return buildFieldReference("this", field);
 	}
@@ -193,4 +276,21 @@ public class TestSSTBuilder {
 		propertyRef.setPropertyName(property);
 		return propertyRef;
 	}
+
+	public ITryBlock buildTryBlock(IStatement body, ICatchBlock catchBlock) {
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setBody(Arrays.asList(body));
+		tryBlock.setCatchBlocks(Arrays.asList(catchBlock));
+		tryBlock.setFinally(Collections.emptyList());
+		return tryBlock;
+	}
+
+	public ICatchBlock buildCatchBlock(IStatement... body) {
+		CatchBlock catchBlock = new CatchBlock();
+		catchBlock.setKind(CatchBlockKind.Default);
+		catchBlock.setBody(Arrays.asList(body));
+		catchBlock.setParameter(CsParameterName.newParameterName("[System.Exception, mscorlib] ex"));
+		return catchBlock;
+	}
+
 }

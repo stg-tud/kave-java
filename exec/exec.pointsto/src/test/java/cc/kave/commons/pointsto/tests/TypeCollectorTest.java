@@ -12,12 +12,14 @@
  */
 package cc.kave.commons.pointsto.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Iterators;
@@ -57,14 +59,14 @@ public class TypeCollectorTest {
 		TypeCollector collector = new TypeCollector(streamTestContext);
 		Set<TypeName> allTypes = collector.getTypes();
 
-		Assert.assertFalse(allTypes.isEmpty());
+		assertFalse(allTypes.isEmpty());
 
 		TypeName streamTestType = streamTestContext.getTypeShape().getTypeHierarchy().getElement();
 		Set<TypeName> expectedTypes = Sets.newHashSet(streamTestType, languageOptions.getTopClass(),
 				builder.getStringType(), builder.getFileStreamType(), builder.getByteArrayType(),
 				builder.getInt32Type());
 		expectedTypes.add(CsTypeName.UNKNOWN_NAME); // assume that enums are treated as unknown types
-		Assert.assertEquals(expectedTypes, allTypes);
+		assertEquals(expectedTypes, allTypes);
 	}
 
 	@Test
@@ -79,19 +81,19 @@ public class TypeCollectorTest {
 			MethodName method = methodDecl.getName();
 			List<IStatement> stmts = methodDecl.getBody();
 			if (method.isConstructor()) {
-				Assert.assertEquals(1, stmts.size());
+				assertEquals(1, stmts.size());
 				IAssignment assignment = (IAssignment) stmts.get(0);
-				Assert.assertEquals(builder.getStringType(), collector.getType(assignment.getReference()));
+				assertEquals(builder.getStringType(), collector.getType(assignment.getReference()));
 				testedMethods.set(0, true);
 			} else if (method.getName().equals("OpenSource")) {
 				IReturnStatement retStmt = (IReturnStatement) stmts.get(stmts.size() - 1);
 				IReferenceExpression refExpr = (IReferenceExpression) retStmt.getExpression();
-				Assert.assertEquals(builder.getFileStreamType(), collector.getType(refExpr.getReference()));
+				assertEquals(builder.getFileStreamType(), collector.getType(refExpr.getReference()));
 				testedMethods.set(1, true);
 			}
 		}
 
-		Assert.assertEquals(Arrays.asList(true, true, false), testedMethods);
+		assertEquals(Arrays.asList(true, true, false), testedMethods);
 	}
 
 	@Test
@@ -99,7 +101,7 @@ public class TypeCollectorTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 
 		// void return type should not be collected
-		Assert.assertFalse(new TypeCollector(builder.createStreamTest()).getTypes().contains(builder.getVoidType()));
+		assertFalse(new TypeCollector(builder.createStreamTest()).getTypes().contains(builder.getVoidType()));
 
 		SST sst = builder.createEmptySST(CsTypeName.newTypeName("Test.ReturnTest, Test"));
 		IMethodDeclaration testVoidDecl = SSTUtil.declareMethod(CsMethodName.newMethodName("["
@@ -114,7 +116,7 @@ public class TypeCollectorTest {
 		TypeCollector collector = new TypeCollector(context);
 		Set<TypeName> expected = Sets.newHashSet(sst.getEnclosingType(), languageOptions.getTopClass(),
 				builder.getStringType());
-		Assert.assertEquals(expected, collector.getTypes());
+		assertEquals(expected, collector.getTypes());
 	}
 
 	public void testInvocationReference() {
@@ -134,7 +136,7 @@ public class TypeCollectorTest {
 		sst.setMethods(Sets.newHashSet(testDecl));
 
 		TypeCollector collector = new TypeCollector(builder.createContext(sst));
-		Assert.assertEquals(languageOptions.getTopClass(), collector.getType(equalsInvocation.getReference()));
+		assertEquals(languageOptions.getTopClass(), collector.getType(equalsInvocation.getReference()));
 	}
 
 	@Test
@@ -161,7 +163,7 @@ public class TypeCollectorTest {
 		sst.setMethods(Sets.newHashSet(testDecl));
 
 		TypeCollector collector = new TypeCollector(builder.createContext(sst));
-		Assert.assertEquals(testClass, collector.getType(fieldReference.getReference()));
-		Assert.assertEquals(builder.getStringType(), collector.getType(propertyReference.getReference()));
+		assertEquals(testClass, collector.getType(fieldReference.getReference()));
+		assertEquals(builder.getStringType(), collector.getType(propertyReference.getReference()));
 	}
 }
