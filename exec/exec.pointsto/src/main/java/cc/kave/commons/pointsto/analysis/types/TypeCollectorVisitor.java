@@ -15,6 +15,7 @@ package cc.kave.commons.pointsto.analysis.types;
 import cc.kave.commons.model.names.LambdaName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
@@ -53,7 +54,7 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 	public Void visit(ILambdaExpression expr, TypeCollectorVisitorContext context) {
 		LambdaName lambda = expr.getName();
 		context.collectType(lambda.getReturnType());
-		
+
 		context.enterScope();
 		for (ParameterName parameter : lambda.getParameters()) {
 			context.declareParameter(parameter);
@@ -92,7 +93,13 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			context.enterScope();
-			context.declareParameter(catchBlock.getParameter());
+
+			// only default catch blocks have a usable parameter, the other kinds do not bind the caught exception to a
+			// usable name
+			if (catchBlock.getKind() == CatchBlockKind.Default) {
+				context.declareParameter(catchBlock.getParameter());
+			}
+
 			visitStatements(catchBlock.getBody(), context);
 			context.leaveScope();
 		}
@@ -204,17 +211,17 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 		context.declareVariable(stmt);
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IInvocationExpression entity, TypeCollectorVisitorContext context) {
 		MethodName method = entity.getMethodName();
 		context.collectType(method.getDeclaringType());
 		context.collectType(method.getReturnType());
-		
+
 		for (ParameterName parameter : method.getParameters()) {
 			context.collectType(parameter.getValueType());
 		}
-		
+
 		return super.visit(entity, context);
 	}
 
