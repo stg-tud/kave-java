@@ -76,7 +76,12 @@ public class PointsToUsageExtractor {
 				new SimpleDescentStrategy());
 		String className = context.getSST().getEnclosingType().getName();
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
-			visitor.visitEntryPoint(methodDecl, visitorContext);
+			try {
+				visitor.visitEntryPoint(methodDecl, visitorContext);
+			} catch (RuntimeException ex) {
+				LOGGER.error("Failed to extract usages from " + className + ":" + methodDecl.getName().getName(), ex);
+				continue;
+			}
 
 			List<DummyUsage> rawUsages = visitorContext.getUsages();
 			List<DummyUsage> processedUsages = processUsages(rawUsages, context.getTypeShape());
