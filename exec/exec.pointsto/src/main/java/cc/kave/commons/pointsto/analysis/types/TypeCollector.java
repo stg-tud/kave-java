@@ -28,9 +28,8 @@ public class TypeCollector {
 
 	public TypeCollector(Context context) {
 		 TypeCollectorVisitor visitor = new TypeCollectorVisitor();
-		 TypeCollectorVisitorContext visitorContext = new TypeCollectorVisitorContext();
+		 TypeCollectorVisitorContext visitorContext = new TypeCollectorVisitorContext(context);
 		
-		 visitorContext.initializeSymbolTable(context);
 		 visitor.visit(context.getSST(), visitorContext);
 		
 		 referenceTypes = visitorContext.getReferenceTypes();

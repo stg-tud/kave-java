@@ -45,6 +45,10 @@ public class TypeCollectorVisitorContext {
 	private IdentityHashMap<IReference, ITypeName> referenceTypes = new IdentityHashMap<>();
 	private Set<ITypeName> allTypes = new HashSet<>();
 
+	public TypeCollectorVisitorContext(Context context) {
+		initializeSymbolTable(context);
+	}
+	
 	public IdentityHashMap<IReference, ITypeName> getReferenceTypes() {
 		return referenceTypes;
 	}
@@ -53,7 +57,7 @@ public class TypeCollectorVisitorContext {
 		return allTypes;
 	}
 
-	public void initializeSymbolTable(Context context) {
+	private void initializeSymbolTable(Context context) {
 		symbolTable.enter();
 
 		// add implicitly available variables
