@@ -27,9 +27,9 @@ import cc.kave.commons.pointsto.analysis.types.TypeCollector;
  * A {@link PointerAnalysis} that assumes that all variables of a specific type point to one {@link AbstractLocation}.
  *
  */
-public class TypeAliasedAnalysis extends AbstractPointerAnalysis {
+public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TypeAliasedAnalysis.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TypeBasedAnalysis.class);
 
 	@Override
 	public PointsToContext compute(Context context) {

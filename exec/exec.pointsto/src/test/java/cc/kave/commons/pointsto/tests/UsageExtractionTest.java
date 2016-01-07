@@ -27,7 +27,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
-import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
+import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyCallsite;
 import cc.kave.commons.pointsto.dummies.DummyDefinitionSite;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
@@ -40,8 +40,8 @@ public class UsageExtractionTest {
 	@Test
 	public void testPaperTest() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		SimplePointerAnalysisFactory<TypeAliasedAnalysis> paFactory = new SimplePointerAnalysisFactory<>(
-				TypeAliasedAnalysis.class);
+		SimplePointerAnalysisFactory<TypeBasedAnalysis> paFactory = new SimplePointerAnalysisFactory<>(
+				TypeBasedAnalysis.class);
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 		List<Context> contexts = builder.createPaperTest();
 
@@ -150,7 +150,7 @@ public class UsageExtractionTest {
 	@Test
 	public void testStreamTestTypeBased() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		PointerAnalysis pointerAnalysis = new TypeAliasedAnalysis();
+		PointerAnalysis pointerAnalysis = new TypeBasedAnalysis();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 		Context context = builder.createStreamTest();
 

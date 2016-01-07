@@ -27,7 +27,7 @@ import com.google.common.io.Files;
 
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
-import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
+import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;

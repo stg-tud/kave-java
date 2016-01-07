@@ -24,7 +24,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
-import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
+import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 
 public class TypeBasedAnalysisTest {
 
@@ -37,7 +37,7 @@ public class TypeBasedAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createStreamTest();
 
-		TypeAliasedAnalysis pointerAnalysis = new TypeAliasedAnalysis();
+		TypeBasedAnalysis pointerAnalysis = new TypeBasedAnalysis();
 		pointerAnalysis.compute(context);
 
 		Set<AbstractLocation> fileStreamLocations = pointerAnalysis.query(createQuery(builder.getFileStreamType()));
