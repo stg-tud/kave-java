@@ -19,7 +19,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -40,26 +39,14 @@ public class PointsToUsageExtractor {
 	private UsageStatisticsCollector collector;
 
 	public PointsToUsageExtractor() {
-		this.collector = new UsageStatisticsCollector() {
-
-			@Override
-			public void onProcessContext(Context context) {
-
-			}
-
-			@Override
-			public void merge(UsageStatisticsCollector other) {
-
-			}
-
-			@Override
-			public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
-
-			}
-		};
+		this.collector = new NopUsageStatisticsCollector();
 	}
 
 	public PointsToUsageExtractor(UsageStatisticsCollector collector) {
+		this.collector = collector;
+	}
+	
+	public void setStatisticsCollector(UsageStatisticsCollector collector) {
 		this.collector = collector;
 	}
 

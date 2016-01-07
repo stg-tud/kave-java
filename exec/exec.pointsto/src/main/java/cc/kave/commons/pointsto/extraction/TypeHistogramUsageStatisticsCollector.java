@@ -1,0 +1,96 @@
+/**
+ * Copyright 2016 Simon Reuß
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package cc.kave.commons.pointsto.extraction;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.pointsto.dummies.DummyUsage;
+
+public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCollector {
+
+	private Map<TypeName, Integer> histrogram = new HashMap<>();
+
+	@Override
+	public UsageStatisticsCollector create() {
+		return new TypeHistogramUsageStatisticsCollector();
+	}
+
+	@Override
+	public void merge(UsageStatisticsCollector other) {
+		TypeHistogramUsageStatisticsCollector otherHistoCollector = (TypeHistogramUsageStatisticsCollector) other;
+
+		for (Map.Entry<TypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
+			Integer oldCount = histrogram.getOrDefault(entry.getKey(), 0);
+			histrogram.put(entry.getKey(), oldCount + entry.getValue());
+		}
+	}
+
+	@Override
+	public void onProcessContext(Context context) {
+
+	}
+
+	@Override
+	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
+		for (DummyUsage usage : usages) {
+			TypeName type = usage.getType();
+
+			Integer oldCount = histrogram.getOrDefault(type, 0);
+			histrogram.put(type, oldCount + 1);
+		}
+	}
+
+	@Override
+	public void output(Path file) throws IOException {
+		List<Map.Entry<TypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
+		// List<Map.Entry<TypeName, Integer>> entries = new ArrayList<>(histrogram.size());
+		//
+		// // skip entries that occur only once
+		// for (Map.Entry<TypeName, Integer> entry : histrogram.entrySet()) {
+		// if (entry.getValue() > 1) {
+		// entries.add(entry);
+		// }
+		// }
+
+		Collections.sort(entries, new Comparator<Map.Entry<TypeName, Integer>>() {
+
+			@Override
+			public int compare(Entry<TypeName, Integer> o1, Entry<TypeName, Integer> o2) {
+				return o2.getValue() - o1.getValue();
+			}
+		});
+
+		try (BufferedWriter writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"))) {
+			for (Map.Entry<TypeName, Integer> entry : entries) {
+				writer.write(entry.getKey().getFullName() + " " + entry.getValue());
+				writer.newLine();
+			}
+		}
+
+	}
+
+}

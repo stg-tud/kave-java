@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
+import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
 import cc.recommenders.io.WritingArchive;
 
@@ -47,12 +50,27 @@ public class PointsToUsageGenerator {
 	private Path pointstoDestDir;
 	private Path usagesDestDir;
 
+	private Map<PointerAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
+
 	public PointsToUsageGenerator(List<PointerAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Path usagesDestDir) throws IOException {
+		this(factories, srcDirectory, pointstoDestDir, usagesDestDir, new NopUsageStatisticsCollector());
+	}
+
+	public PointsToUsageGenerator(List<PointerAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
+			Path usagesDestDir, UsageStatisticsCollector statisticsCollector) throws IOException {
 		this.factories = factories;
 		this.sources = getZipFiles(srcDirectory);
 		this.pointstoDestDir = pointstoDestDir;
 		this.usagesDestDir = usagesDestDir;
+
+		for (PointerAnalysisFactory factory : factories) {
+			statisticsCollectors.put(factory, statisticsCollector.create());
+		}
+	}
+
+	public Map<PointerAnalysisFactory, UsageStatisticsCollector> getStatisticsCollectors() {
+		return Collections.unmodifiableMap(statisticsCollectors);
 	}
 
 	public Map<PointerAnalysisFactory, List<DummyUsage>> getUsages() {
@@ -93,7 +111,15 @@ public class PointsToUsageGenerator {
 
 			for (PointerAnalysisFactory factory : this.factories) {
 				PointerAnalysis pa = factory.create();
-				PointsToContext ptContext = pa.compute(context);
+				PointsToContext ptContext = null;
+
+				// guard against exception in CsMethod:getSignature()
+				try {
+					ptContext = pa.compute(context);
+				} catch (RuntimeException ex) {
+					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);
+					continue;
+				}
 
 				try {
 					// annotatedContextWriters.get(factory).add(ptContext);
@@ -101,6 +127,7 @@ public class PointsToUsageGenerator {
 					LOGGER.error("Failed to serialize an annotated context from " + inputFilename.toString(), e);
 				}
 
+				extractor.setStatisticsCollector(statisticsCollectors.get(factory));
 				List<DummyUsage> extractedUsages = extractor.extract(ptContext);
 				for (DummyUsage usage : extractedUsages) {
 					try {

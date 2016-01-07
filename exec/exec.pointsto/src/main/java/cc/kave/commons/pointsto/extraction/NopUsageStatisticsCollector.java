@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Simon Reuß
+ * Copyright 2016 Simon Reuß
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -20,23 +20,34 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 
-public interface UsageStatisticsCollector {
+/**
+ * A {@link UsageStatisticsCollector} that performs no operations.
+ */
+public class NopUsageStatisticsCollector implements UsageStatisticsCollector {
 
-	/**
-	 * Creates a new {@link UsageStatisticsCollector} instance of the implementing class.
-	 */
-	UsageStatisticsCollector create();
+	@Override
+	public UsageStatisticsCollector create() {
+		return new NopUsageStatisticsCollector();
+	}
 
-	/**
-	 * Merges the state of the given {@link UsageStatisticsCollector} into this instance. Only guaranteed to work if
-	 * this and the other instance are of the same class.
-	 */
-	void merge(UsageStatisticsCollector other);
+	@Override
+	public void merge(UsageStatisticsCollector other) {
 
-	void onProcessContext(Context context);
+	}
 
-	void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages);
+	@Override
+	public void onProcessContext(Context context) {
 
-	void output(Path file) throws IOException;
+	}
+
+	@Override
+	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
+
+	}
+
+	@Override
+	public void output(Path file) throws IOException {
+
+	}
 
 }

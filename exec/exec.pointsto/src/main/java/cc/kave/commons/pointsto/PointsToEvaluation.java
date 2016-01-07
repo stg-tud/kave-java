@@ -16,42 +16,66 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Files;
+
+import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeAliasedAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
+import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 
 public class PointsToEvaluation {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToEvaluation.class);
 
-	private static final Path SRC_PATH = Paths.get("E:\\Coding\\MT\\Contexts");
-	private static final Path CONTEXT_DEST = Paths.get("E:\\Coding\\MT\\annotatedContexts");
-	private static final Path USAGE_DEST = Paths.get("E:\\Coding\\MT\\Usages");
+	private static final Path BASE_PATH = Paths.get("E:\\Coding\\MT");
+
+	private static final Path SRC_PATH = BASE_PATH.resolve("Contexts");
+	private static final Path CONTEXT_DEST = BASE_PATH.resolve("annotatedContexts");
+	private static final Path USAGE_DEST = BASE_PATH.resolve("Usages");
+	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
 
 	public static void main(String[] args) {
 		new PointsToEvaluation()
-				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(TypeAliasedAnalysis.class)));
+				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)));
 
 	}
 
 	private Map<PointerAnalysisFactory, List<DummyUsage>> generateUsages(List<PointerAnalysisFactory> factories) {
 		try {
-			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST,
-					USAGE_DEST);
+			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST, USAGE_DEST,
+					new TypeHistogramUsageStatisticsCollector());
 
-			return generator.getUsages();
+			Map<PointerAnalysisFactory, List<DummyUsage>> usages = generator.getUsages();
+			outputStatisticsCollectors(generator.getStatisticsCollectors());
+
+			return usages;
 		} catch (IOException e) {
 			LOGGER.error("Error during usage generation", e);
 		}
 
-		return new HashMap<>();
+		return Collections.emptyMap();
+	}
+
+	private void outputStatisticsCollectors(Map<PointerAnalysisFactory, UsageStatisticsCollector> collectors) {
+		try {
+			for (Map.Entry<PointerAnalysisFactory, UsageStatisticsCollector> entry : collectors.entrySet()) {
+				Path statFile = STATISTICS_DEST.resolve(entry.getKey().getName() + ".txt");
+				Files.createParentDirs(statFile.toFile());
+
+				entry.getValue().output(statFile);
+			}
+		} catch (IOException e) {
+			LOGGER.error("Failed to write the results of the statistics collectors to disk", e);
+		}
 	}
 
 }
