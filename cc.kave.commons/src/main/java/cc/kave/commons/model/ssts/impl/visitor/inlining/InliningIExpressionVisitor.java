@@ -10,7 +10,6 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -40,6 +39,7 @@ import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<InliningContext, IExpression> {
 
@@ -236,7 +236,7 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 	@Override
 	public IExpression visit(ICompletionExpression entity, InliningContext context) {
 		CompletionExpression expression = new CompletionExpression();
-		IVariableReference objectReference = entity.getObjectReference();
+		IVariableReference objectReference = entity.getVariableReference();
 		if (objectReference != null)
 			expression.setObjectReference(
 					(IVariableReference) objectReference.accept(context.getReferenceVisitor(), context));

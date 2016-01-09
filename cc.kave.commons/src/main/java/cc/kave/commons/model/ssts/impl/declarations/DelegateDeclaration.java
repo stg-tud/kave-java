@@ -1,9 +1,12 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class DelegateDeclaration implements IDelegateDeclaration {
@@ -12,6 +15,11 @@ public class DelegateDeclaration implements IDelegateDeclaration {
 
 	public DelegateDeclaration() {
 		this.name = DelegateTypeName.UNKNOWN_NAME;
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return Lists.newArrayList();
 	}
 
 	@Override

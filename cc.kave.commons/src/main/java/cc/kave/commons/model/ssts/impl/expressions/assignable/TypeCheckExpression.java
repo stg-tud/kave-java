@@ -38,6 +38,7 @@ public class TypeCheckExpression implements ITypeCheckExpression {
 		this.reference = reference;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

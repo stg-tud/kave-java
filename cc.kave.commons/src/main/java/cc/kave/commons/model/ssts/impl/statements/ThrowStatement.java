@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ThrowStatement implements IThrowStatement {
@@ -11,6 +14,11 @@ public class ThrowStatement implements IThrowStatement {
 
 	public ThrowStatement() {
 		this.reference = new VariableReference();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

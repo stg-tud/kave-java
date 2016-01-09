@@ -13,7 +13,7 @@ public interface ICompletionExpression extends IAssignableExpression {
 	ITypeName getTypeReference();
 
 	@Nullable
-	IVariableReference getObjectReference();
+	IVariableReference getVariableReference();
 
 	@Nonnull
 	String getToken();

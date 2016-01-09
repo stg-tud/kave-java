@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -43,6 +43,16 @@ public class SwitchBlockTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getDefaultSection()));
 	}
 
+	@Test
+	public void testChildrenIdentity() {
+		SwitchBlock sut = new SwitchBlock();
+		sut.setReference(someVarRef("a"));
+		sut.getSections().add(new CaseBlock());
+		sut.getDefaultSection().add(new ReturnStatement());
+
+		assertChildren(sut, sut.getReference(), sut.getDefaultSection().get(0));
+	}
+	
 	@Test
 	public void testEqualityDefault() {
 		SwitchBlock a = new SwitchBlock();

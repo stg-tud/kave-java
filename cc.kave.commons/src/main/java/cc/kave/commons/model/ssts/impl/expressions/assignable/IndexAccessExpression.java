@@ -38,6 +38,7 @@ public class IndexAccessExpression implements IIndexAccessExpression {
 		this.indices = indices;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

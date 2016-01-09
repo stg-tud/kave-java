@@ -1,6 +1,9 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class GotoStatement implements IGotoStatement {
@@ -11,6 +14,11 @@ public class GotoStatement implements IGotoStatement {
 		this.label = "";
 	}
 
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
+	}
+	
 	@Override
 	public String getLabel() {
 		return this.label;

@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -34,6 +34,14 @@ public class DoLoopTest extends SSTBaseTest {
 
 		assertThat(new ConstantValueExpression(), equalTo(sut.getCondition()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getBody()));
+	}
+	
+	@Test
+	public void testChildrenIdentity() {
+		DoLoop sut = new DoLoop();
+		sut.setCondition(new ConstantValueExpression());
+		sut.getBody().add(new ReturnStatement());
+		assertChildren(sut, sut.getCondition(), sut.getBody().get(0));
 	}
 
 	@Test

@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class IfElseExpression implements IIfElseExpression {
@@ -15,6 +18,11 @@ public class IfElseExpression implements IIfElseExpression {
 		this.condition = new UnknownExpression();
 		this.thenExpression = new UnknownExpression();
 		this.elseExpression = new UnknownExpression();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

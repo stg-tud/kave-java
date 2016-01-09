@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -35,6 +35,14 @@ public class UncheckBlockTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new BreakStatement()), equalTo(sut.getBody()));
 	}
 
+	@Test
+	public void testChildrenIdentity() throws Exception {
+		UncheckedBlock sut = new UncheckedBlock();
+		sut.getBody().add(new BreakStatement());
+
+		assertChildren(sut, sut.getBody().get(0));
+	}
+	
 	@Test
 	public void testEqualityDefault() {
 		UncheckedBlock a = new UncheckedBlock();

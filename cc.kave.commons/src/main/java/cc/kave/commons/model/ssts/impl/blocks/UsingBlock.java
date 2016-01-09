@@ -3,10 +3,13 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class UsingBlock implements IUsingBlock {
@@ -17,6 +20,13 @@ public class UsingBlock implements IUsingBlock {
 	public UsingBlock() {
 		this.reference = new VariableReference();
 		this.body = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = Lists.newArrayList(reference);
+		children.addAll(body);
+		return children;
 	}
 
 	@Override

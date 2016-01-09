@@ -1,9 +1,12 @@
 package cc.kave.commons.model.ssts.impl.references;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class EventReference implements IEventReference {
@@ -14,6 +17,11 @@ public class EventReference implements IEventReference {
 	public EventReference() {
 		this.reference = new VariableReference();
 		this.eventName = EventName.UNKNOWN_NAME;
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

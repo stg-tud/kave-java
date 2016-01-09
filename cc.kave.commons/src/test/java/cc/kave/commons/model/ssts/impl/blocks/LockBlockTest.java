@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -37,6 +37,15 @@ public class LockBlockTest extends SSTBaseTest {
 
 		assertThat(this.someVarRef("x"), equalTo(sut.getReference()));
 		assertThat(Lists.newArrayList(new BreakStatement()), equalTo(sut.getBody()));
+	}
+	
+	@Test
+	public void testChildrenIdentity() {
+		LockBlock sut = new LockBlock();
+		sut.setReference(this.someVarRef("x"));
+		sut.setBody(Lists.newArrayList(new BreakStatement()));
+
+		assertChildren(sut, sut.getReference(), sut.getBody().get(0));
 	}
 
 	@Test

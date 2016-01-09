@@ -10,9 +10,10 @@ public interface ICastExpression extends IAssignableExpression {
 
 	@Nonnull
 	ITypeName getTargetType();
+	
+	CastOperator getOperator();
 
 	@Nonnull
 	IVariableReference getReference();
 
-	CastOperator getOperator();
 }

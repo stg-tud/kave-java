@@ -37,6 +37,7 @@ public class UnaryExpression implements IUnaryExpression {
 		this.operand = operand;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

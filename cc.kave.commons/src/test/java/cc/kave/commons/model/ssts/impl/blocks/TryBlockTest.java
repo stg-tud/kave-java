@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -41,6 +41,16 @@ public class TryBlockTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getBody()));
 		assertThat(Lists.newArrayList(new CatchBlock()), equalTo(sut.getCatchBlocks()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getFinally()));
+	}
+	
+	@Test
+	public void testChildrenIdentity() {
+		TryBlock sut = new TryBlock();
+		sut.getBody().add(new ContinueStatement());
+		sut.getCatchBlocks().add(new CatchBlock());
+		sut.getFinally().add(new ReturnStatement());
+
+		assertChildren(sut, sut.getBody().get(0), sut.getFinally().get(0));
 	}
 
 	@Test

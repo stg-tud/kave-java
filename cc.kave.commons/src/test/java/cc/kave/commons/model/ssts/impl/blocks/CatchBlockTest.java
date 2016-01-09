@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -89,6 +89,13 @@ public class CatchBlockTest extends SSTBaseTest {
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
+	public void testEnumNumberingIsStable() {
+		assertThat(0, equalTo(CatchBlockKind.Default.ordinal()));
+		assertThat(1, equalTo(CatchBlockKind.Unnamed.ordinal()));
+		assertThat(2, equalTo(CatchBlockKind.General.ordinal()));
 	}
 
 }

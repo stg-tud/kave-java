@@ -6,8 +6,10 @@ import java.util.List;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
+import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
 public class TryBlock implements ITryBlock {
@@ -21,6 +23,13 @@ public class TryBlock implements ITryBlock {
 		this.body = new ArrayList<>();
 		this.catchBlocks = new ArrayList<>();
 		this._finally = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = new ArrayList<>(body);
+		children.addAll(_finally);
+		return children;
 	}
 
 	@Override

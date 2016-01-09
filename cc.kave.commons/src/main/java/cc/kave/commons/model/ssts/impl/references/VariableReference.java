@@ -1,6 +1,9 @@
 package cc.kave.commons.model.ssts.impl.references;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class VariableReference implements IVariableReference {
@@ -11,6 +14,11 @@ public class VariableReference implements IVariableReference {
 
 	public VariableReference() {
 		this.identifier = this.defaultIdentifier;
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class CompletionExpressionTest extends SSTBaseTest {
 		CompletionExpression sut = new CompletionExpression();
 
 		assertThat("", equalTo(sut.getToken()));
-		assertThat(null, equalTo(sut.getObjectReference()));
+		assertThat(null, equalTo(sut.getVariableReference()));
 		assertThat(null, equalTo(sut.getTypeReference()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
@@ -32,7 +32,7 @@ public class CompletionExpressionTest extends SSTBaseTest {
 		sut.setToken("t");
 
 		assertThat("t", equalTo(sut.getToken()));
-		assertThat(someVarRef("i"), equalTo(sut.getObjectReference()));
+		assertThat(someVarRef("i"), equalTo(sut.getVariableReference()));
 		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getTypeReference()));
 	}
 

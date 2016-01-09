@@ -19,7 +19,6 @@ import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -49,6 +48,7 @@ import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableReference>, Void> {
 	@Override
@@ -226,7 +226,7 @@ public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableR
 
 	@Override
 	public Void visit(ICompletionExpression entity, Set<IVariableReference> context) {
-		IVariableReference objectReference = entity.getObjectReference();
+		IVariableReference objectReference = entity.getVariableReference();
 		if (objectReference != null)
 			objectReference.accept(this, context);
 		return null;

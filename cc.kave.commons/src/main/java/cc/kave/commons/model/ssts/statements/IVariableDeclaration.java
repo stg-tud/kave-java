@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.declarations;
+package cc.kave.commons.model.ssts.statements;
 
 import javax.annotation.Nonnull;
 

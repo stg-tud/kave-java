@@ -46,6 +46,17 @@ public class ForLoopTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new BreakStatement()), equalTo(sut.getStep()));
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getBody()));
 	}
+	
+	@Test
+	public void testChildrenIdentity(){
+		ForLoop sut = new ForLoop();
+		sut.setCondition(new ConstantValueExpression());
+		sut.getInit().add(new GotoStatement());
+		sut.getStep().add(new BreakStatement());
+		sut.getBody().add(new ContinueStatement());
+		
+		assertChildren(sut, sut.getInit().get(0), sut.getCondition(), sut.getStep().get(0), sut.getBody().get(0)); 
+	}
 
 	@Test
 	public void testEqualityDefault() {

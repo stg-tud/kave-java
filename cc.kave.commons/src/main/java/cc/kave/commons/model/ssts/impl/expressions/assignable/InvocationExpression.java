@@ -9,6 +9,7 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class InvocationExpression implements IInvocationExpression {
@@ -21,6 +22,11 @@ public class InvocationExpression implements IInvocationExpression {
 		this.reference = new VariableReference();
 		this.methodName = MethodName.UNKNOWN_NAME;
 		this.parameters = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

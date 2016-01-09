@@ -1,6 +1,7 @@
 package cc.kave.commons.model.ssts.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import cc.kave.commons.model.names.ILambdaName;
@@ -10,15 +11,29 @@ import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public abstract class SSTBaseTest {
+
+	protected static void assertChildren(ISSTNode sut, ISSTNode... expecteds) {
+		Iterator<ISSTNode> actualIterator = sut.getChildren().iterator();
+		for (ISSTNode expected : expecteds) {
+			assertTrue(actualIterator.hasNext());
+			assertThat(expected, equalTo(actualIterator.next()));
+		}
+		assertFalse(actualIterator.hasNext());
+	}
 
 	protected ISimpleExpression label(String label) {
 		ConstantValueExpression expr = new ConstantValueExpression();

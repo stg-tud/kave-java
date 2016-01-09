@@ -25,6 +25,7 @@ public class IndexAccessReference implements IIndexAccessReference {
 		this.expression = expression;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

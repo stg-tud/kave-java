@@ -50,6 +50,7 @@ public class CastExpression implements ICastExpression {
 		this.operator = operator;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

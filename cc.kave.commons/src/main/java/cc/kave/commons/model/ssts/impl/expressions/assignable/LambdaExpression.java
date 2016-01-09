@@ -7,6 +7,7 @@ import cc.kave.commons.model.names.ILambdaName;
 import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class LambdaExpression implements ILambdaExpression {
@@ -18,6 +19,11 @@ public class LambdaExpression implements ILambdaExpression {
 		this.name = LambdaName.UNKNOWN_NAME;
 	}
 
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
+	}
+	
 	@Override
 	public List<IStatement> getBody() {
 		return this.body;

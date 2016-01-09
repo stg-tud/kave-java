@@ -1,5 +1,6 @@
 package cc.kave.commons.model.ssts.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class SST implements ISST {
@@ -37,6 +39,11 @@ public class SST implements ISST {
 		this.methods = new HashSet<IMethodDeclaration>();
 		this.events = new HashSet<IEventDeclaration>();
 		this.delegates = new HashSet<IDelegateDeclaration>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

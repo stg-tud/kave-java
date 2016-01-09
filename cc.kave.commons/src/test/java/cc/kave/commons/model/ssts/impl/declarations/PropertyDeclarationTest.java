@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
@@ -33,11 +34,11 @@ public class PropertyDeclarationTest {
 	@Test
 	public void testSettingValues() {
 		PropertyDeclaration sut = new PropertyDeclaration();
-		sut.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		sut.setName(someProperty());
 		sut.setGet(Lists.newArrayList(new ReturnStatement()));
 		sut.setSet(Lists.newArrayList(new ContinueStatement()));
 
-		assertThat(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"), equalTo(sut.getName()));
+		assertThat(someProperty(), equalTo(sut.getName()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getGet()));
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getSet()));
 	}
@@ -55,8 +56,8 @@ public class PropertyDeclarationTest {
 	public void testEqualityReallyTheSame() {
 		PropertyDeclaration a = new PropertyDeclaration();
 		PropertyDeclaration b = new PropertyDeclaration();
-		a.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
-		b.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		a.setName(someProperty());
+		b.setName(someProperty());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -66,7 +67,7 @@ public class PropertyDeclarationTest {
 	public void testEqualityDifferentType() {
 		PropertyDeclaration a = new PropertyDeclaration();
 		PropertyDeclaration b = new PropertyDeclaration();
-		a.setName(PropertyName.newPropertyName("[T1,P1] [T2,P2].Property"));
+		a.setName(someProperty());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
@@ -101,5 +102,9 @@ public class PropertyDeclarationTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	private IPropertyName someProperty() {
+		return PropertyName.newPropertyName("[T1,P1] [T2,P2].Property");
 	}
 }

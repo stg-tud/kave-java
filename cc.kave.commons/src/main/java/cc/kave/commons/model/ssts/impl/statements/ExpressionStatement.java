@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ExpressionStatement implements IExpressionStatement {
@@ -11,6 +14,11 @@ public class ExpressionStatement implements IExpressionStatement {
 
 	public ExpressionStatement() {
 		this.expression = new UnknownExpression();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

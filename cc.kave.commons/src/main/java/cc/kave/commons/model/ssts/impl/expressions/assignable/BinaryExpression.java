@@ -48,6 +48,7 @@ public class BinaryExpression implements IBinaryExpression {
 		this.rightOperand = rightOperand;
 	}
 
+	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}

@@ -1,11 +1,14 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class EventSubscriptionStatement implements IEventSubscriptionStatement {
@@ -18,7 +21,12 @@ public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 		expression = new UnknownExpression();
 		operation = EventSubscriptionOperation.Add;
 	}
-
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
+	}
+	
 	public IAssignableReference getReference() {
 		return reference;
 	}

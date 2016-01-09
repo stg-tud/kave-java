@@ -29,7 +29,6 @@ import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
@@ -57,6 +56,7 @@ import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingContext, Void> {
@@ -430,7 +430,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 	}
 
 	public Void visit(ICompletionExpression entity, SSTPrintingContext c) {
-		IVariableReference objectReference = entity.getObjectReference();
+		IVariableReference objectReference = entity.getVariableReference();
 		if (objectReference != null) {
 			c.text(objectReference.getIdentifier()).text(".");
 		} else if (entity.getTypeReference() != null) {

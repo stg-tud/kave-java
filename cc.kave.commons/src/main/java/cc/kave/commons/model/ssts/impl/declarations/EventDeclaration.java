@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class EventDeclaration implements IEventDeclaration {
@@ -11,6 +14,11 @@ public class EventDeclaration implements IEventDeclaration {
 
 	public EventDeclaration() {
 		this.name = EventName.UNKNOWN_NAME;
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return Lists.newArrayList();
 	}
 
 	@Override

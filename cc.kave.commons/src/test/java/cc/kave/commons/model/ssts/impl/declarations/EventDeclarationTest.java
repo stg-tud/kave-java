@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 
@@ -23,9 +24,9 @@ public class EventDeclarationTest {
 	@Test
 	public void testSettingValues() {
 		EventDeclaration sut = new EventDeclaration();
-		sut.setName(EventName.newEventName("[T1,P1] [T2,P2].Event"));
+		sut.setName(someEvent());
 
-		assertThat(EventName.newEventName("[T1,P1] [T2,P2].Event"), equalTo(sut.getName()));
+		assertThat(someEvent(), equalTo(sut.getName()));
 	}
 
 	@Test
@@ -41,8 +42,8 @@ public class EventDeclarationTest {
 	public void testEqualityReallyTheSame() {
 		EventDeclaration a = new EventDeclaration();
 		EventDeclaration b = new EventDeclaration();
-		a.setName(EventName.newEventName("[T1,P1] [T2,P2].Event"));
-		b.setName(EventName.newEventName("[T1,P1] [T2,P2].Event"));
+		a.setName(someEvent());
+		b.setName(someEvent());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -52,7 +53,7 @@ public class EventDeclarationTest {
 	public void testEqualityDifferentType() {
 		EventDeclaration a = new EventDeclaration();
 		EventDeclaration b = new EventDeclaration();
-		a.setName(EventName.newEventName("[T1,P1] [T2,P2].Event"));
+		a.setName(someEvent());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
@@ -67,5 +68,9 @@ public class EventDeclarationTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+	
+	private IEventName someEvent() {
+		return EventName.newEventName("[T1,P1] [T2,P2].Event");
 	}
 }

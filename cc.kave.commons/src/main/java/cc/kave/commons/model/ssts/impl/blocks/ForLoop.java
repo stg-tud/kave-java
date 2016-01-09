@@ -3,10 +3,13 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ForLoop implements IForLoop {
@@ -21,6 +24,15 @@ public class ForLoop implements IForLoop {
 		this.step = new ArrayList<>();
 		this.body = new ArrayList<>();
 		this.condition = new UnknownExpression();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = new ArrayList<>(init);
+		children.add(condition);
+		children.addAll(step);
+		children.addAll(body);
+		return children;
 	}
 
 	@Override

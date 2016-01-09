@@ -6,10 +6,13 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class MethodDeclaration implements IMethodDeclaration {
@@ -21,6 +24,11 @@ public class MethodDeclaration implements IMethodDeclaration {
 	public MethodDeclaration() {
 		name = MethodName.UNKNOWN_NAME;
 		body = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return Lists.newArrayList();
 	}
 
 	@Override

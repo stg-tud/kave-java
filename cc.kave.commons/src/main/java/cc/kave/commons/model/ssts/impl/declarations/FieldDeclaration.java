@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.declarations;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class FieldDeclaration implements IFieldDeclaration {
@@ -11,6 +14,11 @@ public class FieldDeclaration implements IFieldDeclaration {
 
 	public FieldDeclaration() {
 		this.name = FieldName.UNKNOWN_NAME;
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return Lists.newArrayList();
 	}
 
 	@Override

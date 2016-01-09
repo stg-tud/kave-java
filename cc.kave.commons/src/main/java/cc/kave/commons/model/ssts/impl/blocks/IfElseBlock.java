@@ -6,12 +6,14 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class IfElseBlock implements IIfElseBlock {
@@ -25,6 +27,14 @@ public class IfElseBlock implements IIfElseBlock {
 		this.condition = new UnknownExpression();
 		this._else = new ArrayList<>();
 		this.then = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = Lists.newArrayList(condition);
+		children.addAll(then);
+		children.addAll(_else);
+		return children;
 	}
 
 	@Override

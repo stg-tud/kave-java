@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -37,6 +37,16 @@ public class ForEachLoopTest extends SSTBaseTest {
 		assertThat(this.someDeclaration(), equalTo(sut.getDeclaration()));
 		assertThat(this.someVarRef("a"), equalTo(sut.getLoopedReference()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getBody()));
+	}
+	
+	@Test
+	public void testChildrenIdentity() {
+		ForEachLoop sut = new ForEachLoop();
+		sut.setDeclaration(someDeclaration());
+		sut.setLoopedReference(this.someVarRef("a"));
+		sut.getBody().add(new ReturnStatement());
+		
+		assertChildren(sut, sut.getDeclaration(), sut.getLoopedReference(), sut.getBody().get(0));
 	}
 
 	@Test

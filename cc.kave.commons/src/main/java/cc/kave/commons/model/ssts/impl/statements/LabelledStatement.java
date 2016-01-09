@@ -1,7 +1,10 @@
 package cc.kave.commons.model.ssts.impl.statements;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class LabelledStatement implements ILabelledStatement {
@@ -12,6 +15,11 @@ public class LabelledStatement implements ILabelledStatement {
 	public LabelledStatement() {
 		this.label = "";
 		this.statement = new UnknownStatement();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

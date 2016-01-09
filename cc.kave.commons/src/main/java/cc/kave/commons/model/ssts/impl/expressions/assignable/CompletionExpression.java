@@ -1,8 +1,11 @@
 package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class CompletionExpression implements ICompletionExpression {
@@ -16,12 +19,17 @@ public class CompletionExpression implements ICompletionExpression {
 	}
 
 	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
+	}
+
+	@Override
 	public ITypeName getTypeReference() {
 		return this.typeReference;
 	}
 
 	@Override
-	public IVariableReference getObjectReference() {
+	public IVariableReference getVariableReference() {
 		return this.objectReference;
 	}
 

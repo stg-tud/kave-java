@@ -5,6 +5,7 @@ import java.util.List;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class UncheckedBlock implements IUncheckedBlock {
@@ -13,6 +14,12 @@ public class UncheckedBlock implements IUncheckedBlock {
 
 	public UncheckedBlock() {
 		this.body = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = new ArrayList<>(body);
+		return children;
 	}
 
 	@Override

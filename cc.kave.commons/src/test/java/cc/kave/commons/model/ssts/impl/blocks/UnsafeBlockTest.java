@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -11,6 +11,12 @@ import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
 
 public class UnsafeBlockTest extends SSTBaseTest {
+	
+	@Test
+	public void testChildrenIdentity() {
+		UnsafeBlock sut = new UnsafeBlock();
+		assertChildren(sut);
+	}
 
 	@Test
 	public void testEquality() {

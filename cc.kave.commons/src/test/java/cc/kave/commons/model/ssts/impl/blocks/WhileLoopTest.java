@@ -2,7 +2,7 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -41,6 +41,15 @@ public class WhileLoopTest extends SSTBaseTest {
 
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getBody()));
 		assertThat(new ConstantValueExpression(), equalTo(sut.getCondition()));
+	}
+
+	@Test
+	public void testChildrenIdentity() {
+		WhileLoop sut = new WhileLoop();
+		sut.getBody().add(new ReturnStatement());
+		sut.setCondition(new ConstantValueExpression());
+
+		assertChildren(sut, sut.getCondition(), sut.getBody().get(0));
 	}
 
 	@Test

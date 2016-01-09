@@ -5,6 +5,7 @@ import java.util.List;
 
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ComposedExpression implements IComposedExpression {
@@ -13,6 +14,11 @@ public class ComposedExpression implements IComposedExpression {
 
 	public ComposedExpression() {
 		this.references = new ArrayList<>();
+	}
+
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
 	}
 
 	@Override

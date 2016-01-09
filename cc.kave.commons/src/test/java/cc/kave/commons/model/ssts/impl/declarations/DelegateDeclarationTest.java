@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 
@@ -23,9 +24,9 @@ public class DelegateDeclarationTest {
 	@Test
 	public void testSettingValues() {
 		DelegateDeclaration sut = new DelegateDeclaration();
-		sut.setName(DelegateTypeName.newDelegateTypeName("d:SomeType,P"));
+		sut.setName(someDelegateType());
 
-		assertThat(DelegateTypeName.newDelegateTypeName("d:SomeType,P"), equalTo(sut.getName()));
+		assertThat(someDelegateType(), equalTo(sut.getName()));
 	}
 
 	@Test
@@ -40,8 +41,8 @@ public class DelegateDeclarationTest {
 	public void testEqualityReallyTheSame() {
 		DelegateDeclaration a = new DelegateDeclaration();
 		DelegateDeclaration b = new DelegateDeclaration();
-		a.setName(DelegateTypeName.newDelegateTypeName("d:SomeType,P"));
-		b.setName(DelegateTypeName.newDelegateTypeName("d:SomeType,P"));
+		a.setName(someDelegateType());
+		b.setName(someDelegateType());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -51,7 +52,7 @@ public class DelegateDeclarationTest {
 	public void testEqualityDifferentType() {
 		DelegateDeclaration a = new DelegateDeclaration();
 		DelegateDeclaration b = new DelegateDeclaration();
-		a.setName(DelegateTypeName.newDelegateTypeName("d:SomeType,P"));
+		a.setName(someDelegateType());
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
@@ -66,5 +67,9 @@ public class DelegateDeclarationTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+	
+	private static IDelegateTypeName someDelegateType(){
+		return DelegateTypeName.newDelegateTypeName("d:[R,P] [SomeDelegateType,P].()");
 	}
 }

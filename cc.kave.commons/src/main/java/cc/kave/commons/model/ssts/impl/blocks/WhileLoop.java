@@ -3,10 +3,13 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class WhileLoop implements IWhileLoop {
@@ -17,6 +20,13 @@ public class WhileLoop implements IWhileLoop {
 	public WhileLoop() {
 		this.condition = new UnknownExpression();
 		this.body = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		List<ISSTNode> children = Lists.newArrayList(condition);
+		children.addAll(body);
+		return children;
 	}
 
 	@Override

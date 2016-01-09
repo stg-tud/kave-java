@@ -1,4 +1,4 @@
-package cc.kave.commons.model.ssts.impl.declarations;
+package cc.kave.commons.model.ssts.impl.statements;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;

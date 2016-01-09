@@ -7,11 +7,13 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 
 public interface IBinaryExpression extends IAssignableExpression {
 
+	@Nonnull
+	ISimpleExpression getLeftOperand();
+	
 	BinaryOperator getOperator();
 
 	@Nonnull
 	ISimpleExpression getRightOperand();
 
-	@Nonnull
-	ISimpleExpression getLeftOperand();
+
 }

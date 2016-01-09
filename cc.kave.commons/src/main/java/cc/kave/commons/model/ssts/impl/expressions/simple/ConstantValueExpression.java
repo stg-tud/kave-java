@@ -1,11 +1,19 @@
 package cc.kave.commons.model.ssts.impl.expressions.simple;
 
+import java.util.ArrayList;
+
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class ConstantValueExpression implements IConstantValueExpression {
 
 	private String value;
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return new ArrayList<ISSTNode>();
+	}
 
 	@Override
 	public String getValue() {

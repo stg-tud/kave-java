@@ -3,10 +3,13 @@ package cc.kave.commons.model.ssts.impl.declarations;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class PropertyDeclaration implements IPropertyDeclaration {
@@ -19,6 +22,11 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 		this.name = PropertyName.UNKNOWN_NAME;
 		this.get = new ArrayList<>();
 		this.set = new ArrayList<>();
+	}
+	
+	@Override
+	public Iterable<ISSTNode> getChildren() {
+		return Lists.newArrayList();
 	}
 
 	@Override
