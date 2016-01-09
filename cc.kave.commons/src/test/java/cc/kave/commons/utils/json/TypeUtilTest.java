@@ -29,4 +29,12 @@ public class TypeUtilTest {
 		Assert.assertEquals(expected, actual);
 	}
 
+	@Test
+	public void JavaTypeNameToCsharp() {
+		String type = "\"cc.kave.commons.model.events.completionevents.Context\"";
+		String expected = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
+		String actual = TypeUtil.toCSharpTypeNames(type);
+		Assert.assertEquals(expected, actual);
+	}
+
 }
