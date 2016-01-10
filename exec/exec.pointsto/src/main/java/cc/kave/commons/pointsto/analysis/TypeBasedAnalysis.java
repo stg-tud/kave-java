@@ -34,7 +34,7 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 	@Override
 	public PointsToContext compute(Context context) {
 		checkContextBinding();
-		
+
 		TypeCollector typeCollector = new TypeCollector(context);
 		for (ITypeName type : typeCollector.getTypes()) {
 			QueryContextKey key = new QueryContextKey(null, null, type, null);
@@ -53,10 +53,15 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 				return Collections.emptySet();
 			}
 
-			// assume that unknown types may point to any known location
 			if (type.isUnknown()) {
 				LOGGER.debug("Queried for an unknown type");
-				return new HashSet<>(contextToLocations.values());
+
+				if (queryStrategy == QueryStrategy.EXHAUSTIVE) {
+					// assume that unknown types may point to any known location
+					return new HashSet<>(contextToLocations.values());
+				} else {
+					return Collections.emptySet();
+				}
 			}
 		}
 

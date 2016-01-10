@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,22 @@ import cc.kave.commons.model.events.completionevents.Context;
 public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 
 	protected Multimap<QueryContextKey, AbstractLocation> contextToLocations = HashMultimap.create();
+
+	protected QueryStrategy queryStrategy;
+
+	public AbstractPointerAnalysis() {
+		this.queryStrategy = QueryStrategy.MINIMIZE_USAGE_DEFECTS;
+	}
+
+	@Override
+	public QueryStrategy getQueryStrategy() {
+		return queryStrategy;
+	}
+
+	@Override
+	public void setQueryStrategy(QueryStrategy strategy) {
+		this.queryStrategy = strategy;
+	}
 
 	/**
 	 * Checks whether this {@link PointerAnalysis} has already been bound to a {@link Context} and throws an
@@ -45,7 +62,8 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 			// conservative assumption: may point to any known location
 			LoggerFactory.getLogger(AbstractPointerAnalysis.class).warn("Failed to find any matching entries for {}",
 					query);
-			locations = contextToLocations.values();
+			locations = (queryStrategy == QueryStrategy.EXHAUSTIVE) ? contextToLocations.values()
+					: Collections.emptyList();
 		}
 
 		return new HashSet<>(locations);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Simon Reuß
+ * Copyright 2016 Simon Reuß
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,21 +12,10 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import java.util.Set;
+/**
+ * Controls how {@link PointerAnalysis} implementations resolve incomplete queries.
+ */
+public enum QueryStrategy {
 
-import cc.kave.commons.model.events.completionevents.Context;
-
-public interface PointerAnalysis {
-
-	/**
-	 * Computes the points-to information for the specified {@link Context} and stores a reference to this instance in
-	 * the returned {@link PointsToContext}. This method may only be called once.
-	 */
-	PointsToContext compute(Context context);
-
-	QueryStrategy getQueryStrategy();
-
-	void setQueryStrategy(QueryStrategy strategy);
-
-	Set<AbstractLocation> query(QueryContextKey query);
+	MINIMIZE_USAGE_DEFECTS, EXHAUSTIVE
 }
