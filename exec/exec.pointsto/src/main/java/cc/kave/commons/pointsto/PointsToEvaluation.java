@@ -44,8 +44,9 @@ public class PointsToEvaluation {
 	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
 
 	public static void main(String[] args) {
-		new PointsToEvaluation()
-				.generateUsages(Arrays.asList(new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)));
+		List<PointerAnalysisFactory> factories = Arrays
+				.asList(new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class));
+		new PointsToEvaluation().generateUsages(factories);
 
 	}
 

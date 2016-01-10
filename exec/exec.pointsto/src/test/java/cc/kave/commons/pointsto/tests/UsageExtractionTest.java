@@ -18,14 +18,18 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyCallsite;
@@ -100,13 +104,13 @@ public class UsageExtractionTest {
 				}
 			} else if (typeName.equals("C")) {
 				List<DummyUsage> usages = usageExtractor.extract(paFactory.create().compute(context));
-				
+
 				assertEquals(3, usages.size()); // B, C, D
 				for (DummyUsage usage : usages) {
 					String usageTypeName = usage.getType().getName();
-					
+
 					assertEquals("C", usage.getClassContext().getName());
-					
+
 					if (usageTypeName.equals("B")) {
 						assertEquals("entry2", usage.getMethodContext().getName());
 						assertEquals("C", usage.getMethodContext().getDeclaringType().getName());
@@ -190,5 +194,50 @@ public class UsageExtractionTest {
 				assertThat(usageTypeName, Matchers.isOneOf("Byte[]", "Int32"));
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testStreamTestReferenceBased() {
+		TestSSTBuilder builder = new TestSSTBuilder();
+		PointerAnalysis pointerAnalysis = new ReferenceBasedAnalysis();
+		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
+		Context context = builder.createStreamTest();
+
+		List<DummyUsage> usages = usageExtractor.extract(pointerAnalysis.compute(context));
+		int fileStreamUsages = 0;
+		int stringUsages = 0;
+		for (DummyUsage usage : usages) {
+			String usageTypeName = usage.getType().getName();
+
+			if (usageTypeName.equals("FileStream")) {
+				++fileStreamUsages;
+				// analysis cannot infer that the FileStream created in OpenSource is the same as the one returned by
+				// the method call in CopyTo
+				assertThat(usage.getDefinitionSite().getKind(),
+						Matchers.isOneOf(DefinitionSiteKind.NEW, DefinitionSiteKind.RETURN));
+
+				Set<DummyCallsite> callsites = usage.getAllCallsites();
+				assertEquals(2, callsites.size());
+				assertEquals(callsites.stream().map(c -> c.getKind()).collect(Collectors.toSet()),
+						Sets.newHashSet(CallSiteKind.RECEIVER));
+				assertThat(callsites.stream().map(c -> c.getMethod().getName()).collect(Collectors.toSet()),
+						Matchers.isOneOf(Sets.newHashSet("Read", "Close"), Sets.newHashSet("Write", "Close")));
+			} else if (usageTypeName.equals("String")) {
+				++stringUsages;
+				assertThat(usage.getDefinitionSite().getKind(),
+						Matchers.isOneOf(DefinitionSiteKind.PARAM, DefinitionSiteKind.FIELD));
+
+				Set<DummyCallsite> callsites = usage.getAllCallsites();
+				assertEquals(1, callsites.size());
+				DummyCallsite callsite = callsites.iterator().next();
+				assertEquals(CallSiteKind.PARAMETER, callsite.getKind());
+				assertTrue(callsite.getMethod().isConstructor());
+				assertEquals("FileStream", callsite.getMethod().getDeclaringType().getName());
+			}
+		}
+
+		assertEquals(2, stringUsages);
+		assertEquals(2, fileStreamUsages);
 	}
 }
