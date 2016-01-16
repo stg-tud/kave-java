@@ -18,4 +18,9 @@ package breakstatementanalysistest;
 
 public class BreakInLoop {
 
+	public void method() {
+		while (true) {
+			break;
+		}
+	}
 }

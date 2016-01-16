@@ -26,12 +26,13 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "ifelseblockanalysistest;";
+	public IfElseBlockAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
 
 	@Test
 	public void basicIfElseBlock() {
-		updateContext(projectName, packageName + "BasicIfElseBlock.java");
+		updateContext();
 
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
@@ -43,7 +44,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withThenStatement() {
-		updateContext(projectName, packageName + "WithThenStatement.java");
+		updateContext();;
 
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
@@ -56,7 +57,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withElseStatement() {
-		updateContext(projectName, packageName + "WithElseStatement.java");
+		updateContext();
 
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
@@ -69,7 +70,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withStatements() {
-		updateContext(projectName, packageName + "WithStatements.java");
+		updateContext();
 
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
@@ -83,7 +84,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void noElseBlock() {
-		updateContext(projectName, packageName + "NoElseBlock.java");
+		updateContext();
 
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));

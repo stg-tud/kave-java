@@ -17,17 +17,14 @@
 package eclipse.commons.analysis.sstanalysistestsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
@@ -38,7 +35,6 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
@@ -54,15 +50,32 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import eclipse.commons.test.PluginAstParser;
 
-public class BaseSSTAnalysisTest {
+public abstract class BaseSSTAnalysisTest {
 
 	protected SST context;
+	protected String packageName = "";
+	private String projectName = "testproject";
+
+	@Rule
+	public TestName name = new TestName();
 
 	protected MethodDeclaration newMethodDeclaration(String identifier) {
 		MethodDeclaration decl = new MethodDeclaration();
 		decl.setName(CsMethodName.newMethodName(identifier));
 
 		return decl;
+	}
+
+	protected MethodDeclaration newDefaultMethodDeclaration(String qualifiedName) {
+		MethodDeclaration decl = new MethodDeclaration();
+		decl.setName(newDefaultMethodName(qualifiedName));
+
+		return decl;
+	}
+
+	protected MethodName newDefaultMethodName(String qualifiedName) {
+		String identifier = "[%void, rt.jar, 1.8] [" + qualifiedName + ", ?].method()";
+		return CsMethodName.newMethodName(identifier);
 	}
 
 	protected FieldDeclaration newFieldDeclaration(String identifier) {
@@ -84,8 +97,7 @@ public class BaseSSTAnalysisTest {
 		return expressionStatement;
 	}
 
-	protected IVariableDeclaration newVariableDeclaration(String varName,
-			TypeName type) {
+	protected IVariableDeclaration newVariableDeclaration(String varName, TypeName type) {
 		VariableDeclaration var = new VariableDeclaration();
 		var.setType(type);
 		var.setReference(newVariableReference(varName));
@@ -100,18 +112,15 @@ public class BaseSSTAnalysisTest {
 		return varRef;
 	}
 
-	protected static IAssignment newAssignment(String id,
-			IAssignableExpression expr) {
+	protected static IAssignment newAssignment(String id, IAssignableExpression expr) {
 		Assignment assignment = new Assignment();
 		assignment.setReference(newVariableReference(id));
 		assignment.setExpression(expr);
 		return assignment;
 	}
 
-	protected static InvocationExpression newInvokeConstructor(
-			MethodName methodName, ISimpleExpression... parameters) {
-		assertThat("methodName is not a constructor",
-				methodName.isConstructor());
+	protected static InvocationExpression newInvokeConstructor(MethodName methodName, ISimpleExpression... parameters) {
+		assertThat("methodName is not a constructor", methodName.isConstructor());
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setMethodName(methodName);
 		invocation.setParameters(Arrays.asList(parameters));
@@ -152,12 +161,6 @@ public class BaseSSTAnalysisTest {
 	// }
 	// }
 
-	protected MethodName defaultMethodName(String qualifiedName) {
-		String identifier = "[%void, rt.jar, 1.8] [" + qualifiedName
-				+ ", ?].method()";
-		return CsMethodName.newMethodName(identifier);
-	}
-
 	protected IMethodDeclaration getFirstMethod() {
 		return context.getMethods().iterator().next();
 	}
@@ -187,10 +190,16 @@ public class BaseSSTAnalysisTest {
 	}
 
 	/*
-	 * Has to be called for every new test class.
+	 * Has to be called for every new test class. Testcases need to have the
+	 * name of the tested compilationunit and the testclass must be named after
+	 * the package of the compilationunits.
 	 */
-	protected void updateContext(String projectName, String packageName) {
-		PluginAstParser parser = new PluginAstParser(projectName, packageName);
+	protected void updateContext() {
+		String cu = name.getMethodName();
+		cu = cu.substring(0, 1).toUpperCase() + cu.substring(1);
+		String qualifiedName = this.packageName.toLowerCase() + ";" + cu + ".java";
+
+		PluginAstParser parser = new PluginAstParser(projectName, qualifiedName);
 		context = parser.getContext();
 	}
 }

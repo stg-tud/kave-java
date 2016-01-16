@@ -29,19 +29,19 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class ConstructorDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "constructordeclarationanalysistest;";
-
+	public ConstructorDeclarationAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
+	
 	@Test
 	public void defaultConstructorIsNotCaptured() {
-		updateContext(projectName, packageName
-				+ "DefaultConstructorIsNotCaptured.java");
+		updateContext();
 		assertEquals(newSet(), context.getMethods());
 	}
 
 	@Test
 	public void explicitDefinition() {
-		updateContext(projectName, packageName + "ExplicitDefinition.java");
+		updateContext();
 		MethodDeclaration m = newMethodDeclaration("[constructordeclarationanalysistest.ExplicitDefinition, ?] [constructordeclarationanalysistest.ExplicitDefinition, ?]..ctor()");
 
 		Set<MethodDeclaration> expected = newSet(m);
@@ -52,7 +52,7 @@ public class ConstructorDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void bodyIsAnalyzed() {
-		updateContext(projectName, packageName + "BodyIsAnalyzed.java");
+		updateContext();
 		MethodDeclaration ctor = newMethodDeclaration("[constructordeclarationanalysistest.BodyIsAnalyzed, ?] [constructordeclarationanalysistest.BodyIsAnalyzed, ?]..ctor()");
 		ReturnStatement returnStatement = new ReturnStatement();
 		returnStatement.setIsVoid(true);
@@ -71,8 +71,7 @@ public class ConstructorDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void ConstructorsOfNestedClasses() {
-		updateContext(projectName, packageName
-				+ "ConstructorsOfNestedClasses.java");
+		updateContext();
 		MethodDeclaration m = newMethodDeclaration("[constructordeclarationanalysistest.ConstructorsOfNestedClasses, ?] [constructordeclarationanalysistest.ConstructorsOfNestedClasses, ?]..ctor()");
 
 		Set<MethodDeclaration> expected = newSet(m);

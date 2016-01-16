@@ -31,12 +31,13 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class WhileLoopAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "whileloopanalysistest;";
+	public WhileLoopAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
 
 	@Test
 	public void basicLoop() {
-		updateContext(projectName, packageName + "BasicLoop.java");
+		updateContext();
 
 		WhileLoop expected = new WhileLoop();
 		expected.setCondition(newConstantValue("true"));
@@ -48,7 +49,7 @@ public class WhileLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withStatementInBody() {
-		updateContext(projectName, packageName + "WithStatementInBody.java");
+		updateContext();
 
 		WhileLoop expected = new WhileLoop();
 		expected.setCondition(newConstantValue("true"));

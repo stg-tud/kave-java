@@ -21,21 +21,21 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
-public class MemberDeclarationTest extends BaseSSTAnalysisTest {
+public class MemberDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "memberdeclarationanalysistest;";
-
+	public MemberDeclarationAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
+	
 	@Test
 	public void fieldDeclaration() {
-		updateContext(projectName, packageName + "FieldDeclaration.java");
+		updateContext();
 
 		Set<IFieldDeclaration> actual = context.getFields();
 		Set<IFieldDeclaration> expected = new HashSet<>();
@@ -47,7 +47,7 @@ public class MemberDeclarationTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void methodDeclaration() {
-		updateContext(projectName, packageName + "MethodDeclaration.java");
+		updateContext();
 
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration m = newMethodDeclaration(
 				"[%void, rt.jar, 1.8] [memberdeclarationanalysistest.MethodDeclaration, ?].M()");
@@ -63,7 +63,7 @@ public class MemberDeclarationTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void nestedClass_Methods() {
-		updateContext(projectName, packageName + "NestedClass_Methods.java");
+		updateContext();
 		
 		Set<IMethodDeclaration> actual = context.getMethods();
 		Set<IMethodDeclaration> expected = new HashSet<>();
@@ -73,7 +73,7 @@ public class MemberDeclarationTest extends BaseSSTAnalysisTest {
 	
 	@Test
 	public void nestedClass_Fields() {
-		updateContext(projectName, packageName + "NestedClass_Fields.java");
+		updateContext();
 		
 		Set<IFieldDeclaration> actual = context.getFields();
 		Set<IFieldDeclaration> expected = new HashSet<>();

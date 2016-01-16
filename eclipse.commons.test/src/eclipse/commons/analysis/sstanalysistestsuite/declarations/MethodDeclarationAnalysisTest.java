@@ -28,12 +28,13 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class MethodDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "methoddeclarationanalysistest;";
+	public MethodDeclarationAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
 
 	@Test
 	public void privateIsInlined() {
-		updateContext(projectName, packageName + "PrivateIsInlined.java");
+		updateContext();
 		MethodDeclaration mPub = newMethodDeclaration("[%void, rt.jar, 1.8] [methoddeclarationanalysistest.PrivateIsInlined, ?].PublicA()");
 		MethodDeclaration mPriv = newMethodDeclaration("[%void, rt.jar, 1.8] [methoddeclarationanalysistest.PrivateIsInlined, ?].PrivateA()");
 		mPriv.setEntryPoint(false);

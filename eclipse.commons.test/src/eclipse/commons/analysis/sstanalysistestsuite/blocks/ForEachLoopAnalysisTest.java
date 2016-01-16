@@ -31,16 +31,16 @@ import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
 public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "foreachloopanalysistest;";
-
+	public ForEachLoopAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
+	
 	@Test
 	public void basicForEachLoop() {
-		updateContext(projectName, packageName + "BasicForEachLoop.java");
+		updateContext();
 
-		MethodDeclaration expected = new MethodDeclaration();
+		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.BasicForEachLoop");
 		// TODO: List statt boolean
-		expected.setName(defaultMethodName(packageName + ".BasicForEachLoop.java"));
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
 		expected.getBody()
@@ -59,10 +59,9 @@ public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withStatementInBody() {
-		updateContext(projectName, packageName + "WithStatementInBody.java");
+		updateContext();
 
-		MethodDeclaration expected = new MethodDeclaration();
-		expected.setName(defaultMethodName(packageName + ".WithStatementInBody.java"));
+		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.WithStatementInBody");
 		// TODO: List statt boolean
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
@@ -83,11 +82,9 @@ public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void inlineDefinitionOfEnumerable() {
-		updateContext(projectName, packageName
-				+ "InlineDefinitionOfEnumerable.java");
+		updateContext();
 
-		MethodDeclaration expected = new MethodDeclaration();
-		expected.setName(defaultMethodName(packageName + ".InlineDefinitionOfEnumerable.java"));
+		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.InlineDefinitionOfEnumerable");
 		// TODO: List statt boolean
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));

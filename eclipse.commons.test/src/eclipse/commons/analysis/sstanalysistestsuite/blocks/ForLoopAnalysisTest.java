@@ -32,12 +32,13 @@ import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
 public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
-	private final String projectName = "testproject";
-	private final String packageName = "forloopanalysistest;";
+	public ForLoopAnalysisTest() {
+		packageName = getClass().getSimpleName();
+	}
 
 	@Test
-	public void basicLoop() {
-		updateContext(projectName, packageName + "BasicForLoop.java");
+	public void basicForLoop() {
+		updateContext();
 
 		ForLoop expected = new ForLoop();
 
@@ -48,8 +49,7 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void init_VariableDeclaration() {
-		updateContext(projectName, packageName
-				+ "Init_VariableDeclaration.java");
+		updateContext();
 
 		ForLoop expected = new ForLoop();
 		expected.getInit().add(
@@ -63,28 +63,29 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void init_MultipleStatements() {
-		updateContext(projectName, packageName + "Init_MultipleStatements.java");
+		updateContext();
 
-		MethodDeclaration method = new MethodDeclaration();
-		method.getBody().add(
+		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.BasicForEachLoop");
+		expected.getBody().add(
 				newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		method.getBody().add(
+		expected.getBody().add(
 				newVariableDeclaration("j", SSTAnalysisFixture.INT));
-		method.setName(defaultMethodName(packageName
-				+ ".Init_MultipleStatements"));
+		expected.setName(newDefaultMethodName(getClass().getName()));
 
-		ForLoop expected = new ForLoop();
-		expected.getInit().add(newAssignment("i", newConstantValue("0")));
-		expected.getInit().add(newAssignment("j", newConstantValue("1")));
-		IStatement actual = getFirstStatement();
+		ForLoop loop = new ForLoop();
+		loop.getInit().add(newAssignment("i", newConstantValue("0")));
+		loop.getInit().add(newAssignment("j", newConstantValue("1")));
+		expected.getBody().add(loop);
+		IMethodDeclaration actual =getFirstMethod();
 
 		assertEquals(expected, actual);
 		assertFalse(true);
 	}
 
+	//TODO: AddMethod
 	@Test
 	public void condition() {
-		updateContext(projectName, packageName + "Condition.java");
+		updateContext();
 
 		ForLoop expected = new ForLoop();
 		expected.setCondition(newConstantValue("true"));
@@ -96,46 +97,49 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void step_SingleStatement() {
-		updateContext(projectName, packageName + "Step_SingleStatement.java");
+		updateContext();
 
-		IMethodDeclaration method = new MethodDeclaration();
-		method.getBody().add(
+		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.Step_SingleStatement");
+		expected.getBody().add(
 				newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		method.getBody().add(newAssignment("i", newConstantValue("0")));
+		expected.getBody().add(newAssignment("i", newConstantValue("0")));
 
-		ForLoop expected = new ForLoop();
+		ForLoop loop = new ForLoop();
 		ComposedExpression composedExpr = new ComposedExpression();
 		composedExpr.getReferences().add(newVariableReference("i"));
-		expected.getStep().add(newAssignment("i", composedExpr));
+		loop.getStep().add(newAssignment("i", composedExpr));
+		expected.getBody().add(loop);
 
 		IMethodDeclaration actual = getFirstMethod();
 
-		assertEquals(expected, actual);
+		assertEquals(loop, actual);
 	}
 
 	@Test
 	public void step_MultipleStatements() {
-		updateContext(projectName, packageName + "Step_MultipleStatements.java");
+		updateContext();
 
-		IMethodDeclaration method = new MethodDeclaration();
-		method.getBody().add(
+		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.Step_MultipleStatement");
+		expected.getBody().add(
 				newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		method.getBody().add(newAssignment("i", newConstantValue("0")));
+		expected.getBody().add(newAssignment("i", newConstantValue("0")));
 
-		ForLoop expected = new ForLoop();
+		ForLoop loop = new ForLoop();
 		ComposedExpression composedExpr = new ComposedExpression();
 		composedExpr.getReferences().add(newVariableReference("i"));
-		expected.getStep().add(newAssignment("i", composedExpr));
-		expected.getStep().add(newAssignment("i", composedExpr));
+		loop.getStep().add(newAssignment("i", composedExpr));
+		loop.getStep().add(newAssignment("i", composedExpr));
+		expected.getBody().add(loop);
 
 		IMethodDeclaration actual = getFirstMethod();
 
 		assertEquals(expected, actual);
 	}
 
+	//TODO: Add Method
 	@Test
 	public void bodyWithStatement() {
-		updateContext(projectName, packageName + "BodyWithStatement.java");
+		updateContext();
 
 		ForLoop expected = new ForLoop();
 		expected.setCondition(new UnknownExpression());

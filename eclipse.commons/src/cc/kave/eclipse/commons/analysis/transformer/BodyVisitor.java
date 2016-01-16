@@ -58,10 +58,11 @@ import cc.kave.eclipse.commons.analysis.util.UniqueVariableNameGenerator;
 import cc.kave.eclipse.namefactory.NodeFactory;
 import cc.kave.eclipse.namefactory.NodeFactory.BindingFactory;
 
-public class BodyVisitor {
+public class BodyVisitor extends ASTVisitor{
 
 	private ExpressionVisitor exprVisitor;
 	private UniqueVariableNameGenerator nameGen;
+	private List<IStatement> body;
 
 	public BodyVisitor(UniqueVariableNameGenerator nameGen) {
 		this.nameGen = nameGen;
