@@ -155,7 +155,7 @@ public class InlineConstantVisitor extends AbstractTraversingNodeVisitor<Void, V
 		return null;
 	}
 
-	public boolean isConstantExpression(ISimpleExpression expr) {
+	private boolean isConstantExpression(ISimpleExpression expr) {
 		if (expr instanceof IReferenceExpression) {
 			IReference reference = ((IReferenceExpression) expr).getReference();
 			if (reference instanceof IFieldReference) {
@@ -165,7 +165,7 @@ public class InlineConstantVisitor extends AbstractTraversingNodeVisitor<Void, V
 		return false;
 	}
 
-	public boolean isConstant(IFieldReference field) {
+	private boolean isConstant(IFieldReference field) {
 		for (IFieldDeclaration constant : constants) {
 			if (constant.getName().equals(field.getFieldName()))
 				return true;
