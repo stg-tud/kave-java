@@ -44,6 +44,8 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -66,6 +68,7 @@ import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
@@ -253,14 +256,18 @@ public class SSTUtil {
 		forLoop.setCondition(condition);
 		return forLoop;
 	}
-
-	public static IIfElseBlock simpleIf(List<IStatement> elseStatement, ISimpleExpression condition,
+	
+	public static IfElseBlock ifElseBlock(ISimpleExpression condition, List<IStatement> thenPart, List<IStatement> elsePart) {
+		IfElseBlock ifElseBlock = new IfElseBlock();
+		ifElseBlock.setCondition(condition);
+		ifElseBlock.setThen(thenPart);
+		ifElseBlock.setElse(elsePart);
+		return ifElseBlock;
+	}
+	
+	public static IIfElseBlock simpleIf(List<IStatement> elseStatements, ISimpleExpression condition,
 			IStatement... body) {
-		IfElseBlock ifElse = new IfElseBlock();
-		ifElse.setCondition(condition);
-		ifElse.setThen(Lists.newArrayList(body));
-		ifElse.setElse(elseStatement);
-		return ifElse;
+		return ifElseBlock(condition, Lists.newArrayList(body), elseStatements);
 	}
 
 	public static IDoLoop doLoop(ILoopHeaderBlockExpression condition, IStatement... body) {
@@ -285,11 +292,17 @@ public class SSTUtil {
 		return lockBlock;
 	}
 
-	public static ISwitchBlock switchBlock(String identifier, ICaseBlock... caseBlocks) {
+	public static SwitchBlock switchBlock(IVariableReference ref, List<ICaseBlock> sections,
+			List<IStatement> defaultSection) {
 		SwitchBlock switchBlock = new SwitchBlock();
-		switchBlock.setReference(variableReference(identifier));
-		switchBlock.setSections(Lists.newArrayList(caseBlocks));
+		switchBlock.setReference(ref);
+		switchBlock.setSections(sections);
+		switchBlock.setDefaultSection(defaultSection);
 		return switchBlock;
+	}
+
+	public static ISwitchBlock switchBlock(String identifier, ICaseBlock... caseBlocks) {
+		return switchBlock(variableReference(identifier), Lists.newArrayList(caseBlocks), new ArrayList<IStatement>());
 	}
 	
 	public static ICaseBlock caseBlock(ISimpleExpression label, IStatement... body) {
@@ -446,6 +459,14 @@ public class SSTUtil {
 		completionExpr.setObjectReference(variableReference(ref));
 		return completionExpr;
 	}
+	
+	public static IBinaryExpression binExpr(BinaryOperator op, ISimpleExpression lhs, ISimpleExpression rhs) {
+		BinaryExpression binaryExpression = new BinaryExpression();
+		binaryExpression.setOperator(op);
+		binaryExpression.setLeftOperand(lhs);
+		binaryExpression.setRightOperand(rhs);
+		return binaryExpression;
+	}
 
 	public static IReference unknownRef() {
 		UnknownReference ref = new UnknownReference();
@@ -469,7 +490,6 @@ public class SSTUtil {
 	}
 
 	public static IVariableDeclaration declareVar(String identifier) {
-		// TODO: int, bool, unknown Type methods
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setReference(variableReference(identifier));
 		return variable;
