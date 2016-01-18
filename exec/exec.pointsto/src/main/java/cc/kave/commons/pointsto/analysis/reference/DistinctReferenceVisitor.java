@@ -12,30 +12,19 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.pointsto.ScopedMap;
+public interface DistinctReferenceVisitor<TReturn, TContext> {
 
-public class DistinctReferenceVisitor
-		extends AbstractNodeVisitor<ScopedMap<String, IVariableDeclaration>, DistinctReference> {
+	TReturn visit(DistinctFieldReference fieldRef, TContext context);
 
-	@Override
-	public DistinctReference visit(IFieldReference fieldRef, ScopedMap<String, IVariableDeclaration> context) {
-		return new DistinctFieldReference(fieldRef);
-	}
+	TReturn visit(DistinctVariableReference varRef, TContext context);
 
-	@Override
-	public DistinctReference visit(IPropertyReference propertyRef, ScopedMap<String, IVariableDeclaration> context) {
-		return new DistinctPropertyReference(propertyRef);
-	}
+	TReturn visit(DistinctPropertyReference propertyRef, TContext context);
 
-	@Override
-	public DistinctReference visit(IVariableReference varRef, ScopedMap<String, IVariableDeclaration> context) {
-		IVariableDeclaration varDecl = context.get(varRef.getIdentifier());
-		return new DistinctVariableReference(varRef, varDecl);
-	}
+	TReturn visit(DistinctPropertyParameterReference propertyParameterRef, TContext context);
 
+	TReturn visit(DistinctCatchBlockParameterReference catchBlockParameterRef, TContext context);
+
+	TReturn visit(DistinctLambdaParameterReference lambdaParameterRef, TContext context);
+
+	TReturn visit(DistinctMethodParameterReference methodParameterRef, TContext context);
 }

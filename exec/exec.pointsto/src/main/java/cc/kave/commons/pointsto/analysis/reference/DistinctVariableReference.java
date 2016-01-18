@@ -12,27 +12,35 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class DistinctVariableReference implements DistinctReference {
 
-	private IVariableReference varRef;
 	private IVariableDeclaration varDecl;
+
+	public DistinctVariableReference(IVariableDeclaration varDecl) {
+		this.varDecl = varDecl;
+	}
 
 	@Override
 	public IReference getReference() {
-		return varRef;
+		return varDecl.getReference();
+	}
+
+	@Override
+	public TypeName getType() {
+		return varDecl.getType();
 	}
 
 	public IVariableDeclaration getDeclaration() {
 		return varDecl;
 	}
 
-	public DistinctVariableReference(IVariableReference varRef, IVariableDeclaration varDecl) {
-		this.varRef = varRef;
-		this.varDecl = varDecl;
+	@Override
+	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
+		return visitor.visit(this, context);
 	}
 
 	@Override
@@ -40,7 +48,6 @@ public class DistinctVariableReference implements DistinctReference {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((varDecl == null) ? 0 : varDecl.hashCode());
-		result = prime * result + ((varRef == null) ? 0 : varRef.hashCode());
 		return result;
 	}
 
@@ -57,11 +64,6 @@ public class DistinctVariableReference implements DistinctReference {
 			if (other.varDecl != null)
 				return false;
 		} else if (varDecl != other.varDecl) // reference equality
-			return false;
-		if (varRef == null) {
-			if (other.varRef != null)
-				return false;
-		} else if (!varRef.equals(other.varRef))
 			return false;
 		return true;
 	}

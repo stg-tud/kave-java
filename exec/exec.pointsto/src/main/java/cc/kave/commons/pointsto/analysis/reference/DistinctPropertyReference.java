@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 
@@ -19,13 +20,23 @@ public class DistinctPropertyReference implements DistinctReference {
 
 	private IPropertyReference propertyRef;
 
+	public DistinctPropertyReference(IPropertyReference propertyRef) {
+		this.propertyRef = propertyRef;
+	}
+
 	@Override
 	public IReference getReference() {
 		return propertyRef;
 	}
 
-	public DistinctPropertyReference(IPropertyReference propertyRef) {
-		this.propertyRef = propertyRef;
+	@Override
+	public TypeName getType() {
+		return propertyRef.getPropertyName().getValueType();
+	}
+
+	@Override
+	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
+		return visitor.visit(this, context);
 	}
 
 	@Override

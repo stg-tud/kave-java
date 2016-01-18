@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
@@ -19,13 +20,23 @@ public class DistinctFieldReference implements DistinctReference {
 
 	private IFieldReference fieldRef;
 
+	public DistinctFieldReference(IFieldReference fieldRef) {
+		this.fieldRef = fieldRef;
+	}
+
 	@Override
 	public IReference getReference() {
 		return fieldRef;
 	}
 
-	public DistinctFieldReference(IFieldReference fieldRef) {
-		this.fieldRef = fieldRef;
+	@Override
+	public TypeName getType() {
+		return fieldRef.getFieldName().getValueType();
+	}
+
+	@Override
+	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
+		return visitor.visit(this, context);
 	}
 
 	@Override
