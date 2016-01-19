@@ -104,6 +104,29 @@ public class SwitchBlockNormalizationVisitorTest {
 		assertTransformedSST();
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | switch(x) { ..... |......| if ( x == 0 ) {} |
+	// | ..case 0: break;. |..=>..| else ........... |
+	// | ..default: stmt;. |......| ..stmt; ........ |
+	// | } ............... |......|__________________|
+	// |___________________|
+	@Test
+	public void testEmptySectionNoFallthrough() {
+		ICaseBlock case0 = caseBlock(label0, breakStatement());
+
+		switchBlock.setDefaultSection(Lists.newArrayList(stmt0));
+		switchBlock.setSections(Lists.newArrayList(case0));
+
+		IVariableReference var0 = variableReference("cond_0");
+		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label0);
+		IAssignment assign0 = assign(var0, eq0);
+		IfElseBlock ifElseBlock = ifCond(var0);
+		setElse(ifElseBlock, stmt0);
+
+		expectedMethod.setBody(Lists.newArrayList(booleanDec(var0), assign0, ifElseBlock));
+		assertTransformedSST();
+	}
+
 	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
 	// | switch(x) { ..... |......| if( x == 0 ) |
 	// | ..case 0: stmt0;. |..=>..| ..stmt0; .... |
@@ -113,14 +136,13 @@ public class SwitchBlockNormalizationVisitorTest {
 	// |___________________|
 	@Test
 	public void testOneSectionNoFallthrough() {
-		IConstantValueExpression label = constant("0");
-		ICaseBlock caseBlock = caseBlock(label, stmt0, breakStatement());
+		ICaseBlock caseBlock = caseBlock(label0, stmt0, breakStatement());
 
 		switchBlock.setDefaultSection(Lists.newArrayList(stmt1));
 		switchBlock.setSections(Lists.newArrayList(caseBlock));
 
 		IVariableReference var0 = variableReference("cond_0");
-		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label);
+		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label0);
 		IAssignment assign0 = assign(var0, eq0);
 		IfElseBlock ifElseBlock = ifCond(var0);
 		setThen(ifElseBlock, stmt0);
@@ -192,7 +214,7 @@ public class SwitchBlockNormalizationVisitorTest {
 	public void testNonEmptySectionDefaultFallthrough() {
 		ICaseBlock case0 = caseBlock(label0, stmt0);
 		IVariableReference var0 = variableReference("cond_0");
-		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var0), label0);
+		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label0);
 		IAssignment assign0 = assign(var0, eq0);
 
 		switchBlock.setDefaultSection(Lists.newArrayList(stmt1));
@@ -305,14 +327,14 @@ public class SwitchBlockNormalizationVisitorTest {
 
 		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label0);
 		IAssignableExpression eq1 = binExpr(BinaryOperator.Equal, refExpr(var), label1);
-		IAssignableExpression eq2 = binExpr(BinaryOperator.Equal, refExpr(var), label1);
+		IAssignableExpression eq2 = binExpr(BinaryOperator.Equal, refExpr(var), label2);
 		IAssignableExpression or0 = binExpr(BinaryOperator.Or, refExpr(var0), refExpr(var1));
-		IAssignableExpression or1 = binExpr(BinaryOperator.Or, refExpr(var3), refExpr(var2));
+		IAssignableExpression or1 = binExpr(BinaryOperator.Or, refExpr(var2), refExpr(var3));
 
 		IAssignment assign0 = assign(var0, eq0);
 		IAssignment assign1 = assign(var1, eq1);
-		IAssignment assign2 = assign(var2, eq2);
-		IAssignment assign3 = assign(var3, or0);
+		IAssignment assign2 = assign(var2, or0);
+		IAssignment assign3 = assign(var3, eq2);
 		IAssignment assign4 = assign(var4, or1);
 
 		switchBlock.setDefaultSection(Lists.newArrayList(stmt3));
@@ -355,14 +377,14 @@ public class SwitchBlockNormalizationVisitorTest {
 
 		IAssignableExpression eq0 = binExpr(BinaryOperator.Equal, refExpr(var), label0);
 		IAssignableExpression eq1 = binExpr(BinaryOperator.Equal, refExpr(var), label1);
-		IAssignableExpression eq2 = binExpr(BinaryOperator.Equal, refExpr(var), label1);
+		IAssignableExpression eq2 = binExpr(BinaryOperator.Equal, refExpr(var), label2);
 		IAssignableExpression or0 = binExpr(BinaryOperator.Or, refExpr(var0), refExpr(var1));
-		IAssignableExpression or1 = binExpr(BinaryOperator.Or, refExpr(var3), refExpr(var2));
+		IAssignableExpression or1 = binExpr(BinaryOperator.Or, refExpr(var2), refExpr(var3));
 
 		IAssignment assign0 = assign(var0, eq0);
 		IAssignment assign1 = assign(var1, eq1);
-		IAssignment assign2 = assign(var2, eq2);
-		IAssignment assign3 = assign(var3, or0);
+		IAssignment assign2 = assign(var2, or0);
+		IAssignment assign3 = assign(var3, eq2);
 		IAssignment assign4 = assign(var4, or1);
 
 		switchBlock.setDefaultSection(Lists.newArrayList(stmt3));
@@ -381,6 +403,14 @@ public class SwitchBlockNormalizationVisitorTest {
 		assertTransformedSST();
 	}
 
+	// ------------------------ inner breaks ----------------------------------
+
+	// TODO
+	@Test
+	public void testInnerBreak() {
+		assertTransformedSST();
+	}
+
 	// ---------------------------- asserts -----------------------------------
 
 	private void assertSSTs(ISST expectedSST, ISST sst) {
@@ -388,7 +418,7 @@ public class SwitchBlockNormalizationVisitorTest {
 		Set<IMethodDeclaration> methods = sst.getMethods();
 		Set<IMethodDeclaration> expectedMethods = expectedSST.getMethods();
 		List<IStatement> body = methods.iterator().next().getBody();
-		List<IStatement> expectedBody = methods.iterator().next().getBody();
+		List<IStatement> expectedBody = expectedMethods.iterator().next().getBody();
 
 		assertThat(methods.size(), equalTo(1));
 		assertThat(methods.size(), equalTo(expectedMethods.size()));
