@@ -12,11 +12,14 @@
  */
 package cc.kave.commons.pointsto;
 
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.TypeName
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public class CSharpLanguageOptions extends LanguageOptions {
@@ -54,7 +57,7 @@ public class CSharpLanguageOptions extends LanguageOptions {
 	public IMethodName addLambda(IMethodName method) {
 		String oldNamePart = "." + method.getName() + "(";
 		String newNamePart = "." + method.getName() + LAMBDA_KEYWORD + "(";
-		
+
 		return MethodName.newMethodName(method.getIdentifier().replace(oldNamePart, newNamePart));
 	}
 
@@ -62,13 +65,20 @@ public class CSharpLanguageOptions extends LanguageOptions {
 	public ITypeName addLambda(ITypeName type) {
 		String oldNamePart = type.getFullName();
 		String newNamePart = oldNamePart + LAMBDA_KEYWORD;
-		
+
 		return TypeName.newTypeName(type.getIdentifier().replace(oldNamePart, newNamePart));
 	}
 
 	@Override
 	public IMethodName removeLambda(IMethodName method) {
 		return MethodName.newMethodName(method.getIdentifier().replace(LAMBDA_KEYWORD, ""));
+	}
+
+	@Override
+	public IFieldName propertyToField(IPropertyName property) {
+		String propertyIdentifier = property.getIdentifier();
+		String fieldIdentifier = propertyIdentifier.substring(0, propertyIdentifier.lastIndexOf('('));
+		return FieldName.newFieldName(fieldIdentifier);
 	}
 
 }

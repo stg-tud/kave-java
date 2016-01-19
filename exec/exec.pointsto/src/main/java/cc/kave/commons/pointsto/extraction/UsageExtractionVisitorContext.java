@@ -30,7 +30,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -141,6 +140,7 @@ public class UsageExtractionVisitorContext {
 		return currentCallpath.getFirst();
 	}
 
+	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, ITypeName type) {
 		QueryContextKey query = new QueryContextKey(reference, currentStatement, type, currentCallpath);
 		return pointerAnalysis.query(query);
 	}
@@ -173,12 +173,13 @@ public class UsageExtractionVisitorContext {
 
 		// treat properties as fields if they have no custom get code
 		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
-			if (!propertyDecl.getGet().isEmpty()) {
+			if (!languageOptions.isAutoImplementedProperty(propertyDecl)) {
 				continue;
 			}
 
 			IPropertyName property = propertyDecl.getName();
-			DummyDefinitionSite propertyDefinition = DummyDefinitionSite.byField(propertyToField(property));
+			DummyDefinitionSite propertyDefinition = DummyDefinitionSite
+					.byField(languageOptions.propertyToField(property));
 			IReference propertyRefernce = SSTBuilder.propertyReference(property);
 			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
 				// do not overwrite an existing definition by a real field
@@ -188,11 +189,6 @@ public class UsageExtractionVisitorContext {
 			}
 		}
 
-	}
-
-	private IFieldName propertyToField(IPropertyName property) {
-		IFieldName field = FieldName.newFieldName(property.getIdentifier());
-		return field;
 	}
 
 	private DummyUsage initializeUsage(ITypeName type, AbstractLocation location) {

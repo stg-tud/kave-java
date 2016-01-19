@@ -12,9 +12,12 @@
  */
 package cc.kave.commons.pointsto;
 
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public abstract class LanguageOptions {
@@ -36,6 +39,12 @@ public abstract class LanguageOptions {
 	public abstract ITypeName getTopClass();
 
 	public abstract String getPropertyParameterName();
+
+	public boolean isAutoImplementedProperty(IPropertyDeclaration propertyDecl) {
+		return propertyDecl.getGet().isEmpty();
+	}
+
+	public abstract IFieldName propertyToField(IPropertyName property);
 
 	public abstract IMethodName addLambda(IMethodName method);
 

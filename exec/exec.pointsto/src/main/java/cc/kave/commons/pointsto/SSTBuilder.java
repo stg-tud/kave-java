@@ -30,8 +30,13 @@ public class SSTBuilder {
 	}
 
 	public static IFieldReference fieldReference(IFieldName field) {
+		IVariableReference thisReference = variableReference(LanguageOptions.getInstance().getThisName());
+		return fieldReference(thisReference, field);
+	}
+
+	public static IFieldReference fieldReference(IVariableReference reference, FieldName field) {
 		FieldReference fieldRef = new FieldReference();
-		fieldRef.setReference(variableReference(LanguageOptions.getInstance().getThisName()));
+		fieldRef.setReference(reference);
 		fieldRef.setFieldName(field);
 		return fieldRef;
 	}
