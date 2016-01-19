@@ -14,6 +14,8 @@ package cc.kave.commons.pointsto.analysis.reference;
 
 public interface DistinctReferenceVisitor<TReturn, TContext> {
 
+	TReturn visit(DistinctKeywordReference keywordRef, TContext context);
+
 	TReturn visit(DistinctFieldReference fieldRef, TContext context);
 
 	TReturn visit(DistinctVariableReference varRef, TContext context);

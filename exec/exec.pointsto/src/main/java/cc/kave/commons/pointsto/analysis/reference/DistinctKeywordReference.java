@@ -14,29 +14,26 @@ package cc.kave.commons.pointsto.analysis.reference;
 
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.pointsto.SSTBuilder;
 
-public class DistinctCatchBlockParameterReference implements DistinctReference {
+public class DistinctKeywordReference implements DistinctReference {
 
-	private ICatchBlock catchBlock;
+	private String keyword;
+	private TypeName type;
 
-	public DistinctCatchBlockParameterReference(ICatchBlock catchBlock) {
-		this.catchBlock = catchBlock;
+	public DistinctKeywordReference(String keyword, TypeName type) {
+		this.keyword = keyword;
+		this.type = type;
 	}
 
 	@Override
 	public IReference getReference() {
-		return SSTBuilder.variableReference(catchBlock.getParameter().getName());
+		return SSTBuilder.variableReference(keyword);
 	}
 
 	@Override
 	public TypeName getType() {
-		return catchBlock.getParameter().getValueType();
-	}
-
-	public ICatchBlock getCatchBlock() {
-		return catchBlock;
+		return type;
 	}
 
 	@Override
@@ -48,7 +45,8 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((catchBlock == null) ? 0 : catchBlock.hashCode());
+		result = prime * result + ((keyword == null) ? 0 : keyword.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -60,13 +58,17 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctCatchBlockParameterReference other = (DistinctCatchBlockParameterReference) obj;
-		if (catchBlock == null) {
-			if (other.catchBlock != null)
+		DistinctKeywordReference other = (DistinctKeywordReference) obj;
+		if (keyword == null) {
+			if (other.keyword != null)
 				return false;
-		} else if (catchBlock != other.catchBlock) // reference equality
+		} else if (!keyword.equals(other.keyword))
 			return false;
-
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
 		return true;
 	}
 
