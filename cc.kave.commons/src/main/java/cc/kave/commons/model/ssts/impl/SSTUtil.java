@@ -231,6 +231,13 @@ public class SSTUtil {
 			method.getBody().add(s);
 		return method;
 	}
+	
+	public static IMethodDeclaration declareMethod(IStatement... statements) {
+		MethodDeclaration method = new MethodDeclaration();
+		for (IStatement s : statements)
+			method.getBody().add(s);
+		return method;
+	}
 
 	public static IComposedExpression compose(IVariableReference... refs) {
 		ComposedExpression composedExpr = new ComposedExpression();
@@ -284,12 +291,16 @@ public class SSTUtil {
 		switchBlock.setSections(Lists.newArrayList(caseBlocks));
 		return switchBlock;
 	}
-
-	public static ICaseBlock caseBlock(String label, IStatement... body) {
+	
+	public static ICaseBlock caseBlock(ISimpleExpression label, IStatement... body) {
 		CaseBlock caseBlock = new CaseBlock();
-		caseBlock.setLabel(constant(label));
+		caseBlock.setLabel(label);
 		caseBlock.setBody(Lists.newArrayList(body));
 		return caseBlock;
+	}
+	
+	public static ICaseBlock caseBlock(String label, IStatement... body) {
+		return caseBlock(constant(label), body);
 	}
 
 	public static ITryBlock simpleTryBlock(IStatement... body) {
