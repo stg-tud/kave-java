@@ -22,16 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.model.ssts.references.IUnknownReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
@@ -134,44 +128,6 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 		} else {
 			return Collections.emptySet();
 		}
-	}
-
-	private static class ReferenceNormalizationVisitor extends AbstractNodeVisitor<Void, IReference> {
-
-		@Override
-		public IReference visit(IUnknownReference unknownRef, Void context) {
-			return null;
-		}
-
-		@Override
-		public IReference visit(IFieldReference fieldRef, Void context) {
-			FieldName field = fieldRef.getFieldName();
-			if (field.isUnknown()) {
-				return null;
-			} else if (!field.isStatic() && fieldRef.getReference().isMissing()) {
-				return null;
-			} else {
-				return fieldRef;
-			}
-		}
-
-		@Override
-		public IReference visit(IVariableReference varRef, Void context) {
-			return varRef.isMissing() ? null : varRef;
-		}
-
-		@Override
-		public IReference visit(IPropertyReference propertyRef, Void context) {
-			PropertyName property = propertyRef.getPropertyName();
-			if (property.isUnknown()) {
-				return null;
-			} else if (!property.isStatic() && propertyRef.getReference().isMissing()) {
-				return null;
-			} else {
-				return propertyRef;
-			}
-		}
-
 	}
 
 }
