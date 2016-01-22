@@ -15,10 +15,12 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.switchblock;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.switchBlock;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,32 +29,30 @@ import java.util.stream.Collectors;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
-import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.ISwitchBlock;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.transformation.AbstractStatementNormalizationVisitor;
-import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 
 public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizationVisitor<IReferenceExpression> {
 
-//	private Map<IReferenceExpression, IBinaryExpression> refLookup;
+	// private Map<IReferenceExpression, IBinaryExpression> refLookup;
 	private NodeFinderVisitor breakFinder;
 	private int counter;
 
 	public SwitchBlockNormalizationVisitor() {
 		counter = 0;
 		breakFinder = new NodeFinderVisitor(new BreakStatement());
-//		refLookup = new HashMap<IReferenceExpression, IBinaryExpression>();
+		// refLookup = new HashMap<IReferenceExpression, IBinaryExpression>();
 	}
 
 	@Override
@@ -69,9 +69,10 @@ public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizat
 
 		ICaseBlock section = sections.get(0);
 		ISimpleExpression label = section.getLabel();
-		
+
 		boolean fallthrough = !containsBreak(section.getBody());
 		boolean fallthroughToDefault = fallthrough && sections.size() == 1;
+		boolean fallthroughToCase = fallthrough && !fallthroughToDefault;
 
 		List<IStatement> conditionStatements = getConditionStatements(ref, label, context);
 		IReferenceExpression condition = getMainCondition(conditionStatements);
@@ -81,19 +82,15 @@ public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizat
 		List<IStatement> thenPart = getThenPart(section);
 		List<IStatement> elsePart = getElsePart(elseSections, defaultSection, ref, updatedContext);
 
-		IIfElseBlock ifElse = assembleIfElse(condition, thenPart, elsePart, fallthrough);
-		boolean emptyIf = ifElse.getThen().isEmpty() && ifElse.getElse().isEmpty();
-		
+		List<IStatement> ifElseStatements = assembleIfElse(condition, thenPart, elsePart, fallthrough);
+		boolean emptyIf = ifElseStatements.isEmpty() || ifElseStatements.equals(elsePart);
+
 		List<IStatement> normalized = new ArrayList<IStatement>();
-
-		if (!(emptyIf)) {
+		
+		if (!emptyIf || fallthroughToCase) {
 			normalized.addAll(conditionStatements);
-			normalized.add(ifElse);
-		} else if (fallthrough && !fallthroughToDefault)
-			normalized.addAll(conditionStatements);
-		if (fallthrough)
-			normalized.addAll(elsePart);
-
+		}
+		normalized.addAll(ifElseStatements);
 		return normalized;
 	}
 
@@ -109,24 +106,6 @@ public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizat
 		// TODO: check TypeName
 		return declare(getConditionName(), TypeName.newTypeName("System.Boolean"));
 	}
-
-	// private List<ISimpleExpression> collectConditionLabels(List<ICaseBlock>
-	// sections) {
-	// List<ISimpleExpression> labels = Lists.newArrayList();
-	// if (sections.isEmpty())
-	// return labels;
-	//
-	// ListIterator<ICaseBlock> it = sections.listIterator();
-	// ICaseBlock current = it.next();
-	// labels.add(current.getLabel());
-	//
-	// while (it.hasNext() && !containsBreak(current.getBody())) {
-	// current = it.next();
-	// labels.add(current.getLabel());
-	// }
-	//
-	// return labels;
-	// }
 
 	private IReferenceExpression getMainCondition(List<IStatement> conditionStatements) {
 		List<IVariableDeclaration> vars = conditionStatements.stream().filter(s -> s instanceof IVariableDeclaration)
@@ -154,41 +133,6 @@ public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizat
 
 		return statements;
 	}
-
-	// private List<IStatement> getConditionStatements(IVariableReference ref,
-	// List<ISimpleExpression> labels) {
-	// List<IStatement> statements = getEqualityStatements(ref, labels);
-	// List<IReferenceExpression> vars = new ArrayList<IReferenceExpression>();
-	//
-	// for (IStatement s : statements)
-	// if (s instanceof IVariableDeclaration)
-	// vars.add(refExpr(((IVariableDeclaration) s).getReference()));
-	//
-	// vars.stream().reduce((v1, v2) -> {
-	// IVariableDeclaration var = conditionDeclaration();
-	// IAssignment assignment = assign(var.getReference(),
-	// binExpr(BinaryOperator.Or, v1, v2));
-	// statements.add(var);
-	// statements.add(assignment);
-	// return refExpr(var.getReference());
-	// });
-	//
-	// return statements;
-	// }
-
-	// private List<IStatement> getEqualityStatements(IVariableReference ref,
-	// List<ISimpleExpression> labels) {
-	// List<IStatement> statements = new ArrayList<IStatement>();
-	// labels.forEach(l -> {
-	// IBinaryExpression eqExpr = binExpr(BinaryOperator.Equal, refExpr(ref),
-	// l);
-	// IVariableDeclaration var = conditionDeclaration();
-	// IAssignment assignment = assign(var.getReference(), eqExpr);
-	// statements.add(var);
-	// statements.add(assignment);
-	// });
-	// return statements;
-	// }
 
 	// -------------------------- then part -----------------------------------
 
@@ -227,20 +171,47 @@ public class SwitchBlockNormalizationVisitor extends AbstractStatementNormalizat
 
 	// --------------------------- helper -------------------------------------
 
-	private IIfElseBlock assembleIfElse(IReferenceExpression condition, List<IStatement> thenPart,
+	private List<IStatement> assembleIfElse(IReferenceExpression condition, List<IStatement> thenPart,
 			List<IStatement> elsePart, boolean fallthrough) {
 		IfElseBlock ifElse = new IfElseBlock();
 		ifElse.setCondition(condition);
 		ifElse.setThen(thenPart);
-		if (!fallthrough)
-			ifElse.setElse(elsePart);
-		return ifElse;
-	}
 
-	private IAssignment assign(IAssignableReference ref, IBinaryExpression expr) {
-		IAssignment statement = SSTUtil.assign(ref, expr);
-//		refLookup.put(refExpr(ref), expr);
-		return statement;
+		List<IStatement> statements = new ArrayList<IStatement>();
+		statements.add(ifElse);
+
+		/* in case of fallthrough, put remaining statements after if-block */
+		if (fallthrough) {
+			statements.addAll(elsePart);
+		} else {
+			ifElse.setElse(elsePart);
+		}
+
+		boolean emptyThen = ifElse.getThen().isEmpty();
+		boolean emptyElse = ifElse.getElse().isEmpty();
+
+		/* no if-block necessary if both branches are empty */
+		if (emptyThen && emptyElse) {
+			statements.remove(0);
+			return statements;
+		}
+
+		/*
+		 * if then-branch is empty but else-branch is not, switch branches and
+		 * negate condition
+		 */
+		if (emptyThen) {
+			IVariableDeclaration negVar = conditionDeclaration();
+			IVariableReference negRef = negVar.getReference();
+			IAssignment negAssign = assign(negRef, unaryExpr(UnaryOperator.Not, condition));
+			statements.add(0, negVar);
+			statements.add(1, negAssign);
+			ifElse.setCondition(refExpr(negRef));
+			ifElse.setThen(ifElse.getElse());
+			ifElse.setElse(thenPart);
+		}
+
+		return statements;
 	}
 
 }
