@@ -77,7 +77,14 @@ public class CSharpLanguageOptions extends LanguageOptions {
 	@Override
 	public IFieldName propertyToField(IPropertyName property) {
 		String propertyIdentifier = property.getIdentifier();
-		String fieldIdentifier = propertyIdentifier.substring(0, propertyIdentifier.lastIndexOf('('));
+		// remove 'get set' and trailing '()'
+		String fieldIdentifier = propertyIdentifier.substring(propertyIdentifier.indexOf('['));
+		fieldIdentifier = fieldIdentifier.substring(0, fieldIdentifier.lastIndexOf('('));
+		
+		if (property.isStatic()) {
+			fieldIdentifier = "static " + fieldIdentifier;
+		}
+		
 		return FieldName.newFieldName(fieldIdentifier);
 	}
 

@@ -42,8 +42,13 @@ public class SSTBuilder {
 	}
 
 	public static IPropertyReference propertyReference(IPropertyName property) {
+		IVariableReference thisReference = variableReference(LanguageOptions.getInstance().getThisName());
+		return propertyReference(thisReference, property);
+	}
+
+	public static IPropertyReference propertyReference(IVariableReference reference, PropertyName property) {
 		PropertyReference propertyRef = new PropertyReference();
-		propertyRef.setReference(variableReference(LanguageOptions.getInstance().getThisName()));
+		propertyRef.setReference(reference);
 		propertyRef.setPropertyName(property);
 		return propertyRef;
 	}
