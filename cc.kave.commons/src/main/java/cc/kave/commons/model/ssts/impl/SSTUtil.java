@@ -50,6 +50,8 @@ import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -74,6 +76,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
@@ -458,6 +461,13 @@ public class SSTUtil {
 		completionExpr.setToken("token");
 		completionExpr.setObjectReference(variableReference(ref));
 		return completionExpr;
+	}
+	
+	public static IUnaryExpression unaryExpr(UnaryOperator op, ISimpleExpression exp) {
+		UnaryExpression unaryExpression = new UnaryExpression();
+		unaryExpression.setOperator(op);
+		unaryExpression.setOperand(exp);
+		return unaryExpression;
 	}
 	
 	public static IBinaryExpression binExpr(BinaryOperator op, ISimpleExpression lhs, ISimpleExpression rhs) {
