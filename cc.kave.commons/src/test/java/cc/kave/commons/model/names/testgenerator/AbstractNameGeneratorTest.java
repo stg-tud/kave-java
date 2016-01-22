@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.AssemblyName;
+import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.names.csharp.TypeParameterName;
 
@@ -13,6 +15,10 @@ public abstract class AbstractNameGeneratorTest {
 
 	protected Iterable<ITypeName> getTypes() {
 		return getTypes(1);
+	}
+
+	protected Iterable<ITypeName> getTypeParameters() {
+		return getTypeParameters(1);
 	}
 
 	// Depth: 1 --> 70 Types generated
@@ -26,18 +32,34 @@ public abstract class AbstractNameGeneratorTest {
 			types.add(type("%s, %s", getUniqueName(), assemblyName));
 
 			// resolved generic
-			for (ITypeName t : getTypeParameters(maxDepth)) {
-				types.add(type("%s´1[[%s]], %s", getUniqueName(), t.getIdentifier(), assemblyName));
-			}
-			for (ITypeName t : getTypeParameters(maxDepth)) {
-				types.add(type("%s´2[[%s],[%s]], %s", getUniqueName(), t.getIdentifier(), t.getIdentifier(),
-						assemblyName));
-			}
+			getGenericNames(maxDepth, types, assemblyName);
 
-			// delegate names
-			// TODO
+			if (maxDepth > 0) {
+				Iterable<ITypeName> types2 = getTypes(maxDepth - 1);
+				for (ITypeName t : types2) {
+					for (ITypeName t2 : types2) {
+						types.add(delegate("d:[%s] [%s].[%s]()", t, t2, getUniqueName()));
+					}
+				}
+			}
 		}
+		/*
+		 * List<IDelegateTypeName> delegateTypeNames = Lists.newLinkedList();
+		 * for(ITypeName t : types){ delegateTypeNames.add(delegate(
+		 * "d:[%s] [%s].()", t.getIdentifier(), getUniqueName())); }
+		 * types.addAll(delegateTypeNames);
+		 */
 		return types;
+	}
+
+	private void getGenericNames(int maxDepth, List<ITypeName> types, String assemblyName) {
+		for (ITypeName t : getTypeParameters(maxDepth)) {
+			types.add(type("%s´1[[%s]], %s", getUniqueName(), t.getIdentifier(), assemblyName));
+		}
+		for (ITypeName t : getTypeParameters(maxDepth)) {
+			types.add(type("%s´2[[%s],[%s]], %s", getUniqueName(), t.getIdentifier(), t.getIdentifier(),
+					assemblyName));
+		}
 	}
 
 	private Iterable<ITypeName> getTypeParameters(int maxDepth) {
@@ -67,6 +89,10 @@ public abstract class AbstractNameGeneratorTest {
 
 	private ITypeName type(String id, Object... args) {
 		return TypeName.newTypeName(String.format(id, args));
+	}
+
+	private IDelegateTypeName delegate(String id, Object... args) {
+		return DelegateTypeName.newDelegateTypeName(String.format(id, args));
 	}
 
 	protected boolean[] trueAndFalse() {

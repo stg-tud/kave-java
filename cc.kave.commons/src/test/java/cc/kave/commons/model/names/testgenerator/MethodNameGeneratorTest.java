@@ -15,40 +15,28 @@ import cc.kave.commons.model.names.csharp.MethodName;
 public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 
 	@Test
-	@Ignore
 	public void generateAllCombination() {
 		for (List<ITypeName> typeParams : createTypeParameters()) {
-			for (ITypeName returnType : getTypes()) {
-				for (ITypeName declaringType : getTypes()) {
-					for (String simpleMethodName : new String[] { "M", ".ctor", ".cctor" }) {
-
-						String genericPart = createGenericPart(typeParams);
-
-						IMethodName sut = m("[%s] [%s].%s%s()", returnType, declaringType, simpleMethodName,
-								genericPart);
-						Assert.assertEquals(createLog(sut), returnType, sut.getReturnType());
-						assertReturnType(returnType, sut);
-						Assert.assertEquals(declaringType, sut.getDeclaringType());
-						assertSimpleMethodName(simpleMethodName, sut);
-
-						if (isConstructor(simpleMethodName)) {
-							assertIsConstructor(sut);
-						}
-						assertTypeParameters(typeParams, sut);
-
-					}
+			for (String simpleMethodName : new String[] { "M", ".ctor", ".cctor" }) {
+				String genericPart = createGenericPart(typeParams);
+				IMethodName sut = m("[] [].%s%s()", simpleMethodName, "");
+				assertSimpleMethodName(simpleMethodName, sut);
+				if (isConstructor(simpleMethodName)) {
+					assertIsConstructor(sut);
 				}
+				//assertTypeParameters(typeParams, sut);
 			}
 		}
-	}
 
-	@Test
-	public void testTypes() {
-		int index = 0;
-		for (ITypeName type : getTypes()) {
-			index++;
+		for (ITypeName declaringType : getTypes()) {
+			IMethodName sut = m("[] [%s].M()", declaringType);
+			Assert.assertEquals(declaringType, sut.getDeclaringType());
 		}
-		System.out.println(index);
+
+		for (ITypeName returnType : getTypes()) {
+			IMethodName sut = m("[%s] [].M()", returnType);
+			assertReturnType(returnType, sut);
+		}
 	}
 
 	private void assertTypeParameters(List<ITypeName> typeParams, IMethodName sut) {
@@ -58,14 +46,26 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 	}
 
 	private String createGenericPart(List<ITypeName> typeParams) {
-		// TODO implement me!
+		if(typeParams.size() == 1){
+			return String.format("´1[[%s]]", typeParams.get(0));
+		}else if(typeParams.size() == 2){
+			return String.format("´2[[%s],[%s]]", typeParams.get(0), typeParams.get(1));
+		}
 		return "";
 	}
 
 	private Iterable<List<ITypeName>> createTypeParameters() {
-		// TODO implement me!
 		List<List<ITypeName>> params = Lists.newArrayList();
+		Iterable<ITypeName> typeParams = getTypeParameters();
 		params.add(Lists.newLinkedList());
+		ITypeName lastType = null;
+		for(ITypeName t : getTypeParameters()){
+			params.add(Lists.newArrayList(t));
+			if(lastType != null){
+				params.add(Lists.newArrayList(lastType, t));
+			}
+			lastType = t;
+		}
 		return params;
 	}
 
@@ -79,7 +79,9 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 	private int num = 0;
 
 	private IMethodName m(String id, Object... args) {
-		IMethodName sut = MethodName.newMethodName(String.format(id, args));
+		String identifier = String.format(id, args);
+		System.out.printf("(%d) building '%s...'\n", (num), identifier);
+		IMethodName sut = MethodName.newMethodName(identifier);
 		System.out.printf("(%d) testing '%s...'\n", (num++), sut.getIdentifier());
 		return sut;
 	}
@@ -89,13 +91,11 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 	}
 
 	private void assertReturnType(ITypeName returnType, IMethodName sut) {
-		// TODO Auto-generated method stub
-
+		Assert.assertEquals(returnType, sut.getReturnType());
 	}
 
 	private void assertIsConstructor(IMethodName sut) {
-		// TODO Auto-generated method stub
-
+		Assert.assertTrue(sut.isConstructor());
 	}
 
 	private String createLog(IMethodName sut) {

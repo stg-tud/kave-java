@@ -18,6 +18,7 @@ public class MethodName extends MemberName implements IMethodName {
 	public static final IMethodName UNKNOWN_NAME = newMethodName("[?] [?].???()");
 	private static final Pattern signatureSyntax = Pattern
 			.compile(".*\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\)).*");
+	// "\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$"
 
 	public static IMethodName newMethodName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
@@ -51,7 +52,7 @@ public class MethodName extends MemberName implements IMethodName {
 
 	@Override
 	public boolean isConstructor() {
-		return getSignature().startsWith(".ctor(");
+		return getSignature().startsWith(".ctor(") || getSignature().startsWith(".cctor(");
 	}
 
 	@Override
