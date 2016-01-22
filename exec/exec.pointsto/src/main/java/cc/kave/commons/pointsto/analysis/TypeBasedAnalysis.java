@@ -53,8 +53,8 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 				return Collections.emptySet();
 			}
 
-			if (type.isUnknown()) {
-				LOGGER.debug("Queried for an unknown type");
+			if (type.isUnknown() || type.isTypeParameter()) {
+				LOGGER.debug("Queried for an unknown/generic type");
 
 				if (queryStrategy == QueryStrategy.EXHAUSTIVE) {
 					// assume that unknown types may point to any known location

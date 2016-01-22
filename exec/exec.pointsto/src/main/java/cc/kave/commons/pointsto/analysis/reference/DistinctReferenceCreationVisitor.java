@@ -12,14 +12,14 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.ssts.impl.visitor.AbstractNodeVisitor;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.ScopedMap;
+import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 
 public class DistinctReferenceCreationVisitor
-		extends AbstractNodeVisitor<ScopedMap<String, DistinctReference>, DistinctReference> {
+		extends FailSafeNodeVisitor<ScopedMap<String, DistinctReference>, DistinctReference> {
 
 	@Override
 	public DistinctReference visit(IFieldReference fieldRef, ScopedMap<String, DistinctReference> context) {

@@ -23,12 +23,18 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.ssts.IReference;
 
 public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 
 	protected Multimap<QueryContextKey, AbstractLocation> contextToLocations = HashMultimap.create();
 
 	protected QueryStrategy queryStrategy;
+
+	private ReferenceNormalizationVisitor referenceNormalizationVisitor = new ReferenceNormalizationVisitor();
 
 	public AbstractPointerAnalysis() {
 		this.queryStrategy = QueryStrategy.MINIMIZE_USAGE_DEFECTS;
@@ -67,6 +73,23 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 		}
 
 		return new HashSet<>(locations);
+	}
+
+	protected TypeName normalizeType(TypeName type) {
+		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
+			return null;
+		} else {
+			return type;
+		}
+	}
+
+	protected MethodName normalizeMethod(MethodName method) {
+		// TODO replace with isUnknown once it is overridden
+		return method.equals(CsMethodName.UNKNOWN_NAME) ? null : method;
+	}
+
+	protected IReference normalizeReference(IReference reference) {
+		return reference.accept(referenceNormalizationVisitor, null);
 	}
 
 }

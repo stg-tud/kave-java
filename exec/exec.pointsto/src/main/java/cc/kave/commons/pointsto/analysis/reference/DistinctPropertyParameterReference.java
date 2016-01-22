@@ -16,14 +16,16 @@ import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.pointsto.LanguageOptions;
+import cc.kave.commons.pointsto.SSTBuilder;
 
 public class DistinctPropertyParameterReference implements DistinctReference {
 
 	private IVariableReference varRef;
 	private PropertyName property;
 
-	public DistinctPropertyParameterReference(IVariableReference varRef, PropertyName property) {
-		this.varRef = varRef;
+	public DistinctPropertyParameterReference(LanguageOptions languageOptions, PropertyName property) {
+		this.varRef = SSTBuilder.variableReference(languageOptions.getPropertyParameterName());
 		this.property = property;
 	}
 

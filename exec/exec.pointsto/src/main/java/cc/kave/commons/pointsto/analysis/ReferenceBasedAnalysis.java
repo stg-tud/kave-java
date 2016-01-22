@@ -32,8 +32,6 @@ import cc.kave.commons.pointsto.SSTBuilder;
 
 public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 
-	private ReferenceNormalizationVisitor referenceNormalizationVisitor = new ReferenceNormalizationVisitor();
-
 	@Override
 	public PointsToContext compute(Context context) {
 		checkContextBinding();
@@ -60,14 +58,8 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
-		IReference reference = query.getReference();
-		TypeName type = query.getType();
-
-		reference = reference.accept(referenceNormalizationVisitor, null);
-
-		if (type != null && type.isUnknownType()) {
-			type = null;
-		}
+		IReference reference = normalizeReference(query.getReference());
+		TypeName type = normalizeType(query.getType());
 
 		if (reference == null) {
 			if (type != null) {
