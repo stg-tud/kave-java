@@ -19,7 +19,7 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 		for (List<ITypeName> typeParams : createTypeParameters()) {
 			for (String simpleMethodName : new String[] { "M", ".ctor", ".cctor" }) {
 				String genericPart = createGenericPart(typeParams);
-				IMethodName sut = m("[] [].%s%s()", simpleMethodName, "");
+				IMethodName sut = m("[?] [?].%s%s()", simpleMethodName, "");
 				assertSimpleMethodName(simpleMethodName, sut);
 				if (isConstructor(simpleMethodName)) {
 					assertIsConstructor(sut);
@@ -29,12 +29,12 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 		}
 
 		for (ITypeName declaringType : getTypes()) {
-			IMethodName sut = m("[] [%s].M()", declaringType);
+			IMethodName sut = m("[?] [%s].M()", declaringType);
 			Assert.assertEquals(declaringType, sut.getDeclaringType());
 		}
 
 		for (ITypeName returnType : getTypes()) {
-			IMethodName sut = m("[%s] [].M()", returnType);
+			IMethodName sut = m("[%s] [?].M()", returnType);
 			assertReturnType(returnType, sut);
 		}
 	}
