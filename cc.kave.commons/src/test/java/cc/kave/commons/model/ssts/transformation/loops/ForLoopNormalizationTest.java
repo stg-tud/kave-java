@@ -15,16 +15,9 @@
  */
 package cc.kave.commons.model.ssts.transformation.loops;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-
-import java.util.List;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,191 +25,209 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
-import cc.kave.commons.model.ssts.blocks.IWhileLoop;
-import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
-import cc.kave.commons.model.ssts.statements.IAssignment;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class ForLoopNormalizationTest extends LoopNormalizationTest {
-	private String loopVarA;
-	private String loopVarB;
+public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseTest<Void> {
+	private ForLoop forLoop;
 
 	@Before
 	public void setup() {
 		super.setup();
-		loopVarA = "indexA";
-		loopVarB = "indexB";
+		sut = new ForLoopNormalizationVisitor();
+		forLoop = new ForLoop();
+		setNormalizing(forLoop);
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(;;) {} |..=>..| while(true) {} |
+	// |____________|......|________________|
+	@Test
+	public void testEmptyLoop() {
+		setCondition(loopHeader());
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
+		setExpected(whileLoop);
+		assertTransformedSST();
+	}
+
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(init;;) {} |..=>..| init; ........ |
+	// |________________|......| while(true) {} |
+	// ........................|________________|
 	@Test
 	public void testLoopInit() {
-		List<IStatement> init = list(declareVar(loopVarA),
-				assign(variableReference(loopVarA), constant("0")));
-		ForLoop forLoop = new ForLoop();
-		forLoop.setInit(copy(init));
-
-		List<IStatement> normalized = forLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(3));
-		assertThat(normalized.get(0), is(init.get(0)));
-		assertThat(normalized.get(1), is(init.get(1)));
-		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
+		setCondition(loopHeader());
+		setInit(stmt0, stmt1);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
+		setExpected(stmt0, stmt1, whileLoop);
+		assertTransformedSST();
 	}
 
-	@Test
-	public void testNoLoopInit() {
-		ForLoop forLoop = new ForLoop();
-		List<IStatement> normalized = forLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(1));
-		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
-	}
-
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(;;step) {} |..=>..| while(true) { |
+	// |________________|......| ..step; ..... |
+	// ........................| } ........... |
+	// ........................|_______________|
 	@Test
 	public void testLoopStep() {
-		List<IStatement> step = list(assign(variableReference(loopVarA), constant("0")));
-		ForLoop forLoop = new ForLoop();
-		forLoop.setStep(copy(step));
-
-		List<IStatement> normalized = forLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(1));
-		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
-		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
-		assertThat(whileBody, is(step));
+		setCondition(loopHeader());
+		setStep(stmt0, stmt1);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
+		whileLoop.setBody(Lists.newArrayList(stmt0, stmt1));
+		setExpected(whileLoop);
+		assertTransformedSST();
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(;;) { |......| while(true) { |
+	// | ..body; . |..=>..| ..body; ..... |
+	// | } ....... |......| } ........... |
+	// |___________|......|_______________|
+	@Test
+	public void testLoopBody() {
+		setCondition(loopHeader());
+		setBody(stmt0, stmt1);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
+		whileLoop.setBody(Lists.newArrayList(stmt0, stmt1));
+		setExpected(whileLoop);
+		assertTransformedSST();
+	}
+
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(init;cond;step) { |......| init; ....... |
+	// | ..body .............. |..=>..| while(cond) { |
+	// | } ....................|..... | ..body; ..... |
+	// |_______________________|......| ..step; ..... |
+	// ...............................| } ........... |
+	// ...............................|_______________|
 	@Test
 	public void testSimpleForToWhile() {
-		ILoopHeaderBlockExpression condition = loopHeader();
-		IVariableDeclaration varDecl = declareVar(loopVarA);
-		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
-		IStatement stmt = new UnknownStatement();
-		List<IStatement> body = list(stmt);
-		List<IStatement> step = list(assignment);
+		ILoopHeaderExpression condition = constant("0");
+		setCondition(condition);
+		setInit(stmt0);
+		setBody(stmt1);
+		setStep(stmt2);
 
-		ForLoop forLoop = new ForLoop();
-		forLoop.setInit(list(varDecl, assignment));
-		forLoop.setStep(copy(step));
-		forLoop.setBody(copy(body));
-		forLoop.setCondition(condition);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(condition);
+		whileLoop.setBody(Lists.newArrayList(stmt1, stmt2));
 
-		List<IStatement> normalized = forLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(3));
-		assertThat(normalized.get(0), is(varDecl));
-		assertThat(normalized.get(1), is(assignment));
-		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
-		IWhileLoop whileLoop = (IWhileLoop) normalized.get(2);
-		assertThat(whileLoop.getCondition(), is(condition));
-		assertThat(whileLoop.getBody(), is(list(stmt, assignment)));
+		setExpected(stmt0, whileLoop);
+		assertTransformedSST();
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(;cond;step) { |......| while(cond) { |
+	// | ..continue; ..... |..=>..| ..step; ..... |
+	// | } ................|..... | ..continue; . |
+	// |___________________|......| } ........... |
+	// ...........................|_______________|
 	@Test
 	public void testContinueInsideLoopBody() {
 		ContinueStatement continueStmt = new ContinueStatement();
-		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
-		List<IStatement> step = list(assignment);
-		ForLoop forLoop = new ForLoop();
-		forLoop.setBody(list(continueStmt));
-		forLoop.setStep(step);
+		setBody(continueStmt);
+		setStep(stmt0);
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setBody(list(stmt0, continueStmt));
 
-		List<IStatement> normalized = forLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(1));
-		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
-		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
-		int whileBodySize = whileBody.size();
-		assertThat(whileBodySize, is(3));
-		assertThat(whileBody.subList(0, 1), is(step));
-		assertThat(whileBody.get(1), is(continueStmt));
-		assertThat(whileBody.subList(whileBodySize - step.size(), whileBodySize), is(step));
+		setExpected(whileLoop);
+		assertTransformedSST();
 	}
-	
+
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(;a;step) { |......| while(a) { .. |
+	// | ..if(b) ...... |..=>..| ..if(b) { ... |
+	// | ....continue;. |..... | ....step; ... |
+	// | } .............|..... | ....continue; |
+	// |________________|......| ..} ......... |
+	// ........................| ..step;...... |
+	// ........................| } ........... |
+	// ........................|_______________|
 	@Test
 	public void testContinueInsideBodyStatement() {
 		ContinueStatement continueStmt = new ContinueStatement();
-		IAssignment assignment = assign(variableReference(loopVarA), constant("0"));
 		IfElseBlock ifElseBlock = new IfElseBlock();
 		ifElseBlock.setThen(list(continueStmt));
-		
-		List<IStatement> step = list(assignment);
-		ForLoop forLoop = new ForLoop();
-		forLoop.setBody(list(ifElseBlock));
-		forLoop.setStep(step);
-		
-		List<IStatement> normalized = forLoop.accept(visitor, null);
 
-		assertThat(normalized.size(), is(1));
-		assertThat(normalized.get(0), instanceOf(IWhileLoop.class));
-		List<IStatement> whileBody = ((IWhileLoop) normalized.get(0)).getBody();
-		int whileBodySize = whileBody.size();
-		assertThat(whileBodySize, is(2));
-		assertThat(whileBody.get(0), instanceOf(IIfElseBlock.class));
-		
-		IIfElseBlock ifElseNormalized = (IIfElseBlock) whileBody.get(0);
-		List<IStatement> thenNormalized = ifElseNormalized.getThen();
-		List<IStatement> elseNormalized = ifElseNormalized.getElse();
-		assertThat(thenNormalized.size(), is(2));
-		assertThat(thenNormalized.get(0), is(step.get(0)));
-		assertThat(thenNormalized.get(1), is(continueStmt));
-		assertThat(elseNormalized, is(ifElseBlock.getElse()));
+		setBody(ifElseBlock);
+		setStep(stmt0);
+
+		IfElseBlock ifElseNormalized = new IfElseBlock();
+		ifElseNormalized.setThen(list(stmt0, continueStmt));
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setBody(list(ifElseNormalized, stmt0));
+
+		setExpected(whileLoop);
+		assertTransformedSST();
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(i0;c0;s0) . |......| i0; ......... |
+	// | ..for(i1;c1;s1) |..=>..| while(c0) { . |
+	// | ....body; ..... |......| ..i1;.. ..... |
+	// |_________________|......| ..while(c1) { |
+	// .........................| ....body;.... |
+	// .........................| ....s1;...... |
+	// .........................| ..}.......... |
+	// .........................| ..s0;........ |
+	// .........................| } ........... |
+	// .........................|_______________|
 	@Test
 	public void testCascadedForLoops() {
-		ILoopHeaderBlockExpression condition = loopHeader();
-		IStatement stmt = new UnknownStatement();
-		IVariableDeclaration varDeclA = declareVar(loopVarA);
-		IAssignment assignA = assign(variableReference(loopVarA), constant("0"));
-		List<IStatement> body = list(stmt);
-		List<IStatement> step = list(assignA);
+		// inner for loop
+		ISimpleExpression innerCondition = constant("0");
+		ForLoop innerFor = new ForLoop();
+		innerFor.setInit(list(stmt0));
+		innerFor.setStep(list(stmt1));
+		innerFor.setBody(list(stmt2));
+		innerFor.setCondition(innerCondition);
 
-		ForLoop innerLoop = new ForLoop();
-		innerLoop.setInit(list(varDeclA, assignA));
-		innerLoop.setStep(step);
-		innerLoop.setBody(body);
-		innerLoop.setCondition(condition);
+		// outer for loop
+		ISimpleExpression outerCondition = constant("1");
+		IStatement stmt4 = dummyStatement(4);
+		setInit(stmt3);
+		setStep(stmt4);
+		setBody(innerFor);
+		setCondition(outerCondition);
 
-		IVariableDeclaration varDeclB = declareVar(loopVarB);
-		IAssignment assignB = assign(variableReference(loopVarB), constant("0"));
-		List<IStatement> bodyB = list(innerLoop);
-		List<IStatement> stepB = list(assignB);
+		// inner while loop
+		WhileLoop innerWhile = new WhileLoop();
+		innerWhile.setCondition(innerCondition);
+		innerWhile.setBody(list(stmt2, stmt1));
 
-		ForLoop outerLoop = new ForLoop();
-		outerLoop.setInit(list(varDeclB, assignB));
-		outerLoop.setStep(stepB);
-		outerLoop.setBody(bodyB);
-		outerLoop.setCondition(condition);
+		// outer while loop
+		WhileLoop outerWhile = new WhileLoop();
+		outerWhile.setCondition(outerCondition);
+		outerWhile.setBody(list(stmt0, innerWhile, stmt4));
 
-		List<IStatement> normalized = outerLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), is(3));
-		assertThat(normalized.get(0), is(varDeclB));
-		assertThat(normalized.get(1), is(assignB));
-		assertThat(normalized.get(2), instanceOf(IWhileLoop.class));
-
-		IWhileLoop whileLoop = (IWhileLoop) normalized.get(2);
-		assertThat(whileLoop.getCondition(), is(condition));
-		List<IStatement> whileBody = whileLoop.getBody();
-		assertThat(whileBody.size(), is(4));
-		assertThat(whileBody.get(0), is(varDeclA));
-		assertThat(whileBody.get(1), is(assignA));
-		assertThat(whileBody.get(2), instanceOf(IWhileLoop.class));
-		assertThat(whileBody.get(3), is(assignB));
+		setExpected(stmt3, outerWhile);
+		assertTransformedSST();
 	}
-	
-	private <T> List<T> copy(List<T> l) {
-		return Lists.newArrayList(l);
+
+	// ---------------------------- helpers -----------------------------------
+
+	private void setBody(IStatement... statements) {
+		forLoop.setBody(Lists.newArrayList(statements));
 	}
-	
-	@SuppressWarnings("unchecked")
-	private <T> List<T> list(T... elements) {
-		return Lists.newArrayList(elements);
+
+	private void setCondition(ILoopHeaderExpression loopHeader) {
+		forLoop.setCondition(loopHeader);
 	}
+
+	private void setInit(IStatement... statements) {
+		forLoop.setInit(Lists.newArrayList(statements));
+	}
+
+	private void setStep(IStatement... statements) {
+		forLoop.setStep(Lists.newArrayList(statements));
+	}
+
 }
