@@ -13,55 +13,32 @@
 package cc.kave.commons.pointsto.analysis.reference;
 
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
-public class DistinctFieldReference implements DistinctReference {
+public class DistinctFieldReference extends DistinctMemberReference {
 
-	private IFieldReference fieldRef;
-
-	public DistinctFieldReference(IFieldReference fieldRef) {
-		this.fieldRef = fieldRef;
+	public DistinctFieldReference(IFieldReference fieldRef, DistinctReference baseReference) {
+		super(fieldRef, baseReference);
 	}
 
 	@Override
-	public IReference getReference() {
-		return fieldRef;
+	public boolean isStaticMember() {
+		return getReference().getFieldName().isStatic();
+	}
+
+	@Override
+	public IFieldReference getReference() {
+		return (IFieldReference) super.getReference();
 	}
 
 	@Override
 	public TypeName getType() {
-		return fieldRef.getFieldName().getValueType();
+		return ((IFieldReference) memberReference).getFieldName().getValueType();
 	}
 
 	@Override
 	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
 		return visitor.visit(this, context);
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((fieldRef == null) ? 0 : fieldRef.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DistinctFieldReference other = (DistinctFieldReference) obj;
-		if (fieldRef == null) {
-			if (other.fieldRef != null)
-				return false;
-		} else if (!fieldRef.equals(other.fieldRef))
-			return false;
-		return true;
 	}
 
 }

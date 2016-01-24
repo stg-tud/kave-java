@@ -13,55 +13,32 @@
 package cc.kave.commons.pointsto.analysis.reference;
 
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 
-public class DistinctPropertyReference implements DistinctReference {
+public class DistinctPropertyReference extends DistinctMemberReference {
 
-	private IPropertyReference propertyRef;
-
-	public DistinctPropertyReference(IPropertyReference propertyRef) {
-		this.propertyRef = propertyRef;
+	public DistinctPropertyReference(IPropertyReference propertyRef, DistinctReference baseReference) {
+		super(propertyRef, baseReference);
 	}
-
+	
 	@Override
-	public IReference getReference() {
-		return propertyRef;
+	public boolean isStaticMember() {
+		return getReference().getPropertyName().isStatic();
+	}
+	
+	@Override
+	public IPropertyReference getReference() {
+		return (IPropertyReference) super.getReference();
 	}
 
 	@Override
 	public TypeName getType() {
-		return propertyRef.getPropertyName().getValueType();
+		return ((IPropertyReference) memberReference).getPropertyName().getValueType();
 	}
 
 	@Override
 	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
 		return visitor.visit(this, context);
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((propertyRef == null) ? 0 : propertyRef.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DistinctPropertyReference other = (DistinctPropertyReference) obj;
-		if (propertyRef == null) {
-			if (other.propertyRef != null)
-				return false;
-		} else if (!propertyRef.equals(other.propertyRef))
-			return false;
-		return true;
 	}
 
 }

@@ -29,4 +29,6 @@ public interface DistinctReferenceVisitor<TReturn, TContext> {
 	TReturn visit(DistinctLambdaParameterReference lambdaParameterRef, TContext context);
 
 	TReturn visit(DistinctMethodParameterReference methodParameterRef, TContext context);
+
+	TReturn visit(DistinctIndexAccessReference indexAccessRef, TContext context);
 }

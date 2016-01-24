@@ -12,32 +12,35 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import com.google.common.base.MoreObjects;
-
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
+import cc.recommenders.assertions.Asserts;
 
-public class DistinctVariableReference implements DistinctReference {
+public class DistinctIndexAccessReference implements DistinctReference {
 
-	private IVariableDeclaration varDecl;
+	private IIndexAccessReference reference;
+	private DistinctReference baseReference;
 
-	public DistinctVariableReference(IVariableDeclaration varDecl) {
-		this.varDecl = varDecl;
+	public DistinctIndexAccessReference(IIndexAccessReference reference, DistinctReference baseReference) {
+		this.reference = reference;
+		this.baseReference = baseReference;
+		Asserts.assertTrue(reference.getExpression().getReference().equals(baseReference.getReference()));
 	}
 
 	@Override
-	public IReference getReference() {
-		return varDecl.getReference();
+	public IIndexAccessReference getReference() {
+		return reference;
+	}
+
+	public DistinctReference getBaseReference() {
+		return baseReference;
 	}
 
 	@Override
 	public TypeName getType() {
-		return varDecl.getType();
-	}
-
-	public IVariableDeclaration getDeclaration() {
-		return varDecl;
+		TypeName baseType = baseReference.getType();
+		return baseType.isArrayType() ? baseType.getArrayBaseType() : CsTypeName.UNKNOWN_NAME;
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class DistinctVariableReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((varDecl == null) ? 0 : varDecl.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		return result;
 	}
 
@@ -61,19 +64,13 @@ public class DistinctVariableReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctVariableReference other = (DistinctVariableReference) obj;
-		if (varDecl == null) {
-			if (other.varDecl != null)
+		DistinctIndexAccessReference other = (DistinctIndexAccessReference) obj;
+		if (reference == null) {
+			if (other.reference != null)
 				return false;
-		} else if (varDecl != other.varDecl) // reference equality
+		} else if (!reference.equals(other.reference))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(DistinctVariableReference.class)
-				.add("name", varDecl.getReference().getIdentifier()).add("type", varDecl.getType()).toString();
 	}
 
 }
