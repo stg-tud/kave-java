@@ -28,6 +28,7 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.usages.DefinitionSiteKind;
 
 public class PointsToUsageExtractor {
@@ -65,6 +66,8 @@ public class PointsToUsageExtractor {
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
 			try {
 				visitor.visitEntryPoint(methodDecl, visitorContext);
+			} catch(AssertionException ex) {
+				throw ex;
 			} catch (RuntimeException ex) {
 				LOGGER.error("Failed to extract usages from " + className + ":" + methodDecl.getName().getName(), ex);
 				continue;

@@ -63,263 +63,262 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 
 /**
- * A {@link ISSTNodeVisitor} which throws a {@link RuntimeException} in each of its visit methods. Useful for
+ * A {@link ISSTNodeVisitor} which throws a {@link UnexpectedSSTNodeException} in each of its visit methods. Useful for
  * implementing visitors that are expected to run only on a subset of the SST nodes.
  */
 public class FailSafeNodeVisitor<TContext, TReturn> implements ISSTNodeVisitor<TContext, TReturn> {
 
-	private static final String NOT_IMPLEMENTED_MSG = "Not implemented";
-
 	@Override
 	public TReturn visit(ISST sst, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(sst);
 	}
 
 	@Override
 	public TReturn visit(IDelegateDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IEventDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IFieldDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IMethodDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IPropertyDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IVariableDeclaration stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IAssignment stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IBreakStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IContinueStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IExpressionStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IGotoStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(ILabelledStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IReturnStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IThrowStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IEventSubscriptionStatement stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(stmt);
 	}
 
 	@Override
 	public TReturn visit(IDoLoop block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IForEachLoop block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IForLoop block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IIfElseBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
-	public TReturn visit(ILockBlock stmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+	public TReturn visit(ILockBlock block, TContext context) {
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(ISwitchBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(ITryBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IUncheckedBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IUnsafeBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IUsingBlock block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(IWhileLoop block, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(block);
 	}
 
 	@Override
 	public TReturn visit(ICompletionExpression entity, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(entity);
 	}
 
 	@Override
 	public TReturn visit(IComposedExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IIfElseExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IInvocationExpression entity, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(entity);
 	}
 
 	@Override
 	public TReturn visit(ILambdaExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(ILoopHeaderBlockExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IConstantValueExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(INullExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IReferenceExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(ICastExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IIndexAccessExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(ITypeCheckExpression expr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
-	public TReturn visit(IBinaryExpression indexAccessRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+	public TReturn visit(IBinaryExpression expr, TContext context) {
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
-	public TReturn visit(IUnaryExpression indexAccessRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+	public TReturn visit(IUnaryExpression expr, TContext context) {
+		throw new UnexpectedSSTNodeException(expr);
 	}
 
 	@Override
 	public TReturn visit(IEventReference eventRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(eventRef);
 	}
 
 	@Override
 	public TReturn visit(IFieldReference fieldRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(fieldRef);
 	}
 
 	@Override
 	public TReturn visit(IMethodReference methodRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(methodRef);
 	}
 
 	@Override
-	public TReturn visit(IPropertyReference methodRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+	public TReturn visit(IPropertyReference propertyRef, TContext context) {
+		throw new UnexpectedSSTNodeException(propertyRef);
 	}
 
 	@Override
 	public TReturn visit(IVariableReference varRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(varRef);
 	}
 
 	@Override
 	public TReturn visit(IIndexAccessReference indexAccessRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(indexAccessRef);
 	}
 
 	@Override
 	public TReturn visit(IUnknownReference unknownRef, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(unknownRef);
 	}
 
 	@Override
 	public TReturn visit(IUnknownExpression unknownExpr, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(unknownExpr);
 	}
 
 	@Override
 	public TReturn visit(IUnknownStatement unknownStmt, TContext context) {
-		throw new RuntimeException(NOT_IMPLEMENTED_MSG);
+		throw new UnexpectedSSTNodeException(unknownStmt);
 	}
 
 }

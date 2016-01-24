@@ -32,11 +32,13 @@ import com.google.common.collect.Iterables;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.WritingArchive;
 
 public class PointsToUsageGenerator {
@@ -116,6 +118,10 @@ public class PointsToUsageGenerator {
 				// guard against exception in CsMethod:getSignature()
 				try {
 					ptContext = pa.compute(context);
+				} catch (AssertionException ex) {
+					throw ex;
+				} catch (UnexpectedSSTNodeException ex) {
+					throw ex;
 				} catch (RuntimeException ex) {
 					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);
 					continue;
