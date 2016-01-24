@@ -71,6 +71,12 @@ public class Asserts {
 			throw new AssertionException(format("parameter %f must be less or equal to %f", a, b));
 		}
 	}
+	
+	public static void assertLessOrEqual(int a, int b) {
+		if (a > b) {
+			throw new AssertionException(format("parameter %d must be less or equal to %d", a, b));
+		}
+	}
 
 	public static void assertPositive(int a) {
 		if (a < 1) {
