@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Carina Oberle
+ * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,147 +15,180 @@
  */
 package cc.kave.commons.model.ssts.transformation.loops;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertTrue;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.blocks.IWhileLoop;
-import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
-import cc.kave.commons.model.ssts.impl.statements.Assignment;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
+import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
-import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
-public class ForEachLoopNormalizationTest extends LoopNormalizationTest {
+public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorBaseTest<Void> {
 
+	private ForEachLoop forEachLoop;
+	private IVariableReference loopedRef0, loopedRef1;
+	IVariableDeclaration dec0, dec1;
+
+	@Before
+	public void setup() {
+		super.setup();
+		sut = new ForEachLoopNormalizationVisitor();
+		forEachLoop = new ForEachLoop();
+		setNormalizing(forEachLoop);
+
+		loopedRef0 = dummyVar(0);
+		loopedRef1 = dummyVar(1);
+		dec0 = declare("e0", TypeName.newTypeName("t0"));
+		dec1 = declare("e1", TypeName.newTypeName("t1"));
+	}
+
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(E e : elems) {} |..=>..| Iterator<E> it = elems.iterator(); |
+	// |_____________________|......| while(it.hasNext()) { ............ |
+	// .............................| ..E e = it.next(); ............... |
+	// .............................| } ................................ |
+	// .............................|____________________________________|
 	@Test
 	public void testSimpleForEachToWhile() {
-		ForEachLoop forEachLoop = new ForEachLoop();
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
+		setDeclaration(dec0);
+		setLoopedReference(loopedRef0);
 
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
-		assertThat(normalized.get(1), instanceOf(IAssignment.class));
-		assertThat(normalized.get(2), instanceOf(IVariableDeclaration.class));
-		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
+		// declare & initialize iterator
+		ITypeName iteratorTypeName = iteratorType(dec0.getType());
+		IVariableReference iterator = variableReference("it_0");
+		IVariableDeclaration iteratorDec = declareVar(iterator.getIdentifier(), iteratorTypeName);
+		IAssignment iteratorInit = assign(iterator, iteratorInvocation(loopedRef0));
+
+		// assign next element
+		IAssignment assignNext = assign(dec0.getReference(), getNext(iterator));
+
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(getWhileCondition(iterator));
+		whileLoop.setBody(list(dec0, assignNext));
+
+		setExpected(iteratorDec, iteratorInit, whileLoop);
+		assertTransformedSST();
 	}
 
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(E e : elems) { |......| Iterator<E> it = elems.iterator(); |
+	// | ..body; .......... |..=>..| while(it.hasNext()) { ............ |
+	// | } ................ |......| ..E e = it.next(); ............... |
+	// |____________________|......| ..body; .......................... |
+	// ............................| } ................................ |
+	// ............................|____________________________________|
 	@Test
-	public void testIteratorDeclaration() {
-		IVariableReference loopedReference = SSTUtil.variableReference("collection");
-		VariableDeclaration declaration = new VariableDeclaration();
-		ITypeName elementType = TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
-		declaration.setType(elementType);
-		ForEachLoop forEachLoop = new ForEachLoop();
-		forEachLoop.setDeclaration(declaration);
-		forEachLoop.setLoopedReference(loopedReference);
-
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
-
-		IVariableDeclaration iteratorDecl = (IVariableDeclaration) normalized.get(0);
-		ITypeName iteratorType = iteratorDecl.getType();
-		assertTrue(iteratorType.hasTypeParameters());
-		List<ITypeName> typeParameters = iteratorType.getTypeParameters();
-		assertThat(typeParameters.size(), equalTo(1));
-		assertThat(typeParameters.get(0).getTypeParameterType(), equalTo(elementType));
-	}
-
-	@Test
-	public void testIteratorInitialization() {
-		IVariableReference loopedReference = SSTUtil.variableReference("collection");
-		ForEachLoop forEachLoop = new ForEachLoop();
-		forEachLoop.setLoopedReference(loopedReference);
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
-		assertThat(normalized.get(1), instanceOf(IAssignment.class));
-		
-		IVariableDeclaration declaration = (IVariableDeclaration) normalized.get(0);
-		
-		IAssignment assignment = (IAssignment) normalized.get(1);
-		assertThat(assignment.getReference(), equalTo(declaration.getReference()));
-		assertThat(assignment.getExpression(), instanceOf(IInvocationExpression.class));
-
-		IInvocationExpression invocation = (IInvocationExpression) assignment.getExpression();
-		assertThat(invocation.getReference(), equalTo(loopedReference));
-		assertThat(invocation.getMethodName().getIdentifier(), equalTo("iterator"));
-		assertThat(invocation.getParameters(), equalTo(empty()));
-	}
-
-	@Test
-	public void testElementDeclaration() {
-		VariableDeclaration declaration = new VariableDeclaration();
-		ITypeName elementType = TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0");
-		declaration.setType(elementType);
-		ForEachLoop forEachLoop = new ForEachLoop();
-		forEachLoop.setDeclaration(declaration);
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(2), instanceOf(IVariableDeclaration.class));
-		assertThat(((IVariableDeclaration) normalized.get(2)).getType(), equalTo(elementType));
-	}
-
-	@Test
-	public void testLoopCondition() {
-		IVariableReference loopedReference = SSTUtil.variableReference("collection");
-		ForEachLoop forEachLoop = new ForEachLoop();
-		forEachLoop.setLoopedReference(loopedReference);
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
-
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(0), instanceOf(IVariableDeclaration.class));
-		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
-		IVariableDeclaration iteratorDecl = (IVariableDeclaration) normalized.get(0);
-		IWhileLoop whileLoop = (IWhileLoop) normalized.get(3);
-
-		assertThat(whileLoop.getCondition(), instanceOf(LoopHeaderBlockExpression.class));
-		List<IStatement> conditionBlock = ((LoopHeaderBlockExpression) whileLoop.getCondition()).getBody();
-		assertThat(conditionBlock.size(), equalTo(1));
-		assertThat(conditionBlock.get(0), instanceOf(IExpressionStatement.class));
-		IAssignableExpression assignableExpression = ((IExpressionStatement) conditionBlock.get(0)).getExpression();
-		assertThat(assignableExpression, instanceOf(IInvocationExpression.class));
-
-		IInvocationExpression invocation = (IInvocationExpression) assignableExpression;
-		assertThat(invocation.getParameters(), equalTo(empty()));
-		assertThat(invocation.getReference(), equalTo(iteratorDecl.getReference()));
-		assertThat(invocation.getMethodName().getIdentifier(), equalTo("hasNext"));
-	}
-
 	public void testLoopBody() {
-		List<IStatement> forEachBody = new ArrayList<IStatement>();
-		forEachBody.add(new Assignment());
-		forEachBody.add(new ReturnStatement());
-		ForEachLoop forEachLoop = new ForEachLoop();
-		forEachLoop.setBody(forEachBody);
-		List<IStatement> normalized = forEachLoop.accept(visitor, null);
+		setDeclaration(dec0);
+		setLoopedReference(loopedRef0);
+		setBody(stmt0);
 
-		assertThat(normalized.size(), equalTo(4));
-		assertThat(normalized.get(3), instanceOf(IWhileLoop.class));
-		List<IStatement> whileBody = ((IWhileLoop) normalized.get(3)).getBody();
-		int whileBodySize = whileBody.size();
-		assertThat(whileBodySize, equalTo(3));
-		assertThat(whileBody.subList(whileBodySize - 2, whileBodySize), equalTo(forEachBody));
+		// declare & initialize iterator
+		ITypeName iteratorTypeName = iteratorType(dec0.getType());
+		IVariableReference iterator = variableReference("it_0");
+		IVariableDeclaration iteratorDec = declareVar(iterator.getIdentifier(), iteratorTypeName);
+		IAssignment iteratorInit = assign(iterator, iteratorInvocation(loopedRef0));
+
+		// assign next element
+		IAssignment assignNext = assign(dec0.getReference(), getNext(iterator));
+
+		WhileLoop whileLoop = new WhileLoop();
+		whileLoop.setCondition(getWhileCondition(iterator));
+		whileLoop.setBody(list(dec0, assignNext, stmt0));
+
+		setExpected(iteratorDec, iteratorInit, whileLoop);
+		assertTransformedSST();
+	}
+
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// | for(A a : as) . |......| Iterator<A> itA = as.iterator(); . |
+	// | ..for(B b : bs) |..=>..| while(itA.hasNext()) { ........... |
+	// | ....body; ..... |......| ..A a = itA.next(); .............. |
+	// |_________________|......| ..Iterator<B> itB = bs.iterator(); |
+	// .........................| ..while(itB.hasNext()) { ......... |
+	// .........................| ....B b = itB.next(); ............ |
+	// .........................| ....body; ........................ |
+	// .........................| ..} .............................. |
+	// .........................| } ................................ |
+	// .........................|____________________________________|
+	@Test
+	public void testCascadedForEachLoops() {
+		// inner for-each loop
+		ForEachLoop innerForEach = new ForEachLoop();
+		innerForEach.setDeclaration(dec0);
+		innerForEach.setLoopedReference(loopedRef0);
+		innerForEach.setBody(list(stmt0));
+
+		// outer for-each loop
+		setDeclaration(dec1);
+		setLoopedReference(loopedRef1);
+		setBody(innerForEach);
+
+		// declare & initialize iterators
+		ITypeName iteratorType0 = iteratorType(dec0.getType());
+		ITypeName iteratorType1 = iteratorType(dec1.getType());
+		IVariableReference iterator0 = variableReference("it_0");
+		IVariableReference iterator1 = variableReference("it_1");
+		IVariableDeclaration iteratorDec0 = declareVar(iterator0.getIdentifier(), iteratorType0);
+		IVariableDeclaration iteratorDec1 = declareVar(iterator1.getIdentifier(), iteratorType1);
+		IAssignment iteratorInit0 = assign(iterator0, iteratorInvocation(loopedRef0));
+		IAssignment iteratorInit1 = assign(iterator1, iteratorInvocation(loopedRef1));
+
+		// assign next element
+		IAssignment assignNext0 = assign(dec0.getReference(), getNext(iterator0));
+		IAssignment assignNext1 = assign(dec1.getReference(), getNext(iterator1));
+
+		WhileLoop innerWhile = new WhileLoop();
+		innerWhile.setCondition(getWhileCondition(iterator0));
+		innerWhile.setBody(list(dec0, assignNext0, stmt0));
+
+		WhileLoop outerWhile = new WhileLoop();
+		outerWhile.setCondition(getWhileCondition(iterator1));
+		outerWhile.setBody(list(dec1, assignNext1, iteratorDec0, iteratorInit0, innerWhile));
+		setExpected(iteratorDec1, iteratorInit1, outerWhile);
+		assertTransformedSST();
+	}
+
+	// ---------------------------- helpers -----------------------------------
+
+	private void setBody(IStatement... statements) {
+		forEachLoop.setBody(Lists.newArrayList(statements));
+	}
+
+	private void setDeclaration(IVariableDeclaration declaration) {
+		forEachLoop.setDeclaration(declaration);
+	}
+
+	private void setLoopedReference(IVariableReference loopedReference) {
+		forEachLoop.setLoopedReference(loopedReference);
+	}
+
+	private ILoopHeaderExpression getWhileCondition(IVariableReference iterator) {
+		IVariableReference hasNext = variableReference("hasNext");
+		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), TypeName.newTypeName("System.Boolean"));
+		return loopHeader(hasNextDec, assign(hasNext, hasNext(iterator)), returnStatement(refExpr(hasNext)));
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> List<T> list(T... elements) {
+		return Lists.newArrayList(elements);
 	}
 }
