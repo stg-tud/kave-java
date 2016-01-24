@@ -20,74 +20,51 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.breakStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.caseBlock;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.SST;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
-import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.transformation.switchblock.SwitchBlockNormalizationVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
-public class SwitchBlockNormalizationVisitorTest {
-	private SwitchBlockNormalizationVisitor sut;
+public class SwitchBlockNormalizationVisitorTest extends StatementNormalizationVisitorBaseTest<IReferenceExpression> {
 	private SwitchBlock switchBlock;
-	private MethodDeclaration expectedMethod;
 	private IVariableReference var;
-	private IStatement stmt0, stmt1, stmt2, stmt3;
-	private SST sst, expectedSST;
 	IConstantValueExpression label0, label1, label2;
 
 	@Before
 	public void setup() {
+		super.setup();
 		sut = new SwitchBlockNormalizationVisitor();
 		var = variableReference("x");
 		switchBlock = new SwitchBlock();
 		switchBlock.setReference(var);
-		sst = new SST();
-		sst.setMethods(Sets.newHashSet(declareMethod(switchBlock)));
-
-		expectedMethod = new MethodDeclaration();
-		expectedSST = new SST();
-		expectedSST.setMethods(Sets.newHashSet(expectedMethod));
+		setNormalizing(switchBlock);
 
 		label0 = constant("0");
 		label1 = constant("1");
 		label2 = constant("2");
-
-		stmt0 = dummyStatement(0);
-		stmt1 = dummyStatement(1);
-		stmt2 = dummyStatement(2);
-		stmt3 = dummyStatement(3);
 	}
 
 	// --------------------- No fall-through ----------------------------------
@@ -413,29 +390,7 @@ public class SwitchBlockNormalizationVisitorTest {
 	// TODO
 	@Test
 	public void testInnerBreak() {
-		assertTransformedSST();
-	}
-
-	// ---------------------------- asserts -----------------------------------
-
-	private void assertSSTs(ISST expectedSST, ISST sst) {
-		sst.accept(sut, null);
-		Set<IMethodDeclaration> methods = sst.getMethods();
-		Set<IMethodDeclaration> expectedMethods = expectedSST.getMethods();
-		List<IStatement> body = methods.iterator().next().getBody();
-		List<IStatement> expectedBody = expectedMethods.iterator().next().getBody();
-
-		assertThat(methods.size(), equalTo(1));
-		assertThat(methods.size(), equalTo(expectedMethods.size()));
-		assertThat(body.size(), equalTo(expectedBody.size()));
-
-		for (int i = 0; i < body.size(); i++) {
-			assertThat(body.get(i), equalTo(expectedBody.get(i)));
-		}
-	}
-
-	private void assertTransformedSST() {
-		assertSSTs(expectedSST, sst);
+//		assertTransformedSST();
 	}
 
 	// ---------------------------- helpers -----------------------------------
@@ -448,19 +403,11 @@ public class SwitchBlockNormalizationVisitorTest {
 		switchBlock.setDefaultSection(Lists.newArrayList(defaultStatements));
 	}
 
-	private void setExpected(IStatement... statements) {
-		expectedMethod.setBody(Lists.newArrayList(statements));
-	}
-
 	private IVariableDeclaration booleanDec(IVariableReference ref) {
 		VariableDeclaration var = new VariableDeclaration();
 		var.setReference(ref);
 		var.setType(TypeName.newTypeName("System.Boolean"));
 		return var;
-	}
-
-	private IStatement dummyStatement(int i) {
-		return SSTUtil.declareVar("dummy" + i);
 	}
 
 	private IfElseBlock ifCond(IVariableReference ref) {

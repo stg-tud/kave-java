@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Carina Oberle
+ * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package cc.kave.commons.model.ssts.transformation.loops;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +25,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
@@ -49,9 +50,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	@Test
 	public void testEmptyLoop() {
 		setCondition(loopHeader());
-		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
-		setExpected(whileLoop);
+		setExpected(whileLoop(constant("true")));
 		assertTransformedSST();
 	}
 
@@ -63,9 +62,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopInit() {
 		setCondition(loopHeader());
 		setInit(stmt0, stmt1);
-		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
-		setExpected(stmt0, stmt1, whileLoop);
+		setExpected(stmt0, stmt1, whileLoop(constant("true")));
 		assertTransformedSST();
 	}
 
@@ -78,10 +75,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopStep() {
 		setCondition(loopHeader());
 		setStep(stmt0, stmt1);
-		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
-		whileLoop.setBody(Lists.newArrayList(stmt0, stmt1));
-		setExpected(whileLoop);
+		setExpected(whileLoop(constant("true"), stmt0, stmt1));
 		assertTransformedSST();
 	}
 
@@ -94,10 +88,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopBody() {
 		setCondition(loopHeader());
 		setBody(stmt0, stmt1);
-		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(loopHeader(returnStatement(constant("true"))));
-		whileLoop.setBody(Lists.newArrayList(stmt0, stmt1));
-		setExpected(whileLoop);
+		setExpected(whileLoop(constant("true"), stmt0, stmt1));
 		assertTransformedSST();
 	}
 
@@ -116,11 +107,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 		setBody(stmt1);
 		setStep(stmt2);
 
-		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(condition);
-		whileLoop.setBody(Lists.newArrayList(stmt1, stmt2));
-
-		setExpected(stmt0, whileLoop);
+		setExpected(stmt0, whileLoop(condition, stmt1, stmt2));
 		assertTransformedSST();
 	}
 
@@ -198,15 +185,8 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 		setBody(innerFor);
 		setCondition(outerCondition);
 
-		// inner while loop
-		WhileLoop innerWhile = new WhileLoop();
-		innerWhile.setCondition(innerCondition);
-		innerWhile.setBody(list(stmt2, stmt1));
-
-		// outer while loop
-		WhileLoop outerWhile = new WhileLoop();
-		outerWhile.setCondition(outerCondition);
-		outerWhile.setBody(list(stmt0, innerWhile, stmt4));
+		IWhileLoop innerWhile = whileLoop(innerCondition, stmt2, stmt1);
+		IWhileLoop outerWhile = whileLoop(outerCondition, stmt0, innerWhile, stmt4);
 
 		setExpected(stmt3, outerWhile);
 		assertTransformedSST();

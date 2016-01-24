@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -43,6 +44,7 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -99,6 +101,7 @@ import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
@@ -110,6 +113,12 @@ public class SSTUtil {
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setReference(variableReference(identifier));
 		variable.setType(type);
+		return variable;
+	}
+	
+	public static IVariableDeclaration declare(IVariableReference varRef) {
+		VariableDeclaration variable = new VariableDeclaration();
+		variable.setReference(varRef);
 		return variable;
 	}
 
@@ -365,7 +374,7 @@ public class SSTUtil {
 		return expr;
 	}
 
-	public static IWhileLoop whileLoop(ILoopHeaderBlockExpression condition, IStatement... body) {
+	public static IWhileLoop whileLoop(ILoopHeaderExpression condition, IStatement... body) {
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(Lists.newArrayList(body));
 		whileLoop.setCondition(condition);
@@ -412,11 +421,25 @@ public class SSTUtil {
 		return refExpr;
 	}
 
-	public static IFieldReference fieldReference(String identifier) {
+	public static IFieldReference fieldReference(String varId, String fieldId) {
 		FieldReference ref = new FieldReference();
-		ref.setFieldName(FieldName.newFieldName(identifier));
-		ref.setReference(variableReference(identifier));
+		ref.setFieldName(FieldName.newFieldName(fieldId));
+		ref.setReference(variableReference(varId));
 		return ref;
+	}
+	
+	public static IFieldReference fieldReference(IVariableReference varRef, String fieldId) {
+		FieldReference fielRef = new FieldReference();
+		fielRef.setFieldName(FieldName.newFieldName(fieldId));
+		fielRef.setReference(varRef);
+		return fielRef;
+	}
+	
+	public static IPropertyReference propertyReference(IVariableReference varRef, String propertyId) {
+		PropertyReference propertyRef = new PropertyReference();
+		propertyRef.setPropertyName(PropertyName.newPropertyName(propertyId));
+		propertyRef.setReference(varRef);
+		return propertyRef;
 	}
 
 	public static IStatement breakStatement() {
