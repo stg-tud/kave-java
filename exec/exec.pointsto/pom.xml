@@ -19,6 +19,21 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+		<!-- UnionFind -->
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+
+		<!-- Pair -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+
+
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

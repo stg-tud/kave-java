@@ -28,6 +28,7 @@ import com.google.common.io.Files;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
+import cc.kave.commons.pointsto.analysis.unification.SteensgaardUnificationAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
@@ -44,8 +45,11 @@ public class PointsToEvaluation {
 	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
 
 	public static void main(String[] args) {
-		List<PointerAnalysisFactory> factories = Arrays
-				.asList(new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class));
+		List<PointerAnalysisFactory> factories = Arrays.asList(
+				//new SimplePointerAnalysisFactory<>(TypeBasedAnalysis.class),
+				//new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)
+				new SimplePointerAnalysisFactory<>(SteensgaardUnificationAnalysis.class)
+				);
 		new PointsToEvaluation().generateUsages(factories);
 
 	}
