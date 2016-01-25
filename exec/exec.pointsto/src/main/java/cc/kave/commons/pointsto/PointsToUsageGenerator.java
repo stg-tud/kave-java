@@ -118,9 +118,8 @@ public class PointsToUsageGenerator {
 				// guard against exception in CsMethod:getSignature()
 				try {
 					ptContext = pa.compute(context);
-				} catch (AssertionException ex) {
-					throw ex;
-				} catch (UnexpectedSSTNodeException ex) {
+				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException
+						| NullPointerException ex) {
 					throw ex;
 				} catch (RuntimeException ex) {
 					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);

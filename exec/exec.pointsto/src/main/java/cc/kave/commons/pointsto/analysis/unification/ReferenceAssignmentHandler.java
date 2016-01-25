@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
@@ -83,67 +84,39 @@ public class ReferenceAssignmentHandler extends AssignmentHandler<IReference> {
 		context.assign((IPropertyReference) dest, (IPropertyReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignArrayToVar(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignArrayToVar(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.readArray((IVariableReference) dest, (IIndexAccessReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignArrayToField(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignArrayToField(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.assign((IFieldReference) dest, (IIndexAccessReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignArrayToProp(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignArrayToProp(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.assign((IPropertyReference) dest, (IIndexAccessReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignVarToArray(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignVarToArray(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.writeArray((IIndexAccessReference) dest, (IVariableReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignFieldToArray(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignFieldToArray(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.assign((IIndexAccessReference) dest, (IFieldReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignPropToArray(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignPropToArray(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.assign((IIndexAccessReference) dest, (IPropertyReference) src);
 	}
 
-	/* (non-Javadoc)
-	 * @see cc.kave.commons.pointsto.analysis.unification.AssignmentHandler#assignArrayToArray(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void assignArrayToArray(IReference dest, IReference src) {
-		// TODO Auto-generated method stub
-		
+		context.assign((IIndexAccessReference) dest, (IIndexAccessReference) src);
 	}
 
 }

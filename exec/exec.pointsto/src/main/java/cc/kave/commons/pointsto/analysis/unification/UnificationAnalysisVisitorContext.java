@@ -43,6 +43,7 @@ import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.DistinctReferenceVisitorContext;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctMemberReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
@@ -273,6 +274,40 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		}
 	}
 
+	private ReferenceLocation readDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
+		SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
+		SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
+
+		if (srcDerefRep.getLocation().isBottom()) {
+			setLocation(srcDerefRep, new ReferenceLocation(destDerefRep.getLocation(), destDerefRep));
+		} else {
+			ReferenceLocation fieldLoc = (ReferenceLocation) srcDerefRep.getLocation();
+			SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
+			if (destDerefRep != fieldDerefRep) {
+				cjoin(destDerefRep, fieldDerefRep);
+			}
+		}
+
+		return (ReferenceLocation) srcDerefRep.getLocation();
+	}
+
+	private ReferenceLocation writeDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
+		SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
+		SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
+
+		if (destDerefRep.getLocation().isBottom()) {
+			setLocation(destDerefRep, new ReferenceLocation(srcDerefRep.getLocation(), srcDerefRep));
+		} else {
+			ReferenceLocation fieldLoc = (ReferenceLocation) destDerefRep.getLocation();
+			SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
+			if (fieldDerefRep != srcDerefRep) {
+				cjoin(fieldDerefRep, srcDerefRep);
+			}
+		}
+
+		return (ReferenceLocation) destDerefRep.getLocation();
+	}
+
 	public void copy(IVariableReference dest, IVariableReference src) {
 		copy(dest.accept(distinctReferenceCreationVisitor, namesToReferences),
 				src.accept(distinctReferenceCreationVisitor, namesToReferences));
@@ -286,7 +321,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void assign(DistinctFieldReference dest, DistinctFieldReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
 		readMember(tempLoc, src);
-		writeMember(dest, dest.getReference().getFieldName(), tempLoc);
+		writeMember(dest, tempLoc);
 	}
 
 	public void assign(IPropertyReference dest, IPropertyReference src) {
@@ -305,7 +340,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		PropertyName destProperty = dest.getReference().getPropertyName();
 		if (treatPropertyAsField(dest.getReference())) {
-			writeMember(dest, destProperty, tempLoc);
+			writeMember(dest, tempLoc);
 		} else {
 			DistinctReference destPropertyParameter = new DistinctPropertyParameterReference(languageOptions,
 					destProperty);
@@ -324,7 +359,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		PropertyName destProperty = dest.getReference().getPropertyName();
 		if (treatPropertyAsField(dest.getReference())) {
-			writeMember(dest, destProperty, tempLoc);
+			writeMember(dest, tempLoc);
 		} else {
 			DistinctReference destPropertyParameter = new DistinctPropertyParameterReference(languageOptions,
 					destProperty);
@@ -346,22 +381,32 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			requestedReturnLocations.put(srcProperty, tempLoc);
 		}
 
-		writeMember(dest, dest.getReference().getFieldName(), tempLoc);
+		writeMember(dest, tempLoc);
 	}
 
 	public void assign(IFieldReference dest, IIndexAccessReference src) {
+		assign((DistinctFieldReference) dest.accept(distinctReferenceCreationVisitor, namesToReferences),
+				(DistinctIndexAccessReference) src.accept(distinctReferenceCreationVisitor, namesToReferences));
+	}
+
+	private void assign(DistinctFieldReference dest, DistinctIndexAccessReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
 		readArray(tempLoc, src);
-		writeMember(dest, dest.getFieldName(), tempLoc);
+		writeMember(dest, tempLoc);
 	}
 
 	public void assign(IPropertyReference dest, IIndexAccessReference src) {
+		assign((DistinctPropertyReference) dest.accept(distinctReferenceCreationVisitor, namesToReferences),
+				(DistinctIndexAccessReference) src.accept(distinctReferenceCreationVisitor, namesToReferences));
+	}
+
+	private void assign(DistinctPropertyReference dest, DistinctIndexAccessReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
 		readArray(tempLoc, src);
 
-		PropertyName destProperty = dest.getPropertyName();
-		if (treatPropertyAsField(dest)) {
-			writeMember(dest, destProperty, tempLoc);
+		PropertyName destProperty = dest.getReference().getPropertyName();
+		if (treatPropertyAsField(dest.getReference())) {
+			writeMember(dest, tempLoc);
 		} else {
 			DistinctReference destPropertyParameter = new DistinctPropertyParameterReference(languageOptions,
 					destProperty);
@@ -370,17 +415,27 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public void assign(IIndexAccessReference dest, IFieldReference src) {
+		assign((DistinctIndexAccessReference) dest.accept(distinctReferenceCreationVisitor, namesToReferences),
+				(DistinctFieldReference) src.accept(distinctReferenceCreationVisitor, namesToReferences));
+	}
+
+	private void assign(DistinctIndexAccessReference dest, DistinctFieldReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
-		readMember(tempLoc, src, src.getFieldName());
+		readMember(tempLoc, src);
 		writeArray(dest, tempLoc);
 	}
 
 	public void assign(IIndexAccessReference dest, IPropertyReference src) {
+		assign((DistinctIndexAccessReference) dest.accept(distinctReferenceCreationVisitor, namesToReferences),
+				(DistinctPropertyReference) src.accept(distinctReferenceCreationVisitor, namesToReferences));
+	}
+
+	private void assign(DistinctIndexAccessReference dest, DistinctPropertyReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
 
-		PropertyName srcProperty = src.getPropertyName();
-		if (treatPropertyAsField(src)) {
-			readMember(tempLoc, src, srcProperty);
+		PropertyName srcProperty = src.getReference().getPropertyName();
+		if (treatPropertyAsField(src.getReference())) {
+			readMember(tempLoc, src);
 		} else {
 			requestedReturnLocations.put(srcProperty, tempLoc);
 		}
@@ -389,6 +444,10 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public void assign(IIndexAccessReference dest, IIndexAccessReference src) {
+		assign((DistinctIndexAccessReference) dest, (DistinctIndexAccessReference) src);
+	}
+
+	private void assign(DistinctIndexAccessReference dest, DistinctIndexAccessReference src) {
 		ReferenceLocation tempLoc = createReferenceLocation();
 		readArray(tempLoc, src);
 		writeArray(dest, tempLoc);
@@ -435,21 +494,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		} else {
 
 			ReferenceLocation srcLocation = getOrCreateLocation(memberRef.getBaseReference());
+			ReferenceLocation srcDerefLocation = readDereference(destLocation, srcLocation);
 
-			SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
-			SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
-
-			if (srcDerefRep.getLocation().isBottom()) {
-				setLocation(srcDerefRep, new ReferenceLocation(destDerefRep.getLocation(), destDerefRep));
-			} else {
-				ReferenceLocation fieldLoc = (ReferenceLocation) srcDerefRep.getLocation();
-				SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
-				if (destDerefRep != fieldDerefRep) {
-					cjoin(destDerefRep, fieldDerefRep);
-				}
-			}
-
-			registerReference(memberRef, (ReferenceLocation) srcDerefRep.getLocation());
+			registerReference(memberRef, (ReferenceLocation) srcDerefLocation);
 		}
 	}
 
@@ -464,36 +511,19 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void writeField(DistinctFieldReference fieldRef, DistinctReference srcRef) {
 		ReferenceLocation srcLocation = getOrCreateLocation(srcRef);
-		writeMember(fieldRef, fieldRef.getReference().getFieldName(), srcLocation);
+		writeMember(fieldRef, srcLocation);
 	}
 
-	private void writeMember(IMemberReference memberRef, MemberName member, ReferenceLocation srcLocation) {
-		DistinctReference distinctMemberRef = memberRef.accept(distinctReferenceCreationVisitor, namesToReferences);
-		writeMember((DistinctMemberReference) distinctMemberRef, member, srcLocation);
-	}
-
-	private void writeMember(DistinctMemberReference memberRef, MemberName member, ReferenceLocation srcLocation) {
+	private void writeMember(DistinctMemberReference memberRef, ReferenceLocation srcLocation) {
 		if (memberRef.isStaticMember()) {
 			// model static members (fields, properties) as global variables
 			copy(getOrCreateLocation(memberRef), srcLocation);
 		} else {
 
 			ReferenceLocation destLocation = getOrCreateLocation(memberRef.getBaseReference());
+			ReferenceLocation destDerefLocation = writeDereference(destLocation, srcLocation);
 
-			SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
-			SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
-
-			if (destDerefRep.getLocation().isBottom()) {
-				setLocation(destDerefRep, new ReferenceLocation(srcDerefRep.getLocation(), srcDerefRep));
-			} else {
-				ReferenceLocation fieldLoc = (ReferenceLocation) destDerefRep.getLocation();
-				SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
-				if (fieldDerefRep != srcDerefRep) {
-					cjoin(fieldDerefRep, srcDerefRep);
-				}
-			}
-
-			registerReference(memberRef, (ReferenceLocation) destDerefRep.getLocation());
+			registerReference(memberRef, destDerefLocation);
 		}
 	}
 
@@ -530,7 +560,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		PropertyName property = propertyRef.getReference().getPropertyName();
 		if (treatPropertyAsField(propertyRef.getReference())) {
 			ReferenceLocation srcLocation = getOrCreateLocation(srcRef);
-			writeMember(propertyRef, property, srcLocation);
+			writeMember(propertyRef, srcLocation);
 		} else {
 			// map parameter of the property setter to the source
 			copy(new DistinctPropertyParameterReference(languageOptions, property), srcRef);
@@ -544,29 +574,37 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public void readArray(IVariableReference destRef, IIndexAccessReference srcRef) {
-		readArray(destRef.accept(distinctReferenceCreationVisitor, namesToReferences), srcRef);
+		DistinctReference dest = destRef.accept(distinctReferenceCreationVisitor, namesToReferences);
+		DistinctIndexAccessReference src = (DistinctIndexAccessReference) srcRef
+				.accept(distinctReferenceCreationVisitor, namesToReferences);
+		readArray(dest, src);
 	}
 
-	private void readArray(DistinctReference destRef, IIndexAccessReference srcRef) {
+	private void readArray(DistinctReference destRef, DistinctIndexAccessReference srcRef) {
 		ReferenceLocation destLocation = getOrCreateLocation(destRef);
 		readArray(destLocation, srcRef);
 	}
 
-	private void readArray(ReferenceLocation destLocation, IIndexAccessReference srcRef) {
-
+	private void readArray(ReferenceLocation destLocation, DistinctIndexAccessReference srcRef) {
+		ReferenceLocation srcLocation = getOrCreateLocation(srcRef.getBaseReference());
+		readDereference(destLocation, srcLocation);
 	}
 
 	public void writeArray(IIndexAccessReference destRef, IVariableReference srcRef) {
-		writeArray(destRef, srcRef.accept(distinctReferenceCreationVisitor, namesToReferences));
+		DistinctIndexAccessReference dest = (DistinctIndexAccessReference) destRef
+				.accept(distinctReferenceCreationVisitor, namesToReferences);
+		DistinctReference src = srcRef.accept(distinctReferenceCreationVisitor, namesToReferences);
+		writeArray(dest, src);
 	}
 
-	private void writeArray(IIndexAccessReference destRef, DistinctReference srcRef) {
+	private void writeArray(DistinctIndexAccessReference destRef, DistinctReference srcRef) {
 		ReferenceLocation srcLocation = getOrCreateLocation(srcRef);
 		writeArray(destRef, srcLocation);
 	}
 
-	private void writeArray(IIndexAccessReference destRef, ReferenceLocation srcLocation) {
-
+	private void writeArray(DistinctIndexAccessReference destRef, ReferenceLocation srcLocation) {
+		ReferenceLocation destLocation = getOrCreateLocation(destRef.getBaseReference());
+		writeDereference(destLocation, srcLocation);
 	}
 
 	public void setCurrentMember(MemberName member) {
@@ -658,41 +696,37 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		protected void assignArrayToVar(DistinctReference dest, DistinctReference src) {
-			// TODO
+			readArray(dest, (DistinctIndexAccessReference) src);
 		}
 
 		@Override
 		protected void assignArrayToField(DistinctReference dest, DistinctReference src) {
-			// TODO
+			assign((DistinctFieldReference) dest, (DistinctIndexAccessReference) src);
 		}
 
 		@Override
 		protected void assignArrayToProp(DistinctReference dest, DistinctReference src) {
-			// TODO Auto-generated method stub
+			assign((DistinctPropertyReference) dest, (DistinctIndexAccessReference) src);
 		}
 
 		@Override
 		protected void assignVarToArray(DistinctReference dest, DistinctReference src) {
-			// TODO Auto-generated method stub
-
+			writeArray((DistinctIndexAccessReference) dest, src);
 		}
 
 		@Override
 		protected void assignFieldToArray(DistinctReference dest, DistinctReference src) {
-			// TODO Auto-generated method stub
-
+			assign((DistinctIndexAccessReference) dest, (DistinctFieldReference) src);
 		}
 
 		@Override
 		protected void assignPropToArray(DistinctReference dest, DistinctReference src) {
-			// TODO Auto-generated method stub
-
+			assign((DistinctIndexAccessReference) dest, (DistinctPropertyReference) src);
 		}
 
 		@Override
 		protected void assignArrayToArray(DistinctReference dest, DistinctReference src) {
-			// TODO Auto-generated method stub
-
+			assign((DistinctIndexAccessReference) dest, (DistinctIndexAccessReference) src);
 		}
 
 	}
