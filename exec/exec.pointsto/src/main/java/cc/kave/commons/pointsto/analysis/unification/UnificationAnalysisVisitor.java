@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
@@ -35,6 +36,7 @@ import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
+import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.ScopingVisitor;
 import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
@@ -83,6 +85,10 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 				referenceAssignmentHandler.setContext(context);
 				referenceAssignmentHandler.process(destRef, srcRef);
 			}
+		} else if (srcExpr instanceof IIndexAccessExpression) {
+			referenceAssignmentHandler.setContext(context);
+			referenceAssignmentHandler.process(destRef,
+					SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
 		}
 
 		return super.visit(stmt, context);

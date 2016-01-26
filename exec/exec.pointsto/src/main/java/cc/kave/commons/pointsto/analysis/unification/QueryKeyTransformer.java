@@ -50,11 +50,10 @@ public class QueryKeyTransformer
 
 	private Callpath normalizeMethod(MethodName method) {
 		// TODO replace with isUnknown once it is overridden
-		method = method.equals(CsMethodName.UNKNOWN_NAME) ? null : method;
-		if (method != null) {
-			return new Callpath(method);
-		} else {
+		if (method == null || method.equals(CsMethodName.UNKNOWN_NAME)) {
 			return null;
+		} else {
+			return new Callpath(method);
 		}
 	}
 

@@ -14,10 +14,13 @@ package cc.kave.commons.pointsto;
 
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
@@ -51,5 +54,11 @@ public class SSTBuilder {
 		propertyRef.setReference(reference);
 		propertyRef.setPropertyName(property);
 		return propertyRef;
+	}
+
+	public static IIndexAccessReference indexAccessReference(IIndexAccessExpression expr) {
+		IndexAccessReference reference = new IndexAccessReference();
+		reference.setExpression(expr);
+		return reference;
 	}
 }

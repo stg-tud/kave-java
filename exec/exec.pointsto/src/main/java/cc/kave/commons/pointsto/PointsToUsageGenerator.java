@@ -119,7 +119,7 @@ public class PointsToUsageGenerator {
 				try {
 					ptContext = pa.compute(context);
 				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException
-						| NullPointerException ex) {
+						| NullPointerException | StackOverflowError ex) {
 					throw ex;
 				} catch (RuntimeException ex) {
 					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);

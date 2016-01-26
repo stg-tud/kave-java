@@ -31,6 +31,7 @@ import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
@@ -191,6 +192,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		for (SetRepresentative x : pending.get(setRepresentative)) {
 			join(setRepresentative, x);
 		}
+		pending.removeAll(setRepresentative);
 
 	}
 
@@ -220,6 +222,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 				for (SetRepresentative x : pending.get(rep1)) {
 					join(unionRep, x);
 				}
+				pending.removeAll(rep1);
 			}
 		} else {
 			unionRep.setLocation(loc1);
@@ -227,6 +230,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 				for (SetRepresentative x : pending.get(rep2)) {
 					join(unionRep, x);
 				}
+				pending.removeAll(rep2);
 			} else {
 				// both locations are not bottom -> must be references
 				unify((ReferenceLocation) loc1, (ReferenceLocation) loc2);
@@ -255,6 +259,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	public void allocate(IInvocationExpression invocation) {
 		if (lastAssignment == null || lastAssignment.getExpression() != invocation) {
 			// allocated object not bound to a name
+			return;
+		}
+
+		IAssignableReference targetRef = lastAssignment.getReference();
+		if (targetRef instanceof IUnknownReference) {
+			LOGGER.error("Ignoring an allocation due to an unknown reference");
 			return;
 		}
 
@@ -638,8 +648,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			return;
 		}
 
-		requestedReturnReferences.put(method,
-				lastAssignment.getReference().accept(distinctReferenceCreationVisitor, namesToReferences));
+		IAssignableReference targetRef = lastAssignment.getReference();
+		if (targetRef instanceof IUnknownReference) {
+			LOGGER.error("Ignoring unknown reference");
+			return;
+		}
+
+		requestedReturnReferences.put(method, targetRef.accept(distinctReferenceCreationVisitor, namesToReferences));
 	}
 
 	private class DistinctAssignmentHandler extends AssignmentHandler<DistinctReference> {
