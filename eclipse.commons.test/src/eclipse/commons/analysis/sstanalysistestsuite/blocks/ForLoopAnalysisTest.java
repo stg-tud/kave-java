@@ -32,14 +32,8 @@ import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
 public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
-	public ForLoopAnalysisTest() {
-		packageName = getClass().getSimpleName();
-	}
-
 	@Test
 	public void basicForLoop() {
-		updateContext();
-
 		ForLoop expected = new ForLoop();
 
 		IStatement actual = getFirstStatement();
@@ -49,11 +43,8 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void init_VariableDeclaration() {
-		updateContext();
-
 		ForLoop expected = new ForLoop();
-		expected.getInit().add(
-				newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		expected.getInit().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		expected.getInit().add(newAssignment("i", newConstantValue("0")));
 
 		IStatement actual = getFirstStatement();
@@ -63,30 +54,23 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void init_MultipleStatements() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.BasicForEachLoop");
-		expected.getBody().add(
-				newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getBody().add(
-				newVariableDeclaration("j", SSTAnalysisFixture.INT));
-		expected.setName(newDefaultMethodName(getClass().getName()));
+		MethodDeclaration expected = newDefaultMethodDeclaration();
+		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		expected.getBody().add(newVariableDeclaration("j", SSTAnalysisFixture.INT));
 
 		ForLoop loop = new ForLoop();
 		loop.getInit().add(newAssignment("i", newConstantValue("0")));
 		loop.getInit().add(newAssignment("j", newConstantValue("1")));
 		expected.getBody().add(loop);
-		IMethodDeclaration actual =getFirstMethod();
+		IMethodDeclaration actual = getFirstMethod();
 
 		assertEquals(expected, actual);
 		assertFalse(true);
 	}
 
-	//TODO: AddMethod
+	// TODO: AddMethod
 	@Test
 	public void condition() {
-		updateContext();
-
 		ForLoop expected = new ForLoop();
 		expected.setCondition(newConstantValue("true"));
 
@@ -97,11 +81,8 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void step_SingleStatement() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.Step_SingleStatement");
-		expected.getBody().add(
-				newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		MethodDeclaration expected = newDefaultMethodDeclaration();
+		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		expected.getBody().add(newAssignment("i", newConstantValue("0")));
 
 		ForLoop loop = new ForLoop();
@@ -117,11 +98,8 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void step_MultipleStatements() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("forloopanalysistest.Step_MultipleStatement");
-		expected.getBody().add(
-				newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		MethodDeclaration expected = newDefaultMethodDeclaration();
+		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		expected.getBody().add(newAssignment("i", newConstantValue("0")));
 
 		ForLoop loop = new ForLoop();
@@ -136,17 +114,16 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 		assertEquals(expected, actual);
 	}
 
-	//TODO: Add Method
+	// TODO: Add Method
 	@Test
 	public void bodyWithStatement() {
-		updateContext();
+		MethodDeclaration expected = newDefaultMethodDeclaration();
 
-		ForLoop expected = new ForLoop();
-		expected.setCondition(new UnknownExpression());
-		expected.getBody().add(
-				newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		
-		IStatement actual = getFirstStatement();
+		ForLoop loop = new ForLoop();
+		loop.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		expected.getBody().add(loop);
+
+		IMethodDeclaration actual = getFirstMethod();
 
 		assertEquals(expected, actual);
 

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Commons
 Bundle-SymbolicName: eclipse.commons
 Bundle-Version: 1.0.0.qualifier
-Export-Package: cc.kave.eclipse.commons.analysis.completiontarget,
+Export-Package: 
  cc.kave.eclipse.commons.analysis.transformer,
  cc.kave.eclipse.commons.analysis.util
 Require-Bundle: org.eclipse.jdt.core,

@@ -20,7 +20,7 @@ public class BodyWithStatement {
 
 	public void method() {
 		for (;;) {
-			;
+			int i;
 		}
 	}
 }

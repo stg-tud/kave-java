@@ -20,8 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -31,15 +29,9 @@ import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
 public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
-	public ForEachLoopAnalysisTest() {
-		packageName = getClass().getSimpleName();
-	}
-	
 	@Test
 	public void basicForEachLoop() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.BasicForEachLoop");
+		MethodDeclaration expected = newDefaultMethodDeclaration();
 		// TODO: List statt boolean
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
@@ -59,9 +51,7 @@ public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withStatementInBody() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.WithStatementInBody");
+		MethodDeclaration expected = newDefaultMethodDeclaration();
 		// TODO: List statt boolean
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
@@ -82,9 +72,7 @@ public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void inlineDefinitionOfEnumerable() {
-		updateContext();
-
-		MethodDeclaration expected = newDefaultMethodDeclaration("foreachloopanalysistest.InlineDefinitionOfEnumerable");
+		MethodDeclaration expected = newDefaultMethodDeclaration();
 		// TODO: List statt boolean
 		expected.getBody().add(
 				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));

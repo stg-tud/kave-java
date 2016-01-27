@@ -15,15 +15,20 @@
  */
 package eclipse.commons.test;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -32,14 +37,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
-import cc.kave.eclipse.commons.analysis.completiontarget.CompletionTargetMarker;
 import cc.kave.eclipse.commons.analysis.transformer.DeclarationVisitor;
 
 public class PluginAstParser {
@@ -65,9 +63,30 @@ public class PluginAstParser {
 		initializeAst(projectName, qualifiedName);
 	}
 
+	/**
+	 * @return A complete list of all java projects in the current workspace.
+	 */
+	private List<IJavaProject> getJavaProjects() {
+		List<IJavaProject> javaProjects = new ArrayList<IJavaProject>();
+		IWorkspaceRoot myWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+
+		for (IProject project : myWorkspaceRoot.getProjects()) {
+//			updateProject(project);
+			try {
+				if (project.isNatureEnabled(JAVA_NATURE)) {
+					IJavaProject javaProject = JavaCore.create(project);
+					javaProjects.add(javaProject);
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return javaProjects;
+	}
+
 	private void initializeAst(String projectName, String qualifiedName) {
-		ICompilationUnit compilationUnit = getCompilationunit(projectName,
-				qualifiedName);
+		ICompilationUnit compilationUnit = getCompilationunit(projectName, qualifiedName);
 		parsed = parse(compilationUnit);
 
 		DeclarationVisitor declVisitor = new DeclarationVisitor(context);
@@ -90,44 +109,41 @@ public class PluginAstParser {
 		return (CompilationUnit) parser.createAST(null); // parse
 	}
 
-	/**
-	 * 
-	 * @return A complete list of all java projects in the current workspace.
-	 */
-	private List<IJavaProject> getJavaProjects() {
-		List<IJavaProject> javaProjects = new ArrayList<IJavaProject>();
-		IWorkspaceRoot myWorkspaceRoot = ResourcesPlugin.getWorkspace()
-				.getRoot();
-
-		for (IProject project : myWorkspaceRoot.getProjects()) {
-			try {
-				if (project.isNatureEnabled(JAVA_NATURE)) {
-					IJavaProject javaProject = JavaCore.create(project);
-					javaProjects.add(javaProject);
-				}
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return javaProjects;
-	}
-
-	private ICompilationUnit getCompilationunit(String project,
-			String qualifiedName) {
+	private ICompilationUnit getCompilationunit(String project, String qualifiedName) {
 		String[] split = qualifiedName.split(";");
 
 		for (IJavaProject iJavaProject : javaProjects) {
 			if (iJavaProject.getElementName().equals(project)) {
 				try {
-					return iJavaProject.findType(split[0], split[1])
-							.getCompilationUnit();
+					return iJavaProject.findType(split[0], split[1]).getCompilationUnit();
 				} catch (JavaModelException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 		return null;
+	}
+
+	public void updateProject(IResource project) {
+		try {
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e1) {
+			e1.printStackTrace();
+		}
+
+		IJobManager jobManager = Job.getJobManager();
+
+		try {
+			jobManager.join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
+		} catch (OperationCanceledException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		} catch (OperationCanceledException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	public SST getContext() {

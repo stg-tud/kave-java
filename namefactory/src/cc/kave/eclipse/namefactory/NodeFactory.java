@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
@@ -80,13 +81,13 @@ public class NodeFactory {
 		case ASTNode.PACKAGE_DECLARATION:
 			PackageDeclaration packageNode = (PackageDeclaration) node;
 			return CsNamespaceName.newNamespaceName(packageNode.resolveBinding().getName());
-			
+
 		case ASTNode.FIELD_DECLARATION:
 			return createVariableName(node);
-			
+
 		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
 			return createVariableName(node);
-			
+
 		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
 			return createVariableName(node);
 
@@ -234,7 +235,7 @@ public class NodeFactory {
 		sb.append("(");
 
 		String[] parameterNames = createParameterNames(methodNode, method);
-		
+
 		for (int i = 0; i < parameterNames.length; i++) {
 			sb.append(parameterNames[i]);
 
@@ -364,6 +365,10 @@ public class NodeFactory {
 		else {
 			return "";
 		}
+	}
+
+	public static TypeName getBindingName(ITypeBinding binding) {
+		return CsTypeName.newTypeName(BindingFactory.getBindingName(binding));
 	}
 
 	public static class BindingFactory {

@@ -68,38 +68,4 @@ public class DeclarationVisitorTest extends BaseDeclarationTest {
 
 		assertTrue(containsMethod(methodName));
 	}
-
-	@Test
-	public void isNestedDeclarationTest() {
-		Class[] params = { DelegateTypeName.class, SST.class };
-		Method method;
-
-		try {
-			method = DeclarationVisitor.class.getDeclaredMethod(
-					"isNestedDeclaration", params);
-			method.setAccessible(true);
-			DelegateTypeName dName = CsDelegateTypeName
-					.newDelegateTypeName("d:[R, P] [O+D, P].()");
-			System.out.println(method.invoke(null, dName, context));
-		} catch (NoSuchMethodException | SecurityException
-				| IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			params[0] = MemberName.class;
-			method = DeclarationVisitor.class.getDeclaredMethod(
-					"isNestedDeclaration", params);
-			method.setAccessible(true);
-
-			MemberName mName = CsMethodName
-					.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MethodName()");
-			System.out.println(method.invoke(null, mName, context));
-		} catch (NoSuchMethodException | SecurityException
-				| IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
 }

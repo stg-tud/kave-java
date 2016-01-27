@@ -93,15 +93,14 @@ public class DeclarationVisitor extends ASTVisitor {
 		MethodName methodName = (MethodName) NodeFactory.createNodeName(decl);
 
 		// if (!isNestedDeclaration(methodName, context)) {
-		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration sstDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
-		sstDecl.setName(methodName);
+		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
+		methodDecl.setName(methodName);
 
 		if (!Modifier.isAbstract(decl.getModifiers())) {
-			BodyVisitor bodyVisitor = new BodyVisitor(
-					new UniqueVariableNameGenerator());
-			bodyVisitor.visitStatement(decl.getBody(), sstDecl.getBody());
+			BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), methodDecl.getBody());
+			decl.getBody().accept(bodyVisitor);
 		}
-		context.getMethods().add(sstDecl);
+		context.getMethods().add(methodDecl);
 
 		// }
 	}
@@ -111,19 +110,18 @@ public class DeclarationVisitor extends ASTVisitor {
 
 		// if (!isNestedDeclaration(methodName, context)) {
 
-		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration sstDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
-		sstDecl.setName(methodName);
+		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
+		methodDecl.setName(methodName);
 
-		BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator());
-		bodyVisitor.visitStatement(decl.getBody(), sstDecl.getBody());
+		BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), methodDecl.getBody());
+		decl.getBody().accept(bodyVisitor);
 
-		context.getMethods().add(sstDecl);
+		context.getMethods().add(methodDecl);
 		// }
 	}
 
 	// TODO: Test für hilfsmethode
-	private static boolean isNestedDeclaration(DelegateTypeName name,
-			SST context) {
+	private static boolean isNestedDeclaration(DelegateTypeName name, SST context) {
 		TypeName declaringType = name.getDeclaringType();
 		System.out.println(declaringType.getIdentifier());
 		System.out.println(context.getEnclosingType().getIdentifier());

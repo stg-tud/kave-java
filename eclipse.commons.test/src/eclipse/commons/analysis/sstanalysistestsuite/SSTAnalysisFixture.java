@@ -21,30 +21,35 @@ import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
-public class SSTAnalysisFixture {
+public class SSTAnalysisFixture extends BaseSSTAnalysisTest{
 
-	public static final TypeName INT = CsTypeName
-			.newTypeName("%int, rt.jar, 1.8");
+	public static final TypeName INT = CsTypeName.newTypeName("%int, rt.jar, 1.8");
 
-	public static final TypeName FLOAT = CsTypeName
-			.newTypeName("%float, rt.jar, 1.8");
+	public static final TypeName FLOAT = CsTypeName.newTypeName("%float, rt.jar, 1.8");
 
-	public static final TypeName DOUBLE = CsTypeName
-			.newTypeName("%double, rt.jar, 1.8");
+	public static final TypeName DOUBLE = CsTypeName.newTypeName("%double, rt.jar, 1.8");
 
-	public static final TypeName LONG = CsTypeName
-			.newTypeName("%long, rt.jar, 1.8");
+	public static final TypeName LONG = CsTypeName.newTypeName("%long, rt.jar, 1.8");
 
-	public static final TypeName BOOLEAN = CsTypeName
-			.newTypeName("%boolean, rt.jar, 1.8");
+	public static final TypeName BOOLEAN = CsTypeName.newTypeName("%boolean, rt.jar, 1.8");
 
-	public static final TypeName SHORT = CsTypeName
-			.newTypeName("%short, rt.jar, 1.8");
+	public static final TypeName SHORT = CsTypeName.newTypeName("%short, rt.jar, 1.8");
 
-	public static final TypeName VOID = CsTypeName
-			.newTypeName("%void, rt.jar, 1.8");
+	public static final TypeName VOID = CsTypeName.newTypeName("%void, rt.jar, 1.8");
+
+	public static final TypeName STRING = CsTypeName.newTypeName("java.lang.String, rt.jar, 1.8");
+
+	public static final TypeName OBJECT = CsTypeName.newTypeName("java.lang.Object, rt.jar, 1.8");
+
+	public static final MethodName OBJECT_CTOR = CsMethodName
+			.newMethodName("[%void, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8]..ctor()");
+
+	public static MethodName getHashCode(TypeName type) {
+		return CsMethodName.newMethodName("[%int, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8].hashCode()");
+	}
+
+	public static final MethodName HASHCODE = CsMethodName.newMethodName("[%int, rt.jar, 1.8] [].hashCode()");
 
 	// TODO: get name
-	public static final MethodName LIST_OF_INT_INIT = CsMethodName
-			.newMethodName("[java.util. ][java.util. ]..ctor()");
+	public static final MethodName LIST_OF_INT_INIT = CsMethodName.newMethodName("[java.util. ][java.util. ]..ctor()");
 }

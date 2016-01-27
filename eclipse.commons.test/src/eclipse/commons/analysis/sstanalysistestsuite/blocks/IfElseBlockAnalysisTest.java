@@ -26,14 +26,8 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
-	public IfElseBlockAnalysisTest() {
-		packageName = getClass().getSimpleName();
-	}
-
 	@Test
 	public void basicIfElseBlock() {
-		updateContext();
-
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
 
@@ -44,8 +38,6 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withThenStatement() {
-		updateContext();;
-
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
 		expected.getThen().add(newEmptyCompletionExpression());
@@ -57,8 +49,6 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withElseStatement() {
-		updateContext();
-
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
 		expected.getElse().add(newEmptyCompletionExpression());
@@ -70,8 +60,6 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void withStatements() {
-		updateContext();
-
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
 		expected.getThen().add(newEmptyCompletionExpression());
@@ -84,8 +72,6 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void noElseBlock() {
-		updateContext();
-
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
 		expected.getThen().add(newEmptyCompletionExpression());

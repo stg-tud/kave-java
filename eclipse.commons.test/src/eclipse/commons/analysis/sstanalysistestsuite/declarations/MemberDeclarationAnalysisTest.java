@@ -29,14 +29,8 @@ import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
 public class MemberDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
-	public MemberDeclarationAnalysisTest() {
-		packageName = getClass().getSimpleName();
-	}
-	
 	@Test
 	public void fieldDeclaration() {
-		updateContext();
-
 		Set<IFieldDeclaration> actual = context.getFields();
 		Set<IFieldDeclaration> expected = new HashSet<>();
 		expected.add(newFieldDeclaration(
@@ -47,8 +41,6 @@ public class MemberDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void methodDeclaration() {
-		updateContext();
-
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration m = newMethodDeclaration(
 				"[%void, rt.jar, 1.8] [memberdeclarationanalysistest.MethodDeclaration, ?].M()");
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration n = newMethodDeclaration(
@@ -63,8 +55,6 @@ public class MemberDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void nestedClass_Methods() {
-		updateContext();
-		
 		Set<IMethodDeclaration> actual = context.getMethods();
 		Set<IMethodDeclaration> expected = new HashSet<>();
 
@@ -73,8 +63,6 @@ public class MemberDeclarationAnalysisTest extends BaseSSTAnalysisTest {
 	
 	@Test
 	public void nestedClass_Fields() {
-		updateContext();
-		
 		Set<IFieldDeclaration> actual = context.getFields();
 		Set<IFieldDeclaration> expected = new HashSet<>();
 
