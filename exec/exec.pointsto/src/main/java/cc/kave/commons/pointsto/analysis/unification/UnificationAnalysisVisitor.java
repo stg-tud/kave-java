@@ -39,6 +39,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.ScopingVisitor;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingBaseVariableException;
 import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 
@@ -75,23 +76,28 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 		IAssignableReference destRef = stmt.getReference();
 		IAssignableExpression srcExpr = stmt.getExpression();
 
-		// TODO IndexAccessExpr
-		if (srcExpr instanceof IReferenceExpression) {
-			IReference srcRef = ((IReferenceExpression) srcExpr).getReference();
+		try {
+			if (srcExpr instanceof IReferenceExpression) {
+				IReference srcRef = ((IReferenceExpression) srcExpr).getReference();
 
-			if (destRef instanceof IUnknownReference || srcRef instanceof IUnknownReference) {
-				LOGGER.error("Ignoring an assignment with an unknown reference");
-			} else {
+				if (destRef instanceof IUnknownReference || srcRef instanceof IUnknownReference) {
+					LOGGER.error("Ignoring an assignment with an unknown reference");
+				} else {
+					referenceAssignmentHandler.setContext(context);
+					referenceAssignmentHandler.process(destRef, srcRef);
+				}
+			} else if (srcExpr instanceof IIndexAccessExpression) {
 				referenceAssignmentHandler.setContext(context);
-				referenceAssignmentHandler.process(destRef, srcRef);
+				referenceAssignmentHandler.process(destRef,
+						SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
 			}
-		} else if (srcExpr instanceof IIndexAccessExpression) {
-			referenceAssignmentHandler.setContext(context);
-			referenceAssignmentHandler.process(destRef,
-					SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
+
+			super.visit(stmt, context);
+		} catch (MissingBaseVariableException ex) {
+			LOGGER.error("Failed to process an assignment", ex);
 		}
 
-		return super.visit(stmt, context);
+		return null;
 	}
 
 	@Override

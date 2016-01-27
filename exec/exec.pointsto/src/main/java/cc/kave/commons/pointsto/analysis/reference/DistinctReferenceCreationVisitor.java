@@ -18,18 +18,29 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.ScopedMap;
 import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingBaseVariableException;
 
 public class DistinctReferenceCreationVisitor
 		extends FailSafeNodeVisitor<ScopedMap<String, DistinctReference>, DistinctReference> {
 
 	@Override
 	public DistinctReference visit(IFieldReference fieldRef, ScopedMap<String, DistinctReference> context) {
-		return new DistinctFieldReference(fieldRef, context.get(fieldRef.getReference().getIdentifier()));
+		IVariableReference baseRef = fieldRef.getReference();
+		if (baseRef.isMissing() && !fieldRef.getFieldName().isStatic()) {
+			throw new MissingBaseVariableException(fieldRef);
+		}
+
+		return new DistinctFieldReference(fieldRef, context.get(baseRef.getIdentifier()));
 	}
 
 	@Override
 	public DistinctReference visit(IPropertyReference propertyRef, ScopedMap<String, DistinctReference> context) {
-		return new DistinctPropertyReference(propertyRef, context.get(propertyRef.getReference().getIdentifier()));
+		IVariableReference baseRef = propertyRef.getReference();
+		if (baseRef.isMissing() && !propertyRef.getPropertyName().isStatic()) {
+			throw new MissingBaseVariableException(propertyRef);
+		}
+
+		return new DistinctPropertyReference(propertyRef, context.get(baseRef.getIdentifier()));
 	}
 
 	@Override
@@ -39,8 +50,12 @@ public class DistinctReferenceCreationVisitor
 
 	@Override
 	public DistinctReference visit(IIndexAccessReference indexAccessRef, ScopedMap<String, DistinctReference> context) {
-		return new DistinctIndexAccessReference(indexAccessRef,
-				context.get(indexAccessRef.getExpression().getReference().getIdentifier()));
+		IVariableReference baseRef = indexAccessRef.getExpression().getReference();
+		if (baseRef.isMissing()) {
+			throw new MissingBaseVariableException(indexAccessRef);
+		}
+
+		return new DistinctIndexAccessReference(indexAccessRef, context.get(baseRef.getIdentifier()));
 	}
 
 }

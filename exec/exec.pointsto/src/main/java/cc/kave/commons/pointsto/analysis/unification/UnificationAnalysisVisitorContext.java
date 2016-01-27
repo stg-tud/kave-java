@@ -216,8 +216,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (loc1.isBottom()) {
 			unionRep.setLocation(loc2);
 			if (loc2.isBottom()) {
-				pending.put(unionRep, rep1);
-				pending.put(unionRep, rep2);
+				if (unionRep != rep1) {
+					pending.put(unionRep, rep1);
+				}
+				if (unionRep != rep2) {
+					pending.put(unionRep, rep2);
+				}
 			} else {
 				for (SetRepresentative x : pending.get(rep1)) {
 					join(unionRep, x);
@@ -321,6 +325,23 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	public void copy(IVariableReference dest, IVariableReference src) {
 		copy(dest.accept(distinctReferenceCreationVisitor, namesToReferences),
 				src.accept(distinctReferenceCreationVisitor, namesToReferences));
+	}
+
+	private void copy(DistinctReference dest, DistinctReference src) {
+		Asserts.assertNotNull(dest);
+		Asserts.assertNotNull(src);
+		ReferenceLocation destLocation = getOrCreateLocation(dest);
+		ReferenceLocation srcLocation = getOrCreateLocation(src);
+		copy(destLocation, srcLocation);
+	}
+
+	private void copy(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
+		SetRepresentative repDest = unionFind.find(destLocation.getSetRepresentative());
+		SetRepresentative repSrc = unionFind.find(srcLocation.getSetRepresentative());
+
+		if (repDest != repSrc) {
+			cjoin(repDest, repSrc);
+		}
 	}
 
 	public void assign(IFieldReference dest, IFieldReference src) {
@@ -461,23 +482,6 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation tempLoc = createReferenceLocation();
 		readArray(tempLoc, src);
 		writeArray(dest, tempLoc);
-	}
-
-	private void copy(DistinctReference dest, DistinctReference src) {
-		Asserts.assertNotNull(dest);
-		Asserts.assertNotNull(src);
-		ReferenceLocation destLocation = getOrCreateLocation(dest);
-		ReferenceLocation srcLocation = getOrCreateLocation(src);
-		copy(destLocation, srcLocation);
-	}
-
-	private void copy(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
-		SetRepresentative repDest = unionFind.find(destLocation.getSetRepresentative());
-		SetRepresentative repSrc = unionFind.find(srcLocation.getSetRepresentative());
-
-		if (repDest != repSrc) {
-			cjoin(repDest, repSrc);
-		}
 	}
 
 	public void readField(IVariableReference destRef, IFieldReference fieldRef) {
@@ -654,7 +658,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			return;
 		}
 
-		requestedReturnReferences.put(method, targetRef.accept(distinctReferenceCreationVisitor, namesToReferences));
+		DistinctReference distRef = targetRef.accept(distinctReferenceCreationVisitor, namesToReferences);
+		requestedReturnReferences.put(method, distRef);
 	}
 
 	private class DistinctAssignmentHandler extends AssignmentHandler<DistinctReference> {

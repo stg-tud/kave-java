@@ -52,6 +52,7 @@ public class DistinctIndexAccessReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((baseReference == null) ? 0 : baseReference.hashCode());
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		return result;
 	}
@@ -65,6 +66,11 @@ public class DistinctIndexAccessReference implements DistinctReference {
 		if (getClass() != obj.getClass())
 			return false;
 		DistinctIndexAccessReference other = (DistinctIndexAccessReference) obj;
+		if (baseReference == null) {
+			if (other.baseReference != null)
+				return false;
+		} else if (!baseReference.equals(other.baseReference))
+			return false;
 		if (reference == null) {
 			if (other.reference != null)
 				return false;

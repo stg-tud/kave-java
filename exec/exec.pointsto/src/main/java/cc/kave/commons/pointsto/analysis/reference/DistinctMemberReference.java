@@ -24,7 +24,7 @@ public abstract class DistinctMemberReference implements DistinctReference {
 	public DistinctMemberReference(IMemberReference memberReference, DistinctReference baseReference) {
 		this.memberReference = memberReference;
 		this.baseReference = baseReference;
-		
+
 		if (!isStaticMember()) {
 			Asserts.assertTrue(memberReference.getReference().equals(baseReference.getReference()));
 		}
@@ -45,6 +45,7 @@ public abstract class DistinctMemberReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((baseReference == null) ? 0 : baseReference.hashCode());
 		result = prime * result + ((memberReference == null) ? 0 : memberReference.hashCode());
 		return result;
 	}
@@ -58,6 +59,11 @@ public abstract class DistinctMemberReference implements DistinctReference {
 		if (getClass() != obj.getClass())
 			return false;
 		DistinctMemberReference other = (DistinctMemberReference) obj;
+		if (baseReference == null) {
+			if (other.baseReference != null)
+				return false;
+		} else if (!baseReference.equals(other.baseReference))
+			return false;
 		if (memberReference == null) {
 			if (other.memberReference != null)
 				return false;

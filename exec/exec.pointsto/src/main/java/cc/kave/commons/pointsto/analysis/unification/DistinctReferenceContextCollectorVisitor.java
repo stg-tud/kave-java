@@ -191,12 +191,14 @@ public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<Dis
 	@Override
 	public Void visit(IFieldReference fieldRef, DistinctReferenceContextCollector context) {
 		context.useReference(fieldRef);
+		context.useReference(fieldRef.getReference());
 		return null;
 	}
 
 	@Override
 	public Void visit(IPropertyReference propertyRef, DistinctReferenceContextCollector context) {
 		context.useReference(propertyRef);
+		context.useReference(propertyRef.getReference());
 		return null;
 	}
 
