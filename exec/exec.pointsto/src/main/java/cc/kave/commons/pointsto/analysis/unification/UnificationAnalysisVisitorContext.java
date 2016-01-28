@@ -90,7 +90,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		for (Map.Entry<DistinctReference, ReferenceLocation> entry : referenceLocations.entrySet()) {
 			DistinctReference reference = entry.getKey();
 
-			SetRepresentative ecr = unionFind.find(entry.getValue().getSetRepresentative());
+			SetRepresentative ecr = unionFind.find(entry.getValue().getLocation().getSetRepresentative());
 
 			AbstractLocation abstractLocation = refToAbstractLocation.get(ecr);
 			if (abstractLocation == null) {
@@ -106,10 +106,11 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void createImplicitLocations(Context context) {
 		DistinctReference thisRef = namesToReferences.get(languageOptions.getThisName());
+		allocate(thisRef);
 		DistinctReference superRef = namesToReferences.get(languageOptions.getSuperName());
 
 		// create locations and let 'this' and 'super' point to the same object
-		copy(thisRef, superRef);
+		copy(superRef, thisRef);
 	}
 
 	public void finalize() {
@@ -154,6 +155,19 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 				}
 			}
 		}
+
+		finalizePendingJoins();
+	}
+
+	private void finalizePendingJoins() {
+		for (SetRepresentative rep : pending.keySet()) {
+			for (SetRepresentative x : pending.get(rep)) {
+				join(rep, x);
+			}
+		}
+		pending.clear();
+	}
+
 	}
 
 	private ReferenceLocation createReferenceLocation() {
@@ -217,10 +231,10 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			unionRep.setLocation(loc2);
 			if (loc2.isBottom()) {
 				if (unionRep != rep1) {
-					pending.put(unionRep, rep1);
+					pending.putAll(unionRep, pending.get(rep1));
 				}
 				if (unionRep != rep2) {
-					pending.put(unionRep, rep2);
+					pending.putAll(unionRep, pending.get(rep2));
 				}
 			} else {
 				for (SetRepresentative x : pending.get(rep1)) {
@@ -336,11 +350,11 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void copy(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
-		SetRepresentative repDest = unionFind.find(destLocation.getSetRepresentative());
-		SetRepresentative repSrc = unionFind.find(srcLocation.getSetRepresentative());
+		SetRepresentative derefDestRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
+		SetRepresentative derefSrcRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
 
-		if (repDest != repSrc) {
-			cjoin(repDest, repSrc);
+		if (derefDestRep != derefSrcRep) {
+			cjoin(derefDestRep, derefSrcRep);
 		}
 	}
 
