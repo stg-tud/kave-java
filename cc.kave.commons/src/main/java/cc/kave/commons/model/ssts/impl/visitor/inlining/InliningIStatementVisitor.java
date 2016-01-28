@@ -24,6 +24,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -348,5 +349,5 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 		context.addStatement(statement);
 		return null;
 	}
-
+	
 }

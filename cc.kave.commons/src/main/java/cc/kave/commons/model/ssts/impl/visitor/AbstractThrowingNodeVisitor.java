@@ -295,12 +295,12 @@ public abstract class AbstractThrowingNodeVisitor<TContext, TReturn> implements 
 	}
 
 	@Override
-	public TReturn visit(IBinaryExpression indexAccessRef, TContext context) {
+	public TReturn visit(IBinaryExpression expr, TContext context) {
 		throw new RuntimeException();
 	}
 
 	@Override
-	public TReturn visit(IUnaryExpression indexAccessRef, TContext context) {
+	public TReturn visit(IUnaryExpression expr, TContext context) {
 		throw new RuntimeException();
 	}
 }

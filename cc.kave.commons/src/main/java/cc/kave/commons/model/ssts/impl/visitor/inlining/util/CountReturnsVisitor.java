@@ -18,11 +18,16 @@ import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -283,15 +288,43 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 		return null;
 	}
 
+	public Void visit(IEventSubscriptionStatement stmt, CountReturnContext context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+	
+	@Override
+	public Void visit(IBinaryExpression expr, CountReturnContext context) {
+		expr.getLeftOperand().accept(this, context);
+		expr.getRightOperand().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnaryExpression expr, CountReturnContext context) {
+		expr.getOperand().accept(this, context);
+		return null;
+	}
+	
+	@Override
+	public Void visit(ICastExpression expr, CountReturnContext context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IIndexAccessExpression expr, CountReturnContext context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(ITypeCheckExpression expr, CountReturnContext context) {
+		return null;
+	}
+	
 	public void visit(List<IStatement> body, CountReturnContext context) {
 		for (IStatement statement : body) {
 			statement.accept(this, context);
 		}
-	}
-
-	public Void visit(IEventSubscriptionStatement stmt, CountReturnContext context) {
-		stmt.getExpression().accept(this, context);
-		return null;
 	}
 
 }

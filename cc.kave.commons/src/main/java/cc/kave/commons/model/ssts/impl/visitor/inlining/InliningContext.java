@@ -121,6 +121,8 @@ public class InliningContext {
 
 	public void enterScope(List<IStatement> body, Map<IVariableReference, IVariableReference> preChangedNames) {
 		Set<IVariableReference> newNames = collectNames(body);
+		for(IVariableReference ref : newNames)
+			System.out.println(ref.getIdentifier());
 		Scope newScope = new Scope();
 		if (scope != null) {
 			newScope.existingIds.addAll(scope.existingIds);

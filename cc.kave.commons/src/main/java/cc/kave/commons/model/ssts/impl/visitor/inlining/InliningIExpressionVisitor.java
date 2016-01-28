@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
@@ -11,22 +12,32 @@ import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
@@ -244,5 +255,48 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 		expression.setToken(entity.getToken());
 		return expression;
 		// TODO tests
+	}
+	
+	@Override
+	public IExpression visit(IUnaryExpression expr, InliningContext context){
+		UnaryExpression expression = new UnaryExpression();
+		expression.setOperator(expr.getOperator());
+		expression.setOperand((ISimpleExpression) expr.getOperand().accept(context.getExpressionVisitor(), context));
+		return expression;
+	}
+	
+	@Override
+	public IExpression visit(ICastExpression expr, InliningContext context){
+		CastExpression expression = new CastExpression();
+		expression.setOperator(expr.getOperator());
+		expression.setTargetType(expr.getTargetType());
+		expression.setReference((IVariableReference) expr.getReference().accept(context.getReferenceVisitor(), context));
+		return expression;
+	}
+	
+	@Override
+	public IExpression visit(ITypeCheckExpression expr, InliningContext context){
+		TypeCheckExpression expression = new TypeCheckExpression();
+		expression.setReference((IVariableReference) expr.getReference().accept(context.getReferenceVisitor(), context));
+		expression.setType(expr.getType());
+		return expression;
+	}
+	
+	@Override
+	public IExpression visit(IBinaryExpression expr, InliningContext context) {
+		BinaryExpression expression = new BinaryExpression();
+		expression.setOperator(expr.getOperator());
+		expression.setLeftOperand((ISimpleExpression) expr.getLeftOperand().accept(context.getExpressionVisitor(), context));
+		expression.setRightOperand((ISimpleExpression) expr.getRightOperand().accept(context.getExpressionVisitor(), context));
+		return expression;
+	}
+	
+	@Override
+	public IExpression visit(IIndexAccessExpression expr, InliningContext context) {
+		IndexAccessExpression expression = new IndexAccessExpression();
+		for(ISimpleExpression e : expr.getIndices())
+			expression.getIndices().add((ISimpleExpression) e.accept(context.getExpressionVisitor(), context));
+		expression.setReference((IVariableReference) expr.getReference().accept(context.getReferenceVisitor(), context));
+		return expression;
 	}
 }

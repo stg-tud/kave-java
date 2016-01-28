@@ -20,11 +20,17 @@ import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -277,6 +283,38 @@ public class InvocationMethodNameVisitor extends AbstractThrowingNodeVisitor<Set
 	}
 
 	public Void visit(IEventSubscriptionStatement stmt, Set<IMethodName> context) {
+		stmt.getExpression().accept(this, context);
+		return null;
+	}
+	
+	@Override
+	public Void visit(IBinaryExpression expr, Set<IMethodName> context) {
+		expr.getLeftOperand().accept(this, context);
+		expr.getRightOperand().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnaryExpression expr, Set<IMethodName> context) {
+		expr.getOperand().accept(this, context);
+		return null;
+	}
+	
+	@Override
+	public Void visit(ICastExpression expr, Set<IMethodName> context) {
+		return null;
+	}
+
+	@Override
+	public Void visit(IIndexAccessExpression expr, Set<IMethodName> context) {
+		for(ISimpleExpression e : expr.getIndices()){
+			e.accept(this, context);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ITypeCheckExpression expr, Set<IMethodName> context) {
 		return null;
 	}
 }
