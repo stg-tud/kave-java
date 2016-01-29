@@ -12,21 +12,26 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-public class ReferenceLocation extends Location {
+import java.util.List;
 
-	private Location location;
+public class FunctionLocation extends Location {
 
-	public ReferenceLocation(Location location, SetRepresentative setRepresentative) {
+	private List<ReferenceLocation> parameterLocations;
+	private ReferenceLocation returnLocation;
+
+	public FunctionLocation(List<ReferenceLocation> parameterLocations, ReferenceLocation returnLocation,
+			SetRepresentative setRepresentative) {
 		super(setRepresentative);
-		this.location = location;
+		this.parameterLocations = parameterLocations;
+		this.returnLocation = returnLocation;
 	}
 
-	public Location getLocation() {
-		return location;
+	public List<ReferenceLocation> getParameterLocations() {
+		return parameterLocations;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
+	public ReferenceLocation getReturnLocation() {
+		return returnLocation;
 	}
 
 	@Override

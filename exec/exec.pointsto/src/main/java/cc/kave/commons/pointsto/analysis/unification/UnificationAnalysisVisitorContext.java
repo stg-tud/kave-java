@@ -12,11 +12,16 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-import java.util.Collection;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.alg.util.UnionFind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +32,18 @@ import com.google.common.collect.Multimap;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.MemberName;
 import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -42,10 +51,12 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.DistinctReferenceVisitorContext;
-import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctLambdaParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctMemberReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
@@ -67,14 +78,15 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private Map<DistinctReference, ReferenceLocation> referenceLocations = new HashMap<>();
 
 	private IAssignment lastAssignment;
+	private MemberName currentMember;
+	private Deque<Pair<ILambdaExpression, ReferenceLocation>> lambdaStack = new ArrayDeque<>();
 
 	private DeclarationMapper declarationMapper;
-	private MemberName currentMember;
-	private Multimap<MemberName, DistinctReference> returnedReferences = HashMultimap.create();
-	private Multimap<MemberName, DistinctReference> requestedReturnReferences = HashMultimap.create();
-	private Multimap<PropertyName, ReferenceLocation> requestedReturnLocations = HashMultimap.create();
 
-	private DistinctAssignmentHandler distinctAssignmentHandler = new DistinctAssignmentHandler();
+	private Map<MemberName, ReferenceLocation> returnLocations = new HashMap<>();
+
+	private DestinationLocationVisitor destLocationVisitor = new DestinationLocationVisitor();
+	private SourceLocationVisitor srcLocationVisitor = new SourceLocationVisitor();
 
 	public UnificationAnalysisVisitorContext(Context context) {
 		super(context);
@@ -114,60 +126,15 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public void finalize() {
-		// connect destination of method / property invocations to the returned references
-		for (Map.Entry<MemberName, DistinctReference> requestedRefEntry : requestedReturnReferences.entries()) {
-			Collection<DistinctReference> returnedRefs = returnedReferences.get(requestedRefEntry.getKey());
-			DistinctReference destRef = requestedRefEntry.getValue();
-
-			if (returnedRefs.isEmpty()) {
-				// no returned location available (probably a call to a method of another class)
-				allocate(destRef);
-			} else {
-				for (DistinctReference returnedRef : returnedRefs) {
-					distinctAssignmentHandler.process(destRef, returnedRef);
-				}
-			}
-		}
-
-		// connect destination of custom property getters to the returned references
-		for (Map.Entry<PropertyName, ReferenceLocation> requestedLocEntry : requestedReturnLocations.entries()) {
-			Collection<DistinctReference> returnedRefs = returnedReferences.get(requestedLocEntry.getKey());
-			ReferenceLocation destLocation = requestedLocEntry.getValue();
-
-			for (DistinctReference returnedRef : returnedRefs) {
-				IReference sstRef = returnedRef.getReference();
-				if (sstRef instanceof IVariableReference) {
-					copy(destLocation, getOrCreateLocation(returnedRef));
-				} else if (sstRef instanceof IFieldReference) {
-					IFieldReference fieldRef = (IFieldReference) sstRef;
-					readMember(destLocation, fieldRef, fieldRef.getFieldName());
-				} else if (sstRef instanceof IPropertyReference) {
-					IPropertyReference propertyRef = (IPropertyReference) sstRef;
-					if (treatPropertyAsField(propertyRef)) {
-						copy(destLocation, getOrCreateLocation(returnedRef));
-					} else {
-						readMember(destLocation, propertyRef, propertyRef.getPropertyName());
-					}
-				} else if (sstRef instanceof IUnknownReference) {
-					LOGGER.error("Ignoring unknown reference");
-				} else {
-					throw new UnexpectedSSTNodeException(sstRef);
-				}
-			}
-		}
-
 		finalizePendingJoins();
 	}
 
 	private void finalizePendingJoins() {
-		for (SetRepresentative rep : pending.keySet()) {
-			for (SetRepresentative x : pending.get(rep)) {
-				join(rep, x);
-			}
+		while (!pending.isEmpty()) {
+			Map.Entry<SetRepresentative, SetRepresentative> entry = pending.entries().iterator().next();
+			join(entry.getKey(), entry.getValue());
+			pending.remove(entry.getKey(), entry.getValue());
 		}
-		pending.clear();
-	}
-
 	}
 
 	private ReferenceLocation createReferenceLocation() {
@@ -182,12 +149,58 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return refLocation;
 	}
 
+	private FunctionLocation createFunctionLocation(ILambdaExpression lambdaExpr) {
+		List<ParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
+		List<ReferenceLocation> parameterLocations = new ArrayList<>(lambdaParameters.size());
+
+		for (ParameterName formalParameter : lambdaParameters) {
+			DistinctReference distRef = new DistinctLambdaParameterReference(formalParameter, lambdaExpr);
+			ReferenceLocation formalParameterLocation = getOrCreateLocation(distRef);
+
+			parameterLocations.add(formalParameterLocation);
+		}
+
+		Pair<ILambdaExpression, ReferenceLocation> currentLambdaEntry = lambdaStack.getFirst();
+		Asserts.assertTrue(lambdaExpr == currentLambdaEntry.getKey());
+
+		SetRepresentative functionRep = new SetRepresentative();
+		unionFind.addElement(functionRep);
+		return new FunctionLocation(parameterLocations, currentLambdaEntry.getValue(), functionRep);
+	}
+
+	private FunctionLocation createFunctionLocation(MethodName method) {
+		List<ParameterName> methodParameters = method.getParameters();
+		List<ReferenceLocation> parameterLocations = new ArrayList<>(methodParameters.size());
+
+		for (ParameterName formalParameter : methodParameters) {
+			DistinctMethodParameterReference distRef = new DistinctMethodParameterReference(formalParameter, method);
+			ReferenceLocation formalParameterLocation = getOrCreateLocation(distRef);
+
+			parameterLocations.add(formalParameterLocation);
+		}
+
+		SetRepresentative functionRep = new SetRepresentative();
+		unionFind.addElement(functionRep);
+		return new FunctionLocation(parameterLocations, getOrCreateReturnLocation(method), functionRep);
+	}
+
 	private ReferenceLocation getOrCreateLocation(DistinctReference reference) {
 		ReferenceLocation location = referenceLocations.get(reference);
 
 		if (location == null) {
 			location = createReferenceLocation();
 			referenceLocations.put(reference, location);
+		}
+
+		return location;
+	}
+
+	private ReferenceLocation getOrCreateReturnLocation(MemberName member) {
+		ReferenceLocation location = returnLocations.get(member);
+
+		if (location == null) {
+			location = createReferenceLocation();
+			returnLocations.put(member, location);
 		}
 
 		return location;
@@ -219,6 +232,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void join(SetRepresentative rep1, SetRepresentative rep2) {
+		rep1 = unionFind.find(rep1);
+		rep2 = unionFind.find(rep2);
+		if (rep1 == rep2) {
+			// prevent indefinite loop when finalizing the set of pending joins
+			return;
+		}
+
 		Location loc1 = rep1.getLocation();
 		Location loc2 = rep2.getLocation();
 
@@ -250,10 +270,17 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 				}
 				pending.removeAll(rep2);
 			} else {
-				// both locations are not bottom -> must be references
-				unify((ReferenceLocation) loc1, (ReferenceLocation) loc2);
+				unify(loc1, loc2);
 			}
 
+		}
+	}
+
+	private void unify(Location loc1, Location loc2) {
+		if (loc1 instanceof ReferenceLocation && loc2 instanceof ReferenceLocation) {
+			unify((ReferenceLocation) loc1, (ReferenceLocation) loc2);
+		} else if (loc1 instanceof FunctionLocation && loc2 instanceof FunctionLocation) {
+			unify((FunctionLocation) loc1, (FunctionLocation) loc2);
 		}
 	}
 
@@ -267,38 +294,71 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (rep1 != rep2) {
 			join(rep1, rep2);
 		}
+	}
 
+	private void unify(FunctionLocation funLoc1, FunctionLocation funLoc2) {
+		List<ReferenceLocation> fun1Parameters = funLoc1.getParameterLocations();
+		List<ReferenceLocation> fun2Parameters = funLoc2.getParameterLocations();
+
+		Asserts.assertEquals(fun1Parameters.size(), fun2Parameters.size());
+		for (int i = 0; i < fun1Parameters.size(); ++i) {
+			unify(fun1Parameters.get(i), fun2Parameters.get(i));
+		}
+
+		unify(funLoc1.getReturnLocation(), funLoc2.getReturnLocation());
+	}
+
+	public ReferenceLocation getLocation(IVariableReference varRef) {
+		DistinctReference distRef = varRef.accept(distinctReferenceCreationVisitor, namesToReferences);
+		return getOrCreateLocation(distRef);
+	}
+
+	public void setCurrentMember(MemberName member) {
+		this.currentMember = member;
 	}
 
 	public void setLastAssignment(IAssignment assignment) {
 		lastAssignment = assignment;
 	}
 
-	public void allocate(IInvocationExpression invocation) {
-		if (lastAssignment == null || lastAssignment.getExpression() != invocation) {
-			// allocated object not bound to a name
-			return;
+	public IAssignableReference getDestinationForExpr(IAssignableExpression expr) {
+		if (lastAssignment == null || lastAssignment.getReference() instanceof IUnknownReference
+				|| lastAssignment.getExpression() != expr) {
+			return null;
+		} else {
+			return lastAssignment.getReference();
 		}
+	}
 
-		IAssignableReference targetRef = lastAssignment.getReference();
-		if (targetRef instanceof IUnknownReference) {
+	public void enterLambda(ILambdaExpression lambdaExpr) {
+		ReferenceLocation lambdaReturnLocation = createReferenceLocation();
+		lambdaStack.addFirst(ImmutablePair.of(lambdaExpr, lambdaReturnLocation));
+	}
+
+	public void leaveLambda() {
+		lambdaStack.removeFirst();
+	}
+
+	public void allocate(IAssignableReference destRef) {
+		if (destRef instanceof IUnknownReference) {
 			LOGGER.error("Ignoring an allocation due to an unknown reference");
 			return;
 		}
 
-		DistinctReference distinctReference = lastAssignment.getReference().accept(distinctReferenceCreationVisitor,
-				namesToReferences);
-		allocate(distinctReference);
+		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, null);
+		allocate(destLocation);
 	}
 
 	private void allocate(DistinctReference destRef) {
-		ReferenceLocation location = (ReferenceLocation) unionFind
-				.find(getOrCreateLocation(destRef).getSetRepresentative()).getLocation();
-		Location derefLocation = location.getLocation();
+		allocate(getOrCreateLocation(destRef));
+	}
 
-		if (derefLocation.isBottom()) {
+	private void allocate(ReferenceLocation destLocation) {
+		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+
+		if (derefDestLocation.isBottom()) {
 			ReferenceLocation allocatedLocation = createReferenceLocation();
-			setLocation(derefLocation.getSetRepresentative(), allocatedLocation);
+			setLocation(derefDestLocation.getSetRepresentative(), allocatedLocation);
 		}
 	}
 
@@ -358,6 +418,117 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		}
 	}
 
+	public void storeFunction(IReference destRef, ILambdaExpression lambdaExpr) {
+		Asserts.assertTrue(lambdaExpr == lambdaStack.getFirst().getKey());
+
+		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, null);
+		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+
+		if (derefDestLocation.isBottom()) {
+			FunctionLocation functionLocation = createFunctionLocation(lambdaExpr);
+			setLocation(derefDestLocation.getSetRepresentative(), functionLocation);
+		} else {
+			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
+
+			List<ParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
+			List<DistinctReference> distLambdaParameters = new ArrayList<>(lambdaParameters.size());
+			for (ParameterName lambdaParameter : lambdaParameters) {
+				distLambdaParameters.add(new DistinctLambdaParameterReference(lambdaParameter, lambdaExpr));
+			}
+
+			ReferenceLocation lambdaReturnLocation = lambdaStack.getFirst().getValue();
+
+			updateFunctionLocation(functionLocation, distLambdaParameters, lambdaReturnLocation);
+		}
+
+	}
+
+	public void storeFunction(IReference destRef, IMethodReference methodRef) {
+		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, null);
+		storeFunction(destLocation, methodRef);
+	}
+
+	private void storeFunction(ReferenceLocation destLocation, IMethodReference methodRef) {
+		MethodName method = methodRef.getMethodName();
+
+		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+
+		if (derefDestLocation.isBottom()) {
+			FunctionLocation functionLocation = createFunctionLocation(method);
+			setLocation(derefDestLocation.getSetRepresentative(), functionLocation);
+		} else {
+			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
+
+			List<ParameterName> methodParameters = method.getParameters();
+			List<DistinctReference> distMethodParameters = new ArrayList<>(methodParameters.size());
+			for (ParameterName parameter : methodParameters) {
+				distMethodParameters.add(new DistinctMethodParameterReference(parameter, method));
+			}
+
+			updateFunctionLocation(functionLocation, distMethodParameters, getOrCreateReturnLocation(method));
+		}
+	}
+
+	private void updateFunctionLocation(FunctionLocation functionLocation, List<DistinctReference> newParameters,
+			ReferenceLocation newReturnLocation) {
+		List<ReferenceLocation> funLocParameters = functionLocation.getParameterLocations();
+		Asserts.assertEquals(funLocParameters.size(), newParameters.size());
+
+		for (int i = 0; i < newParameters.size(); ++i) {
+			DistinctReference distParameterRef = newParameters.get(i);
+			ReferenceLocation newParameterLocation = getOrCreateLocation(distParameterRef);
+			SetRepresentative derefNewParameterLocationRep = unionFind
+					.find(newParameterLocation.getLocation().getSetRepresentative());
+			SetRepresentative derefFunLocParameterRep = unionFind
+					.find(funLocParameters.get(i).getLocation().getSetRepresentative());
+
+			if (derefFunLocParameterRep != derefNewParameterLocationRep) {
+				join(derefNewParameterLocationRep, derefFunLocParameterRep);
+			}
+		}
+
+		SetRepresentative derefNewReturnLocRep = unionFind.find(newReturnLocation.getLocation().getSetRepresentative());
+		SetRepresentative derefFunLocReturnRep = unionFind
+				.find(functionLocation.getReturnLocation().getLocation().getSetRepresentative());
+		if (derefFunLocReturnRep != derefNewReturnLocRep) {
+			join(derefFunLocReturnRep, derefNewReturnLocRep);
+		}
+	}
+
+	public FunctionLocation invokeDelegate(IInvocationExpression invocation) {
+		MethodName method = invocation.getMethodName();
+
+		DistinctReference receiverRef = invocation.getReference().accept(distinctReferenceCreationVisitor,
+				namesToReferences);
+		ReferenceLocation receiverLoc = getOrCreateLocation(receiverRef);
+		Location derefReceiverLoc = unionFind.find(receiverLoc.getLocation().getSetRepresentative()).getLocation();
+
+		FunctionLocation functionLocation;
+		if (derefReceiverLoc.isBottom()) {
+			functionLocation = createFunctionLocation(method);
+			setLocation(derefReceiverLoc.getSetRepresentative(), functionLocation);
+		} else {
+			functionLocation = (FunctionLocation) derefReceiverLoc;
+		}
+
+		return functionLocation;
+	}
+
+	public List<ReferenceLocation> getMethodParameterLocations(MethodName method) {
+		List<ParameterName> formalParameters = method.getParameters();
+		List<ReferenceLocation> parameterLocations = new ArrayList<>(formalParameters.size());
+		for (ParameterName parameter : formalParameters) {
+			DistinctReference distParameterRef = new DistinctMethodParameterReference(parameter, method);
+			parameterLocations.add(getOrCreateLocation(distParameterRef));
+		}
+
+		return parameterLocations;
+	}
+
+	public ReferenceLocation getMethodReturnLocation(MethodName method) {
+		return getOrCreateReturnLocation(method);
+	}
+
 	public void assign(IFieldReference dest, IFieldReference src) {
 		assign((DistinctFieldReference) dest.accept(distinctReferenceCreationVisitor, namesToReferences),
 				(DistinctFieldReference) src.accept(distinctReferenceCreationVisitor, namesToReferences));
@@ -380,7 +551,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
-			requestedReturnLocations.put(srcProperty, tempLoc);
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(srcProperty);
+			copy(tempLoc, returnLocation);
 		}
 
 		PropertyName destProperty = dest.getReference().getPropertyName();
@@ -423,7 +595,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
-			requestedReturnLocations.put(srcProperty, tempLoc);
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(srcProperty);
+			copy(tempLoc, returnLocation);
 		}
 
 		writeMember(dest, tempLoc);
@@ -482,14 +655,19 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
-			requestedReturnLocations.put(srcProperty, tempLoc);
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(srcProperty);
+			copy(tempLoc, returnLocation);
 		}
 
 		writeArray(dest, tempLoc);
 	}
 
 	public void assign(IIndexAccessReference dest, IIndexAccessReference src) {
-		assign((DistinctIndexAccessReference) dest, (DistinctIndexAccessReference) src);
+		DistinctIndexAccessReference distDestRef = (DistinctIndexAccessReference) dest
+				.accept(distinctReferenceCreationVisitor, namesToReferences);
+		DistinctIndexAccessReference distSrcRef = (DistinctIndexAccessReference) src
+				.accept(distinctReferenceCreationVisitor, namesToReferences);
+		assign(distDestRef, distSrcRef);
 	}
 
 	private void assign(DistinctIndexAccessReference dest, DistinctIndexAccessReference src) {
@@ -503,14 +681,10 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void readField(DistinctReference destRef, IFieldReference fieldRef) {
-		readMember(getOrCreateLocation(destRef), fieldRef, fieldRef.getFieldName());
-	}
-
-	private void readField(DistinctReference destRef, DistinctFieldReference fieldRef) {
 		readMember(getOrCreateLocation(destRef), fieldRef);
 	}
 
-	private void readMember(ReferenceLocation destLocation, IMemberReference memberRef, MemberName member) {
+	private void readMember(ReferenceLocation destLocation, IMemberReference memberRef) {
 		DistinctReference distinctMemberRef = memberRef.accept(distinctReferenceCreationVisitor, namesToReferences);
 		readMember(destLocation, (DistinctMemberReference) distinctMemberRef);
 	}
@@ -565,12 +739,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void readProperty(DistinctReference destRef, DistinctPropertyReference propertyRef) {
+		ReferenceLocation destLocation = getOrCreateLocation(destRef);
 		PropertyName property = propertyRef.getReference().getPropertyName();
 		if (treatPropertyAsField(propertyRef.getReference())) {
-			ReferenceLocation destLocation = getOrCreateLocation(destRef);
 			readMember(destLocation, propertyRef);
 		} else {
-			requestedReturnReferences.put(property, destRef);
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(property);
+			copy(destLocation, returnLocation);
 		}
 	}
 
@@ -635,134 +810,124 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		writeDereference(destLocation, srcLocation);
 	}
 
-	public void setCurrentMember(MemberName member) {
-		this.currentMember = member;
+	public void registerParameterReference(ReferenceLocation parameterLocation, IVariableReference actualParameter) {
+		copy(parameterLocation, getLocation(actualParameter));
 	}
 
-	public void registerParameterReference(DistinctReference formalParameter, IVariableReference actualParameter) {
-		copy(formalParameter, actualParameter.accept(distinctReferenceCreationVisitor, namesToReferences));
+	public void registerParameterReference(ReferenceLocation parameterLocation, IFieldReference actualParameter) {
+		readMember(parameterLocation, actualParameter);
 	}
 
-	public void registerParameterReference(DistinctReference formalParameter, IFieldReference actualParameter) {
-		readField(formalParameter, actualParameter);
+	public void registerParameterReference(ReferenceLocation parameterLocation, IPropertyReference actualParameter) {
+		readMember(parameterLocation, actualParameter);
 	}
 
-	public void registerParameterReference(DistinctReference formalParameter, IPropertyReference actualParameter) {
-		readProperty(formalParameter, actualParameter);
+	public void registerParameterReference(ReferenceLocation parameterLocation, IMethodReference actualParameter) {
+		storeFunction(parameterLocation, actualParameter);
 	}
 
 	public void registerReturnReference(IReference ref) {
 		if (ref instanceof IUnknownReference) {
 			LOGGER.error("Ignoring returning of an unknown reference");
 		} else {
-			returnedReferences.put(currentMember, ref.accept(distinctReferenceCreationVisitor, namesToReferences));
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(currentMember);
+			ReferenceLocation srcLocation = ref.accept(srcLocationVisitor, null);
+
+			copy(returnLocation, srcLocation);
 		}
 	}
 
-	public void requestReturnReference(IInvocationExpression invocation) {
-		MethodName method = invocation.getMethodName();
-		if (lastAssignment == null || lastAssignment.getExpression() != invocation) {
-			// returned object ignored
-			return;
-		}
-
-		IAssignableReference targetRef = lastAssignment.getReference();
-		if (targetRef instanceof IUnknownReference) {
-			LOGGER.error("Ignoring unknown reference");
-			return;
-		}
-
-		DistinctReference distRef = targetRef.accept(distinctReferenceCreationVisitor, namesToReferences);
-		requestedReturnReferences.put(method, distRef);
+	public void storeReturn(IAssignableReference destRef, ReferenceLocation returnLocation) {
+		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, null);
+		copy(destLocation, returnLocation);
 	}
 
-	private class DistinctAssignmentHandler extends AssignmentHandler<DistinctReference> {
+	private class DestinationLocationVisitor extends FailSafeNodeVisitor<Void, ReferenceLocation> {
 
 		@Override
-		protected IReference getReference(DistinctReference entry) {
-			return entry.getReference();
+		public ReferenceLocation visit(IVariableReference varRef, Void context) {
+			return getLocation(varRef);
 		}
 
 		@Override
-		protected void assignVarToVar(DistinctReference dest, DistinctReference src) {
-			copy(dest, src);
+		public ReferenceLocation visit(IFieldReference fieldRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+			DistinctFieldReference distRef = (DistinctFieldReference) fieldRef.accept(distinctReferenceCreationVisitor,
+					namesToReferences);
+			writeMember(distRef, tempLoc);
+			return tempLoc;
 		}
 
 		@Override
-		protected void assignFieldToVar(DistinctReference dest, DistinctReference src) {
-			readField(dest, (DistinctFieldReference) src);
+		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+
+			PropertyName property = propertyRef.getPropertyName();
+			if (treatPropertyAsField(propertyRef)) {
+				DistinctPropertyReference distRef = (DistinctPropertyReference) propertyRef
+						.accept(distinctReferenceCreationVisitor, namesToReferences);
+				writeMember(distRef, tempLoc);
+			} else {
+				DistinctReference destPropertyParameter = new DistinctPropertyParameterReference(languageOptions,
+						property);
+				copy(getOrCreateLocation(destPropertyParameter), tempLoc);
+			}
+
+			return tempLoc;
 		}
 
 		@Override
-		protected void assignPropToVar(DistinctReference dest, DistinctReference src) {
-			readProperty(dest, (DistinctPropertyReference) src);
+		public ReferenceLocation visit(IIndexAccessReference indexAccessRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+			DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) indexAccessRef
+					.accept(distinctReferenceCreationVisitor, namesToReferences);
+			writeArray(distRef, tempLoc);
+			return tempLoc;
+		}
+
+	}
+
+	private class SourceLocationVisitor extends FailSafeNodeVisitor<Void, ReferenceLocation> {
+
+		@Override
+		public ReferenceLocation visit(IVariableReference varRef, Void context) {
+			return getLocation(varRef);
 		}
 
 		@Override
-		protected void assignVarToField(DistinctReference dest, DistinctReference src) {
-			writeField((DistinctFieldReference) dest, src);
+		public ReferenceLocation visit(IFieldReference fieldRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+			DistinctFieldReference distRef = (DistinctFieldReference) fieldRef.accept(distinctReferenceCreationVisitor,
+					namesToReferences);
+			readMember(tempLoc, distRef);
+			return tempLoc;
 		}
 
 		@Override
-		protected void assignFieldToField(DistinctReference dest, DistinctReference src) {
-			assign((DistinctFieldReference) dest, (DistinctFieldReference) src);
+		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+
+			PropertyName property = propertyRef.getPropertyName();
+			if (treatPropertyAsField(propertyRef)) {
+				DistinctPropertyReference distRef = (DistinctPropertyReference) propertyRef
+						.accept(distinctReferenceCreationVisitor, namesToReferences);
+				readMember(tempLoc, distRef);
+			} else {
+				ReferenceLocation returnLocation = getOrCreateReturnLocation(property);
+				copy(tempLoc, returnLocation);
+			}
+
+			return tempLoc;
 		}
 
 		@Override
-		protected void assignPropToField(DistinctReference dest, DistinctReference src) {
-			assign((DistinctFieldReference) dest, (DistinctPropertyReference) src);
+		public ReferenceLocation visit(IIndexAccessReference indexAccessRef, Void context) {
+			ReferenceLocation tempLoc = createReferenceLocation();
+			DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) indexAccessRef
+					.accept(distinctReferenceCreationVisitor, namesToReferences);
+			readArray(tempLoc, distRef);
+			return tempLoc;
 		}
-
-		@Override
-		protected void assignVarToProp(DistinctReference dest, DistinctReference src) {
-			writeProperty((DistinctPropertyReference) dest, src);
-		}
-
-		@Override
-		protected void assignFieldToProp(DistinctReference dest, DistinctReference src) {
-			assign((DistinctPropertyReference) dest, (DistinctFieldReference) src);
-		}
-
-		@Override
-		protected void assignPropToProp(DistinctReference dest, DistinctReference src) {
-			assign((DistinctPropertyReference) dest, (DistinctPropertyReference) src);
-		}
-
-		@Override
-		protected void assignArrayToVar(DistinctReference dest, DistinctReference src) {
-			readArray(dest, (DistinctIndexAccessReference) src);
-		}
-
-		@Override
-		protected void assignArrayToField(DistinctReference dest, DistinctReference src) {
-			assign((DistinctFieldReference) dest, (DistinctIndexAccessReference) src);
-		}
-
-		@Override
-		protected void assignArrayToProp(DistinctReference dest, DistinctReference src) {
-			assign((DistinctPropertyReference) dest, (DistinctIndexAccessReference) src);
-		}
-
-		@Override
-		protected void assignVarToArray(DistinctReference dest, DistinctReference src) {
-			writeArray((DistinctIndexAccessReference) dest, src);
-		}
-
-		@Override
-		protected void assignFieldToArray(DistinctReference dest, DistinctReference src) {
-			assign((DistinctIndexAccessReference) dest, (DistinctFieldReference) src);
-		}
-
-		@Override
-		protected void assignPropToArray(DistinctReference dest, DistinctReference src) {
-			assign((DistinctIndexAccessReference) dest, (DistinctPropertyReference) src);
-		}
-
-		@Override
-		protected void assignArrayToArray(DistinctReference dest, DistinctReference src) {
-			assign((DistinctIndexAccessReference) dest, (DistinctIndexAccessReference) src);
-		}
-
 	}
 
 }

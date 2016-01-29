@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -28,24 +27,28 @@ import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
+import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.ScopingVisitor;
-import cc.kave.commons.pointsto.analysis.exceptions.MissingBaseVariableException;
-import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
+import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 
 public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalysisVisitorContext, Void> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnificationAnalysisVisitor.class);
+
+	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 
 	private ReferenceAssignmentHandler referenceAssignmentHandler = new ReferenceAssignmentHandler();
 	private MethodParameterVisitor parameterVisitor = new MethodParameterVisitor();
@@ -76,11 +79,16 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 		IAssignableReference destRef = stmt.getReference();
 		IAssignableExpression srcExpr = stmt.getExpression();
 
+		if (destRef instanceof IUnknownReference) {
+			LOGGER.error("Ignoring assignment to an unknown reference");
+			return null;
+		}
+
 		try {
 			if (srcExpr instanceof IReferenceExpression) {
 				IReference srcRef = ((IReferenceExpression) srcExpr).getReference();
 
-				if (destRef instanceof IUnknownReference || srcRef instanceof IUnknownReference) {
+				if (srcRef instanceof IUnknownReference) {
 					LOGGER.error("Ignoring an assignment with an unknown reference");
 				} else {
 					referenceAssignmentHandler.setContext(context);
@@ -103,40 +111,80 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 	public Void visit(IInvocationExpression entity, UnificationAnalysisVisitorContext context) {
 		MethodName method = entity.getMethodName();
 
+		IAssignableReference destRef = context.getDestinationForExpr(entity);
+
 		// TODO replace with isUnknown once fixed
 		if (method.equals(CsMethodName.UNKNOWN_NAME)) {
 			// assume that unknown methods return a newly allocated object
-			context.allocate(entity);
+			if (destRef != null) {
+				context.allocate(destRef);
+			}
 			return super.visit(entity, context);
 		}
 
-		if (method.isConstructor()) {
-			context.allocate(entity);
+		List<ReferenceLocation> parameterLocations;
+		ReferenceLocation returnLocation;
+
+		if (method.isConstructor() && destRef != null) {
+			context.allocate(destRef);
+		}
+
+		if (languageOptions.isDelegateInvocation(method)) {
+			// TODO detect a bug where a delegate stored in a property of the class is invoked by using 'this' as the
+			// receiver
+			if (entity.getReference().getIdentifier().equals(languageOptions.getThisName())) {
+				LOGGER.error("Skipping malformed delegate invocation");
+				return null;
+			}
+			FunctionLocation functionLocation = context.invokeDelegate(entity);
+			parameterLocations = functionLocation.getParameterLocations();
+			returnLocation = functionLocation.getReturnLocation();
+		} else {
+			parameterLocations = context.getMethodParameterLocations(method);
+			returnLocation = context.getMethodReturnLocation(method);
 		}
 
 		List<ISimpleExpression> parameters = entity.getParameters();
 		int numberOfFormalParameters = method.getParameters().size();
-		for (int i = 0; i < parameters.size(); ++i) {
-			ISimpleExpression parameterExpr = parameters.get(i);
-			if (parameterExpr instanceof IReferenceExpression) {
-				IReference parameterRef = ((IReferenceExpression) parameterExpr).getReference();
+		if (numberOfFormalParameters == 0 && parameters.size() > 0) {
+			LOGGER.error("Attempted to invoke method {}.{} which expects zero parameters with {} actual parameters",
+					method.getDeclaringType().getName(), method.getName(), parameters.size());
+		} else {
+			for (int i = 0; i < parameters.size(); ++i) {
+				ISimpleExpression parameterExpr = parameters.get(i);
+				if (parameterExpr instanceof IReferenceExpression) {
+					IReference parameterRef = ((IReferenceExpression) parameterExpr).getReference();
 
-				// due to parameter arrays the number of actual parameters can be greater than the number for formal
-				// parameters
-				int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
-				ParameterName formalParameter = method.getParameters().get(formalParameterIndex);
-				DistinctMethodParameterReference formalParameterRef = new DistinctMethodParameterReference(
-						formalParameter, method);
+					// due to parameter arrays the number of actual parameters can be greater than the number for formal
+					// parameters
+					int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
+					ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
 
-				parameterRef.accept(parameterVisitor, new ContextReferencePair(context, formalParameterRef));
+					parameterRef.accept(parameterVisitor, new ContextReferencePair(context, formalParameterLocation));
+				}
 			}
 		}
 
-		if (!method.getReturnType().isVoidType()) {
-			context.requestReturnReference(entity);
+		if (destRef != null && !method.getReturnType().isVoidType()) {
+			context.storeReturn(destRef, returnLocation);
 		}
 
 		return super.visit(entity, context);
+	}
+
+	@Override
+	public Void visit(ILambdaExpression expr, UnificationAnalysisVisitorContext context) {
+		IAssignableReference destRef = context.getDestinationForExpr(expr);
+		context.enterLambda(expr);
+		try {
+			super.visit(expr, context);
+			if (destRef != null) {
+				context.storeFunction(destRef, expr);
+			}
+		} finally {
+			context.leaveLambda();
+		}
+		return null;
 	}
 
 	@Override
@@ -151,12 +199,12 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 	}
 
 	private static class ContextReferencePair {
-		public UnificationAnalysisVisitorContext context;
-		public DistinctReference reference;
+		public UnificationAnalysisVisitorContext analysis;
+		public ReferenceLocation parameterLocation;
 
-		public ContextReferencePair(UnificationAnalysisVisitorContext context, DistinctReference reference) {
-			this.context = context;
-			this.reference = reference;
+		public ContextReferencePair(UnificationAnalysisVisitorContext context, ReferenceLocation parameterLocaction) {
+			this.analysis = context;
+			this.parameterLocation = parameterLocaction;
 		}
 
 	}
@@ -165,19 +213,25 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 		@Override
 		public Void visit(IVariableReference varRef, ContextReferencePair context) {
-			context.context.registerParameterReference(context.reference, varRef);
+			context.analysis.registerParameterReference(context.parameterLocation, varRef);
 			return null;
 		}
 
 		@Override
 		public Void visit(IFieldReference fieldRef, ContextReferencePair context) {
-			context.context.registerParameterReference(context.reference, fieldRef);
+			context.analysis.registerParameterReference(context.parameterLocation, fieldRef);
 			return null;
 		}
 
 		@Override
 		public Void visit(IPropertyReference propertyRef, ContextReferencePair context) {
-			context.context.registerParameterReference(context.reference, propertyRef);
+			context.analysis.registerParameterReference(context.parameterLocation, propertyRef);
+			return null;
+		}
+
+		@Override
+		public Void visit(IMethodReference methodRef, ContextReferencePair context) {
+			context.analysis.registerParameterReference(context.parameterLocation, methodRef);
 			return null;
 		}
 

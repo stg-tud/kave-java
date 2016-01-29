@@ -12,14 +12,21 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 
 public abstract class AssignmentHandler<T> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AssignmentHandler.class);
 
 	protected abstract IReference getReference(T entry);
 
@@ -36,6 +43,10 @@ public abstract class AssignmentHandler<T> {
 				assignPropToVar(dest, src);
 			} else if (srcRef instanceof IIndexAccessReference) {
 				assignArrayToVar(dest, src);
+			} else if (srcRef instanceof IMethodReference) {
+				assignMethodToVar(dest, src);
+			} else if (srcRef instanceof IEventReference) {
+				LOGGER.info("Ignoring event reference");
 			} else {
 				throw new UnexpectedSSTNodeException(srcRef);
 			}
@@ -48,6 +59,10 @@ public abstract class AssignmentHandler<T> {
 				assignPropToField(dest, src);
 			} else if (srcRef instanceof IIndexAccessReference) {
 				assignArrayToField(dest, src);
+			} else if (srcRef instanceof IMethodReference) {
+				assignMethodToField(dest, src);
+			} else if (srcRef instanceof IEventReference) {
+				LOGGER.info("Ignoring event reference");
 			} else {
 				throw new UnexpectedSSTNodeException(srcRef);
 			}
@@ -60,6 +75,10 @@ public abstract class AssignmentHandler<T> {
 				assignPropToProp(dest, src);
 			} else if (srcRef instanceof IIndexAccessReference) {
 				assignArrayToProp(dest, src);
+			} else if (srcRef instanceof IMethodReference) {
+				assignMethodToProp(dest, src);
+			} else if (srcRef instanceof IEventReference) {
+				LOGGER.info("Ignoring event reference");
 			} else {
 				throw new UnexpectedSSTNodeException(srcRef);
 			}
@@ -72,6 +91,10 @@ public abstract class AssignmentHandler<T> {
 				assignPropToArray(dest, src);
 			} else if (srcRef instanceof IIndexAccessReference) {
 				assignArrayToArray(dest, src);
+			} else if (srcRef instanceof IMethodReference) {
+				assignMethodToArray(dest, src);
+			} else if (srcRef instanceof IEventReference) {
+				LOGGER.info("Ignoring event reference");
 			} else {
 				throw new UnexpectedSSTNodeException(srcRef);
 			}
@@ -88,6 +111,8 @@ public abstract class AssignmentHandler<T> {
 
 	protected abstract void assignArrayToVar(T dest, T src);
 
+	protected abstract void assignMethodToVar(T dest, T src);
+
 	protected abstract void assignVarToField(T dest, T src);
 
 	protected abstract void assignFieldToField(T dest, T src);
@@ -95,6 +120,8 @@ public abstract class AssignmentHandler<T> {
 	protected abstract void assignPropToField(T dest, T src);
 
 	protected abstract void assignArrayToField(T dest, T src);
+
+	protected abstract void assignMethodToField(T dest, T src);
 
 	protected abstract void assignVarToProp(T dest, T src);
 
@@ -104,6 +131,8 @@ public abstract class AssignmentHandler<T> {
 
 	protected abstract void assignArrayToProp(T dest, T src);
 
+	protected abstract void assignMethodToProp(T dest, T src);
+
 	protected abstract void assignVarToArray(T dest, T src);
 
 	protected abstract void assignFieldToArray(T dest, T src);
@@ -111,5 +140,7 @@ public abstract class AssignmentHandler<T> {
 	protected abstract void assignPropToArray(T dest, T src);
 
 	protected abstract void assignArrayToArray(T dest, T src);
+
+	protected abstract void assignMethodToArray(T dest, T src);
 
 }

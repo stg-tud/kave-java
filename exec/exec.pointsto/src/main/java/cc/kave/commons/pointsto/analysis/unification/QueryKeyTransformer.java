@@ -145,8 +145,9 @@ public class QueryKeyTransformer
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(lambdaParameterRef);
 		Collection<MethodName> methods = context.getMethods(lambdaParameterRef);
-		Asserts.assertEquals(1, methods.size());
-		Callpath methodPath = normalizeMethod(methods.iterator().next());
+		// the user is free to write lambdas which do not use a parameter
+		Asserts.assertLessOrEqual(methods.size(), 1);
+		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
 		TypeName type = normalizeType(lambdaParameterRef.getType());
 		IReference reference = lambdaParameterRef.getReference().accept(normalizationVisitor, null);
 		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());

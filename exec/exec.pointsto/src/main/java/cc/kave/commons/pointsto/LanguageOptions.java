@@ -56,4 +56,6 @@ public abstract class LanguageOptions {
 		return name.getIdentifier().contains(LAMBDA_KEYWORD);
 	}
 
+	public abstract boolean isDelegateInvocation(IMethodName invokedMethod);
+
 }

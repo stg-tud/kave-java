@@ -80,12 +80,17 @@ public class CSharpLanguageOptions extends LanguageOptions {
 		// remove 'get set' and trailing '()'
 		String fieldIdentifier = propertyIdentifier.substring(propertyIdentifier.indexOf('['));
 		fieldIdentifier = fieldIdentifier.substring(0, fieldIdentifier.lastIndexOf('('));
-		
+
 		if (property.isStatic()) {
 			fieldIdentifier = "static " + fieldIdentifier;
 		}
-		
+
 		return FieldName.newFieldName(fieldIdentifier);
+	}
+
+	@Override
+	public boolean isDelegateInvocation(IMethodName invokedMethod) {
+		return invokedMethod.getName().equals("Invoke") && invokedMethod.getDeclaringType().isDelegateType();
 	}
 
 }

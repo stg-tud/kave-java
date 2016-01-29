@@ -15,6 +15,7 @@ package cc.kave.commons.pointsto.analysis.unification;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
@@ -117,6 +118,26 @@ public class ReferenceAssignmentHandler extends AssignmentHandler<IReference> {
 	@Override
 	protected void assignArrayToArray(IReference dest, IReference src) {
 		context.assign((IIndexAccessReference) dest, (IIndexAccessReference) src);
+	}
+
+	@Override
+	protected void assignMethodToVar(IReference dest, IReference src) {
+		context.storeFunction(dest, (IMethodReference) src);
+	}
+
+	@Override
+	protected void assignMethodToField(IReference dest, IReference src) {
+		context.storeFunction(dest, (IMethodReference) src);
+	}
+
+	@Override
+	protected void assignMethodToProp(IReference dest, IReference src) {
+		context.storeFunction(dest, (IMethodReference) src);
+	}
+
+	@Override
+	protected void assignMethodToArray(IReference dest, IReference src) {
+		context.storeFunction(dest, (IMethodReference) src);
 	}
 
 }
