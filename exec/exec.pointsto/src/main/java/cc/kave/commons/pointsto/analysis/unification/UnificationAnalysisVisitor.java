@@ -92,9 +92,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 						SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
 			}
 
-			super.visit(stmt, context);
-		} catch (MissingBaseVariableException ex) {
-			LOGGER.error("Failed to process an assignment", ex);
+		} catch (MissingVariableException | UndeclaredVariableException ex) {
+			LOGGER.error("Failed to process an assignment: {}", ex.getMessage());
 		}
 
 		return null;

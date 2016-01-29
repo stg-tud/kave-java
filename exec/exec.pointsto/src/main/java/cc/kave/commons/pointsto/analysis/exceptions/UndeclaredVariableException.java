@@ -12,13 +12,13 @@
  */
 package cc.kave.commons.pointsto.analysis.exceptions;
 
-import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 
-public class MissingBaseVariableException extends MissingVariableException {
+public class UndeclaredVariableException extends RuntimeException {
 
-	private static final long serialVersionUID = 6793365524654039412L;
+	private static final long serialVersionUID = -2831865255279169873L;
 
-	public MissingBaseVariableException(IReference reference) {
-		super("The base variable of " + reference.toString() + " is missing");
+	public UndeclaredVariableException(IVariableReference varRef) {
+		super("Variable " + varRef.getIdentifier() + " has not been declared prior to being used");
 	}
 }

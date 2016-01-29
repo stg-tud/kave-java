@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -19,6 +20,8 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.ScopedMap;
 import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingBaseVariableException;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
+import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 
 public class DistinctReferenceCreationVisitor
 		extends FailSafeNodeVisitor<ScopedMap<String, DistinctReference>, DistinctReference> {
@@ -45,7 +48,16 @@ public class DistinctReferenceCreationVisitor
 
 	@Override
 	public DistinctReference visit(IVariableReference varRef, ScopedMap<String, DistinctReference> context) {
-		return context.get(varRef.getIdentifier());
+		if (varRef.isMissing()) {
+			throw new MissingVariableException(varRef);
+		}
+
+		DistinctReference distRef = context.get(varRef.getIdentifier());
+		if (distRef == null) {
+			throw new UndeclaredVariableException(varRef);
+		}
+
+		return distRef;
 	}
 
 	@Override
