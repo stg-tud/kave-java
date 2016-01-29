@@ -12,6 +12,34 @@
  */
 package cc.kave.commons.pointsto.tests;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assignmentToLocal;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareFields;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationExpression;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.referenceExprToVariable;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnVariable;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.unknownStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
+
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.MethodName;
@@ -42,18 +70,7 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
-
-import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
+import cc.kave.commons.utils.json.JsonUtils;
 
 /**
  * Provides functionality related to SST construction for tests.
@@ -257,6 +274,11 @@ public class TestSSTBuilder {
 		Context cContext = createContext(sst);
 
 		return Arrays.asList(aContext, cContext);
+	}
+	
+	public Context createDelegateTest() {
+		InputStream resource = getClass().getResourceAsStream("./DelegateTest.json");
+		return JsonUtils.fromJson(resource, Context.class);
 	}
 
 	private IFieldReference buildFieldReference(FieldName field) {

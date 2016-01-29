@@ -20,13 +20,17 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.FieldName;
@@ -39,6 +43,7 @@ import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -75,12 +80,12 @@ public class UnificationAnalysisTest {
 		visitorContext.declareVariable(xDecl);
 		IInvocationExpression invocation = invocationExpr(aCtor);
 		visitorContext.setLastAssignment(assignmentToLocal("x", invocation));
-		visitorContext.allocate(invocation);
+		visitorContext.allocate(visitorContext.getDestinationForExpr(invocation));
 
 		visitorContext.declareVariable(zDecl);
 		invocation = invocationExpr(bCtor);
 		visitorContext.setLastAssignment(assignmentToLocal("z", invocation));
-		visitorContext.allocate(invocation);
+		visitorContext.allocate(visitorContext.getDestinationForExpr(invocation));
 
 		visitorContext.declareVariable(aDecl);
 		visitorContext.copy(variableReference("a"), variableReference("x"));
@@ -172,5 +177,60 @@ public class UnificationAnalysisTest {
 		assertEquals(1, outputStreamLocations.size());
 		// input != output
 		assertFalse(inputStreamLocations.equals(outputStreamLocations));
+	}
+
+	@Test
+	public void testDelegates() {
+		TestSSTBuilder builder = new TestSSTBuilder();
+		Context context = builder.createDelegateTest();
+
+		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
+		pointerAnalysis.compute(context);
+
+		IMethodDeclaration fooDecl = context.getSST().getNonEntryPoints().iterator().next();
+		IMethodDeclaration entry1Decl = Iterables.find(context.getSST().getEntryPoints(),
+				md -> md.getName().getName().equals("entry1"));
+		IMethodDeclaration entry2Decl = Iterables.find(context.getSST().getEntryPoints(),
+				md -> md.getName().getName().equals("entry2"));
+		assertNotNull(fooDecl);
+		assertNotNull(entry1Decl);
+		assertNotNull(entry2Decl);
+
+		Callpath entry1Callpath = new Callpath(entry1Decl.getName());
+		IVariableDeclaration entry1ArgDecl = (IVariableDeclaration) entry1Decl.getBody().get(2);
+		TypeName objectType = entry1ArgDecl.getType();
+		IAssignment entry1InvokeFunAssignment = (IAssignment) entry1Decl.getBody().get(5);
+		Set<AbstractLocation> entry1ArgInvocationLocations = pointerAnalysis.query(
+				new QueryContextKey(variableReference("arg"), entry1InvokeFunAssignment, objectType, entry1Callpath));
+		assertEquals(1, entry1ArgInvocationLocations.size());
+
+		Set<AbstractLocation> fooParameterLocations = pointerAnalysis
+				.query(new QueryContextKey(variableReference("x"), null, objectType, new Callpath(fooDecl.getName())));
+		assertThat(entry1ArgInvocationLocations, Matchers.is(fooParameterLocations));
+
+		Callpath entry2Callpath = new Callpath(entry2Decl.getName());
+		IAssignment entry2InvokeFunAssignment = (IAssignment) entry2Decl.getBody().get(5);
+		Set<AbstractLocation> entry2ArgInvocationLocations = pointerAnalysis.query(
+				new QueryContextKey(variableReference("arg"), entry2InvokeFunAssignment, objectType, entry2Callpath));
+		assertEquals(1, entry2ArgInvocationLocations.size());
+
+		ILambdaExpression lambda = (ILambdaExpression) ((IAssignment) entry2Decl.getBody().get(1)).getExpression();
+		Set<AbstractLocation> lambdaParameterLocations = pointerAnalysis.query(
+				new QueryContextKey(variableReference("x"), lambda.getBody().get(1), objectType, entry2Callpath));
+		assertThat(entry2ArgInvocationLocations, Matchers.is(lambdaParameterLocations));
+
+		// the parameter of 'foo' and the lambda get unified by the 'arg0' parameter of String.Format
+		assertThat(fooParameterLocations, Matchers.is(lambdaParameterLocations));
+
+		// check that the 'fun' variables of entry1 and entry2 do not refer to the same object
+		TypeName delegateType = ((IVariableDeclaration) entry1Decl.getBody().get(0)).getType();
+		Set<AbstractLocation> entry1FunLocations = pointerAnalysis.query(
+				new QueryContextKey(variableReference("fun"), entry1InvokeFunAssignment, delegateType, entry1Callpath));
+		Set<AbstractLocation> entry2FunLocations = pointerAnalysis.query(
+				new QueryContextKey(variableReference("fun"), entry2InvokeFunAssignment, delegateType, entry2Callpath));
+		assertEquals(1, entry1FunLocations.size());
+		assertEquals(1, entry2FunLocations.size());
+		assertThat(entry1FunLocations, Matchers.not(entry2FunLocations));
+
 	}
 }
