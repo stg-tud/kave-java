@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.AbstractPointerAnalysis;
 import cc.kave.commons.pointsto.analysis.Callpath;
@@ -92,6 +94,14 @@ public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 			// drop statements & method
 			locations = contextToLocations.get(new QueryContextKey(reference, null, type, null));
 			if (locations.isEmpty()) {
+				if (query.getStmt() != null && reference != null) {
+					// statement + reference are unique enough for a last effort exhaustive search
+					locations = query(reference, query.getStmt());
+					if (!locations.isEmpty()) {
+						return new HashSet<>(locations);
+					}
+				}
+
 				LOGGER.warn("Failed to find a location after dropping both statement and method");
 			}
 		}
@@ -101,6 +111,21 @@ public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 		}
 
 		return new HashSet<>(locations);
+	}
+
+	private Collection<AbstractLocation> query(IReference reference, IStatement stmt) {
+		Set<AbstractLocation> locations = new HashSet<>();
+		for (QueryContextKey queryKey : contextToLocations.keySet()) {
+			if (queryKey.getStmt() == stmt && reference.equals(queryKey.getReference())) {
+				locations.addAll(contextToLocations.get(queryKey));
+			}
+		}
+
+		if (locations.size() > 1 && queryStrategy == QueryStrategy.MINIMIZE_USAGE_DEFECTS) {
+			return Collections.emptySet();
+		} else {
+			return locations;
+		}
 	}
 
 }

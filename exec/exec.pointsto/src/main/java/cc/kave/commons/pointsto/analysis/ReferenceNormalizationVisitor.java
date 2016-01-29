@@ -12,11 +12,15 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
+import cc.kave.commons.model.names.EventName;
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -61,5 +65,27 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 	public IReference visit(IIndexAccessReference indexAccessRef, Void context) {
 		// map array accesses to the base variable
 		return indexAccessRef.getExpression().getReference().accept(this, context);
+	}
+
+	@Override
+	public IReference visit(IMethodReference methodRef, Void context) {
+		// TODO replace with isUnknown once fixed
+		if (CsMethodName.UNKNOWN_NAME.equals(methodRef.getMethodName())) {
+			return null;
+		} else {
+			return methodRef;
+		}
+	}
+
+	@Override
+	public IReference visit(IEventReference eventRef, Void context) {
+		EventName event = eventRef.getEventName();
+		if (event.isUnknown()) {
+			return null;
+		} else if (!event.isStatic() && eventRef.getReference().isMissing()) {
+			return null;
+		} else {
+			return eventRef;
+		}
 	}
 }
