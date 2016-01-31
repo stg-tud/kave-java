@@ -12,7 +12,6 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -63,11 +62,8 @@ public class DistinctReferenceCreationVisitor
 	@Override
 	public DistinctReference visit(IIndexAccessReference indexAccessRef, ScopedMap<String, DistinctReference> context) {
 		IVariableReference baseRef = indexAccessRef.getExpression().getReference();
-		if (baseRef.isMissing()) {
-			throw new MissingBaseVariableException(indexAccessRef);
-		}
 
-		return new DistinctIndexAccessReference(indexAccessRef, context.get(baseRef.getIdentifier()));
+		return new DistinctIndexAccessReference(indexAccessRef, baseRef.accept(this, context));
 	}
 
 }

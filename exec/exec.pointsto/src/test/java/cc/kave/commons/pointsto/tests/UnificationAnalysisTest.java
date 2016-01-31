@@ -56,6 +56,7 @@ import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
+import cc.kave.commons.pointsto.analysis.unification.SteensgaardLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.SteensgaardUnificationAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysisVisitorContext;
 
@@ -66,7 +67,7 @@ public class UnificationAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		TypeName testType = CsTypeName.newTypeName("Test.UnificationContextTest, Test");
 		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(
-				builder.createContext(builder.createEmptySST(testType)));
+				builder.createContext(builder.createEmptySST(testType)), new SteensgaardLocationIdentifierFactory());
 
 		MethodName aCtor = CsMethodName.newMethodName("[?] [UnificationContextTest.A]..ctor()");
 		MethodName bCtor = CsMethodName.newMethodName("[?] [UnificationContextTest.B]..ctor()");
@@ -106,6 +107,7 @@ public class UnificationAnalysisTest {
 		visitorContext.setLastAssignment(assignmentToLocal("c", refExpr(fieldRef)));
 		visitorContext.readField(variableReference("c"), fieldRef);
 
+		visitorContext.finalize();
 		referenceLocations = visitorContext.getReferenceLocations();
 		AbstractLocation thisLocation = referenceLocations
 				.get(new DistinctKeywordReference(LanguageOptions.getInstance().getThisName(), testType));

@@ -12,15 +12,20 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-public class BottomLocation extends Location {
+import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
+import cc.kave.commons.model.ssts.references.IMemberReference;
+import cc.kave.commons.model.ssts.references.IPropertyReference;
 
-	public BottomLocation(SetRepresentative setRepresentative) {
-		super(setRepresentative);
-	}
+public interface LocationIdentifierFactory {
+	
+	
+	LocationIdentifier create(IMemberReference memberRef);
 
-	@Override
-	public final boolean isBottom() {
-		return true;
-	}
+	LocationIdentifier create(IFieldReference fieldRef);
+
+	LocationIdentifier create(IPropertyReference propertyRef);
+	
+	LocationIdentifier create(IIndexAccessReference indexAccessRef);
 
 }

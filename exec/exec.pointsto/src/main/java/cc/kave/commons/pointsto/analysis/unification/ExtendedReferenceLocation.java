@@ -12,15 +12,32 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-public class BottomLocation extends Location {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-	public BottomLocation(SetRepresentative setRepresentative) {
+public class ExtendedReferenceLocation extends ReferenceLocation {
+
+	private Map<LocationIdentifier, Location> locations = new HashMap<>();
+
+	public ExtendedReferenceLocation(SetRepresentative setRepresentative) {
 		super(setRepresentative);
 	}
 
 	@Override
-	public final boolean isBottom() {
-		return true;
+	public Location getLocation(LocationIdentifier identifier) {
+		return locations.get(identifier);
+	}
+
+	@Override
+	public void setLocation(LocationIdentifier identifier, Location location) {
+		locations.put(identifier, location);
+	}
+
+	@Override
+	public Set<LocationIdentifier> getIdentifiers() {
+		return Collections.unmodifiableSet(locations.keySet());
 	}
 
 }

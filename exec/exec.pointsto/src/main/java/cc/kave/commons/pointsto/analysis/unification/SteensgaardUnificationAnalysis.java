@@ -44,7 +44,8 @@ public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 		checkContextBinding();
 
 		UnificationAnalysisVisitor visitor = new UnificationAnalysisVisitor();
-		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(context);
+		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(context,
+				new SteensgaardLocationIdentifierFactory());
 
 		visitor.visit(context.getSST(), visitorContext);
 		Map<DistinctReference, AbstractLocation> referenceToLocation = visitorContext.getReferenceLocations();

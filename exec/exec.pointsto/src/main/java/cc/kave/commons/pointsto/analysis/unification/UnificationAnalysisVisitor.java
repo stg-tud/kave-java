@@ -30,6 +30,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -214,6 +215,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 	private static class MethodParameterVisitor extends FailSafeNodeVisitor<ContextReferencePair, Void> {
 
+		private static final Logger LOGGER = LoggerFactory.getLogger(MethodParameterVisitor.class);
+
 		@Override
 		public Void visit(IVariableReference varRef, ContextReferencePair context) {
 			context.analysis.registerParameterReference(context.parameterLocation, varRef);
@@ -239,8 +242,14 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 		}
 
 		@Override
+		public Void visit(IEventReference eventRef, ContextReferencePair context) {
+			LOGGER.info("Ignoring event reference");
+			return null;
+		}
+
+		@Override
 		public Void visit(IUnknownReference unknownRef, ContextReferencePair context) {
-			LoggerFactory.getLogger(MethodParameterVisitor.class).error("Ignoring an unknown reference");
+			LOGGER.error("Ignoring an unknown reference");
 			return null;
 		}
 	}

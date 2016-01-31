@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -34,6 +36,7 @@ import cc.kave.commons.model.names.MemberName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -76,6 +79,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private UnionFind<SetRepresentative> unionFind = new UnionFind<>(new HashSet<>());
 
 	private Map<DistinctReference, ReferenceLocation> referenceLocations = new HashMap<>();
+	private Map<DistinctMemberReference, SetRepresentative> memberLocations = new HashMap<>();
 
 	private IAssignment lastAssignment;
 	private MemberName currentMember;
@@ -88,21 +92,53 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private DestinationLocationVisitor destLocationVisitor = new DestinationLocationVisitor();
 	private SourceLocationVisitor srcLocationVisitor = new SourceLocationVisitor();
 
-	public UnificationAnalysisVisitorContext(Context context) {
+	private LocationIdentifierFactory identifierFactory;
+
+	private Set<Pair<ReferenceLocation, ReferenceLocation>> joinLocationsOf = new HashSet<>();
+
+	public UnificationAnalysisVisitorContext(Context context, LocationIdentifierFactory identifierFactory) {
 		super(context);
 		declarationMapper = new DeclarationMapper(context);
+		this.identifierFactory = identifierFactory;
 
 		createImplicitLocations(context);
 	}
 
 	public Map<DistinctReference, AbstractLocation> getReferenceLocations() {
-		Map<DistinctReference, AbstractLocation> result = new HashMap<>(referenceLocations.size());
-		Map<SetRepresentative, AbstractLocation> refToAbstractLocation = new HashMap<>(referenceLocations.size());
+		int totalReferences = referenceLocations.size() + memberLocations.size();
+		Map<DistinctReference, AbstractLocation> result = new HashMap<>(totalReferences);
+		Map<SetRepresentative, AbstractLocation> refToAbstractLocation = new HashMap<>(totalReferences);
 
 		for (Map.Entry<DistinctReference, ReferenceLocation> entry : referenceLocations.entrySet()) {
 			DistinctReference reference = entry.getKey();
+			ReferenceLocation location = entry.getValue();
 
-			SetRepresentative ecr = unionFind.find(entry.getValue().getLocation().getSetRepresentative());
+			SetRepresentative ecr;
+			if (reference instanceof DistinctMemberReference) {
+				ecr = unionFind.find(location.getSetRepresentative());
+			} else {
+				Location valueLocation = unionFind
+						.find(location.getLocation(LocationIdentifier.VALUE).getSetRepresentative()).getLocation();
+				Location funLocation = location.getLocation(LocationIdentifier.FUNCTION);
+				if (funLocation != null) {
+					funLocation = unionFind.find(funLocation.getSetRepresentative()).getLocation();
+				}
+				ecr = (valueLocation.isBottom() && funLocation != null && !funLocation.isBottom())
+						? funLocation.getSetRepresentative() : valueLocation.getSetRepresentative();
+			}
+
+			AbstractLocation abstractLocation = refToAbstractLocation.get(ecr);
+			if (abstractLocation == null) {
+				abstractLocation = new AbstractLocation();
+				refToAbstractLocation.put(ecr, abstractLocation);
+			}
+
+			result.put(reference, abstractLocation);
+		}
+
+		for (Map.Entry<DistinctMemberReference, SetRepresentative> entry : memberLocations.entrySet()) {
+			DistinctReference reference = entry.getKey();
+			SetRepresentative ecr = unionFind.find(entry.getValue());
 
 			AbstractLocation abstractLocation = refToAbstractLocation.get(ecr);
 			if (abstractLocation == null) {
@@ -137,16 +173,67 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		}
 	}
 
-	private ReferenceLocation createReferenceLocation() {
-		SetRepresentative bottomRepresentative = new SetRepresentative();
-		BottomLocation bottom = new BottomLocation(bottomRepresentative);
+	private LocationIdentifier getIdentifierForSimpleRefLoc(TypeName type) {
+		if (type.isDelegateType()) {
+			return LocationIdentifier.FUNCTION;
+		} else {
+			return LocationIdentifier.VALUE;
+		}
+	}
+
+	private BottomLocation createBottomLocation() {
+		SetRepresentative bottomRep = new SetRepresentative();
+		unionFind.addElement(bottomRep);
+		return new BottomLocation(bottomRep);
+	}
+
+	private ReferenceLocation createSimpleReferenceLocation() {
+		SetRepresentative valueBottomRep = new SetRepresentative();
+		SetRepresentative funBottomRep = new SetRepresentative();
 
 		SetRepresentative refRepresentative = new SetRepresentative();
-		ReferenceLocation refLocation = new ReferenceLocation(bottom, refRepresentative);
+		ReferenceLocation refLocation = new SimpleReferenceLocation(refRepresentative,
+				new BottomLocation(valueBottomRep), new BottomLocation(funBottomRep));
 
-		unionFind.addElement(bottomRepresentative);
+		unionFind.addElement(valueBottomRep);
+		unionFind.addElement(funBottomRep);
 		unionFind.addElement(refRepresentative);
 		return refLocation;
+	}
+
+	private ReferenceLocation createExtendedReferenceLocation() {
+		SetRepresentative setRep = new SetRepresentative();
+		unionFind.addElement(setRep);
+		return new ExtendedReferenceLocation(setRep);
+	}
+
+	private Set<LocationIdentifier> getCommonIdentifiers(ReferenceLocation refLoc1, ReferenceLocation refLoc2) {
+		Set<LocationIdentifier> identifiers = new HashSet<>(refLoc1.getIdentifiers());
+		identifiers.retainAll(refLoc2.getIdentifiers());
+		return identifiers;
+	}
+
+	private Set<LocationIdentifier> harmonizeIdentifiers(ReferenceLocation refLoc1, ReferenceLocation refLoc2) {
+		Set<LocationIdentifier> loc1Identifiers = refLoc1.getIdentifiers();
+		Set<LocationIdentifier> loc2Identifiers = refLoc2.getIdentifiers();
+
+		{
+			Set<LocationIdentifier> missingInLoc1 = new HashSet<>(loc2Identifiers);
+			missingInLoc1.removeAll(loc1Identifiers);
+			for (LocationIdentifier identifier : missingInLoc1) {
+				refLoc1.setLocation(identifier, createBottomLocation());
+			}
+		}
+
+		{
+			Set<LocationIdentifier> missingInLoc2 = new HashSet<>(loc1Identifiers);
+			missingInLoc2.removeAll(loc2Identifiers);
+			for (LocationIdentifier identifier : missingInLoc2) {
+				refLoc2.setLocation(identifier, createBottomLocation());
+			}
+		}
+
+		return loc1Identifiers;
 	}
 
 	private FunctionLocation createFunctionLocation(ILambdaExpression lambdaExpr) {
@@ -169,6 +256,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private FunctionLocation createFunctionLocation(MethodName method) {
+		SetRepresentative functionRep = new SetRepresentative();
+		unionFind.addElement(functionRep);
+		return createFunctionLocation(method, functionRep);
+	}
+
+	private FunctionLocation createFunctionLocation(MethodName method, SetRepresentative functionRep) {
 		List<ParameterName> methodParameters = method.getParameters();
 		List<ReferenceLocation> parameterLocations = new ArrayList<>(methodParameters.size());
 
@@ -179,8 +272,6 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			parameterLocations.add(formalParameterLocation);
 		}
 
-		SetRepresentative functionRep = new SetRepresentative();
-		unionFind.addElement(functionRep);
 		return new FunctionLocation(parameterLocations, getOrCreateReturnLocation(method), functionRep);
 	}
 
@@ -188,7 +279,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation location = referenceLocations.get(reference);
 
 		if (location == null) {
-			location = createReferenceLocation();
+			location = createSimpleReferenceLocation();
 			referenceLocations.put(reference, location);
 		}
 
@@ -199,16 +290,16 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation location = returnLocations.get(member);
 
 		if (location == null) {
-			location = createReferenceLocation();
+			location = createSimpleReferenceLocation();
 			returnLocations.put(member, location);
 		}
 
 		return location;
 	}
 
-	public void registerReference(DistinctReference reference, ReferenceLocation location) {
-		if (!referenceLocations.containsKey(reference)) {
-			referenceLocations.put(reference, location);
+	private void registerMemberLocation(DistinctMemberReference memberRef, Location location) {
+		if (!memberLocations.containsKey(memberRef)) {
+			memberLocations.put(memberRef, location.getSetRepresentative());
 		}
 	}
 
@@ -285,14 +376,18 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void unify(ReferenceLocation refLoc1, ReferenceLocation refLoc2) {
-		Location loc1 = refLoc1.getLocation();
-		Location loc2 = refLoc2.getLocation();
+		Set<LocationIdentifier> commonIdentifiers = harmonizeIdentifiers(refLoc1, refLoc2);
 
-		SetRepresentative rep1 = unionFind.find(loc1.getSetRepresentative());
-		SetRepresentative rep2 = unionFind.find(loc2.getSetRepresentative());
+		for (LocationIdentifier identifier : commonIdentifiers) {
+			Location loc1 = refLoc1.getLocation(identifier);
+			Location loc2 = refLoc2.getLocation(identifier);
 
-		if (rep1 != rep2) {
-			join(rep1, rep2);
+			SetRepresentative rep1 = unionFind.find(loc1.getSetRepresentative());
+			SetRepresentative rep2 = unionFind.find(loc2.getSetRepresentative());
+
+			if (rep1 != rep2) {
+				join(rep1, rep2);
+			}
 		}
 	}
 
@@ -300,9 +395,20 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		List<ReferenceLocation> fun1Parameters = funLoc1.getParameterLocations();
 		List<ReferenceLocation> fun2Parameters = funLoc2.getParameterLocations();
 
-		Asserts.assertEquals(fun1Parameters.size(), fun2Parameters.size());
-		for (int i = 0; i < fun1Parameters.size(); ++i) {
+		int minParametersSize = Math.min(fun1Parameters.size(), fun2Parameters.size());
+		int maxParametersSize = Math.max(fun1Parameters.size(), fun2Parameters.size());
+		for (int i = 0; i < minParametersSize; ++i) {
 			unify(fun1Parameters.get(i), fun2Parameters.get(i));
+		}
+
+		// function locations have a different number of parameters: copy over the additional ones
+		if (minParametersSize != maxParametersSize) {
+			List<ReferenceLocation> minParameters = (fun1Parameters.size() == minParametersSize) ? fun1Parameters
+					: fun2Parameters;
+			List<ReferenceLocation> maxParameters = (fun1Parameters.size() == maxParametersSize) ? fun1Parameters
+					: fun2Parameters;
+
+			minParameters.addAll(maxParameters.subList(minParametersSize, maxParametersSize));
 		}
 
 		unify(funLoc1.getReturnLocation(), funLoc2.getReturnLocation());
@@ -331,7 +437,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public void enterLambda(ILambdaExpression lambdaExpr) {
-		ReferenceLocation lambdaReturnLocation = createReferenceLocation();
+		ReferenceLocation lambdaReturnLocation = createSimpleReferenceLocation();
 		lambdaStack.addFirst(ImmutablePair.of(lambdaExpr, lambdaReturnLocation));
 	}
 
@@ -354,46 +460,88 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void allocate(ReferenceLocation destLocation) {
-		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+		Location derefDestLocation = unionFind
+				.find(destLocation.getLocation(LocationIdentifier.VALUE).getSetRepresentative()).getLocation();
 
 		if (derefDestLocation.isBottom()) {
-			ReferenceLocation allocatedLocation = createReferenceLocation();
+			ReferenceLocation allocatedLocation = createExtendedReferenceLocation();
 			setLocation(derefDestLocation.getSetRepresentative(), allocatedLocation);
+			destLocation.setLocation(LocationIdentifier.VALUE, allocatedLocation);
 		}
 	}
 
-	private ReferenceLocation readDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
-		SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
-		SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
+	private Location readDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation,
+			LocationIdentifier destIdentifier, LocationIdentifier srcIdentifier) {
+		SetRepresentative destDerefRep = unionFind
+				.find(destLocation.getLocation(destIdentifier).getSetRepresentative());
+		SetRepresentative srcDerefRep = unionFind
+				.find(srcLocation.getLocation(LocationIdentifier.VALUE).getSetRepresentative());
 
 		if (srcDerefRep.getLocation().isBottom()) {
-			setLocation(srcDerefRep, new ReferenceLocation(destDerefRep.getLocation(), destDerefRep));
-		} else {
-			ReferenceLocation fieldLoc = (ReferenceLocation) srcDerefRep.getLocation();
-			SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
-			if (destDerefRep != fieldDerefRep) {
-				cjoin(destDerefRep, fieldDerefRep);
+			ReferenceLocation srcDerefLoc = new ExtendedReferenceLocation(srcDerefRep);
+			Location dereferenceTargetLoc = destDerefRep.getLocation();
+			if (dereferenceTargetLoc.isBottom()) {
+				dereferenceTargetLoc = new ExtendedReferenceLocation(destDerefRep);
+				setLocation(destDerefRep, dereferenceTargetLoc);
+				destLocation.setLocation(destIdentifier, dereferenceTargetLoc);
 			}
-		}
+			srcDerefLoc.setLocation(srcIdentifier, dereferenceTargetLoc);
+			setLocation(srcDerefRep, srcDerefLoc);
+			srcLocation.setLocation(LocationIdentifier.VALUE, srcDerefLoc);
 
-		return (ReferenceLocation) srcDerefRep.getLocation();
+			return destDerefRep.getLocation();
+		} else {
+			ReferenceLocation srcDerefLocation = (ReferenceLocation) srcDerefRep.getLocation();
+			Location dereferenceTargetLoc = srcDerefLocation.getLocation(srcIdentifier);
+			if (dereferenceTargetLoc == null) {
+				dereferenceTargetLoc = createExtendedReferenceLocation();
+				srcDerefLocation.setLocation(srcIdentifier, dereferenceTargetLoc);
+			}
+
+			SetRepresentative dereferenceTargetRep = unionFind.find(dereferenceTargetLoc.getSetRepresentative());
+			if (destDerefRep != dereferenceTargetRep) {
+				cjoin(destDerefRep, dereferenceTargetRep);
+			}
+
+			return dereferenceTargetRep.getLocation();
+		}
 	}
 
-	private ReferenceLocation writeDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
-		SetRepresentative destDerefRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
-		SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
+	private Location writeDereference(ReferenceLocation destLocation, ReferenceLocation srcLocation,
+			LocationIdentifier destIdentifier, LocationIdentifier srcIdentifier) {
+		SetRepresentative destDerefRep = unionFind
+				.find(destLocation.getLocation(LocationIdentifier.VALUE).getSetRepresentative());
+		SetRepresentative srcDerefRep = unionFind.find(srcLocation.getLocation(srcIdentifier).getSetRepresentative());
 
 		if (destDerefRep.getLocation().isBottom()) {
-			setLocation(destDerefRep, new ReferenceLocation(srcDerefRep.getLocation(), srcDerefRep));
-		} else {
-			ReferenceLocation fieldLoc = (ReferenceLocation) destDerefRep.getLocation();
-			SetRepresentative fieldDerefRep = unionFind.find(fieldLoc.getLocation().getSetRepresentative());
-			if (fieldDerefRep != srcDerefRep) {
-				cjoin(fieldDerefRep, srcDerefRep);
+			ReferenceLocation destDerefLoc = new ExtendedReferenceLocation(destDerefRep);
+			Location dereferenceTargetLoc = srcDerefRep.getLocation();
+			if (dereferenceTargetLoc.isBottom()) {
+				dereferenceTargetLoc = new ExtendedReferenceLocation(srcDerefRep);
+				setLocation(srcDerefRep, dereferenceTargetLoc);
+				srcLocation.setLocation(srcIdentifier, dereferenceTargetLoc);
 			}
-		}
+			destDerefLoc.setLocation(destIdentifier, srcDerefRep.getLocation());
+			setLocation(destDerefRep, destDerefLoc);
+			destLocation.setLocation(LocationIdentifier.VALUE, destDerefLoc);
 
-		return (ReferenceLocation) destDerefRep.getLocation();
+			return srcDerefRep.getLocation();
+		} else {
+			ReferenceLocation destDerefLocation = (ReferenceLocation) destDerefRep.getLocation();
+			Location dereferenceTargetLoc = destDerefLocation.getLocation(destIdentifier);
+			if (dereferenceTargetLoc == null) {
+				dereferenceTargetLoc = createExtendedReferenceLocation();
+				destDerefLocation.setLocation(destIdentifier, dereferenceTargetLoc);
+			}
+
+			SetRepresentative dereferenceTargetRep = unionFind.find(dereferenceTargetLoc.getSetRepresentative());
+
+			if (dereferenceTargetRep != srcDerefRep) {
+				cjoin(dereferenceTargetRep, srcDerefRep);
+			}
+
+			return dereferenceTargetRep.getLocation();
+		}
 	}
 
 	public void copy(IVariableReference dest, IVariableReference src) {
@@ -410,8 +558,15 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void copy(ReferenceLocation destLocation, ReferenceLocation srcLocation) {
-		SetRepresentative derefDestRep = unionFind.find(destLocation.getLocation().getSetRepresentative());
-		SetRepresentative derefSrcRep = unionFind.find(srcLocation.getLocation().getSetRepresentative());
+		for (LocationIdentifier identifier : harmonizeIdentifiers(destLocation, srcLocation)) {
+			copy(destLocation, srcLocation, identifier);
+		}
+		joinLocationsOf.add(ImmutablePair.of(destLocation, srcLocation));
+	}
+
+	private void copy(ReferenceLocation destLocation, ReferenceLocation srcLocation, LocationIdentifier identifier) {
+		SetRepresentative derefDestRep = unionFind.find(destLocation.getLocation(identifier).getSetRepresentative());
+		SetRepresentative derefSrcRep = unionFind.find(srcLocation.getLocation(identifier).getSetRepresentative());
 
 		if (derefDestRep != derefSrcRep) {
 			cjoin(derefDestRep, derefSrcRep);
@@ -422,11 +577,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		Asserts.assertTrue(lambdaExpr == lambdaStack.getFirst().getKey());
 
 		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, null);
-		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+		Location derefDestLocation = unionFind
+				.find(destLocation.getLocation(LocationIdentifier.FUNCTION).getSetRepresentative()).getLocation();
 
 		if (derefDestLocation.isBottom()) {
 			FunctionLocation functionLocation = createFunctionLocation(lambdaExpr);
 			setLocation(derefDestLocation.getSetRepresentative(), functionLocation);
+			destLocation.setLocation(LocationIdentifier.FUNCTION, functionLocation);
 		} else {
 			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
 
@@ -437,8 +594,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			}
 
 			ReferenceLocation lambdaReturnLocation = lambdaStack.getFirst().getValue();
+			TypeName lambdaReturnType = lambdaStack.getFirst().getKey().getName().getReturnType();
 
-			updateFunctionLocation(functionLocation, distLambdaParameters, lambdaReturnLocation);
+			updateFunctionLocation(functionLocation, distLambdaParameters, lambdaReturnType, lambdaReturnLocation);
 		}
 
 	}
@@ -451,11 +609,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void storeFunction(ReferenceLocation destLocation, IMethodReference methodRef) {
 		MethodName method = methodRef.getMethodName();
 
-		Location derefDestLocation = unionFind.find(destLocation.getLocation().getSetRepresentative()).getLocation();
+		Location derefDestLocation = unionFind
+				.find(destLocation.getLocation(LocationIdentifier.FUNCTION).getSetRepresentative()).getLocation();
 
 		if (derefDestLocation.isBottom()) {
 			FunctionLocation functionLocation = createFunctionLocation(method);
 			setLocation(derefDestLocation.getSetRepresentative(), functionLocation);
+			destLocation.setLocation(LocationIdentifier.FUNCTION, functionLocation);
 		} else {
 			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
 
@@ -465,31 +625,35 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 				distMethodParameters.add(new DistinctMethodParameterReference(parameter, method));
 			}
 
-			updateFunctionLocation(functionLocation, distMethodParameters, getOrCreateReturnLocation(method));
+			updateFunctionLocation(functionLocation, distMethodParameters, method.getReturnType(),
+					getOrCreateReturnLocation(method));
 		}
 	}
 
 	private void updateFunctionLocation(FunctionLocation functionLocation, List<DistinctReference> newParameters,
-			ReferenceLocation newReturnLocation) {
+			TypeName newReturnType, ReferenceLocation newReturnLocation) {
 		List<ReferenceLocation> funLocParameters = functionLocation.getParameterLocations();
 		Asserts.assertEquals(funLocParameters.size(), newParameters.size());
 
 		for (int i = 0; i < newParameters.size(); ++i) {
 			DistinctReference distParameterRef = newParameters.get(i);
 			ReferenceLocation newParameterLocation = getOrCreateLocation(distParameterRef);
+			LocationIdentifier newParameterIdentifier = getIdentifierForSimpleRefLoc(distParameterRef.getType());
 			SetRepresentative derefNewParameterLocationRep = unionFind
-					.find(newParameterLocation.getLocation().getSetRepresentative());
+					.find(newParameterLocation.getLocation(newParameterIdentifier).getSetRepresentative());
 			SetRepresentative derefFunLocParameterRep = unionFind
-					.find(funLocParameters.get(i).getLocation().getSetRepresentative());
+					.find(funLocParameters.get(i).getLocation(newParameterIdentifier).getSetRepresentative());
 
 			if (derefFunLocParameterRep != derefNewParameterLocationRep) {
 				join(derefNewParameterLocationRep, derefFunLocParameterRep);
 			}
 		}
 
-		SetRepresentative derefNewReturnLocRep = unionFind.find(newReturnLocation.getLocation().getSetRepresentative());
+		LocationIdentifier newReturnIdentifier = getIdentifierForSimpleRefLoc(newReturnType);
+		SetRepresentative derefNewReturnLocRep = unionFind
+				.find(newReturnLocation.getLocation(newReturnIdentifier).getSetRepresentative());
 		SetRepresentative derefFunLocReturnRep = unionFind
-				.find(functionLocation.getReturnLocation().getLocation().getSetRepresentative());
+				.find(functionLocation.getReturnLocation().getLocation(newReturnIdentifier).getSetRepresentative());
 		if (derefFunLocReturnRep != derefNewReturnLocRep) {
 			join(derefFunLocReturnRep, derefNewReturnLocRep);
 		}
@@ -501,14 +665,24 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		DistinctReference receiverRef = invocation.getReference().accept(distinctReferenceCreationVisitor,
 				namesToReferences);
 		ReferenceLocation receiverLoc = getOrCreateLocation(receiverRef);
-		Location derefReceiverLoc = unionFind.find(receiverLoc.getLocation().getSetRepresentative()).getLocation();
+		Location derefReceiverLoc = unionFind
+				.find(receiverLoc.getLocation(LocationIdentifier.FUNCTION).getSetRepresentative()).getLocation();
 
 		FunctionLocation functionLocation;
 		if (derefReceiverLoc.isBottom()) {
 			functionLocation = createFunctionLocation(method);
 			setLocation(derefReceiverLoc.getSetRepresentative(), functionLocation);
+			receiverLoc.setLocation(LocationIdentifier.FUNCTION, functionLocation);
 		} else {
-			functionLocation = (FunctionLocation) derefReceiverLoc;
+			if (derefReceiverLoc instanceof FunctionLocation) {
+				functionLocation = (FunctionLocation) derefReceiverLoc;
+			} else {
+				// location got initialized by readDereference or writeDereference to an ExtendedRefernceLocation as we
+				// cannot simply extract the method name at that stage
+				functionLocation = createFunctionLocation(method, derefReceiverLoc.getSetRepresentative());
+				derefReceiverLoc.getSetRepresentative().setLocation(functionLocation);
+				receiverLoc.setLocation(LocationIdentifier.FUNCTION, functionLocation);
+			}
 		}
 
 		return functionLocation;
@@ -535,7 +709,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctFieldReference dest, DistinctFieldReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readMember(tempLoc, src);
 		writeMember(dest, tempLoc);
 	}
@@ -546,7 +720,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctPropertyReference dest, DistinctPropertyReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		PropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
@@ -571,7 +745,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctPropertyReference dest, DistinctFieldReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readMember(tempLoc, src);
 
 		PropertyName destProperty = dest.getReference().getPropertyName();
@@ -590,7 +764,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctFieldReference dest, DistinctPropertyReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		PropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
@@ -608,7 +782,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctFieldReference dest, DistinctIndexAccessReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readArray(tempLoc, src);
 		writeMember(dest, tempLoc);
 	}
@@ -619,7 +793,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctPropertyReference dest, DistinctIndexAccessReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readArray(tempLoc, src);
 
 		PropertyName destProperty = dest.getReference().getPropertyName();
@@ -638,7 +812,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctIndexAccessReference dest, DistinctFieldReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readMember(tempLoc, src);
 		writeArray(dest, tempLoc);
 	}
@@ -649,7 +823,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctIndexAccessReference dest, DistinctPropertyReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
 		PropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
@@ -671,7 +845,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void assign(DistinctIndexAccessReference dest, DistinctIndexAccessReference src) {
-		ReferenceLocation tempLoc = createReferenceLocation();
+		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readArray(tempLoc, src);
 		writeArray(dest, tempLoc);
 	}
@@ -685,8 +859,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void readMember(ReferenceLocation destLocation, IMemberReference memberRef) {
-		DistinctReference distinctMemberRef = memberRef.accept(distinctReferenceCreationVisitor, namesToReferences);
-		readMember(destLocation, (DistinctMemberReference) distinctMemberRef);
+		DistinctMemberReference distinctMemberRef = (DistinctMemberReference) memberRef
+				.accept(distinctReferenceCreationVisitor, namesToReferences);
+		readMember(destLocation, distinctMemberRef);
 	}
 
 	private void readMember(ReferenceLocation destLocation, DistinctMemberReference memberRef) {
@@ -696,9 +871,11 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		} else {
 
 			ReferenceLocation srcLocation = getOrCreateLocation(memberRef.getBaseReference());
-			ReferenceLocation srcDerefLocation = readDereference(destLocation, srcLocation);
+			LocationIdentifier destIdentifier = getIdentifierForSimpleRefLoc(memberRef.getType());
+			LocationIdentifier srcIdentifier = identifierFactory.create(memberRef.getReference());
+			Location srcDerefLocation = readDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 
-			registerReference(memberRef, (ReferenceLocation) srcDerefLocation);
+			registerMemberLocation(memberRef, srcDerefLocation);
 		}
 	}
 
@@ -723,9 +900,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		} else {
 
 			ReferenceLocation destLocation = getOrCreateLocation(memberRef.getBaseReference());
-			ReferenceLocation destDerefLocation = writeDereference(destLocation, srcLocation);
+			LocationIdentifier destIdentifier = identifierFactory.create(memberRef.getReference());
+			// we live in a type safe environment (src must be a delegate type as well if the member is one)
+			LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(memberRef.getType());
+			Location destDerefLocation = writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 
-			registerReference(memberRef, destDerefLocation);
+			registerMemberLocation(memberRef, destDerefLocation);
 		}
 	}
 
@@ -790,7 +970,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void readArray(ReferenceLocation destLocation, DistinctIndexAccessReference srcRef) {
 		ReferenceLocation srcLocation = getOrCreateLocation(srcRef.getBaseReference());
-		readDereference(destLocation, srcLocation);
+		LocationIdentifier destIdentifier = getIdentifierForSimpleRefLoc(srcRef.getType());
+		LocationIdentifier srcIdentifier = identifierFactory.create(srcRef.getReference());
+		readDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 	}
 
 	public void writeArray(IIndexAccessReference destRef, IVariableReference srcRef) {
@@ -807,7 +989,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void writeArray(DistinctIndexAccessReference destRef, ReferenceLocation srcLocation) {
 		ReferenceLocation destLocation = getOrCreateLocation(destRef.getBaseReference());
-		writeDereference(destLocation, srcLocation);
+		LocationIdentifier destIdentifier = identifierFactory.create(destRef.getReference());
+		LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(destRef.getType());
+		writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 	}
 
 	public void registerParameterReference(ReferenceLocation parameterLocation, IVariableReference actualParameter) {
@@ -851,7 +1035,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IFieldReference fieldRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 			DistinctFieldReference distRef = (DistinctFieldReference) fieldRef.accept(distinctReferenceCreationVisitor,
 					namesToReferences);
 			writeMember(distRef, tempLoc);
@@ -860,7 +1044,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
 			PropertyName property = propertyRef.getPropertyName();
 			if (treatPropertyAsField(propertyRef)) {
@@ -878,7 +1062,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IIndexAccessReference indexAccessRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 			DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) indexAccessRef
 					.accept(distinctReferenceCreationVisitor, namesToReferences);
 			writeArray(distRef, tempLoc);
@@ -896,7 +1080,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IFieldReference fieldRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 			DistinctFieldReference distRef = (DistinctFieldReference) fieldRef.accept(distinctReferenceCreationVisitor,
 					namesToReferences);
 			readMember(tempLoc, distRef);
@@ -905,7 +1089,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
 			PropertyName property = propertyRef.getPropertyName();
 			if (treatPropertyAsField(propertyRef)) {
@@ -922,7 +1106,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 		@Override
 		public ReferenceLocation visit(IIndexAccessReference indexAccessRef, Void context) {
-			ReferenceLocation tempLoc = createReferenceLocation();
+			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 			DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) indexAccessRef
 					.accept(distinctReferenceCreationVisitor, namesToReferences);
 			readArray(tempLoc, distRef);

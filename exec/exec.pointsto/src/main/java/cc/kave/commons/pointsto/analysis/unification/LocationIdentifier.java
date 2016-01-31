@@ -12,15 +12,19 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-public class BottomLocation extends Location {
+public interface LocationIdentifier {
 
-	public BottomLocation(SetRepresentative setRepresentative) {
-		super(setRepresentative);
-	}
+	public static final LocationIdentifier VALUE = new LocationIdentifier() {
+		@Override
+		public String toString() {
+			return "VALUE";
+		};
+	};
 
-	@Override
-	public final boolean isBottom() {
-		return true;
-	}
-
+	public static final LocationIdentifier FUNCTION = new LocationIdentifier() {
+		@Override
+		public String toString() {
+			return "FUNCTION";
+		};
+	};
 }

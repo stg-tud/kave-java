@@ -12,22 +12,19 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-public class ReferenceLocation extends Location {
+import java.util.Set;
 
-	private Location location;
+public abstract class ReferenceLocation extends Location {
 
-	public ReferenceLocation(Location location, SetRepresentative setRepresentative) {
+	public ReferenceLocation(SetRepresentative setRepresentative) {
 		super(setRepresentative);
-		this.location = location;
 	}
 
-	public Location getLocation() {
-		return location;
-	}
+	public abstract Location getLocation(LocationIdentifier identifier);
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
+	public abstract void setLocation(LocationIdentifier identifier, Location location);
+
+	public abstract Set<LocationIdentifier> getIdentifiers();
 
 	@Override
 	public final boolean isBottom() {
