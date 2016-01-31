@@ -12,7 +12,6 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.recommenders.assertions.Asserts;
 
@@ -33,7 +32,7 @@ public abstract class DistinctMemberReference implements DistinctReference {
 	public abstract boolean isStaticMember();
 
 	@Override
-	public IReference getReference() {
+	public IMemberReference getReference() {
 		return memberReference;
 	}
 

@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.IReference;
@@ -76,6 +78,12 @@ public class DistinctLambdaParameterReference implements DistinctReference {
 		} else if (!parameter.equals(other.parameter))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctLambdaParameterReference.class).add("name", parameter.getName())
+				.add("type", parameter.getValueType().getName()).toString();
 	}
 
 }

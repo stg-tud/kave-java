@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
@@ -76,6 +78,12 @@ public class DistinctMethodParameterReference implements DistinctReference {
 		} else if (!parameter.equals(other.parameter))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctMethodParameterReference.class).add("method", method.getName())
+				.add("name", parameter.getName()).toString();
 	}
 
 }

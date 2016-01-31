@@ -15,8 +15,8 @@ package cc.kave.commons.pointsto.analysis.reference;
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class DistinctVariableReference implements DistinctReference {
 
@@ -27,7 +27,7 @@ public class DistinctVariableReference implements DistinctReference {
 	}
 
 	@Override
-	public IReference getReference() {
+	public IVariableReference getReference() {
 		return varDecl.getReference();
 	}
 

@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
@@ -39,6 +41,12 @@ public class DistinctFieldReference extends DistinctMemberReference {
 	@Override
 	public <TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctFieldReference.class).add("base", getBaseReference())
+				.add("name", getReference().getFieldName().getName()).toString();
 	}
 
 }
