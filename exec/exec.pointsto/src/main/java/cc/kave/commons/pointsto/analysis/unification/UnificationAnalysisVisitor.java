@@ -98,6 +98,9 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 				referenceAssignmentHandler.setContext(context);
 				referenceAssignmentHandler.process(destRef,
 						SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
+			} else {
+				// visit expressions (invocation, lambda, ...)
+				return super.visit(stmt, context);
 			}
 
 		} catch (MissingVariableException | UndeclaredVariableException ex) {
