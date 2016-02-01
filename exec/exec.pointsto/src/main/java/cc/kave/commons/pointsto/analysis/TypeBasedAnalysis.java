@@ -46,7 +46,7 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
-		TypeName type = query.getType();
+		ITypeName type = query.getType();
 		if (type != null) {
 			// querying for void types does not make any sense...
 			if (type.isVoidType()) {

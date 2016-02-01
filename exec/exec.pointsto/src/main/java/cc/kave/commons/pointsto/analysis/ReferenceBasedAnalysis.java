@@ -24,7 +24,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.LanguageOptions;
@@ -36,7 +36,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 	public PointsToContext compute(Context context) {
 		checkContextBinding();
 
-		Multimap<IReference, TypeName> referenceTypes = HashMultimap.create();
+		Multimap<IReference, ITypeName> referenceTypes = HashMultimap.create();
 		ReferenceCollectionVisitor collectionVisitor = new ReferenceCollectionVisitor();
 		collectionVisitor.visit(context.getSST(), referenceTypes);
 
@@ -46,7 +46,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 		referenceTypes.put(SSTBuilder.variableReference(languageOptions.getSuperName()),
 				languageOptions.getSuperType(typeHierarchy));
 
-		for (Map.Entry<IReference, TypeName> entry : referenceTypes.entries()) {
+		for (Map.Entry<IReference, ITypeName> entry : referenceTypes.entries()) {
 			QueryContextKey query = new QueryContextKey(entry.getKey(), null, entry.getValue(), null);
 			if (!contextToLocations.containsKey(query)) {
 				contextToLocations.put(query, new AbstractLocation());
@@ -59,7 +59,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
 		IReference reference = normalizeReference(query.getReference());
-		TypeName type = normalizeType(query.getType());
+		ITypeName type = normalizeType(query.getType());
 
 		if (reference == null) {
 			if (type != null) {
@@ -108,7 +108,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 		}
 	}
 
-	private Set<AbstractLocation> queryType(TypeName type) {
+	private Set<AbstractLocation> queryType(ITypeName type) {
 		if (queryStrategy == QueryStrategy.EXHAUSTIVE) {
 			Set<AbstractLocation> locations = new HashSet<>();
 			for (Map.Entry<QueryContextKey, AbstractLocation> entry : contextToLocations.entries()) {

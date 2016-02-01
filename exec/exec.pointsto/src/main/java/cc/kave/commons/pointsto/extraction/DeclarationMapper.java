@@ -16,18 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.PropertyName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 
 public class DeclarationMapper {
 
-	private Map<MethodName, IMethodDeclaration> methods;
-	private Map<FieldName, IFieldDeclaration> fields;
-	private Map<PropertyName, IPropertyDeclaration> properties;
+	private Map<IMethodName, IMethodDeclaration> methods;
+	private Map<IFieldName, IFieldDeclaration> fields;
+	private Map<IPropertyName, IPropertyDeclaration> properties;
 
 	public DeclarationMapper(Context context) {
 		methods = new HashMap<>(context.getSST().getMethods().size());
@@ -46,15 +46,15 @@ public class DeclarationMapper {
 		}
 	}
 
-	public IMethodDeclaration get(MethodName method) {
+	public IMethodDeclaration get(IMethodName method) {
 		return methods.get(method);
 	}
 
-	public IFieldDeclaration get(FieldName field) {
+	public IFieldDeclaration get(IFieldName field) {
 		return fields.get(field);
 	}
 
-	public IPropertyDeclaration get(PropertyName property) {
+	public IPropertyDeclaration get(IPropertyName property) {
 		return properties.get(property);
 	}
 }

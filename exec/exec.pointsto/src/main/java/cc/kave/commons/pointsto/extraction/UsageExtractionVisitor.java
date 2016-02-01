@@ -54,8 +54,8 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 	}
 
 	private void visitMethod(IMethodDeclaration methodDecl, UsageExtractionVisitorContext context) {
-		MethodName method = methodDecl.getName();
-		List<ParameterName> parameters = method.getParameters();
+		IMethodName method = methodDecl.getName();
+		List<IParameterName> parameters = method.getParameters();
 		for (int i = 0; i < parameters.size(); ++i) {
 			context.registerParameter(method, parameters.get(i), i);
 		}
@@ -86,7 +86,7 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 
 	@Override
 	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
-		MethodName method = entity.getMethodName();
+		IMethodName method = entity.getMethodName();
 
 		// TODO replace with isUnknown once fixed
 		if (method.getIdentifier().equals(MethodName.UNKNOWN_NAME.getIdentifier())) {

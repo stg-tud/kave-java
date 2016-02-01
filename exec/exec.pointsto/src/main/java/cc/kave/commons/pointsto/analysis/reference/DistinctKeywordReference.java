@@ -14,16 +14,16 @@ package cc.kave.commons.pointsto.analysis.reference;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.pointsto.SSTBuilder;
 
 public class DistinctKeywordReference implements DistinctReference {
 
 	private String keyword;
-	private TypeName type;
+	private ITypeName type;
 
-	public DistinctKeywordReference(String keyword, TypeName type) {
+	public DistinctKeywordReference(String keyword, ITypeName type) {
 		this.keyword = keyword;
 		this.type = type;
 	}
@@ -34,7 +34,7 @@ public class DistinctKeywordReference implements DistinctReference {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return type;
 	}
 

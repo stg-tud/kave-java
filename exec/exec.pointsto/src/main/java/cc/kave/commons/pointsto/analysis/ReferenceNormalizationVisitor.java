@@ -12,10 +12,10 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import cc.kave.commons.model.names.EventName;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IEventName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -34,7 +34,7 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 
 	@Override
 	public IReference visit(IFieldReference fieldRef, Void context) {
-		FieldName field = fieldRef.getFieldName();
+		IFieldName field = fieldRef.getFieldName();
 		if (field.isUnknown()) {
 			return null;
 		} else if (!field.isStatic() && fieldRef.getReference().isMissing()) {
@@ -51,7 +51,7 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 
 	@Override
 	public IReference visit(IPropertyReference propertyRef, Void context) {
-		PropertyName property = propertyRef.getPropertyName();
+		IPropertyName property = propertyRef.getPropertyName();
 		if (property.isUnknown()) {
 			return null;
 		} else if (!property.isStatic() && propertyRef.getReference().isMissing()) {
@@ -70,7 +70,7 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 	@Override
 	public IReference visit(IMethodReference methodRef, Void context) {
 		// TODO replace with isUnknown once fixed
-		if (CsMethodName.UNKNOWN_NAME.equals(methodRef.getMethodName())) {
+		if (MethodName.UNKNOWN_NAME.equals(methodRef.getMethodName())) {
 			return null;
 		} else {
 			return methodRef;
@@ -79,7 +79,7 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 
 	@Override
 	public IReference visit(IEventReference eventRef, Void context) {
-		EventName event = eventRef.getEventName();
+		IEventName event = eventRef.getEventName();
 		if (event.isUnknown()) {
 			return null;
 		} else if (!event.isStatic() && eventRef.getReference().isMissing()) {

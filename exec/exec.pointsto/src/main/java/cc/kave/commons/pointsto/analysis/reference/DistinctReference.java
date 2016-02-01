@@ -12,14 +12,14 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 
 public interface DistinctReference {
 
 	IReference getReference();
 
-	TypeName getType();
+	ITypeName getType();
 
 	<TReturn, TContext> TReturn accept(DistinctReferenceVisitor<TReturn, TContext> visitor, TContext context);
 }

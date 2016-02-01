@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.LanguageOptions;
@@ -22,9 +22,9 @@ import cc.kave.commons.pointsto.SSTBuilder;
 public class DistinctPropertyParameterReference implements DistinctReference {
 
 	private IVariableReference varRef;
-	private PropertyName property;
+	private IPropertyName property;
 
-	public DistinctPropertyParameterReference(LanguageOptions languageOptions, PropertyName property) {
+	public DistinctPropertyParameterReference(LanguageOptions languageOptions, IPropertyName property) {
 		this.varRef = SSTBuilder.variableReference(languageOptions.getPropertyParameterName());
 		this.property = property;
 	}
@@ -35,11 +35,11 @@ public class DistinctPropertyParameterReference implements DistinctReference {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return property.getValueType();
 	}
 
-	public PropertyName getProperty() {
+	public IPropertyName getProperty() {
 		return property;
 	}
 

@@ -33,20 +33,20 @@ import org.junit.Test;
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
@@ -65,18 +65,18 @@ public class UnificationAnalysisTest {
 	@Test
 	public void testVisitorContext() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		TypeName testType = CsTypeName.newTypeName("Test.UnificationContextTest, Test");
+		ITypeName testType = TypeName.newTypeName("Test.UnificationContextTest, Test");
 		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(
 				builder.createContext(builder.createEmptySST(testType)), new SteensgaardLocationIdentifierFactory());
 
-		MethodName aCtor = CsMethodName.newMethodName("[?] [UnificationContextTest.A]..ctor()");
-		MethodName bCtor = CsMethodName.newMethodName("[?] [UnificationContextTest.B]..ctor()");
-		IVariableDeclaration xDecl = declare("x", CsTypeName.UNKNOWN_NAME);
-		IVariableDeclaration zDecl = declare("z", CsTypeName.UNKNOWN_NAME);
-		IVariableDeclaration aDecl = declare("a", CsTypeName.UNKNOWN_NAME);
-		IVariableDeclaration bDecl = declare("b", CsTypeName.UNKNOWN_NAME);
-		IVariableDeclaration yDecl = declare("y", CsTypeName.UNKNOWN_NAME);
-		IVariableDeclaration cDecl = declare("c", CsTypeName.UNKNOWN_NAME);
+		IMethodName aCtor = MethodName.newMethodName("[?] [UnificationContextTest.A]..ctor()");
+		IMethodName bCtor = MethodName.newMethodName("[?] [UnificationContextTest.B]..ctor()");
+		IVariableDeclaration xDecl = declare("x", TypeName.UNKNOWN_NAME);
+		IVariableDeclaration zDecl = declare("z", TypeName.UNKNOWN_NAME);
+		IVariableDeclaration aDecl = declare("a", TypeName.UNKNOWN_NAME);
+		IVariableDeclaration bDecl = declare("b", TypeName.UNKNOWN_NAME);
+		IVariableDeclaration yDecl = declare("y", TypeName.UNKNOWN_NAME);
+		IVariableDeclaration cDecl = declare("c", TypeName.UNKNOWN_NAME);
 
 		visitorContext.declareVariable(xDecl);
 		IInvocationExpression invocation = invocationExpr(aCtor);
@@ -103,7 +103,7 @@ public class UnificationAnalysisTest {
 		assertEquals(2, new HashSet<>(referenceLocations.values()).size());
 
 		visitorContext.declareVariable(cDecl);
-		IFieldReference fieldRef = builder.buildFieldReference("y", CsFieldName.newFieldName("[?] [?].f"));
+		IFieldReference fieldRef = builder.buildFieldReference("y", FieldName.newFieldName("[?] [?].f"));
 		visitorContext.setLastAssignment(assignmentToLocal("c", refExpr(fieldRef)));
 		visitorContext.readField(variableReference("c"), fieldRef);
 
@@ -129,12 +129,12 @@ public class UnificationAnalysisTest {
 	public void testStreams() {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createStreamTest();
-		TypeName enclosingType = context.getSST().getEnclosingType();
+		ITypeName enclosingType = context.getSST().getEnclosingType();
 
 		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
 		pointerAnalysis.compute(context);
 
-		FieldName sourceField = CsFieldName.newFieldName(
+		IFieldName sourceField = FieldName.newFieldName(
 				"[" + builder.getStringType().getIdentifier() + "] [" + enclosingType.getIdentifier() + "].source");
 		Set<AbstractLocation> sourceFieldLocations = pointerAnalysis.query(
 				new QueryContextKey(SSTBuilder.fieldReference(sourceField), null, builder.getStringType(), null));
@@ -200,7 +200,7 @@ public class UnificationAnalysisTest {
 
 		Callpath entry1Callpath = new Callpath(entry1Decl.getName());
 		IVariableDeclaration entry1ArgDecl = (IVariableDeclaration) entry1Decl.getBody().get(2);
-		TypeName objectType = entry1ArgDecl.getType();
+		ITypeName objectType = entry1ArgDecl.getType();
 		IAssignment entry1InvokeFunAssignment = (IAssignment) entry1Decl.getBody().get(5);
 		Set<AbstractLocation> entry1ArgInvocationLocations = pointerAnalysis.query(
 				new QueryContextKey(variableReference("arg"), entry1InvokeFunAssignment, objectType, entry1Callpath));
@@ -225,7 +225,7 @@ public class UnificationAnalysisTest {
 		assertThat(fooParameterLocations, Matchers.is(lambdaParameterLocations));
 
 		// check that the 'fun' variables of entry1 and entry2 do not refer to the same object
-		TypeName delegateType = ((IVariableDeclaration) entry1Decl.getBody().get(0)).getType();
+		ITypeName delegateType = ((IVariableDeclaration) entry1Decl.getBody().get(0)).getType();
 		Set<AbstractLocation> entry1FunLocations = pointerAnalysis.query(
 				new QueryContextKey(variableReference("fun"), entry1InvokeFunAssignment, delegateType, entry1Callpath));
 		Set<AbstractLocation> entry2FunLocations = pointerAnalysis.query(

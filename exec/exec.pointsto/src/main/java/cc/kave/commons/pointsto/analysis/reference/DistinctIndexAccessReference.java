@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.recommenders.assertions.Asserts;
 
@@ -38,9 +38,9 @@ public class DistinctIndexAccessReference implements DistinctReference {
 	}
 
 	@Override
-	public TypeName getType() {
-		TypeName baseType = baseReference.getType();
-		return baseType.isArrayType() ? baseType.getArrayBaseType() : CsTypeName.UNKNOWN_NAME;
+	public ITypeName getType() {
+		ITypeName baseType = baseReference.getType();
+		return baseType.isArrayType() ? baseType.getArrayBaseType() : TypeName.UNKNOWN_NAME;
 	}
 
 	@Override

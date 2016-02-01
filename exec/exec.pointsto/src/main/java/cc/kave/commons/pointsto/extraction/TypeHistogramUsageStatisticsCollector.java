@@ -26,13 +26,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 
 public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCollector {
 
-	private Map<TypeName, Integer> histrogram = new HashMap<>();
+	private Map<ITypeName, Integer> histrogram = new HashMap<>();
 
 	@Override
 	public UsageStatisticsCollector create() {
@@ -43,7 +43,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	public void merge(UsageStatisticsCollector other) {
 		TypeHistogramUsageStatisticsCollector otherHistoCollector = (TypeHistogramUsageStatisticsCollector) other;
 
-		for (Map.Entry<TypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
+		for (Map.Entry<ITypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
 			Integer oldCount = histrogram.getOrDefault(entry.getKey(), 0);
 			histrogram.put(entry.getKey(), oldCount + entry.getValue());
 		}
@@ -57,7 +57,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	@Override
 	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
 		for (DummyUsage usage : usages) {
-			TypeName type = usage.getType();
+			ITypeName type = usage.getType();
 
 			Integer oldCount = histrogram.getOrDefault(type, 0);
 			histrogram.put(type, oldCount + 1);
@@ -66,26 +66,26 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 
 	@Override
 	public void output(Path file) throws IOException {
-		List<Map.Entry<TypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
-		// List<Map.Entry<TypeName, Integer>> entries = new ArrayList<>(histrogram.size());
+		List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
+		// List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.size());
 		//
 		// // skip entries that occur only once
-		// for (Map.Entry<TypeName, Integer> entry : histrogram.entrySet()) {
+		// for (Map.Entry<ITypeName, Integer> entry : histrogram.entrySet()) {
 		// if (entry.getValue() > 1) {
 		// entries.add(entry);
 		// }
 		// }
 
-		Collections.sort(entries, new Comparator<Map.Entry<TypeName, Integer>>() {
+		Collections.sort(entries, new Comparator<Map.Entry<ITypeName, Integer>>() {
 
 			@Override
-			public int compare(Entry<TypeName, Integer> o1, Entry<TypeName, Integer> o2) {
+			public int compare(Entry<ITypeName, Integer> o1, Entry<ITypeName, Integer> o2) {
 				return o2.getValue() - o1.getValue();
 			}
 		});
 
 		try (BufferedWriter writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"))) {
-			for (Map.Entry<TypeName, Integer> entry : entries) {
+			for (Map.Entry<ITypeName, Integer> entry : entries) {
 				writer.write(entry.getKey().getFullName() + " " + entry.getValue());
 				writer.newLine();
 			}

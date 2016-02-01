@@ -14,18 +14,18 @@ package cc.kave.commons.pointsto.analysis.reference;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.pointsto.SSTBuilder;
 
 public class DistinctMethodParameterReference implements DistinctReference {
 
-	private ParameterName parameter;
-	private MethodName method;
+	private IParameterName parameter;
+	private IMethodName method;
 
-	public DistinctMethodParameterReference(ParameterName parameter, MethodName method) {
+	public DistinctMethodParameterReference(IParameterName parameter, IMethodName method) {
 		this.parameter = parameter;
 		this.method = method;
 	}
@@ -36,11 +36,11 @@ public class DistinctMethodParameterReference implements DistinctReference {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return parameter.getValueType();
 	}
 
-	public MethodName getMethod() {
+	public IMethodName getMethod() {
 		return method;
 	}
 

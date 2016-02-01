@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
@@ -173,7 +173,7 @@ public class UsageExtractionTest {
 				DummyCallsite callsite = callsites.iterator().next();
 				assertEquals(CallSiteKind.PARAMETER, callsite.getKind());
 				assertEquals(0, callsite.getArgIndex());
-				MethodName method = callsite.getMethod();
+				IMethodName method = callsite.getMethod();
 				assertTrue(method.isConstructor());
 				assertEquals("FileStream", method.getDeclaringType().getName());
 

@@ -26,14 +26,14 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
-import cc.kave.commons.model.names.csharp.CsPropertyName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -57,15 +57,15 @@ public class TypeCollectorTest {
 		Context streamTestContext = builder.createStreamTest();
 
 		TypeCollector collector = new TypeCollector(streamTestContext);
-		Set<TypeName> allTypes = collector.getTypes();
+		Set<ITypeName> allTypes = collector.getTypes();
 
 		assertFalse(allTypes.isEmpty());
 
-		TypeName streamTestType = streamTestContext.getTypeShape().getTypeHierarchy().getElement();
-		Set<TypeName> expectedTypes = Sets.newHashSet(streamTestType, languageOptions.getTopClass(),
+		ITypeName streamTestType = streamTestContext.getTypeShape().getTypeHierarchy().getElement();
+		Set<ITypeName> expectedTypes = Sets.newHashSet(streamTestType, languageOptions.getTopClass(),
 				builder.getStringType(), builder.getFileStreamType(), builder.getByteArrayType(),
 				builder.getInt32Type());
-		expectedTypes.add(CsTypeName.UNKNOWN_NAME); // assume that enums are treated as unknown types
+		expectedTypes.add(TypeName.UNKNOWN_NAME); // assume that enums are treated as unknown types
 		assertEquals(expectedTypes, allTypes);
 	}
 
@@ -78,7 +78,7 @@ public class TypeCollectorTest {
 		List<Boolean> testedMethods = new ArrayList<>(Arrays.asList(false, false, false));
 
 		for (IMethodDeclaration methodDecl : streamTestContext.getSST().getMethods()) {
-			MethodName method = methodDecl.getName();
+			IMethodName method = methodDecl.getName();
 			List<IStatement> stmts = methodDecl.getBody();
 			if (method.isConstructor()) {
 				assertEquals(1, stmts.size());
@@ -103,18 +103,18 @@ public class TypeCollectorTest {
 		// void return type should not be collected
 		assertFalse(new TypeCollector(builder.createStreamTest()).getTypes().contains(builder.getVoidType()));
 
-		SST sst = builder.createEmptySST(CsTypeName.newTypeName("Test.ReturnTest, Test"));
-		IMethodDeclaration testVoidDecl = SSTUtil.declareMethod(CsMethodName.newMethodName("["
+		SST sst = builder.createEmptySST(TypeName.newTypeName("Test.ReturnTest, Test"));
+		IMethodDeclaration testVoidDecl = SSTUtil.declareMethod(MethodName.newMethodName("["
 				+ builder.getVoidType().getIdentifier() + "] [" + sst.getEnclosingType().getIdentifier() + "].test1()"),
 				true);
 		IMethodDeclaration testStringDecl = SSTUtil
-				.declareMethod(CsMethodName.newMethodName("[" + builder.getStringType().getIdentifier() + "] ["
+				.declareMethod(MethodName.newMethodName("[" + builder.getStringType().getIdentifier() + "] ["
 						+ sst.getEnclosingType().getIdentifier() + "].test2()"), true);
 		sst.setMethods(Sets.newHashSet(testVoidDecl, testStringDecl));
 		Context context = builder.createContext(sst);
 
 		TypeCollector collector = new TypeCollector(context);
-		Set<TypeName> expected = Sets.newHashSet(sst.getEnclosingType(), languageOptions.getTopClass(),
+		Set<ITypeName> expected = Sets.newHashSet(sst.getEnclosingType(), languageOptions.getTopClass(),
 				builder.getStringType());
 		assertEquals(expected, collector.getTypes());
 	}
@@ -122,14 +122,14 @@ public class TypeCollectorTest {
 	public void testInvocationReference() {
 		TestSSTBuilder builder = new TestSSTBuilder();
 
-		SST sst = builder.createEmptySST(CsTypeName.newTypeName("Test.InvocationReferenceTest, Test"));
+		SST sst = builder.createEmptySST(TypeName.newTypeName("Test.InvocationReferenceTest, Test"));
 		IInvocationExpression equalsInvocation = SSTUtil.invocationExpression(languageOptions.getSuperName(),
-				CsMethodName.newMethodName(
+				MethodName.newMethodName(
 						"[" + builder.getBooleanType() + "] [" + languageOptions.getTopClass().getIdentifier()
 								+ "].Equals([" + languageOptions.getTopClass() + "] obj"),
 				Iterators.forArray(SSTUtil.refExpr("tmp")));
 		IMethodDeclaration testDecl = SSTUtil.declareMethod(
-				CsMethodName.newMethodName("[" + builder.getVoidType().getIdentifier() + "] ["
+				MethodName.newMethodName("[" + builder.getVoidType().getIdentifier() + "] ["
 						+ sst.getEnclosingType().getIdentifier() + "].test()"),
 				true, SSTUtil.declareVar("tmp", languageOptions.getTopClass()),
 				SSTUtil.assignmentToLocal("tmp", SSTUtil.nullExpr()), SSTUtil.expr(equalsInvocation));
@@ -143,18 +143,18 @@ public class TypeCollectorTest {
 	public void testSubReferenceTypes() {
 		TestSSTBuilder builder = new TestSSTBuilder();
 
-		SST sst = builder.createEmptySST(CsTypeName.newTypeName("Test.SubReferenceTest, Test"));
-		TypeName testClass = CsTypeName.newTypeName("Test.SomeClassWithStringField, Test");
-		FieldName testField = CsFieldName.newFieldName(
+		SST sst = builder.createEmptySST(TypeName.newTypeName("Test.SubReferenceTest, Test"));
+		ITypeName testClass = TypeName.newTypeName("Test.SomeClassWithStringField, Test");
+		IFieldName testField = FieldName.newFieldName(
 				"[" + builder.getStringType().getIdentifier() + "] [" + testClass.getIdentifier() + "].desc");
-		PropertyName strLengthProperty = CsPropertyName.newPropertyName("[" + builder.getInt32Type().getIdentifier()
+		IPropertyName strLengthProperty = PropertyName.newPropertyName("[" + builder.getInt32Type().getIdentifier()
 				+ "] [" + builder.getStringType().getIdentifier() + "].Length()");
 
 		IFieldReference fieldReference = builder.buildFieldReference("dummy", testField);
 		IPropertyReference propertyReference = builder.buildPropertyRef("str", strLengthProperty);
 
 		IMethodDeclaration testDecl = SSTUtil.declareMethod(
-				CsMethodName.newMethodName("[" + builder.getVoidType().getIdentifier() + "] ["
+				MethodName.newMethodName("[" + builder.getVoidType().getIdentifier() + "] ["
 						+ sst.getEnclosingType().getIdentifier() + "].test()"),
 				true, SSTUtil.declareVar("dummy", testClass), SSTUtil.assignmentToLocal("dummy", SSTUtil.nullExpr()),
 				SSTUtil.declareVar("str", builder.getStringType()),

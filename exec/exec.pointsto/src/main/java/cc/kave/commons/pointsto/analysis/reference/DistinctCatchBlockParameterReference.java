@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.pointsto.SSTBuilder;
@@ -31,7 +31,7 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return catchBlock.getParameter().getValueType();
 	}
 

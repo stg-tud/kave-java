@@ -12,12 +12,12 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public interface ScopingVisitorContext {
 
@@ -25,11 +25,11 @@ public interface ScopingVisitorContext {
 
 	void leaveScope();
 
-	void declareParameter(ParameterName parameter, MethodName method);
+	void declareParameter(IParameterName parameter, IMethodName method);
 
-	void declareParameter(ParameterName parameter, ILambdaExpression lambdaExpr);
+	void declareParameter(IParameterName parameter, ILambdaExpression lambdaExpr);
 
-	void declareParameter(ParameterName parameter, ICatchBlock catchBlock);
+	void declareParameter(IParameterName parameter, ICatchBlock catchBlock);
 
 	void declarePropertySetParameter(IPropertyDeclaration propertyDecl);
 

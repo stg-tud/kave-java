@@ -52,11 +52,11 @@ public class Callpath implements Iterable<IMethodName> {
 	public IMethodName getLast() {
 		return path.getLast();
 	}
-	
-	public boolean contains(MethodName method) {
+
+	public boolean contains(IMethodName method) {
 		return path.contains(method);
 	}
-	
+
 	public int size() {
 		return path.size();
 	}
@@ -65,8 +65,8 @@ public class Callpath implements Iterable<IMethodName> {
 	public Iterator<IMethodName> iterator() {
 		return path.iterator();
 	}
-	
-	public Iterator<MethodName> reverseIterator() {
+
+	public Iterator<IMethodName> reverseIterator() {
 		return path.descendingIterator();
 	}
 

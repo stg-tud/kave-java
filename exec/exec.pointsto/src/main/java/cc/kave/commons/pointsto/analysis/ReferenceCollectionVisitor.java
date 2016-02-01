@@ -14,11 +14,11 @@ package cc.kave.commons.pointsto.analysis;
 
 import com.google.common.collect.Multimap;
 
-import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.LambdaName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.ILambdaName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -26,31 +26,31 @@ import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.SSTBuilder;
 
-public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IReference, TypeName>, Void> {
+public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IReference, ITypeName>, Void> {
 
 	@Override
-	public Void visit(IFieldDeclaration fieldDecl, Multimap<IReference, TypeName> context) {
-		FieldName field = fieldDecl.getName();
+	public Void visit(IFieldDeclaration fieldDecl, Multimap<IReference, ITypeName> context) {
+		IFieldName field = fieldDecl.getName();
 		IReference fieldRef = SSTBuilder.fieldReference(field);
 		context.put(fieldRef, field.getValueType());
 		return null;
 	}
 
 	@Override
-	public Void visit(IFieldReference fieldRef, Multimap<IReference, TypeName> context) {
+	public Void visit(IFieldReference fieldRef, Multimap<IReference, ITypeName> context) {
 		context.put(fieldRef, fieldRef.getFieldName().getValueType());
 		return null;
 	}
 
 	@Override
-	public Void visit(IPropertyDeclaration propertyDecl, Multimap<IReference, TypeName> context) {
-		PropertyName property = propertyDecl.getName();
+	public Void visit(IPropertyDeclaration propertyDecl, Multimap<IReference, ITypeName> context) {
+		IPropertyName property = propertyDecl.getName();
 		IReference propertyRef = SSTBuilder.propertyReference(property);
 		context.put(propertyRef, property.getValueType());
 
@@ -58,20 +58,20 @@ public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IRefe
 	}
 
 	@Override
-	public Void visit(IPropertyReference propertyRef, Multimap<IReference, TypeName> context) {
+	public Void visit(IPropertyReference propertyRef, Multimap<IReference, ITypeName> context) {
 		context.put(propertyRef, propertyRef.getPropertyName().getValueType());
 		return null;
 	}
 
 	@Override
-	public Void visit(IVariableDeclaration varDecl, Multimap<IReference, TypeName> context) {
+	public Void visit(IVariableDeclaration varDecl, Multimap<IReference, ITypeName> context) {
 		context.put(varDecl.getReference(), varDecl.getType());
 		return null;
 	}
 
 	@Override
-	public Void visit(IMethodDeclaration methodDecl, Multimap<IReference, TypeName> context) {
-		for (ParameterName parameter : methodDecl.getName().getParameters()) {
+	public Void visit(IMethodDeclaration methodDecl, Multimap<IReference, ITypeName> context) {
+		for (IParameterName parameter : methodDecl.getName().getParameters()) {
 			IReference parameterRef = SSTBuilder.variableReference(parameter.getName());
 			context.put(parameterRef, parameter.getValueType());
 		}
@@ -80,10 +80,10 @@ public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IRefe
 	}
 
 	@Override
-	public Void visit(ITryBlock block, Multimap<IReference, TypeName> context) {
+	public Void visit(ITryBlock block, Multimap<IReference, ITypeName> context) {
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			if (catchBlock.getKind() == CatchBlockKind.Default) {
-				ParameterName parameter = catchBlock.getParameter();
+				IParameterName parameter = catchBlock.getParameter();
 				IReference parameterRef = SSTBuilder.variableReference(parameter.getName());
 				context.put(parameterRef, parameter.getValueType());
 			}
@@ -93,9 +93,9 @@ public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IRefe
 	}
 
 	@Override
-	public Void visit(ILambdaExpression expr, Multimap<IReference, TypeName> context) {
-		LambdaName lambda = expr.getName();
-		for (ParameterName parameter : lambda.getParameters()) {
+	public Void visit(ILambdaExpression expr, Multimap<IReference, ITypeName> context) {
+		ILambdaName lambda = expr.getName();
+		for (IParameterName parameter : lambda.getParameters()) {
 			IReference parameterRef = SSTBuilder.variableReference(parameter.getName());
 			context.put(parameterRef, parameter.getValueType());
 		}

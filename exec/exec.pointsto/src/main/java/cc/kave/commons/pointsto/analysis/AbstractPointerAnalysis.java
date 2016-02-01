@@ -23,9 +23,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 
 public abstract class AbstractPointerAnalysis implements PointerAnalysis {
@@ -75,7 +75,7 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 		return new HashSet<>(locations);
 	}
 
-	protected TypeName normalizeType(TypeName type) {
+	protected ITypeName normalizeType(ITypeName type) {
 		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
 			return null;
 		} else {
@@ -83,9 +83,9 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 		}
 	}
 
-	protected MethodName normalizeMethod(MethodName method) {
+	protected IMethodName normalizeMethod(IMethodName method) {
 		// TODO replace with isUnknown once it is overridden
-		return method.equals(CsMethodName.UNKNOWN_NAME) ? null : method;
+		return method.equals(MethodName.UNKNOWN_NAME) ? null : method;
 	}
 
 	protected IReference normalizeReference(IReference reference) {

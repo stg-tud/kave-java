@@ -21,14 +21,14 @@ import java.util.Set;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 
 public class TypeBasedAnalysisTest {
 
-	private QueryContextKey createQuery(TypeName type) {
+	private QueryContextKey createQuery(ITypeName type) {
 		return new QueryContextKey(null, null, type, null);
 	}
 

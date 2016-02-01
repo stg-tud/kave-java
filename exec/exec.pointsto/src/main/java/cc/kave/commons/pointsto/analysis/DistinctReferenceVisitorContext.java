@@ -13,12 +13,12 @@
 package cc.kave.commons.pointsto.analysis;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.ScopedMap;
@@ -62,17 +62,17 @@ public abstract class DistinctReferenceVisitorContext implements ScopingVisitorC
 	}
 
 	@Override
-	public void declareParameter(ParameterName parameter, MethodName method) {
+	public void declareParameter(IParameterName parameter, IMethodName method) {
 		namesToReferences.create(parameter.getName(), new DistinctMethodParameterReference(parameter, method));
 	}
 
 	@Override
-	public void declareParameter(ParameterName parameter, ILambdaExpression lambdaExpr) {
+	public void declareParameter(IParameterName parameter, ILambdaExpression lambdaExpr) {
 		namesToReferences.create(parameter.getName(), new DistinctLambdaParameterReference(parameter, lambdaExpr));
 	}
 
 	@Override
-	public void declareParameter(ParameterName parameter, ICatchBlock catchBlock) {
+	public void declareParameter(IParameterName parameter, ICatchBlock catchBlock) {
 		namesToReferences.create(parameter.getName(), new DistinctCatchBlockParameterReference(catchBlock));
 	}
 

@@ -37,7 +37,7 @@ public class SSTBuilder {
 		return fieldReference(thisReference, field);
 	}
 
-	public static IFieldReference fieldReference(IVariableReference reference, FieldName field) {
+	public static IFieldReference fieldReference(IVariableReference reference, IFieldName field) {
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setReference(reference);
 		fieldRef.setFieldName(field);
@@ -49,7 +49,7 @@ public class SSTBuilder {
 		return propertyReference(thisReference, property);
 	}
 
-	public static IPropertyReference propertyReference(IVariableReference reference, PropertyName property) {
+	public static IPropertyReference propertyReference(IVariableReference reference, IPropertyName property) {
 		PropertyReference propertyRef = new PropertyReference();
 		propertyRef.setReference(reference);
 		propertyRef.setPropertyName(property);

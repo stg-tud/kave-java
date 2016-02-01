@@ -12,9 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import cc.kave.commons.model.names.LambdaName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.ILambdaName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -29,9 +29,8 @@ import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
-import cc.kave.commons.pointsto.analysis.TraversingVisitor;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class ScopingVisitor<TContext extends ScopingVisitorContext, TReturn>
 		extends TraversingVisitor<TContext, TReturn> {
@@ -39,8 +38,8 @@ public class ScopingVisitor<TContext extends ScopingVisitorContext, TReturn>
 	@Override
 	public TReturn visit(IMethodDeclaration stmt, TContext context) {
 		context.enterScope();
-		MethodName method = stmt.getName();
-		for (ParameterName parameter : method.getParameters()) {
+		IMethodName method = stmt.getName();
+		for (IParameterName parameter : method.getParameters()) {
 			context.declareParameter(parameter, method);
 		}
 		super.visit(stmt, context);
@@ -51,10 +50,10 @@ public class ScopingVisitor<TContext extends ScopingVisitorContext, TReturn>
 
 	@Override
 	public TReturn visit(ILambdaExpression expr, TContext context) {
-		LambdaName lambda = expr.getName();
+		ILambdaName lambda = expr.getName();
 
 		context.enterScope();
-		for (ParameterName parameter : lambda.getParameters()) {
+		for (IParameterName parameter : lambda.getParameters()) {
 			context.declareParameter(parameter, expr);
 		}
 		visitStatements(expr.getBody(), context);

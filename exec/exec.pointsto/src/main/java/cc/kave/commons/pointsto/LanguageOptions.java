@@ -14,9 +14,9 @@ package cc.kave.commons.pointsto;
 
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.Name;
-import cc.kave.commons.model.names.PropertyName;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
@@ -52,7 +52,7 @@ public abstract class LanguageOptions {
 
 	public abstract ITypeName addLambda(ITypeName type);
 
-	public boolean isLambdaName(Name name) {
+	public boolean isLambdaName(IName name) {
 		return name.getIdentifier().contains(LAMBDA_KEYWORD);
 	}
 

@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.reference;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
 public class DistinctFieldReference extends DistinctMemberReference {
@@ -34,7 +34,7 @@ public class DistinctFieldReference extends DistinctMemberReference {
 	}
 
 	@Override
-	public TypeName getType() {
+	public ITypeName getType() {
 		return ((IFieldReference) memberReference).getFieldName().getValueType();
 	}
 

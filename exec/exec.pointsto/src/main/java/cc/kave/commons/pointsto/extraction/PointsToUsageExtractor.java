@@ -134,11 +134,11 @@ public class PointsToUsageExtractor {
 		}
 	}
 
-	private TypeName getClassContext(TypeName currentContext, ITypeHierarchy typeHierarchy) {
+	private ITypeName getClassContext(ITypeName currentContext, ITypeHierarchy typeHierarchy) {
 		boolean wasLambdaContext = languageOptions.isLambdaName(currentContext);
 
 		if (typeHierarchy.hasSuperclass()) {
-			TypeName superType = typeHierarchy.getExtends().getElement();
+			ITypeName superType = typeHierarchy.getExtends().getElement();
 
 			if (wasLambdaContext && !languageOptions.isLambdaName(superType)) {
 				return languageOptions.addLambda(superType);
@@ -150,22 +150,22 @@ public class PointsToUsageExtractor {
 		}
 	}
 
-	private MethodName getMethodContext(MethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
+	private IMethodName getMethodContext(IMethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
 		boolean wasLambdaContext = languageOptions.isLambdaName(currentContext);
-		MethodName restoredMethod = currentContext;
+		IMethodName restoredMethod = currentContext;
 		if (wasLambdaContext) {
 			// remove lambda qualifiers in order to find the fitting method hierarchy
 			restoredMethod = languageOptions.removeLambda(currentContext);
 		}
 
 		for (IMethodHierarchy methodHierarchy : hierarchies) {
-			MethodName method = methodHierarchy.getElement();
+			IMethodName method = methodHierarchy.getElement();
 
 			if (restoredMethod.equals(method)) {
-				MethodName firstMethod = methodHierarchy.getFirst();
-				MethodName superMethod = methodHierarchy.getSuper();
+				IMethodName firstMethod = methodHierarchy.getFirst();
+				IMethodName superMethod = methodHierarchy.getSuper();
 
-				MethodName newMethodContext = currentContext;
+				IMethodName newMethodContext = currentContext;
 				if (firstMethod != null) {
 					newMethodContext = firstMethod;
 				} else if (superMethod != null) {

@@ -14,12 +14,11 @@ package cc.kave.commons.pointsto;
 
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.TypeName
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public class CSharpLanguageOptions extends LanguageOptions {

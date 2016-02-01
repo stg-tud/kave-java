@@ -12,9 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis.types;
 
-import cc.kave.commons.model.names.LambdaName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
+import cc.kave.commons.model.names.ILambdaName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -52,11 +52,11 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 	@Override
 	public Void visit(ILambdaExpression expr, TypeCollectorVisitorContext context) {
-		LambdaName lambda = expr.getName();
+		ILambdaName lambda = expr.getName();
 		context.collectType(lambda.getReturnType());
 
 		context.enterScope();
-		for (ParameterName parameter : lambda.getParameters()) {
+		for (IParameterName parameter : lambda.getParameters()) {
 			context.declareParameter(parameter);
 		}
 		visitStatements(expr.getBody(), context);
@@ -214,11 +214,11 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 
 	@Override
 	public Void visit(IInvocationExpression entity, TypeCollectorVisitorContext context) {
-		MethodName method = entity.getMethodName();
+		IMethodName method = entity.getMethodName();
 		context.collectType(method.getDeclaringType());
 		context.collectType(method.getReturnType());
 
-		for (ParameterName parameter : method.getParameters()) {
+		for (IParameterName parameter : method.getParameters()) {
 			context.collectType(parameter.getValueType());
 		}
 
