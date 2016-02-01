@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -971,7 +970,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void readArray(ReferenceLocation destLocation, DistinctIndexAccessReference srcRef) {
 		ReferenceLocation srcLocation = getOrCreateLocation(srcRef.getBaseReference());
 		LocationIdentifier destIdentifier = getIdentifierForSimpleRefLoc(srcRef.getType());
-		LocationIdentifier srcIdentifier = identifierFactory.create(srcRef.getReference());
+		LocationIdentifier srcIdentifier = identifierFactory.create(srcRef);
 		readDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 	}
 
@@ -989,7 +988,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void writeArray(DistinctIndexAccessReference destRef, ReferenceLocation srcLocation) {
 		ReferenceLocation destLocation = getOrCreateLocation(destRef.getBaseReference());
-		LocationIdentifier destIdentifier = identifierFactory.create(destRef.getReference());
+		LocationIdentifier destIdentifier = identifierFactory.create(destRef);
 		LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(destRef.getType());
 		writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 	}

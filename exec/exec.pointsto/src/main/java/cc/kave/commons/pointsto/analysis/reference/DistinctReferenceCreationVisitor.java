@@ -28,21 +28,37 @@ public class DistinctReferenceCreationVisitor
 	@Override
 	public DistinctReference visit(IFieldReference fieldRef, ScopedMap<String, DistinctReference> context) {
 		IVariableReference baseRef = fieldRef.getReference();
-		if (baseRef.isMissing() && !fieldRef.getFieldName().isStatic()) {
-			throw new MissingBaseVariableException(fieldRef);
+		DistinctReference distBaseRef = context.get(baseRef.getIdentifier());
+
+		if (!fieldRef.getFieldName().isStatic()) {
+			if (baseRef.isMissing()) {
+				throw new MissingBaseVariableException(fieldRef);
+			}
+
+			if (distBaseRef == null) {
+				throw new UndeclaredVariableException(baseRef);
+			}
 		}
 
-		return new DistinctFieldReference(fieldRef, context.get(baseRef.getIdentifier()));
+		return new DistinctFieldReference(fieldRef, distBaseRef);
 	}
 
 	@Override
 	public DistinctReference visit(IPropertyReference propertyRef, ScopedMap<String, DistinctReference> context) {
 		IVariableReference baseRef = propertyRef.getReference();
-		if (baseRef.isMissing() && !propertyRef.getPropertyName().isStatic()) {
-			throw new MissingBaseVariableException(propertyRef);
+		DistinctReference distBaseRef = context.get(baseRef.getIdentifier());
+
+		if (!propertyRef.getPropertyName().isStatic()) {
+			if (baseRef.isMissing()) {
+				throw new MissingBaseVariableException(propertyRef);
+			}
+
+			if (distBaseRef == null) {
+				throw new UndeclaredVariableException(baseRef);
+			}
 		}
 
-		return new DistinctPropertyReference(propertyRef, context.get(baseRef.getIdentifier()));
+		return new DistinctPropertyReference(propertyRef, distBaseRef);
 	}
 
 	@Override

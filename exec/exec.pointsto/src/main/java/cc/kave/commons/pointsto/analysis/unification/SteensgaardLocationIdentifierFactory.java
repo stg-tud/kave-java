@@ -13,12 +13,10 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IIndexAccessReference;
-import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 
-public class SteensgaardLocationIdentifierFactory implements LocationIdentifierFactory {
+public class SteensgaardLocationIdentifierFactory extends AbstractLocationIdentifierFactory {
 
 	@Override
 	public LocationIdentifier create(IFieldReference fieldRef) {
@@ -39,18 +37,7 @@ public class SteensgaardLocationIdentifierFactory implements LocationIdentifierF
 	}
 
 	@Override
-	public LocationIdentifier create(IMemberReference memberRef) {
-		if (memberRef instanceof IFieldReference) {
-			return create((IFieldReference) memberRef);
-		} else if (memberRef instanceof IPropertyReference) {
-			return create((IPropertyReference) memberRef);
-		} else {
-			throw new UnexpectedSSTNodeException(memberRef);
-		}
-	}
-
-	@Override
-	public LocationIdentifier create(IIndexAccessReference indexAccessRef) {
+	public LocationIdentifier create(DistinctIndexAccessReference indexAccessRef) {
 		return LocationIdentifier.VALUE;
 	}
 

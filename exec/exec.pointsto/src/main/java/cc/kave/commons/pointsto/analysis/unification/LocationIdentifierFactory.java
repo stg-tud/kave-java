@@ -13,9 +13,9 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 
 public interface LocationIdentifierFactory {
 	
@@ -26,6 +26,6 @@ public interface LocationIdentifierFactory {
 
 	LocationIdentifier create(IPropertyReference propertyRef);
 	
-	LocationIdentifier create(IIndexAccessReference indexAccessRef);
+	LocationIdentifier create(DistinctIndexAccessReference indexAccessRef);
 
 }
