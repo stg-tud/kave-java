@@ -56,7 +56,6 @@ public class MethodNameGeneratorTest extends AbstractNameGeneratorTest {
 
 	private Iterable<List<ITypeName>> createTypeParameters() {
 		List<List<ITypeName>> params = Lists.newArrayList();
-		Iterable<ITypeName> typeParams = getTypeParameters();
 		params.add(Lists.newLinkedList());
 		ITypeName lastType = null;
 		for(ITypeName t : getTypeParameters()){

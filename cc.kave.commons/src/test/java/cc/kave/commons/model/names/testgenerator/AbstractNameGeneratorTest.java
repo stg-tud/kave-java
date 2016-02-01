@@ -2,12 +2,16 @@ package cc.kave.commons.model.names.testgenerator;
 
 import java.util.List;
 
+import org.junit.Assert;
+
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.IDelegateTypeName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.AssemblyName;
 import cc.kave.commons.model.names.csharp.DelegateTypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.names.csharp.TypeParameterName;
 
@@ -77,6 +81,27 @@ public abstract class AbstractNameGeneratorTest {
 		return types;
 	}
 
+	
+	public Iterable<IMethodName> getMethodNames(){
+		return getMethodNames(1);
+	}
+
+	private Iterable<IMethodName> getMethodNames(int maxDepth) {
+		List<IMethodName> methodNames = Lists.newLinkedList();
+		// TODO: TypeParameters and Generic MethodNames
+		// for (List<ITypeName> typeParams : createTypeParameters()) {
+		for (String simpleMethodName : new String[] { "M", ".ctor", ".cctor" }) {
+			for (ITypeName declaringType : getTypes(maxDepth)) {
+				for (ITypeName returnType : getTypes(maxDepth)) {
+					// String genericPart = createGenericPart(typeParams);
+					methodNames.add(method("[%s] [%s].%s%s()", returnType, declaringType, simpleMethodName, ""));
+				}
+			}
+		}
+		// }
+		return methodNames;
+	}
+	
 	private Iterable<String> getAssemblyName() {
 		return Lists.newArrayList(AssemblyName.UNKNOWN_NAME.getIdentifier(), getUniqueName(), "mscorlib, 4.0.0.0");
 	}
@@ -89,6 +114,10 @@ public abstract class AbstractNameGeneratorTest {
 
 	private ITypeName type(String id, Object... args) {
 		return TypeName.newTypeName(String.format(id, args));
+	}
+	
+	private IMethodName method(String id, Object...args){
+		return MethodName.newMethodName(String.format(id, args));
 	}
 
 	private IDelegateTypeName delegate(String id, Object... args) {
