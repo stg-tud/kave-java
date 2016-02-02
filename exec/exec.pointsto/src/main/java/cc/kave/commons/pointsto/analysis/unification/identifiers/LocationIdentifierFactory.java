@@ -10,35 +10,22 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 
-public class SteensgaardLocationIdentifierFactory extends AbstractLocationIdentifierFactory {
+public interface LocationIdentifierFactory {
+	
+	
+	LocationIdentifier create(IMemberReference memberRef);
 
-	@Override
-	public LocationIdentifier create(IFieldReference fieldRef) {
-		if (fieldRef.getFieldName().getValueType().isDelegateType()) {
-			return LocationIdentifier.FUNCTION;
-		} else {
-			return LocationIdentifier.VALUE;
-		}
-	}
+	LocationIdentifier create(IFieldReference fieldRef);
 
-	@Override
-	public LocationIdentifier create(IPropertyReference propertyRef) {
-		if (propertyRef.getPropertyName().getValueType().isDelegateType()) {
-			return LocationIdentifier.FUNCTION;
-		} else {
-			return LocationIdentifier.VALUE;
-		}
-	}
-
-	@Override
-	public LocationIdentifier create(DistinctIndexAccessReference indexAccessRef) {
-		return LocationIdentifier.VALUE;
-	}
+	LocationIdentifier create(IPropertyReference propertyRef);
+	
+	LocationIdentifier create(DistinctIndexAccessReference indexAccessRef);
 
 }

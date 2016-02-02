@@ -56,9 +56,9 @@ import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
-import cc.kave.commons.pointsto.analysis.unification.SteensgaardLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.SteensgaardUnificationAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysisVisitorContext;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
 
 public class UnificationAnalysisTest {
 

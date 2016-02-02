@@ -10,11 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.locations;
 
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+
+import cc.kave.commons.pointsto.analysis.unification.SetRepresentative;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifier;
 
 public class SimpleReferenceLocation extends ReferenceLocation {
 

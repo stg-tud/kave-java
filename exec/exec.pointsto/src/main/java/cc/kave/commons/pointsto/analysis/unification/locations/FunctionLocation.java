@@ -10,9 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.locations;
 
 import java.util.List;
+
+import cc.kave.commons.pointsto.analysis.unification.SetRepresentative;
 
 public class FunctionLocation extends Location {
 

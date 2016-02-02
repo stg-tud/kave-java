@@ -34,6 +34,7 @@ import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.QueryStrategy;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
 
 public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 

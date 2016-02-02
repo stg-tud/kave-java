@@ -10,27 +10,19 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.locations;
 
-public abstract class Location {
+import cc.kave.commons.pointsto.analysis.unification.SetRepresentative;
 
-	private SetRepresentative setRepresentative;
+public class BottomLocation extends Location {
 
-	public Location(SetRepresentative setRepresentative) {
-		this.setRepresentative = setRepresentative;
-		if (setRepresentative.getLocation() == null) {
-			setRepresentative.setLocation(this);
-		}
+	public BottomLocation(SetRepresentative setRepresentative) {
+		super(setRepresentative);
 	}
 
-	public SetRepresentative getSetRepresentative() {
-		return setRepresentative;
+	@Override
+	public final boolean isBottom() {
+		return true;
 	}
-
-	public void setSetRepresentative(SetRepresentative representative) {
-		this.setRepresentative = representative;
-	}
-
-	public abstract boolean isBottom();
 
 }

@@ -10,17 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
-public class BottomLocation extends Location {
+public interface LocationIdentifier {
 
-	public BottomLocation(SetRepresentative setRepresentative) {
-		super(setRepresentative);
-	}
+	public static final LocationIdentifier VALUE = new LocationIdentifier() {
+		@Override
+		public String toString() {
+			return "VALUE";
+		};
+	};
 
-	@Override
-	public final boolean isBottom() {
-		return true;
-	}
-
+	public static final LocationIdentifier FUNCTION = new LocationIdentifier() {
+		@Override
+		public String toString() {
+			return "FUNCTION";
+		};
+	};
 }

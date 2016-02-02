@@ -16,6 +16,8 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifier;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
 
 public abstract class AbstractLocationIdentifierFactory implements LocationIdentifierFactory {
 

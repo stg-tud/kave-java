@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
+import cc.kave.commons.pointsto.analysis.unification.locations.Location;
+
 public class SetRepresentative {
 
 	private Location location;

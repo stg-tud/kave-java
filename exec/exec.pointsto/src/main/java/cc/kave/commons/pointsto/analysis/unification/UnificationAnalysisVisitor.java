@@ -44,6 +44,8 @@ import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.ScopingVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
+import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
+import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
 
 public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalysisVisitorContext, Void> {
 

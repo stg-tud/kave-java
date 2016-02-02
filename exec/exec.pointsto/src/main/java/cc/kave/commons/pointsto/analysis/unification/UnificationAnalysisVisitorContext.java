@@ -63,6 +63,14 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterRefe
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifier;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
+import cc.kave.commons.pointsto.analysis.unification.locations.BottomLocation;
+import cc.kave.commons.pointsto.analysis.unification.locations.ExtendedReferenceLocation;
+import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
+import cc.kave.commons.pointsto.analysis.unification.locations.Location;
+import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
+import cc.kave.commons.pointsto.analysis.unification.locations.SimpleReferenceLocation;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 import cc.recommenders.assertions.Asserts;
 
