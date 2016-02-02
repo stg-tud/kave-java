@@ -17,8 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -113,12 +113,12 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 	@Override
 	public Void visit(IInvocationExpression entity, UnificationAnalysisVisitorContext context) {
-		MethodName method = entity.getMethodName();
+		IMethodName method = entity.getMethodName();
 
 		IAssignableReference destRef = context.getDestinationForExpr(entity);
 
 		// TODO replace with isUnknown once fixed
-		if (method.equals(CsMethodName.UNKNOWN_NAME)) {
+		if (method.equals(MethodName.UNKNOWN_NAME)) {
 			// assume that unknown methods return a newly allocated object
 			if (destRef != null) {
 				context.allocate(destRef);

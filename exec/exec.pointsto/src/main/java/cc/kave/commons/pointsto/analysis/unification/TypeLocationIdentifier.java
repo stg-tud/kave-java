@@ -12,17 +12,17 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.ITypeName;
 
 public class TypeLocationIdentifier implements LocationIdentifier {
 
-	private TypeName type;
+	private ITypeName type;
 
-	public TypeLocationIdentifier(TypeName type) {
+	public TypeLocationIdentifier(ITypeName type) {
 		this.type = type;
 	}
 
-	public TypeName getType() {
+	public ITypeName getType() {
 		return type;
 	}
 

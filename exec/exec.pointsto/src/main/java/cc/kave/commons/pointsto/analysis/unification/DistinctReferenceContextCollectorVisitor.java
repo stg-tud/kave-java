@@ -23,7 +23,6 @@ import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -34,6 +33,7 @@ import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.analysis.ScopingVisitor;
 
 public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<DistinctReferenceContextCollector, Void> {

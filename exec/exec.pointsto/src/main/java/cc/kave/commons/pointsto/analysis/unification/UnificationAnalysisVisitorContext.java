@@ -31,11 +31,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MemberName;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.ParameterName;
-import cc.kave.commons.model.names.PropertyName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -81,12 +81,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private Map<DistinctMemberReference, SetRepresentative> memberLocations = new HashMap<>();
 
 	private IAssignment lastAssignment;
-	private MemberName currentMember;
+	private IMemberName currentMember;
 	private Deque<Pair<ILambdaExpression, ReferenceLocation>> lambdaStack = new ArrayDeque<>();
 
 	private DeclarationMapper declarationMapper;
 
-	private Map<MemberName, ReferenceLocation> returnLocations = new HashMap<>();
+	private Map<IMemberName, ReferenceLocation> returnLocations = new HashMap<>();
 
 	private DestinationLocationVisitor destLocationVisitor = new DestinationLocationVisitor();
 	private SourceLocationVisitor srcLocationVisitor = new SourceLocationVisitor();
@@ -172,7 +172,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		}
 	}
 
-	private LocationIdentifier getIdentifierForSimpleRefLoc(TypeName type) {
+	private LocationIdentifier getIdentifierForSimpleRefLoc(ITypeName type) {
 		if (type.isDelegateType()) {
 			return LocationIdentifier.FUNCTION;
 		} else {
@@ -236,10 +236,10 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private FunctionLocation createFunctionLocation(ILambdaExpression lambdaExpr) {
-		List<ParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
+		List<IParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
 		List<ReferenceLocation> parameterLocations = new ArrayList<>(lambdaParameters.size());
 
-		for (ParameterName formalParameter : lambdaParameters) {
+		for (IParameterName formalParameter : lambdaParameters) {
 			DistinctReference distRef = new DistinctLambdaParameterReference(formalParameter, lambdaExpr);
 			ReferenceLocation formalParameterLocation = getOrCreateLocation(distRef);
 
@@ -254,17 +254,17 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return new FunctionLocation(parameterLocations, currentLambdaEntry.getValue(), functionRep);
 	}
 
-	private FunctionLocation createFunctionLocation(MethodName method) {
+	private FunctionLocation createFunctionLocation(IMethodName method) {
 		SetRepresentative functionRep = new SetRepresentative();
 		unionFind.addElement(functionRep);
 		return createFunctionLocation(method, functionRep);
 	}
 
-	private FunctionLocation createFunctionLocation(MethodName method, SetRepresentative functionRep) {
-		List<ParameterName> methodParameters = method.getParameters();
+	private FunctionLocation createFunctionLocation(IMethodName method, SetRepresentative functionRep) {
+		List<IParameterName> methodParameters = method.getParameters();
 		List<ReferenceLocation> parameterLocations = new ArrayList<>(methodParameters.size());
 
-		for (ParameterName formalParameter : methodParameters) {
+		for (IParameterName formalParameter : methodParameters) {
 			DistinctMethodParameterReference distRef = new DistinctMethodParameterReference(formalParameter, method);
 			ReferenceLocation formalParameterLocation = getOrCreateLocation(distRef);
 
@@ -285,7 +285,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return location;
 	}
 
-	private ReferenceLocation getOrCreateReturnLocation(MemberName member) {
+	private ReferenceLocation getOrCreateReturnLocation(IMemberName member) {
 		ReferenceLocation location = returnLocations.get(member);
 
 		if (location == null) {
@@ -418,7 +418,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return getOrCreateLocation(distRef);
 	}
 
-	public void setCurrentMember(MemberName member) {
+	public void setCurrentMember(IMemberName member) {
 		this.currentMember = member;
 	}
 
@@ -586,14 +586,14 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		} else {
 			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
 
-			List<ParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
+			List<IParameterName> lambdaParameters = lambdaExpr.getName().getParameters();
 			List<DistinctReference> distLambdaParameters = new ArrayList<>(lambdaParameters.size());
-			for (ParameterName lambdaParameter : lambdaParameters) {
+			for (IParameterName lambdaParameter : lambdaParameters) {
 				distLambdaParameters.add(new DistinctLambdaParameterReference(lambdaParameter, lambdaExpr));
 			}
 
 			ReferenceLocation lambdaReturnLocation = lambdaStack.getFirst().getValue();
-			TypeName lambdaReturnType = lambdaStack.getFirst().getKey().getName().getReturnType();
+			ITypeName lambdaReturnType = lambdaStack.getFirst().getKey().getName().getReturnType();
 
 			updateFunctionLocation(functionLocation, distLambdaParameters, lambdaReturnType, lambdaReturnLocation);
 		}
@@ -606,7 +606,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void storeFunction(ReferenceLocation destLocation, IMethodReference methodRef) {
-		MethodName method = methodRef.getMethodName();
+		IMethodName method = methodRef.getMethodName();
 
 		Location derefDestLocation = unionFind
 				.find(destLocation.getLocation(LocationIdentifier.FUNCTION).getSetRepresentative()).getLocation();
@@ -618,9 +618,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		} else {
 			FunctionLocation functionLocation = (FunctionLocation) derefDestLocation;
 
-			List<ParameterName> methodParameters = method.getParameters();
+			List<IParameterName> methodParameters = method.getParameters();
 			List<DistinctReference> distMethodParameters = new ArrayList<>(methodParameters.size());
-			for (ParameterName parameter : methodParameters) {
+			for (IParameterName parameter : methodParameters) {
 				distMethodParameters.add(new DistinctMethodParameterReference(parameter, method));
 			}
 
@@ -630,7 +630,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void updateFunctionLocation(FunctionLocation functionLocation, List<DistinctReference> newParameters,
-			TypeName newReturnType, ReferenceLocation newReturnLocation) {
+			ITypeName newReturnType, ReferenceLocation newReturnLocation) {
 		List<ReferenceLocation> funLocParameters = functionLocation.getParameterLocations();
 		Asserts.assertEquals(funLocParameters.size(), newParameters.size());
 
@@ -659,7 +659,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public FunctionLocation invokeDelegate(IInvocationExpression invocation) {
-		MethodName method = invocation.getMethodName();
+		IMethodName method = invocation.getMethodName();
 
 		DistinctReference receiverRef = invocation.getReference().accept(distinctReferenceCreationVisitor,
 				namesToReferences);
@@ -687,10 +687,10 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return functionLocation;
 	}
 
-	public List<ReferenceLocation> getMethodParameterLocations(MethodName method) {
-		List<ParameterName> formalParameters = method.getParameters();
+	public List<ReferenceLocation> getMethodParameterLocations(IMethodName method) {
+		List<IParameterName> formalParameters = method.getParameters();
 		List<ReferenceLocation> parameterLocations = new ArrayList<>(formalParameters.size());
-		for (ParameterName parameter : formalParameters) {
+		for (IParameterName parameter : formalParameters) {
 			DistinctReference distParameterRef = new DistinctMethodParameterReference(parameter, method);
 			parameterLocations.add(getOrCreateLocation(distParameterRef));
 		}
@@ -698,7 +698,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return parameterLocations;
 	}
 
-	public ReferenceLocation getMethodReturnLocation(MethodName method) {
+	public ReferenceLocation getMethodReturnLocation(IMethodName method) {
 		return getOrCreateReturnLocation(method);
 	}
 
@@ -720,7 +720,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void assign(DistinctPropertyReference dest, DistinctPropertyReference src) {
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
-		PropertyName srcProperty = src.getReference().getPropertyName();
+		IPropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
@@ -728,7 +728,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			copy(tempLoc, returnLocation);
 		}
 
-		PropertyName destProperty = dest.getReference().getPropertyName();
+		IPropertyName destProperty = dest.getReference().getPropertyName();
 		if (treatPropertyAsField(dest.getReference())) {
 			writeMember(dest, tempLoc);
 		} else {
@@ -747,7 +747,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readMember(tempLoc, src);
 
-		PropertyName destProperty = dest.getReference().getPropertyName();
+		IPropertyName destProperty = dest.getReference().getPropertyName();
 		if (treatPropertyAsField(dest.getReference())) {
 			writeMember(dest, tempLoc);
 		} else {
@@ -764,7 +764,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void assign(DistinctFieldReference dest, DistinctPropertyReference src) {
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
-		PropertyName srcProperty = src.getReference().getPropertyName();
+		IPropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
@@ -795,7 +795,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readArray(tempLoc, src);
 
-		PropertyName destProperty = dest.getReference().getPropertyName();
+		IPropertyName destProperty = dest.getReference().getPropertyName();
 		if (treatPropertyAsField(dest.getReference())) {
 			writeMember(dest, tempLoc);
 		} else {
@@ -824,7 +824,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void assign(DistinctIndexAccessReference dest, DistinctPropertyReference src) {
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
-		PropertyName srcProperty = src.getReference().getPropertyName();
+		IPropertyName srcProperty = src.getReference().getPropertyName();
 		if (treatPropertyAsField(src.getReference())) {
 			readMember(tempLoc, src);
 		} else {
@@ -919,7 +919,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void readProperty(DistinctReference destRef, DistinctPropertyReference propertyRef) {
 		ReferenceLocation destLocation = getOrCreateLocation(destRef);
-		PropertyName property = propertyRef.getReference().getPropertyName();
+		IPropertyName property = propertyRef.getReference().getPropertyName();
 		if (treatPropertyAsField(propertyRef.getReference())) {
 			readMember(destLocation, propertyRef);
 		} else {
@@ -939,7 +939,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	private void writeProperty(DistinctPropertyReference propertyRef, DistinctReference srcRef) {
-		PropertyName property = propertyRef.getReference().getPropertyName();
+		IPropertyName property = propertyRef.getReference().getPropertyName();
 		if (treatPropertyAsField(propertyRef.getReference())) {
 			ReferenceLocation srcLocation = getOrCreateLocation(srcRef);
 			writeMember(propertyRef, srcLocation);
@@ -1045,7 +1045,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
 			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
-			PropertyName property = propertyRef.getPropertyName();
+			IPropertyName property = propertyRef.getPropertyName();
 			if (treatPropertyAsField(propertyRef)) {
 				DistinctPropertyReference distRef = (DistinctPropertyReference) propertyRef
 						.accept(distinctReferenceCreationVisitor, namesToReferences);
@@ -1090,7 +1090,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		public ReferenceLocation visit(IPropertyReference propertyRef, Void context) {
 			ReferenceLocation tempLoc = createSimpleReferenceLocation();
 
-			PropertyName property = propertyRef.getPropertyName();
+			IPropertyName property = propertyRef.getPropertyName();
 			if (treatPropertyAsField(propertyRef)) {
 				DistinctPropertyReference distRef = (DistinctPropertyReference) propertyRef
 						.accept(distinctReferenceCreationVisitor, namesToReferences);

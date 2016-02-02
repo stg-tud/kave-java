@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.Callpath;
@@ -48,16 +48,16 @@ public class QueryKeyTransformer
 		this.enableStmtsForVariables = enableStmtsForVariables;
 	}
 
-	private Callpath normalizeMethod(MethodName method) {
+	private Callpath normalizeMethod(IMethodName method) {
 		// TODO replace with isUnknown once it is overridden
-		if (method == null || method.equals(CsMethodName.UNKNOWN_NAME)) {
+		if (method == null || method.equals(MethodName.UNKNOWN_NAME)) {
 			return null;
 		} else {
 			return new Callpath(method);
 		}
 	}
 
-	private TypeName normalizeType(TypeName type) {
+	private ITypeName normalizeType(ITypeName type) {
 		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
 			return null;
 		} else {
@@ -79,11 +79,11 @@ public class QueryKeyTransformer
 
 	@Override
 	public List<QueryContextKey> visit(DistinctVariableReference varRef, DistinctReferenceContextCollector context) {
-		Collection<MethodName> methods = context.getMethods(varRef);
+		Collection<IMethodName> methods = context.getMethods(varRef);
 		// if a declared variable is not used in a method, there will be no associated methods or statements
 		Asserts.assertLessOrEqual(methods.size(), 1);
 		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
-		TypeName type = normalizeType(varRef.getType());
+		ITypeName type = normalizeType(varRef.getType());
 		IReference reference = varRef.getReference().accept(normalizationVisitor, null);
 
 		if (enableStmtsForVariables) {
@@ -111,7 +111,7 @@ public class QueryKeyTransformer
 	public List<QueryContextKey> visit(DistinctPropertyParameterReference propertyParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(propertyParameterRef);
-		TypeName type = normalizeType(propertyParameterRef.getType());
+		ITypeName type = normalizeType(propertyParameterRef.getType());
 		IReference reference = propertyParameterRef.getReference().accept(normalizationVisitor, null);
 		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
 
@@ -126,10 +126,10 @@ public class QueryKeyTransformer
 	public List<QueryContextKey> visit(DistinctCatchBlockParameterReference catchBlockParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(catchBlockParameterRef);
-		Collection<MethodName> methods = context.getMethods(catchBlockParameterRef);
+		Collection<IMethodName> methods = context.getMethods(catchBlockParameterRef);
 		Asserts.assertEquals(1, methods.size());
 		Callpath methodPath = normalizeMethod(methods.iterator().next());
-		TypeName type = normalizeType(catchBlockParameterRef.getType());
+		ITypeName type = normalizeType(catchBlockParameterRef.getType());
 		IReference reference = catchBlockParameterRef.getReference().accept(normalizationVisitor, null);
 		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
 
@@ -144,11 +144,11 @@ public class QueryKeyTransformer
 	public List<QueryContextKey> visit(DistinctLambdaParameterReference lambdaParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(lambdaParameterRef);
-		Collection<MethodName> methods = context.getMethods(lambdaParameterRef);
+		Collection<IMethodName> methods = context.getMethods(lambdaParameterRef);
 		// the user is free to write lambdas which do not use a parameter
 		Asserts.assertLessOrEqual(methods.size(), 1);
 		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
-		TypeName type = normalizeType(lambdaParameterRef.getType());
+		ITypeName type = normalizeType(lambdaParameterRef.getType());
 		IReference reference = lambdaParameterRef.getReference().accept(normalizationVisitor, null);
 		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
 
@@ -163,7 +163,7 @@ public class QueryKeyTransformer
 	public List<QueryContextKey> visit(DistinctMethodParameterReference methodParameterRef,
 			DistinctReferenceContextCollector context) {
 		Callpath methodPath = normalizeMethod(methodParameterRef.getMethod());
-		TypeName type = normalizeType(methodParameterRef.getType());
+		ITypeName type = normalizeType(methodParameterRef.getType());
 		IReference reference = methodParameterRef.getReference().accept(normalizationVisitor, null);
 		ArrayList<QueryContextKey> queryKeys = new ArrayList<>();
 

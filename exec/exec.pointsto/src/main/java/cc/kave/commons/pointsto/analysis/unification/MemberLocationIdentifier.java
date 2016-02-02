@@ -12,17 +12,17 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-import cc.kave.commons.model.names.MemberName;
+import cc.kave.commons.model.names.IMemberName;
 
 public class MemberLocationIdentifier implements LocationIdentifier {
 
-	private MemberName member;
+	private IMemberName member;
 
-	public MemberLocationIdentifier(MemberName member) {
+	public MemberLocationIdentifier(IMemberName member) {
 		this.member = member;
 	}
 
-	public MemberName getMember() {
+	public IMemberName getMember() {
 		return member;
 	}
 

@@ -21,7 +21,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -35,17 +35,17 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 
 	private Logger LOGGER = LoggerFactory.getLogger(DistinctReferenceContextCollector.class);
 
-	private MethodName currentMethod;
+	private IMethodName currentMethod;
 	private IStatement currentStatement;
 
-	private Multimap<DistinctReference, MethodName> referenceToMethods = HashMultimap.create();
+	private Multimap<DistinctReference, IMethodName> referenceToMethods = HashMultimap.create();
 	private Multimap<DistinctReference, IStatement> referenceToStmts = HashMultimap.create();
 
 	public DistinctReferenceContextCollector(Context context) {
 		super(context);
 	}
 
-	public Collection<MethodName> getMethods(DistinctReference ref) {
+	public Collection<IMethodName> getMethods(DistinctReference ref) {
 		return referenceToMethods.get(ref);
 	}
 
@@ -53,7 +53,7 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 		return referenceToStmts.get(ref);
 	}
 
-	public void setCurrentMethod(MethodName method) {
+	public void setCurrentMethod(IMethodName method) {
 		this.currentMethod = method;
 	}
 

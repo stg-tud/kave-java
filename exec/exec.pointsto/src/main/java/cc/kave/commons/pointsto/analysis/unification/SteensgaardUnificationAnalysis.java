@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
@@ -69,11 +69,11 @@ public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 	@Override
 	public Set<AbstractLocation> query(QueryContextKey query) {
 		IReference reference = normalizeReference(query.getReference());
-		TypeName type = normalizeType(query.getType());
+		ITypeName type = normalizeType(query.getType());
 		// use the current method for the query
 		Callpath methodPath = null;
 		if (query.getCallpath() != null) {
-			MethodName method = normalizeMethod(query.getCallpath().getLast());
+			IMethodName method = normalizeMethod(query.getCallpath().getLast());
 			methodPath = (method != null) ? new Callpath(method) : null;
 		}
 
