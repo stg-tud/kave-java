@@ -138,6 +138,7 @@ public class QueryGenerator {
 	private List<Integer> removeByPercentage(int numberInvocations) {
 		List<Integer> removeInvocations = new LinkedList<Integer>();
 		List<Double> percentages = new LinkedList<Double>();
+		percentages.add(0.01);
 		percentages.add(0.25);
 		percentages.add(0.50);
 		percentages.add(0.75);
