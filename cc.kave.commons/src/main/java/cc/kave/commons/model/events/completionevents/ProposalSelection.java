@@ -28,13 +28,17 @@ public class ProposalSelection implements IProposalSelection {
 
 	@Nullable
 	public String SelectedAfter;
+	
+	public int index;
 
 	public ProposalSelection() {
 		Proposal = new Proposal();
+		this.index = -1;
 	}
 
 	public ProposalSelection(IProposal p) {
 		Proposal = p;
+		this.index = -1;
 	}
 
 	@Override
@@ -60,5 +64,15 @@ public class ProposalSelection implements IProposalSelection {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
+
+	@Override
+	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

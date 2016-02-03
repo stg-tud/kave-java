@@ -26,4 +26,8 @@ public interface IProposalSelection {
 
 	@Nullable
 	String getSelectedAfter();
+	
+	int getIndex();
+	
+	void setIndex(int index);
 }

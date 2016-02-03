@@ -241,6 +241,7 @@ public abstract class JsonUtils {
 
 		// completion event
 		registerHierarchy(gb, ICompletionEvent.class, CompletionEvent.class);
+		registerHierarchy(gb, CompletionEvent.class, CompletionEvent.class);
 		registerHierarchy(gb, IProposal.class, Proposal.class);
 		registerHierarchy(gb, IProposalSelection.class, ProposalSelection.class);
 

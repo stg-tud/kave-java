@@ -18,6 +18,7 @@ package cc.kave.commons.model.events.completionevents;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
 import cc.kave.commons.model.events.IDEEvent;
@@ -26,38 +27,56 @@ import cc.kave.commons.model.events.Trigger;
 public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
 	@SerializedName("Context2")
-	public Context Context;
+	public Context context;
 
-	public List<IProposal> ProposalCollection;
+	public List<IProposal> proposalCollection;
 
-	public List<IProposalSelection> Selections;
+	public List<IProposalSelection> selections;
 
-	public Trigger TerminatedBy;
+	public Trigger terminatedBy;
 
-	public TerminationState TerminatedState;
-
+	public TerminationState terminatedState;
+	
+	private int proposalCount;
+	
+	public CompletionEvent(){
+		this.selections = Lists.newArrayList();
+		this.proposalCollection = Lists.newArrayList();
+		this.context = new Context();
+		this.terminatedState = terminatedState.Unknown;
+		this.proposalCount = 0;
+	}
+	
 	@Override
 	public Context getContext() {
-		return Context;
+		return context;
 	}
 
 	@Override
 	public List<IProposal> getProposalCollection() {
-		return ProposalCollection;
+		return proposalCollection;
 	}
 
 	@Override
 	public List<IProposalSelection> getSelections() {
-		return Selections;
+		return selections;
 	}
 
 	@Override
 	public Trigger getTerminatedBy() {
-		return TerminatedBy;
+		return terminatedBy;
 	}
 
 	@Override
 	public TerminationState getTerminatedState() {
-		return TerminatedState;
+		return terminatedState;
+	}
+
+	public int getProposalCount() {
+		return proposalCount;
+	}
+
+	public void setProposalCount(int proposalCount) {
+		this.proposalCount = proposalCount;
 	}
 }
