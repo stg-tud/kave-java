@@ -76,20 +76,20 @@ public class CompletionEventSerializationTest {
 
 		SST sst = new SST();
 		sst.setEnclosingType(TypeName.newTypeName("T,P"));
-		e.Context = new Context();
-		e.Context.setSST(sst);
+		e.context = new Context();
+		e.context.setSST(sst);
 
-		e.ProposalCollection = Lists.newLinkedList();
-		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M1()"));
-		e.ProposalCollection.add(createProposal("[T1,P1] [T1,P2].M2()"));
+		e.proposalCollection = Lists.newLinkedList();
+		e.proposalCollection.add(createProposal("[T1,P1] [T1,P2].M1()"));
+		e.proposalCollection.add(createProposal("[T1,P1] [T1,P2].M2()"));
 
-		e.Selections = Lists.newLinkedList();
-		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.6720000"));
-		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M2()", "18:54:59.7830000"));
-		e.Selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.8940000"));
+		e.selections = Lists.newLinkedList();
+		e.selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.6720000"));
+		e.selections.add(createProposalSelection("[T1,P1] [T1,P2].M2()", "18:54:59.7830000"));
+		e.selections.add(createProposalSelection("[T1,P1] [T1,P2].M1()", "18:54:59.8940000"));
 
-		e.TerminatedBy = Trigger.Typing;
-		e.TerminatedState = TerminationState.Applied;
+		e.terminatedBy = Trigger.Typing;
+		e.terminatedState = TerminationState.Applied;
 
 		return e;
 	}

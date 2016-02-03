@@ -104,7 +104,7 @@ public class CompletionEventProcessor {
 	}
 
 	private void inline(CompletionEvent orig) {
-		orig.Context = inline(orig.Context);
+		orig.context = inline(orig.context);
 	}
 
 	private Context inline(Context orig) {
