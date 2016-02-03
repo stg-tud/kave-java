@@ -23,6 +23,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.statements.EventSubscriptionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
@@ -33,47 +34,47 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 
 public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
-	public void BreakStatement() {
+	public void testBreakStatement() {
 		BreakStatement sst = new BreakStatement();
-		AssertPrint(sst, "break;");
+		assertPrint(sst, "break;");
 	}
 
 	@Test
 
-	public void ContinueStatement() {
+	public void testContinueStatement() {
 		ContinueStatement sst = new ContinueStatement();
-		AssertPrint(sst, "continue;");
+		assertPrint(sst, "continue;");
 	}
 
 	@Test
 
-	public void Assignment() {
+	public void testAssignment() {
 		IAssignment sst = SSTUtil.assignmentToLocal("var", constant("true"));
-		AssertPrint(sst, "var = true;");
+		assertPrint(sst, "var = true;");
 	}
 
 	@Test
 
-	public void GotoStatement() {
+	public void testGotoStatement() {
 		GotoStatement sst = new GotoStatement();
 		sst.setLabel("L");
 
-		AssertPrint(sst, "goto L;");
+		assertPrint(sst, "goto L;");
 	}
 
 	@Test
 
-	public void LabelledStatement() {
+	public void testLabelledStatement() {
 		LabelledStatement sst = new LabelledStatement();
 		sst.setLabel("L");
 		sst.setStatement(new ContinueStatement());
 
-		AssertPrint(sst, "L:", "continue;");
+		assertPrint(sst, "L:", "continue;");
 	}
 
 	@Test
 
-	public void ThrowStatement() {
+	public void testThrowStatement() {
 		ThrowStatement sst = new ThrowStatement();
 		VariableReference ref = new VariableReference();
 		ref.setIdentifier("T");
@@ -81,29 +82,29 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 
 		// note: we can ignore exception constructors and throwing existing
 		// objects
-		AssertPrint(sst, "throw new T();");
+		assertPrint(sst, "throw new T();");
 	}
 
 	@Test
 
-	public void ReturnStatement() {
+	public void testReturnStatement() {
 		ReturnStatement sst = new ReturnStatement();
 		sst.setExpression(constant("val"));
 
-		AssertPrint(sst, "return \"val\";");
+		assertPrint(sst, "return \"val\";");
 	}
 
 	@Test
 
-	public void ReturnStatement_Void() {
+	public void testReturnStatement_Void() {
 		cc.kave.commons.model.ssts.impl.statements.ReturnStatement sst = new ReturnStatement();
 		sst.setIsVoid(true);
-		AssertPrint(sst, "return;");
+		assertPrint(sst, "return;");
 	}
 
 	@Test
 
-	public void ExpressionStatement() {
+	public void testExpressionStatement() {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setReference(SSTUtil.variableReference("this"));
 		invocation.setMethodName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
@@ -111,13 +112,19 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 
 		ExpressionStatement sst = new ExpressionStatement();
 		sst.setExpression(invocation);
-		AssertPrint(sst, "this.M(1);");
+		assertPrint(sst, "this.M(1);");
 	}
 
 	@Test
 
-	public void UnknownStatement() {
+	public void testUnknownStatement() {
 		UnknownStatement sst = new UnknownStatement();
-		AssertPrint(sst, "???;");
+		assertPrint(sst, "???;");
+	}
+	
+	@Test
+	public void testEventSubscriptionStatement(){
+		EventSubscriptionStatement sst = new EventSubscriptionStatement();
+		assertPrint(sst, "???");
 	}
 }

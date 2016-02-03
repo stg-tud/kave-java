@@ -25,58 +25,68 @@ import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
-@Ignore
 public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
-	public void VariableReference() {
+	public void testVariableReference() {
 		IVariableReference sst = SSTUtil.variableReference("variable");
-		AssertPrint(sst, "variable");
+		assertPrint(sst, "variable");
 	}
 
 	@Test
-	public void EventReference() {
+	public void testEventReference() {
 		EventReference sst = new EventReference();
 		sst.setEventName(EventName.newEventName("[EventType,P] [DeclaringType,P].E"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "o.E");
+		assertPrint(sst, "o.E");
 	}
 
 	@Test
-	public void FieldReference() {
+	public void testFieldReference() {
 		FieldReference sst = new FieldReference();
 		sst.setFieldName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "o.F");
+		assertPrint(sst, "o.F");
 	}
 
 	@Test
-	public void MethodReference() {
+	public void testMethodReference() {
 		MethodReference sst = new MethodReference();
 		sst.setMethodName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "o.M");
+		assertPrint(sst, "o.M");
 	}
 
 	@Test
-	public void PropertyReference() {
+	public void testPropertyReference() {
 		PropertyReference sst = new PropertyReference();
 		sst.setPropertyName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
-		AssertPrint(sst, "o.P");
+		assertPrint(sst, "o.P");
 	}
 
 	@Test
-	public void UnknownReference() {
+	public void testUnknownReference() {
 		UnknownReference sst = new UnknownReference();
-		AssertPrint(sst, "???");
+		assertPrint(sst, "???");
 	}
+	
+	@Test
+	public void testIndexAccessReference() {
+		IndexAccessReference sst = new IndexAccessReference();
+		assertPrint(sst, "???");
+	}
+	
+	
+	
+	
 }

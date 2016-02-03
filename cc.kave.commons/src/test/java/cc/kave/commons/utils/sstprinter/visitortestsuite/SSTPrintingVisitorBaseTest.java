@@ -28,7 +28,7 @@ import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
 public class SSTPrintingVisitorBaseTest {
 	private SSTPrintingVisitor _sut = new SSTPrintingVisitor();
 
-	protected void AssertPrintWithCustomContext(ISSTNode sst, SSTPrintingContext context, String expected) {
+	protected void assertPrintWithCustomContext(ISSTNode sst, SSTPrintingContext context, String expected) {
 		int indentationLevel = context.indentationLevel;
 		sst.accept(_sut, context);
 		String actual = context.toString();
@@ -36,27 +36,27 @@ public class SSTPrintingVisitorBaseTest {
 		Assert.assertEquals(indentationLevel, context.indentationLevel);
 	}
 
-	protected void AssertPrintWithCustomContext(ISSTNode sst, SSTPrintingContext context, String... expectedLines) {
-		AssertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
+	protected void assertPrintWithCustomContext(ISSTNode sst, SSTPrintingContext context, String... expectedLines) {
+		assertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
 	}
 
-	protected void AssertPrint(ISSTNode sst, String... expectedLines) {
-		TestPrintingWithoutIndentation(sst, expectedLines);
-		TestPrintingWithHighlightingProducesValidXaml(sst);
+	protected void assertPrint(ISSTNode sst, String... expectedLines) {
+		testPrintingWithoutIndentation(sst, expectedLines);
+		testPrintingWithHighlightingProducesValidXaml(sst);
 
 		// Expressions and references can't be indented
 		if (!(sst instanceof IExpression || sst instanceof IReference)) {
-			TestPrintingWithIndentation(sst, expectedLines);
+			testPrintingWithIndentation(sst, expectedLines);
 		}
 	}
 
-	private void TestPrintingWithoutIndentation(ISSTNode sst, String[] expectedLines) {
+	private void testPrintingWithoutIndentation(ISSTNode sst, String[] expectedLines) {
 		SSTPrintingContext context = new SSTPrintingContext();
 		context.setIndentationLevel(0);
-		AssertPrintWithCustomContext(sst, context, expectedLines);
+		assertPrintWithCustomContext(sst, context, expectedLines);
 	}
 
-	private void TestPrintingWithHighlightingProducesValidXaml(ISSTNode sst) {
+	private void testPrintingWithHighlightingProducesValidXaml(ISSTNode sst) {
 		// var context = new XamlSSTPrintingContext();
 		SSTPrintingContext context = new SSTPrintingContext();
 		sst.accept(_sut, context);
@@ -66,7 +66,7 @@ public class SSTPrintingVisitorBaseTest {
 		// XamlUtils.CreateDataTemplateFromXaml(actual);
 	}
 
-	private void TestPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
+	private void testPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
 		String[] indentedLines = new String[expectedLines.length];
 		for (int i = 0; i < expectedLines.length; i++) {
 			indentedLines[i] = (expectedLines[i] != "" || expectedLines[i] != null) ? expectedLines[i]
@@ -74,7 +74,7 @@ public class SSTPrintingVisitorBaseTest {
 		}
 		SSTPrintingContext context = new SSTPrintingContext();
 		context.setIndentationLevel(1);
-		AssertPrintWithCustomContext(sst, context, indentedLines);
+		assertPrintWithCustomContext(sst, context, indentedLines);
 	}
 
 	protected ConstantValueExpression constant(String value) {

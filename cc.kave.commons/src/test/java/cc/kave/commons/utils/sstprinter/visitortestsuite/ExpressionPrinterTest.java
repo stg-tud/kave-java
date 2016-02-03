@@ -20,11 +20,16 @@ import org.junit.Test;
 import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
@@ -34,214 +39,223 @@ import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
 public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
-	public void NullExpression() {
-		AssertPrint(new NullExpression(), "null");
+	public void nullExpression() {
+		assertPrint(new NullExpression(), "null");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithoutValue() {
-		AssertPrint(constant(""), "\"...\"");
+	public void constantValueExpression_WithoutValue() {
+		assertPrint(constant(""), "\"...\"");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithString() {
-		AssertPrint(constant("val"), "\"val\"");
+	public void constantValueExpression_WithString() {
+		assertPrint(constant("val"), "\"val\"");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_NullLiteralIsUsedAsString() {
-		AssertPrint(constant("null"), "\"null\"");
+	public void constantValueExpression_NullLiteralIsUsedAsString() {
+		assertPrint(constant("null"), "\"null\"");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithInt() {
-		AssertPrint(constant("1"), "1");
+	public void constantValueExpression_WithInt() {
+		assertPrint(constant("1"), "1");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithFloat() {
-		AssertPrint(constant("0.123"), "0.123");
+	public void constantValueExpression_WithFloat() {
+		assertPrint(constant("0.123"), "0.123");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithBoolTrue() {
-		AssertPrint(constant("true"), "true");
+	public void constantValueExpression_WithBoolTrue() {
+		assertPrint(constant("true"), "true");
 	}
 
 	@Test
-
-	public void ConstantValueExpression_WithBoolFalse() {
-		AssertPrint(constant("false"), "false");
+	public void constantValueExpression_WithBoolFalse() {
+		assertPrint(constant("false"), "false");
 	}
 
 	@Test
-
-	public void InvocationExpression_ConstantValue() {
+	public void invocationExpression_ConstantValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
 		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(constant("1"));
 
-		AssertPrint(sst, "this.M(1)");
+		assertPrint(sst, "this.M(1)");
 	}
 
 	@Test
-
-	public void InvocationExpression_NullValue() {
+	public void invocationExpression_NullValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
 		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
-		AssertPrint(sst, "this.M(null)");
+		assertPrint(sst, "this.M(null)");
 	}
 
 	@Test
-
-	public void InvocationExpression_Static() {
+	public void invocationExpression_Static() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("should be ignored anyways"));
 		sst.setMethodName(MethodName.newMethodName("static [R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
-		AssertPrint(sst, "D.M(null)");
+		assertPrint(sst, "D.M(null)");
 	}
 
 	@Test
-
-	public void IfElseExpression() {
+	public void ifElseExpression() {
 		IfElseExpression sst = new IfElseExpression();
 		sst.setCondition(constant("true"));
 		sst.setThenExpression(constant("1"));
 		sst.setElseExpression(constant("2"));
 
-		AssertPrint(sst, "(true) ? 1 : 2");
+		assertPrint(sst, "(true) ? 1 : 2");
 	}
 
 	@Test
-
-	public void ReferenceExpression() {
+	public void referenceExpression() {
 		ReferenceExpression sst = new ReferenceExpression();
 		sst.setReference(varRef("variable"));
-		AssertPrint(sst, "variable");
+		assertPrint(sst, "variable");
 	}
 
 	@Test
-
-	public void ComposedExpression() {
+	public void composedExpression() {
 		ComposedExpression sst = new ComposedExpression();
 		sst.getReferences().add(varRef("a"));
 		sst.getReferences().add(varRef("b"));
 		sst.getReferences().add(varRef("c"));
 
-		AssertPrint(sst, "composed(a, b, c)");
+		assertPrint(sst, "composed(a, b, c)");
 	}
 
 	@Test
-
-	public void LoopHeaderBlockExpression() {
+	public void loopHeaderBlockExpression() {
 		LoopHeaderBlockExpression sst = new LoopHeaderBlockExpression();
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
-		AssertPrint(sst, "", "{", "    continue;", "    break;", "}");
+		assertPrint(sst, "", "{", "    continue;", "    break;", "}");
 	}
 
 	@Test
-
-	public void UnknownExpression() {
+	public void unknownExpression() {
 		UnknownExpression sst = new UnknownExpression();
-		AssertPrint(sst, "???");
+		assertPrint(sst, "???");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnNothing() {
+	public void completionExpression_OnNothing() {
 		CompletionExpression sst = new CompletionExpression();
-		AssertPrint(sst, "$");
+		assertPrint(sst, "$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnToken() {
+	public void completionExpression_OnToken() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setToken("t");
-		AssertPrint(sst, "t$");
+		assertPrint(sst, "t$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnVariableReference() {
+	public void completionExpression_OnVariableReference() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setObjectReference(varRef("o"));
-		AssertPrint(sst, "o.$");
+		assertPrint(sst, "o.$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnVariableReferenceWithToken() {
+	public void completionExpression_OnVariableReferenceWithToken() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setObjectReference(varRef("o"));
 		sst.setToken("t");
-		AssertPrint(sst, "o.t$");
+		assertPrint(sst, "o.t$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnTypeReference() {
+	public void completionExpression_OnTypeReference() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setTypeReference(TypeName.newTypeName("T,P"));
-		AssertPrint(sst, "T.$");
+		assertPrint(sst, "T.$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnTypeReferenceWithToken() {
+	public void completionExpression_OnTypeReferenceWithToken() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setTypeReference(TypeName.newTypeName("T,P"));
 		sst.setToken("t");
-		AssertPrint(sst, "T.t$");
+		assertPrint(sst, "T.t$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnTypeReference_GenericType() {
+	public void completionExpression_OnTypeReference_GenericType() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setTypeReference(TypeName.newTypeName("T`1[[G -> A,P]],P"));
-		AssertPrint(sst, "T<A>.$");
+		assertPrint(sst, "T<A>.$");
 	}
 
 	@Test
-
-	public void CompletionExpression_OnTypeReference_UnresolvedGenericType() {
+	public void completionExpression_OnTypeReference_UnresolvedGenericType() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setTypeReference(TypeName.newTypeName("T`1[[G]],P"));
-		AssertPrint(sst, "T<?>.$");
+		assertPrint(sst, "T<?>.$");
 	}
 
 	@Test
-
-	public void LambdaExpression() {
+	public void lambdaExpression() {
 		LambdaExpression sst = new LambdaExpression();
 		sst.setName(LambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
-		AssertPrint(sst, "(C p1, C p2) =>", "{", "    continue;", "    break;", "}");
+		assertPrint(sst, "(C p1, C p2) =>", "{", "    continue;", "    break;", "}");
 	}
 
 	@Test
-
-	public void LambdaExpression_NoParametersAndEmptyBody() {
+	public void lambdaExpression_NoParametersAndEmptyBody() {
 		LambdaExpression sst = new LambdaExpression();
 
-		AssertPrint(sst, "() => { }");
+		assertPrint(sst, "() => { }");
 	}
 
+	@Test
+	public void binaryExpression() {
+		BinaryExpression sst = new BinaryExpression();
+
+		assertPrint(sst, "");
+	}
+
+	@Test
+	public void castExpression() {
+		CastExpression sst = new CastExpression();
+
+		assertPrint(sst, "");
+	}
+	
+	@Test
+	public void indexAccessExpression() {
+		IndexAccessExpression sst = new IndexAccessExpression();
+
+		assertPrint(sst, "");
+	}
+	
+	@Test
+	public void typeCheckExpression() {
+		TypeCheckExpression sst = new TypeCheckExpression();
+
+		assertPrint(sst, "");
+	}
+	
+	@Test
+	public void unaryExpression() {
+		UnaryExpression sst = new UnaryExpression();
+
+		assertPrint(sst, "");
+	}
 }

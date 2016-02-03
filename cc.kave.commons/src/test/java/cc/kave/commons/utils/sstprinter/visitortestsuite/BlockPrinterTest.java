@@ -49,7 +49,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setLoopedReference(SSTUtil.variableReference("elements"));
 		sst.getBody().add(new ContinueStatement());
 
-		AssertPrint(sst, "foreach (T e in elements)", "{", "    continue;", "}");
+		assertPrint(sst, "foreach (T e in elements)", "{", "    continue;", "}");
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getSections().add(case1);
 		sst.getSections().add(case2);
 
-		AssertPrint(sst, "switch (a)", "{", "    case 1:", "        break;", "        break;", "    case 2:",
+		assertPrint(sst, "switch (a)", "{", "    case 1:", "        break;", "        break;", "    case 2:",
 				"        break;", "    default:", "        break;", "}");
 	}
 
@@ -85,7 +85,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getSections().add(case1);
 		sst.getSections().add(case2);
 
-		AssertPrint(sst, "switch (a)", "{", "    case 1:", "        break;", "        break;", "    case 2:",
+		assertPrint(sst, "switch (a)", "{", "    case 1:", "        break;", "        break;", "    case 2:",
 				"        break;", "}");
 	}
 
@@ -101,7 +101,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getFinally().add(new ContinueStatement());
 		sst.getBody().add(s);
 
-		AssertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType e)", "{",
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType e)", "{",
 				"    break;", "}", "finally", "{", "    continue;", "}");
 	}
 
@@ -116,7 +116,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		AssertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType e)", "{",
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType e)", "{",
 				"    break;", "}");
 	}
 
@@ -131,7 +131,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		AssertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch", "{", "    break;", "}");
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch", "{", "    break;", "}");
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		AssertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType)", "{", "    break;",
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (ExceptionType)", "{", "    break;",
 				"}");
 	}
 
@@ -155,13 +155,13 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		UncheckedBlock sst = new UncheckedBlock();
 		sst.getBody().add(new BreakStatement());
 
-		AssertPrint(sst, "unchecked", "{", "    break;", "}");
+		assertPrint(sst, "unchecked", "{", "    break;", "}");
 	}
 
 	@Test
 	public void testUnsafeBlock() {
 		UnsafeBlock sst = new UnsafeBlock();
-		AssertPrint(sst, "unsafe { /* content ignored */ }");
+		assertPrint(sst, "unsafe { /* content ignored */ }");
 	}
 
 	@Test
@@ -170,7 +170,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setReference(SSTUtil.variableReference("variable"));
 		sst.getBody().add(new BreakStatement());
 
-		AssertPrint(sst, "using (variable)", "{", "    break;", "}");
+		assertPrint(sst, "using (variable)", "{", "    break;", "}");
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getThen().add(new ContinueStatement());
 		sst.getElse().add(new BreakStatement());
 
-		AssertPrint(sst, "if (true)", "{", "    continue;", "}", "else", "{", "    break;", "}");
+		assertPrint(sst, "if (true)", "{", "    continue;", "}", "else", "{", "    break;", "}");
 	}
 
 	@Test
@@ -189,7 +189,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setCondition(constant("true"));
 		sst.getThen().add(new ContinueStatement());
 
-		AssertPrint(sst, "if (true)", "{", "    continue;", "}");
+		assertPrint(sst, "if (true)", "{", "    continue;", "}");
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setReference(SSTUtil.variableReference("variable"));
 		sst.getBody().add(new ContinueStatement());
 
-		AssertPrint(sst, "lock (variable)", "{", "    continue;", "}");
+		assertPrint(sst, "lock (variable)", "{", "    continue;", "}");
 	}
 
 	@Test
@@ -212,7 +212,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
-		AssertPrint(sst, "while (", "    {", "        return true;", "    }", ")", "{", "    continue;", "    break;",
+		assertPrint(sst, "while (", "    {", "        return true;", "    }", ")", "{", "    continue;", "    break;",
 				"}");
 	}
 
@@ -226,7 +226,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setCondition(loopHeader);
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
-		AssertPrint(sst, "do", "{", "    continue;", "    break;", "}", "while (", "    {", "        return true;",
+		assertPrint(sst, "do", "{", "    continue;", "    break;", "}", "while (", "    {", "        return true;",
 				"    }", ")");
 	}
 
@@ -243,7 +243,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		loopHeader.getBody().add(returnStatement);
 		sst.setCondition(loopHeader);
 
-		AssertPrint(sst, "for (", "    {", "        T i;", "        i = 0;", "    };", "    {", "        return true;",
+		assertPrint(sst, "for (", "    {", "        T i;", "        i = 0;", "    };", "    {", "        return true;",
 				"    }; { }", ")", "{", "    continue;", "    break;", "}");
 	}
 
