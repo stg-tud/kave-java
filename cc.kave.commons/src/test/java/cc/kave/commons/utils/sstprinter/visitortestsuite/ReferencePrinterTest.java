@@ -82,8 +82,9 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	
 	@Test
 	public void testIndexAccessReference() {
+		// TODO: Better Example ? implementation?
 		IndexAccessReference sst = new IndexAccessReference();
-		assertPrint(sst, "???");
+		assertPrint(sst, "[]");
 	}
 	
 	

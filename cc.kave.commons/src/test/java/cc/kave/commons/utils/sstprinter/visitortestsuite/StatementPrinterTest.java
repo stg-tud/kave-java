@@ -30,6 +30,7 @@ import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
+import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 
 public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
@@ -123,8 +124,20 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 	}
 	
 	@Test
-	public void testEventSubscriptionStatement(){
+	public void testAddEventSubscriptionStatement(){
 		EventSubscriptionStatement sst = new EventSubscriptionStatement();
-		assertPrint(sst, "???");
+		sst.setOperation(EventSubscriptionOperation.Add);
+		sst.setExpression(constant("2"));
+		sst.setReference(varRef("a"));
+		assertPrint(sst, "a += 2");
+	}
+	
+	@Test
+	public void testRemoveEventSubscriptionStatement(){
+		EventSubscriptionStatement sst = new EventSubscriptionStatement();
+		sst.setOperation(EventSubscriptionOperation.Remove);
+		sst.setExpression(constant("2"));
+		sst.setReference(varRef("a"));
+		assertPrint(sst, "a -= 2");
 	}
 }

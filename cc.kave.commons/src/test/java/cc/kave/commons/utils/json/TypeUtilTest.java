@@ -21,7 +21,7 @@ import org.junit.Test;
 public class TypeUtilTest {
 
 	@Test
-	public void SSTTypeToJaveTypeName() {
+	public void testSSTTypeToJaveTypeName() {
 		String type = "[SST:Expressions.Simple.UnknownExpression]";
 		String expected = "cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression";
 		String actual = TypeUtil.toJavaTypeNames(type);
@@ -29,7 +29,7 @@ public class TypeUtilTest {
 	}
 
 	@Test
-	public void contextToJavaTypeName() {
+	public void testContextToJavaTypeName() {
 		String type = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
 		String expected = "\"cc.kave.commons.model.events.completionevents.Context\"";
 		String actual = TypeUtil.toJavaTypeNames(type);
@@ -37,7 +37,7 @@ public class TypeUtilTest {
 	}
 
 	@Test
-	public void sstType() {
+	public void testSSTType() {
 		String type = "[SST:Declarations.FieldDeclaration]";
 		String expected = "cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration";
 		String actual = TypeUtil.toJavaTypeNames(type);
@@ -45,7 +45,7 @@ public class TypeUtilTest {
 	}
 
 	@Test
-	public void JavaTypeNameToCsharp() {
+	public void testJavaTypeNameToCsharp() {
 		String type = "\"cc.kave.commons.model.events.completionevents.Context\"";
 		String expected = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
 		String actual = TypeUtil.toCSharpTypeNames(type);

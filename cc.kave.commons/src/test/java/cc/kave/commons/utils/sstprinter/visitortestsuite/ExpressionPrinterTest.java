@@ -17,9 +17,15 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
@@ -226,36 +232,57 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	@Test
 	public void binaryExpression() {
+		// TODO: test more operations
 		BinaryExpression sst = new BinaryExpression();
-
-		assertPrint(sst, "");
+		sst.setLeftOperand(constant("1"));
+		sst.setRightOperand(constant("1"));
+		sst.setOperator(BinaryOperator.Equal);
+		assertPrint(sst, "1 == 1");
 	}
 
 	@Test
-	public void castExpression() {
+	public void testCastExpression() {
 		CastExpression sst = new CastExpression();
-
-		assertPrint(sst, "");
+		sst.setReference(SSTUtil.variableReference("x"));
+		assertPrint(sst, "(?) x");
 	}
 	
 	@Test
-	public void indexAccessExpression() {
+	public void testCastExpressionSafe() {
+		CastExpression sst = new CastExpression();
+		sst.setOperator(CastOperator.SafeCast);
+		sst.setReference(SSTUtil.variableReference("x"));
+		assertPrint(sst, "x as ?");
+	}
+	
+	@Test
+	public void testIndexAccessExpression() {
 		IndexAccessExpression sst = new IndexAccessExpression();
-
-		assertPrint(sst, "");
+		sst.setIndices(Lists.newArrayList(constant("1"), constant("2")));
+		sst.setReference(varRef("x"));
+		assertPrint(sst, "x[1,2]");
 	}
 	
 	@Test
-	public void typeCheckExpression() {
+	public void testTypeCheckExpression() {
 		TypeCheckExpression sst = new TypeCheckExpression();
-
-		assertPrint(sst, "");
+		sst.setReference(varRef("x"));
+		assertPrint(sst, "x instanceof ?");
 	}
 	
 	@Test
-	public void unaryExpression() {
+	public void testDefaultUnaryExpression() {
 		UnaryExpression sst = new UnaryExpression();
-
-		assertPrint(sst, "");
+		sst.setOperand(constant("2"));
+		assertPrint(sst, "?2");
+	}
+	
+	@Test
+	public void testPostDecrementUnaryExpression() {
+		// TODO: Test ALL Operators
+		UnaryExpression sst = new UnaryExpression();
+		sst.setOperand(constant("2"));
+		sst.setOperator(UnaryOperator.PostDecrement);
+		assertPrint(sst, "2--");
 	}
 }

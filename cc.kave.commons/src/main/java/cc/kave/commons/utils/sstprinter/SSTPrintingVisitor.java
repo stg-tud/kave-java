@@ -45,11 +45,19 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
@@ -58,6 +66,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -65,6 +74,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
@@ -76,453 +86,486 @@ import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingContext, Void> {
 
-	public Void visit(ISST sst, SSTPrintingContext c) {
-		c.indentation();
+	@Override
+	public Void visit(ISST sst, SSTPrintingContext context) {
+		context.indentation();
 
 		if (sst.getEnclosingType().isInterfaceType()) {
-			c.keyword("interface");
+			context.keyword("interface");
 		} else if (sst.getEnclosingType().isEnumType()) {
-			c.keyword("enum");
+			context.keyword("enum");
 		} else if (sst.getEnclosingType().isStructType()) {
-			c.keyword("struct");
+			context.keyword("struct");
 		} else {
-			c.keyword("class");
+			context.keyword("class");
 		}
 
-		c.space().type(sst.getEnclosingType());
-		if (c.typeShape != null && c.typeShape.getTypeHierarchy().hasSupertypes()) {
+		context.space().type(sst.getEnclosingType());
+		if (context.typeShape != null && context.typeShape.getTypeHierarchy().hasSupertypes()) {
 
-			c.text(" : ");
+			context.text(" : ");
 
-			ITypeHierarchy extends1 = c.typeShape.getTypeHierarchy().getExtends();
-			if (c.typeShape.getTypeHierarchy().hasSuperclass() && extends1 != null) {
-				c.type(extends1.getElement());
+			ITypeHierarchy extends1 = context.typeShape.getTypeHierarchy().getExtends();
+			if (context.typeShape.getTypeHierarchy().hasSuperclass() && extends1 != null) {
+				context.type(extends1.getElement());
 
-				if (c.typeShape.getTypeHierarchy().isImplementingInterfaces()) {
-					c.text(", ");
+				if (context.typeShape.getTypeHierarchy().isImplementingInterfaces()) {
+					context.text(", ");
 				}
 			}
 			int index = 0;
-			for (ITypeHierarchy i : c.typeShape.getTypeHierarchy().getImplements()) {
-				c.type(i.getElement());
+			for (ITypeHierarchy i : context.typeShape.getTypeHierarchy().getImplements()) {
+				context.type(i.getElement());
 				index++;
-				if (index != c.typeShape.getTypeHierarchy().getImplements().size()) {
-					c.text(", ");
+				if (index != context.typeShape.getTypeHierarchy().getImplements().size()) {
+					context.text(", ");
 				}
 			}
 		}
 
-		c.newLine().indentation().text("{").newLine();
+		context.newLine().indentation().text("{").newLine();
 
-		c.indentationLevel++;
+		context.indentationLevel++;
 
-		appendMemberDeclarationGroup(c, sst.getDelegates().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(c, sst.getEvents().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(c, sst.getFields().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(c, sst.getProperties().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(c, sst.getMethods().stream().collect(Collectors.toSet()), 2, 1);
+		appendMemberDeclarationGroup(context, sst.getDelegates().stream().collect(Collectors.toSet()), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getEvents().stream().collect(Collectors.toSet()), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getFields().stream().collect(Collectors.toSet()), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getProperties().stream().collect(Collectors.toSet()), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getMethods().stream().collect(Collectors.toSet()), 2, 1);
 
-		c.indentationLevel--;
+		context.indentationLevel--;
 
-		c.indentation().text("}");
+		context.indentation().text("}");
 		return null;
 	}
 
-	private Void appendMemberDeclarationGroup(SSTPrintingContext c, Set<IMemberDeclaration> nodeGroup,
+	private Void appendMemberDeclarationGroup(SSTPrintingContext context, Set<IMemberDeclaration> nodeGroup,
 			int inBetweenNewLineCount, int trailingNewLineCount) {
 
 		List<IMemberDeclaration> nodeList = nodeGroup.stream().collect(Collectors.toList());
 		for (int i = 0; i < nodeList.size(); i++) {
 			IMemberDeclaration node = nodeList.get(i);
-			node.accept(this, c);
+			node.accept(this, context);
 
 			int newLinesNeeded = (i < (nodeList.size() - 1) ? inBetweenNewLineCount : trailingNewLineCount);
 
 			for (int j = 0; j < newLinesNeeded; j++) {
-				c.newLine();
+				context.newLine();
 			}
 		}
 		return null;
 	}
 
-	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext c) {
-		c.indentation().keyword("delegate").space().type(stmt.getName())
+	@Override
+	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext context) {
+		context.indentation().keyword("delegate").space().type(stmt.getName())
 				.parameterList(((IDelegateTypeName) stmt.getName()).getParameters()).text(";");
 		return null;
 	}
 
-	public Void visit(IEventDeclaration stmt, SSTPrintingContext c) {
-		c.indentation().keyword("event").space().type(stmt.getName().getHandlerType()).space()
+	@Override
+	public Void visit(IEventDeclaration stmt, SSTPrintingContext context) {
+		context.indentation().keyword("event").space().type(stmt.getName().getHandlerType()).space()
 				.text(stmt.getName().getName()).text(";");
 		return null;
 	}
 
-	public Void visit(IFieldDeclaration stmt, SSTPrintingContext c) {
-		c.indentation();
+	@Override
+	public Void visit(IFieldDeclaration stmt, SSTPrintingContext context) {
+		context.indentation();
 
 		if (stmt.getName().isStatic()) {
-			c.keyword("static").space();
+			context.keyword("static").space();
 		}
 
-		c.type(stmt.getName().getValueType()).space().text(stmt.getName().getName()).text(";");
+		context.type(stmt.getName().getValueType()).space().text(stmt.getName().getName()).text(";");
 		return null;
 	}
 
-	public Void visit(IMethodDeclaration stmt, SSTPrintingContext c) {
-		c.indentation();
+	@Override
+	public Void visit(IMethodDeclaration stmt, SSTPrintingContext context) {
+		context.indentation();
 
 		if (stmt.getName().isStatic()) {
-			c.keyword("static").space();
+			context.keyword("static").space();
 		}
 
-		c.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
+		context.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
 		if (stmt.getName().hasTypeParameters()) {
-			c.typeParameters(stmt.getName().getTypeParameters());
+			context.typeParameters(stmt.getName().getTypeParameters());
 		}
 
-		c.parameterList(stmt.getName().getParameters());
+		context.parameterList(stmt.getName().getParameters());
 
-		c.statementBlock(stmt.getBody(), this, true);
+		context.statementBlock(stmt.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IPropertyDeclaration stmt, SSTPrintingContext c) {
-		c.indentation().type(stmt.getName().getValueType()).space().text(stmt.getName().getName());
+	@Override
+	public Void visit(IPropertyDeclaration stmt, SSTPrintingContext context) {
+		context.indentation().type(stmt.getName().getValueType()).space().text(stmt.getName().getName());
 
 		boolean hasBody = !stmt.getGet().isEmpty() || !stmt.getSet().isEmpty();
 
 		if (hasBody) // Long version: At least one body exists --> line breaks +
 						// indentation
 		{
-			c.newLine().indentation();
+			context.newLine().indentation();
 
-			c.indentationLevel++;
+			context.indentationLevel++;
 
-			c.text("{").newLine();
+			context.text("{").newLine();
 
 			if (stmt.getName().hasGetter()) {
-				appendPropertyAccessor(c, stmt.getGet(), "get");
+				appendPropertyAccessor(context, stmt.getGet(), "get");
 			}
 
 			if (stmt.getName().hasSetter()) {
-				appendPropertyAccessor(c, stmt.getSet(), "set");
+				appendPropertyAccessor(context, stmt.getSet(), "set");
 			}
 
-			c.indentationLevel--;
+			context.indentationLevel--;
 
-			c.indentation().text("}");
+			context.indentation().text("}");
 		} else // Short Version: No bodies --> getter/setter declaration : same
 				// line
 		{
-			c.text(" { ");
+			context.text(" { ");
 			if (stmt.getName().hasGetter()) {
-				c.keyword("get").text(";").space();
+				context.keyword("get").text(";").space();
 			}
 			if (stmt.getName().hasSetter()) {
-				c.keyword("set").text(";").space();
+				context.keyword("set").text(";").space();
 			}
-			c.text("}");
+			context.text("}");
 		}
 		return null;
 	}
 
-	private Void appendPropertyAccessor(SSTPrintingContext c, List<IStatement> body, String keyword) {
+	private Void appendPropertyAccessor(SSTPrintingContext context, List<IStatement> body, String keyword) {
 		if (!body.isEmpty()) {
-			c.indentation().text(keyword);
-			c.statementBlock(body, this, true);
+			context.indentation().text(keyword);
+			context.statementBlock(body, this, true);
 		} else {
-			c.indentation().text(keyword).text(";");
+			context.indentation().text(keyword).text(";");
 		}
 
-		c.newLine();
+		context.newLine();
 		return null;
 	}
 
-	public Void visit(IVariableDeclaration stmt, SSTPrintingContext c) {
-		c.indentation().type(stmt.getType()).space();
-		stmt.getReference().accept(this, c);
-		c.text(";");
+	@Override
+	public Void visit(IVariableDeclaration stmt, SSTPrintingContext context) {
+		context.indentation().type(stmt.getType()).space();
+		stmt.getReference().accept(this, context);
+		context.text(";");
 		return null;
 	}
 
-	public Void visit(IAssignment stmt, SSTPrintingContext c) {
-		c.indentation();
-		stmt.getReference().accept(this, c);
-		c.text(" = ");
-		stmt.getExpression().accept(this, c);
-		c.text(";");
+	@Override
+	public Void visit(IAssignment stmt, SSTPrintingContext context) {
+		context.indentation();
+		stmt.getReference().accept(this, context);
+		context.text(" = ");
+		stmt.getExpression().accept(this, context);
+		context.text(";");
 		return null;
 	}
 
-	public Void visit(IBreakStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("break").text(";");
+	@Override
+	public Void visit(IBreakStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("break").text(";");
 		return null;
 	}
 
-	public Void visit(IContinueStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("continue").text(";");
+	@Override
+	public Void visit(IContinueStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("continue").text(";");
 		return null;
 	}
 
-	public Void visit(IExpressionStatement stmt, SSTPrintingContext c) {
-		c.indentation();
-		stmt.getExpression().accept(this, c);
-		c.text(";");
+	@Override
+	public Void visit(IExpressionStatement stmt, SSTPrintingContext context) {
+		context.indentation();
+		stmt.getExpression().accept(this, context);
+		context.text(";");
 		return null;
 	}
 
-	public Void visit(IGotoStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("goto").space().text(stmt.getLabel()).text(";");
+	@Override
+	public Void visit(IGotoStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("goto").space().text(stmt.getLabel()).text(";");
 		return null;
 	}
 
-	public Void visit(ILabelledStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword(stmt.getLabel()).text(":").newLine();
-		stmt.getStatement().accept(this, c);
+	@Override
+	public Void visit(ILabelledStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword(stmt.getLabel()).text(":").newLine();
+		stmt.getStatement().accept(this, context);
 		return null;
 	}
 
-	public Void visit(IReturnStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("return");
+	@Override
+	public Void visit(IReturnStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("return");
 
 		if (!stmt.isVoid()) {
-			c.space();
-			stmt.getExpression().accept(this, c);
+			context.space();
+			stmt.getExpression().accept(this, context);
 		}
 
-		c.text(";");
+		context.text(";");
 		return null;
 	}
 
-	public Void visit(IThrowStatement stmt, SSTPrintingContext c) {
-		c.indentation().keyword("throw").space().keyword("new").space().text(stmt.getReference().getIdentifier())
+	@Override
+	public Void visit(IThrowStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("throw").space().keyword("new").space().text(stmt.getReference().getIdentifier())
 				.text("();");
 		return null;
 	}
 
-	public Void visit(IDoLoop block, SSTPrintingContext c) {
-		c.indentation().keyword("do");
+	@Override
+	public Void visit(IDoLoop block, SSTPrintingContext context) {
+		context.indentation().keyword("do");
 
-		c.statementBlock(block.getBody(), this, true);
+		context.statementBlock(block.getBody(), this, true);
 
-		c.newLine().indentation().keyword("while").space().text("(");
-		c.indentationLevel++;
-		block.getCondition().accept(this, c);
-		c.indentationLevel--;
-		c.newLine().indentation().text(")");
+		context.newLine().indentation().keyword("while").space().text("(");
+		context.indentationLevel++;
+		block.getCondition().accept(this, context);
+		context.indentationLevel--;
+		context.newLine().indentation().text(")");
 		return null;
 	}
 
-	public Void visit(IForEachLoop block, SSTPrintingContext c) {
-		c.indentation().keyword("foreach").space().text("(").type(block.getDeclaration().getType()).space();
-		block.getDeclaration().getReference().accept(this, c);
-		c.space().keyword("in").space();
-		block.getLoopedReference().accept(this, c);
-		c.text(")");
+	@Override
+	public Void visit(IForEachLoop block, SSTPrintingContext context) {
+		context.indentation().keyword("foreach").space().text("(").type(block.getDeclaration().getType()).space();
+		block.getDeclaration().getReference().accept(this, context);
+		context.space().keyword("in").space();
+		block.getLoopedReference().accept(this, context);
+		context.text(")");
 
-		c.statementBlock(block.getBody(), this, true);
+		context.statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IForLoop block, SSTPrintingContext c) {
-		c.indentation().keyword("for").space().text("(");
+	@Override
+	public Void visit(IForLoop block, SSTPrintingContext context) {
+		context.indentation().keyword("for").space().text("(");
 
-		c.indentationLevel++;
+		context.indentationLevel++;
 
-		c.statementBlock(block.getInit(), this, true);
-		c.text(";");
-		block.getCondition().accept(this, c);
-		c.text(";");
-		c.statementBlock(block.getStep(), this, true);
+		context.statementBlock(block.getInit(), this, true);
+		context.text(";");
+		block.getCondition().accept(this, context);
+		context.text(";");
+		context.statementBlock(block.getStep(), this, true);
 
-		c.indentationLevel--;
+		context.indentationLevel--;
 
-		c.newLine().indentation().text(")");
+		context.newLine().indentation().text(")");
 
-		c.statementBlock(block.getBody(), this, true);
+		context.statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IIfElseBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("if").space().text("(");
-		block.getCondition().accept(this, c);
-		c.text(")");
+	@Override
+	public Void visit(IIfElseBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("if").space().text("(");
+		block.getCondition().accept(this, context);
+		context.text(")");
 
-		c.statementBlock(block.getThen(), this, true);
+		context.statementBlock(block.getThen(), this, true);
 
 		if (!block.getElse().isEmpty()) {
-			c.newLine().indentation().keyword("else");
+			context.newLine().indentation().keyword("else");
 
-			c.statementBlock(block.getElse(), this, true);
+			context.statementBlock(block.getElse(), this, true);
 		}
 		return null;
 	}
 
-	public Void visit(ILockBlock stmt, SSTPrintingContext c) {
-		c.indentation().keyword("lock").space().text("(");
-		stmt.getReference().accept(this, c);
-		c.text(")");
+	@Override
+	public Void visit(ILockBlock stmt, SSTPrintingContext context) {
+		context.indentation().keyword("lock").space().text("(");
+		stmt.getReference().accept(this, context);
+		context.text(")");
 
-		c.statementBlock(stmt.getBody(), this, true);
+		context.statementBlock(stmt.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(ISwitchBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("switch").space().text("(");
-		block.getReference().accept(this, c);
-		c.text(")").newLine().indentation();
-		c.indentationLevel++;
-		c.text("{");
+	@Override
+	public Void visit(ISwitchBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("switch").space().text("(");
+		block.getReference().accept(this, context);
+		context.text(")").newLine().indentation();
+		context.indentationLevel++;
+		context.text("{");
 
 		for (ICaseBlock section : block.getSections()) {
-			c.newLine().indentation().keyword("case").space();
-			section.getLabel().accept(this, c);
-			c.text(":").statementBlock(section.getBody(), this, false);
+			context.newLine().indentation().keyword("case").space();
+			section.getLabel().accept(this, context);
+			context.text(":").statementBlock(section.getBody(), this, false);
 		}
 
 		if (!block.getDefaultSection().isEmpty()) {
-			c.newLine().indentation().keyword("default").text(":").statementBlock(block.getDefaultSection(), this,
+			context.newLine().indentation().keyword("default").text(":").statementBlock(block.getDefaultSection(), this,
 					false);
 		}
 
-		c.newLine();
-		c.indentationLevel--;
-		c.indentation().text("}");
+		context.newLine();
+		context.indentationLevel--;
+		context.indentation().text("}");
 		return null;
 	}
 
-	public Void visit(ITryBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("try").statementBlock(block.getBody(), this, true);
+	@Override
+	public Void visit(ITryBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("try").statementBlock(block.getBody(), this, true);
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			c.newLine().indentation().keyword("catch");
+			context.newLine().indentation().keyword("catch");
 
 			if (catchBlock.getKind() != CatchBlockKind.General) {
-				c.space().text("(").type(catchBlock.getParameter().getValueType());
+				context.space().text("(").type(catchBlock.getParameter().getValueType());
 
 				if (catchBlock.getKind() != CatchBlockKind.Unnamed) {
-					c.space().text(catchBlock.getParameter().getName());
+					context.space().text(catchBlock.getParameter().getName());
 				}
 
-				c.text(")");
+				context.text(")");
 			}
 
-			c.statementBlock(catchBlock.getBody(), this, true);
+			context.statementBlock(catchBlock.getBody(), this, true);
 		}
 
 		if (!block.getFinally().isEmpty()) {
-			c.newLine().indentation().keyword("finally").statementBlock(block.getFinally(), this, true);
+			context.newLine().indentation().keyword("finally").statementBlock(block.getFinally(), this, true);
 		}
 		return null;
 	}
 
-	public Void visit(IUncheckedBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("unchecked").statementBlock(block.getBody(), this, true);
+	@Override
+	public Void visit(IUncheckedBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("unchecked").statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IUnsafeBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("unsafe").text(" { ").comment("/* content ignored */").text(" }");
+	@Override
+	public Void visit(IUnsafeBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("unsafe").text(" { ").comment("/* content ignored */").text(" }");
 		return null;
 	}
 
-	public Void visit(IUsingBlock block, SSTPrintingContext c) {
-		c.indentation().keyword("using").space().text("(");
-		block.getReference().accept(this, c);
-		c.text(")").statementBlock(block.getBody(), this, true);
+	@Override
+	public Void visit(IUsingBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("using").space().text("(");
+		block.getReference().accept(this, context);
+		context.text(")").statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IWhileLoop block, SSTPrintingContext c) {
-		c.indentation().keyword("while").space().text("(");
-		c.indentationLevel++;
-		block.getCondition().accept(this, c);
-		c.indentationLevel--;
-		c.newLine().indentation().text(")");
+	@Override
+	public Void visit(IWhileLoop block, SSTPrintingContext context) {
+		context.indentation().keyword("while").space().text("(");
+		context.indentationLevel++;
+		block.getCondition().accept(this, context);
+		context.indentationLevel--;
+		context.newLine().indentation().text(")");
 
-		c.statementBlock(block.getBody(), this, true);
+		context.statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(ICompletionExpression entity, SSTPrintingContext c) {
+	@Override
+	public Void visit(ICompletionExpression entity, SSTPrintingContext context) {
 		IVariableReference objectReference = entity.getVariableReference();
 		if (objectReference != null) {
-			c.text(objectReference.getIdentifier()).text(".");
+			context.text(objectReference.getIdentifier()).text(".");
 		} else if (entity.getTypeReference() != null) {
-			c.type(entity.getTypeReference()).text(".");
+			context.type(entity.getTypeReference()).text(".");
 		}
 
-		c.text(entity.getToken()).cursorPosition();
+		context.text(entity.getToken()).cursorPosition();
 		return null;
 	}
 
-	public Void visit(IComposedExpression expr, SSTPrintingContext c) {
-		c.keyword("composed").text("(");
+	@Override
+	public Void visit(IComposedExpression expr, SSTPrintingContext context) {
+		context.keyword("composed").text("(");
 
 		for (IReference reference : expr.getReferences()) {
-			reference.accept(this, c);
+			reference.accept(this, context);
 
 			if (!reference.equals(expr.getReferences().get(expr.getReferences().size() - 1))) {
-				c.text(", ");
+				context.text(", ");
 			}
 		}
 
-		c.text(")");
+		context.text(")");
 		return null;
 	}
 
-	public Void visit(IIfElseExpression expr, SSTPrintingContext c) {
-		c.text("(");
-		expr.getCondition().accept(this, c);
-		c.text(")").space().text("?").space();
-		expr.getThenExpression().accept(this, c);
-		c.space().text(":").space();
-		expr.getElseExpression().accept(this, c);
+	@Override
+	public Void visit(IIfElseExpression expr, SSTPrintingContext context) {
+		context.text("(");
+		expr.getCondition().accept(this, context);
+		context.text(")").space().text("?").space();
+		expr.getThenExpression().accept(this, context);
+		context.space().text(":").space();
+		expr.getElseExpression().accept(this, context);
 		return null;
 	}
 
-	public Void visit(IInvocationExpression expr, SSTPrintingContext c) {
+	@Override
+	public Void visit(IInvocationExpression expr, SSTPrintingContext context) {
 		IMethodName methodName = expr.getMethodName();
 
 		if (methodName.isConstructor()) {
-			c.keyword("new");
-			c.space();
-			c.text(methodName.getDeclaringType().getName());
+			context.keyword("new");
+			context.space();
+			context.text(methodName.getDeclaringType().getName());
 		} else {
 			if (methodName.isStatic()) {
-				c.text(methodName.getDeclaringType().getName());
+				context.text(methodName.getDeclaringType().getName());
 			} else {
-				expr.getReference().accept(this, c);
+				expr.getReference().accept(this, context);
 			}
-			c.text(".").text(methodName.getName());
+			context.text(".").text(methodName.getName());
 		}
 
-		c.text("(");
+		context.text("(");
 		boolean isFirst = true;
 		for (ISimpleExpression parameter : expr.getParameters()) {
 			if (!isFirst) {
-				c.text(", ");
+				context.text(", ");
 				isFirst = false;
 			}
-			parameter.accept(this, c);
+			parameter.accept(this, context);
 		}
-		c.text(")");
+		context.text(")");
 
 		return null;
 	}
 
-	public Void visit(ILambdaExpression expr, SSTPrintingContext c) {
-		c.parameterList(expr.getName().getParameters()).space().text("=>");
-		c.statementBlock(expr.getBody(), this, true);
+	@Override
+	public Void visit(ILambdaExpression expr, SSTPrintingContext context) {
+		context.parameterList(expr.getName().getParameters()).space().text("=>");
+		context.statementBlock(expr.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(ILoopHeaderBlockExpression expr, SSTPrintingContext c) {
-		c.statementBlock(expr.getBody(), this, true);
+	@Override
+	public Void visit(ILoopHeaderBlockExpression expr, SSTPrintingContext context) {
+		context.statementBlock(expr.getBody(), this, true);
 		return null;
 	}
 
-	public Void visit(IConstantValueExpression expr, SSTPrintingContext c) {
+	@Override
+	public Void visit(IConstantValueExpression expr, SSTPrintingContext context) {
 		String value2 = expr.getValue();
 		if (value2 != null) {
 			String value = !value2.isEmpty() ? value2 : "...";
@@ -530,69 +573,245 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 			// Double.TryParse(expr.Value, out parsed
 			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")
 					|| value.matches("[0-9]+\\.[0-9]+")) {
-				c.keyword(value);
+				context.keyword(value);
 			} else {
-				c.stringLiteral(value);
+				context.stringLiteral(value);
 			}
 		}
 		return null;
 	}
 
-	public Void visit(INullExpression expr, SSTPrintingContext c) {
-		c.keyword("null");
+	@Override
+	public Void visit(INullExpression expr, SSTPrintingContext context) {
+		context.keyword("null");
 		return null;
 	}
 
-	public Void visit(IReferenceExpression expr, SSTPrintingContext c) {
-		expr.getReference().accept(this, c);
+	@Override
+	public Void visit(IReferenceExpression expr, SSTPrintingContext context) {
+		expr.getReference().accept(this, context);
 		return null;
 	}
 
-	public Void visit(IEventReference eventRef, SSTPrintingContext c) {
-		c.text(eventRef.getReference().getIdentifier());
-		c.text(".");
-		c.text(eventRef.getEventName().getName());
+	@Override
+	public Void visit(IEventReference eventRef, SSTPrintingContext context) {
+		context.text(eventRef.getReference().getIdentifier());
+		context.text(".");
+		context.text(eventRef.getEventName().getName());
 		return null;
 	}
 
-	public Void visit(IFieldReference fieldRef, SSTPrintingContext c) {
-		c.text(fieldRef.getReference().getIdentifier());
-		c.text(".");
-		c.text(fieldRef.getFieldName().getName());
+	@Override
+	public Void visit(IFieldReference fieldRef, SSTPrintingContext context) {
+		context.text(fieldRef.getReference().getIdentifier());
+		context.text(".");
+		context.text(fieldRef.getFieldName().getName());
 		return null;
 	}
 
-	public Void visit(IMethodReference methodRef, SSTPrintingContext c) {
-		c.text(methodRef.getReference().getIdentifier());
-		c.text(".");
-		c.text(methodRef.getMethodName().getName());
+	@Override
+	public Void visit(IMethodReference methodRef, SSTPrintingContext context) {
+		context.text(methodRef.getReference().getIdentifier());
+		context.text(".");
+		context.text(methodRef.getMethodName().getName());
 		return null;
 	}
 
-	public Void visit(IPropertyReference propertyRef, SSTPrintingContext c) {
-		c.text(propertyRef.getReference().getIdentifier());
-		c.text(".");
-		c.text(propertyRef.getPropertyName().getName());
+	@Override
+	public Void visit(IPropertyReference propertyRef, SSTPrintingContext context) {
+		context.text(propertyRef.getReference().getIdentifier());
+		context.text(".");
+		context.text(propertyRef.getPropertyName().getName());
 		return null;
 	}
 
-	public Void visit(IVariableReference varRef, SSTPrintingContext c) {
-		c.text(varRef.getIdentifier());
+	@Override
+	public Void visit(IVariableReference varRef, SSTPrintingContext context) {
+		context.text(varRef.getIdentifier());
 		return null;
 	}
 
-	public Void visit(IUnknownReference unknownRef, SSTPrintingContext c) {
-		c.unknownMarker();
+	@Override
+	public Void visit(IUnknownReference unknownRef, SSTPrintingContext context) {
+		context.unknownMarker();
 		return null;
 	}
 
-	public Void visit(IUnknownExpression unknownExpr, SSTPrintingContext c) {
-		c.unknownMarker();
+	@Override
+	public Void visit(IUnknownExpression unknownExpr, SSTPrintingContext context) {
+		context.unknownMarker();
 		return null;
 	}
 
-	public Void visit(IUnknownStatement unknownStmt, SSTPrintingContext c) {
-		c.indentation().unknownMarker().text(";");
+	@Override
+	public Void visit(IUnknownStatement unknownStmt, SSTPrintingContext context) {
+		context.indentation().unknownMarker().text(";");
+		return null;
+	}
+
+	@Override
+	public Void visit(IIndexAccessReference indexAccessRef, SSTPrintingContext context) {
+		// TODO: How to display these references ?
+		indexAccessRef.getExpression().accept(this, context);
+		return null;
+	}
+
+	@Override
+	public Void visit(ICastExpression expr, SSTPrintingContext context) {
+		if (expr.getOperator() == CastOperator.SafeCast) {
+			context.text(expr.getReference().getIdentifier());
+			context.text(" as ");
+			context.text(expr.getTargetType().getName());
+		} else {
+			context.text("(" + expr.getTargetType().getName() + ") ");
+			context.text(expr.getReference().getIdentifier());
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ITypeCheckExpression expr, SSTPrintingContext context) {
+		context.text(expr.getReference().getIdentifier());
+		context.text(" instanceof ");
+		context.text(expr.getType().getName());
+		return null;
+	}
+
+	@Override
+	public Void visit(IIndexAccessExpression expr, SSTPrintingContext context) {
+		context.text(expr.getReference().getIdentifier());
+		context.text("[");
+		for (int i = 0; i < expr.getIndices().size(); i++) {
+			expr.getIndices().get(i).accept(this, context);
+			if (i < expr.getIndices().size() - 1)
+				context.text(",");
+		}
+		context.text("]");
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnaryExpression expr, SSTPrintingContext context) {
+		switch (expr.getOperator()) {
+		case Not:
+			context.text("!");
+			expr.getOperand().accept(this, context);
+			break;
+		case PreIncrement:
+			context.text("++");
+			expr.getOperand().accept(this, context);
+			break;
+		case PostIncrement:
+			expr.getOperand().accept(this, context);
+			context.text("++");
+			break;
+		case PreDecrement:
+			context.text("--");
+			expr.getOperand().accept(this, context);
+			break;
+		case PostDecrement:
+			expr.getOperand().accept(this, context);
+			context.text("--");
+			break;
+		case Plus:
+			context.text("+");
+			expr.getOperand().accept(this, context);
+			break;
+		case Minus:
+			context.text("-");
+			expr.getOperand().accept(this, context);
+			break;
+		case Complement:
+			context.text("~");
+			expr.getOperand().accept(this, context);
+			break;
+		default:
+			context.text("?");
+			expr.getOperand().accept(this, context);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(IBinaryExpression expr, SSTPrintingContext context) {
+		expr.getLeftOperand().accept(this, context);
+		switch (expr.getOperator()) {
+		case And:
+			context.text(" && ");
+			break;
+		case BitwiseAnd:
+			context.text(" & ");
+			break;
+		case BitwiseOr:
+			context.text(" | ");
+			break;
+		case BitwiseXor:
+			context.text(" ^ ");
+			break;
+		case Divide:
+			context.text(" / ");
+			break;
+		case Equal:
+			context.text(" == ");
+			break;
+		case GreaterThan:
+			context.text(" > ");
+			break;
+		case GreaterThanOrEqual:
+			context.text(" >= ");
+			break;
+		case LessThan:
+			context.text(" < ");
+			break;
+		case LessThanOrEqual:
+			context.text(" <= ");
+			break;
+		case Minus:
+			context.text(" - ");
+			break;
+		case Modulo:
+			context.text(" % ");
+			break;
+		case Multiply:
+			context.text(" * ");
+			break;
+		case NotEqual:
+			context.text(" != ");
+			break;
+		case Or:
+			context.text(" || ");
+			break;
+		case Plus:
+			context.text(" + ");
+			break;
+		case ShiftLeft:
+			context.text(" << ");
+			break;
+		case ShiftRight:
+			context.text(" >> ");
+			break;
+		default:
+			context.text(" ?? ");
+			break;
+		}
+		expr.getRightOperand().accept(this, context);
+		return null;
+	}
+	
+	@Override
+	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
+		stmt.getReference().accept(this, context);
+		switch(stmt.getOperation()){
+		case Add:
+			context.text(" += ");
+			break;
+		case Remove:
+			context.text(" -= ");
+			break;
+		default:
+			context.text(" ?? ");
+		}
+		stmt.getExpression().accept(this, context);
 		return null;
 	}
 }
