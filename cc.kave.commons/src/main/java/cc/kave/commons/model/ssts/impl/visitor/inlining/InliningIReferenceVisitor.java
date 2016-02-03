@@ -1,14 +1,17 @@
 package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -56,6 +59,13 @@ public class InliningIReferenceVisitor extends AbstractThrowingNodeVisitor<Inlin
 		reference.setMethodName(methodRef.getMethodName());
 		reference.setReference(methodRef.getReference());
 		return reference;
+	}
+
+	@Override
+	public IReference visit(IIndexAccessReference indexAccessRef, InliningContext context) {
+		IndexAccessReference ref = new IndexAccessReference();
+		ref.setExpression((IIndexAccessExpression) indexAccessRef.getExpression().accept(context.getExpressionVisitor(), context));;
+		return ref;
 	}
 
 }

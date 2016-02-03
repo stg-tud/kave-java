@@ -43,6 +43,7 @@ import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -377,6 +378,11 @@ public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableR
 			e.accept(this, context);
 		}
 		expr.getReference().accept(this, context);
+		return null;
+	}
+	
+	public Void visit(IIndexAccessReference indexAccessRef, Set<IVariableReference> context) {
+		indexAccessRef.getExpression().accept(this, context);
 		return null;
 	}
 

@@ -18,6 +18,7 @@ import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -36,6 +37,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
@@ -313,6 +315,9 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 
 	@Override
 	public Void visit(IIndexAccessExpression expr, CountReturnContext context) {
+		for(ISimpleExpression e : expr.getIndices()){
+			e.accept(this, context);
+		}
 		return null;
 	}
 
@@ -321,10 +326,16 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 		return null;
 	}
 	
+	@Override
+	public Void visit(IIndexAccessReference indexAccessRef, CountReturnContext context) {
+		indexAccessRef.getExpression().accept(this, context);
+		return null;
+	}
+	
 	public void visit(List<IStatement> body, CountReturnContext context) {
 		for (IStatement statement : body) {
 			statement.accept(this, context);
 		}
 	}
-
+	
 }
