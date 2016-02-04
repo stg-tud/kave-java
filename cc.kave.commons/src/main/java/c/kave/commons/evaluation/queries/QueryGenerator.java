@@ -28,7 +28,7 @@ public class QueryGenerator {
 	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Episode> allMethods,
 			QueryConfigurations configuration) {
 		Map<Episode, Map<Integer, List<Episode>>> generatedQueries = new HashMap<Episode, Map<Integer, List<Episode>>>();
-
+		
 		for (Episode episode : allMethods) {
 			Map<Integer, List<Episode>> queries = new HashMap<Integer, List<Episode>>();
 			List<Integer> sublistLengths = new LinkedList<Integer>();
@@ -96,7 +96,7 @@ public class QueryGenerator {
 		List<String> invocations = getInvocations(episode);
 
 		for (int remove : subsets) {
-			List<List<String>> allQueries = subsetsGenerator(invocations, invocations.size() - remove);
+			List<List<String>> allQueries = SubsetGenerator.generateSubsets(invocations, invocations.size() - remove);
 			List<Episode> queryLevel = new LinkedList<Episode>();
 			for (List<String> list : allQueries) {
 				Episode query = createQuery(episode, list, md);
@@ -149,36 +149,5 @@ public class QueryGenerator {
 			}
 		}
 		return removeInvocations;
-	}
-
-	public List<List<String>> subsetsGenerator(List<String> array, int subsetLength) {
-		int N = array.size();
-		List<List<String>> results = new LinkedList<List<String>>();
-
-		int[] binary = new int[(int) Math.pow(2, N)];
-		for (int i = 0; i < Math.pow(2, N); i++) {
-			int b = 1;
-			binary[i] = 0;
-			int num = i, count = 0;
-			while (num > 0) {
-				if (num % 2 == 1)
-					count++;
-				binary[i] += (num % 2) * b;
-				num /= 2;
-				b = b * 10;
-			}
-
-			if (count == subsetLength) {
-				List<String> subset = new LinkedList<>();
-				for (int j = 0; j < N; j++) {
-					if (binary[i] % 10 == 1) {
-						subset.add(array.get(j));
-					}
-					binary[i] /= 10;
-				}
-				results.add(subset);
-			}
-		}
-		return results;
 	}
 }
