@@ -12,5 +12,6 @@
   	<module>exec.episodes</module>
   	<module>exec.inlining</module>
   	<module>exec.pointsto</module>
+  	<module>exec.examples</module>
   </modules>
 </project>
