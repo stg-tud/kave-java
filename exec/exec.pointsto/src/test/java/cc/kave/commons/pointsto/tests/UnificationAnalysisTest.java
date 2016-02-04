@@ -36,16 +36,20 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.ArrayTypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
@@ -107,7 +111,7 @@ public class UnificationAnalysisTest {
 		visitorContext.setLastAssignment(assignmentToLocal("c", refExpr(fieldRef)));
 		visitorContext.readField(variableReference("c"), fieldRef);
 
-		visitorContext.finalize();
+		visitorContext.finalizeAnalysis();
 		referenceLocations = visitorContext.getReferenceLocations();
 		AbstractLocation thisLocation = referenceLocations
 				.get(new DistinctKeywordReference(LanguageOptions.getInstance().getThisName(), testType));
@@ -233,6 +237,49 @@ public class UnificationAnalysisTest {
 		assertEquals(1, entry1FunLocations.size());
 		assertEquals(1, entry2FunLocations.size());
 		assertThat(entry1FunLocations, Matchers.not(entry2FunLocations));
+
+	}
+
+	@Test
+	public void testParameterArrays() {
+		TestSSTBuilder builder = new TestSSTBuilder();
+		Context context = builder.createParameterArrayTest();
+
+		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
+		pointerAnalysis.compute(context);
+
+		IMethodDeclaration runDecl = context.getSST().getEntryPoints().iterator().next();
+		ITypeName stringType = ((IVariableDeclaration) runDecl.getBody().get(0)).getType();
+		Callpath runCallpath = new Callpath(runDecl.getName());
+		IExpressionStatement stmt = (IExpressionStatement) runDecl.getBody().get(4);
+
+		Set<AbstractLocation> name1Locations = pointerAnalysis
+				.query(new QueryContextKey(variableReference("name1"), stmt, stringType, runCallpath));
+		Set<AbstractLocation> name2Locations = pointerAnalysis
+				.query(new QueryContextKey(variableReference("name2"), stmt, stringType, runCallpath));
+		assertEquals(1, name1Locations.size());
+		assertEquals(1, name2Locations.size());
+		// should be unified as they are stored in the same array
+		assertThat(name1Locations, Matchers.is(name2Locations));
+
+		IMethodDeclaration consumeDecl = context.getSST().getNonEntryPoints().iterator().next();
+		ITypeName stringArrayType = ArrayTypeName.from(stringType, 1);
+		Callpath consumeCallpath = new Callpath(consumeDecl.getName());
+		IForEachLoop consumeLoop = (IForEachLoop) consumeDecl.getBody().get(0);
+		IStatement consoleCall = consumeLoop.getBody().get(0);
+
+		Set<AbstractLocation> consumeParameterLocations = pointerAnalysis
+				.query(new QueryContextKey(variableReference("names"), null, stringArrayType, consumeCallpath));
+		assertEquals(1, consumeParameterLocations.size());
+		assertThat(name1Locations, Matchers.not(consumeParameterLocations));
+		assertThat(name2Locations, Matchers.not(consumeParameterLocations));
+
+		Set<AbstractLocation> consoleCallArgLocations = pointerAnalysis
+				.query(new QueryContextKey(variableReference("name"), consoleCall, stringType, consumeCallpath));
+		assertEquals(1, consoleCallArgLocations.size());
+		assertThat(consoleCallArgLocations, Matchers.not(consumeParameterLocations));
+		assertThat(consoleCallArgLocations, Matchers.is(name1Locations));
+		assertThat(consoleCallArgLocations, Matchers.is(name2Locations));
 
 	}
 }

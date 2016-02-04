@@ -281,6 +281,11 @@ public class TestSSTBuilder {
 		return JsonUtils.fromJson(resource, Context.class);
 	}
 
+	public Context createParameterArrayTest() {
+		InputStream resource = getClass().getResourceAsStream("./ParameterArrayTest.json");
+		return JsonUtils.fromJson(resource, Context.class);
+	}
+
 	private IFieldReference buildFieldReference(IFieldName field) {
 		return buildFieldReference("this", field);
 	}

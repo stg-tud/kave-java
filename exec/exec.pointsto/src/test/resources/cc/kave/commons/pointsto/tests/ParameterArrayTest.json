@@ -1,0 +1,156 @@
+{
+  "$type":"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons",
+  "TypeShape":{
+    "$type":"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons",
+    "TypeHierarchy":{
+      "$type":"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons",
+      "Element":"CSharp.TypeName:Test.ParameterArrayTest, Test",
+      "Implements":[
+
+      ]
+    },
+    "MethodHierarchies":[
+      {
+        "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
+        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Run()"
+      },
+      {
+        "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
+        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)"
+      }
+    ]
+  },
+  "SST":{
+    "$type":"[SST:SST]",
+    "EnclosingType":"CSharp.TypeName:Test.ParameterArrayTest, Test",
+    "PartialClassIdentifier":"",
+    "Fields":[
+
+    ],
+    "Properties":[
+
+    ],
+    "Methods":[
+      {
+        "$type":"[SST:Declarations.MethodDeclaration]",
+        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Run()",
+        "IsEntryPoint":true,
+        "Body":[
+          {
+            "$type":"[SST:Statements.VariableDeclaration]",
+            "Reference":{
+              "$type":"[SST:References.VariableReference]",
+              "Identifier":"name1"
+            },
+            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+          },
+          {
+            "$type":"[SST:Statements.Assignment]",
+            "Reference":{
+              "$type":"[SST:References.VariableReference]",
+              "Identifier":"name1"
+            },
+            "Expression":{
+              "$type":"[SST:Expressions.Simple.ConstantValueExpression]"
+            }
+          },
+          {
+            "$type":"[SST:Statements.VariableDeclaration]",
+            "Reference":{
+              "$type":"[SST:References.VariableReference]",
+              "Identifier":"name2"
+            },
+            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+          },
+          {
+            "$type":"[SST:Statements.Assignment]",
+            "Reference":{
+              "$type":"[SST:References.VariableReference]",
+              "Identifier":"name2"
+            },
+            "Expression":{
+              "$type":"[SST:Expressions.Simple.ConstantValueExpression]"
+            }
+          },
+          {
+            "$type":"[SST:Statements.ExpressionStatement]",
+            "Expression":{
+              "$type":"[SST:Expressions.Assignable.InvocationExpression]",
+              "Reference":{
+                "$type":"[SST:References.VariableReference]",
+                "Identifier":"this"
+              },
+              "MethodName":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
+              "Parameters":[
+                {
+                  "$type":"[SST:Expressions.Simple.ReferenceExpression]",
+                  "Reference":{
+                    "$type":"[SST:References.VariableReference]",
+                    "Identifier":"name1"
+                  }
+                },
+                {
+                  "$type":"[SST:Expressions.Simple.ReferenceExpression]",
+                  "Reference":{
+                    "$type":"[SST:References.VariableReference]",
+                    "Identifier":"name2"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "$type":"[SST:Declarations.MethodDeclaration]",
+        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
+        "IsEntryPoint":false,
+        "Body":[
+          {
+            "$type":"[SST:Blocks.ForEachLoop]",
+            "Declaration":{
+              "$type":"[SST:Statements.VariableDeclaration]",
+              "Reference":{
+                "$type":"[SST:References.VariableReference]",
+                "Identifier":"name"
+              },
+              "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            },
+            "LoopedReference":{
+              "$type":"[SST:References.VariableReference]",
+              "Identifier":"names"
+            },
+            "Body":[
+              {
+                "$type":"[SST:Statements.ExpressionStatement]",
+                "Expression":{
+                  "$type":"[SST:Expressions.Assignable.InvocationExpression]",
+                  "Reference":{
+                    "$type":"[SST:References.VariableReference]",
+                    "Identifier":""
+                  },
+                  "MethodName":"CSharp.MethodName:static [System.Void, mscorlib, 4.0.0.0] [System.Console, mscorlib, 4.0.0.0].WriteLine([System.String, mscorlib, 4.0.0.0] value)",
+                  "Parameters":[
+                    {
+                      "$type":"[SST:Expressions.Simple.ReferenceExpression]",
+                      "Reference":{
+                        "$type":"[SST:References.VariableReference]",
+                        "Identifier":"name"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Events":[
+
+    ],
+    "Delegates":[
+
+    ]
+  }
+}

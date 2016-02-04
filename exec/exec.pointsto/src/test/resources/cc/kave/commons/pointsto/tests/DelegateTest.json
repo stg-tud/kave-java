@@ -4,7 +4,7 @@
     "$type":"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons",
     "TypeHierarchy":{
       "$type":"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons",
-      "Element":"CSharp.TypeName:ConsoleTest.DelegateTest, ConsoleTest",
+      "Element":"CSharp.TypeName:Test.DelegateTest, Test",
       "Implements":[
 
       ]
@@ -12,21 +12,21 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].entry1()"
+        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry1()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].entry2()"
+        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry2()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].foo([System.Object, mscorlib, 4.0.0.0] x)"
+        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)"
       }
     ]
   },
   "SST":{
     "$type":"[SST:SST]",
-    "EnclosingType":"CSharp.TypeName:ConsoleTest.DelegateTest, ConsoleTest",
+    "EnclosingType":"CSharp.TypeName:Test.DelegateTest, Test",
     "PartialClassIdentifier":"",
     "Fields":[
 
@@ -37,7 +37,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].entry1()",
+        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry1()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -62,7 +62,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"this"
                 },
-                "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].foo([System.Object, mscorlib, 4.0.0.0] x)"
+                "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)"
               }
             }
           },
@@ -131,7 +131,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].entry2()",
+        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry2()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -266,7 +266,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [ConsoleTest.DelegateTest, ConsoleTest].foo([System.Object, mscorlib, 4.0.0.0] x)",
+        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)",
         "IsEntryPoint":false,
         "Body":[
           {
