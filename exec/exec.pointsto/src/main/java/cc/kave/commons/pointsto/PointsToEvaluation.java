@@ -25,10 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 
+import cc.kave.commons.pointsto.analysis.AdvancedPointerAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.unification.SteensgaardUnificationAnalysis;
+import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
@@ -46,9 +48,9 @@ public class PointsToEvaluation {
 
 	public static void main(String[] args) {
 		List<PointerAnalysisFactory> factories = Arrays.asList(
-				//new SimplePointerAnalysisFactory<>(TypeBasedAnalysis.class),
-				//new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)
-				new SimplePointerAnalysisFactory<>(SteensgaardUnificationAnalysis.class)
+				// new SimplePointerAnalysisFactory<>(TypeBasedAnalysis.class),
+				// new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)
+				new AdvancedPointerAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)
 				);
 		new PointsToEvaluation().generateUsages(factories);
 
