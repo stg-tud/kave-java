@@ -12,9 +12,14 @@
  */
 package cc.kave.commons.pointsto;
 
+import java.util.Arrays;
+
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
@@ -25,6 +30,12 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class SSTBuilder {
+
+	public static IConstantValueExpression constantValue() {
+		ConstantValueExpression constantValueExpr = new ConstantValueExpression();
+		constantValueExpr.setValue("");
+		return constantValueExpr;
+	}
 
 	public static IVariableReference variableReference(String name) {
 		VariableReference varRef = new VariableReference();
@@ -60,5 +71,12 @@ public class SSTBuilder {
 		IndexAccessReference reference = new IndexAccessReference();
 		reference.setExpression(expr);
 		return reference;
+	}
+
+	public static IIndexAccessReference indexAccessReference(IVariableReference varRef) {
+		IndexAccessExpression indexAccessExpr = new IndexAccessExpression();
+		indexAccessExpr.setReference(varRef);
+		indexAccessExpr.setIndices(Arrays.asList(constantValue()));
+		return indexAccessReference(indexAccessExpr);
 	}
 }

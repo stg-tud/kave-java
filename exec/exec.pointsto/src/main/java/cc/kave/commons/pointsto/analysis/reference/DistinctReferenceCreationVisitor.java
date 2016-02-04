@@ -17,10 +17,10 @@ import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.ScopedMap;
-import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingBaseVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
+import cc.kave.commons.pointsto.analysis.visitors.FailSafeNodeVisitor;
 
 public class DistinctReferenceCreationVisitor
 		extends FailSafeNodeVisitor<ScopedMap<String, DistinctReference>, DistinctReference> {

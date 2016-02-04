@@ -22,18 +22,23 @@ import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.pointsto.analysis.DistinctReferenceVisitorContext;
-import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
+import cc.kave.commons.model.ssts.references.IMemberReference;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
+import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
+import cc.kave.commons.pointsto.analysis.reference.DistinctMemberReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
+import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
 
 public class DistinctReferenceContextCollector extends DistinctReferenceVisitorContext {
 
 	private Logger LOGGER = LoggerFactory.getLogger(DistinctReferenceContextCollector.class);
+
+	private static final String SKIPPING_REF_MSG = "Skipping reference: {}";
+
+	private DistinctReferenceCreationVisitor distRefCreationVisitor = new DistinctReferenceCreationVisitor();
 
 	private IMethodName currentMethod;
 	private IStatement currentStatement;
@@ -61,33 +66,34 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 		this.currentStatement = stmt;
 	}
 
-	public void useReference(IVariableReference varRef) {
-		if (varRef.isMissing()) {
-			LOGGER.warn("Skipping missing variable reference");
-			return;
-		}
+	private DistinctReference getDistinctReference(IReference reference) {
+		return reference.accept(distRefCreationVisitor, namesToReferences);
+	}
 
-		DistinctReference ref = namesToReferences.get(varRef.getIdentifier());
-		if (ref == null) {
-			LOGGER.error("Found a variable without a prior declaration: {}", varRef.getIdentifier());
-		} else {
-			referenceToMethods.put(ref, currentMethod);
-			referenceToStmts.put(ref, currentStatement);
+	private void registerReference(DistinctReference distRef) {
+		referenceToMethods.put(distRef, currentMethod);
+		referenceToStmts.put(distRef, currentStatement);
+	}
+
+	public void useReference(IReference reference) {
+		try {
+			DistinctReference distRef = getDistinctReference(reference);
+			registerReference(distRef);
+		} catch (MissingVariableException | UndeclaredVariableException ex) {
+			LOGGER.error(SKIPPING_REF_MSG, ex.getMessage());
 		}
 	}
 
-	public void useReference(IFieldReference fieldRef) {
-		DistinctReference ref = new DistinctFieldReference(fieldRef,
-				namesToReferences.get(fieldRef.getReference().getIdentifier()));
-		referenceToMethods.put(ref, currentMethod);
-		referenceToStmts.put(ref, currentStatement);
-	}
-
-	public void useReference(IPropertyReference propertyRef) {
-		DistinctReference ref = new DistinctPropertyReference(propertyRef,
-				namesToReferences.get(propertyRef.getReference().getIdentifier()));
-		referenceToMethods.put(ref, currentMethod);
-		referenceToStmts.put(ref, currentStatement);
+	public void useReference(IMemberReference reference) {
+		try {
+			DistinctMemberReference distRef = (DistinctMemberReference) getDistinctReference(reference);
+			registerReference(distRef);
+			if (!distRef.isStaticMember()) {
+				registerReference(distRef.getBaseReference());
+			}
+		} catch (MissingVariableException | UndeclaredVariableException ex) {
+			LOGGER.error(SKIPPING_REF_MSG, ex.getMessage());
+		}
 	}
 
 }

@@ -18,34 +18,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
-import cc.kave.commons.model.ssts.references.IEventReference;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IMethodReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
-import cc.kave.commons.pointsto.analysis.FailSafeNodeVisitor;
-import cc.kave.commons.pointsto.analysis.ScopingVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
+import cc.kave.commons.pointsto.analysis.visitors.ScopingVisitor;
 
 public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalysisVisitorContext, Void> {
 
@@ -53,13 +57,13 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 
-	private ReferenceAssignmentHandler referenceAssignmentHandler = new ReferenceAssignmentHandler();
+	private SimpleExpressionVisitor simpleExpressionVisitor = new SimpleExpressionVisitor();
 	private MethodParameterVisitor parameterVisitor = new MethodParameterVisitor();
 
 	@Override
 	public Void visit(ISST sst, UnificationAnalysisVisitorContext context) {
 		super.visit(sst, context);
-		context.finalize();
+		context.finalizeAnalysis();
 		return null;
 	}
 
@@ -76,6 +80,39 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 	}
 
 	@Override
+	public Void visit(IForEachLoop block, UnificationAnalysisVisitorContext context) {
+		context.enterScope();
+		block.getLoopedReference().accept(this, context);
+		context.declareVariable(block.getDeclaration());
+
+		try {
+			// model as dest = src[X]
+			IVariableReference srcRef = block.getLoopedReference();
+			IVariableReference destRef = block.getDeclaration().getReference();
+			context.readArray(destRef, SSTBuilder.indexAccessReference(srcRef));
+
+			visitStatements(block.getBody(), context);
+		} catch (MissingVariableException | UndeclaredVariableException ex) {
+			LOGGER.error("Failed to process a for each loop: {}", ex.getMessage());
+		} finally {
+			context.leaveScope();
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visit(IExpressionStatement stmt, UnificationAnalysisVisitorContext context) {
+		try {
+			super.visit(stmt, context);
+		} catch (MissingVariableException | UndeclaredVariableException ex) {
+			LOGGER.error("Failed to process an expression statement: {}", ex.getMessage());
+		}
+
+		return null;
+	}
+
+	@Override
 	public Void visit(IAssignment stmt, UnificationAnalysisVisitorContext context) {
 		context.setLastAssignment(stmt);
 
@@ -88,19 +125,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 		}
 
 		try {
-			if (srcExpr instanceof IReferenceExpression) {
-				IReference srcRef = ((IReferenceExpression) srcExpr).getReference();
-
-				if (srcRef instanceof IUnknownReference) {
-					LOGGER.error("Ignoring an assignment with an unknown reference");
-				} else {
-					referenceAssignmentHandler.setContext(context);
-					referenceAssignmentHandler.process(destRef, srcRef);
-				}
-			} else if (srcExpr instanceof IIndexAccessExpression) {
-				referenceAssignmentHandler.setContext(context);
-				referenceAssignmentHandler.process(destRef,
-						SSTBuilder.indexAccessReference((IIndexAccessExpression) srcExpr));
+			if (srcExpr instanceof ISimpleExpression || srcExpr instanceof IIndexAccessExpression) {
+				srcExpr.accept(simpleExpressionVisitor, new ContextReferencePair(context, destRef));
 			} else {
 				// visit expressions (invocation, lambda, ...)
 				return super.visit(stmt, context);
@@ -157,16 +183,42 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 					method.getDeclaringType().getName(), method.getName(), parameters.size());
 		} else {
 			for (int i = 0; i < parameters.size(); ++i) {
+				// due to parameter arrays the number of actual parameters can be greater than the number for formal
+				// parameters
+				int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
+				ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
+				IParameterName formalParameter = method.getParameters().get(formalParameterIndex);
+
 				ISimpleExpression parameterExpr = parameters.get(i);
 				if (parameterExpr instanceof IReferenceExpression) {
 					IReference parameterRef = ((IReferenceExpression) parameterExpr).getReference();
 
-					// due to parameter arrays the number of actual parameters can be greater than the number for formal
-					// parameters
-					int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
-					ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
+					if (parameterRef instanceof IUnknownReference) {
+						LOGGER.warn("Skipping unknown parameter reference");
+						continue;
+					}
 
-					parameterRef.accept(parameterVisitor, new ContextReferencePair(context, formalParameterLocation));
+					// parameter arrays are treated separately: write actual parameters into the array
+					if (formalParameter.isParameterArray()) {
+						IIndexAccessReference indexAccessRef = SSTBuilder
+								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
+						context.writeArray(indexAccessRef, formalParameterLocation,
+								formalParameter.getValueType().getArrayBaseType(), parameterRef);
+					} else {
+
+						parameterRef.accept(parameterVisitor,
+								new ContextLocationPair(context, formalParameterLocation));
+					}
+				} else if (parameterExpr instanceof IConstantValueExpression) {
+					if (formalParameter.isParameterArray()) {
+						ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
+						IIndexAccessReference indexAccessRef = SSTBuilder
+								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
+						context.writeArray(indexAccessRef, formalParameterLocation,
+								formalParameter.getValueType().getArrayBaseType(), tempLoc);
+					} else {
+						context.allocate(formalParameterLocation);
+					}
 				}
 			}
 		}
@@ -194,65 +246,56 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 	}
 
 	@Override
-	public Void visit(IReturnStatement stmt, UnificationAnalysisVisitorContext context) {
-		ISimpleExpression expr = stmt.getExpression();
-		if (expr instanceof IReferenceExpression) {
-			IReference ref = ((IReferenceExpression) expr).getReference();
-			context.registerReturnReference(ref);
+	public Void visit(ICastExpression expr, UnificationAnalysisVisitorContext context) {
+		IAssignableReference destRef = context.getDestinationForExpr(expr);
+
+		if (destRef != null) {
+			IVariableReference srcVarRef = expr.getReference();
+			context.alias(destRef, srcVarRef);
 		}
 
 		return null;
 	}
 
-	private static class ContextReferencePair {
-		public UnificationAnalysisVisitorContext analysis;
-		public ReferenceLocation parameterLocation;
+	@Override
+	public Void visit(IIfElseExpression expr, UnificationAnalysisVisitorContext context) {
+		IAssignableReference destRef = context.getDestinationForExpr(expr);
 
-		public ContextReferencePair(UnificationAnalysisVisitorContext context, ReferenceLocation parameterLocaction) {
-			this.analysis = context;
-			this.parameterLocation = parameterLocaction;
+		if (destRef != null) {
+			ContextReferencePair crPair = new ContextReferencePair(context, destRef);
+			expr.getThenExpression().accept(simpleExpressionVisitor, crPair);
+			expr.getElseExpression().accept(simpleExpressionVisitor, crPair);
 		}
 
+		return null;
 	}
 
-	private static class MethodParameterVisitor extends FailSafeNodeVisitor<ContextReferencePair, Void> {
+	@Override
+	public Void visit(IBinaryExpression expr, UnificationAnalysisVisitorContext context) {
+		IAssignableReference destRef = context.getDestinationForExpr(expr);
+		if (destRef != null) {
+			context.allocate(destRef);
+		}
+		return null;
+	}
 
-		private static final Logger LOGGER = LoggerFactory.getLogger(MethodParameterVisitor.class);
+	@Override
+	public Void visit(IUnaryExpression expr, UnificationAnalysisVisitorContext context) {
+		IAssignableReference destRef = context.getDestinationForExpr(expr);
+		if (destRef != null) {
+			context.allocate(destRef);
+		}
+		return null;
+	}
 
-		@Override
-		public Void visit(IVariableReference varRef, ContextReferencePair context) {
-			context.analysis.registerParameterReference(context.parameterLocation, varRef);
-			return null;
+	@Override
+	public Void visit(IReturnStatement stmt, UnificationAnalysisVisitorContext context) {
+		ISimpleExpression expr = stmt.getExpression();
+		if (expr instanceof IReferenceExpression) {
+			IReference ref = ((IReferenceExpression) expr).getReference();
+			context.registerReturnedReference(ref);
 		}
 
-		@Override
-		public Void visit(IFieldReference fieldRef, ContextReferencePair context) {
-			context.analysis.registerParameterReference(context.parameterLocation, fieldRef);
-			return null;
-		}
-
-		@Override
-		public Void visit(IPropertyReference propertyRef, ContextReferencePair context) {
-			context.analysis.registerParameterReference(context.parameterLocation, propertyRef);
-			return null;
-		}
-
-		@Override
-		public Void visit(IMethodReference methodRef, ContextReferencePair context) {
-			context.analysis.registerParameterReference(context.parameterLocation, methodRef);
-			return null;
-		}
-
-		@Override
-		public Void visit(IEventReference eventRef, ContextReferencePair context) {
-			LOGGER.info("Ignoring event reference");
-			return null;
-		}
-
-		@Override
-		public Void visit(IUnknownReference unknownRef, ContextReferencePair context) {
-			LOGGER.error("Ignoring an unknown reference");
-			return null;
-		}
+		return null;
 	}
 }

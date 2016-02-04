@@ -55,12 +55,13 @@ import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
+import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
-import cc.kave.commons.pointsto.analysis.unification.SteensgaardUnificationAnalysis;
+import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysisVisitorContext;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
 
@@ -93,14 +94,14 @@ public class UnificationAnalysisTest {
 		visitorContext.allocate(visitorContext.getDestinationForExpr(invocation));
 
 		visitorContext.declareVariable(aDecl);
-		visitorContext.copy(variableReference("a"), variableReference("x"));
+		visitorContext.alias(variableReference("a"), variableReference("x"));
 
 		visitorContext.declareVariable(bDecl);
-		visitorContext.copy(variableReference("b"), variableReference("z"));
+		visitorContext.alias(variableReference("b"), variableReference("z"));
 
 		visitorContext.declareVariable(yDecl);
-		visitorContext.copy(variableReference("y"), variableReference("x"));
-		visitorContext.copy(variableReference("y"), variableReference("z"));
+		visitorContext.alias(variableReference("y"), variableReference("x"));
+		visitorContext.alias(variableReference("y"), variableReference("z"));
 
 		Map<DistinctReference, AbstractLocation> referenceLocations = visitorContext.getReferenceLocations();
 		// all variables point to the same location + this/super location
@@ -135,7 +136,7 @@ public class UnificationAnalysisTest {
 		Context context = builder.createStreamTest();
 		ITypeName enclosingType = context.getSST().getEnclosingType();
 
-		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
+		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		pointerAnalysis.compute(context);
 
 		IFieldName sourceField = FieldName.newFieldName(
@@ -190,7 +191,7 @@ public class UnificationAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createDelegateTest();
 
-		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
+		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		pointerAnalysis.compute(context);
 
 		IMethodDeclaration fooDecl = context.getSST().getNonEntryPoints().iterator().next();
@@ -245,7 +246,7 @@ public class UnificationAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createParameterArrayTest();
 
-		PointerAnalysis pointerAnalysis = new SteensgaardUnificationAnalysis();
+		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		pointerAnalysis.compute(context);
 
 		IMethodDeclaration runDecl = context.getSST().getEntryPoints().iterator().next();

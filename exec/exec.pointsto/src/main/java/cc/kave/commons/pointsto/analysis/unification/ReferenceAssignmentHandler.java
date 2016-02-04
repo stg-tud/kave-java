@@ -42,7 +42,7 @@ public class ReferenceAssignmentHandler extends AssignmentHandler<IReference> {
 
 	@Override
 	protected void assignVarToVar(IReference dest, IReference src) {
-		context.copy((IVariableReference) dest, (IVariableReference) src);
+		context.alias((IVariableReference) dest, (IVariableReference) src);
 	}
 
 	@Override

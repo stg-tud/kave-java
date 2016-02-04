@@ -30,15 +30,38 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.AbstractPointerAnalysis;
 import cc.kave.commons.pointsto.analysis.Callpath;
+import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.QueryStrategy;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.MemberLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
+import cc.kave.commons.pointsto.analysis.unification.identifiers.TypeLocationIdentifierFactory;
 
-public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
+public class UnificationAnalysis extends AbstractPointerAnalysis {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SteensgaardUnificationAnalysis.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UnificationAnalysis.class);
+
+	private final FieldSensitivity fieldSensitivity;
+
+	public UnificationAnalysis(FieldSensitivity fieldSensitivity) {
+		this.fieldSensitivity = fieldSensitivity;
+	}
+
+	private LocationIdentifierFactory getIdentifierFactory() {
+		switch (fieldSensitivity) {
+		case NONE:
+			return new SteensgaardLocationIdentifierFactory();
+		case TYPE_BASED:
+			return new TypeLocationIdentifierFactory();
+		case FULL:
+			return new MemberLocationIdentifierFactory();
+		default:
+			throw new IllegalArgumentException("Unknown field sensitivity: " + fieldSensitivity.toString());
+		}
+	}
 
 	@Override
 	public PointsToContext compute(Context context) {
@@ -46,7 +69,7 @@ public class SteensgaardUnificationAnalysis extends AbstractPointerAnalysis {
 
 		UnificationAnalysisVisitor visitor = new UnificationAnalysisVisitor();
 		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(context,
-				new SteensgaardLocationIdentifierFactory());
+				getIdentifierFactory());
 
 		visitor.visit(context.getSST(), visitorContext);
 		Map<DistinctReference, AbstractLocation> referenceToLocation = visitorContext.getReferenceLocations();

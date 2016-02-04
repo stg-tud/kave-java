@@ -12,10 +12,10 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
-import cc.kave.commons.pointsto.analysis.unification.AbstractLocationIdentifierFactory;
 
 public class TypeLocationIdentifierFactory extends AbstractLocationIdentifierFactory {
 
@@ -30,8 +30,8 @@ public class TypeLocationIdentifierFactory extends AbstractLocationIdentifierFac
 	}
 
 	@Override
-	public LocationIdentifier create(DistinctIndexAccessReference indexAccessRef) {
-		return new TypeLocationIdentifier(indexAccessRef.getType());
+	public LocationIdentifier create(IIndexAccessReference indexAccessRef, ITypeName baseType) {
+		return new TypeLocationIdentifier(baseType);
 	}
 
 }

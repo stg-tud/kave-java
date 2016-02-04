@@ -10,14 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.unification;
+package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
-import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifier;
-import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
 
 public abstract class AbstractLocationIdentifierFactory implements LocationIdentifierFactory {
 

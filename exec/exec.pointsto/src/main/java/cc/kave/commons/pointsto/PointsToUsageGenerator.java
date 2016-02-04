@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class PointsToUsageGenerator {
 				try {
 					ptContext = pa.compute(context);
 				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException
-						| NullPointerException | StackOverflowError ex) {
+						| NullPointerException | ConcurrentModificationException | StackOverflowError ex) {
 					throw ex;
 				} catch (RuntimeException ex) {
 					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);

@@ -12,20 +12,20 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 
 public interface LocationIdentifierFactory {
-	
-	
+
 	LocationIdentifier create(IMemberReference memberRef);
 
 	LocationIdentifier create(IFieldReference fieldRef);
 
 	LocationIdentifier create(IPropertyReference propertyRef);
-	
-	LocationIdentifier create(DistinctIndexAccessReference indexAccessRef);
+
+	LocationIdentifier create(IIndexAccessReference indexAccessRef, ITypeName baseType);
 
 }

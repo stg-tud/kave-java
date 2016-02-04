@@ -27,6 +27,7 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 
 public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 

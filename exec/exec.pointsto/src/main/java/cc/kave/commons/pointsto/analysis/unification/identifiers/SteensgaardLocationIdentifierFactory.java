@@ -12,10 +12,10 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
-import cc.kave.commons.pointsto.analysis.unification.AbstractLocationIdentifierFactory;
 
 public class SteensgaardLocationIdentifierFactory extends AbstractLocationIdentifierFactory {
 
@@ -38,7 +38,7 @@ public class SteensgaardLocationIdentifierFactory extends AbstractLocationIdenti
 	}
 
 	@Override
-	public LocationIdentifier create(DistinctIndexAccessReference indexAccessRef) {
+	public LocationIdentifier create(IIndexAccessReference indexAccessRef, ITypeName baseType) {
 		return LocationIdentifier.VALUE;
 	}
 

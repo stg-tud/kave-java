@@ -24,7 +24,6 @@ import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
-import cc.kave.commons.pointsto.analysis.ReferenceNormalizationVisitor;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
@@ -35,6 +34,7 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterRefe
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceVisitor;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
+import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 import cc.recommenders.assertions.Asserts;
 
 public class QueryKeyTransformer

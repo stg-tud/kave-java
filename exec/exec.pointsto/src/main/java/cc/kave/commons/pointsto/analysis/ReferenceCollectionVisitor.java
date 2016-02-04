@@ -31,6 +31,7 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
 public class ReferenceCollectionVisitor extends TraversingVisitor<Multimap<IReference, ITypeName>, Void> {
 

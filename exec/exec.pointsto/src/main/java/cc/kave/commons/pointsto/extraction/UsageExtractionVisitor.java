@@ -36,7 +36,7 @@ import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.pointsto.analysis.TraversingVisitor;
+import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
 public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVisitorContext, Void> {
 
