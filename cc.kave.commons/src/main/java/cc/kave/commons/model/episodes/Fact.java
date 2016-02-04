@@ -24,7 +24,7 @@ public class Fact {
 
 	private String rawFact = "";
 
-	@Deprecated
+	
 	public Fact(String rawFact) {
 		Asserts.assertNotNull(rawFact);
 		this.rawFact = rawFact;
