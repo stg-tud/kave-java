@@ -126,8 +126,8 @@ public class NestedZipFoldersTest {
 
 		List<String> actuals = sut.readAllZips("a", String.class);
 		// TODO: check test, changed to get green tests
-		//List<String> expecteds = Lists.newArrayList("1-1", "1-2", "2-1");
-		List<String> expecteds = Lists.newArrayList("2-1", "1-1", "1-2");
+		List<String> expecteds = Lists.newArrayList("1-1", "1-2", "2-1");
+		//List<String> expecteds = Lists.newArrayList("2-1", "1-1", "1-2");
 		assertEquals(expecteds, actuals);
 	}
 
