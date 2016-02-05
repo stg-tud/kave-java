@@ -25,12 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import c.kave.commons.evaluation.queries.QueryGenerator;
+import c.kave.commons.evaluation.queries.SubsetsGenerator;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.QueryConfigurations;
 
 public class QueryGeneratorTest {
 
 	private List<Episode> allMethods = new LinkedList<Episode>();
+	private SubsetsGenerator subsets;
 	private QueryGenerator sut;
 	
 	@Before
@@ -240,28 +242,28 @@ public class QueryGeneratorTest {
 		List<String> episodeAsList = createList("b", "c", "d", "e", "f", "g", "h", "i");
 		episodeQueries = new HashMap<Integer, List<Episode>>();
 		queryLevel = new LinkedList<Episode>();
-		List<List<String>> queries = sut.subsetsGenerator(episodeAsList, 6);
+		List<List<String>> queries = subsets.generateSubsets(episodeAsList, 6);
 		for (List<String> q : queries) {
 			queryLevel.add(createEpisodeFromList(q));
 		}
 		episodeQueries.put(2, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queries = sut.subsetsGenerator(episodeAsList, 4);
+		queries = subsets.generateSubsets(episodeAsList, 4);
 		for (List<String> q : queries) {
 			queryLevel.add(createEpisodeFromList(q));
 		}
 		episodeQueries.put(4, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queries = sut.subsetsGenerator(episodeAsList, 2);
+		queries = subsets.generateSubsets(episodeAsList, 2);
 		for (List<String> q : queries) {
 			queryLevel.add(createEpisodeFromList(q));
 		}
 		episodeQueries.put(6, queryLevel);
 		
 		queryLevel = new LinkedList<Episode>();
-		queries = sut.subsetsGenerator(episodeAsList, 1);
+		queries = subsets.generateSubsets(episodeAsList, 1);
 		for (List<String> q : queries) {
 			queryLevel.add(createEpisodeFromList(q));
 		}

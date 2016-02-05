@@ -3,11 +3,15 @@ package c.kave.commons.evaluation.queries;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SubsetGenerator {
+public class SubsetsGenerator {
 
-	public static List<List<String>> generateSubsets(List<String> array, int subsetLength) {
+	public List<List<String>> generateSubsets(List<String> array, int subsetLength) {
 		int N = array.size();
 		List<List<String>> results = new LinkedList<List<String>>();
+		
+		if (N == subsetLength) {
+			return results;
+		}
 
 		int[] binary = new int[(int) Math.pow(2, N)];
 		for (int i = 0; i < Math.pow(2, N); i++) {

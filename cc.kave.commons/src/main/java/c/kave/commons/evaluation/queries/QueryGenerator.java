@@ -24,6 +24,8 @@ import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.QueryConfigurations;
 
 public class QueryGenerator {
+	
+	private SubsetsGenerator generator = new SubsetsGenerator();
 
 	public Map<Episode, Map<Integer, List<Episode>>> createQuery(List<Episode> allMethods,
 			QueryConfigurations configuration) {
@@ -96,7 +98,7 @@ public class QueryGenerator {
 		List<String> invocations = getInvocations(episode);
 
 		for (int remove : subsets) {
-			List<List<String>> allQueries = SubsetGenerator.generateSubsets(invocations, invocations.size() - remove);
+			List<List<String>> allQueries = generator.generateSubsets(invocations, invocations.size() - remove);
 			List<Episode> queryLevel = new LinkedList<Episode>();
 			for (List<String> list : allQueries) {
 				Episode query = createQuery(episode, list, md);
