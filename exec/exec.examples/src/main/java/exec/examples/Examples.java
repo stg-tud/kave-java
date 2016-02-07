@@ -23,12 +23,20 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.AbstractLocation;
+import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
+import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
@@ -133,7 +141,30 @@ public class Examples {
 	/**
 	 * 7: perform a points-to analysis
 	 */
-	public static void performPointsTo(ISST originalSst) {
-		// TODO: contact Simon regarding the minimal code snippet
+	public static void performPointsTo(Context originalContext) {
+		// instantiate a pointer analysis that assigns each type a unique location
+		PointerAnalysis pointerAnalysis = new TypeBasedAnalysis();
+
+		// run the analysis and retrieve a context augmented with the pointer analysis instance
+		PointsToContext ptContext = pointerAnalysis.compute(originalContext);
+
+		// create a query builder so that we do not have to populate the complete query ourselves
+		PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(ptContext);
+
+		IMethodDeclaration methodDecl = ptContext.getSST().getMethods().iterator().next();
+		IStatement lastStmt = methodDecl.getBody().get(methodDecl.getBody().size() - 1);
+		// let's assume that the last statement of the method we selected above is of the form 'a.SomeMethod(b)'
+
+		Set<AbstractLocation> locationsOfA = pointerAnalysis
+				.query(queryBuilder.newQuery(SSTBuilder.variableReference("a"), lastStmt));
+		Set<AbstractLocation> locationsOfB = pointerAnalysis
+				.query(queryBuilder.newQuery(SSTBuilder.variableReference("b"), lastStmt));
+
+		// check whether 'a' and 'b' point to the same entity
+		if (locationsOfA.equals(locationsOfB)) {
+			// yes
+		} else {
+			// no
+		}
 	}
 }
