@@ -23,6 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 
 import cc.kave.commons.pointsto.analysis.AdvancedPointerAnalysisFactory;
@@ -52,7 +53,11 @@ public class PointsToEvaluation {
 				// new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)
 				new AdvancedPointerAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)
 				);
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		new PointsToEvaluation().generateUsages(factories);
+		stopwatch.stop();
+		
+		LOGGER.info("Usage generation took {}", stopwatch.toString());
 
 	}
 
