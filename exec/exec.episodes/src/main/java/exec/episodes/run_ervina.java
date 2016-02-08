@@ -24,7 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
+import cc.kave.episodes.mining.reader.EventStreamReader;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -44,10 +44,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		load(EpisodeGraphGenerator.class).generateGraphs(12, 0.7);
+//		load(EpisodeGraphGenerator.class).generateGraphs(12, 0.7);
 //		load(Suggestions.class).run();
 //		load(EventStreamModifier.class).modify();
-//		load(EventStreamReader.class).read();
+		load(EventStreamReader.class).read();
 //		load(MappingReader.class).read();
 		
 		Logger.log("done");
