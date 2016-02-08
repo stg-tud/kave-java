@@ -78,26 +78,42 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	protected abstract boolean match(ISSTNode node);
 
+	protected boolean ignore(ISSTNode node) {
+		return false;
+	}
+
+	private Boolean mayFind(ISSTNode node, Void context) {
+		return (!ignore(node) && node.accept(this, context));
+	}
+
+	private Boolean mayFind(List<IStatement> statements, Void context) {
+		for (IStatement s : statements) {
+			if (mayFind(s, context))
+				return true;
+		}
+		return false;
+	}
+
 	@Override
 	public Boolean visit(ISST sst, Void context) {
 		for (IDelegateDeclaration decl : sst.getDelegates()) {
-			if (decl.accept(this, context))
+			if (mayFind(decl, context))
 				return true;
 		}
 		for (IEventDeclaration decl : sst.getEvents()) {
-			if (decl.accept(this, context))
+			if (mayFind(decl, context))
 				return true;
 		}
 		for (IFieldDeclaration decl : sst.getFields()) {
-			if (decl.accept(this, context))
+			if (mayFind(decl, context))
 				return true;
 		}
 		for (IMethodDeclaration decl : sst.getMethods()) {
-			if (decl.accept(this, context))
+			if (mayFind(decl, context))
 				return true;
 		}
 		for (IPropertyDeclaration decl : sst.getProperties()) {
-			if (decl.accept(this, context))
+			if (mayFind(decl, context))
 				return true;
 		}
 		return false;
@@ -120,22 +136,22 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(IMethodDeclaration decl, Void context) {
-		return match(decl) || visit(decl.getBody(), context);
+		return match(decl) || mayFind(decl.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(IPropertyDeclaration decl, Void context) {
-		return match(decl) || visit(decl.getGet(), context) || visit(decl.getSet(), context);
+		return match(decl) || mayFind(decl.getGet(), context) || mayFind(decl.getSet(), context);
 	}
 
 	@Override
 	public Boolean visit(IVariableDeclaration stmt, Void context) {
-		return match(stmt) || stmt.getReference().accept(this, context);
+		return match(stmt) || mayFind(stmt.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IAssignment stmt, Void context) {
-		return match(stmt) || stmt.getReference().accept(this, context) || stmt.getExpression().accept(this, context);
+		return match(stmt) || mayFind(stmt.getReference(), context) || mayFind(stmt.getExpression(), context);
 	}
 
 	@Override
@@ -150,12 +166,12 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(IEventSubscriptionStatement stmt, Void context) {
-		return match(stmt) || stmt.getReference().accept(this, context) || stmt.getExpression().accept(this, context);
+		return match(stmt) || mayFind(stmt.getReference(), context) || mayFind(stmt.getExpression(), context);
 	}
 
 	@Override
 	public Boolean visit(IExpressionStatement stmt, Void context) {
-		return match(stmt) || stmt.getExpression().accept(this, context);
+		return match(stmt) || mayFind(stmt.getExpression(), context);
 	}
 
 	@Override
@@ -165,72 +181,72 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(ILabelledStatement stmt, Void context) {
-		return match(stmt) || stmt.getStatement().accept(this, context);
+		return match(stmt) || mayFind(stmt.getStatement(), context);
 	}
 
 	@Override
 	public Boolean visit(IReturnStatement stmt, Void context) {
-		return match(stmt) || stmt.getExpression().accept(this, context);
+		return match(stmt) || mayFind(stmt.getExpression(), context);
 	}
 
 	@Override
 	public Boolean visit(IThrowStatement stmt, Void context) {
-		return match(stmt) || stmt.getReference().accept(this, context);
+		return match(stmt) || mayFind(stmt.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IDoLoop block, Void context) {
-		return match(block) || block.getCondition().accept(this, context) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getCondition(), context) || mayFind(block.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(IForEachLoop block, Void context) {
-		return match(block) || block.getDeclaration().accept(this, context)
-				|| block.getLoopedReference().accept(this, context) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getDeclaration(), context) || mayFind(block.getLoopedReference(), context)
+				|| mayFind(block.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(IForLoop block, Void context) {
-		return match(block) || visit(block.getInit(), context) || block.getCondition().accept(this, context)
-				|| visit(block.getStep(), context) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getInit(), context) || mayFind(block.getCondition(), context)
+				|| mayFind(block.getStep(), context) || mayFind(block.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(IIfElseBlock block, Void context) {
-		return match(block) || block.getCondition().accept(this, context) || visit(block.getThen(), context)
-				|| visit(block.getElse(), context);
+		return match(block) || mayFind(block.getCondition(), context) || mayFind(block.getThen(), context)
+				|| mayFind(block.getElse(), context);
 	}
 
 	@Override
 	public Boolean visit(ILockBlock stmt, Void context) {
-		return match(stmt) || stmt.getReference().accept(this, context) || visit(stmt.getBody(), context);
+		return match(stmt) || mayFind(stmt.getReference(), context) || mayFind(stmt.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(ISwitchBlock block, Void context) {
-		if (match(block) || block.getReference().accept(this, context))
+		if (match(block) || mayFind(block.getReference(), context))
 			return true;
 		for (ICaseBlock cb : block.getSections()) {
-			if (cb.getLabel().accept(this, context) || visit(cb.getBody(), context))
+			if (mayFind(cb.getLabel(), context) || mayFind(cb.getBody(), context))
 				return true;
 		}
-		return visit(block.getDefaultSection(), context);
+		return mayFind(block.getDefaultSection(), context);
 	}
 
 	@Override
 	public Boolean visit(ITryBlock block, Void context) {
-		if (match(block) || visit(block.getBody(), context))
+		if (match(block) || mayFind(block.getBody(), context))
 			return true;
 		for (ICatchBlock cb : block.getCatchBlocks()) {
-			if (visit(cb.getBody(), context))
+			if (mayFind(cb.getBody(), context))
 				return true;
 		}
-		return visit(block.getFinally(), context);
+		return mayFind(block.getFinally(), context);
 	}
 
 	@Override
 	public Boolean visit(IUncheckedBlock block, Void context) {
-		return match(block) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getBody(), context);
 	}
 
 	@Override
@@ -240,12 +256,12 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(IUsingBlock block, Void context) {
-		return match(block) || block.getReference().accept(this, context) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getReference(), context) || mayFind(block.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(IWhileLoop block, Void context) {
-		return match(block) || block.getCondition().accept(this, context) || visit(block.getBody(), context);
+		return match(block) || mayFind(block.getCondition(), context) || mayFind(block.getBody(), context);
 	}
 
 	@Override
@@ -258,7 +274,7 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 		if (match(expr))
 			return true;
 		for (IVariableReference varRef : expr.getReferences()) {
-			if (varRef.accept(this, context))
+			if (mayFind(varRef, context))
 				return true;
 		}
 		return false;
@@ -268,16 +284,16 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 	public Boolean visit(IIfElseExpression expr, Void context) {
 		if (match(expr))
 			return true;
-		return expr.getCondition().accept(this, context) || expr.getThenExpression().accept(this, context)
-				|| expr.getElseExpression().accept(this, context);
+		return mayFind(expr.getCondition(), context) || mayFind(expr.getThenExpression(), context)
+				|| mayFind(expr.getElseExpression(), context);
 	}
 
 	@Override
 	public Boolean visit(IInvocationExpression expr, Void context) {
-		if (match(expr) || expr.getReference().accept(this, context))
+		if (match(expr) || mayFind(expr.getReference(), context))
 			return true;
 		for (ISimpleExpression p : expr.getParameters()) {
-			if (p.accept(this, context))
+			if (mayFind(p, context))
 				return true;
 		}
 		return false;
@@ -285,12 +301,12 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(ILambdaExpression expr, Void context) {
-		return match(expr) || visit(expr.getBody(), context);
+		return match(expr) || mayFind(expr.getBody(), context);
 	}
 
 	@Override
 	public Boolean visit(ILoopHeaderBlockExpression expr, Void context) {
-		return match(expr) || visit(expr.getBody(), context);
+		return match(expr) || mayFind(expr.getBody(), context);
 	}
 
 	@Override
@@ -305,20 +321,20 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(IReferenceExpression expr, Void context) {
-		return match(expr) || expr.getReference().accept(this, context);
+		return match(expr) || mayFind(expr.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(ICastExpression expr, Void context) {
-		return match(expr) || expr.getReference().accept(this, context);
+		return match(expr) || mayFind(expr.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IIndexAccessExpression expr, Void context) {
-		if (match(expr) || expr.getReference().accept(this, context))
+		if (match(expr) || mayFind(expr.getReference(), context))
 			return true;
 		for (ISimpleExpression idx : expr.getIndices()) {
-			if (idx.accept(this, context))
+			if (mayFind(idx, context))
 				return true;
 		}
 		return false;
@@ -326,38 +342,37 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(ITypeCheckExpression expr, Void context) {
-		return match(expr) || expr.getReference().accept(this, context);
+		return match(expr) || mayFind(expr.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IBinaryExpression expr, Void context) {
-		return match(expr) || expr.getLeftOperand().accept(this, context)
-				|| expr.getRightOperand().accept(this, context);
+		return match(expr) || mayFind(expr.getLeftOperand(), context) || mayFind(expr.getRightOperand(), context);
 	}
 
 	@Override
 	public Boolean visit(IUnaryExpression expr, Void context) {
-		return match(expr) || expr.getOperand().accept(this, context);
+		return match(expr) || mayFind(expr.getOperand(), context);
 	}
 
 	@Override
 	public Boolean visit(IEventReference ref, Void context) {
-		return match(ref) || ref.getReference().accept(this, context);
+		return match(ref) || mayFind(ref.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IFieldReference ref, Void context) {
-		return match(ref) || ref.getReference().accept(this, context);
+		return match(ref) || mayFind(ref.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IMethodReference ref, Void context) {
-		return match(ref) || ref.getReference().accept(this, context);
+		return match(ref) || mayFind(ref.getReference(), context);
 	}
 
 	@Override
 	public Boolean visit(IPropertyReference ref, Void context) {
-		return match(ref) || ref.getReference().accept(this, context);
+		return match(ref) || mayFind(ref.getReference(), context);
 	}
 
 	@Override
@@ -367,7 +382,7 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 
 	@Override
 	public Boolean visit(IIndexAccessReference ref, Void context) {
-		return match(ref) || ref.getExpression().accept(this, context);
+		return match(ref) || mayFind(ref.getExpression(), context);
 	}
 
 	@Override
@@ -383,14 +398,6 @@ public abstract class AbstractNodeFinderVisitor extends AbstractThrowingNodeVisi
 	@Override
 	public Boolean visit(IUnknownStatement unknownStmt, Void context) {
 		return match(unknownStmt);
-	}
-
-	private Boolean visit(List<IStatement> body, Void context) {
-		for (IStatement stmt : body) {
-			if (stmt.accept(this, context))
-				return true;
-		}
-		return false;
 	}
 
 }
