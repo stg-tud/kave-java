@@ -15,7 +15,10 @@
  */
 package cc.kave.commons.model.episodes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +47,8 @@ public class EpisodeTest {
 		assertEquals(2, sut.getNumEvents());
 		sut.setFrequency(3);
 		assertEquals(3, sut.getFrequency());
+		sut.setContext(new Fact("a"));
+		assertEquals(new Fact("a"), sut.getContext());
 		sut.addFact("f");
 		assertEquals(Lists.newArrayList(new Fact("f")), sut.getFacts());
 	}

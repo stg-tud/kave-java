@@ -61,7 +61,7 @@ public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Voi
 
 		Set<Fact> newFacts = Sets.newHashSet(newFact);
 		for (Fact fact : facts) {
-			if (!fact.isRelationship()) {
+			if (!fact.isRelation()) {
 				newFacts.add(new Fact(fact, newFact));
 			}
 		}

@@ -42,7 +42,7 @@ public class Fact {
 		rawFact = null;
 	}
 
-	public boolean isRelationship() {
+	public boolean isRelation() {
 		return rawFact.contains(">");
 	}
 
