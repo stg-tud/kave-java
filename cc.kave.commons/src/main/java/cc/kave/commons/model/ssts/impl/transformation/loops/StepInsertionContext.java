@@ -37,12 +37,12 @@ public class StepInsertionContext extends StatementInsertionContext {
 	public boolean insertBefore(IStatement stmt) {
 		return stmt instanceof IContinueStatement;
 	}
-	
+
 	/**
-	 * Skip loops (as we don't want to insert the current loop step
-	 * before continue statements of inner loops)
+	 * Skip loops (as we don't want to insert the current loop step before
+	 * continue statements of inner loops)
 	 */
-	@Override 
+	@Override
 	public boolean skip(ISSTNode node) {
 		return (node instanceof IForLoop) || (node instanceof IWhileLoop) || (node instanceof IDoLoop);
 	}

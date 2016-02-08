@@ -48,13 +48,14 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<StatementInsertionContext, List<IStatement>> {
+public class StatementInsertionVisitor
+		extends AbstractThrowingNodeVisitor<StatementInsertionContext, List<IStatement>> {
 
 	@Override
 	public List<IStatement> visit(ISST sst, StatementInsertionContext context) {
-		if(context.skip(sst))
+		if (context.skip(sst))
 			return null;
-		
+
 		for (IPropertyDeclaration property : sst.getProperties()) {
 			property.accept(this, context);
 		}
@@ -66,7 +67,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IMethodDeclaration method, StatementInsertionContext context) {
-		if(context.skip(method))
+		if (context.skip(method))
 			return null;
 		List<IStatement> body = method.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -121,7 +122,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IDoLoop block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -131,7 +132,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IForEachLoop block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -141,7 +142,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IForLoop block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> initNormalized = visit(block.getInit(), context);
 		List<IStatement> stepNormalized = visit(block.getStep(), context);
@@ -154,7 +155,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IIfElseBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> thenNormalized = visit(block.getThen(), context);
 		List<IStatement> elseNormalized = visit(block.getElse(), context);
@@ -165,7 +166,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(ILockBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> bodyNormalized = visit(block.getBody(), context);
 		update(block.getBody(), bodyNormalized);
@@ -174,7 +175,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(ISwitchBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		for (ICaseBlock caseBlock : block.getSections()) {
 			List<IStatement> body = caseBlock.getBody();
@@ -190,7 +191,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(ITryBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -210,7 +211,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IUncheckedBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -225,7 +226,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IUsingBlock block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
@@ -235,7 +236,7 @@ public class StatementInsertionVisitor extends AbstractThrowingNodeVisitor<State
 
 	@Override
 	public List<IStatement> visit(IWhileLoop block, StatementInsertionContext context) {
-		if(context.skip(block))
+		if (context.skip(block))
 			return null;
 		List<IStatement> body = block.getBody();
 		List<IStatement> bodyNormalized = visit(body, context);
