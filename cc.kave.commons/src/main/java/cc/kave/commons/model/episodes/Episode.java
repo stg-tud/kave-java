@@ -28,7 +28,6 @@ public class Episode {
 
 	private int frequency;
 	private int numberOfEvents;
-	private Fact methodContext;
 	private List<Fact> facts = Lists.newLinkedList();
 
 	public Iterable<Fact> getFacts() {
@@ -46,10 +45,6 @@ public class Episode {
 	public int getFrequency() {
 		return frequency;
 	}
-	
-	public Fact getContext() {
-		return methodContext;
-	}
 
 	public void setNumEvents(int numEvents) {
 		this.numberOfEvents = numEvents;
@@ -57,10 +52,6 @@ public class Episode {
 
 	public void setFrequency(int frequency) {
 		this.frequency = frequency;
-	}
-	
-	public void setContext(Fact fact) {
-		this.methodContext = fact;
 	}
 
 	public void addFact(Fact fact) {

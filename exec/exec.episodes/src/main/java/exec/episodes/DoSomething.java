@@ -20,15 +20,22 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
+import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.ReadingArchive;
 
@@ -48,6 +55,23 @@ public class DoSomething {
 			System.out.println("found contexts for the following classes:");
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
+				
+				
+				
+				List<Event> events = Lists.newLinkedList(); // get from somewhere ("eventMapping.txt")
+				ToFactsVisitor tfv = new ToFactsVisitor(events);
+				
+				ISST sst = ctx.getSST();
+				for(IMethodDeclaration md : sst.getMethods()) {
+					Episode ep = new Episode();
+					Set<Fact> facts = Sets.newHashSet();
+					md.accept(tfv, facts);
+					
+					for(Fact f : facts){
+						ep.addFact(f);
+					}
+				}
+				
 				System.out.println("\t- " + ctx.getSST().getEnclosingType());
 
 				if (i++ > 10) {

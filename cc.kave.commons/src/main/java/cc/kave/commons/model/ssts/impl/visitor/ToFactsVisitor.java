@@ -35,6 +35,10 @@ public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Voi
 	}
 
 	private Fact toFact(Event e) {
+		// TODO write test case
+		// if(!events.contains(e)){
+		// events.add(e);
+		// }
 		return new Fact(events.indexOf(e));
 	}
 

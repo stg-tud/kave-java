@@ -16,17 +16,8 @@ public class QueryGeneratorByNumber {
 		Map<Integer, List<Episode>> generatedQueries = new HashMap<Integer, List<Episode>>();
 		
 		Iterable<Fact> allFacts = originalEpisode.getFacts();
-		List<Fact> events = new LinkedList<Fact>();
-		List<Fact> relations = new LinkedList<Fact>();
-		
-		for (Fact fact : allFacts) {
-			if (fact.isRelation()) {
-				relations.add(fact);
-			} else {
-				events.add(fact);
-			}
-		}
-		List<List<Fact>> subsets = generator.generateSubsets(events, removeEvents);
+	
+		List<List<Fact>> subsets = generator.generateSubsets((List<Fact>) allFacts, removeEvents);
 		
 		for (List<Fact> query : subsets) {
 			Episode q = createEpisode(originalEpisode, query);
@@ -43,7 +34,6 @@ public class QueryGeneratorByNumber {
 		Episode query = new Episode();
 		query.setFrequency(1);
 		query.setNumEvents(queryFacts.size());
-		query.setContext(episode.getContext());
 		
 		for (Fact f : queryFacts) {
 			query.addFact(f);

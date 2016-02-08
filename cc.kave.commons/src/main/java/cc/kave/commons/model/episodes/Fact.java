@@ -45,15 +45,21 @@ public class Fact {
 	public boolean isRelation() {
 		return rawFact.contains(">");
 	}
+	
+	public boolean isRelatedTo(Fact f) {
+		// check that f is a non relation
+		
+		return false;
+	}
 
 	/**
 	 * this should not be used... use the "int" or the "Fact, Fact" version
 	 * instead
 	 */
-	@Deprecated
-	public void setFact(String rawFact) {
-		this.rawFact = rawFact;
-	}
+//	@Deprecated
+//	public void setFact(String rawFact) {
+//		this.rawFact = rawFact;
+//	}
 
 	/**
 	 * this should not be used... why do we have an abstraction, if we access

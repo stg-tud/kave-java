@@ -85,11 +85,7 @@ public class EpisodeParserTest {
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
 
-		Episode episode = new Episode();
-		episode.addFact("1");
-		episode.setNumEvents(1);
-		episode.setFrequency(3);
-
+		Episode episode = createEpisode(3, 1, "1");
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
@@ -125,11 +121,7 @@ public class EpisodeParserTest {
 		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
 
-		Episode episode = new Episode();
-		episode.addFact("1");
-		episode.setNumEvents(1);
-		episode.setFrequency(3);
-
+		Episode episode = createEpisode(3, 1, "1");
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
