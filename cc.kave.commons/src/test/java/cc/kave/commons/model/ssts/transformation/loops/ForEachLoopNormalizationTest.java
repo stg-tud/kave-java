@@ -23,8 +23,6 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +43,7 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 
 	private ForEachLoop forEachLoop;
 	private IVariableReference loopedRef0, loopedRef1;
+	private IVariableReference it0, it1;
 	IVariableDeclaration dec0, dec1;
 
 	@Before
@@ -56,6 +55,8 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 
 		loopedRef0 = dummyVar(0);
 		loopedRef1 = dummyVar(1);
+		it0 = variableReference("$it_0");
+		it1 = variableReference("$it_1");
 		dec0 = declare("e0", TypeName.newTypeName("t0"));
 		dec1 = declare("e1", TypeName.newTypeName("t1"));
 	}
@@ -73,15 +74,14 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 
 		// declare & initialize iterator
 		ITypeName iteratorTypeName = iteratorType(dec0.getType());
-		IVariableReference iterator = variableReference("it_0");
-		IVariableDeclaration iteratorDec = declareVar(iterator.getIdentifier(), iteratorTypeName);
-		IAssignment iteratorInit = assign(iterator, iteratorInvocation(loopedRef0));
+		IVariableDeclaration iteratorDec = declareVar(it0.getIdentifier(), iteratorTypeName);
+		IAssignment iteratorInit = assign(it0, iteratorInvocation(loopedRef0));
 
 		// assign next element
-		IAssignment assignNext = assign(dec0.getReference(), getNext(iterator));
+		IAssignment assignNext = assign(dec0.getReference(), getNext(it0));
 
 		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(getWhileCondition(iterator));
+		whileLoop.setCondition(getWhileCondition(it0));
 		whileLoop.setBody(list(dec0, assignNext));
 
 		setExpected(iteratorDec, iteratorInit, whileLoop);
@@ -103,15 +103,14 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 
 		// declare & initialize iterator
 		ITypeName iteratorTypeName = iteratorType(dec0.getType());
-		IVariableReference iterator = variableReference("it_0");
-		IVariableDeclaration iteratorDec = declareVar(iterator.getIdentifier(), iteratorTypeName);
-		IAssignment iteratorInit = assign(iterator, iteratorInvocation(loopedRef0));
+		IVariableDeclaration iteratorDec = declareVar(it0.getIdentifier(), iteratorTypeName);
+		IAssignment iteratorInit = assign(it0, iteratorInvocation(loopedRef0));
 
 		// assign next element
-		IAssignment assignNext = assign(dec0.getReference(), getNext(iterator));
+		IAssignment assignNext = assign(dec0.getReference(), getNext(it0));
 
 		WhileLoop whileLoop = new WhileLoop();
-		whileLoop.setCondition(getWhileCondition(iterator));
+		whileLoop.setCondition(getWhileCondition(it0));
 		whileLoop.setBody(list(dec0, assignNext, stmt0));
 
 		setExpected(iteratorDec, iteratorInit, whileLoop);
@@ -145,23 +144,21 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 		// declare & initialize iterators
 		ITypeName iteratorType0 = iteratorType(dec0.getType());
 		ITypeName iteratorType1 = iteratorType(dec1.getType());
-		IVariableReference iterator0 = variableReference("it_0");
-		IVariableReference iterator1 = variableReference("it_1");
-		IVariableDeclaration iteratorDec0 = declareVar(iterator0.getIdentifier(), iteratorType0);
-		IVariableDeclaration iteratorDec1 = declareVar(iterator1.getIdentifier(), iteratorType1);
-		IAssignment iteratorInit0 = assign(iterator0, iteratorInvocation(loopedRef0));
-		IAssignment iteratorInit1 = assign(iterator1, iteratorInvocation(loopedRef1));
+		IVariableDeclaration iteratorDec0 = declareVar(it0.getIdentifier(), iteratorType0);
+		IVariableDeclaration iteratorDec1 = declareVar(it1.getIdentifier(), iteratorType1);
+		IAssignment iteratorInit0 = assign(it0, iteratorInvocation(loopedRef0));
+		IAssignment iteratorInit1 = assign(it1, iteratorInvocation(loopedRef1));
 
 		// assign next element
-		IAssignment assignNext0 = assign(dec0.getReference(), getNext(iterator0));
-		IAssignment assignNext1 = assign(dec1.getReference(), getNext(iterator1));
+		IAssignment assignNext0 = assign(dec0.getReference(), getNext(it0));
+		IAssignment assignNext1 = assign(dec1.getReference(), getNext(it1));
 
 		WhileLoop innerWhile = new WhileLoop();
-		innerWhile.setCondition(getWhileCondition(iterator0));
+		innerWhile.setCondition(getWhileCondition(it0));
 		innerWhile.setBody(list(dec0, assignNext0, stmt0));
 
 		WhileLoop outerWhile = new WhileLoop();
-		outerWhile.setCondition(getWhileCondition(iterator1));
+		outerWhile.setCondition(getWhileCondition(it1));
 		outerWhile.setBody(list(dec1, assignNext1, iteratorDec0, iteratorInit0, innerWhile));
 		setExpected(iteratorDec1, iteratorInit1, outerWhile);
 		assertTransformedSST();
@@ -187,8 +184,4 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 		return loopHeader(hasNextDec, assign(hasNext, hasNext(iterator)), returnStatement(refExpr(hasNext)));
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> List<T> list(T... elements) {
-		return Lists.newArrayList(elements);
-	}
 }
