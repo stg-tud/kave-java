@@ -206,9 +206,9 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 	}
 
 	@Override
-	public TReturn visit(ILockBlock stmt, TContext context) {
-		stmt.getReference().accept(this, context);
-		visitStatements(stmt.getBody(), context);
+	public TReturn visit(ILockBlock block, TContext context) {
+		block.getReference().accept(this, context);
+		visitStatements(block.getBody(), context);
 		return null;
 	}
 
