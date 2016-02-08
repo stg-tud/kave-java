@@ -485,21 +485,6 @@ public class SSTUtil {
 		completionExpr.setObjectReference(variableReference(ref));
 		return completionExpr;
 	}
-	
-	public static IUnaryExpression unaryExpr(UnaryOperator op, ISimpleExpression exp) {
-		UnaryExpression unaryExpression = new UnaryExpression();
-		unaryExpression.setOperator(op);
-		unaryExpression.setOperand(exp);
-		return unaryExpression;
-	}
-	
-	public static IBinaryExpression binExpr(BinaryOperator op, ISimpleExpression lhs, ISimpleExpression rhs) {
-		BinaryExpression binaryExpression = new BinaryExpression();
-		binaryExpression.setOperator(op);
-		binaryExpression.setLeftOperand(lhs);
-		binaryExpression.setRightOperand(rhs);
-		return binaryExpression;
-	}
 
 	public static IReference unknownRef() {
 		UnknownReference ref = new UnknownReference();
@@ -543,6 +528,49 @@ public class SSTUtil {
 			fields.add(fieldDeclaration);
 		}
 		return fields;
+	}
+	
+	// ----------------------- binary expressions -----------------------------
+	
+	public static IBinaryExpression binExpr(BinaryOperator op, ISimpleExpression lhs, ISimpleExpression rhs) {
+		BinaryExpression binaryExpression = new BinaryExpression();
+		binaryExpression.setOperator(op);
+		binaryExpression.setLeftOperand(lhs);
+		binaryExpression.setRightOperand(rhs);
+		return binaryExpression;
+	}
+
+	public static IBinaryExpression or(ISimpleExpression lhs, ISimpleExpression rhs) {
+		return binExpr(BinaryOperator.Or, lhs, rhs);
+	}
+
+	public static IBinaryExpression or(IVariableReference lhs, IVariableReference rhs) {
+		return or(refExpr(lhs), refExpr(rhs));
+	}
+
+	public static IBinaryExpression and(ISimpleExpression lhs, ISimpleExpression rhs) {
+		return binExpr(BinaryOperator.And, lhs, rhs);
+	}
+	
+	public static IBinaryExpression and(IVariableReference lhs, IVariableReference rhs) {
+		return and(refExpr(lhs), refExpr(rhs));
+	}
+
+	// ------------------------ unary expressions -----------------------------
+	
+	public static IUnaryExpression unaryExpr(UnaryOperator op, ISimpleExpression exp) {
+		UnaryExpression unaryExpression = new UnaryExpression();
+		unaryExpression.setOperator(op);
+		unaryExpression.setOperand(exp);
+		return unaryExpression;
+	}
+
+	public static IUnaryExpression not(ISimpleExpression expr) {
+		return unaryExpr(UnaryOperator.Not, expr);
+	}
+	
+	public static IUnaryExpression not(IVariableReference ref) {
+		return not(refExpr(ref));
 	}
 
 }
