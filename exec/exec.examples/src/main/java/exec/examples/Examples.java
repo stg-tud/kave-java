@@ -33,10 +33,11 @@ import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
+import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
-import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
+import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
@@ -142,8 +143,8 @@ public class Examples {
 	 * 7: perform a points-to analysis
 	 */
 	public static void performPointsTo(Context originalContext) {
-		// instantiate a pointer analysis that assigns each type a unique location
-		PointerAnalysis pointerAnalysis = new TypeBasedAnalysis();
+		// instantiate a field-sensitive unification pointer analysis
+		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 
 		// run the analysis and retrieve a context augmented with the pointer analysis instance
 		PointsToContext ptContext = pointerAnalysis.compute(originalContext);
