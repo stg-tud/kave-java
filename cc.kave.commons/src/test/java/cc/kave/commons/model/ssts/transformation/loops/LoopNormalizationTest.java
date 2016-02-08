@@ -20,7 +20,7 @@ import org.junit.Before;
 import cc.kave.commons.model.ssts.impl.transformation.loops.LoopNormalizationVisitor;
 import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
-public abstract class LoopNormalizationTest extends StatementNormalizationVisitorBaseTest<Void> {
+public class LoopNormalizationTest extends StatementNormalizationVisitorBaseTest<Void> {
 
 	@Before
 	public void setup() {
