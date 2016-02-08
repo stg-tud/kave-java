@@ -33,10 +33,10 @@ public class ConstantCollectorVisitor extends AbstractConstantCollectorVisitor {
 				constants.add(field);
 		}
 		for (IPropertyDeclaration property : sst.getProperties()) {
-			property.accept(this, constants);
+			constants.addAll(property.accept(this, constants));
 		}
 		for (IMethodDeclaration method : sst.getMethods()) {
-			method.accept(this, constants);
+			constants.addAll(method.accept(this, constants));
 		}
 		return constants;
 	}
