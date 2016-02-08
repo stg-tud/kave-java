@@ -75,7 +75,7 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class AbstractStatementNormalizationVisitor<TContext>
+public abstract class AbstractStatementNormalizationVisitor<TContext>
 		extends AbstractThrowingNodeVisitor<TContext, List<IStatement>> {
 	@Override
 	public List<IStatement> visit(ISST sst, TContext context) {
