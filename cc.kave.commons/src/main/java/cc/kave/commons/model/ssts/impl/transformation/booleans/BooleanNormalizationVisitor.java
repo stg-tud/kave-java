@@ -51,7 +51,7 @@ public class BooleanNormalizationVisitor extends AbstractStatementNormalizationV
 	 */
 	private List<IStatement> getNewDeclarations(IStatement stmt, RefLookup context) {
 		stmt.accept(expressionVisitor, context);
-		return expressionVisitor.clearNewDeclarations();
+		return expressionVisitor.clearCreatedStatements();
 	}
 
 	private List<IStatement> handleNewDeclarations(IStatement stmt, RefLookup context) {

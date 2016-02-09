@@ -20,7 +20,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainVar;
-import static cc.kave.commons.model.ssts.impl.transformation.booleans.ExpressionNormalizationVisitor.getNegated;
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.BinaryOperatorUtil.getNegated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,9 +72,11 @@ public class TestNegated extends BooleanNormalizationVisitorBaseTest {
 		/* we create 2 variables before transformation */
 		counter -= 2;
 		List<IStatement> toNormalize = not(binary(a, b, op));
-		List<IStatement> expected = new ArrayList<IStatement>();
+		
 		List<IStatement> notA = not(a);
 		List<IStatement> notB = not(b);
+		
+		List<IStatement> expected = new ArrayList<IStatement>();
 		expected.addAll(toNormalize.subList(0, toNormalize.size() - 1));
 		expected.addAll(notA);
 		expected.addAll(notB);

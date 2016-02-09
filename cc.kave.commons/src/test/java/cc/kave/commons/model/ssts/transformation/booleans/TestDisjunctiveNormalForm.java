@@ -88,24 +88,21 @@ public class TestDisjunctiveNormalForm extends BooleanNormalizationVisitorBaseTe
 		List<IStatement> toNormalize = and(lhs, rhs);
 
 		List<IStatement> def0 = and(a, mainCondition(rhs));
-		List<IStatement> def1 = and(b, mainCondition(rhs));
-		List<IStatement> def2 = and(c, a);
-		List<IStatement> def3 = and(d, a);
+		List<IStatement> def1 = and(c, a);
+		List<IStatement> def2 = and(d, a);
+		List<IStatement> def3 = and(b, mainCondition(rhs));
 		List<IStatement> def4 = and(c, b);
 		List<IStatement> def5 = and(d, b);
 		List<IStatement> def6 = defineNew(SSTUtil.or(mainCondition(def0), mainCondition(def4)));
 
 		List<IStatement> expected = new ArrayList<IStatement>();
 		expected.addAll(toNormalize.subList(0, toNormalize.size() - 1));
-
+		expected.addAll(def1);
 		expected.addAll(def2);
-		expected.addAll(def3);
-		expected.addAll(define(mainVar(def0), SSTUtil.or(mainCondition(def2), mainCondition(def3))));
-
+		expected.addAll(define(mainVar(def0), SSTUtil.or(mainCondition(def1), mainCondition(def2))));
 		expected.addAll(def4);
 		expected.addAll(def5);
-		expected.addAll(define(mainVar(def1), SSTUtil.or(mainCondition(def4), mainCondition(def5))));
-
+		expected.addAll(define(mainVar(def3), SSTUtil.or(mainCondition(def4), mainCondition(def5))));
 		expected.addAll(def6);
 		expected.add(assign(mainVar(toNormalize), SSTUtil.or(mainCondition(def6), mainCondition(def5))));
 

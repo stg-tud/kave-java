@@ -18,6 +18,8 @@ package cc.kave.commons.model.ssts.impl.transformation.booleans;
 import java.util.HashMap;
 
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class RefLookup extends HashMap<IVariableReference, IAssignableExpression> {
@@ -28,5 +30,13 @@ public class RefLookup extends HashMap<IVariableReference, IAssignableExpression
 	}
 
 	public RefLookup() {
+	}
+
+	public IAssignableExpression tryLookup(ISimpleExpression simple) {
+		IAssignableExpression result = null;
+		if (simple instanceof IReferenceExpression) {
+			result = get(((IReferenceExpression) simple).getReference());
+		}
+		return result;
 	}
 }

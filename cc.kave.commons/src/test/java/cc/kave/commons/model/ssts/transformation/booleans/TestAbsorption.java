@@ -18,7 +18,7 @@ package cc.kave.commons.model.ssts.transformation.booleans;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainVar;
-import static cc.kave.commons.model.ssts.impl.transformation.booleans.ExpressionNormalizationVisitor.getNegated;
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.BinaryOperatorUtil.getNegated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,9 +66,10 @@ public class TestAbsorption extends BooleanNormalizationVisitorBaseTest {
 		/* we create 2 variables before transformation */
 		counter -= 2;
 		List<IStatement> innerBinary = binary(a, b, getNegated(op));
-		List<IStatement> toNormalize = new ArrayList<IStatement>();
 		List<IStatement> outerBinary = left ? binary(a, mainCondition(innerBinary), op)
 				: binary(mainCondition(innerBinary), a, op);
+		
+		List<IStatement> toNormalize = new ArrayList<IStatement>();
 		toNormalize.addAll(innerBinary);
 		toNormalize.addAll(outerBinary);
 

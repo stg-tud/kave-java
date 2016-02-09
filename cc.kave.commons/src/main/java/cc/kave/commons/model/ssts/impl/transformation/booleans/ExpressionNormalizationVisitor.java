@@ -23,11 +23,11 @@ import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationU
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.TRUE;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.BinaryOperatorUtil.getNegated;
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.BinaryOperatorUtil.isLogical;
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.BinaryOperatorUtil.isRelational;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.ImmutableBiMap;
 
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
@@ -54,48 +54,36 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 
 public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizationVisitor<RefLookup> {
 	private ReferenceCollectorVisitor referenceCollector;
-	private List<IStatement> newDeclarations;
-	private int variableCount;
+	private StatementRegistry createdStatements;
+	private int createdVariables;
 
 	public ExpressionNormalizationVisitor() {
 		referenceCollector = new ReferenceCollectorVisitor();
-		newDeclarations = new ArrayList<IStatement>();
-		variableCount = 0;
+		createdStatements = new StatementRegistry();
+		createdVariables = 0;
 	}
 
-	//@formatter:off
-	private static final ImmutableBiMap<BinaryOperator, BinaryOperator> opNegation = ImmutableBiMap.of(
-			BinaryOperator.And, BinaryOperator.Or, 
-			BinaryOperator.Equal, BinaryOperator.NotEqual, 
-			BinaryOperator.LessThan, BinaryOperator.GreaterThanOrEqual, 
-			BinaryOperator.GreaterThan, BinaryOperator.LessThanOrEqual);
-	//@formatter:on
-
-	public static BinaryOperator getNegated(BinaryOperator op) {
-		return opNegation.getOrDefault(op, opNegation.inverse().get(op));
+	public List<IStatement> clearCreatedStatements() {
+		return createdStatements.clearContent();
 	}
 
-	private int next() {
-		return variableCount++;
-	}
-
-	public List<IStatement> clearNewDeclarations() {
-		List<IStatement> newDeclarations = new ArrayList<IStatement>();
-		newDeclarations.addAll(this.newDeclarations);
-		this.newDeclarations.clear();
-		return newDeclarations;
+	private List<IStatement> defineNew(IAssignableExpression expr, RefLookup context) {
+		List<IStatement> definition = define(createdVariables++, expr);
+		registerNewDeclarations(definition, context);
+		return definition;
 	}
 
 	private void registerNewDeclarations(List<IStatement> statements, RefLookup context) {
 		/* update context with newly assigned references */
 		statements.stream().filter(s -> s instanceof IAssignment).map(s -> (IAssignment) s).forEach(a -> {
 			IReference ref = a.getReference();
-			if (ref instanceof IVariableReference)
+			if (ref instanceof IVariableReference) {
 				context.put((IVariableReference) ref, a.getExpression());
+			}
 		});
 		/* normalize newly created statements */
 		visit(statements, context);
-		newDeclarations.addAll(statements);
+		createdStatements.addAll(statements);
 	}
 
 	@Override
@@ -114,8 +102,9 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 			IAssignableReference ref = assignment.getReference();
 
 			/* update context */
-			if (ref instanceof IVariableReference)
+			if (ref instanceof IVariableReference) {
 				context.put((IVariableReference) ref, normalized);
+			}
 		}
 		return null;
 	}
@@ -123,7 +112,7 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	@Override
 	public IAssignableExpression visit(IIfElseBlock block, RefLookup context) {
 		super.visit(block, context);
-		IAssignableExpression expr = tryLookup(block.getCondition(), context);
+		IAssignableExpression expr = context.tryLookup(block.getCondition());
 		if (expr instanceof IUnaryExpression) {
 			IUnaryExpression unary = (IUnaryExpression) expr;
 
@@ -143,7 +132,7 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	@Override
 	public IAssignableExpression visit(IIfElseExpression expr, RefLookup context) {
 		super.visit(expr, context);
-		IAssignableExpression referenced = tryLookup(expr.getCondition(), context);
+		IAssignableExpression referenced = context.tryLookup(expr.getCondition());
 		if (referenced instanceof IUnaryExpression) {
 			IUnaryExpression unary = (IUnaryExpression) referenced;
 
@@ -163,24 +152,27 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	@Override
 	public IAssignableExpression visit(IReferenceExpression expr, RefLookup context) {
 		IAssignableExpression referencedExpr = context.get(expr.getReference());
+		IAssignableExpression normalized = null;
 
 		/* inline constant */
-		if (referencedExpr instanceof IConstantValueExpression)
-			return referencedExpr;
+		if (referencedExpr instanceof IConstantValueExpression) {
+			normalized = referencedExpr;
+		}
 
 		/* inline reference */
-		if (referencedExpr instanceof IReferenceExpression) {
+		else if (referencedExpr instanceof IReferenceExpression) {
 			IReferenceExpression referencedRefExpr = (IReferenceExpression) referencedExpr;
 			IReferenceExpression referencedExprNormalized = (IReferenceExpression) referencedExpr.accept(this, context);
 			if (expr instanceof ReferenceExpression) {
 				IReference newRef = referencedExprNormalized != null ? referencedExprNormalized.getReference()
 						: referencedRefExpr.getReference();
 				/* only inline references that are assigned exactly once */
-				if (context.containsKey(newRef))
+				if (context.containsKey(newRef)) {
 					((ReferenceExpression) expr).setReference(newRef);
+				}
 			}
 		}
-		return null;
+		return normalized;
 	}
 
 	// ----------------------- binary expressions -----------------------------
@@ -190,14 +182,17 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 		// normalize operands first
 		super.visit(expr, context);
 		ISimpleExpression normalized0 = idempotence(expr, context);
-		if (normalized0 != null)
+		if (normalized0 != null) {
 			return normalized0;
+		}
 		ISimpleExpression normalized1 = constantOperand(expr, context);
-		if (normalized1 != null)
+		if (normalized1 != null) {
 			return normalized1;
+		}
 		ISimpleExpression normalized2 = absorption(expr, context);
-		if (normalized2 != null)
+		if (normalized2 != null) {
 			return normalized2;
+		}
 		IBinaryExpression normalized3 = disjunctiveNormalForm(expr, context);
 		IBinaryExpression normalized4 = normalized3 == null ? toLeftAssociative(expr, context)
 				: toLeftAssociative(normalized3, context);
@@ -208,16 +203,20 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	 * or(x, x) -> x, and(x, x) -> x
 	 */
 	private ISimpleExpression idempotence(IBinaryExpression expr, RefLookup context) {
-		if (!(isDisjunction(expr) || isConjunction(expr)))
-			return null;
-		ISimpleExpression lhs = expr.getLeftOperand();
-		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = tryLookup(lhs, context);
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
-		if (lhs.equals(rhs)
-				|| leftReferenced != null && rightReferenced != null && leftReferenced.equals(rightReferenced))
-			return lhs;
-		return null;
+		ISimpleExpression normalized = null;
+		if (isDisjunction(expr) || isConjunction(expr)) {
+			ISimpleExpression lhs = expr.getLeftOperand();
+			ISimpleExpression rhs = expr.getRightOperand();
+			IAssignableExpression leftReferenced = context.tryLookup(lhs);
+			IAssignableExpression rightReferenced = context.tryLookup(rhs);
+			boolean referencedEqual = leftReferenced != null && rightReferenced != null
+					&& leftReferenced.equals(rightReferenced);
+
+			if (lhs.equals(rhs) || referencedEqual) {
+				normalized = lhs;
+			}
+		}
+		return normalized;
 	}
 
 	/**
@@ -231,18 +230,24 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = tryLookup(lhs, context);
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
+		IAssignableExpression leftReferenced = context.tryLookup(lhs);
+		IAssignableExpression rightReferenced = context.tryLookup(rhs);
+
+		boolean leftTrue = isTrue(lhs) || isTrue(leftReferenced);
+		boolean rightTrue = isTrue(rhs) || isTrue(rightReferenced);
+		boolean leftFalse = isFalse(lhs) || isFalse(leftReferenced);
+		boolean rightFalse = isFalse(rhs) || isFalse(rightReferenced);
 
 		ISimpleExpression normalized = null;
-		if (lhs.equals(TRUE) || leftReferenced != null && leftReferenced.equals(TRUE))
+		if (leftTrue) {
 			normalized = isDisjunction ? TRUE : rhs;
-		else if (rhs.equals(TRUE) || rightReferenced != null && rightReferenced.equals(TRUE))
+		} else if (rightTrue) {
 			normalized = isDisjunction ? TRUE : lhs;
-		else if (lhs.equals(FALSE) || leftReferenced != null && leftReferenced.equals(FALSE))
+		} else if (leftFalse) {
 			normalized = isDisjunction ? rhs : FALSE;
-		else if (rhs.equals(FALSE) || rightReferenced != null && rightReferenced.equals(FALSE))
+		} else if (rightFalse) {
 			normalized = isDisjunction ? lhs : FALSE;
+		}
 		return normalized;
 	}
 
@@ -257,8 +262,9 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = tryLookup(lhs, context);
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
+		IAssignableExpression leftReferenced = context.tryLookup(lhs);
+		IAssignableExpression rightReferenced = context.tryLookup(rhs);
+		
 		IBinaryExpression leftBinary = (leftReferenced instanceof IBinaryExpression)
 				? (IBinaryExpression) leftReferenced : null;
 		IBinaryExpression rightBinary = (rightReferenced instanceof IBinaryExpression)
@@ -282,8 +288,8 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 		BinaryOperator op = expr.getOperator();
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = tryLookup(lhs, context);
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
+		IAssignableExpression leftReferenced = context.tryLookup(lhs);
+		IAssignableExpression rightReferenced = context.tryLookup(rhs);
 
 		if (lhs.equals(member) || rhs.equals(member) || leftReferenced != null && leftReferenced.equals(member)
 				|| rightReferenced != null && rightReferenced.equals(member))
@@ -313,17 +319,18 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 		BinaryOperator op = expr.getOperator();
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
+		IAssignableExpression rightReferenced = context.tryLookup(rhs);
+		IBinaryExpression normalized = null;
 
 		if (rightReferenced instanceof IBinaryExpression) {
 			IBinaryExpression rightReferencedBinary = (IBinaryExpression) rightReferenced;
 			if (rightReferencedBinary.getOperator().equals(op)) {
-				List<IStatement> innerBinary = define(next(), binExpr(op, lhs, rightReferencedBinary.getLeftOperand()));
-				registerNewDeclarations(innerBinary, context);
-				return binExpr(op, mainCondition(innerBinary), rightReferencedBinary.getRightOperand());
+				List<IStatement> innerBinary = defineNew(binExpr(op, lhs, rightReferencedBinary.getLeftOperand()),
+						context);
+				normalized = binExpr(op, mainCondition(innerBinary), rightReferencedBinary.getRightOperand());
 			}
 		}
-		return null;
+		return normalized;
 	}
 
 	/**
@@ -338,38 +345,31 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = tryLookup(lhs, context);
-		IAssignableExpression rightReferenced = tryLookup(rhs, context);
+		IAssignableExpression leftReferenced = context.tryLookup(lhs);
+		IAssignableExpression rightReferenced = context.tryLookup(rhs);
+		IBinaryExpression normalized = null;
 
 		if (leftReferenced instanceof IBinaryExpression) {
 			IBinaryExpression leftBinary = (IBinaryExpression) leftReferenced;
-			if (isDisjunction(leftBinary))
-				return applyDistributivity(leftBinary, rhs, context);
+			if (isDisjunction(leftBinary)) {
+				normalized = applyDistributivity(leftBinary, rhs, context);
+			}
 		}
 
-		if (rightReferenced instanceof IBinaryExpression) {
+		else if (rightReferenced instanceof IBinaryExpression) {
 			IBinaryExpression rightBinary = (IBinaryExpression) rightReferenced;
-			if (isDisjunction(rightBinary))
-				return applyDistributivity(rightBinary, lhs, context);
+			if (isDisjunction(rightBinary)) {
+				normalized = applyDistributivity(rightBinary, lhs, context);
+			}
 		}
-		return null;
+		return normalized;
 	}
 
 	private IBinaryExpression applyDistributivity(IBinaryExpression disjunction, ISimpleExpression simple,
 			RefLookup context) {
-		List<IStatement> andLeft = define(next(), and(disjunction.getLeftOperand(), simple));
-		List<IStatement> andRight = define(next(), and(disjunction.getRightOperand(), simple));
-		registerNewDeclarations(andLeft, context);
-		registerNewDeclarations(andRight, context);
+		List<IStatement> andLeft = defineNew(and(disjunction.getLeftOperand(), simple), context);
+		List<IStatement> andRight = defineNew(and(disjunction.getRightOperand(), simple), context);
 		return or(mainCondition(andLeft), mainCondition(andRight));
-	}
-
-	private boolean isConjunction(IBinaryExpression expr) {
-		return expr.getOperator().equals(BinaryOperator.And);
-	}
-
-	private boolean isDisjunction(IBinaryExpression expr) {
-		return expr.getOperator().equals(BinaryOperator.Or);
 	}
 
 	// ------------------------ unary expressions -----------------------------
@@ -379,24 +379,25 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 		// normalize operand first
 		super.visit(expr, context);
 		ISimpleExpression operandNormalized = (ISimpleExpression) expr.getOperand().accept(this, context);
-		if (operandNormalized != null && expr instanceof UnaryExpression)
+		if (operandNormalized != null && expr instanceof UnaryExpression) {
 			((UnaryExpression) expr).setOperand(operandNormalized);
+		}
 		IAssignableExpression normalized = handleNegation(expr, context);
 		return normalized;
 	}
 
 	private IAssignableExpression handleNegation(IUnaryExpression unaryExpr, RefLookup context) {
-		if (!isNegated(unaryExpr))
-			return null;
+		IAssignableExpression normalized = null;
+		if (isNegated(unaryExpr)) {
+			IAssignableExpression operandExpr = context.tryLookup(unaryExpr.getOperand());
 
-		IAssignableExpression operandExpr = tryLookup(unaryExpr.getOperand(), context);
-
-		if (operandExpr instanceof IUnaryExpression)
-			return handleNegatedUnaryExpression((IUnaryExpression) operandExpr);
-		else if (operandExpr instanceof IBinaryExpression)
-			return handleNegatedBinaryExpression((IBinaryExpression) operandExpr, context);
-
-		return null;
+			if (operandExpr instanceof IUnaryExpression) {
+				normalized = handleNegatedUnaryExpression((IUnaryExpression) operandExpr);
+			} else if (operandExpr instanceof IBinaryExpression) {
+				normalized = handleNegatedBinaryExpression((IBinaryExpression) operandExpr, context);
+			}
+		}
+		return normalized;
 	}
 
 	private IAssignableExpression handleNegatedUnaryExpression(IUnaryExpression negatedExpr) {
@@ -408,45 +409,44 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 
 	private IAssignableExpression handleNegatedBinaryExpression(IBinaryExpression negatedExpr, RefLookup context) {
 		BinaryOperator op = negatedExpr.getOperator();
+		BinaryOperator negatedOp = getNegated(op);
 		ISimpleExpression lhs = negatedExpr.getLeftOperand();
 		ISimpleExpression rhs = negatedExpr.getRightOperand();
-		BinaryOperator negatedOp = getNegated(op);
+		IBinaryExpression result = null;
 
-		switch (op) {
-		case And: // --> or(not(lhs), not(rhs))
-		case Or: // --> and(not(lhs), not(rhs))
+		if (isLogical(op)) {
 			/* apply De Morgan's laws */
-			List<IStatement> negatedLeft = define(next(), not(lhs));
-			List<IStatement> negatedRight = define(next(), not(rhs));
-			registerNewDeclarations(negatedLeft, context);
-			registerNewDeclarations(negatedRight, context);
-			return binExpr(negatedOp, mainCondition(negatedLeft), mainCondition(negatedRight));
-		case Equal:
-		case NotEqual:
-		case GreaterThan:
-		case GreaterThanOrEqual:
-		case LessThan:
-		case LessThanOrEqual:
-			/* negate operator */
-			return binExpr(negatedOp, lhs, rhs);
-		default:
-			return null;
+			List<IStatement> negatedLeft = defineNew(not(lhs), context);
+			List<IStatement> negatedRight = defineNew(not(rhs), context);
+			result = binExpr(negatedOp, mainCondition(negatedLeft), mainCondition(negatedRight));
 		}
+
+		else if (isRelational(op)) {
+			/* negate operator */
+			result = binExpr(negatedOp, lhs, rhs);
+		}
+		return result;
 	}
+
+	// ---------------------------- helpers -----------------------------------
 
 	private boolean isNegated(IUnaryExpression unaryExpr) {
 		return unaryExpr.getOperator().equals(UnaryOperator.Not);
 	}
 
-	private IAssignableExpression tryLookup(ISimpleExpression simple, RefLookup lookup) {
-		if (!(simple instanceof IReferenceExpression))
-			return null;
-
-		IReference ref = ((IReferenceExpression) simple).getReference();
-		if (!(ref instanceof IVariableReference))
-			return null;
-
-		return lookup.get((IVariableReference) ref);
+	private boolean isConjunction(IBinaryExpression expr) {
+		return expr.getOperator().equals(BinaryOperator.And);
 	}
 
+	private boolean isDisjunction(IBinaryExpression expr) {
+		return expr.getOperator().equals(BinaryOperator.Or);
+	}
+
+	private boolean isTrue(IAssignableExpression expr) {
+		return expr != null && expr.equals(TRUE);
+	}
+
+	private boolean isFalse(IAssignableExpression expr) {
+		return expr != null && expr.equals(FALSE);
+	}
 }
