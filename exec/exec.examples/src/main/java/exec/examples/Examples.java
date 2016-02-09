@@ -20,23 +20,26 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
-import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
+import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
@@ -141,31 +144,53 @@ public class Examples {
 
 	/**
 	 * 7: perform a points-to analysis
+	 * 
+	 * Names are a bit ambiguous in this example.
+	 * 
+	 * The parameter "originalContext" points to the class "Context", which
+	 * represents a class (incl. the IR of the source code, and information
+	 * about the type sytem).
+	 * 
+	 * The class "PointsToContext" refers to the result of the points-to
+	 * analysis and which can be used to find abstract locations.
 	 */
 	public static void performPointsTo(Context originalContext) {
-		// instantiate a field-sensitive unification pointer analysis
-		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
+		// pick an implementation for a pointer analysis
+		PointerAnalysis pa = new UnificationAnalysis(FieldSensitivity.FULL);
 
-		// run the analysis and retrieve a context augmented with the pointer analysis instance
-		PointsToContext ptContext = pointerAnalysis.compute(originalContext);
+		// run the analysis
+		PointsToContext ptRes = pa.compute(originalContext);
 
-		// create a query builder so that we do not have to populate the complete query ourselves
-		PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(ptContext);
+		// create a helper for building the queries
+		PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(ptRes);
 
-		IMethodDeclaration methodDecl = ptContext.getSST().getMethods().iterator().next();
-		IStatement lastStmt = methodDecl.getBody().get(methodDecl.getBody().size() - 1);
-		// let's assume that the last statement of the method we selected above is of the form 'a.SomeMethod(b)'
+		// assume we find an invocation expressions somewhere in the SST...
+		IInvocationExpression ie = null;
+		// ...together with its parent statement
+		IStatement stmt = null;
 
-		Set<AbstractLocation> locationsOfA = pointerAnalysis
-				.query(queryBuilder.newQuery(SSTBuilder.variableReference("a"), lastStmt));
-		Set<AbstractLocation> locationsOfB = pointerAnalysis
-				.query(queryBuilder.newQuery(SSTBuilder.variableReference("b"), lastStmt));
+		// we are interested to find the instances that are used as the receiver
+		// or as a parameter of this invocation
 
-		// check whether 'a' and 'b' point to the same entity
-		if (locationsOfA.equals(locationsOfB)) {
-			// yes
-		} else {
-			// no
+		// create a query for the receiver of the invocation...
+		QueryContextKey queryForReceiver = queryBuilder.newQuery(ie.getReference(), stmt);
+		// ... and query for the abstract locations (instances)
+		Set<AbstractLocation> receivers = pa.query(queryForReceiver);
+
+		// now iterate over all parameters
+		for (IParameterName p : ie.getMethodName().getParameters()) {
+			// again, create a query...
+			QueryContextKey queryForParam = queryBuilder.newQuery(varRef(p.getName()), stmt);
+			// ... and query for the abstract locations
+			Set<AbstractLocation> parameters = pa.query(queryForParam);
 		}
+
+		// do something with the results
+	}
+
+	private static IReference varRef(String name) {
+		VariableReference vr = new VariableReference();
+		vr.setIdentifier(name);
+		return vr;
 	}
 }
