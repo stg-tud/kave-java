@@ -41,6 +41,9 @@ public class EpisodeParserTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+	
+	private static final int FREQ = 2;
+	private static final double BD = 0.1;
 
 	private FileReader reader;
 	private EpisodeParser sut;
@@ -92,7 +95,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse();
+		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -128,7 +131,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse();
+		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -175,7 +178,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse();
+		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -193,7 +196,7 @@ public class EpisodeParserTest {
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/output.txt");
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/outputF2B0.1.txt");
 		return fileName;
 	}
 }

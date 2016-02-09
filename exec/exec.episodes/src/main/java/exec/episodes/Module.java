@@ -22,18 +22,18 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
 import cc.kave.commons.mining.episodes.EpisodeRecommender;
-import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
-import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
-import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
-import cc.kave.commons.mining.reader.EpisodeParser;
-import cc.kave.commons.mining.reader.EventMappingParser;
-import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
-import cc.kave.commons.mining.reader.EventStreamReader;
-import cc.kave.commons.mining.reader.FileReader;
-import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
-import cc.kave.commons.model.persistence.EventStreamModifier;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeGraphGeneratorTrainingData;
+import cc.kave.episodes.mining.graphs.EpisodeGraphGeneratorValidationData;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
+import cc.kave.episodes.mining.patterns.MaximalEpisodes;
+import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.EventStreamReader;
+import cc.kave.episodes.mining.reader.FileReader;
+import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -46,21 +46,25 @@ public class Module extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		File episodeFile = new File(rootFolder + "n-graph-miner/");
+		File episodeFile = new File(rootFolder + "configurations/");
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
 		File eventStreamData = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
 		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
+		File validationContexts = new File(rootFolder + "EpisodeMining/Contexts-Validation/");
+		Directory validationCtxtDir = new Directory(validationContexts.getAbsolutePath());
 		File graphFile = new File(rootFolder);
 		Directory graphDir = new Directory(graphFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
+		dirs.put("contexts", validationCtxtDir);
 		dirs.put("graph", graphDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
+		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(validationContexts);
 		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
 
 		File episodeRoot = episodeFile;
@@ -68,23 +72,28 @@ public class Module extends AbstractModule {
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 		
 		File eventStreamRoot = eventStreamData;
-		bind(EventStreamAsListOfMethodsParser.class).toInstance(new EventStreamAsListOfMethodsParser(eventStreamRoot, reader));
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
 		
 		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
 		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
-		bind(EventStreamModifier.class).toInstance(new EventStreamModifier(eventStreamRoot, reader));
 		File graphRoot = graphFile;
 		
+		File validationContextsRoot = validationContexts;
+		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(validationContextsRoot));
+		
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
-		MaximalFrequentEpisodes episodeLearned = new MaximalFrequentEpisodes();
+		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
-		NoTransitivelyClosedEpisodes transitivityClosure = new NoTransitivelyClosedEpisodes();
-		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		EventStreamAsListOfMethodsParser query = new EventStreamAsListOfMethodsParser(eventStreamRoot, reader);
+		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
+		
+		ValidationContextsParser validationParser = new ValidationContextsParser(validationContextsRoot);
+//		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, validationParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter));
+//		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 		EpisodeRecommender recommender = new EpisodeRecommender();
-		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, transitivityClosure, query, mappingParser, recommender, graphConverter, graphWriter));
+//		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, transitivityClosure, query, mappingParser, recommender, graphConverter, graphWriter));
+		bind(EpisodeGraphGeneratorValidationData.class).toInstance(new EpisodeGraphGeneratorValidationData(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(EpisodeGraphGeneratorTrainingData.class).toInstance(new EpisodeGraphGeneratorTrainingData(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

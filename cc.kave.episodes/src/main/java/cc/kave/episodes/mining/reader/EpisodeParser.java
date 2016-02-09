@@ -41,9 +41,9 @@ public class EpisodeParser {
 		this.reader = reader;
 	}
 
-	public Map<Integer, List<Episode>> parse() {
+	public Map<Integer, List<Episode>> parse(int freq, double bd) {
 
-		File filePath = getFilePath();
+		File filePath = getFilePath(freq, bd);
 		List<String> lines = reader.readFile(filePath);
 
 		Map<Integer, List<Episode>> episodeIndexed = new HashMap<Integer, List<Episode>>();
@@ -90,8 +90,8 @@ public class EpisodeParser {
 		return episode;
 	}
 
-	private File getFilePath() {
-		String fileName = rootFolder.getAbsolutePath() + "/output.txt";
+	private File getFilePath(int freq, double bd) {
+		String fileName = rootFolder.getAbsolutePath() + "/outputF" + freq + "B" + bd + ".txt";
 		File file = new File(fileName);
 		return file;
 	}

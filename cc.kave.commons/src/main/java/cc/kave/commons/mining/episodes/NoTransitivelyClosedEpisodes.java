@@ -22,6 +22,7 @@ import java.util.Map;
 
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Fact;
+import cc.recommenders.datastructures.Tuple;
 
 public class NoTransitivelyClosedEpisodes {
 
@@ -54,19 +55,19 @@ public class NoTransitivelyClosedEpisodes {
 	}
 
 	private Episode reduceRelations(Episode episode) {
-		List<List<String>> allPaths = new LinkedList<List<String>>();
+		List<List<Fact>> allPaths = new LinkedList<List<Fact>>();
 		Episode episodeResult = new Episode();
 		episodeResult.setFrequency(episode.getFrequency());
 		episodeResult.setNumEvents(episode.getNumEvents());
 		for (Fact fact : episode.getFacts()) {
-			if (fact.getRawFact().contains(">")) {
+			if (fact.isRelation()) {
 				addFactPath(fact, allPaths);
 			} else {
-				episodeResult.addFact(fact.getRawFact());
+				episodeResult.addFact(fact);
 			}
 		}
-		List<String> simplifiedRelations = removeClosureRelations(allPaths);
-		List<String> finalRelations = doubleCheckClosureRemoval(simplifiedRelations);
+		List<Fact> simplifiedRelations = removeClosureRelations(allPaths);
+		List<Fact> finalRelations = doubleCheckClosureRemoval(simplifiedRelations);
 		for (int numItr = 0; numItr < episode.getNumEvents() - 3; numItr++) {
 			finalRelations = doubleCheckClosureRemoval(finalRelations);
 		}
@@ -74,30 +75,30 @@ public class NoTransitivelyClosedEpisodes {
 		return episodeResult;
 	}
 
-	private List<String> doubleCheckClosureRemoval(List<String> simplifiedRelations) {
-		List<String> positiveRelations = new LinkedList<String>();
-		List<String> negativeRelations = new LinkedList<String>();
+	private List<Fact> doubleCheckClosureRemoval(List<Fact> simplifiedRelations) {
+		List<Fact> positiveRelations = new LinkedList<Fact>();
+		List<Fact> negativeRelations = new LinkedList<Fact>();
 		for (int idStart = 0; idStart < simplifiedRelations.size() - 1; idStart++) {
-			String relation = simplifiedRelations.get(idStart);
+			Fact relation = simplifiedRelations.get(idStart);
 			if (!(positiveRelations.contains(relation) || negativeRelations.contains(relation))) {
 				positiveRelations.add(relation);
 			}
-			String[] eventsStart = relation.split(">");
+			Tuple<Fact, Fact> eventsStart = relation.getRelationFacts();
 			for (int idContinue = idStart + 1; idContinue < simplifiedRelations.size(); idContinue++) {
-				String[] eventsContinue = simplifiedRelations.get(idContinue).split(">");
-				if (eventsStart[1].equalsIgnoreCase(eventsContinue[0])) {
-					negativeRelations.add(eventsStart[0] + ">" + eventsContinue[1]);
+				Tuple<Fact, Fact> eventsContinue = simplifiedRelations.get(idContinue).getRelationFacts();
+				if (eventsStart.getSecond().equals(eventsContinue.getFirst())) {
+					negativeRelations.add(new Fact(eventsStart.getFirst() + ">" + eventsContinue.getSecond()));
 				}
-				if (eventsStart[0].equalsIgnoreCase(eventsContinue[1])) {
-					negativeRelations.add(eventsContinue[0] + ">" + eventsStart[1]);
+				if (eventsStart.getFirst().equals(eventsContinue.getSecond())) {
+					negativeRelations.add(new Fact(eventsContinue.getFirst() + ">" + eventsStart.getSecond()));
 				}
 			}
 		}
-		String lastRelation = simplifiedRelations.get(simplifiedRelations.size() - 1);
+		Fact lastRelation = simplifiedRelations.get(simplifiedRelations.size() - 1);
 		if (!(negativeRelations.contains(lastRelation) || positiveRelations.contains(lastRelation))) {
 			positiveRelations.add(lastRelation);
 		}
-		for (String relation : negativeRelations) {
+		for (Fact relation : negativeRelations) {
 			if (positiveRelations.contains(relation)) {
 				positiveRelations.remove(relation);
 			}
@@ -105,12 +106,12 @@ public class NoTransitivelyClosedEpisodes {
 		return positiveRelations;
 	}
 
-	private List<String> removeClosureRelations(List<List<String>> allPaths) {
-		List<String> positiveRelations = new LinkedList<String>();
+	private List<Fact> removeClosureRelations(List<List<Fact>> allPaths) {
+		List<Fact> positiveRelations = new LinkedList<Fact>();
 		List<String> negativeRelations = new LinkedList<String>();
-		for (List<String> list : allPaths) {
+		for (List<Fact> list : allPaths) {
 			for (int idx = 0; idx < list.size() - 1; idx++) {
-				String relation = list.get(idx) + ">" + list.get(idx + 1);
+				Fact relation = new Fact(list.get(idx) + ">" + list.get(idx + 1));
 				if (!(positiveRelations.contains(relation) || negativeRelations.contains(relation))) {
 					positiveRelations.add(relation);
 				}
@@ -130,24 +131,24 @@ public class NoTransitivelyClosedEpisodes {
 		return positiveRelations;
 	}
 
-	private void addFactPath(Fact fact, List<List<String>> allPaths) {
-		String[] events = fact.getRawFact().split(">");
+	private void addFactPath(Fact fact, List<List<Fact>> allPaths) {
+		Tuple<Fact, Fact> existance = fact.getRelationFacts();
 		boolean pathFound = false;
 		if (!allPaths.isEmpty()) {
-			for (List<String> list : allPaths) {
-				if (list.get(list.size() - 1).equalsIgnoreCase(events[0])) {
-					list.add(events[1]);
+			for (List<Fact> list : allPaths) {
+				if (list.get(list.size() - 1).equals(existance.getFirst())) {
+					list.add(existance.getSecond());
 					pathFound = true;
-				} else if (list.get(0).equalsIgnoreCase(events[1])) {
-					list.add(0, events[0]);
+				} else if (list.get(0).equals(existance.getSecond())) {
+					list.add(0, existance.getFirst());
 					pathFound = true;
 				}
 			}
 		}
 		if (!pathFound) {
-			List<String> factPaths = new LinkedList<String>();
-			factPaths.add(events[0]);
-			factPaths.add(events[1]);
+			List<Fact> factPaths = new LinkedList<Fact>();
+			factPaths.add(existance.getFirst());
+			factPaths.add(existance.getSecond());
 			allPaths.add(factPaths);
 		}
 	}

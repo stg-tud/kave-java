@@ -22,7 +22,7 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class MaximalEpisodes {
 	
-	public Map<Integer, List<Episode>> getMaximalFrequentEpisodes(Map<Integer, List<Episode>> episodes) {
+	public Map<Integer, List<Episode>> getMaximalEpisodes(Map<Integer, List<Episode>> episodes) {
 		assertTrue(!episodes.isEmpty(), "The list of learned episodes is empty!");
 		
 		Map<Integer, List<Episode>> maximalEpisodes = new HashMap<Integer, List<Episode>>();

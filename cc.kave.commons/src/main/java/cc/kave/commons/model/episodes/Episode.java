@@ -68,8 +68,8 @@ public class Episode {
 		}
 	}
 
-	public void addListOfFacts(List<String> rawFacts) {
-		for (String rawFact : rawFacts) {
+	public void addListOfFacts(List<Fact> rawFacts) {
+		for (Fact rawFact : rawFacts) {
 			addFact(rawFact);
 		}
 	}

@@ -60,7 +60,7 @@ public class MaximalEpisodesTest {
 	public void cannotGetEmptyListOfEpisodes() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
-		sut.getMaximalFrequentEpisodes(episodes);
+		sut.getMaximalEpisodes(episodes);
 	}
 	
 	@Test
@@ -83,7 +83,7 @@ public class MaximalEpisodesTest {
 		
 		expecteds.put(2, episodeList);
 		
-		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 		
 		assertEquals(expecteds, actuals);
 	}
@@ -114,7 +114,7 @@ public class MaximalEpisodesTest {
 		
 		expecteds.put(2, episodeList);
 		
-		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 		
 		assertEquals(expecteds, actuals);
 	}
@@ -149,7 +149,7 @@ public class MaximalEpisodesTest {
 
 		expected.put(2, episodeListExp);
 
-		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 
 		assertEquals(expected, actuals);
 	}
@@ -184,7 +184,7 @@ public class MaximalEpisodesTest {
 
 		expected.put(2, episodeListExp);
 
-		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 
 		assertEquals(expected, actuals);
 	}
@@ -219,7 +219,7 @@ public class MaximalEpisodesTest {
 
 		expected.put(2, episodeListExp);
 
-		Map<Integer, List<Episode>> actuals = sut.getMaximalFrequentEpisodes(initialEpisodes);
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 
 		assertEquals(expected, actuals);
 	}

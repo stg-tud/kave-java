@@ -19,12 +19,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import cc.recommenders.assertions.Asserts;
+import cc.recommenders.datastructures.Tuple;
 
 public class Fact {
 
 	private String rawFact = "";
 
-	
 	public Fact(String rawFact) {
 		Asserts.assertNotNull(rawFact);
 		this.rawFact = rawFact;
@@ -35,7 +35,7 @@ public class Fact {
 	}
 
 	public Fact(Fact first, Fact after) {
-		rawFact = first.rawFact + ">" + after;
+		rawFact = first.rawFact + ">" + after.rawFact;
 	}
 
 	public Fact() {
@@ -44,6 +44,20 @@ public class Fact {
 
 	public boolean isRelation() {
 		return rawFact.contains(">");
+	}
+	
+	public boolean isLabel() {
+		return rawFact.contains("\\l");
+	}
+	
+	public Tuple<Fact, Fact> getRelationFacts() {
+		if (this.isRelation()) {
+			String order = this.rawFact;
+			String[] facts = order.split(">");
+			return Tuple.newTuple(new Fact(facts[0]), new Fact(facts[1]));
+		} else {
+			return Tuple.newTuple(this, this);
+		}
 	}
 	
 	public boolean isRelatedTo(Fact f) {
@@ -61,13 +75,17 @@ public class Fact {
 //		this.rawFact = rawFact;
 //	}
 
-	/**
-	 * this should not be used... why do we have an abstraction, if we access
-	 * the string directly?
-	 */
-	@Deprecated
+//	/**
+//	 * this should not be used... why do we have an abstraction, if we access
+//	 * the string directly?
+//	 */
+//	@Deprecated
 	public String getRawFact() {
-		return this.rawFact;
+		if (this.isLabel()) {
+			return this.rawFact;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -87,6 +105,14 @@ public class Fact {
 			return true;
 		}
 		return false;
+	}
+	
+	public int getFactID() {
+		if (!(this.isRelation())) {
+			return Integer.parseInt(this.rawFact);
+		} else {
+			return -1;
+		}
 	}
 
 	@Override

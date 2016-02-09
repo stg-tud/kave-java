@@ -42,8 +42,8 @@ import cc.recommenders.io.ReadingArchive;
 public class DoSomething {
 
 	public void run(String fileEventStream, String fileEventMapping, String dirContexts) throws IOException {
-//		readAllContexts(dirContexts);
-		readMapping(fileEventMapping);
+		readAllContexts(dirContexts);
+//		readMapping(fileEventMapping);
 	}
 
 	private void readAllContexts(String dirContexts) throws ZipException, IOException {

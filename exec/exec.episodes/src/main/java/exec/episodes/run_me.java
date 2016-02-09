@@ -21,7 +21,7 @@ public class run_me {
 
 //	private static String root = "/Volumes/Data/EpisodeMining/";
 	private static String root = "/Users/ervinacergani/Documents/PhD_work/episode-miner/";
-	private static String dirContexts = root + "Contexts/";
+	private static String dirContexts = root + "EpisodeMining/Contexts-validation/";
 	private static String fileEventStream = root + "eventStream.txt";
 	private static String fileEventMapping = root + "EpisodeMining/EventStreamForEpisodeMining/eventMapping.txt";
 

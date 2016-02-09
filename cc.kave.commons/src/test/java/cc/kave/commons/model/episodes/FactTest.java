@@ -15,35 +15,25 @@
  */
 package cc.kave.commons.model.episodes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
 public class FactTest {
 
 	@Test
-	public void defaultConstructor() {
-		Fact sut = new Fact();
-		assertEquals(null, sut.getRawFact());
-	}
-
-	@Test
 	public void specialConstructor() {
 		Fact sut = new Fact("f");
-		assertEquals("f", sut.getRawFact());
+		assertEquals(new Fact("f"), sut);
 	}
 
 	@Test(expected = AssertionException.class)
 	public void specialConstructorHandlesNull() {
 		new Fact(null);
-	}
-	
-	@Test
-	public void scontainsEventId() {
-		Fact sut = new Fact("fgj");
-		assertTrue(sut.getRawFact().contains("gj"));
 	}
 
 	@Test
@@ -52,6 +42,35 @@ public class FactTest {
 		Fact b = new Fact();
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
+	}
+	
+	@Test
+	public void createOrder() {
+		Fact fact = new Fact(new Fact("ab"), new Fact("bc"));
+		Fact expected = new Fact("ab>bc");
+		assertEquals(expected, fact);
+	}
+	
+	@Test
+	public void getID() {
+		Fact fact = new Fact("12");
+		assertEquals(12, fact.getFactID());
+	}
+	
+	@Test
+	public void getFactsFromRelation() {
+		Fact orderFact = new Fact("ab>bc");
+		Tuple<Fact, Fact> expected = Tuple.newTuple(new Fact("ab"), new Fact("bc"));
+		Tuple<Fact, Fact> actuals = orderFact.getRelationFacts();
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void getFactsFromFact() {
+		Fact orderFact = new Fact("ab");
+		Tuple<Fact, Fact> expected = Tuple.newTuple(new Fact("ab"), new Fact("ab"));
+		Tuple<Fact, Fact> actuals = orderFact.getRelationFacts();
+		assertEquals(expected, actuals);
 	}
 
 	@Test
