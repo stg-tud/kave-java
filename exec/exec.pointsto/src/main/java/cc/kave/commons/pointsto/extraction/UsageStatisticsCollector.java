@@ -18,7 +18,7 @@ import java.util.List;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.usages.Usage;
 
 public interface UsageStatisticsCollector {
 
@@ -35,7 +35,7 @@ public interface UsageStatisticsCollector {
 
 	void onProcessContext(Context context);
 
-	void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages);
+	void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<? extends Usage> usages);
 
 	void output(Path file) throws IOException;
 

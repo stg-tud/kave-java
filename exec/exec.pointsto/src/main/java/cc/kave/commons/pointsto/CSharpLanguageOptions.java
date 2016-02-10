@@ -54,23 +54,18 @@ public class CSharpLanguageOptions extends LanguageOptions {
 
 	@Override
 	public IMethodName addLambda(IMethodName method) {
-		String oldNamePart = "." + method.getName() + "(";
-		String newNamePart = "." + method.getName() + LAMBDA_KEYWORD + "(";
-
-		return MethodName.newMethodName(method.getIdentifier().replace(oldNamePart, newNamePart));
+		return MethodName
+				.newMethodName(LambdaNameHelper.addLambdaToMethodName(method.getIdentifier(), method.getName()));
 	}
 
 	@Override
 	public ITypeName addLambda(ITypeName type) {
-		String oldNamePart = type.getFullName();
-		String newNamePart = oldNamePart + LAMBDA_KEYWORD;
-
-		return TypeName.newTypeName(type.getIdentifier().replace(oldNamePart, newNamePart));
+		return TypeName.newTypeName(LambdaNameHelper.addLambdaToTypeName(type.getIdentifier()));
 	}
 
 	@Override
 	public IMethodName removeLambda(IMethodName method) {
-		return MethodName.newMethodName(method.getIdentifier().replace(LAMBDA_KEYWORD, ""));
+		return MethodName.newMethodName(LambdaNameHelper.removeLambda(method.getIdentifier()));
 	}
 
 	@Override

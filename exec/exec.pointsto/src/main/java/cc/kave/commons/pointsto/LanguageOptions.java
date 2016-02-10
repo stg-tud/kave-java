@@ -28,8 +28,6 @@ public abstract class LanguageOptions {
 		return instance;
 	}
 
-	protected static final String LAMBDA_KEYWORD = "$Lambda";
-
 	public abstract String getThisName();
 
 	public abstract String getSuperName();
@@ -53,7 +51,7 @@ public abstract class LanguageOptions {
 	public abstract ITypeName addLambda(ITypeName type);
 
 	public boolean isLambdaName(IName name) {
-		return name.getIdentifier().contains(LAMBDA_KEYWORD);
+		return LambdaNameHelper.isLambdaName(name.getIdentifier());
 	}
 
 	public abstract boolean isDelegateInvocation(IMethodName invokedMethod);

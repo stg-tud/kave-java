@@ -18,7 +18,7 @@ import java.util.List;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.usages.Usage;
 
 /**
  * A {@link UsageStatisticsCollector} that performs no operations.
@@ -41,7 +41,7 @@ public class NopUsageStatisticsCollector implements UsageStatisticsCollector {
 	}
 
 	@Override
-	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
+	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<? extends Usage> usages) {
 
 	}
 

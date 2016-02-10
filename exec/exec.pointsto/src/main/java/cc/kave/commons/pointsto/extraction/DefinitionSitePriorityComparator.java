@@ -16,10 +16,10 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.EnumMap;
 
-import cc.kave.commons.pointsto.dummies.DummyDefinitionSite;
+import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSiteKind;
 
-public class DefinitionSitePriorityComparator implements Comparator<DummyDefinitionSite>, Serializable {
+public class DefinitionSitePriorityComparator implements Comparator<DefinitionSite>, Serializable {
 
 	private static final long serialVersionUID = 850239537351939837L;
 
@@ -40,7 +40,7 @@ public class DefinitionSitePriorityComparator implements Comparator<DummyDefinit
 	}
 
 	@Override
-	public int compare(DummyDefinitionSite defSite1, DummyDefinitionSite defSite2) {
+	public int compare(DefinitionSite defSite1, DefinitionSite defSite2) {
 		return priorites.get(defSite1.getKind()) - priorites.get(defSite2.getKind());
 	}
 

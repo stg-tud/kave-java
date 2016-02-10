@@ -34,13 +34,13 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.WritingArchive;
+import cc.recommenders.usages.Usage;
 
 public class PointsToUsageGenerator {
 
@@ -76,12 +76,12 @@ public class PointsToUsageGenerator {
 		return Collections.unmodifiableMap(statisticsCollectors);
 	}
 
-	public Map<PointerAnalysisFactory, List<DummyUsage>> getUsages() {
-		Map<PointerAnalysisFactory, List<DummyUsage>> usages = new HashMap<>();
+	public Map<PointerAnalysisFactory, List<Usage>> getUsages() {
+		Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
 
 		for (Path zipFile : sources) {
 			try {
-				processZipFile(zipFile);
+				usages.putAll(processZipFile(zipFile));
 			} catch (IOException e) {
 				LOGGER.error("Failed to process zip " + zipFile.toString(), e);
 			}
@@ -90,8 +90,8 @@ public class PointsToUsageGenerator {
 		return usages;
 	}
 
-	private Map<PointerAnalysisFactory, List<DummyUsage>> processZipFile(Path path) throws IOException {
-		final Map<PointerAnalysisFactory, List<DummyUsage>> usages = new HashMap<>();
+	private Map<PointerAnalysisFactory, List<Usage>> processZipFile(Path path) throws IOException {
+		final Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
 		final Map<PointerAnalysisFactory, WritingArchive> annotatedContextWriters = new HashMap<>(factories.size());
@@ -119,8 +119,8 @@ public class PointsToUsageGenerator {
 				// guard against exception in CsMethod:getSignature()
 				try {
 					ptContext = pa.compute(context);
-				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException
-						| NullPointerException | ConcurrentModificationException | StackOverflowError ex) {
+				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException | NullPointerException
+						| ConcurrentModificationException | StackOverflowError ex) {
 					throw ex;
 				} catch (RuntimeException ex) {
 					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);
@@ -134,8 +134,8 @@ public class PointsToUsageGenerator {
 				}
 
 				extractor.setStatisticsCollector(statisticsCollectors.get(factory));
-				List<DummyUsage> extractedUsages = extractor.extract(ptContext);
-				for (DummyUsage usage : extractedUsages) {
+				List<Usage> extractedUsages = extractor.extract(ptContext);
+				for (Usage usage : extractedUsages) {
 					try {
 						// usageWriters.get(factory).add(usage);
 					} catch (Exception e) {

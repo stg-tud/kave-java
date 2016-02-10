@@ -26,9 +26,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.Names;
+import cc.recommenders.usages.Usage;
 
 public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCollector {
 
@@ -55,8 +56,8 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	}
 
 	@Override
-	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<DummyUsage> usages) {
-		for (DummyUsage usage : usages) {
+	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<? extends Usage> usages) {
+		for (Usage usage : usages) {
 			ITypeName type = usage.getType();
 
 			Integer oldCount = histrogram.getOrDefault(type, 0);
@@ -86,7 +87,10 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 
 		try (BufferedWriter writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"))) {
 			for (Map.Entry<ITypeName, Integer> entry : entries) {
-				writer.write(entry.getKey().getFullName() + " " + entry.getValue());
+				ITypeName type = entry.getKey();
+				writer.write(Names.vm2srcQualifiedType(type));
+				writer.write(' ');
+				writer.write(Integer.toString(entry.getValue()));
 				writer.newLine();
 			}
 		}

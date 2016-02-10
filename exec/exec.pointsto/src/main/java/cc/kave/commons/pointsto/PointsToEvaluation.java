@@ -32,9 +32,9 @@ import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
+import cc.recommenders.usages.Usage;
 
 public class PointsToEvaluation {
 
@@ -61,12 +61,12 @@ public class PointsToEvaluation {
 
 	}
 
-	private Map<PointerAnalysisFactory, List<DummyUsage>> generateUsages(List<PointerAnalysisFactory> factories) {
+	private Map<PointerAnalysisFactory, List<Usage>> generateUsages(List<PointerAnalysisFactory> factories) {
 		try {
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST, USAGE_DEST,
 					new TypeHistogramUsageStatisticsCollector());
 
-			Map<PointerAnalysisFactory, List<DummyUsage>> usages = generator.getUsages();
+			Map<PointerAnalysisFactory, List<Usage>> usages = generator.getUsages();
 			outputStatisticsCollectors(generator.getStatisticsCollectors());
 
 			return usages;

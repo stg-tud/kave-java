@@ -46,10 +46,12 @@ import cc.kave.commons.pointsto.analysis.PointerAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.QueryContextKey;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
-import cc.kave.commons.pointsto.dummies.DummyCallsite;
-import cc.kave.commons.pointsto.dummies.DummyDefinitionSite;
-import cc.kave.commons.pointsto.dummies.DummyUsage;
+import cc.recommenders.usages.CallSite;
+import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSiteKind;
+import cc.recommenders.usages.DefinitionSites;
+import cc.recommenders.usages.Query;
 
 public class UsageExtractionVisitorContext {
 
@@ -61,14 +63,16 @@ public class UsageExtractionVisitorContext {
 	private PointerAnalysis pointerAnalysis;
 	private DescentStrategy descentStrategy;
 	private TypeCollector typeCollector;
+
 	private DeclarationMapper declarationMapper;
+	private Map<cc.recommenders.names.IMethodName, IMethodName> returnDefinitionMethodToSSTMethod = new HashMap<>();
 
 	private ITypeName enclosingClass;
 	private Deque<ITypeName> classContextStack = new ArrayDeque<>();
 
-	private Map<AbstractLocation, DummyUsage> locationUsages = new HashMap<>();
+	private Map<AbstractLocation, Query> locationUsages = new HashMap<>();
 
-	private Map<AbstractLocation, DummyDefinitionSite> implicitDefinitions = new HashMap<>();
+	private Map<AbstractLocation, DefinitionSite> implicitDefinitions = new HashMap<>();
 
 	private IStatement currentStatement;
 	private Callpath currentCallpath;
@@ -88,7 +92,7 @@ public class UsageExtractionVisitorContext {
 		createImplicitDefinitions(context);
 	}
 
-	public List<DummyUsage> getUsages() {
+	public List<Query> getUsages() {
 		return new ArrayList<>(locationUsages.values());
 	}
 
@@ -98,6 +102,7 @@ public class UsageExtractionVisitorContext {
 
 		// reset usages
 		locationUsages.clear();
+		returnDefinitionMethodToSSTMethod.clear();
 	}
 
 	public void setCurrentStatement(IStatement stmt) {
@@ -147,14 +152,14 @@ public class UsageExtractionVisitorContext {
 
 	private void createImplicitDefinitions(Context context) {
 		// this
-		DummyDefinitionSite thisDefinition = DummyDefinitionSite.byThis();
+		DefinitionSite thisDefinition = DefinitionSites.createDefinitionByThis();
 		IReference thisReference = SSTBuilder.variableReference(languageOptions.getThisName());
 		for (AbstractLocation location : queryPointerAnalysis(thisReference, enclosingClass)) {
 			implicitDefinitions.put(location, thisDefinition);
 		}
 
 		// super
-		DummyDefinitionSite superDefinition = DummyDefinitionSite.byThis();
+		DefinitionSite superDefinition = DefinitionSites.createDefinitionByThis();
 		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
 		ITypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
 		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
@@ -163,7 +168,7 @@ public class UsageExtractionVisitorContext {
 
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
 			IFieldName field = fieldDecl.getName();
-			DummyDefinitionSite fieldDefinition = DummyDefinitionSite.byField(field);
+			DefinitionSite fieldDefinition = DefinitionSites.createDefinitionByField(CoReNameConverter.convert(field));
 			IReference fieldReference = SSTBuilder.fieldReference(field);
 			for (AbstractLocation location : queryPointerAnalysis(fieldReference, field.getValueType())) {
 				// TODO we might overwrite definitions here if two fields share one location
@@ -178,8 +183,8 @@ public class UsageExtractionVisitorContext {
 			}
 
 			IPropertyName property = propertyDecl.getName();
-			DummyDefinitionSite propertyDefinition = DummyDefinitionSite
-					.byField(languageOptions.propertyToField(property));
+			DefinitionSite propertyDefinition = DefinitionSites
+					.createDefinitionByField(CoReNameConverter.convert(property));
 			IReference propertyRefernce = SSTBuilder.propertyReference(property);
 			for (AbstractLocation location : queryPointerAnalysis(propertyRefernce, property.getValueType())) {
 				// do not overwrite an existing definition by a real field
@@ -191,47 +196,48 @@ public class UsageExtractionVisitorContext {
 
 	}
 
-	private DummyUsage initializeUsage(ITypeName type, AbstractLocation location) {
-		DummyUsage usage = new DummyUsage();
+	private Query initializeUsage(ITypeName type, AbstractLocation location) {
+		Query usage = new Query();
 
-		usage.setType(type);
-		usage.setClassContext(classContextStack.getFirst());
-		usage.setMethodContext(getCurrentEnclosingMethod());
+		usage.setType(CoReNameConverter.convert(type));
+		usage.setClassContext(CoReNameConverter.convert(classContextStack.getFirst()));
+		usage.setMethodContext(CoReNameConverter.convert(getCurrentEnclosingMethod()));
 
 		if (location == null || !implicitDefinitions.containsKey(location)) {
-			usage.setDefinitionSite(DummyDefinitionSite.unknown());
+			usage.setDefinition(DefinitionSites.createUnknownDefinitionSite());
 		} else {
-			usage.setDefinitionSite(implicitDefinitions.get(location));
+			usage.setDefinition(implicitDefinitions.get(location));
 		}
 
 		return usage;
 	}
 
-	private DummyUsage getOrCreateUsage(AbstractLocation location, ITypeName type) {
-		DummyUsage usage = locationUsages.get(location);
+	private Query getOrCreateUsage(AbstractLocation location, ITypeName type) {
+		Query usage = locationUsages.get(location);
 		if (usage == null) {
 			usage = initializeUsage(type, location);
 			locationUsages.put(location, usage);
-		} else if (usage.getType().isUnknownType() && !type.isUnknownType()) {
+		} else if (CoReNameConverter.isUnknown(usage.getType()) && !type.isUnknownType()) {
 			// unknown types cause a lot of usages to be (wrongly) initialized with insufficient type information ->
 			// update these usages once we have a concrete type
-			usage.setType(type);
+			usage.setType(CoReNameConverter.convert(type));
 		}
 
 		return usage;
 	}
 
-	private void updateDefinitions(QueryContextKey query, DummyDefinitionSite newDefinition) {
+	private void updateDefinitions(QueryContextKey query, DefinitionSite newDefinition) {
 		Set<AbstractLocation> locations = pointerAnalysis.query(query);
 
 		for (AbstractLocation location : locations) {
-			DummyUsage usage = getOrCreateUsage(location, query.getType());
+			Query usage = getOrCreateUsage(location, query.getType());
 
-			DummyDefinitionSite currentDefinition = usage.getDefinitionSite();
+			DefinitionSite currentDefinition = usage.getDefinitionSite();
 
 			boolean currentDefinitionIsReturnOfNonEntryPoint = false;
 			if (currentDefinition.getKind() == DefinitionSiteKind.RETURN) {
-				IMethodDeclaration methodDecl = declarationMapper.get(currentDefinition.getMethod());
+				IMethodName sstMethod = returnDefinitionMethodToSSTMethod.get(currentDefinition.getMethod());
+				IMethodDeclaration methodDecl = declarationMapper.get(sstMethod);
 				currentDefinitionIsReturnOfNonEntryPoint = methodDecl != null && !methodDecl.isEntryPoint();
 			}
 
@@ -239,18 +245,18 @@ public class UsageExtractionVisitorContext {
 					newDefinition) < 0;
 
 			if (currentDefinitionIsReturnOfNonEntryPoint || newDefinitionHasHigherPriority) {
-				usage.setDefinitionSite(newDefinition);
+				usage.setDefinition(newDefinition);
 			}
 		}
 	}
 
-	private void updateCallsites(QueryContextKey query, DummyCallsite callsite) {
+	private void updateCallsites(QueryContextKey query, CallSite callsite) {
 		Set<AbstractLocation> locations = pointerAnalysis.query(query);
 
 		for (AbstractLocation location : locations) {
-			DummyUsage usage = getOrCreateUsage(location, query.getType());
+			Query usage = getOrCreateUsage(location, query.getType());
 
-			usage.addCallsite(callsite);
+			usage.addCallSite(callsite);
 		}
 	}
 
@@ -263,12 +269,12 @@ public class UsageExtractionVisitorContext {
 
 		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byParam(method, argIndex);
+		DefinitionSite newDefinition = DefinitionSites.createDefinitionByParam(CoReNameConverter.convert(method), argIndex);
 
 		updateDefinitions(query, newDefinition);
 	}
 
-	private void registerMethodDefinition(DummyDefinitionSite definitionSite, ITypeName methodType) {
+	private void registerMethodDefinition(DefinitionSite definitionSite, ITypeName methodType) {
 		if (currentStatement instanceof IExpressionStatement) {
 			// method called without saving returned value -> cannot have any calls
 			return;
@@ -307,18 +313,20 @@ public class UsageExtractionVisitorContext {
 		IAssignment assignStmt = (IAssignment) currentStatement;
 		ITypeName type = typeCollector.getType(assignStmt.getReference());
 		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstant();
+		DefinitionSite newDefinition = DefinitionSites.createDefinitionByConstant();
 
 		updateDefinitions(query, newDefinition);
 	}
 
 	public void registerConstructor(IMethodName method) {
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byConstructor(method);
+		DefinitionSite newDefinition = DefinitionSites.createDefinitionByConstructor(CoReNameConverter.convert(method));
 		registerMethodDefinition(newDefinition, method.getDeclaringType());
 	}
 
 	public void registerPotentialReturnDefinitionSite(IMethodName method) {
-		DummyDefinitionSite newDefinition = DummyDefinitionSite.byReturn(method);
+		cc.recommenders.names.IMethodName definitionMethod = CoReNameConverter.convert(method);
+		returnDefinitionMethodToSSTMethod.put(definitionMethod, method);
+		DefinitionSite newDefinition = DefinitionSites.createDefinitionByReturn(definitionMethod);
 		registerMethodDefinition(newDefinition, method.getReturnType());
 	}
 
@@ -333,20 +341,24 @@ public class UsageExtractionVisitorContext {
 		if (type == null) {
 			// special case: last parameter is declared as parameter array (params)
 			List<IParameterName> formalParameters = method.getParameters();
-			if (argIndex >= formalParameters.size() - 1) {
-				IParameterName lastParameter = formalParameters.get(formalParameters.size() - 1);
-				if (lastParameter.isParameterArray()) {
-					type = lastParameter.getValueType().getArrayBaseType();
+			// there are faulty SSTs that have actual parameters even though the function does not have any formal
+			// parameters
+			if (!formalParameters.isEmpty()) {
+				if (argIndex >= formalParameters.size() - 1) {
+					IParameterName lastParameter = formalParameters.get(formalParameters.size() - 1);
+					if (lastParameter.isParameterArray()) {
+						type = lastParameter.getValueType().getArrayBaseType();
+					} else {
+						type = lastParameter.getValueType();
+					}
 				} else {
-					type = lastParameter.getValueType();
+					type = formalParameters.get(argIndex).getValueType();
 				}
-			} else {
-				type = method.getParameters().get(argIndex).getValueType();
 			}
 		}
 
 		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
-		DummyCallsite callsite = DummyCallsite.parameterCallsite(method, argIndex);
+		CallSite callsite = CallSites.createParameterCallSite(CoReNameConverter.convert(method), argIndex);
 
 		updateCallsites(query, callsite);
 	}
@@ -358,7 +370,7 @@ public class UsageExtractionVisitorContext {
 			type = method.getDeclaringType();
 		}
 		QueryContextKey query = new QueryContextKey(receiver, currentStatement, type, currentCallpath);
-		DummyCallsite callsite = DummyCallsite.receiverCallsite(method);
+		CallSite callsite = CallSites.createReceiverCallSite(CoReNameConverter.convert(method));
 
 		updateCallsites(query, callsite);
 	}
