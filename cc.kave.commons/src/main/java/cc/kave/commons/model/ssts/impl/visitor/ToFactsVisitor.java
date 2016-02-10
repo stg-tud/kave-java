@@ -43,7 +43,6 @@ public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Voi
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, Set<Fact> facts) {
-
 		Event e = new Event();
 		e.setKind(EventKind.METHOD_DECLARATION);
 		e.setMethod(stmt.getName());

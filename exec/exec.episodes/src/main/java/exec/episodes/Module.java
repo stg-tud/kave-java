@@ -78,8 +78,8 @@ public class Module extends AbstractModule {
 		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
 		File graphRoot = graphFile;
 		
-		File validationContextsRoot = validationContexts;
-		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(validationContextsRoot));
+		Directory vcr = new Directory(validationContexts.getAbsolutePath());
+		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
 		
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
@@ -87,7 +87,7 @@ public class Module extends AbstractModule {
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
 		
-		ValidationContextsParser validationParser = new ValidationContextsParser(validationContextsRoot);
+		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
 //		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, validationParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter));
 //		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 		EpisodeRecommender recommender = new EpisodeRecommender();

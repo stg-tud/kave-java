@@ -108,28 +108,19 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 		assertNotEquals(a.getFacts(), b.getFacts());
 	}
-	
-	@Test 
-	public void getIndexTest() {
-		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
-		
-		Fact expected = new Fact("1>2");
-		Fact actual = sut.get(3);
-		assertEquals(expected, actual);
-	}
-	
-	@Test 
+
+	@Test
 	public void containFactTest() {
 		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
-		
+
 		boolean actual = sut.containsFact(new Fact("2"));
 		assertTrue(actual);
 	}
-	
-	@Test 
+
+	@Test
 	public void notContainFactTest() {
 		sut.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
-		
+
 		boolean actual = sut.containsFact(new Fact("4"));
 		assertFalse(actual);
 	}

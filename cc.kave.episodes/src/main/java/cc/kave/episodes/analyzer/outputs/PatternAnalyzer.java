@@ -29,6 +29,9 @@ public class PatternAnalyzer {
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodes;
 	
+	private static final int FREQTHRESH = 3;
+	private static final double BDTHRESH = 0.01;
+	
 	@Inject
 	public PatternAnalyzer(EpisodeParser parser, MaximalEpisodes me) {
 		this.episodeParser = parser;
@@ -36,7 +39,7 @@ public class PatternAnalyzer {
 	}
 	
 	public void readPatterns() {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(4, 0.3);
+		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
 		Map<Integer, List<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
 		
 		int allEpisodeCounter = 0;

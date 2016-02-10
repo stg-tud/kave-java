@@ -15,18 +15,13 @@
  */
 package cc.kave.episodes.mining.reader;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipException;
 
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.Lists;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 
@@ -37,56 +32,56 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
+import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Directory;
+import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class ValidationContextsParser {
 
-	private File rootFolder;
-	
-	public ValidationContextsParser(@Named("contexts")File directory) {
-		assertTrue(directory.exists(), "Frequent episode folder does not exist");
-		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
-		this.rootFolder = directory;
+	private Directory rootDir;
+
+	public ValidationContextsParser(@Named("contexts") Directory directory) {
+		this.rootDir = directory;
 	}
-	
+
 	public List<Episode> parse(List<Event> eventsList) throws ZipException, IOException {
 		List<Episode> validationEpisodes = new LinkedList<Episode>();
-		
-		for (File zip : findAllZips(rootFolder.getAbsolutePath())) {
-			ReadingArchive ra = new ReadingArchive(zip);
-			
+
+		for (String zip : findZips()) {
+			ReadingArchive ra = rootDir.getReadingArchive(zip);
+
 			int i = 0;
-			
+			int counter = 0;
+
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				
-				ToFactsVisitor tfv = new ToFactsVisitor(eventsList);
-				
+
+				ISSTNodeVisitor<Set<Fact>, Void> tfv = new ToFactsVisitor(eventsList);
+
 				ISST sst = ctx.getSST();
-				
-				int counter = 0;
-				
-				for(IMethodDeclaration md : sst.getMethods()) {
-					
+
+				for (IMethodDeclaration md : sst.getMethods()) {
+
 					Set<Fact> facts = Sets.newHashSet();
-					
-//					tfv.visit(md, facts);
-					
+
 					md.accept(tfv, facts);
-					
-					System.out.println("Creating episode" + ++counter);
-					Episode ep = createEpisode(facts);
-					validationEpisodes.add(ep);
-					
-//					System.out.println("New episode");
-//					for (Fact f : ep.getFacts()) {
-//						if (!f.isRelation())
-//							System.out.println(ep.toString());
+
+//					if (counter == 42) {
+						Logger.log("Creating episode " + ++counter);
+						Episode ep = createEpisode(facts);
+						validationEpisodes.add(ep);
+						
+						Logger.log("Output strange episode:" + ep.toString());
+//						return validationEpisodes;
+//					} else {
+//						counter++;
 //					}
 				}
-				
+
 				if (i++ > 10) {
-					System.out.println("\t... (skipping the rest)");
+					Logger.log("\t... (skipping the rest)");
 					ra.close();
 					return validationEpisodes;
 				}
@@ -95,28 +90,37 @@ public class ValidationContextsParser {
 		}
 		return validationEpisodes;
 	}
-	
-	private Episode createEpisode(Set<Fact> facts) {
-		Episode episode = new Episode();
-		episode.setFrequency(1);
-		episode.setNumEvents(facts.size());
-		
-		for(Fact f : facts){
-			episode.addFact(f);
-		} 
-		for (int first = 0; first < facts.size() - 1; first++) {
-			for (int second = first + 1; second < facts.size(); second++) {
-				episode.addFact(new Fact(episode.get(first), episode.get(second)));
+
+	private Set<String> findZips() {
+		Set<String> zips = rootDir.findFiles(new Predicate<String>() {
+
+			@Override
+			public boolean apply(String arg0) {
+				return arg0.endsWith(".zip");
 			}
-		}
-		return episode;
+		});
+		return zips;
 	}
 
-	private List<File> findAllZips(String dir) {
-		List<File> zips = Lists.newLinkedList();
-		for (File f : FileUtils.listFiles(new File(dir), new String[] { "zip" }, true)) {
-			zips.add(f);
+	private Episode createEpisode(Set<Fact> facts) {
+		int numberEvents = 0;
+
+		Episode episode = new Episode();
+		episode.setFrequency(1);
+
+		for (Fact f : facts) {
+			if (!f.isRelation()) {
+				episode.addFact(f);
+				numberEvents++;
+			} else {
+				Tuple<Fact, Fact> factsTuple = f.getRelationFacts();
+				if (!factsTuple.getFirst().equals(factsTuple.getSecond())) {
+					episode.addFact(f);
+				}
+			}
 		}
-		return zips;
+		episode.setNumEvents(numberEvents);
+
+		return episode;
 	}
 }

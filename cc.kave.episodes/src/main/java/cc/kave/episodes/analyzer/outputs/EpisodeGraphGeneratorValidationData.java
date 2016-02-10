@@ -65,28 +65,23 @@ public class EpisodeGraphGeneratorValidationData {
 
 	public void generateGraphs() throws Exception {
 		
+		Logger.setPrinting(true);
+		
 		System.out.println("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
 		
 		System.out.println("Readng Contexts");
 		List<Episode> allEpisodes = validationParser.parse(eventMapping);
 		
-//		System.out.println("Removing transitivity closures");
-//		List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(allEpisodes);
+		System.out.println("Removing transitivity closures");
+		List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(allEpisodes);
 		
 		String directory = createDirectoryStructure();
 
 		int graphIndex = 0;
 
-		for (Episode e : allEpisodes) {
-			if (e.getNumberOfFacts() == 1) {
-				continue;
-			}
+		for (Episode e : learnedEpisodes) {
 			Logger.log("Writting episode number %s.\n", graphIndex);
-			if (graphIndex == 2 || graphIndex == 3 || graphIndex == 4 || graphIndex == 7 || graphIndex == 8 || graphIndex == 9) {
-				graphIndex++;
-				continue;
-			}
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
 			List<String> types = getAPIType(e, eventMapping);
 			for (String t : types) {

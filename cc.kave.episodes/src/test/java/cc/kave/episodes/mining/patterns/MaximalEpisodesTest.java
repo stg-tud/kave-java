@@ -37,9 +37,11 @@ public class MaximalEpisodesTest {
 	private Episode episode1;
 	private Episode episode2;
 	private Episode episode3;
-	private Episode episode4;
+	private Episode episode41;
+	private Episode episode42;
 	private Episode episode5;
 	private Episode episode6;
+	private Episode episode7;
 
 	private Map<Integer, List<Episode>> episodes = new HashMap<Integer, List<Episode>>();
 	private MaximalEpisodes sut;
@@ -51,9 +53,11 @@ public class MaximalEpisodesTest {
 		episode1 = newEpisode(3, 1, "1");
 		episode2 = newEpisode(3, 1, "2");
 		episode3 = newEpisode(3, 1, "3");
-		episode4 = newEpisode(3, 2, "1", "2", "1>2");
+		episode41 = newEpisode(3, 2, "1", "2", "1>2");
+		episode42 = newEpisode(3, 2, "1", "2", "2>1");
 		episode5 = newEpisode(4, 2, "1", "3", "1>3");
 		episode6 = newEpisode(2, 2, "2", "3", "2>3");
+		episode7 = newEpisode(3, 3, "1", "2", "3", "1>2", "1>3");
 	}
 	
 	@Test
@@ -68,7 +72,7 @@ public class MaximalEpisodesTest {
 		Map<Integer, List<Episode>> initialEpisodes = new HashMap<Integer, List<Episode>>();
 		List<Episode> episodeList = new LinkedList<Episode>();
 		
-		episodeList.add(episode4);
+		episodeList.add(episode41);
 		episodeList.add(episode5);
 		episodeList.add(episode6);
 		
@@ -77,7 +81,7 @@ public class MaximalEpisodesTest {
 		Map<Integer, List<Episode>> expecteds = new HashMap<Integer, List<Episode>>();
 		episodeList = new LinkedList<Episode>();
 		
-		episodeList.add(episode4);
+		episodeList.add(episode41);
 		episodeList.add(episode5);
 		episodeList.add(episode6);
 		
@@ -101,7 +105,7 @@ public class MaximalEpisodesTest {
 		
 		episodeList = new LinkedList<Episode>();
 		
-		episodeList.add(episode4);
+		episodeList.add(episode41);
 		episodeList.add(episode5);
 		
 		initialEpisodes.put(2, episodeList);
@@ -109,7 +113,7 @@ public class MaximalEpisodesTest {
 		Map<Integer, List<Episode>> expecteds = new HashMap<Integer, List<Episode>>();
 		episodeList = new LinkedList<Episode>();
 		
-		episodeList.add(episode4);
+		episodeList.add(episode41);
 		episodeList.add(episode5);
 		
 		expecteds.put(2, episodeList);
@@ -132,7 +136,7 @@ public class MaximalEpisodesTest {
 
 		episodeList = new LinkedList<Episode>();
 		
-		episodeList.add(episode4);
+		episodeList.add(episode41);
 
 		initialEpisodes.put(2, episodeList);
 
@@ -145,7 +149,7 @@ public class MaximalEpisodesTest {
 
 		episodeListExp = new LinkedList<Episode>();
 		
-		episodeListExp.add(episode4);
+		episodeListExp.add(episode41);
 
 		expected.put(2, episodeListExp);
 
@@ -218,6 +222,40 @@ public class MaximalEpisodesTest {
 		episodeListExp.add(episode6);
 
 		expected.put(2, episodeListExp);
+
+		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
+
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void sameEventsDiffOrder() throws Exception {
+		Map<Integer, List<Episode>> initialEpisodes = new HashMap<Integer, List<Episode>>();
+		List<Episode> episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode41);
+		episodeList.add(episode42);
+
+		initialEpisodes.put(2, episodeList);
+
+		episodeList = new LinkedList<Episode>();
+		
+		episodeList.add(episode7);
+
+		initialEpisodes.put(3, episodeList);
+
+		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
+		List<Episode> episodeListExp = new LinkedList<Episode>();
+		
+		episodeListExp.add(episode42);
+
+		expected.put(2, episodeListExp);
+
+		episodeListExp = new LinkedList<Episode>();
+		
+		episodeListExp.add(episode7);
+
+		expected.put(3, episodeListExp);
 
 		Map<Integer, List<Episode>> actuals = sut.getMaximalEpisodes(initialEpisodes);
 

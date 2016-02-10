@@ -16,26 +16,23 @@
 package cc.kave.commons.model.episodes;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class Episode {
 
 	private int frequency;
 	private int numberOfEvents;
-	private List<Fact> facts = Lists.newLinkedList();
+	private Set<Fact> facts = Sets.newHashSet();
 
 	public Iterable<Fact> getFacts() {
 		return facts;
-	}
-
-	public Fact get(int i) {
-		return facts.get(i);
 	}
 
 	public int getNumEvents() {
@@ -57,7 +54,7 @@ public class Episode {
 	public void addFact(Fact fact) {
 		facts.add(fact);
 	}
-	
+
 	public void addFact(String rawFact) {
 		facts.add(new Fact(rawFact));
 	}
