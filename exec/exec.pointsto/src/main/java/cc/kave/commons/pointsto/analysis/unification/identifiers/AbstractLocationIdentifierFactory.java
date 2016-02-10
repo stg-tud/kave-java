@@ -29,4 +29,9 @@ public abstract class AbstractLocationIdentifierFactory implements LocationIdent
 			throw new UnexpectedSSTNodeException(memberRef);
 		}
 	}
+
+	protected abstract LocationIdentifier create(IFieldReference fieldRef);
+
+	protected abstract LocationIdentifier create(IPropertyReference propertyRef);
+
 }
