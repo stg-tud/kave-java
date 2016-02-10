@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,14 +74,7 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	}
 
 	private void registerNewDeclarations(List<IStatement> statements, RefLookup context) {
-		/* update context with newly assigned references */
-		statements.stream().filter(s -> s instanceof IAssignment).map(s -> (IAssignment) s).forEach(a -> {
-			IReference ref = a.getReference();
-			if (ref instanceof IVariableReference) {
-				context.put((IVariableReference) ref, a.getExpression());
-			}
-		});
-		/* normalize newly created statements */
+		/* normalize and add newly created statements */
 		visit(statements, context);
 		createdStatements.addAll(statements);
 	}
@@ -257,27 +250,24 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	private ISimpleExpression absorption(IBinaryExpression expr, RefLookup context) {
 		BinaryOperator negatedOp = getNegated(expr.getOperator());
 
-		if (!(isDisjunction(expr) || isConjunction(expr)))
+		if (!(isDisjunction(expr) || isConjunction(expr))) {
 			return null;
-
+		}
 		ISimpleExpression lhs = expr.getLeftOperand();
 		ISimpleExpression rhs = expr.getRightOperand();
-		IAssignableExpression leftReferenced = context.tryLookup(lhs);
-		IAssignableExpression rightReferenced = context.tryLookup(rhs);
-		
-		IBinaryExpression leftBinary = (leftReferenced instanceof IBinaryExpression)
-				? (IBinaryExpression) leftReferenced : null;
-		IBinaryExpression rightBinary = (rightReferenced instanceof IBinaryExpression)
-				? (IBinaryExpression) rightReferenced : null;
 
-		if (leftBinary != null && leftBinary.getOperator().equals(negatedOp)) {
-			if (containsMember(leftBinary, rhs, context))
-				return rhs;
-		} else if (rightBinary != null && rightBinary.getOperator().equals(negatedOp)) {
-			if (containsMember(rightBinary, lhs, context))
-				return lhs;
-		}
-		return null;
+		boolean mayAbsorbLeft = mayAbsorb(lhs, rhs, negatedOp, context);
+		boolean mayAbsorbRight = mayAbsorb(rhs, lhs, negatedOp, context);
+
+		ISimpleExpression normalized = mayAbsorbLeft ? rhs : mayAbsorbRight ? lhs : null;
+		return normalized;
+	}
+
+	private boolean mayAbsorb(ISimpleExpression maybeAbsorbable, ISimpleExpression expr, BinaryOperator op,
+			RefLookup context) {
+		IAssignableExpression referenced = context.tryLookup(maybeAbsorbable);
+		IBinaryExpression binary = (referenced instanceof IBinaryExpression) ? (IBinaryExpression) referenced : null;
+		return binary != null && binary.getOperator().equals(op) && containsMember(binary, expr, context);
 	}
 
 	/**

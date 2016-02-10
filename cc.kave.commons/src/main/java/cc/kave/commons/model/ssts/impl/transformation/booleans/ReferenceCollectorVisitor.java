@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package cc.kave.commons.model.ssts.impl.transformation.booleans;
-
-import java.util.HashMap;
 
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
@@ -88,11 +86,10 @@ public class ReferenceCollectorVisitor extends AbstractTraversingNodeVisitor<Ref
 
 		if (ref instanceof IVariableReference) {
 			IVariableReference varRef = (IVariableReference) ref;
-			/* put unknown value if already assigned or inside conditional */
-			if (refLookup.containsKey(varRef) || context.insideConditional())
-				refLookup.put(varRef, UNKNOWN);
-			else
-				refLookup.put(varRef, expr);
+			/* put unknown expression if already assigned or inside conditional */
+			boolean isUnknown = (refLookup.containsKey(varRef) || context.insideConditional());
+			IAssignableExpression assignedExpr = isUnknown ? UNKNOWN : expr;
+			refLookup.put(varRef, assignedExpr);
 			methodLookup.put(context.getMethod(), refLookup);
 		}
 
@@ -219,15 +216,4 @@ public class ReferenceCollectorVisitor extends AbstractTraversingNodeVisitor<Ref
 		return methodLookup;
 	}
 
-}
-
-final class MethodLookup extends HashMap<IMethodDeclaration, RefLookup> {
-	private static final long serialVersionUID = 1L;
-
-	public MethodLookup(IMethodDeclaration decl, RefLookup lookup) {
-		this.put(decl, lookup);
-	}
-
-	public MethodLookup() {
-	}
 }

@@ -15,27 +15,17 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.booleans;
 
+import java.util.HashMap;
+
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 
-public class ReferenceCollectorContext {
-	private IMethodDeclaration method;
-	private boolean inConditional;
+final class MethodLookup extends HashMap<IMethodDeclaration, RefLookup> {
+	private static final long serialVersionUID = 1L;
 
-	public ReferenceCollectorContext(IMethodDeclaration method, boolean inConditional) {
-		this.method = method;
-		this.inConditional = inConditional;
+	public MethodLookup(IMethodDeclaration decl, RefLookup lookup) {
+		this.put(decl, lookup);
 	}
 
-	public ReferenceCollectorContext() {
-		inConditional = false;
-		method = null;
-	}
-
-	public IMethodDeclaration getMethod() {
-		return method;
-	}
-
-	public boolean insideConditional() {
-		return inConditional;
+	public MethodLookup() {
 	}
 }
