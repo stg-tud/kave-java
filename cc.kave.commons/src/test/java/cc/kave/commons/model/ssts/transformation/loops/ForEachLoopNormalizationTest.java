@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,17 @@ package cc.kave.commons.model.ssts.transformation.loops;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
+import static cc.kave.commons.model.ssts.impl.transformation.loops.IteratorUtil.getNext;
+import static cc.kave.commons.model.ssts.impl.transformation.loops.IteratorUtil.hasNext;
+import static cc.kave.commons.model.ssts.impl.transformation.loops.IteratorUtil.iteratorInvocation;
+import static cc.kave.commons.model.ssts.impl.transformation.loops.IteratorUtil.iteratorType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +41,8 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
+import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.impl.transformation.loops.ForEachLoopNormalizationVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -179,9 +188,14 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 	}
 
 	private ILoopHeaderExpression getWhileCondition(IVariableReference iterator) {
-		IVariableReference hasNext = variableReference("hasNext");
-		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), TypeName.newTypeName("System.Boolean"));
-		return loopHeader(hasNextDec, assign(hasNext, hasNext(iterator)), returnStatement(refExpr(hasNext)));
+		List<IStatement> hasNext = define("hasNext", hasNext(iterator));
+		IStatement returnStatement = returnStatement(mainCondition(hasNext));
+		List<IStatement> loopHeaderBody = new ArrayList<IStatement>();
+		loopHeaderBody.addAll(hasNext);
+		loopHeaderBody.add(returnStatement);
+		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
+		loopHeader.setBody(loopHeaderBody);
+		return loopHeader;
 	}
 
 }

@@ -28,7 +28,6 @@ import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -38,6 +37,7 @@ import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
 import cc.kave.commons.model.ssts.impl.transformation.switchblock.SwitchBlockNormalizationContext;
 import cc.kave.commons.model.ssts.impl.transformation.switchblock.SwitchBlockNormalizationVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
 public class SwitchBlockNormalizationVisitorBaseTest

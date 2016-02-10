@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,11 +79,14 @@ public class NormalizationVisitorBaseTest<TContext, TReturn> {
 			List<IStatement> expectedBody = expectedMethod.getBody();
 			assertThat(body.size(), equalTo(expectedBody.size()));
 
-			for (int i = 0; i < body.size(); i++)
+			for (int i = 0; i < body.size(); i++) {
 				assertThat(body.get(i), equalTo(expectedBody.get(i)));
+			}
 
 			assertThat(method, equalTo(expectedMethod));
 		}
+
+		assertThat(expectedSST, equalTo(sst));
 	}
 
 	protected void assertTransformedSST() {

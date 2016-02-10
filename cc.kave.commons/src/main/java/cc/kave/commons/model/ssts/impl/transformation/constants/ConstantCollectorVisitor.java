@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2015 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,8 +29,9 @@ public class ConstantCollectorVisitor extends AbstractConstantCollectorVisitor {
 	public Set<IFieldDeclaration> visit(ISST sst, Set<IFieldDeclaration> constants) {
 
 		for (IFieldDeclaration field : sst.getFields()) {
-			if (field.getName().getDeclaringType().isSimpleType())
+			if (field.getName().getDeclaringType().isSimpleType()) {
 				constants.add(field);
+			}
 		}
 		for (IPropertyDeclaration property : sst.getProperties()) {
 			constants.addAll(property.accept(this, constants));
@@ -42,8 +43,8 @@ public class ConstantCollectorVisitor extends AbstractConstantCollectorVisitor {
 	}
 
 	/**
-	 * Remove field from set of possible constants in case it appears on lhs of assignment.
-	 * (We only visit field references for which this is the case.)
+	 * Remove field from set of possible constants in case it appears on lhs of
+	 * assignment. (We only visit field references for which this is the case.)
 	 */
 	@Override
 	public Set<IFieldDeclaration> visit(IFieldReference fieldRef, Set<IFieldDeclaration> constants) {

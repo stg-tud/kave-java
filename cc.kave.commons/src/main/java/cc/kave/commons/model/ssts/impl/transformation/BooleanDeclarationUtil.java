@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,12 +28,12 @@ import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class BooleanDeclarationUtil {
 	public static final IConstantValueExpression TRUE = constant("true");

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
@@ -66,7 +67,7 @@ public class IteratorUtil {
 	public static IInvocationExpression iteratorInvocation(IVariableReference ref) {
 		return invocation(ref, ITER_INV, true);
 	}
-	
+
 	public static IInvocationExpression iteratorInvocation(IVariableReference ref, boolean java) {
 		return invocation(ref, ITER_INV, java);
 	}
@@ -76,26 +77,25 @@ public class IteratorUtil {
 	public static IInvocationExpression hasNext(IVariableReference ref) {
 		return invocation(ref, ITER_HAS_NEXT, true);
 	}
-	
+
 	public static IInvocationExpression hasNext(IVariableReference ref, boolean java) {
 		return invocation(ref, ITER_HAS_NEXT, java);
 	}
 
 	// ------------------------ iterator get next -----------------------------
-	
+
 	public static IAssignableExpression getNext(IVariableReference ref) {
 		return getNext(ref, true);
 	}
 
 	public static IAssignableExpression getNext(IVariableReference ref, boolean java) {
-		if (java)
-			return invocation(ref, ITER_GET_NEXT);
-				
-		return refExpr(propertyReference(ref, java2CSharp.get(ITER_GET_NEXT)));
+		IInvocationExpression javaGetNext = invocation(ref, ITER_GET_NEXT);
+		IReferenceExpression cSharpNext = refExpr(propertyReference(ref, java2CSharp.get(ITER_GET_NEXT)));
+		return java ? javaGetNext : cSharpNext;
 	}
-	
+
 	// ---------------------------- helpers -----------------------------------
-	
+
 	private static IInvocationExpression invocation(IVariableReference ref, String javaMethodName) {
 		return invocation(ref, javaMethodName, true);
 	}

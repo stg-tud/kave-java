@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,8 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.loops;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.not;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.TRUE;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
 
@@ -30,7 +30,6 @@ import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
-import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
@@ -42,9 +41,6 @@ public class DoLoopNormalizationVisitor extends AbstractStatementNormalizationVi
 	public List<IStatement> visit(IDoLoop block, Void context) {
 		// normalize inner loops
 		super.visit(block, context);
-
-		// create loop condition
-		IConstantValueExpression condition = constant("true");
 
 		// extract do-loop condition
 		ILoopHeaderExpression loopHeader = block.getCondition();
@@ -61,12 +57,12 @@ public class DoLoopNormalizationVisitor extends AbstractStatementNormalizationVi
 		ISimpleExpression doCondition = ((IReturnStatement) loopHeaderReturn).getExpression();
 
 		// create break condition
-		// (break loop when condition evaluates to false)
+		// (break loop when do-condition evaluates to false)
 		List<IStatement> breakCondition = define("breakCondition", not(doCondition));
 
 		IfElseBlock ifBlock = new IfElseBlock();
 		ifBlock.setCondition(mainCondition(breakCondition));
-		ifBlock.setThen(Lists.newArrayList(new BreakStatement()));
+		ifBlock.setThen(Lists.newArrayList(breakStatement()));
 
 		// assemble while loop
 		List<IStatement> whileBody = new ArrayList<IStatement>();
@@ -77,7 +73,7 @@ public class DoLoopNormalizationVisitor extends AbstractStatementNormalizationVi
 
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(whileBody);
-		whileLoop.setCondition(condition);
+		whileLoop.setCondition(TRUE);
 
 		List<IStatement> normalized = new ArrayList<IStatement>();
 		normalized.add(whileLoop);

@@ -39,7 +39,6 @@ import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -84,6 +83,7 @@ import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public abstract class AbstractExpressionNormalizationVisitor<TContext>
 		extends AbstractThrowingNodeVisitor<TContext, IAssignableExpression> {
@@ -291,7 +291,6 @@ public abstract class AbstractExpressionNormalizationVisitor<TContext>
 
 	@Override
 	public IAssignableExpression visit(ICompletionExpression entity, TContext context) {
-		entity.getObjectReference().accept(this, context);
 		return null;
 	}
 

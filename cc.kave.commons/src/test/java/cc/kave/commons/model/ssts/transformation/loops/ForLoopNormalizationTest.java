@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package cc.kave.commons.model.ssts.transformation.loops;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.TRUE;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,8 @@ import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.transformation.loops.ForLoopNormalizationVisitor;
+import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
 public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseTest<Void> {
 	private ForLoop forLoop;
@@ -50,7 +53,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	@Test
 	public void testEmptyLoop() {
 		setCondition(loopHeader());
-		setExpected(whileLoop(constant("true")));
+		setExpected(whileLoop(TRUE));
 		assertTransformedSST();
 	}
 
@@ -62,7 +65,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopInit() {
 		setCondition(loopHeader());
 		setInit(stmt0, stmt1);
-		setExpected(stmt0, stmt1, whileLoop(constant("true")));
+		setExpected(stmt0, stmt1, whileLoop(TRUE));
 		assertTransformedSST();
 	}
 
@@ -75,7 +78,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopStep() {
 		setCondition(loopHeader());
 		setStep(stmt0, stmt1);
-		setExpected(whileLoop(constant("true"), stmt0, stmt1));
+		setExpected(whileLoop(TRUE, stmt0, stmt1));
 		assertTransformedSST();
 	}
 
@@ -88,7 +91,7 @@ public class ForLoopNormalizationTest extends StatementNormalizationVisitorBaseT
 	public void testLoopBody() {
 		setCondition(loopHeader());
 		setBody(stmt0, stmt1);
-		setExpected(whileLoop(constant("true"), stmt0, stmt1));
+		setExpected(whileLoop(TRUE, stmt0, stmt1));
 		assertTransformedSST();
 	}
 

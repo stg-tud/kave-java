@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2016 Carina Oberle
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ public class BinaryOperatorUtil {
 	}
 
 	public static boolean isRelational(BinaryOperator op) {
-		boolean isNumerical = false;
+		boolean isRelational = false;
 		switch (op) {
 		case Equal:
 		case NotEqual:
@@ -45,10 +45,10 @@ public class BinaryOperatorUtil {
 		case GreaterThan:
 		case LessThanOrEqual:
 		case GreaterThanOrEqual:
-			isNumerical = true;
+			isRelational = true;
 		default:
 			break;
 		}
-		return isNumerical;
+		return isRelational;
 	}
 }
