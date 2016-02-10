@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.graphs;
+package cc.kave.episodes.analyzer.outputs;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -30,6 +30,9 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.recommenders.io.Logger;

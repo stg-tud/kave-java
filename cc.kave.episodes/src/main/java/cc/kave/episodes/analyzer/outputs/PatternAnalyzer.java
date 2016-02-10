@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.patterns;
+package cc.kave.episodes.analyzer.outputs;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,7 @@ import java.util.Map;
 import com.google.inject.Inject;
 
 import cc.kave.commons.model.episodes.Episode;
+import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 
 public class PatternAnalyzer {
@@ -35,7 +36,7 @@ public class PatternAnalyzer {
 	}
 	
 	public void readPatterns() {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(4, 0.5);
+		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(4, 0.3);
 		Map<Integer, List<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
 		
 		int allEpisodeCounter = 0;

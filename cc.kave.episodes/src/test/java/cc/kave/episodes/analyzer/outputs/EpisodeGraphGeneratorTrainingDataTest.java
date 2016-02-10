@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.graphs;
+package cc.kave.episodes.analyzer.outputs;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertFalse;
@@ -38,7 +38,6 @@ import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.mining.episodes.EpisodeGraphGenerator;
 import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -46,6 +45,10 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.episodes.analyzer.outputs.EpisodeGraphGeneratorTrainingData;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
