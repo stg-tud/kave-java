@@ -54,9 +54,9 @@ public class TestIfInversion extends BooleanNormalizationVisitorBaseTest {
 		assertTransformation(toNormalize, expected);
 	}
 
-	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
 	// | !a ? b : c --> a ? c : b |
-	// |____________________________|
+	// |__________________________|
 	@Test
 	public void testNegatedIfExprCondition() {
 		List<IStatement> cond = not(a);

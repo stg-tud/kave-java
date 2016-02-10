@@ -15,41 +15,37 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.switchblock;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.not;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.switchBlock;
-import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.booleanDeclaration;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.ISwitchBlock;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.transformation.AbstractStatementNormalizationVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 
 public class SwitchBlockNormalizationVisitor
 		extends AbstractStatementNormalizationVisitor<SwitchBlockNormalizationContext> {
 
-	private int counter;
+	private int createdVariables;
 
 	public SwitchBlockNormalizationVisitor() {
-		counter = 0;
+		createdVariables = 0;
 	}
 
 	@Override
@@ -107,10 +103,11 @@ public class SwitchBlockNormalizationVisitor
 		statements.add(ifElse);
 
 		/* in case of fall-through, put remaining statements after if-block */
-		if (fallthrough)
+		if (fallthrough) {
 			statements.addAll(remainingPart);
-		else
+		} else {
 			ifElse.setElse(remainingPart);
+		}
 
 		boolean emptyThen = ifElse.getThen().isEmpty();
 		boolean emptyElse = ifElse.getElse().isEmpty();
@@ -118,14 +115,13 @@ public class SwitchBlockNormalizationVisitor
 		/* no if-block necessary if both branches are empty */
 		if (emptyThen && emptyElse) {
 			statements.remove(0);
-			return statements;
 		}
 
 		/*
 		 * if then-branch is empty but else-branch is not, switch branches and
 		 * negate condition
 		 */
-		if (emptyThen) {
+		else if (emptyThen) {
 			List<IStatement> negatedCond = negCond(condition);
 			statements.addAll(0, negatedCond);
 			ifElse.setCondition(mainCondition(negatedCond));
@@ -135,7 +131,7 @@ public class SwitchBlockNormalizationVisitor
 
 		return statements;
 	}
-	
+
 	private List<IStatement> normalizeEmptySwitch(ISwitchBlock switchBlock, SwitchBlockNormalizationContext context) {
 		IReferenceExpression fallthroughCondition = context.getFallthroughCondition();
 		List<IReferenceExpression> labelConditions = context.getLabelConditions();
@@ -195,18 +191,15 @@ public class SwitchBlockNormalizationVisitor
 
 	// -------------------------- condition -----------------------------------
 
-	private IVariableDeclaration conditionDeclaration() {
-		return booleanDeclaration("$cond_" + counter++);
-	}
-
 	private List<IStatement> conditionDefinition(IVariableReference ref, ISimpleExpression label,
 			SwitchBlockNormalizationContext context) {
 		List<IStatement> statements = eqCond(refExpr(ref), label);
 		IReferenceExpression condition = mainCondition(statements);
 		IReferenceExpression fallthroughCondition = context.getFallthroughCondition();
 		context.addLabelCondition(condition);
-		if (fallthroughCondition != null)
+		if (fallthroughCondition != null) {
 			statements.addAll(orCond(fallthroughCondition, condition));
+		}
 		return statements;
 	}
 
@@ -237,8 +230,9 @@ public class SwitchBlockNormalizationVisitor
 			}
 		}
 
-		if (orCond != null)
+		if (orCond != null) {
 			res.addAll(andCond(condition, orCond));
+		}
 		return res;
 	}
 
@@ -285,30 +279,6 @@ public class SwitchBlockNormalizationVisitor
 		return cond;
 	}
 
-	private List<IStatement> binCond(ISimpleExpression lhs, ISimpleExpression rhs, BinaryOperator op) {
-		IVariableDeclaration varDec = conditionDeclaration();
-		IAssignment varAssign = assign(varDec.getReference(), binExpr(op, lhs, rhs));
-		return Lists.newArrayList(varDec, varAssign);
-	}
-
-	private List<IStatement> eqCond(ISimpleExpression lhs, ISimpleExpression rhs) {
-		return binCond(lhs, rhs, BinaryOperator.Equal);
-	}
-
-	private List<IStatement> orCond(ISimpleExpression lhs, ISimpleExpression rhs) {
-		return binCond(lhs, rhs, BinaryOperator.Or);
-	}
-
-	private List<IStatement> andCond(ISimpleExpression lhs, ISimpleExpression rhs) {
-		return binCond(lhs, rhs, BinaryOperator.And);
-	}
-
-	private List<IStatement> negCond(ISimpleExpression cond) {
-		IVariableDeclaration varDec = conditionDeclaration();
-		IAssignment varAssign = assign(varDec.getReference(), not(cond));
-		return Lists.newArrayList(varDec, varAssign);
-	}
-
 	// -------------------------- fall-through --------------------------------
 
 	/**
@@ -334,7 +304,8 @@ public class SwitchBlockNormalizationVisitor
 	}
 
 	/**
-	 * Determine whether we have a general fall-through (under *every* condition).
+	 * Determine whether we have a general fall-through (under *every*
+	 * condition).
 	 */
 	private boolean generalFallthrough(List<IStatement> statements) {
 		boolean noOuterBreak = statements.stream().noneMatch(s -> s instanceof IBreakStatement);
@@ -387,6 +358,30 @@ public class SwitchBlockNormalizationVisitor
 
 	private boolean isEmpty(IfElseBlock ifElse) {
 		return ifElse.getThen().isEmpty() && ifElse.getElse().isEmpty();
+	}
+	
+	private List<IStatement> newCondition(IAssignableExpression expr) {
+		return define(createdVariables++, expr);
+	}
+
+	private List<IStatement> binCond(ISimpleExpression lhs, ISimpleExpression rhs, BinaryOperator op) {
+		return newCondition(binExpr(op, lhs, rhs));
+	}
+
+	private List<IStatement> eqCond(ISimpleExpression lhs, ISimpleExpression rhs) {
+		return binCond(lhs, rhs, BinaryOperator.Equal);
+	}
+
+	private List<IStatement> orCond(ISimpleExpression lhs, ISimpleExpression rhs) {
+		return binCond(lhs, rhs, BinaryOperator.Or);
+	}
+
+	private List<IStatement> andCond(ISimpleExpression lhs, ISimpleExpression rhs) {
+		return binCond(lhs, rhs, BinaryOperator.And);
+	}
+
+	private List<IStatement> negCond(ISimpleExpression cond) {
+		return newCondition(not(cond));
 	}
 
 }

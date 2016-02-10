@@ -15,23 +15,17 @@
  */
 package cc.kave.commons.model.ssts.transformation.booleans;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.define;
 import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.mainCondition;
-import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.newVar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 
-import com.google.common.collect.Lists;
-
-import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
@@ -39,7 +33,6 @@ import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.transformation.booleans.BooleanNormalizationVisitor;
 import cc.kave.commons.model.ssts.impl.transformation.booleans.RefLookup;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.transformation.StatementNormalizationVisitorBaseTest;
 
 public class BooleanNormalizationVisitorBaseTest extends StatementNormalizationVisitorBaseTest<RefLookup> {
@@ -66,6 +59,10 @@ public class BooleanNormalizationVisitorBaseTest extends StatementNormalizationV
 
 	// ---------------------------- helpers -----------------------------------
 
+	protected List<IStatement> defineNew(IAssignableExpression expr) {
+		return define(counter++, expr);
+	}
+
 	protected List<IStatement> or(ISimpleExpression lhs, ISimpleExpression rhs) {
 		return binary(lhs, rhs, BinaryOperator.Or);
 	}
@@ -77,14 +74,14 @@ public class BooleanNormalizationVisitorBaseTest extends StatementNormalizationV
 	protected List<IStatement> and(ISimpleExpression lhs, List<IStatement> rhs) {
 		List<IStatement> result = new ArrayList<IStatement>();
 		result.addAll(rhs);
-		result.addAll(binary(lhs, mainCondition(rhs), BinaryOperator.And));
+		result.addAll(and(lhs, mainCondition(rhs)));
 		return result;
 	}
 
 	protected List<IStatement> and(List<IStatement> lhs, ISimpleExpression rhs) {
 		List<IStatement> result = new ArrayList<IStatement>();
 		result.addAll(lhs);
-		result.addAll(binary(mainCondition(lhs), rhs, BinaryOperator.And));
+		result.addAll(and(mainCondition(lhs), rhs));
 		return result;
 	}
 
@@ -97,9 +94,7 @@ public class BooleanNormalizationVisitorBaseTest extends StatementNormalizationV
 	}
 
 	protected List<IStatement> not(ISimpleExpression cond) {
-		IVariableDeclaration varDec = booleanDeclaration();
-		IAssignment varAssign = assign(varDec.getReference(), SSTUtil.not(cond));
-		return Lists.newArrayList(varDec, varAssign);
+		return defineNew(SSTUtil.not(cond));
 	}
 
 	protected List<IStatement> not(List<IStatement> cond) {
@@ -109,22 +104,7 @@ public class BooleanNormalizationVisitorBaseTest extends StatementNormalizationV
 		return result;
 	}
 
-	protected List<IStatement> defineNew(IAssignableExpression expr) {
-		IVariableDeclaration varDec = booleanDeclaration();
-		IAssignment varAssign = assign(varDec.getReference(), expr);
-		return Lists.newArrayList(varDec, varAssign);
-	}
-
 	protected List<IStatement> binary(ISimpleExpression lhs, ISimpleExpression rhs, BinaryOperator op) {
 		return defineNew(binExpr(op, lhs, rhs));
 	}
-
-	protected IVariableDeclaration booleanDeclaration() {
-		return declare(newName(), TypeName.newTypeName("System.Boolean"));
-	}
-
-	protected String newName() {
-		return newVar(counter++).getIdentifier();
-	}
-
 }

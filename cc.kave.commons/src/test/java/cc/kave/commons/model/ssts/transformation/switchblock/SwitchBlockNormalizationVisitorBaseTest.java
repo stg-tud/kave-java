@@ -19,12 +19,13 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.booleanDeclaration;
+import static cc.kave.commons.model.ssts.impl.transformation.BooleanDeclarationUtil.newVar;
 
 import org.junit.Before;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.declarations.IVariableDeclaration;
@@ -34,7 +35,6 @@ import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
-import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.transformation.switchblock.SwitchBlockNormalizationContext;
 import cc.kave.commons.model.ssts.impl.transformation.switchblock.SwitchBlockNormalizationVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -61,11 +61,11 @@ public class SwitchBlockNormalizationVisitorBaseTest
 		label1 = constant("1");
 		label2 = constant("2");
 
-		cond0 = cond(0);
-		cond1 = cond(1);
-		cond2 = cond(2);
-		cond3 = cond(3);
-		cond4 = cond(4);
+		cond0 = newVar(0);
+		cond1 = newVar(1);
+		cond2 = newVar(2);
+		cond3 = newVar(3);
+		cond4 = newVar(4);
 	}
 
 	// ---------------------------- helpers -----------------------------------
@@ -97,18 +97,11 @@ public class SwitchBlockNormalizationVisitorBaseTest
 	}
 
 	protected IVariableDeclaration dec(IVariableReference ref) {
-		VariableDeclaration var = new VariableDeclaration();
-		var.setReference(ref);
-		var.setType(TypeName.newTypeName("System.Boolean"));
-		return var;
+		return booleanDeclaration(ref);
 	}
 
 	protected IBinaryExpression equal(ISimpleExpression label) {
 		return binExpr(BinaryOperator.Equal, refExpr(var), label);
-	}
-
-	protected IVariableReference cond(int i) {
-		return variableReference("$cond_" + i);
 	}
 
 }

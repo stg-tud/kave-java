@@ -63,9 +63,10 @@ public class SwitchBlockNormalizationContext {
 	}
 
 	public void updateConditionalFallthrough(boolean fallthrough, boolean conditionalFallthrough) {
-		if (!fallthrough)
+		if (!fallthrough) {
 			this.conditionalFallthrough = false;
-		else
+		} else {
 			this.conditionalFallthrough |= conditionalFallthrough;
+		}
 	}
 }
