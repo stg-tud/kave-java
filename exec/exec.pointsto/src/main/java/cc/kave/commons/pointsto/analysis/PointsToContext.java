@@ -18,20 +18,20 @@ import cc.kave.commons.model.typeshapes.TypeShape;
 
 public class PointsToContext extends Context {
 
-	private PointerAnalysis pointerAnalysis;
+	private PointsToAnalysis pointsToAnalysis;
 	
 	public PointsToContext() {
 		this.setSST(new SST());
 		this.setTypeShape(new TypeShape());
 	}
 	
-	public PointsToContext(Context context, PointerAnalysis pointerAnalysis) {
-		this.pointerAnalysis = pointerAnalysis;
+	public PointsToContext(Context context, PointsToAnalysis pointsToAnalysis) {
+		this.pointsToAnalysis = pointsToAnalysis;
 		this.setSST(context.getSST());
 		this.setTypeShape(context.getTypeShape());
 	}
 	
-	public PointerAnalysis getPointerAnalysis() {
-		return pointerAnalysis;
+	public PointsToAnalysis getPointerAnalysis() {
+		return pointsToAnalysis;
 	}
 }

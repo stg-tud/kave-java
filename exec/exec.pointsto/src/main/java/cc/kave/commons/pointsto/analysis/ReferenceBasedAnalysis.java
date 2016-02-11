@@ -30,7 +30,7 @@ import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
 
-public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
+public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 
 	@Override
 	public PointsToContext compute(Context context) {
@@ -47,7 +47,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 				languageOptions.getSuperType(typeHierarchy));
 
 		for (Map.Entry<IReference, ITypeName> entry : referenceTypes.entries()) {
-			QueryContextKey query = new QueryContextKey(entry.getKey(), null, entry.getValue(), null);
+			PointsToQuery query = new PointsToQuery(entry.getKey(), null, entry.getValue(), null);
 			if (!contextToLocations.containsKey(query)) {
 				contextToLocations.put(query, new AbstractLocation());
 			}
@@ -57,7 +57,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 	}
 
 	@Override
-	public Set<AbstractLocation> query(QueryContextKey query) {
+	public Set<AbstractLocation> query(PointsToQuery query) {
 		IReference reference = normalizeReference(query.getReference());
 		ITypeName type = normalizeType(query.getType());
 
@@ -75,7 +75,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 		} else {
 			if (type != null) {
 				Collection<AbstractLocation> locations = contextToLocations
-						.get(new QueryContextKey(reference, null, type, null));
+						.get(new PointsToQuery(reference, null, type, null));
 				if (locations.isEmpty()) {
 					LoggerFactory.getLogger(ReferenceBasedAnalysis.class)
 							.warn("Failed to find any matching entries for {}", query);
@@ -97,7 +97,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 	private Set<AbstractLocation> queryReference(IReference reference) {
 		if (queryStrategy == QueryStrategy.EXHAUSTIVE) {
 			Set<AbstractLocation> locations = new HashSet<>();
-			for (Map.Entry<QueryContextKey, AbstractLocation> entry : contextToLocations.entries()) {
+			for (Map.Entry<PointsToQuery, AbstractLocation> entry : contextToLocations.entries()) {
 				if (entry.getKey().getReference().equals(reference)) {
 					locations.add(entry.getValue());
 				}
@@ -111,7 +111,7 @@ public class ReferenceBasedAnalysis extends AbstractPointerAnalysis {
 	private Set<AbstractLocation> queryType(ITypeName type) {
 		if (queryStrategy == QueryStrategy.EXHAUSTIVE) {
 			Set<AbstractLocation> locations = new HashSet<>();
-			for (Map.Entry<QueryContextKey, AbstractLocation> entry : contextToLocations.entries()) {
+			for (Map.Entry<PointsToQuery, AbstractLocation> entry : contextToLocations.entries()) {
 				if (entry.getKey().getType().equals(type)) {
 					locations.add(entry.getValue());
 				}

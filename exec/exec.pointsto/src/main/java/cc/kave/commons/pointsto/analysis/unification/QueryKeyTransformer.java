@@ -23,7 +23,7 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.Callpath;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
@@ -38,7 +38,7 @@ import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 import cc.recommenders.assertions.Asserts;
 
 public class QueryKeyTransformer
-		implements DistinctReferenceVisitor<List<QueryContextKey>, DistinctReferenceContextCollector> {
+		implements DistinctReferenceVisitor<List<PointsToQuery>, DistinctReferenceContextCollector> {
 
 	private boolean enableStmtsForVariables = false;
 
@@ -66,19 +66,19 @@ public class QueryKeyTransformer
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctKeywordReference keywordRef, DistinctReferenceContextCollector context) {
+	public List<PointsToQuery> visit(DistinctKeywordReference keywordRef, DistinctReferenceContextCollector context) {
 		return Arrays.asList(
-				new QueryContextKey(keywordRef.getReference(), null, normalizeType(keywordRef.getType()), null));
+				new PointsToQuery(keywordRef.getReference(), null, normalizeType(keywordRef.getType()), null));
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctFieldReference fieldRef, DistinctReferenceContextCollector context) {
-		return Arrays.asList(new QueryContextKey(fieldRef.getReference().accept(normalizationVisitor, null), null,
+	public List<PointsToQuery> visit(DistinctFieldReference fieldRef, DistinctReferenceContextCollector context) {
+		return Arrays.asList(new PointsToQuery(fieldRef.getReference().accept(normalizationVisitor, null), null,
 				normalizeType(fieldRef.getType()), null));
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctVariableReference varRef, DistinctReferenceContextCollector context) {
+	public List<PointsToQuery> visit(DistinctVariableReference varRef, DistinctReferenceContextCollector context) {
 		Collection<IMethodName> methods = context.getMethods(varRef);
 		// if a declared variable is not used in a method, there will be no associated methods or statements
 		Asserts.assertLessOrEqual(methods.size(), 1);
@@ -88,42 +88,42 @@ public class QueryKeyTransformer
 
 		if (enableStmtsForVariables) {
 			Collection<IStatement> statements = context.getStatements(varRef);
-			List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
+			List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 			for (IStatement stmt : statements) {
-				queryKeys.add(new QueryContextKey(reference, stmt, type, methodPath));
+				queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
 			}
 
 			return queryKeys;
 		}
 
-		return Arrays.asList(new QueryContextKey(reference, null, type, methodPath));
+		return Arrays.asList(new PointsToQuery(reference, null, type, methodPath));
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctPropertyReference propertyRef,
+	public List<PointsToQuery> visit(DistinctPropertyReference propertyRef,
 			DistinctReferenceContextCollector context) {
-		return Arrays.asList(new QueryContextKey(propertyRef.getReference().accept(normalizationVisitor, null), null,
+		return Arrays.asList(new PointsToQuery(propertyRef.getReference().accept(normalizationVisitor, null), null,
 				normalizeType(propertyRef.getType()), null));
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctPropertyParameterReference propertyParameterRef,
+	public List<PointsToQuery> visit(DistinctPropertyParameterReference propertyParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(propertyParameterRef);
 		ITypeName type = normalizeType(propertyParameterRef.getType());
 		IReference reference = propertyParameterRef.getReference().accept(normalizationVisitor, null);
-		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
+		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new QueryContextKey(reference, stmt, type, null));
+			queryKeys.add(new PointsToQuery(reference, stmt, type, null));
 		}
 
 		return queryKeys;
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctCatchBlockParameterReference catchBlockParameterRef,
+	public List<PointsToQuery> visit(DistinctCatchBlockParameterReference catchBlockParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(catchBlockParameterRef);
 		Collection<IMethodName> methods = context.getMethods(catchBlockParameterRef);
@@ -131,17 +131,17 @@ public class QueryKeyTransformer
 		Callpath methodPath = normalizeMethod(methods.iterator().next());
 		ITypeName type = normalizeType(catchBlockParameterRef.getType());
 		IReference reference = catchBlockParameterRef.getReference().accept(normalizationVisitor, null);
-		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
+		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new QueryContextKey(reference, stmt, type, methodPath));
+			queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
 		}
 
 		return queryKeys;
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctLambdaParameterReference lambdaParameterRef,
+	public List<PointsToQuery> visit(DistinctLambdaParameterReference lambdaParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(lambdaParameterRef);
 		Collection<IMethodName> methods = context.getMethods(lambdaParameterRef);
@@ -150,41 +150,41 @@ public class QueryKeyTransformer
 		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
 		ITypeName type = normalizeType(lambdaParameterRef.getType());
 		IReference reference = lambdaParameterRef.getReference().accept(normalizationVisitor, null);
-		List<QueryContextKey> queryKeys = new ArrayList<>(statements.size());
+		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new QueryContextKey(reference, stmt, type, methodPath));
+			queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
 		}
 
 		return queryKeys;
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctMethodParameterReference methodParameterRef,
+	public List<PointsToQuery> visit(DistinctMethodParameterReference methodParameterRef,
 			DistinctReferenceContextCollector context) {
 		Callpath methodPath = normalizeMethod(methodParameterRef.getMethod());
 		ITypeName type = normalizeType(methodParameterRef.getType());
 		IReference reference = methodParameterRef.getReference().accept(normalizationVisitor, null);
-		ArrayList<QueryContextKey> queryKeys = new ArrayList<>();
+		ArrayList<PointsToQuery> queryKeys = new ArrayList<>();
 
 		if (enableStmtsForVariables) {
 			Collection<IStatement> statements = context.getStatements(methodParameterRef);
 			queryKeys.ensureCapacity(statements.size());
 
 			for (IStatement stmt : statements) {
-				queryKeys.add(new QueryContextKey(reference, stmt, type, methodPath));
+				queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
 			}
 		}
 
 		// parameters are available regardless of statements that use them so that they can be queried by only looking
 		// at the declaring method
-		queryKeys.add(new QueryContextKey(reference, null, type, methodPath));
+		queryKeys.add(new PointsToQuery(reference, null, type, methodPath));
 
 		return queryKeys;
 	}
 
 	@Override
-	public List<QueryContextKey> visit(DistinctIndexAccessReference indexAccessRef,
+	public List<PointsToQuery> visit(DistinctIndexAccessReference indexAccessRef,
 			DistinctReferenceContextCollector context) {
 		return indexAccessRef.getBaseReference().accept(this, context);
 	}

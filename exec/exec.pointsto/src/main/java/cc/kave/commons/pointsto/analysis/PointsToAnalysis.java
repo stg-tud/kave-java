@@ -10,14 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto;
+package cc.kave.commons.pointsto.analysis;
 
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import java.util.Set;
 
-public interface PointerAnalysisFactory {
+import cc.kave.commons.model.events.completionevents.Context;
 
-	String getName();
-	
-	PointerAnalysis create();
-	
+public interface PointsToAnalysis {
+
+	/**
+	 * Computes the points-to information for the specified {@link Context} and stores a reference to this instance in
+	 * the returned {@link PointsToContext}. This method may only be called once.
+	 */
+	PointsToContext compute(Context context);
+
+	QueryStrategy getQueryStrategy();
+
+	void setQueryStrategy(QueryStrategy strategy);
+
+	Set<AbstractLocation> query(PointsToQuery query);
 }

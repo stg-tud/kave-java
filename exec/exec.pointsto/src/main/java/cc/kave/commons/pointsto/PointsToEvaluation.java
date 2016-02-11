@@ -26,10 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 
-import cc.kave.commons.pointsto.analysis.AdvancedPointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
@@ -48,10 +46,10 @@ public class PointsToEvaluation {
 	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
 
 	public static void main(String[] args) {
-		List<PointerAnalysisFactory> factories = Arrays.asList(
-				// new SimplePointerAnalysisFactory<>(TypeBasedAnalysis.class),
-				// new SimplePointerAnalysisFactory<>(ReferenceBasedAnalysis.class)
-				new AdvancedPointerAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)
+		List<PointsToAnalysisFactory> factories = Arrays.asList(
+				// new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
+				// new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class)
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)
 				);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		new PointsToEvaluation().generateUsages(factories);
@@ -61,12 +59,12 @@ public class PointsToEvaluation {
 
 	}
 
-	private Map<PointerAnalysisFactory, List<Usage>> generateUsages(List<PointerAnalysisFactory> factories) {
+	private Map<PointsToAnalysisFactory, List<Usage>> generateUsages(List<PointsToAnalysisFactory> factories) {
 		try {
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, USAGE_DEST,
 					new TypeHistogramUsageStatisticsCollector());
 
-			Map<PointerAnalysisFactory, List<Usage>> usages = generator.getUsages();
+			Map<PointsToAnalysisFactory, List<Usage>> usages = generator.getUsages();
 			outputStatisticsCollectors(generator.getStatisticsCollectors());
 
 			return usages;
@@ -77,9 +75,9 @@ public class PointsToEvaluation {
 		return Collections.emptyMap();
 	}
 
-	private void outputStatisticsCollectors(Map<PointerAnalysisFactory, UsageStatisticsCollector> collectors) {
+	private void outputStatisticsCollectors(Map<PointsToAnalysisFactory, UsageStatisticsCollector> collectors) {
 		try {
-			for (Map.Entry<PointerAnalysisFactory, UsageStatisticsCollector> entry : collectors.entrySet()) {
+			for (Map.Entry<PointsToAnalysisFactory, UsageStatisticsCollector> entry : collectors.entrySet()) {
 				Path statFile = STATISTICS_DEST.resolve(entry.getKey().getName() + ".txt");
 				Files.createParentDirs(statFile.toFile());
 

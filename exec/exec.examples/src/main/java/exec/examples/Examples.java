@@ -36,10 +36,10 @@ import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
@@ -154,7 +154,7 @@ public class Examples {
 	 */
 	public static void performPointsTo(Context originalContext) {
 		// pick an implementation for a pointer analysis
-		PointerAnalysis pa = new UnificationAnalysis(FieldSensitivity.FULL);
+		PointsToAnalysis pa = new UnificationAnalysis(FieldSensitivity.FULL);
 
 		// run the analysis
 		PointsToContext ptRes = pa.compute(originalContext);
@@ -171,14 +171,14 @@ public class Examples {
 		// or as a parameter of this invocation
 
 		// create a query for the receiver of the invocation...
-		QueryContextKey queryForReceiver = queryBuilder.newQuery(ie.getReference(), stmt);
+		PointsToQuery queryForReceiver = queryBuilder.newQuery(ie.getReference(), stmt);
 		// ... and query for the abstract locations (instances)
 		Set<AbstractLocation> receivers = pa.query(queryForReceiver);
 
 		// now iterate over all parameters
 		for (IParameterName p : ie.getMethodName().getParameters()) {
 			// again, create a query...
-			QueryContextKey queryForParam = queryBuilder.newQuery(varRef(p.getName()), stmt);
+			PointsToQuery queryForParam = queryBuilder.newQuery(varRef(p.getName()), stmt);
 			// ... and query for the abstract locations
 			Set<AbstractLocation> parameters = pa.query(queryForParam);
 		}

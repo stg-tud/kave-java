@@ -24,10 +24,10 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 
 /**
- * A {@link PointerAnalysis} that assumes that all variables of a specific type point to one {@link AbstractLocation}.
+ * A {@link PointsToAnalysis} that assumes that all variables of a specific type point to one {@link AbstractLocation}.
  *
  */
-public class TypeBasedAnalysis extends AbstractPointerAnalysis {
+public class TypeBasedAnalysis extends AbstractPointsToAnalysis {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TypeBasedAnalysis.class);
 
@@ -37,7 +37,7 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 
 		TypeCollector typeCollector = new TypeCollector(context);
 		for (ITypeName type : typeCollector.getTypes()) {
-			QueryContextKey key = new QueryContextKey(null, null, type, null);
+			PointsToQuery key = new PointsToQuery(null, null, type, null);
 			contextToLocations.put(key, new AbstractLocation());
 		}
 
@@ -45,7 +45,7 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 	}
 
 	@Override
-	public Set<AbstractLocation> query(QueryContextKey query) {
+	public Set<AbstractLocation> query(PointsToQuery query) {
 		ITypeName type = query.getType();
 		if (type != null) {
 			// querying for void types does not make any sense...
@@ -66,7 +66,7 @@ public class TypeBasedAnalysis extends AbstractPointerAnalysis {
 		}
 
 		// lower query to used format
-		return super.query(new QueryContextKey(null, null, query.getType(), null));
+		return super.query(new PointsToQuery(null, null, query.getType(), null));
 	}
 
 }

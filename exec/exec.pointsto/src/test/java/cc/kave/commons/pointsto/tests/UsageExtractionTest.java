@@ -27,9 +27,9 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.SimplePointerAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.recommenders.names.IMethodName;
@@ -44,7 +44,7 @@ public class UsageExtractionTest {
 	@Test
 	public void testPaperTest() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		SimplePointerAnalysisFactory<TypeBasedAnalysis> paFactory = new SimplePointerAnalysisFactory<>(
+		SimplePointsToAnalysisFactory<TypeBasedAnalysis> paFactory = new SimplePointsToAnalysisFactory<>(
 				TypeBasedAnalysis.class);
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 		List<Context> contexts = builder.createPaperTest();
@@ -154,11 +154,11 @@ public class UsageExtractionTest {
 	@Test
 	public void testStreamTestTypeBased() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		PointerAnalysis pointerAnalysis = new TypeBasedAnalysis();
+		PointsToAnalysis pointsToAnalysis = new TypeBasedAnalysis();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 		Context context = builder.createStreamTest();
 
-		List<Usage> usages = usageExtractor.extract(pointerAnalysis.compute(context));
+		List<Usage> usages = usageExtractor.extract(pointsToAnalysis.compute(context));
 		for (Usage usage : usages) {
 			String usageTypeName = usage.getType().getClassName();
 			String methodContextName = usage.getMethodContext().getName();
@@ -200,11 +200,11 @@ public class UsageExtractionTest {
 	@Test
 	public void testStreamTestReferenceBased() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		PointerAnalysis pointerAnalysis = new ReferenceBasedAnalysis();
+		PointsToAnalysis pointsToAnalysis = new ReferenceBasedAnalysis();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 		Context context = builder.createStreamTest();
 
-		List<Usage> usages = usageExtractor.extract(pointerAnalysis.compute(context));
+		List<Usage> usages = usageExtractor.extract(pointsToAnalysis.compute(context));
 		int fileStreamUsages = 0;
 		int stringUsages = 0;
 		for (Usage usage : usages) {

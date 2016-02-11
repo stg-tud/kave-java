@@ -10,18 +10,18 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis;
+package cc.kave.commons.pointsto;
 
-import cc.kave.commons.pointsto.PointerAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 
 /**
- * A {@link PointerAnalysisFactory} which uses reflection to get the name of the analysis and to create a new instance.
+ * A {@link PointsToAnalysisFactory} which uses reflection to get the name of the analysis and to create a new instance.
  */
-public class SimplePointerAnalysisFactory<T extends PointerAnalysis> implements PointerAnalysisFactory {
+public class SimplePointsToAnalysisFactory<T extends PointsToAnalysis> implements PointsToAnalysisFactory {
 
 	private Class<T> analysisClass;
 
-	public SimplePointerAnalysisFactory(Class<T> analysisClass) {
+	public SimplePointsToAnalysisFactory(Class<T> analysisClass) {
 		this.analysisClass = analysisClass;
 	}
 
@@ -31,7 +31,7 @@ public class SimplePointerAnalysisFactory<T extends PointerAnalysis> implements 
 	}
 
 	@Override
-	public PointerAnalysis create() {
+	public PointsToAnalysis create() {
 		try {
 			return analysisClass.getConstructor().newInstance();
 		} catch (Exception e) {

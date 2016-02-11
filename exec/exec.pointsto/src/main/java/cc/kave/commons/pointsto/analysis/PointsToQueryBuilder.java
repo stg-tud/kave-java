@@ -22,10 +22,10 @@ import cc.kave.commons.pointsto.analysis.methods.EnclosingMethodCollector;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 
 /**
- * A convenience class for building {@link QueryContextKey} objects for a {@link PointerAnalysis}.
+ * A convenience class for building {@link PointsToQuery} objects for a {@link PointsToAnalysis}.
  * 
  * Uses the provided arguments and its internal information about the associated {@link Context} to create a complete
- * {@link QueryContextKey}.
+ * {@link PointsToQuery}.
  */
 public class PointsToQueryBuilder {
 
@@ -46,12 +46,12 @@ public class PointsToQueryBuilder {
 	}
 
 	/**
-	 * Creates a new {@link QueryContextKey} for a {@link PointerAnalysis} using the supplied {@link IReference} and
+	 * Creates a new {@link PointsToQuery} for a {@link PointsToAnalysis} using the supplied {@link IReference} and
 	 * {@link IStatement}. The {@link ITypeName} and the potentially surrounding method is inferred using stored
 	 * information about the {@link ISST}. If the statement has an enclosing method, a {@link Callpath} is created from
 	 * it.
 	 */
-	public QueryContextKey newQuery(IReference reference, IStatement stmt) {
+	public PointsToQuery newQuery(IReference reference, IStatement stmt) {
 		ITypeName type = typeCollector.getType(reference);
 
 		IMethodName method = methodCollector.getMethod(stmt);
@@ -60,17 +60,17 @@ public class PointsToQueryBuilder {
 			callpath = new Callpath(method);
 		}
 
-		return new QueryContextKey(reference, stmt, type, callpath);
+		return new PointsToQuery(reference, stmt, type, callpath);
 	}
 
 	/**
-	 * Creates a new {@link QueryContextKey} for a {@link PointerAnalysis} using the supplied {@link IReference},
+	 * Creates a new {@link PointsToQuery} for a {@link PointsToAnalysis} using the supplied {@link IReference},
 	 * {@link IStatement} and {@link Callpath}. The {@link ITypeName} is inferred using stored information about the
 	 * {@link ISST}.
 	 */
-	public QueryContextKey newQuery(IReference reference, IStatement stmt, Callpath callpath) {
+	public PointsToQuery newQuery(IReference reference, IStatement stmt, Callpath callpath) {
 		ITypeName type = typeCollector.getType(reference);
-		return new QueryContextKey(reference, stmt, type, callpath);
+		return new PointsToQuery(reference, stmt, type, callpath);
 	}
 
 }

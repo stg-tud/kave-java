@@ -29,15 +29,15 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 
-public abstract class AbstractPointerAnalysis implements PointerAnalysis {
+public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 
-	protected Multimap<QueryContextKey, AbstractLocation> contextToLocations = HashMultimap.create();
+	protected Multimap<PointsToQuery, AbstractLocation> contextToLocations = HashMultimap.create();
 
 	protected QueryStrategy queryStrategy;
 
 	private ReferenceNormalizationVisitor referenceNormalizationVisitor = new ReferenceNormalizationVisitor();
 
-	public AbstractPointerAnalysis() {
+	public AbstractPointsToAnalysis() {
 		this.queryStrategy = QueryStrategy.MINIMIZE_USAGE_DEFECTS;
 	}
 
@@ -52,7 +52,7 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 	}
 
 	/**
-	 * Checks whether this {@link PointerAnalysis} has already been bound to a {@link Context} and throws an
+	 * Checks whether this {@link PointsToAnalysis} has already been bound to a {@link Context} and throws an
 	 * {@link IllegalStateException} accordingly.
 	 */
 	protected void checkContextBinding() {
@@ -62,12 +62,12 @@ public abstract class AbstractPointerAnalysis implements PointerAnalysis {
 	}
 
 	@Override
-	public Set<AbstractLocation> query(QueryContextKey query) {
+	public Set<AbstractLocation> query(PointsToQuery query) {
 		Collection<AbstractLocation> locations = contextToLocations.get(query);
 
 		if (locations.isEmpty()) {
 			// conservative assumption: may point to any known location
-			LoggerFactory.getLogger(AbstractPointerAnalysis.class).warn("Failed to find any matching entries for {}",
+			LoggerFactory.getLogger(AbstractPointsToAnalysis.class).warn("Failed to find any matching entries for {}",
 					query);
 			locations = (queryStrategy == QueryStrategy.EXHAUSTIVE) ? contextToLocations.values()
 					: Collections.emptyList();

@@ -23,13 +23,13 @@ import org.junit.Test;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 
 public class TypeBasedAnalysisTest {
 
-	private QueryContextKey createQuery(ITypeName type) {
-		return new QueryContextKey(null, null, type, null);
+	private PointsToQuery createQuery(ITypeName type) {
+		return new PointsToQuery(null, null, type, null);
 	}
 
 	@Test

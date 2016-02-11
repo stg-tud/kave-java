@@ -56,8 +56,8 @@ import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
@@ -136,26 +136,26 @@ public class UnificationAnalysisTest {
 		Context context = builder.createStreamTest();
 		ITypeName enclosingType = context.getSST().getEnclosingType();
 
-		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
-		pointerAnalysis.compute(context);
+		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
+		pointsToAnalysis.compute(context);
 
 		IFieldName sourceField = FieldName.newFieldName(
 				"[" + builder.getStringType().getIdentifier() + "] [" + enclosingType.getIdentifier() + "].source");
-		Set<AbstractLocation> sourceFieldLocations = pointerAnalysis.query(
-				new QueryContextKey(SSTBuilder.fieldReference(sourceField), null, builder.getStringType(), null));
+		Set<AbstractLocation> sourceFieldLocations = pointsToAnalysis.query(
+				new PointsToQuery(SSTBuilder.fieldReference(sourceField), null, builder.getStringType(), null));
 		assertEquals(1, sourceFieldLocations.size());
 
 		IMethodDeclaration openSourceDecl = context.getSST().getNonEntryPoints().iterator().next();
 		IAssignment assignment = (IAssignment) openSourceDecl.getBody().get(1);
 		IInvocationExpression invocation = (IInvocationExpression) assignment.getExpression();
 		IReference firstParameterRef = ((IReferenceExpression) invocation.getParameters().get(0)).getReference();
-		Set<AbstractLocation> firstParameterLocations = pointerAnalysis.query(new QueryContextKey(firstParameterRef,
+		Set<AbstractLocation> firstParameterLocations = pointsToAnalysis.query(new PointsToQuery(firstParameterRef,
 				assignment, builder.getStringType(), new Callpath(openSourceDecl.getName())));
 		assertEquals(1, firstParameterLocations.size());
 		assertTrue(sourceFieldLocations.equals(firstParameterLocations));
 
-		Set<AbstractLocation> openSourceStreamLocations = pointerAnalysis
-				.query(new QueryContextKey(assignment.getReference(), openSourceDecl.getBody().get(2),
+		Set<AbstractLocation> openSourceStreamLocations = pointsToAnalysis
+				.query(new PointsToQuery(assignment.getReference(), openSourceDecl.getBody().get(2),
 						builder.getFileStreamType(), new Callpath(openSourceDecl.getName())));
 		assertEquals(1, openSourceStreamLocations.size());
 
@@ -169,8 +169,8 @@ public class UnificationAnalysisTest {
 		assertNotNull(copyToDecl);
 
 		assignment = (IAssignment) copyToDecl.getBody().get(1);
-		Set<AbstractLocation> inputStreamLocations = pointerAnalysis
-				.query(new QueryContextKey(assignment.getReference(), assignment, builder.getFileStreamType(),
+		Set<AbstractLocation> inputStreamLocations = pointsToAnalysis
+				.query(new PointsToQuery(assignment.getReference(), assignment, builder.getFileStreamType(),
 						new Callpath(copyToDecl.getName())));
 		assertEquals(1, inputStreamLocations.size());
 		// input = object allocated in OpenSource
@@ -178,8 +178,8 @@ public class UnificationAnalysisTest {
 		assertFalse(sourceFieldLocations.equals(inputStreamLocations));
 
 		assignment = (IAssignment) copyToDecl.getBody().get(3);
-		Set<AbstractLocation> outputStreamLocations = pointerAnalysis
-				.query(new QueryContextKey(assignment.getReference(), assignment, builder.getFileStreamType(),
+		Set<AbstractLocation> outputStreamLocations = pointsToAnalysis
+				.query(new PointsToQuery(assignment.getReference(), assignment, builder.getFileStreamType(),
 						new Callpath(copyToDecl.getName())));
 		assertEquals(1, outputStreamLocations.size());
 		// input != output
@@ -191,8 +191,8 @@ public class UnificationAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createDelegateTest();
 
-		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
-		pointerAnalysis.compute(context);
+		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
+		pointsToAnalysis.compute(context);
 
 		IMethodDeclaration fooDecl = context.getSST().getNonEntryPoints().iterator().next();
 		IMethodDeclaration entry1Decl = Iterables.find(context.getSST().getEntryPoints(),
@@ -207,23 +207,23 @@ public class UnificationAnalysisTest {
 		IVariableDeclaration entry1ArgDecl = (IVariableDeclaration) entry1Decl.getBody().get(2);
 		ITypeName objectType = entry1ArgDecl.getType();
 		IAssignment entry1InvokeFunAssignment = (IAssignment) entry1Decl.getBody().get(5);
-		Set<AbstractLocation> entry1ArgInvocationLocations = pointerAnalysis.query(
-				new QueryContextKey(variableReference("arg"), entry1InvokeFunAssignment, objectType, entry1Callpath));
+		Set<AbstractLocation> entry1ArgInvocationLocations = pointsToAnalysis.query(
+				new PointsToQuery(variableReference("arg"), entry1InvokeFunAssignment, objectType, entry1Callpath));
 		assertEquals(1, entry1ArgInvocationLocations.size());
 
-		Set<AbstractLocation> fooParameterLocations = pointerAnalysis
-				.query(new QueryContextKey(variableReference("x"), null, objectType, new Callpath(fooDecl.getName())));
+		Set<AbstractLocation> fooParameterLocations = pointsToAnalysis
+				.query(new PointsToQuery(variableReference("x"), null, objectType, new Callpath(fooDecl.getName())));
 		assertThat(entry1ArgInvocationLocations, Matchers.is(fooParameterLocations));
 
 		Callpath entry2Callpath = new Callpath(entry2Decl.getName());
 		IAssignment entry2InvokeFunAssignment = (IAssignment) entry2Decl.getBody().get(5);
-		Set<AbstractLocation> entry2ArgInvocationLocations = pointerAnalysis.query(
-				new QueryContextKey(variableReference("arg"), entry2InvokeFunAssignment, objectType, entry2Callpath));
+		Set<AbstractLocation> entry2ArgInvocationLocations = pointsToAnalysis.query(
+				new PointsToQuery(variableReference("arg"), entry2InvokeFunAssignment, objectType, entry2Callpath));
 		assertEquals(1, entry2ArgInvocationLocations.size());
 
 		ILambdaExpression lambda = (ILambdaExpression) ((IAssignment) entry2Decl.getBody().get(1)).getExpression();
-		Set<AbstractLocation> lambdaParameterLocations = pointerAnalysis.query(
-				new QueryContextKey(variableReference("x"), lambda.getBody().get(1), objectType, entry2Callpath));
+		Set<AbstractLocation> lambdaParameterLocations = pointsToAnalysis.query(
+				new PointsToQuery(variableReference("x"), lambda.getBody().get(1), objectType, entry2Callpath));
 		assertThat(entry2ArgInvocationLocations, Matchers.is(lambdaParameterLocations));
 
 		// the parameter of 'foo' and the lambda get unified by the 'arg0' parameter of String.Format
@@ -231,10 +231,10 @@ public class UnificationAnalysisTest {
 
 		// check that the 'fun' variables of entry1 and entry2 do not refer to the same object
 		ITypeName delegateType = ((IVariableDeclaration) entry1Decl.getBody().get(0)).getType();
-		Set<AbstractLocation> entry1FunLocations = pointerAnalysis.query(
-				new QueryContextKey(variableReference("fun"), entry1InvokeFunAssignment, delegateType, entry1Callpath));
-		Set<AbstractLocation> entry2FunLocations = pointerAnalysis.query(
-				new QueryContextKey(variableReference("fun"), entry2InvokeFunAssignment, delegateType, entry2Callpath));
+		Set<AbstractLocation> entry1FunLocations = pointsToAnalysis.query(
+				new PointsToQuery(variableReference("fun"), entry1InvokeFunAssignment, delegateType, entry1Callpath));
+		Set<AbstractLocation> entry2FunLocations = pointsToAnalysis.query(
+				new PointsToQuery(variableReference("fun"), entry2InvokeFunAssignment, delegateType, entry2Callpath));
 		assertEquals(1, entry1FunLocations.size());
 		assertEquals(1, entry2FunLocations.size());
 		assertThat(entry1FunLocations, Matchers.not(entry2FunLocations));
@@ -246,18 +246,18 @@ public class UnificationAnalysisTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createParameterArrayTest();
 
-		PointerAnalysis pointerAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
-		pointerAnalysis.compute(context);
+		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
+		pointsToAnalysis.compute(context);
 
 		IMethodDeclaration runDecl = context.getSST().getEntryPoints().iterator().next();
 		ITypeName stringType = ((IVariableDeclaration) runDecl.getBody().get(0)).getType();
 		Callpath runCallpath = new Callpath(runDecl.getName());
 		IExpressionStatement stmt = (IExpressionStatement) runDecl.getBody().get(4);
 
-		Set<AbstractLocation> name1Locations = pointerAnalysis
-				.query(new QueryContextKey(variableReference("name1"), stmt, stringType, runCallpath));
-		Set<AbstractLocation> name2Locations = pointerAnalysis
-				.query(new QueryContextKey(variableReference("name2"), stmt, stringType, runCallpath));
+		Set<AbstractLocation> name1Locations = pointsToAnalysis
+				.query(new PointsToQuery(variableReference("name1"), stmt, stringType, runCallpath));
+		Set<AbstractLocation> name2Locations = pointsToAnalysis
+				.query(new PointsToQuery(variableReference("name2"), stmt, stringType, runCallpath));
 		assertEquals(1, name1Locations.size());
 		assertEquals(1, name2Locations.size());
 		// should be unified as they are stored in the same array
@@ -269,14 +269,14 @@ public class UnificationAnalysisTest {
 		IForEachLoop consumeLoop = (IForEachLoop) consumeDecl.getBody().get(0);
 		IStatement consoleCall = consumeLoop.getBody().get(0);
 
-		Set<AbstractLocation> consumeParameterLocations = pointerAnalysis
-				.query(new QueryContextKey(variableReference("names"), null, stringArrayType, consumeCallpath));
+		Set<AbstractLocation> consumeParameterLocations = pointsToAnalysis
+				.query(new PointsToQuery(variableReference("names"), null, stringArrayType, consumeCallpath));
 		assertEquals(1, consumeParameterLocations.size());
 		assertThat(name1Locations, Matchers.not(consumeParameterLocations));
 		assertThat(name2Locations, Matchers.not(consumeParameterLocations));
 
-		Set<AbstractLocation> consoleCallArgLocations = pointerAnalysis
-				.query(new QueryContextKey(variableReference("name"), consoleCall, stringType, consumeCallpath));
+		Set<AbstractLocation> consoleCallArgLocations = pointsToAnalysis
+				.query(new PointsToQuery(variableReference("name"), consoleCall, stringType, consumeCallpath));
 		assertEquals(1, consoleCallArgLocations.size());
 		assertThat(consoleCallArgLocations, Matchers.not(consumeParameterLocations));
 		assertThat(consoleCallArgLocations, Matchers.is(name1Locations));

@@ -13,7 +13,7 @@
 package cc.kave.commons.pointsto.analysis;
 
 /**
- * Controls how {@link PointerAnalysis} implementations resolve incomplete queries.
+ * Controls how {@link PointsToAnalysis} implementations resolve incomplete queries.
  */
 public enum QueryStrategy {
 

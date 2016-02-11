@@ -17,14 +17,14 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 
-public class QueryContextKey {
+public class PointsToQuery {
 
 	private IReference reference;
 	private IStatement stmt;
 	private ITypeName type;
 	private Callpath callpath;
 
-	public QueryContextKey(IReference reference, IStatement stmt, ITypeName type, Callpath callpath) {
+	public PointsToQuery(IReference reference, IStatement stmt, ITypeName type, Callpath callpath) {
 		this.reference = reference;
 		this.stmt = stmt;
 		this.type = type;
@@ -65,7 +65,7 @@ public class QueryContextKey {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(QueryContextKey.class).add("reference", reference).add("stmt", stmt)
+		return MoreObjects.toStringHelper(PointsToQuery.class).add("reference", reference).add("stmt", stmt)
 				.add("type", type).add("callpath", callpath).toString();
 	}
 
@@ -88,7 +88,7 @@ public class QueryContextKey {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		QueryContextKey other = (QueryContextKey) obj;
+		PointsToQuery other = (PointsToQuery) obj;
 		if (callpath == null) {
 			if (other.callpath != null)
 				return false;

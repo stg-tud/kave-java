@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
@@ -48,21 +48,21 @@ public class PointsToUsageGenerator {
 	private static final String ZIP_FILE_ENDING = ".zip";
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageGenerator.class);
 
-	private List<PointerAnalysisFactory> factories;
+	private List<PointsToAnalysisFactory> factories;
 
 	private Path srcDir;
 	private List<Path> sources;
 	private Path pointstoDestDir;
 	private Path usagesDestDir;
 
-	private Map<PointerAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
+	private Map<PointsToAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
 
-	public PointsToUsageGenerator(List<PointerAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
+	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Path usagesDestDir) throws IOException {
 		this(factories, srcDirectory, pointstoDestDir, usagesDestDir, new NopUsageStatisticsCollector());
 	}
 
-	public PointsToUsageGenerator(List<PointerAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
+	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Path usagesDestDir, UsageStatisticsCollector statisticsCollector) throws IOException {
 		this.factories = factories;
 		this.srcDir = srcDirectory;
@@ -70,17 +70,17 @@ public class PointsToUsageGenerator {
 		this.pointstoDestDir = pointstoDestDir;
 		this.usagesDestDir = usagesDestDir;
 
-		for (PointerAnalysisFactory factory : factories) {
+		for (PointsToAnalysisFactory factory : factories) {
 			statisticsCollectors.put(factory, statisticsCollector.create());
 		}
 	}
 
-	public Map<PointerAnalysisFactory, UsageStatisticsCollector> getStatisticsCollectors() {
+	public Map<PointsToAnalysisFactory, UsageStatisticsCollector> getStatisticsCollectors() {
 		return Collections.unmodifiableMap(statisticsCollectors);
 	}
 
-	public Map<PointerAnalysisFactory, List<Usage>> getUsages() {
-		Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
+	public Map<PointsToAnalysisFactory, List<Usage>> getUsages() {
+		Map<PointsToAnalysisFactory, List<Usage>> usages = new HashMap<>();
 
 		for (Path zipFile : sources) {
 			try {
@@ -93,13 +93,13 @@ public class PointsToUsageGenerator {
 		return usages;
 	}
 
-	private Map<PointerAnalysisFactory, List<Usage>> processZipFile(Path path) throws IOException {
-		final Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
+	private Map<PointsToAnalysisFactory, List<Usage>> processZipFile(Path path) throws IOException {
+		final Map<PointsToAnalysisFactory, List<Usage>> usages = new HashMap<>();
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
-		final Map<PointerAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters = new HashMap<>(
+		final Map<PointsToAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters = new HashMap<>(
 				factories.size());
-		final Map<PointerAnalysisFactory, ZipWriter<Usage>> usageWriters = new HashMap<>(factories.size());
+		final Map<PointsToAnalysisFactory, ZipWriter<Usage>> usageWriters = new HashMap<>(factories.size());
 
 		// initialize writers for the annotated contexts and usages to TARGET/FACTORY_NAME/RELATIVE_INPUT
 		final Path relativeInput = srcDir.relativize(path);
@@ -108,8 +108,8 @@ public class PointsToUsageGenerator {
 		StreamingZipReader reader = new StreamingZipReader(path.toFile());
 		reader.stream(Context.class).forEach((Context context) -> {
 
-			for (PointerAnalysisFactory factory : this.factories) {
-				PointerAnalysis pa = factory.create();
+			for (PointsToAnalysisFactory factory : this.factories) {
+				PointsToAnalysis pa = factory.create();
 				PointsToContext ptContext = null;
 
 				// guard against exception in MethodName:getSignature()
@@ -152,10 +152,10 @@ public class PointsToUsageGenerator {
 	}
 
 	private void initializeWriters(final Path relativeInput,
-			final Map<PointerAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters,
-			final Map<PointerAnalysisFactory, ZipWriter<Usage>> usageWriters) throws IOException {
+			final Map<PointsToAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters,
+			final Map<PointsToAnalysisFactory, ZipWriter<Usage>> usageWriters) throws IOException {
 
-		for (PointerAnalysisFactory factory : factories) {
+		for (PointsToAnalysisFactory factory : factories) {
 			if (pointstoDestDir != null) {
 				File contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(relativeInput).toFile();
 				com.google.common.io.Files.createParentDirs(contextsFile);
@@ -170,8 +170,8 @@ public class PointsToUsageGenerator {
 		}
 	}
 
-	private <T> void writeEntry(T entry, PointerAnalysisFactory factory,
-			Map<PointerAnalysisFactory, ZipWriter<T>> writers) throws IOException {
+	private <T> void writeEntry(T entry, PointsToAnalysisFactory factory,
+			Map<PointsToAnalysisFactory, ZipWriter<T>> writers) throws IOException {
 
 		ZipWriter<T> writer = writers.get(factory);
 		if (writer != null) {

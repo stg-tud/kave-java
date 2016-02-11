@@ -42,9 +42,9 @@ import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
-import cc.kave.commons.pointsto.analysis.PointerAnalysis;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
@@ -60,7 +60,7 @@ public class UsageExtractionVisitorContext {
 	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 	private DefinitionSitePriorityComparator definitionSiteComparator = new DefinitionSitePriorityComparator();
 
-	private PointerAnalysis pointerAnalysis;
+	private PointsToAnalysis pointsToAnalysis;
 	private DescentStrategy descentStrategy;
 	private TypeCollector typeCollector;
 
@@ -78,7 +78,7 @@ public class UsageExtractionVisitorContext {
 	private Callpath currentCallpath;
 
 	public UsageExtractionVisitorContext(PointsToContext context, DescentStrategy descentStrategy) {
-		this.pointerAnalysis = context.getPointerAnalysis();
+		this.pointsToAnalysis = context.getPointerAnalysis();
 		this.descentStrategy = descentStrategy;
 
 		this.enclosingClass = context.getTypeShape().getTypeHierarchy().getElement();
@@ -146,8 +146,8 @@ public class UsageExtractionVisitorContext {
 	}
 
 	private Set<AbstractLocation> queryPointerAnalysis(IReference reference, ITypeName type) {
-		QueryContextKey query = new QueryContextKey(reference, currentStatement, type, currentCallpath);
-		return pointerAnalysis.query(query);
+		PointsToQuery query = new PointsToQuery(reference, currentStatement, type, currentCallpath);
+		return pointsToAnalysis.query(query);
 	}
 
 	private void createImplicitDefinitions(Context context) {
@@ -226,8 +226,8 @@ public class UsageExtractionVisitorContext {
 		return usage;
 	}
 
-	private void updateDefinitions(QueryContextKey query, DefinitionSite newDefinition) {
-		Set<AbstractLocation> locations = pointerAnalysis.query(query);
+	private void updateDefinitions(PointsToQuery query, DefinitionSite newDefinition) {
+		Set<AbstractLocation> locations = pointsToAnalysis.query(query);
 
 		for (AbstractLocation location : locations) {
 			Query usage = getOrCreateUsage(location, query.getType());
@@ -250,8 +250,8 @@ public class UsageExtractionVisitorContext {
 		}
 	}
 
-	private void updateCallsites(QueryContextKey query, CallSite callsite) {
-		Set<AbstractLocation> locations = pointerAnalysis.query(query);
+	private void updateCallsites(PointsToQuery query, CallSite callsite) {
+		Set<AbstractLocation> locations = pointsToAnalysis.query(query);
 
 		for (AbstractLocation location : locations) {
 			Query usage = getOrCreateUsage(location, query.getType());
@@ -267,7 +267,7 @@ public class UsageExtractionVisitorContext {
 			return;
 		}
 
-		QueryContextKey query = new QueryContextKey(SSTBuilder.variableReference(parameter.getName()), null,
+		PointsToQuery query = new PointsToQuery(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
 		DefinitionSite newDefinition = DefinitionSites.createDefinitionByParam(CoReNameConverter.convert(method), argIndex);
 
@@ -299,7 +299,7 @@ public class UsageExtractionVisitorContext {
 		} else {
 			type = methodType;
 		}
-		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
+		PointsToQuery query = new PointsToQuery(assignStmt.getReference(), currentStatement, type, currentCallpath);
 
 		updateDefinitions(query, definitionSite);
 	}
@@ -312,7 +312,7 @@ public class UsageExtractionVisitorContext {
 
 		IAssignment assignStmt = (IAssignment) currentStatement;
 		ITypeName type = typeCollector.getType(assignStmt.getReference());
-		QueryContextKey query = new QueryContextKey(assignStmt.getReference(), currentStatement, type, currentCallpath);
+		PointsToQuery query = new PointsToQuery(assignStmt.getReference(), currentStatement, type, currentCallpath);
 		DefinitionSite newDefinition = DefinitionSites.createDefinitionByConstant();
 
 		updateDefinitions(query, newDefinition);
@@ -357,7 +357,7 @@ public class UsageExtractionVisitorContext {
 			}
 		}
 
-		QueryContextKey query = new QueryContextKey(parameterExpr, currentStatement, type, currentCallpath);
+		PointsToQuery query = new PointsToQuery(parameterExpr, currentStatement, type, currentCallpath);
 		CallSite callsite = CallSites.createParameterCallSite(CoReNameConverter.convert(method), argIndex);
 
 		updateCallsites(query, callsite);
@@ -369,7 +369,7 @@ public class UsageExtractionVisitorContext {
 		if (type == null) {
 			type = method.getDeclaringType();
 		}
-		QueryContextKey query = new QueryContextKey(receiver, currentStatement, type, currentCallpath);
+		PointsToQuery query = new PointsToQuery(receiver, currentStatement, type, currentCallpath);
 		CallSite callsite = CallSites.createReceiverCallSite(CoReNameConverter.convert(method));
 
 		updateCallsites(query, callsite);

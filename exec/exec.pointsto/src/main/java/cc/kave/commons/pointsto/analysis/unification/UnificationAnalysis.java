@@ -28,11 +28,11 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
-import cc.kave.commons.pointsto.analysis.AbstractPointerAnalysis;
+import cc.kave.commons.pointsto.analysis.AbstractPointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.analysis.QueryContextKey;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.QueryStrategy;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
@@ -40,7 +40,7 @@ import cc.kave.commons.pointsto.analysis.unification.identifiers.MemberLocationI
 import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.TypeLocationIdentifierFactory;
 
-public class UnificationAnalysis extends AbstractPointerAnalysis {
+public class UnificationAnalysis extends AbstractPointsToAnalysis {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnificationAnalysis.class);
 
@@ -80,9 +80,9 @@ public class UnificationAnalysis extends AbstractPointerAnalysis {
 
 		QueryKeyTransformer transformer = new QueryKeyTransformer(true);
 		for (Map.Entry<DistinctReference, AbstractLocation> refLoc : referenceToLocation.entrySet()) {
-			List<QueryContextKey> queryKeys = refLoc.getKey().accept(transformer, contextCollector);
+			List<PointsToQuery> queryKeys = refLoc.getKey().accept(transformer, contextCollector);
 
-			for (QueryContextKey queryKey : queryKeys) {
+			for (PointsToQuery queryKey : queryKeys) {
 				contextToLocations.put(queryKey, refLoc.getValue());
 			}
 		}
@@ -91,7 +91,7 @@ public class UnificationAnalysis extends AbstractPointerAnalysis {
 	}
 
 	@Override
-	public Set<AbstractLocation> query(QueryContextKey query) {
+	public Set<AbstractLocation> query(PointsToQuery query) {
 		IReference reference = normalizeReference(query.getReference());
 		ITypeName type = normalizeType(query.getType());
 		// use the current method for the query
@@ -102,22 +102,22 @@ public class UnificationAnalysis extends AbstractPointerAnalysis {
 		}
 
 		Collection<AbstractLocation> locations = contextToLocations
-				.get(new QueryContextKey(reference, query.getStmt(), type, methodPath));
+				.get(new PointsToQuery(reference, query.getStmt(), type, methodPath));
 		if (locations.isEmpty()) {
 			// drop method
-			locations = contextToLocations.get(new QueryContextKey(reference, query.getStmt(), type, null));
+			locations = contextToLocations.get(new PointsToQuery(reference, query.getStmt(), type, null));
 			if (!locations.isEmpty()) {
 				return new HashSet<>(locations);
 			}
 
 			// drop statements
-			locations = contextToLocations.get(new QueryContextKey(reference, null, type, methodPath));
+			locations = contextToLocations.get(new PointsToQuery(reference, null, type, methodPath));
 			if (!locations.isEmpty()) {
 				return new HashSet<>(locations);
 			}
 
 			// drop statements & method
-			locations = contextToLocations.get(new QueryContextKey(reference, null, type, null));
+			locations = contextToLocations.get(new PointsToQuery(reference, null, type, null));
 			if (locations.isEmpty()) {
 				if (query.getStmt() != null && reference != null) {
 					// statement + reference are unique enough for a last effort exhaustive search
@@ -140,7 +140,7 @@ public class UnificationAnalysis extends AbstractPointerAnalysis {
 
 	private Collection<AbstractLocation> query(IReference reference, IStatement stmt) {
 		Set<AbstractLocation> locations = new HashSet<>();
-		for (QueryContextKey queryKey : contextToLocations.keySet()) {
+		for (PointsToQuery queryKey : contextToLocations.keySet()) {
 			if (queryKey.getStmt() == stmt && reference.equals(queryKey.getReference())) {
 				locations.addAll(contextToLocations.get(queryKey));
 			}

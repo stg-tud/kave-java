@@ -10,20 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis;
+package cc.kave.commons.pointsto;
 
-import cc.kave.commons.pointsto.PointerAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.FieldSensitivity;
+import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 
 /**
- * A {@link PointerAnalysisFactory} for context aware {@link PointerAnalysis} implementations that require additional
+ * A {@link PointsToAnalysisFactory} for context aware {@link PointsToAnalysis} implementations that require additional
  * constructor arguments.
  */
-public class AdvancedPointerAnalysisFactory<T extends PointerAnalysis> implements PointerAnalysisFactory {
+public class AdvancedPointsToAnalysisFactory<T extends PointsToAnalysis> implements PointsToAnalysisFactory {
 
 	private Class<T> analysisClass;
 	private FieldSensitivity fieldSensitivity;
 
-	public AdvancedPointerAnalysisFactory(Class<T> analysisClass, FieldSensitivity fieldSensitivity) {
+	public AdvancedPointsToAnalysisFactory(Class<T> analysisClass, FieldSensitivity fieldSensitivity) {
 		this.analysisClass = analysisClass;
 		this.fieldSensitivity = fieldSensitivity;
 	}
@@ -34,7 +35,7 @@ public class AdvancedPointerAnalysisFactory<T extends PointerAnalysis> implement
 	}
 
 	@Override
-	public PointerAnalysis create() {
+	public PointsToAnalysis create() {
 		try {
 			return analysisClass.getConstructor(fieldSensitivity.getClass()).newInstance(fieldSensitivity);
 		} catch (Exception ex) {
