@@ -15,6 +15,8 @@
  */
 package cc.kave.commons.model.ssts.impl.transformation.booleans;
 
+import static cc.kave.commons.model.ssts.impl.transformation.booleans.RefLookup.UNKNOWN;
+
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.ILockBlock;
@@ -31,7 +33,6 @@ import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IEventReference;
@@ -46,7 +47,6 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 public class ReferenceCollectorVisitor extends AbstractTraversingNodeVisitor<ReferenceCollectorContext, MethodLookup> {
 
 	protected MethodLookup methodLookup;
-	protected static final IAssignableExpression UNKNOWN = new UnknownExpression();
 
 	public ReferenceCollectorVisitor() {
 		methodLookup = new MethodLookup();

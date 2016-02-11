@@ -155,12 +155,13 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 		/* inline reference */
 		else if (referencedExpr instanceof IReferenceExpression) {
 			IReferenceExpression referencedRefExpr = (IReferenceExpression) referencedExpr;
-			IReferenceExpression referencedExprNormalized = (IReferenceExpression) referencedExpr.accept(this, context);
-			if (expr instanceof ReferenceExpression) {
-				IReference newRef = referencedExprNormalized != null ? referencedExprNormalized.getReference()
-						: referencedRefExpr.getReference();
+			IAssignableExpression referencedExprNormalized = referencedExpr.accept(this, context);
+			if (referencedExprNormalized instanceof IConstantValueExpression) {
+				normalized = referencedExprNormalized;
+			} else {
+				IReference newRef = referencedRefExpr.getReference();
 				/* only inline references that are assigned exactly once */
-				if (context.containsKey(newRef)) {
+				if (context.isKnown(newRef) && expr instanceof ReferenceExpression) {
 					((ReferenceExpression) expr).setReference(newRef);
 				}
 			}
@@ -357,9 +358,9 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 
 	private IBinaryExpression applyDistributivity(IBinaryExpression disjunction, ISimpleExpression simple,
 			RefLookup context) {
-		List<IStatement> andLeft = defineNew(and(disjunction.getLeftOperand(), simple), context);
-		List<IStatement> andRight = defineNew(and(disjunction.getRightOperand(), simple), context);
-		return or(mainCondition(andLeft), mainCondition(andRight));
+		List<IStatement> left = defineNew(and(disjunction.getLeftOperand(), simple), context);
+		List<IStatement> right = defineNew(and(disjunction.getRightOperand(), simple), context);
+		return or(mainCondition(left), mainCondition(right));
 	}
 
 	// ------------------------ unary expressions -----------------------------
@@ -368,9 +369,9 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	public IAssignableExpression visit(IUnaryExpression expr, RefLookup context) {
 		// normalize operand first
 		super.visit(expr, context);
-		ISimpleExpression operandNormalized = (ISimpleExpression) expr.getOperand().accept(this, context);
-		if (operandNormalized != null && expr instanceof UnaryExpression) {
-			((UnaryExpression) expr).setOperand(operandNormalized);
+		IAssignableExpression operandNormalized = expr.getOperand().accept(this, context);
+		if (operandNormalized instanceof ISimpleExpression && expr instanceof UnaryExpression) {
+			((UnaryExpression) expr).setOperand((ISimpleExpression) operandNormalized);
 		}
 		IAssignableExpression normalized = handleNegation(expr, context);
 		return normalized;

@@ -17,12 +17,16 @@ package cc.kave.commons.model.ssts.impl.transformation.booleans;
 
 import java.util.HashMap;
 
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class RefLookup extends HashMap<IVariableReference, IAssignableExpression> {
+	public static final IAssignableExpression UNKNOWN = new UnknownExpression();
+
 	private static final long serialVersionUID = 1L;
 
 	public RefLookup(IVariableReference ref, IAssignableExpression expr) {
@@ -38,5 +42,9 @@ public class RefLookup extends HashMap<IVariableReference, IAssignableExpression
 			result = get(((IReferenceExpression) simple).getReference());
 		}
 		return result;
+	}
+
+	public boolean isKnown(IReference ref) {
+		return this.containsKey(ref) && !this.get(ref).equals(UNKNOWN);
 	}
 }
