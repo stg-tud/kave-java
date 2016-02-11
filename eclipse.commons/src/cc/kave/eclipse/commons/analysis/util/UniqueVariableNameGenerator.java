@@ -20,6 +20,10 @@ public class UniqueVariableNameGenerator {
 	private long tempVariableCounter = 0;
 
 	public String getNextVariableName() {
-		return "$" + Long.toString(tempVariableCounter);
+		return "$" + Long.toString(tempVariableCounter++);
+	}
+
+	public String getLastVariableName() {
+		return "$" + Long.toString(tempVariableCounter - 1);
 	}
 }

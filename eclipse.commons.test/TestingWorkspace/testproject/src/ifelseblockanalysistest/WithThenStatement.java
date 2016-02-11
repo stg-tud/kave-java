@@ -20,10 +20,9 @@ public class WithThenStatement {
 
 	public void method() {
 		if (true) {
-			;
-		}
-		 else {
+			int i;
+		} else {
 		}
 	}
-		
+
 }

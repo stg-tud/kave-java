@@ -20,9 +20,9 @@ public class WithStatements {
 
 	public void method() {
 		if (true) {
-			;
+			int i;
 		} else {
-			;
+			int i;
 		}
 	}
 }

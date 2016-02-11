@@ -20,7 +20,7 @@ public class NoElseBlock {
 
 	public void method() {
 		if (true) {
-			;
+			int i;
 		}
 	}
 

@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -35,17 +36,24 @@ import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
@@ -53,7 +61,6 @@ import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import eclipse.commons.test.PluginAstParser;
 
 public abstract class BaseSSTAnalysisTest {
 
@@ -122,15 +129,15 @@ public abstract class BaseSSTAnalysisTest {
 		return varRef;
 	}
 
-	protected static FieldReference newFieldReference(String name, TypeName type, String target) {
+	protected FieldReference newFieldReference(String id, TypeName type, String target) {
 		FieldReference fieldRef = new FieldReference();
-		fieldRef.setFieldName(CsFieldName.newFieldName(newMemberName(name, type)));
+		fieldRef.setFieldName(CsFieldName.newFieldName(newMemberName(id, type)));
 		fieldRef.setReference(newVariableReference(target));
 
 		return fieldRef;
 	}
 
-	protected static FieldReference newFieldReference(FieldName name, IVariableReference declTypeRef) {
+	protected FieldReference newFieldReference(FieldName name, IVariableReference declTypeRef) {
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setFieldName(name);
 		fieldRef.setReference(declTypeRef);
@@ -138,8 +145,30 @@ public abstract class BaseSSTAnalysisTest {
 		return fieldRef;
 	}
 
-	private static String newMemberName(String name, TypeName type) {
-		return "[" + type.getIdentifier() + "] [" + packageName.toLowerCase() + "testproject]." + name;
+	protected ISimpleExpression newReferenceExpression(String id) {
+		ReferenceExpression ref = new ReferenceExpression();
+		ref.setReference(newVariableReference(id));
+
+		return ref;
+	}
+
+	protected UnaryExpression newUnaryExpression(ISimpleExpression operand, UnaryOperator operator) {
+		UnaryExpression unaryExpression = new UnaryExpression();
+		unaryExpression.setOperand(operand);
+		unaryExpression.setOperator(operator);
+
+		return unaryExpression;
+	}
+
+	protected ISimpleExpression newReferenceExpression(IReference reference) {
+		ReferenceExpression ref = new ReferenceExpression();
+		ref.setReference(reference);
+
+		return ref;
+	}
+
+	private String newMemberName(String name, TypeName type) {
+		return "[" + type.getIdentifier() + "] [" + getDeclaringType().getIdentifier() + "]." + name;
 	}
 
 	protected static Assignment newAssignment(String id, IAssignableExpression expr) {
@@ -156,12 +185,12 @@ public abstract class BaseSSTAnalysisTest {
 		return assignment;
 	}
 
-	protected static ExpressionStatement newInvokeStatement(String id, MethodName methodName,
+	protected static ExpressionStatement newInvokeStatement(String target, MethodName methodName,
 			ISimpleExpression... parameters) {
 		ExpressionStatement stmt = new ExpressionStatement();
 		assertThat("methodName is static", !methodName.isStatic());
 		InvocationExpression invocation = new InvocationExpression();
-		invocation.setReference(newVariableReference(id));
+		invocation.setReference(newVariableReference(target));
 		invocation.setMethodName(methodName);
 		invocation.setParameters(Arrays.asList(parameters));
 		stmt.setExpression(invocation);
@@ -173,11 +202,49 @@ public abstract class BaseSSTAnalysisTest {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setMethodName(methodName);
 		invocation.setParameters(Arrays.asList(parameters));
+
 		return invocation;
 	}
 
+	protected InvocationExpression newInvokeExpression(String target, MethodName methodName,
+			ISimpleExpression... parameters) {
+		assertThat("methodName is static", !methodName.isStatic());
+		InvocationExpression invocation = new InvocationExpression();
+		invocation.setReference(newVariableReference(target));
+		invocation.setMethodName(methodName);
+		invocation.setParameters(Arrays.asList(parameters));
+		return invocation;
+	}
+
+	protected IAssignableExpression newCastExpression(TypeName target, VariableReference reference) {
+		CastExpression castExpression = new CastExpression();
+		castExpression.setTargetType(target);
+		castExpression.setReference(reference);
+		castExpression.setOperator(CastOperator.Cast);
+
+		return castExpression;
+	}
+
+	protected IAssignableExpression newComposedExpression(String... id) {
+		ComposedExpression comp = new ComposedExpression();
+
+		for (int i = 0; i < id.length; i++) {
+			comp.getReferences().add(newVariableReference(id[i]));
+		}
+
+		return comp;
+	}
+
 	protected IMethodDeclaration getFirstMethod() {
-		return context.getMethods().iterator().next();
+		Set<IMethodDeclaration> methods = context.getMethods();
+
+		for (IMethodDeclaration decl : methods) {
+			if (decl.getName().getName().equals("method")) {
+				return decl;
+			}
+		}
+
+		return (IMethodDeclaration) context.getMethods().toArray()[0];
 	}
 
 	protected IStatement getFirstStatement() {
@@ -232,7 +299,7 @@ public abstract class BaseSSTAnalysisTest {
 		context = parser.getContext();
 	}
 
-	private String capitalizeString(String string) {
+	protected String capitalizeString(String string) {
 		return string.substring(0, 1).toUpperCase() + string.substring(1);
 	}
 }

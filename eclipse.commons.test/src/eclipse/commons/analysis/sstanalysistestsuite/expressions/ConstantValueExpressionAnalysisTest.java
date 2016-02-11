@@ -2,6 +2,8 @@ package eclipse.commons.analysis.sstanalysistestsuite.expressions;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
+import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
@@ -14,12 +16,14 @@ public class ConstantValueExpressionAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void plusIntPrefix() {
-		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", newConstantValue("3")));
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT),
+				newAssignment("i", newUnaryExpression(newConstantValue("3"), UnaryOperator.Plus)));
 	}
 
 	@Test
 	public void minusIntPrefix() {
-		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", newConstantValue("-3")));
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT),
+				newAssignment("i", newUnaryExpression(newConstantValue("3"), UnaryOperator.Minus)));
 	}
 
 	@Test
@@ -36,7 +40,6 @@ public class ConstantValueExpressionAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void nullExpression() {
-		assertMethod(newVariableDeclaration("s", SSTAnalysisFixture.STRING),
-				newAssignment("s", newConstantValue("null")));
+		assertMethod(newVariableDeclaration("s", SSTAnalysisFixture.STRING), newAssignment("s", new NullExpression()));
 	}
 }

@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
+import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
@@ -41,6 +42,7 @@ import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
@@ -81,28 +83,31 @@ public class BodyVisitor extends ASTVisitor {
 			body.add(returnStmt);
 		} else {
 			stmt.getExpression().accept(exprVisitor);
-			// ISimpleExpression expression =
-			// exprVisitor.createSimpleExpression(stmt.getExpression(), body);
-
 			returnStmt.setExpression(exprVisitor.getSimpleExpression());
 			body.add(returnStmt);
 		}
 		return false;
 	}
 
-	@Override
-	public boolean visit(EmptyStatement stmt) {
-		body.add(getEmptyCompletionExpression());
-		return false;
-	}
+	// @Override
+	// public boolean visit(EmptyStatement stmt) {
+	// body.add(getEmptyCompletionExpression());
+	// return false;
+	// }
 
 	@Override
 	public boolean visit(WhileStatement stmt) {
 		WhileLoop loop = new WhileLoop();
-		stmt.getExpression().accept(exprVisitor);
-		// ISimpleExpression condition =
-		// exprVisitor.createSimpleExpression(stmt.getExpression(), body);
-		loop.setCondition(exprVisitor.getSimpleExpression());
+		LoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
+		ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, condition.getBody());
+
+		stmt.getExpression().accept(conditionVisitor);
+		loop.setCondition(conditionVisitor.getSimpleExpression());
+		
+		if(loop.getCondition() == null){
+			loop.setCondition(condition);
+		}
+
 		body.add(loop);
 
 		BodyVisitor visitor = new BodyVisitor(nameGen, loop.getBody());
@@ -116,8 +121,6 @@ public class BodyVisitor extends ASTVisitor {
 		IfElseBlock ifElseBlock = new IfElseBlock();
 
 		stmt.getExpression().accept(exprVisitor);
-		// ISimpleExpression condition =
-		// exprVisitor.createSimpleExpression(stmt.getExpression(), body);
 		ifElseBlock.setCondition(exprVisitor.getSimpleExpression());
 
 		if (stmt.getThenStatement() != null) {
@@ -140,27 +143,23 @@ public class BodyVisitor extends ASTVisitor {
 		ForLoop loop = new ForLoop();
 
 		List<Expression> initializers = stmt.initializers();
-		List<ISimpleExpression> inits = new ArrayList<>();
 
 		for (int i = 0; i < initializers.size(); i++) {
-			initializers.get(i).accept(exprVisitor);
-			// inits.add(exprVisitor.createSimpleExpression(initializers.get(i),
-			// body));
+			ExpressionVisitor initVisitor = new ExpressionVisitor(nameGen, loop.getInit());
+			initializers.get(i).accept(initVisitor);
 		}
 
 		if (stmt.getExpression() != null) {
-			stmt.getExpression().accept(exprVisitor);
-			// loop.setCondition(exprVisitor.createSimpleExpression(stmt.getExpression(),
-			// body));
+			ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, body);
+			stmt.getExpression().accept(conditionVisitor);
+			loop.setCondition(conditionVisitor.getSimpleExpression());
 		}
 
 		List<Expression> updaters = stmt.updaters();
-		List<ISimpleExpression> upd = new ArrayList<>();
 
 		for (int i = 0; i < updaters.size(); i++) {
-			updaters.get(i).accept(exprVisitor);
-			// upd.add(exprVisitor.createSimpleExpression(updaters.get(i),
-			// body));
+			ExpressionVisitor updVisitor = new ExpressionVisitor(nameGen, loop.getStep());
+			updaters.get(i).accept(updVisitor);
 		}
 
 		BodyVisitor visitor = new BodyVisitor(nameGen, loop.getBody());
@@ -175,20 +174,19 @@ public class BodyVisitor extends ASTVisitor {
 		ForEachLoop loop = new ForEachLoop();
 
 		String variableIdentifier = stmt.getParameter().getName().getIdentifier();
-		String typeIdentifier = BindingFactory.getBindingName(stmt.getParameter().getType().resolveBinding());
+		TypeName type = BindingFactory.getTypeName(stmt.getParameter().getType().resolveBinding());
 
 		VariableDeclaration decl = new VariableDeclaration();
 		VariableReference ref = new VariableReference();
 
 		ref.setIdentifier(variableIdentifier);
 		decl.setReference(ref);
-		decl.setType(CsTypeName.newTypeName(typeIdentifier));
+		decl.setType(type);
 		stmt.getParameter();
 		loop.setDeclaration(decl);
 
 		stmt.getExpression().accept(exprVisitor);
-		// loop.setLoopedReference(exprVisitor.createVariableReference(stmt.getExpression(),
-		// body));
+		loop.setLoopedReference(exprVisitor.getVariableReference());
 
 		BodyVisitor visitor = new BodyVisitor(nameGen, loop.getBody());
 		stmt.getBody().accept(visitor);
@@ -213,9 +211,8 @@ public class BodyVisitor extends ASTVisitor {
 			if (fragment.getInitializer() != null) {
 				cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
 				assignment.setReference(variableReference);
-				// TODO: set expression
 				fragment.getInitializer().accept(exprVisitor);
-				assignment.setExpression(exprVisitor.getSimpleExpression());
+				assignment.setExpression(exprVisitor.getAssignableExpression());
 				body.add(assignment);
 			}
 		}
@@ -224,16 +221,8 @@ public class BodyVisitor extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(Assignment stmt) {
-		stmt.getLeftHandSide();
-
-		return false;
-	}
-	
-	@Override
 	public boolean visit(org.eclipse.jdt.core.dom.ExpressionStatement node) {
 		node.accept(exprVisitor);
-		
 		return false;
 	}
 

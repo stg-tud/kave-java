@@ -21,7 +21,7 @@ public class WithElseStatement {
 	public void method() {
 		if (true) {
 		} else {
-			;
+			int i;
 		}
 	}
 }

@@ -16,13 +16,9 @@
 
 package eclipse.commons.analysis.sstanalysistestsuite.blocks;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
@@ -31,59 +27,32 @@ public class ForEachLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void basicForEachLoop() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		// TODO: List statt boolean
-		expected.getBody().add(
-				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
-		expected.getBody()
-				.add(newAssignment(
-						"list",
-						newInvokeConstructor(SSTAnalysisFixture.LIST_OF_INT_INIT)));
 		ForEachLoop loop = new ForEachLoop();
 		loop.setDeclaration(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		loop.setLoopedReference(newVariableReference("list"));
-		expected.getBody().add(loop);
 
-		IMethodDeclaration actual = getFirstMethod();
-
-		assertEquals(expected, actual);
+		assertMethod(newVariableDeclaration("list", SSTAnalysisFixture.LIST),
+				newAssignment("list", newInvokeConstructor(SSTAnalysisFixture.ARRAYLIST_CTOR)), loop);
 	}
 
 	@Test
 	public void withStatementInBody() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		// TODO: List statt boolean
-		expected.getBody().add(
-				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
-		expected.getBody()
-				.add(newAssignment(
-						"list",
-						newInvokeConstructor(SSTAnalysisFixture.LIST_OF_INT_INIT)));
 		ForEachLoop loop = new ForEachLoop();
 		loop.setDeclaration(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		loop.setLoopedReference(newVariableReference("list"));
 		loop.getBody().add(new BreakStatement());
-		expected.getBody().add(loop);
-
-		IMethodDeclaration actual = getFirstMethod();
-
-		assertEquals(expected, actual);
+		
+		assertMethod(newVariableDeclaration("list", SSTAnalysisFixture.LIST),
+				newAssignment("list", newInvokeConstructor(SSTAnalysisFixture.ARRAYLIST_CTOR)), loop);
 	}
 
 	@Test
 	public void inlineDefinitionOfEnumerable() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		// TODO: List statt boolean
-		expected.getBody().add(
-				newVariableDeclaration("list", SSTAnalysisFixture.BOOLEAN));
 		ForEachLoop loop = new ForEachLoop();
 		loop.setDeclaration(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		loop.setLoopedReference(newVariableReference("list"));
-		loop.getBody().add(new BreakStatement());
-		expected.getBody().add(loop);
+		loop.setLoopedReference(newVariableReference("$0"));
 
-		IMethodDeclaration actual = getFirstMethod();
-
-		assertEquals(expected, actual);
+		assertMethod(newVariableDeclaration("$0", SSTAnalysisFixture.ARRAY_LIST),
+				newAssignment("$0", newInvokeConstructor(SSTAnalysisFixture.ARRAYLIST_CTOR)), loop);
 	}
 }

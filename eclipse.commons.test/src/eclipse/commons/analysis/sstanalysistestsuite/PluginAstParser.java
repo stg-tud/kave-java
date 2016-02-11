@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eclipse.commons.test;
+package eclipse.commons.analysis.sstanalysistestsuite;
 
 import java.time.LocalTime;
 import java.util.ArrayList;

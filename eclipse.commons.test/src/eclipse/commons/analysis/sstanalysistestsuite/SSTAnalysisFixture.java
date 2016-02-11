@@ -21,7 +21,7 @@ import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
-public class SSTAnalysisFixture extends BaseSSTAnalysisTest{
+public class SSTAnalysisFixture extends BaseSSTAnalysisTest {
 
 	public static final TypeName INT = CsTypeName.newTypeName("%int, rt.jar, 1.8");
 
@@ -41,15 +41,25 @@ public class SSTAnalysisFixture extends BaseSSTAnalysisTest{
 
 	public static final TypeName OBJECT = CsTypeName.newTypeName("java.lang.Object, rt.jar, 1.8");
 
+	public static final TypeName LIST = CsTypeName.newTypeName("i: java.util.List`1[[T -> T]], ?");
+
+	public static final TypeName ARRAY_LIST = CsTypeName.newTypeName("java.util.ArrayList`1[[T -> T]], ?");
+
+	
 	public static final MethodName OBJECT_CTOR = CsMethodName
-			.newMethodName("[%void, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8]..ctor()");
+			.newMethodName("[java.lang.Object, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8]..ctor()");
 
 	public static MethodName getHashCode(TypeName type) {
-		return CsMethodName.newMethodName("[%int, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8].hashCode()");
+		return CsMethodName.newMethodName("[%int, rt.jar, 1.8] [" + type.getIdentifier() + "].hashCode()");
 	}
 
-	public static final MethodName HASHCODE = CsMethodName.newMethodName("[%int, rt.jar, 1.8] [].hashCode()");
+	public static final MethodName HASHCODE = CsMethodName
+			.newMethodName("[%int, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8].hashCode()");
+
+	public static final MethodName OBJECT_EQUALS = CsMethodName.newMethodName(
+			"[%boolean, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8].equals([java.lang.Object, rt.jar, 1.8] ?)");
 
 	// TODO: get name
-	public static final MethodName LIST_OF_INT_INIT = CsMethodName.newMethodName("[java.util. ][java.util. ]..ctor()");
+	public static final MethodName ARRAYLIST_CTOR = CsMethodName
+			.newMethodName("[java.util.ArrayList`1[[T -> T]], ?] [java.util.ArrayList`1[[T -> T]], ?]..ctor()");
 }

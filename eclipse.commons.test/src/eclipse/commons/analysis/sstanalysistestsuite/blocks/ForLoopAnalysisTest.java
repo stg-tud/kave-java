@@ -23,9 +23,11 @@ import org.junit.Test;
 
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
@@ -34,98 +36,66 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void basicForLoop() {
-		ForLoop expected = new ForLoop();
-
-		IStatement actual = getFirstStatement();
-
-		assertEquals(expected, actual);
+		assertMethod(new ForLoop());
 	}
 
 	@Test
 	public void init_VariableDeclaration() {
-		ForLoop expected = new ForLoop();
-		expected.getInit().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getInit().add(newAssignment("i", newConstantValue("0")));
+		ForLoop loop = new ForLoop();
+		loop.getInit().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		loop.getInit().add(newAssignment("i", newConstantValue("0")));
 
-		IStatement actual = getFirstStatement();
-
-		assertEquals(expected, actual);
+		assertMethod(loop);
 	}
 
 	@Test
 	public void init_MultipleStatements() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getBody().add(newVariableDeclaration("j", SSTAnalysisFixture.INT));
-
 		ForLoop loop = new ForLoop();
 		loop.getInit().add(newAssignment("i", newConstantValue("0")));
 		loop.getInit().add(newAssignment("j", newConstantValue("1")));
-		expected.getBody().add(loop);
-		IMethodDeclaration actual = getFirstMethod();
 
-		assertEquals(expected, actual);
-		assertFalse(true);
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT),
+				newVariableDeclaration("j", SSTAnalysisFixture.INT), loop);
 	}
 
-	// TODO: AddMethod
 	@Test
 	public void condition() {
-		ForLoop expected = new ForLoop();
-		expected.setCondition(newConstantValue("true"));
+		ForLoop loop = new ForLoop();
+		loop.setCondition(newConstantValue("true"));
+
+		assertMethod(loop);
 
 		IStatement actual = getFirstStatement();
-
-		assertEquals(expected, actual);
-	}
-
-	@Test
-	public void step_SingleStatement() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getBody().add(newAssignment("i", newConstantValue("0")));
-
-		ForLoop loop = new ForLoop();
-		ComposedExpression composedExpr = new ComposedExpression();
-		composedExpr.getReferences().add(newVariableReference("i"));
-		loop.getStep().add(newAssignment("i", composedExpr));
-		expected.getBody().add(loop);
-
-		IMethodDeclaration actual = getFirstMethod();
 
 		assertEquals(loop, actual);
 	}
 
 	@Test
-	public void step_MultipleStatements() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-		expected.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getBody().add(newAssignment("i", newConstantValue("0")));
-
+	public void step_SingleStatement() {
 		ForLoop loop = new ForLoop();
-		ComposedExpression composedExpr = new ComposedExpression();
-		composedExpr.getReferences().add(newVariableReference("i"));
-		loop.getStep().add(newAssignment("i", composedExpr));
-		loop.getStep().add(newAssignment("i", composedExpr));
-		expected.getBody().add(loop);
+		loop.getStep()
+				.add(newAssignment("i", newUnaryExpression(newReferenceExpression("i"), UnaryOperator.PostIncrement)));
 
-		IMethodDeclaration actual = getFirstMethod();
-
-		assertEquals(expected, actual);
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", newConstantValue("0")),
+				loop);
 	}
 
-	// TODO: Add Method
+	@Test
+	public void step_MultipleStatements() {
+		ForLoop loop = new ForLoop();
+		UnaryExpression unaryExpr = newUnaryExpression(newReferenceExpression("i"), UnaryOperator.PostIncrement);
+		loop.getStep().add(newAssignment("i", unaryExpr));
+		loop.getStep().add(newAssignment("i", unaryExpr));
+
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", newConstantValue("0")),
+				loop);
+	}
+
 	@Test
 	public void bodyWithStatement() {
-		MethodDeclaration expected = newDefaultMethodDeclaration();
-
 		ForLoop loop = new ForLoop();
 		loop.getBody().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
-		expected.getBody().add(loop);
 
-		IMethodDeclaration actual = getFirstMethod();
-
-		assertEquals(expected, actual);
-
+		assertMethod(loop);
 	}
 }

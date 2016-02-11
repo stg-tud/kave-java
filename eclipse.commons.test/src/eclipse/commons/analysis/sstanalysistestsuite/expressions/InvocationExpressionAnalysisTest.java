@@ -11,16 +11,16 @@ public class InvocationExpressionAnalysisTest extends BaseSSTAnalysisTest {
 	public void invocationOnVariable() {
 		assertMethod(newVariableDeclaration("o", SSTAnalysisFixture.OBJECT),
 				newAssignment("o", newInvokeConstructor(SSTAnalysisFixture.OBJECT_CTOR)),
-				newInvokeStatement("o", SSTAnalysisFixture.getHashCode(getDeclaringType())));
+				newInvokeStatement("o", SSTAnalysisFixture.HASHCODE));
 	}
 
 	@Test
 	public void invocationOnVariableImplicitThis() {
-		assertMethod(newInvokeStatement("this", SSTAnalysisFixture.getHashCode(getDeclaringType())));
+		assertMethod(newInvokeStatement("this", SSTAnalysisFixture.HASHCODE));
 	}
 	
 	@Test
 	public void invocationOnVariableExplicitThis() {
-		assertMethod(newInvokeStatement("this", SSTAnalysisFixture.getHashCode(getDeclaringType())));
+		assertMethod(newInvokeStatement("this", SSTAnalysisFixture.HASHCODE));
 	}
 }

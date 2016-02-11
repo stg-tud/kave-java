@@ -20,18 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -90,6 +93,10 @@ public class NodeFactory {
 
 		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
 			return createVariableName(node);
+
+		case ASTNode.CLASS_INSTANCE_CREATION:
+			String newName = methodNameHelper(null, ((ClassInstanceCreation) node).resolveConstructorBinding(), false);
+			return CsMethodName.newMethodName(newName);
 
 		default:
 			return null;
@@ -171,11 +178,11 @@ public class NodeFactory {
 		QualifiedName qualifiedNameNode = (QualifiedName) node;
 
 		sb.append("[");
-		String typeName = BindingFactory.getBindingName(qualifiedNameNode.resolveTypeBinding());
+		String typeName = BindingFactory.getBindingName(qualifiedNameNode.getName().resolveTypeBinding());
 		sb.append(CsTypeName.newTypeName(typeName).getIdentifier());
 		sb.append("] [");
 		sb.append(getDeclaringType(qualifiedNameNode));
-		sb.append("] ");
+		sb.append("].");
 		sb.append(qualifiedNameNode.getName().getIdentifier());
 
 		return CsFieldName.newFieldName(sb.toString());
@@ -184,6 +191,7 @@ public class NodeFactory {
 	private static Name createSingleVariableDeclName(ASTNode node) {
 		StringBuilder sb = new StringBuilder();
 		SingleVariableDeclaration singleVariable = (SingleVariableDeclaration) node;
+
 		sb.append("[");
 		String typename = BindingFactory
 				.getBindingName(((SingleVariableDeclaration) singleVariable).resolveBinding().getType());
@@ -412,11 +420,18 @@ public class NodeFactory {
 
 				sb.append(", ");
 				sb.append(getAssemblyName(qualifiedName));
-
-				return sb.toString();
+				break;
 
 			// IVariableBinding
 			case 3:
+				IVariableBinding var = (IVariableBinding) binding;
+				sb.append("[").append(getBindingName(var.getType())).append("] ");
+
+				if (var.isField()) {
+					sb.append("[").append(getBindingName(var.getDeclaringClass())).append("].");
+				}
+
+				sb.append(var.getName());
 				break;
 			// IMethodBinding
 			case 4:
@@ -430,7 +445,11 @@ public class NodeFactory {
 			default:
 				return null;
 			}
-			return null;
+			return sb.toString();
+		}
+		
+		public static TypeName getTypeName(ITypeBinding binding){
+			return CsTypeName.newTypeName(getBindingName(binding));
 		}
 
 		private static boolean isPrimitivType(String name) {

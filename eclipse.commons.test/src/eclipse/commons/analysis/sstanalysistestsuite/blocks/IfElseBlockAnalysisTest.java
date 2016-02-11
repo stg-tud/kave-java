@@ -23,6 +23,7 @@ import org.junit.Test;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
+import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
 public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 
@@ -40,7 +41,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 	public void withThenStatement() {
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
-		expected.getThen().add(newEmptyCompletionExpression());
+		expected.getThen().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 
 		IStatement actual = getFirstStatement();
 
@@ -51,7 +52,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 	public void withElseStatement() {
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
-		expected.getElse().add(newEmptyCompletionExpression());
+		expected.getElse().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 
 		IStatement actual = getFirstStatement();
 
@@ -62,8 +63,8 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 	public void withStatements() {
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
-		expected.getThen().add(newEmptyCompletionExpression());
-		expected.getElse().add(newEmptyCompletionExpression());
+		expected.getThen().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		expected.getElse().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 
 		IStatement actual = getFirstStatement();
 
@@ -74,7 +75,7 @@ public class IfElseBlockAnalysisTest extends BaseSSTAnalysisTest {
 	public void noElseBlock() {
 		IfElseBlock expected = new IfElseBlock();
 		expected.setCondition(newConstantValue("true"));
-		expected.getThen().add(newEmptyCompletionExpression());
+		expected.getThen().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 
 		IStatement actual = getFirstStatement();
 

@@ -12,6 +12,10 @@ public abstract class CsMemberName extends CsName implements MemberName {
 	}
 
 	public String getModifiers() {
+		if (identifier.indexOf('[') == -1) {
+			return "";
+		}
+
 		return identifier.substring(0, identifier.indexOf('['));
 	}
 
