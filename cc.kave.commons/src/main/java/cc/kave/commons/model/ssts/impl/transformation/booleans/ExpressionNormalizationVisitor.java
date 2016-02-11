@@ -44,7 +44,6 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.transformation.AbstractExpressionNormalizationVisitor;
@@ -369,10 +368,6 @@ public class ExpressionNormalizationVisitor extends AbstractExpressionNormalizat
 	public IAssignableExpression visit(IUnaryExpression expr, RefLookup context) {
 		// normalize operand first
 		super.visit(expr, context);
-		IAssignableExpression operandNormalized = expr.getOperand().accept(this, context);
-		if (operandNormalized instanceof ISimpleExpression && expr instanceof UnaryExpression) {
-			((UnaryExpression) expr).setOperand((ISimpleExpression) operandNormalized);
-		}
 		IAssignableExpression normalized = handleNegation(expr, context);
 		return normalized;
 	}

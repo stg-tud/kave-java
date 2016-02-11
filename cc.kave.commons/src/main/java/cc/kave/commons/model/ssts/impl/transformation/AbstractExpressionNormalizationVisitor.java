@@ -401,9 +401,9 @@ public abstract class AbstractExpressionNormalizationVisitor<TContext>
 
 	@Override
 	public IAssignableExpression visit(IUnaryExpression expr, TContext context) {
-		ISimpleExpression operandNormalized = (ISimpleExpression) expr.getOperand().accept(this, context);
-		if (operandNormalized != null && expr instanceof UnaryExpression)
-			((UnaryExpression) expr).setOperand(operandNormalized);
+		IAssignableExpression operandNormalized = expr.getOperand().accept(this, context);
+		if (operandNormalized instanceof ISimpleExpression && expr instanceof UnaryExpression)
+			((UnaryExpression) expr).setOperand((ISimpleExpression) operandNormalized);
 		return null;
 	}
 
