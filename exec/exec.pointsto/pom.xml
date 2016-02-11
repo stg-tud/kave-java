@@ -14,6 +14,13 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+		<!-- for serializing Usages -->
+		<dependency>
+			<groupId>cc.kave</groupId>
+			<artifactId>cc.recommenders.utils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- UnionFind -->
 		<dependency>
 			<groupId>org.jgrapht</groupId>

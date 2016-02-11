@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -38,9 +37,11 @@ import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
+import cc.kave.commons.pointsto.io.ZipWriter;
+import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.io.WritingArchive;
 import cc.recommenders.usages.Usage;
+import cc.recommenders.utils.gson.GsonUtil;
 
 public class PointsToUsageGenerator {
 
@@ -49,6 +50,7 @@ public class PointsToUsageGenerator {
 
 	private List<PointerAnalysisFactory> factories;
 
+	private Path srcDir;
 	private List<Path> sources;
 	private Path pointstoDestDir;
 	private Path usagesDestDir;
@@ -63,6 +65,7 @@ public class PointsToUsageGenerator {
 	public PointsToUsageGenerator(List<PointerAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Path usagesDestDir, UsageStatisticsCollector statisticsCollector) throws IOException {
 		this.factories = factories;
+		this.srcDir = srcDirectory;
 		this.sources = getZipFiles(srcDirectory);
 		this.pointstoDestDir = pointstoDestDir;
 		this.usagesDestDir = usagesDestDir;
@@ -94,20 +97,13 @@ public class PointsToUsageGenerator {
 		final Map<PointerAnalysisFactory, List<Usage>> usages = new HashMap<>();
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
-		final Map<PointerAnalysisFactory, WritingArchive> annotatedContextWriters = new HashMap<>(factories.size());
-		final Map<PointerAnalysisFactory, WritingArchive> usageWriters = new HashMap<>(factories.size());
+		final Map<PointerAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters = new HashMap<>(
+				factories.size());
+		final Map<PointerAnalysisFactory, ZipWriter<Usage>> usageWriters = new HashMap<>(factories.size());
 
-		// initialize writers for the annotated contexts and usages to TARGET/FACTORY_NAME/ZIP_FILENAME
-		final Path inputFilename = path.getFileName();
-		for (PointerAnalysisFactory factory : factories) {
-			File contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(inputFilename).toFile();
-			com.google.common.io.Files.createParentDirs(contextsFile);
-			annotatedContextWriters.put(factory, new WritingArchive(contextsFile));
-
-			File usagesFile = usagesDestDir.resolve(factory.getName()).resolve(inputFilename).toFile();
-			com.google.common.io.Files.createParentDirs(usagesFile);
-			usageWriters.put(factory, new WritingArchive(usagesFile));
-		}
+		// initialize writers for the annotated contexts and usages to TARGET/FACTORY_NAME/RELATIVE_INPUT
+		final Path relativeInput = srcDir.relativize(path);
+		initializeWriters(relativeInput, annotatedContextWriters, usageWriters);
 
 		StreamingZipReader reader = new StreamingZipReader(path.toFile());
 		reader.stream(Context.class).forEach((Context context) -> {
@@ -116,7 +112,7 @@ public class PointsToUsageGenerator {
 				PointerAnalysis pa = factory.create();
 				PointsToContext ptContext = null;
 
-				// guard against exception in CsMethod:getSignature()
+				// guard against exception in MethodName:getSignature()
 				try {
 					ptContext = pa.compute(context);
 				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException | NullPointerException
@@ -128,18 +124,18 @@ public class PointsToUsageGenerator {
 				}
 
 				try {
-					// annotatedContextWriters.get(factory).add(ptContext);
+					writeEntry(ptContext, factory, annotatedContextWriters);
 				} catch (Exception e) {
-					LOGGER.error("Failed to serialize an annotated context from " + inputFilename.toString(), e);
+					LOGGER.error("Failed to serialize an annotated context from " + relativeInput.toString(), e);
 				}
 
 				extractor.setStatisticsCollector(statisticsCollectors.get(factory));
 				List<Usage> extractedUsages = extractor.extract(ptContext);
 				for (Usage usage : extractedUsages) {
 					try {
-						// usageWriters.get(factory).add(usage);
+						writeEntry(usage, factory, usageWriters);
 					} catch (Exception e) {
-						LOGGER.error("Failed to serialize an extracted usage from " + inputFilename.toString(), e);
+						LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
 					}
 				}
 
@@ -148,11 +144,39 @@ public class PointsToUsageGenerator {
 		});
 
 		// close writers
-		for (WritingArchive writer : Iterables.concat(annotatedContextWriters.values(), usageWriters.values())) {
+		for (ZipWriter<?> writer : Iterables.concat(annotatedContextWriters.values(), usageWriters.values())) {
 			writer.close();
 		}
 
 		return usages;
+	}
+
+	private void initializeWriters(final Path relativeInput,
+			final Map<PointerAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters,
+			final Map<PointerAnalysisFactory, ZipWriter<Usage>> usageWriters) throws IOException {
+
+		for (PointerAnalysisFactory factory : factories) {
+			if (pointstoDestDir != null) {
+				File contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(relativeInput).toFile();
+				com.google.common.io.Files.createParentDirs(contextsFile);
+				annotatedContextWriters.put(factory, new ZipWriter<>(contextsFile, ptCtxt -> JsonUtils.toJson(ptCtxt)));
+			}
+
+			if (usagesDestDir != null) {
+				File usagesFile = usagesDestDir.resolve(factory.getName()).resolve(relativeInput).toFile();
+				com.google.common.io.Files.createParentDirs(usagesFile);
+				usageWriters.put(factory, new ZipWriter<>(usagesFile, usage -> GsonUtil.serialize(usage)));
+			}
+		}
+	}
+
+	private <T> void writeEntry(T entry, PointerAnalysisFactory factory,
+			Map<PointerAnalysisFactory, ZipWriter<T>> writers) throws IOException {
+
+		ZipWriter<T> writer = writers.get(factory);
+		if (writer != null) {
+			writer.add(entry);
+		}
 	}
 
 	private List<Path> getZipFiles(Path directory) throws IOException {

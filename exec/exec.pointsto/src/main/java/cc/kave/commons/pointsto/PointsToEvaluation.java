@@ -63,7 +63,7 @@ public class PointsToEvaluation {
 
 	private Map<PointerAnalysisFactory, List<Usage>> generateUsages(List<PointerAnalysisFactory> factories) {
 		try {
-			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, CONTEXT_DEST, USAGE_DEST,
+			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, USAGE_DEST,
 					new TypeHistogramUsageStatisticsCollector());
 
 			Map<PointerAnalysisFactory, List<Usage>> usages = generator.getUsages();
