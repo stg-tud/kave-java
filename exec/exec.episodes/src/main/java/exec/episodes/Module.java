@@ -22,9 +22,9 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import cc.kave.commons.mining.episodes.EpisodeRecommender;
 import cc.kave.episodes.analyzer.outputs.EpisodeGraphGeneratorTrainingData;
 import cc.kave.episodes.analyzer.outputs.EpisodeGraphGeneratorValidationData;
+import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;

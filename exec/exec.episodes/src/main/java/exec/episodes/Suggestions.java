@@ -14,23 +14,21 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import cc.kave.commons.mining.episodes.EpisodeRecommender;
-import cc.kave.commons.mining.episodes.EpisodeToGraphConverter;
-import cc.kave.commons.mining.episodes.MaximalFrequentEpisodes;
-import cc.kave.commons.mining.episodes.NoTransitivelyClosedEpisodes;
-import cc.kave.commons.mining.reader.EpisodeParser;
-import cc.kave.commons.mining.reader.EventMappingParser;
-import cc.kave.commons.mining.reader.EventStreamAsListOfMethodsParser;
-import cc.kave.commons.model.persistence.EpisodeAsGraphWriter;
-
 import com.google.inject.name.Named;
+
+import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
+import cc.kave.episodes.mining.patterns.MaximalEpisodes;
+import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.mining.reader.EventMappingParser;
 
 public class Suggestions {
 
 	private EpisodeParser episodeParser;
-	private MaximalFrequentEpisodes maximalEpisodes;
-	private NoTransitivelyClosedEpisodes transitivityClosure;
-	private EventStreamAsListOfMethodsParser queryGenerator;
+	private MaximalEpisodes maximalEpisodes;
+	private TransitivelyClosedEpisodes transitivityClosure;
 	private EventMappingParser eventMappingParser;
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
@@ -39,13 +37,12 @@ public class Suggestions {
 	private File rootFolder;
 	 
 	@Inject
-	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalFrequentEpisodes maximalEpisodes, NoTransitivelyClosedEpisodes transitivityClosure,
-			EventStreamAsListOfMethodsParser queryGenerator, EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
+	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalEpisodes maximalEpisodes, TransitivelyClosedEpisodes transitivityClosure,
+			EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.maximalEpisodes = maximalEpisodes;
 		this.transitivityClosure = transitivityClosure;
-		this.queryGenerator = queryGenerator;
 		this.eventMappingParser = eventMapping;
 		this.recommender = recommender;
 		this.graphConverter = graphConverter;
