@@ -92,7 +92,7 @@ public class FactTest {
 	@Test
 	public void toStringIsImplemented() {
 		String actual = new Fact("a").toString();
-		String expected = "[a]";
+		String expected = "a";
 		assertEquals(expected, actual);
 	}
 }

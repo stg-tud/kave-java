@@ -44,7 +44,7 @@ public class EpisodeAsGraphWriter {
 
 		VertexNameProvider<Fact> vertexName = new VertexNameProvider<Fact>() {
 			public String getVertexName(Fact fact) {
-				return fact.getRawFact();
+				return fact.toString();
 			}
 		};
 

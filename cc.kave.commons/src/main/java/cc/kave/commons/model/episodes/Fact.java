@@ -59,45 +59,6 @@ public class Fact {
 			return Tuple.newTuple(this, this);
 		}
 	}
-	
-	public boolean isRelatedTo(Fact f) {
-		// check that f is a non relation
-		
-		return false;
-	}
-
-	/**
-	 * this should not be used... use the "int" or the "Fact, Fact" version
-	 * instead
-	 */
-//	@Deprecated
-//	public void setFact(String rawFact) {
-//		this.rawFact = rawFact;
-//	}
-
-//	/**
-//	 * this should not be used... why do we have an abstraction, if we access
-//	 * the string directly?
-//	 */
-//	@Deprecated
-	public String getRawFact() {
-		if (this.isLabel()) {
-			return this.rawFact;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * this should not be used... use the event number instead
-	 */
-	@Deprecated
-	public boolean containsEvent(String eventId) {
-		if (rawFact.contains(eventId)) {
-			return true;
-		}
-		return false;
-	}
 
 	public boolean containsEvent(int eventId) {
 		String eventStr = String.valueOf(eventId);
@@ -117,7 +78,7 @@ public class Fact {
 
 	@Override
 	public String toString() {
-		return String.format("[%s]", rawFact);
+		return String.format("%s", rawFact);
 	}
 
 	@Override

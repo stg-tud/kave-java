@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class EpisodeTest {
 
@@ -38,7 +39,7 @@ public class EpisodeTest {
 	public void defaultValues() {
 		assertEquals(0, sut.getNumEvents());
 		assertEquals(0, sut.getFrequency());
-		assertEquals(Lists.newLinkedList(), sut.getFacts());
+		assertEquals(Sets.newHashSet(), sut.getFacts());
 	}
 
 	@Test
@@ -48,13 +49,13 @@ public class EpisodeTest {
 		sut.setFrequency(3);
 		assertEquals(3, sut.getFrequency());
 		sut.addFact("f");
-		assertEquals(Lists.newArrayList(new Fact("f")), sut.getFacts());
+		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
 	}
 
 	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("f", "g");
-		assertEquals(Lists.newArrayList(new Fact("f"), new Fact("g")), sut.getFacts());
+		assertEquals(Sets.newHashSet(new Fact("f"), new Fact("g")), sut.getFacts());
 		assertTrue(sut.getNumberOfFacts() == 2);
 	}
 
