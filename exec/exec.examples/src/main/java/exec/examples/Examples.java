@@ -63,16 +63,14 @@ public class Examples {
 	}
 
 	/**
-	 * 2: access the different elements of a context and print the file
-	 * representation
+	 * 2: access the different elements of a context
 	 */
-	public static void readContextsFromDisk(Context ctx) {
+	public static void accessIRElements(Context ctx) {
 		// get information from type system
 		ITypeShape ts = ctx.getTypeShape();
 
 		// this includes information about type hierarchy, e.g., which
-		// interfaces
-		// are implemented
+		// interfaces are implemented
 		ITypeHierarchy typeHierarchy = ts.getTypeHierarchy();
 
 		// ... as well as information about the implemented methods within this
