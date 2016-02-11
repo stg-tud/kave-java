@@ -96,34 +96,28 @@ public class EpisodeGraphGeneratorTrainingData {
 		}
 	}
 
-	private List<String> getAPIType(Episode frequentEpisode, List<Event> eventMapper) {
+	private List<String> getAPIType(Episode episode, List<Event> events) {
 		List<String> apiTypes = new LinkedList<String>();
-		for (Fact fact : frequentEpisode.getFacts()) {
-			if (fact.isRelation()) {
-				continue;
-			}
-			int index = fact.getFactID();
-			String type = eventMapper.get(index).getMethod().getDeclaringType().getFullName().toString().replace(".",
-					"/");
-			if (!apiTypes.contains(type)) {
-				apiTypes.add(type);
+		for (Fact fact : episode.getFacts()) {
+			if (!fact.isRelation()) {
+				int index = fact.getFactID();
+				String type = events.get(index).getMethod().getDeclaringType().getFullName().toString().replace(".",
+						"/");
+				if (!apiTypes.contains(type)) {
+					apiTypes.add(type);
+				}
 			}
 		}
 		return apiTypes;
 	}
 
-	private String createDirectoryStructure(int frequencyThreshold, double bidirectionalThreshold) {
-		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
-		if (!(new File(targetDirectory).isDirectory())) {
-			new File(targetDirectory).mkdir();
+	private String createDirectoryStructure(int freqThresh, double bdThresh) {
+		String directory = rootFolder.getAbsolutePath() + "/graphs/TrainingData/" + 
+										"/configurationF" + freqThresh + "B" + bdThresh + "/";
+		if (!(new File(directory).isDirectory())) {
+			new File(directory).mkdirs();
 		}
-
-		String configurationFolder = targetDirectory + "/configurationF" + frequencyThreshold + "B"
-				+ bidirectionalThreshold + "/";
-		if (!(new File(configurationFolder).isDirectory())) {
-			new File(configurationFolder).mkdir();
-		}
-		return configurationFolder;
+		return directory;
 	}
 
 	private String getFilePath(String folderPath, String apiType, int fileNumber) throws Exception {

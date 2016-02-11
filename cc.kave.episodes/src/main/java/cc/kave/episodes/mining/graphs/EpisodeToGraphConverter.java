@@ -40,6 +40,13 @@ public class EpisodeToGraphConverter {
 		for (Fact fact : episode.getFacts()) {
 			if (!fact.isRelation()) {
 				graph.addVertex(fact);
+
+//				int index = fact.getFactID();
+//				IMethodName method = eventMapping.get(index).getMethod();
+//				EventKind kind = eventMapping.get(index).getKind();
+//
+//				String out = toLabel(method);
+//				labels += fact.getFactID() + ". " + kind.toString() + ": " + out + "\\l";
 			} 
 		}
 		for (Fact fact : episode.getFacts()) {

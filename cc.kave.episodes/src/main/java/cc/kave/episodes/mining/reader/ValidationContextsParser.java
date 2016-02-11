@@ -68,12 +68,12 @@ public class ValidationContextsParser {
 
 					md.accept(tfv, facts);
 
-//					if (counter == 42) {
+//					if (counter == 44) {
 						Logger.log("Creating episode " + ++counter);
 						Episode ep = createEpisode(facts);
 						validationEpisodes.add(ep);
 						
-						Logger.log("Output strange episode:" + ep.toString());
+//						showEpisode(ep, eventsList);
 //						return validationEpisodes;
 //					} else {
 //						counter++;
@@ -90,6 +90,19 @@ public class ValidationContextsParser {
 		}
 		return validationEpisodes;
 	}
+
+//	private void showEpisode(Episode ep, List<Event> allEvents) {
+//		int numEvents = 0;
+//		Iterable<Fact> allFacts = ep.getFacts();
+//		for (Fact fact : allFacts) {
+//			if (!fact.isRelation()) {
+//				numEvents++;
+//				int id = fact.getFactID();
+//				Logger.log("%d. %s", id, allEvents.get(id).toString());
+//			}
+//		}
+//		Logger.log("Total number of events: %d", numEvents);
+//	}
 
 	private Set<String> findZips() {
 		Set<String> zips = rootDir.findFiles(new Predicate<String>() {
