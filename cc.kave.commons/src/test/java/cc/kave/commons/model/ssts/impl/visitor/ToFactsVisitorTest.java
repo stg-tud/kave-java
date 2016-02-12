@@ -71,13 +71,17 @@ public class ToFactsVisitorTest {
 	
 	@Test
 	public void happyPath2() {
-		IStatement stmt1 = stmt(inv2(1));
-		IStatement stmt2 = stmt(inv2(2));
+		IStatement stmt1 = stmt(inv(1));
+		IStatement stmt2 = stmt(inv(2));
+		IStatement stmt3 = stmt(inv(1));
+		IStatement stmt4 = stmt(inv(4));
 
 		decl.getBody().add(stmt1);
 		decl.getBody().add(stmt2);
+		decl.getBody().add(stmt3);
+		decl.getBody().add(stmt4);
 
-		assertFacts(f(0), f(1), f(2), f(0, 1), f(0, 2), f(1, 2));
+		assertFacts(f(0), f(1), f(2), f(4), f(0, 1), f(0, 4), f(0, 2), f(1, 4), f(2, 4));
 
 	}
 
@@ -85,15 +89,6 @@ public class ToFactsVisitorTest {
 		ExpressionStatement stmt = new ExpressionStatement();
 		stmt.setExpression(expr);
 		return stmt;
-	}
-	
-	private IInvocationExpression inv2(int i) {
-		IMethodName m = MethodName.newMethodName(String.format("[T,P] [T,P].m%d()", i));
-
-		InvocationExpression expr = new InvocationExpression();
-		expr.setMethodName(m);
-
-		return expr;
 	}
 
 	private IInvocationExpression inv(int i) {
