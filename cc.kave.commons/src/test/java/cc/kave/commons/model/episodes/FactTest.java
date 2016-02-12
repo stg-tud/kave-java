@@ -17,6 +17,7 @@ package cc.kave.commons.model.episodes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -49,6 +50,13 @@ public class FactTest {
 		Fact fact = new Fact(new Fact("ab"), new Fact("bc"));
 		Fact expected = new Fact("ab>bc");
 		assertEquals(expected, fact);
+	}
+	
+	@Test
+	public void isContainedTest() {
+		Fact existence = new Fact("ab");
+		Fact order = new Fact("c>ab");
+		assertTrue(existence.isContained(order));
 	}
 	
 	@Test

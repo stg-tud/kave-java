@@ -50,6 +50,14 @@ public class Fact {
 		return rawFact.contains("\\l");
 	}
 	
+	public boolean isContained(Fact fact) {
+		if (fact.isRelation() && fact.rawFact.contains(this.rawFact)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public Tuple<Fact, Fact> getRelationFacts() {
 		if (this.isRelation()) {
 			String order = this.rawFact;
