@@ -12,9 +12,7 @@
  */
 package cc.kave.commons.pointsto;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,12 +20,10 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
@@ -36,16 +32,16 @@ import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.pointsto.extraction.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
+import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
-import cc.kave.commons.pointsto.io.ZipWriter;
+import cc.kave.commons.pointsto.io.ZipArchive;
+import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.gson.GsonUtil;
 
 public class PointsToUsageGenerator {
 
-	private static final String ZIP_FILE_ENDING = ".zip";
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageGenerator.class);
 
 	private List<PointsToAnalysisFactory> factories;
@@ -53,24 +49,25 @@ public class PointsToUsageGenerator {
 	private Path srcDir;
 	private List<Path> sources;
 	private Path pointstoDestDir;
-	private Path usagesDestDir;
+	private Map<PointsToAnalysisFactory, UsageStore> usageStores = new HashMap<>();
 
 	private Map<PointsToAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
 
 	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
-			Path usagesDestDir) throws IOException {
-		this(factories, srcDirectory, pointstoDestDir, usagesDestDir, new NopUsageStatisticsCollector());
+			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory) throws IOException {
+		this(factories, srcDirectory, pointstoDestDir, usageStoreFactory, new NopUsageStatisticsCollector());
 	}
 
 	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
-			Path usagesDestDir, UsageStatisticsCollector statisticsCollector) throws IOException {
+			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory,
+			UsageStatisticsCollector statisticsCollector) throws IOException {
 		this.factories = factories;
 		this.srcDir = srcDirectory;
-		this.sources = getZipFiles(srcDirectory);
+		this.sources = IOHelper.getZipFiles(srcDirectory);
 		this.pointstoDestDir = pointstoDestDir;
-		this.usagesDestDir = usagesDestDir;
 
 		for (PointsToAnalysisFactory factory : factories) {
+			usageStores.put(factory, usageStoreFactory.apply(factory));
 			statisticsCollectors.put(factory, statisticsCollector.create());
 		}
 	}
@@ -90,6 +87,15 @@ public class PointsToUsageGenerator {
 			}
 		}
 
+		// close stores
+		for (UsageStore store : usageStores.values()) {
+			try {
+				store.close();
+			} catch (IOException e) {
+				LOGGER.error("Failed to close a UsageStore", e);
+			}
+		}
+
 		return usages;
 	}
 
@@ -97,13 +103,12 @@ public class PointsToUsageGenerator {
 		final Map<PointsToAnalysisFactory, List<Usage>> usages = new HashMap<>();
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
-		final Map<PointsToAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters = new HashMap<>(
+		final Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters = new HashMap<>(
 				factories.size());
-		final Map<PointsToAnalysisFactory, ZipWriter<Usage>> usageWriters = new HashMap<>(factories.size());
 
-		// initialize writers for the annotated contexts and usages to TARGET/FACTORY_NAME/RELATIVE_INPUT
+		// initialize writers for the annotated contexts to TARGET/FACTORY_NAME/RELATIVE_INPUT
 		final Path relativeInput = srcDir.relativize(path);
-		initializeWriters(relativeInput, annotatedContextWriters, usageWriters);
+		initializeWriters(relativeInput, annotatedContextWriters);
 
 		StreamingZipReader reader = new StreamingZipReader(path.toFile());
 		reader.stream(Context.class).forEach((Context context) -> {
@@ -124,19 +129,18 @@ public class PointsToUsageGenerator {
 				}
 
 				try {
-					writeEntry(ptContext, factory, annotatedContextWriters);
+					writePointsToContext(ptContext, factory, annotatedContextWriters);
 				} catch (Exception e) {
 					LOGGER.error("Failed to serialize an annotated context from " + relativeInput.toString(), e);
 				}
 
 				extractor.setStatisticsCollector(statisticsCollectors.get(factory));
 				List<Usage> extractedUsages = extractor.extract(ptContext);
-				for (Usage usage : extractedUsages) {
-					try {
-						writeEntry(usage, factory, usageWriters);
-					} catch (Exception e) {
-						LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
-					}
+				UsageStore usageStore = usageStores.get(factory);
+				try {
+					usageStore.store(extractedUsages, relativeInput);
+				} catch (Exception e) {
+					LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
 				}
 
 				usages.getOrDefault(factory, new ArrayList<>()).addAll(extractedUsages);
@@ -144,45 +148,36 @@ public class PointsToUsageGenerator {
 		});
 
 		// close writers
-		for (ZipWriter<?> writer : Iterables.concat(annotatedContextWriters.values(), usageWriters.values())) {
-			writer.close();
+		for (ZipArchive archive : annotatedContextWriters.values()) {
+			archive.close();
+		}
+
+		for (UsageStore store : usageStores.values()) {
+			store.flush();
 		}
 
 		return usages;
 	}
 
 	private void initializeWriters(final Path relativeInput,
-			final Map<PointsToAnalysisFactory, ZipWriter<PointsToContext>> annotatedContextWriters,
-			final Map<PointsToAnalysisFactory, ZipWriter<Usage>> usageWriters) throws IOException {
+			final Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters) throws IOException {
 
 		for (PointsToAnalysisFactory factory : factories) {
 			if (pointstoDestDir != null) {
-				File contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(relativeInput).toFile();
-				com.google.common.io.Files.createParentDirs(contextsFile);
-				annotatedContextWriters.put(factory, new ZipWriter<>(contextsFile, ptCtxt -> JsonUtils.toJson(ptCtxt)));
-			}
-
-			if (usagesDestDir != null) {
-				File usagesFile = usagesDestDir.resolve(factory.getName()).resolve(relativeInput).toFile();
-				com.google.common.io.Files.createParentDirs(usagesFile);
-				usageWriters.put(factory, new ZipWriter<>(usagesFile, usage -> GsonUtil.serialize(usage)));
+				Path contextsFile = pointstoDestDir.resolve(factory.getName()).resolve(relativeInput);
+				IOHelper.createParentDirs(contextsFile);
+				annotatedContextWriters.put(factory, new ZipArchive(contextsFile));
 			}
 		}
 	}
 
-	private <T> void writeEntry(T entry, PointsToAnalysisFactory factory,
-			Map<PointsToAnalysisFactory, ZipWriter<T>> writers) throws IOException {
+	private void writePointsToContext(PointsToContext ptCtxt, PointsToAnalysisFactory factory,
+			Map<PointsToAnalysisFactory, ZipArchive> writers) throws IOException {
 
-		ZipWriter<T> writer = writers.get(factory);
-		if (writer != null) {
-			writer.add(entry);
+		ZipArchive archive = writers.get(factory);
+		if (archive != null) {
+			archive.store(ptCtxt, PointsToContext.class, JsonUtils::toJson);
 		}
-	}
-
-	private List<Path> getZipFiles(Path directory) throws IOException {
-		return Files.walk(directory)
-				.filter((Path path) -> Files.isRegularFile(path) && path.toString().endsWith(ZIP_FILE_ENDING))
-				.collect(Collectors.toList());
 	}
 
 }

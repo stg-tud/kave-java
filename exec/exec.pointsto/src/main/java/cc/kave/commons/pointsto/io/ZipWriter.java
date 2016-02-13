@@ -23,6 +23,8 @@ import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+
+@Deprecated
 public class ZipWriter<T> implements Closeable {
 
 	private AtomicInteger count = new AtomicInteger();

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
+import cc.kave.commons.pointsto.stores.ProjectUsageStore;
+import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.recommenders.usages.Usage;
 
 public class PointsToEvaluation {
@@ -49,19 +52,29 @@ public class PointsToEvaluation {
 		List<PointsToAnalysisFactory> factories = Arrays.asList(
 				// new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
 				// new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class)
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)
-				);
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL));
 		Stopwatch stopwatch = Stopwatch.createStarted();
-		new PointsToEvaluation().generateUsages(factories);
+		Map<PointsToAnalysisFactory, List<Usage>> usages = new PointsToEvaluation().generateUsages(factories);
 		stopwatch.stop();
-		
+
 		LOGGER.info("Usage generation took {}", stopwatch.toString());
+		for (Map.Entry<PointsToAnalysisFactory, List<Usage>> entry : usages.entrySet()) {
+			LOGGER.info("{}: {} usages", entry.getKey().getName(), entry.getValue().size());
+		}
 
 	}
 
 	private Map<PointsToAnalysisFactory, List<Usage>> generateUsages(List<PointsToAnalysisFactory> factories) {
 		try {
-			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, USAGE_DEST,
+			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory = (PointsToAnalysisFactory factory) -> {
+				try {
+					return new ProjectUsageStore(USAGE_DEST.resolve(factory.getName()));
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			};
+
+			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, usageStoreFactory,
 					new TypeHistogramUsageStatisticsCollector());
 
 			Map<PointsToAnalysisFactory, List<Usage>> usages = generator.getUsages();
