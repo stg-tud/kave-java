@@ -20,6 +20,12 @@
 			<artifactId>cc.recommenders.utils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<!-- for the evaluation -->
+		<dependency>
+			<groupId>cc.kave</groupId>
+			<artifactId>cc.recommenders.evaluation</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<!-- UnionFind -->
 		<dependency>
@@ -36,6 +42,12 @@
 		</dependency>
 
 
+		<!-- Evaluation: EnumeratedDistribution -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

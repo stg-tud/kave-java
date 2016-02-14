@@ -34,7 +34,6 @@ import com.google.common.collect.Multimaps;
 
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
-import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.Names;
 import cc.recommenders.usages.Usage;
@@ -110,6 +109,19 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		return projectUsageCounts;
+	}
+
+	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ITypeName type) throws IOException {
+		Map<ProjectIdentifier, List<Usage>> projectUsages = new HashMap<>(getNumberOfProjects());
+
+		synchronized (projectDirToStore) {
+			for (Map.Entry<Path, ProjectStore> projectEntry : projectDirToStore.entrySet()) {
+				ProjectIdentifier identifier = new ProjectIdentifier(projectEntry.getKey());
+				projectUsages.put(identifier, projectEntry.getValue().load(type));
+			}
+		}
+
+		return projectUsages;
 	}
 
 	@Override
@@ -286,7 +298,7 @@ public class ProjectUsageStore implements UsageStore {
 			synchronized (typeToZipFiles) {
 				for (Path zipFile : typeToZipFiles.get(type)) {
 					ZipArchive archive = getArchive(zipFile);
-					usages.addAll(archive.stream(Usage.class, JsonUtils::fromJson).collect(Collectors.toList()));
+					usages.addAll(archive.stream(Usage.class, GsonUtil::deserialize).collect(Collectors.toList()));
 				}
 			}
 
