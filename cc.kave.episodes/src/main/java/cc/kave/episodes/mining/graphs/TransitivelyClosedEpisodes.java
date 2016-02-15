@@ -18,8 +18,8 @@ package cc.kave.episodes.mining.graphs;
 import java.util.LinkedList;
 import java.util.List;
 
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
 public class TransitivelyClosedEpisodes {

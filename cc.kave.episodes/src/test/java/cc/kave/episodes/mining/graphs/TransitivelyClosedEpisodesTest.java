@@ -23,7 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.commons.model.episodes.Episode;
+import cc.kave.episodes.model.Episode;
 
 public class TransitivelyClosedEpisodesTest {
 

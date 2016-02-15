@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.commons.model.episodes;
+package cc.kave.episodes.model;
 
 import java.util.List;
 import java.util.Set;
@@ -24,6 +24,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.episodes.Fact;
 
 public class Episode {
 

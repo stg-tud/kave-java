@@ -20,9 +20,9 @@ import java.util.Map;
 
 import com.google.inject.Inject;
 
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.model.Episode;
 
 public class PatternAnalyzer {
 

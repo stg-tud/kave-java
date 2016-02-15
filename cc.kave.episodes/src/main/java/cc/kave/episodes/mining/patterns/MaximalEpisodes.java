@@ -17,8 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.Episode;
 
 public class MaximalEpisodes {
 	

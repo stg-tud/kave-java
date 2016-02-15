@@ -23,8 +23,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.commons.model.episodes.Episode;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
 
 public class MaximalEpisodesTest {

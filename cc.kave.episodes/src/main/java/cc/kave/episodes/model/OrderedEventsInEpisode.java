@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.commons.model.episodes;
+package cc.kave.episodes.model;
 
 import java.util.List;
 
@@ -24,31 +24,50 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Lists;
 
-public class Query {
+public class OrderedEventsInEpisode {
 
-	private List<Fact> facts = Lists.newLinkedList();
-	private int numberOfFacts;
+	private List<String> partialOrderList = Lists.newLinkedList();
+	private List<String> sequentialOrderList = Lists.newLinkedList();
 
-	public Iterable<Fact> getFacts() {
-		return facts;
+	public List<String> getPartialOrderList() {
+		return partialOrderList;
 	}
 
-	public void addStringsOfFacts(String... rawFacts) {
-		for (String rawFact : rawFacts) {
-			addFact(rawFact);
+	public void setPartialOrderList(List<String> partialOrderList) {
+		this.partialOrderList = partialOrderList;
+	}
+
+	public List<String> getSequentialOrderList() {
+		return sequentialOrderList;
+	}
+
+	public void setSequentialOrderList(List<String> sequentialOrderList) {
+		this.sequentialOrderList = sequentialOrderList;
+	}
+
+	public void addEventIDInSequentialOrderList(String event) {
+		this.sequentialOrderList.add(event);
+	}
+
+	public void addPartialEventsIDInSequentialOrderList(String... events) {
+		String partialEvents = "";
+		for (String event : events) {
+			partialEvents += event + " ";
 		}
+		this.sequentialOrderList.add(partialEvents.substring(0, partialEvents.length() - 1));
 	}
 
-	public void addFact(String rawFact) {
-		facts.add(new Fact(rawFact));
+	public boolean eventInSequentialOrderList(String event) {
+		for (String eventFromList : sequentialOrderList) {
+			if (eventFromList.contains(event)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public int getNumberOfFacts() {
-		return numberOfFacts;
-	}
-
-	public void setNumberOfFacts(int numberOfEvents) {
-		this.numberOfFacts = numberOfEvents;
+	public void addEventIDInPartialOrderList(String event) {
+		partialOrderList.add(event);
 	}
 
 	@Override
@@ -64,17 +83,5 @@ public class Query {
 	@Override
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
-	}
-
-	public boolean equals(Query query) {
-		if (this.facts.size() != query.facts.size()) {
-			return false;
-		}
-		for (Fact fact : this.facts) {
-			if (!query.facts.contains(fact)) {
-				return false;
-			}
-		}
-		return true;
 	}
 }

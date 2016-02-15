@@ -30,9 +30,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.commons.model.episodes.Episode;
-import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.FileReader;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeParserTest {

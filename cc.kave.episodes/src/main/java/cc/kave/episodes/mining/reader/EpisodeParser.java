@@ -15,6 +15,8 @@
  */
 package cc.kave.episodes.mining.reader;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,9 +26,7 @@ import java.util.Map;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.mining.reader.FileReader;
-import cc.kave.commons.model.episodes.Episode;
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import cc.kave.episodes.model.Episode;
 
 public class EpisodeParser {
 

@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
@@ -36,7 +35,7 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.model.Episode;
 
 public class EpisodeToGraphConverterTest {
 

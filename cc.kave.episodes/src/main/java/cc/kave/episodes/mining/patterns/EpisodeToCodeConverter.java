@@ -18,7 +18,7 @@ package cc.kave.episodes.mining.patterns;
 import java.util.List;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.OrderedEventsInEpisode;
+import cc.kave.episodes.model.OrderedEventsInEpisode;
 
 public class EpisodeToCodeConverter {
 
