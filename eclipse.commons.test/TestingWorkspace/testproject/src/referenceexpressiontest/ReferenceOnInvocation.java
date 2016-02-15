@@ -6,7 +6,7 @@ public class ReferenceOnInvocation {
 	ReferenceOnInvocation b;
 
 	public void method() {
-		ReferenceOnInvocation c = a.getB().a.getB().b;
+		ReferenceOnInvocation c = a.getB().b;
 	}
 
 	public ReferenceOnInvocation getB() {

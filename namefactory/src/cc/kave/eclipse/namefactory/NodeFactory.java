@@ -22,6 +22,7 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -98,9 +99,23 @@ public class NodeFactory {
 			String newName = methodNameHelper(null, ((ClassInstanceCreation) node).resolveConstructorBinding(), false);
 			return CsMethodName.newMethodName(newName);
 
+		case ASTNode.FIELD_ACCESS:
+			return createFieldAccessName(node);
+
 		default:
 			return null;
 		}
+	}
+
+	private static Name createFieldAccessName(ASTNode node) {
+		StringBuilder sb = new StringBuilder();
+		FieldAccess fieldAccess = (FieldAccess) node;
+		sb.append(modifierHelper(fieldAccess.resolveFieldBinding()));
+		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getType())).append("] ");
+		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getDeclaringClass())).append("].");
+		sb.append(fieldAccess.getName().getIdentifier());
+		
+		return CsFieldName.newFieldName(sb.toString());
 	}
 
 	private static Name createVariableName(ASTNode node) {
@@ -447,8 +462,8 @@ public class NodeFactory {
 			}
 			return sb.toString();
 		}
-		
-		public static TypeName getTypeName(ITypeBinding binding){
+
+		public static TypeName getTypeName(ITypeBinding binding) {
 			return CsTypeName.newTypeName(getBindingName(binding));
 		}
 

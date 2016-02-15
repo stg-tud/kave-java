@@ -61,10 +61,6 @@ public class DeclarationVisitor extends ASTVisitor {
 
 			FieldName name = (FieldName) NodeFactory.createNodeName(fragment);
 
-			// if (isNestedDeclaration(name, context)) {
-			// return super.visit(node);
-			// }
-
 			cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration fieldDeclaration = new cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration();
 			fieldDeclaration.setName(name);
 
@@ -87,12 +83,10 @@ public class DeclarationVisitor extends ASTVisitor {
 		return super.visit(decl);
 	}
 
-	// TODO: Tests
 	private void methodDeclHelper(MethodDeclaration decl) {
 
 		MethodName methodName = (MethodName) NodeFactory.createNodeName(decl);
 
-		// if (!isNestedDeclaration(methodName, context)) {
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 		methodDecl.setName(methodName);
 
@@ -101,14 +95,10 @@ public class DeclarationVisitor extends ASTVisitor {
 			decl.getBody().accept(bodyVisitor);
 		}
 		context.getMethods().add(methodDecl);
-
-		// }
 	}
 
 	private void constructorHelper(MethodDeclaration decl) {
 		MethodName methodName = (MethodName) NodeFactory.createNodeName(decl);
-
-		// if (!isNestedDeclaration(methodName, context)) {
 
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 		methodDecl.setName(methodName);
@@ -117,18 +107,5 @@ public class DeclarationVisitor extends ASTVisitor {
 		decl.getBody().accept(bodyVisitor);
 
 		context.getMethods().add(methodDecl);
-		// }
-	}
-
-	// TODO: Test für hilfsmethode
-	private static boolean isNestedDeclaration(DelegateTypeName name, SST context) {
-		TypeName declaringType = name.getDeclaringType();
-		System.out.println(declaringType.getIdentifier());
-		System.out.println(context.getEnclosingType().getIdentifier());
-		return !declaringType.equals(context.getEnclosingType());
-	}
-
-	private static boolean isNestedDeclaration(MemberName name, SST context) {
-		return !name.getDeclaringType().equals(context.getEnclosingType());
 	}
 }

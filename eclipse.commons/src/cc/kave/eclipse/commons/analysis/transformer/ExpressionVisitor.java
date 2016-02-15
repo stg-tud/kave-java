@@ -24,14 +24,16 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Assignment.Operator;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -43,14 +45,15 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
-import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
@@ -66,17 +69,19 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.eclipse.commons.analysis.util.UniqueVariableNameGenerator;
 import cc.kave.eclipse.namefactory.NodeFactory;
 import cc.kave.eclipse.namefactory.NodeFactory.BindingFactory;
 
 public class ExpressionVisitor extends ASTVisitor {
 
-	private static UniqueVariableNameGenerator nameGen;
+	private UniqueVariableNameGenerator nameGen;
 	private List<IStatement> body;
 	private IAssignableExpression assignableExpression;
 	private IAssignableReference assignableReference;
@@ -89,38 +94,127 @@ public class ExpressionVisitor extends ASTVisitor {
 		this.body = body;
 	}
 
-	@Override
-	public void endVisit(Assignment stmt) {
-		ExpressionVisitor leftVisitor = new ExpressionVisitor(nameGen, body);
-		ExpressionVisitor rightVisitor = new ExpressionVisitor(nameGen, body);
-		stmt.getLeftHandSide().accept(leftVisitor);
-		stmt.getRightHandSide().accept(rightVisitor);
+	private void createAndAssign(ITypeBinding typeBinding, IVariableReference variableReference,
+			IAssignableExpression assign) {
+		VariableDeclaration varDecl = new VariableDeclaration();
+		varDecl.setType(BindingFactory.getTypeName(typeBinding));
+		varDecl.setReference(variableReference);
 
-		if (stmt.getOperator() == Operator.ASSIGN) {
+		body.add(varDecl);
+
+		if (!isSelfAssign(assign, variableReference)) {
 			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-			assignment.setReference(leftVisitor.getAssignableReference());
-			assignment.setExpression(rightVisitor.getSimpleExpression());
+			assignment.setReference(variableReference);
+			assignment.setExpression(assign);
+
 			body.add(assignment);
 		}
 	}
 
 	@Override
-	public void endVisit(BooleanLiteral node) {
+	public boolean visit(Assignment stmt) {
+		ExpressionVisitor leftVisitor = new ExpressionVisitor(nameGen, body);
+		ExpressionVisitor rightVisitor = new ExpressionVisitor(nameGen, body);
+		stmt.getLeftHandSide().accept(leftVisitor);
+		stmt.getRightHandSide().accept(rightVisitor);
+
+		if (stmt.getOperator() == Operator.ASSIGN
+				&& !isSelfAssign(rightVisitor.getAssignableExpression(), leftVisitor.getAssignableReference())) {
+			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+			assignment.setReference(leftVisitor.getAssignableReference());
+			assignment.setExpression(rightVisitor.getAssignableExpression());
+			body.add(assignment);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean visit(BooleanLiteral node) {
 		ConstantValueExpression bool = new ConstantValueExpression();
 		bool.setValue(Boolean.toString(node.booleanValue()));
 		assignableExpression = bool;
 		simpleExpression = bool;
+		return false;
 	}
 
 	@Override
-	public void endVisit(NullLiteral node) {
+	public boolean visit(ConditionalExpression node) {
+		IfElseExpression ifElseExpression = new IfElseExpression();
+
+		node.getExpression().accept(this);
+		ifElseExpression.setCondition(getSimpleExpression());
+		node.getThenExpression().accept(this);
+		ifElseExpression.setThenExpression(getSimpleExpression());
+		node.getElseExpression().accept(this);
+		ifElseExpression.setElseExpression(getSimpleExpression());
+
+		assignableExpression = ifElseExpression;
+		return false;
+	}
+
+	@Override
+	public boolean visit(FieldAccess node) {
+		node.getExpression().accept(this);
+
+		FieldReference fieldReference = new FieldReference();
+		fieldReference.setReference(this.getVariableReference());
+		fieldReference.setFieldName((FieldName) NodeFactory.createNodeName(node));
+
+		ReferenceExpression refExpr = new ReferenceExpression();
+		refExpr.setReference(fieldReference);
+
+		assignableExpression = refExpr;
+
+		if (!isParentStatement(node)) {
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
+
+			createAndAssign(node.resolveTypeBinding(), genVar, refExpr);
+		}
+		// HIER WEITERMACHEN, siehe test referenceoninvocation
+		return false;
+	}
+
+	@Override
+	public boolean visit(InstanceofExpression node) {
+		node.getLeftOperand().accept(this);
+		VariableReference genVar = new VariableReference();
+		genVar.setIdentifier(nameGen.getNextVariableName());
+
+		VariableDeclaration varDecl = new VariableDeclaration();
+		varDecl.setType(BindingFactory.getTypeName(node.resolveTypeBinding()));
+		varDecl.setReference(genVar);
+
+		body.add(varDecl);
+
+		TypeCheckExpression typeCheckExpr = new TypeCheckExpression();
+		typeCheckExpr.setReference(getVariableReference());
+		typeCheckExpr.setType(BindingFactory.getTypeName(node.getRightOperand().resolveBinding()));
+
+		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+		assignment.setReference(genVar);
+		assignment.setExpression(typeCheckExpr);
+		body.add(assignment);
+
+		ReferenceExpression refExpr = new ReferenceExpression();
+		refExpr.setReference(genVar);
+
+		simpleExpression = refExpr;
+		assignableExpression = typeCheckExpr;
+		variableReference = genVar;
+		return false;
+	}
+
+	@Override
+	public boolean visit(NullLiteral node) {
 		NullExpression nullValue = new NullExpression();
 		assignableExpression = nullValue;
 		simpleExpression = nullValue;
+		return false;
 	}
 
 	@Override
-	public void endVisit(NumberLiteral node) {
+	public boolean visit(NumberLiteral node) {
 		ConstantValueExpression number = new ConstantValueExpression();
 		String token = node.getToken();
 
@@ -131,10 +225,41 @@ public class ExpressionVisitor extends ASTVisitor {
 		number.setValue(token);
 		assignableExpression = number;
 		simpleExpression = number;
+		return false;
 	}
 
 	@Override
-	public void endVisit(org.eclipse.jdt.core.dom.ClassInstanceCreation node) {
+	public boolean visit(org.eclipse.jdt.core.dom.CastExpression node) {
+		node.getExpression().accept(this);
+
+		VariableReference genVar = new VariableReference();
+		genVar.setIdentifier(nameGen.getNextVariableName());
+
+		CastExpression castExpr = new CastExpression();
+		castExpr.setOperator(CastOperator.Cast);
+		castExpr.setReference(genVar);
+		TypeName type = BindingFactory.getTypeName(node.getType().resolveBinding());
+		castExpr.setTargetType(type);
+
+		if (isParentStatement(node)) {
+			VariableDeclaration varDecl = new VariableDeclaration();
+			varDecl.setReference(genVar);
+			varDecl.setType(BindingFactory.getTypeName(node.getExpression().resolveTypeBinding()));
+			body.add(varDecl);
+
+			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+			assignment.setReference(genVar);
+			assignment.setExpression(this.getAssignableExpression());
+			body.add(assignment);
+		}
+
+		assignableExpression = castExpr;
+
+		return false;
+	}
+
+	@Override
+	public boolean visit(org.eclipse.jdt.core.dom.ClassInstanceCreation node) {
 
 		InvocationExpression invocation = new InvocationExpression();
 
@@ -151,35 +276,36 @@ public class ExpressionVisitor extends ASTVisitor {
 		invocation.setMethodName((MethodName) NodeFactory.createNodeName(node));
 		invocation.setParameters(simpleExpressions);
 
-		if (node.getParent() instanceof EnhancedForStatement) {
+		if (node.getParent() instanceof org.eclipse.jdt.core.dom.ExpressionStatement) {
+			ExpressionStatement stmt = new ExpressionStatement();
+			stmt.setExpression(invocation);
+			body.add(stmt);
+		} else if (!isParentStatement(node) || node.getParent() instanceof EnhancedForStatement) {
 			VariableReference varRef = new VariableReference();
 			varRef.setIdentifier(nameGen.getNextVariableName());
-
-			VariableDeclaration varDecl = new VariableDeclaration();
-			varDecl.setReference(varRef);
-			varDecl.setType(BindingFactory.getTypeName(node.resolveTypeBinding()));
-
-			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-			assignment.setExpression(invocation);
-			assignment.setReference(varRef);
-
 			variableReference = varRef;
 
-			body.add(varDecl);
-			body.add(assignment);
+			createAndAssign(node.resolveTypeBinding(), varRef, invocation);
+
+			ReferenceExpression refExpr = new ReferenceExpression();
+			refExpr.setReference(varRef);
+
+			simpleExpression = refExpr;
 		}
 
 		assignableExpression = invocation;
+		return false;
 	}
 
 	@Override
-	public void endVisit(org.eclipse.jdt.core.dom.MethodInvocation node) {
+	public boolean visit(org.eclipse.jdt.core.dom.MethodInvocation node) {
 
 		MethodName methodName = (MethodName) NodeFactory.createNodeName(node);
 
 		ExpressionStatement stmt = new ExpressionStatement();
 		InvocationExpression invocation = new InvocationExpression();
 		VariableReference varRef = new VariableReference();
+		ReferenceExpression refExpr = new ReferenceExpression();
 
 		if (node.getExpression() == null || node.getExpression() instanceof ThisExpression) {
 			varRef.setIdentifier("this");
@@ -201,119 +327,83 @@ public class ExpressionVisitor extends ASTVisitor {
 		invocation.setParameters(simpleExpressions);
 		invocation.setMethodName(methodName);
 		invocation.setReference(varRef);
-
-		assignableExpression = invocation;
-		variableReference = varRef;
-
 		stmt.setExpression(invocation);
 
-		if (!(node.getParent() instanceof org.eclipse.jdt.core.dom.CastExpression)) {
+		MethodReference methodReference = new MethodReference();
+		methodReference.setMethodName(methodName);
+		methodReference.setReference(varRef);
+
+		ReferenceExpression methodRefExpr = new ReferenceExpression();
+		methodRefExpr.setReference(methodReference);
+
+		if (isParentAssignment(node) && node.getExpression() == null) {
+			assignableExpression = methodRefExpr;
+		} else {
+			assignableExpression = invocation;
+		}
+
+		variableReference = varRef;
+
+		if (!isParentStatement(node) || isParentLoop(node) || node.getParent() instanceof InstanceofExpression) {
+			if (node.getExpression() instanceof SimpleName || isParentLoop(node)
+					|| node.getParent() instanceof InstanceofExpression) {
+				VariableReference genVar = new VariableReference();
+				genVar.setIdentifier(nameGen.getNextVariableName());
+
+				refExpr.setReference(genVar);
+
+				variableReference = genVar;
+				assignableReference = genVar;
+				simpleExpression = refExpr;
+				assignableExpression = invocation;
+
+				createAndAssign(node.resolveTypeBinding(), genVar, invocation);
+			} else {
+				createAndAssign(node.resolveTypeBinding(), varRef, invocation);
+			}
+		} else if (node.getParent() instanceof Statement) {
 			body.add(stmt);
 		}
+
+		return false;
 	}
 
 	@Override
-	public void endVisit(QualifiedName node) {
-		node.getQualifier().accept(this);
+	public boolean visit(PostfixExpression node) {
+		ExpressionVisitor visitor = new ExpressionVisitor(nameGen, body);
+		UnaryExpression unaryExpression = new UnaryExpression();
+		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
 
-		String lastVar = nameGen.getLastVariableName();
+		node.getOperand().accept(visitor);
 
-		VariableReference targetRef = new VariableReference();
-		targetRef.setIdentifier(lastVar);
+		switch (node.getOperator().toString()) {
 
-		FieldReference fieldRef = new FieldReference();
-		fieldRef.setFieldName((FieldName) NodeFactory.createNodeName(node));
-		fieldRef.setReference(targetRef);
+		case "++":
+			unaryExpression.setOperator(UnaryOperator.PostIncrement);
+			unaryExpression.setOperand(visitor.getSimpleExpression());
+			assignableExpression = unaryExpression;
+			break;
 
-		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(fieldRef);
+		case "--":
+			unaryExpression.setOperator(UnaryOperator.PostDecrement);
+			unaryExpression.setOperand(visitor.getSimpleExpression());
+			assignableExpression = unaryExpression;
+			break;
 
-		assignableExpression = refExpr;
+		default:
+			break;
+		}
 
-		if (!isParentStatement(node)) {
-
-			VariableDeclaration varDecl = new VariableDeclaration();
-			VariableReference varRef = new VariableReference();
-			varRef.setIdentifier(nameGen.getNextVariableName());
-			varDecl.setType(BindingFactory.getTypeName(node.resolveTypeBinding()));
-			varDecl.setReference(varRef);
-
-			body.add(varDecl);
-
-			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-
-			assignment.setReference(varRef);
-			assignment.setExpression(refExpr);
+		if (isPreOrPostfixExpression(node.getOperator().toString())) {
+			assignment.setExpression(unaryExpression);
+			assignment.setReference(visitor.getAssignableReference());
 			body.add(assignment);
-
 		}
-
+		return false;
 	}
 
 	@Override
-	public void endVisit(SimpleName node) {
-
-		if (node.resolveBinding() instanceof IVariableBinding) {
-			IVariableBinding varBinding = (IVariableBinding) node.resolveBinding();
-
-			VariableReference varRef = new VariableReference();
-			FieldReference fieldRef = new FieldReference();
-			ReferenceExpression refExpr = new ReferenceExpression();
-
-			simpleExpression = refExpr;
-
-			if (varBinding.isField()) {
-				String fieldName = BindingFactory.getBindingName(varBinding);
-				varRef.setIdentifier("this");
-				fieldRef.setFieldName(CsFieldName.newFieldName(fieldName));
-				fieldRef.setReference(varRef);
-				refExpr.setReference(fieldRef);
-
-				assignableReference = fieldRef;
-				variableReference = varRef;
-			} else {
-				refExpr.setReference(varRef);
-				varRef.setIdentifier(node.getIdentifier());
-
-				variableReference = varRef;
-				assignableReference = varRef;
-			}
-
-			if (!isParentStatement(node)) {
-				String identifier = nameGen.getNextVariableName();
-				VariableReference genVar = new VariableReference();
-				genVar.setIdentifier(identifier);
-
-				VariableDeclaration varDecl = new VariableDeclaration();
-				varDecl.setReference(genVar);
-				varDecl.setType(BindingFactory.getTypeName(node.resolveTypeBinding()));
-				body.add(varDecl);
-
-				cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-				assignment.setExpression(refExpr);
-				assignment.setReference(genVar);
-				body.add(assignment);
-			}
-		}
-	}
-
-	@Override
-	public void endVisit(StringLiteral node) {
-		ConstantValueExpression string = new ConstantValueExpression();
-		string.setValue(node.getLiteralValue());
-		simpleExpression = string;
-	}
-
-	@Override
-	public void endVisit(FieldAccess node) {
-	}
-
-	@Override
-	public void endVisit(SuperFieldAccess node) {
-	}
-
-	@Override
-	public void endVisit(PrefixExpression node) {
+	public boolean visit(PrefixExpression node) {
 		ExpressionVisitor visitor = new ExpressionVisitor(nameGen, body);
 		UnaryExpression unaryExpression = new UnaryExpression();
 		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
@@ -366,43 +456,101 @@ public class ExpressionVisitor extends ASTVisitor {
 			assignment.setReference(visitor.getAssignableReference());
 			body.add(assignment);
 		}
+		return false;
 	}
 
 	@Override
-	public void endVisit(PostfixExpression node) {
-		ExpressionVisitor visitor = new ExpressionVisitor(nameGen, body);
-		UnaryExpression unaryExpression = new UnaryExpression();
-		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+	public boolean visit(QualifiedName node) {
+		node.getQualifier().accept(this);
 
-		node.getOperand().accept(visitor);
+		String lastVar = nameGen.getLastVariableName();
 
-		switch (node.getOperator().toString()) {
+		VariableReference targetRef = new VariableReference();
+		targetRef.setIdentifier(lastVar);
 
-		case "++":
-			unaryExpression.setOperator(UnaryOperator.PostIncrement);
-			unaryExpression.setOperand(visitor.getSimpleExpression());
-			assignableExpression = unaryExpression;
-			break;
+		FieldReference fieldRef = new FieldReference();
+		fieldRef.setFieldName((FieldName) NodeFactory.createNodeName(node));
+		fieldRef.setReference(targetRef);
 
-		case "--":
-			unaryExpression.setOperator(UnaryOperator.PostDecrement);
-			unaryExpression.setOperand(visitor.getSimpleExpression());
-			assignableExpression = unaryExpression;
-			break;
+		ReferenceExpression refExpr = new ReferenceExpression();
+		refExpr.setReference(fieldRef);
 
-		default:
-			break;
+		assignableExpression = refExpr;
+
+		if (!isParentStatement(node)) {
+			VariableReference varRef = new VariableReference();
+			varRef.setIdentifier(nameGen.getNextVariableName());
+
+			createAndAssign(node.resolveTypeBinding(), varRef, refExpr);
 		}
 
-		if (isPreOrPostfixExpression(node.getOperator().toString())) {
-			assignment.setExpression(unaryExpression);
-			assignment.setReference(visitor.getAssignableReference());
-			body.add(assignment);
-		}
+		return false;
+
 	}
 
 	@Override
-	public void endVisit(VariableDeclarationExpression node) {
+	public boolean visit(SimpleName node) {
+
+		if (node.resolveBinding() instanceof IVariableBinding) {
+			IVariableBinding varBinding = (IVariableBinding) node.resolveBinding();
+
+			ReferenceExpression refExpr = new ReferenceExpression();
+			VariableReference varId = new VariableReference();
+			varId.setIdentifier(node.getIdentifier());
+
+			if (varBinding.isField()) {
+				VariableReference thisRef = new VariableReference();
+				thisRef.setIdentifier("this");
+
+				String fieldName = BindingFactory.getBindingName(varBinding);
+
+				FieldReference fieldRef = new FieldReference();
+				fieldRef.setFieldName(CsFieldName.newFieldName(fieldName));
+				fieldRef.setReference(thisRef);
+
+				refExpr.setReference(fieldRef);
+
+				variableReference = varId;
+				assignableReference = fieldRef;
+			} else {
+
+				refExpr.setReference(varId);
+
+				variableReference = varId;
+				assignableReference = varId;
+			}
+
+			simpleExpression = refExpr;
+			assignableExpression = refExpr;
+
+			if (!isParentStatement(node)) {
+				String identifier = nameGen.getNextVariableName();
+				VariableReference genVar = new VariableReference();
+				genVar.setIdentifier(identifier);
+
+				variableReference = genVar;
+
+				createAndAssign(node.resolveTypeBinding(), genVar, refExpr);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean visit(StringLiteral node) {
+		ConstantValueExpression string = new ConstantValueExpression();
+		string.setValue(node.getLiteralValue());
+		simpleExpression = string;
+		return false;
+	}
+
+	@Override
+	public boolean visit(SuperFieldAccess node) {
+		return false;
+	}
+
+	@Override
+	public boolean visit(VariableDeclarationExpression node) {
 
 		for (int i = 0; i < node.fragments().size(); i++) {
 			VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(i);
@@ -416,81 +564,14 @@ public class ExpressionVisitor extends ASTVisitor {
 			body.add(variableDeclaration);
 
 			if (fragment.getInitializer() != null) {
+				fragment.getInitializer().accept(this);
 				cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
 				assignment.setReference(variableReference);
 				assignment.setExpression(this.getAssignableExpression());
-				fragment.getInitializer().accept(this);
 				body.add(assignment);
 			}
 		}
-	}
-
-	@Override
-	public void endVisit(org.eclipse.jdt.core.dom.CastExpression node) {
-		node.getExpression().accept(this);
-
-		VariableReference genVar = new VariableReference();
-		genVar.setIdentifier(nameGen.getNextVariableName());
-
-		CastExpression castExpr = new CastExpression();
-		castExpr.setOperator(CastOperator.Cast);
-		castExpr.setReference(genVar);
-		castExpr.setTargetType(createTypeName(node.getType().resolveBinding()));
-
-		VariableDeclaration varDecl = new VariableDeclaration();
-		varDecl.setReference(genVar);
-		varDecl.setType(BindingFactory.getTypeName(node.getExpression().resolveTypeBinding()));
-		body.add(varDecl);
-
-		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-		assignment.setReference(genVar);
-		assignment.setExpression(this.getAssignableExpression());
-		body.add(assignment);
-
-		assignableExpression = castExpr;
-	}
-
-	@Override
-	public void endVisit(ConditionalExpression node) {
-		IfElseExpression ifElseExpression = new IfElseExpression();
-
-		node.getExpression().accept(this);
-		ifElseExpression.setCondition(getSimpleExpression());
-		node.getThenExpression().accept(this);
-		ifElseExpression.setThenExpression(getSimpleExpression());
-		node.getElseExpression().accept(this);
-		ifElseExpression.setElseExpression(getSimpleExpression());
-
-		assignableExpression = ifElseExpression;
-	}
-
-	@Override
-	public void endVisit(InstanceofExpression node) {
-		node.getLeftOperand().accept(this);
-		VariableReference genVar = new VariableReference();
-		genVar.setIdentifier(nameGen.getNextVariableName());
-
-		VariableDeclaration varDecl = new VariableDeclaration();
-		varDecl.setType(BindingFactory.getTypeName(node.resolveTypeBinding()));
-		varDecl.setReference(genVar);
-
-		body.add(varDecl);
-
-		TypeCheckExpression typeCheckExpr = new TypeCheckExpression();
-		typeCheckExpr.setReference(getVariableReference());
-		typeCheckExpr.setType(BindingFactory.getTypeName(node.getRightOperand().resolveBinding()));
-
-		cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-		assignment.setReference(genVar);
-		assignment.setExpression(typeCheckExpr);
-		body.add(assignment);
-
-		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(genVar);
-
-		simpleExpression = refExpr;
-		assignableExpression = typeCheckExpr;
-		variableReference = genVar;
+		return false;
 	}
 
 	public IAssignableExpression getAssignableExpression() {
@@ -513,104 +594,40 @@ public class ExpressionVisitor extends ASTVisitor {
 		return variableReference;
 	}
 
-	@Override
-	public boolean visit(org.eclipse.jdt.core.dom.MethodInvocation node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(org.eclipse.jdt.core.dom.CastExpression node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(FieldAccess node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(SuperFieldAccess node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(SimpleName node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(QualifiedName node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(Assignment node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(ConditionalExpression node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(InstanceofExpression node) {
-		return false;
-	}
-
 	private boolean isParentStatement(ASTNode node) {
 		ASTNode parent = node.getParent();
 		if (parent instanceof Statement || parent instanceof VariableDeclarationFragment || parent instanceof Assignment
 				|| parent instanceof MethodInvocation || parent instanceof PrefixExpression
 				|| parent instanceof PostfixExpression || parent instanceof ConditionalExpression
-				|| parent instanceof InstanceofExpression) {
+				|| parent instanceof InstanceofExpression
+				|| parent instanceof org.eclipse.jdt.core.dom.CastExpression) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private TypeName createTypeName(ITypeBinding binding) {
-		String identifier;
+	private boolean isParentLoop(ASTNode node) {
+		ASTNode parent = node.getParent();
 
-		switch (binding.getQualifiedName()) {
-		case "java.lang.Integer":
-			identifier = "%int, rt.jar, 1.8";
-			break;
-		case "java.lang.Long":
-			identifier = "%long, rt.jar, 1.8";
-			break;
-		case "java.lang.Short":
-			identifier = "%short, rt.jar, 1.8";
-			break;
-		case "java.lang.Float":
-			identifier = "%float, rt.jar, 1.8";
-			break;
-		case "java.lang.Double":
-			identifier = "%double, rt.jar, 1.8";
-			break;
-		case "java.lang.Boolean":
-			identifier = "%boolean, rt.jar, 1.8";
-			break;
-		case "java.lang.Byte":
-			identifier = "%byte, rt.jar, 1.8";
-			break;
-		case "java.lang.Void":
-			identifier = "%void, rt.jar, 1.8";
-			break;
-		case "java.lang.Char":
-			identifier = "%char, rt.jar, 1.8";
-			break;
-		default:
-			return BindingFactory.getTypeName(binding);
+		while (!(parent instanceof TypeDeclaration)) {
+			if (parent instanceof DoStatement || parent instanceof ForStatement || parent instanceof WhileStatement) {
+				return true;
+			}
+			parent = parent.getParent();
 		}
 
-		return CsTypeName.newTypeName(identifier);
+		return false;
+	}
+
+	private boolean isParentAssignment(ASTNode node) {
+		ASTNode parent = node.getParent();
+
+		if (parent instanceof Assignment || parent instanceof VariableDeclarationFragment) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private boolean isPreOrPostfixExpression(String operator) {
@@ -620,6 +637,13 @@ public class ExpressionVisitor extends ASTVisitor {
 			if (operator.equals(prefixes[i])) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	private boolean isSelfAssign(IAssignableExpression assign, IAssignableReference varRef) {
+		if (assign instanceof ReferenceExpression && varRef.equals(((ReferenceExpression) assign).getReference())) {
+			return true;
 		}
 		return false;
 	}

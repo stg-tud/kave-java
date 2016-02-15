@@ -16,16 +16,9 @@
 
 package eclipse.commons.analysis.sstanalysistestsuite.blocks;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-
 import org.junit.Test;
 
-import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 
@@ -33,22 +26,18 @@ public class WhileLoopAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void basicLoop() {
-		WhileLoop expected = new WhileLoop();
-		expected.setCondition(newConstantValue("true"));
+		WhileLoop loop = new WhileLoop();
+		loop.setCondition(newConstantValue("true"));
 
-		IStatement actual = getFirstStatement();
-
-		assertEquals(expected, actual);
+		assertMethod(loop);
 	}
 
 	@Test
 	public void withStatementInBody() {
-		WhileLoop expected = new WhileLoop();
-		expected.setCondition(newConstantValue("true"));
-		expected.getBody().add(new BreakStatement());
+		WhileLoop loop = new WhileLoop();
+		loop.setCondition(newConstantValue("true"));
+		loop.getBody().add(new BreakStatement());
 
-		IStatement actual = getFirstStatement();
-
-		assertEquals(expected, actual);
+		assertMethod(loop);
 	}
 }

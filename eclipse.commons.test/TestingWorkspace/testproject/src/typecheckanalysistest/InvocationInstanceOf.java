@@ -1,15 +1,14 @@
-package instanceofexpressionanalysistest;
+package typecheckanalysistest;
 
 public class InvocationInstanceOf {
 
 	public void method() {
-		Object o = "";
-		
+		Object o = null;
 		if (getObject() instanceof Object) {
 		}
 	}
-	
-	public Object getObject(){
+
+	public Object getObject() {
 		return new Object();
 	}
 }

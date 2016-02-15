@@ -1,4 +1,4 @@
-package instanceofexpressionanalysistest;
+package typecheckanalysistest;
 
 public class BasicInstanceOf {
 

@@ -45,10 +45,16 @@ public class SSTAnalysisFixture extends BaseSSTAnalysisTest {
 
 	public static final TypeName ARRAY_LIST = CsTypeName.newTypeName("java.util.ArrayList`1[[T -> T]], ?");
 
-	
 	public static final MethodName OBJECT_CTOR = CsMethodName
 			.newMethodName("[java.lang.Object, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8]..ctor()");
 
+	public static final MethodName ARRAYLIST_CTOR = CsMethodName
+			.newMethodName("[java.util.ArrayList`1[[T -> T]], ?] [java.util.ArrayList`1[[T -> T]], ?]..ctor()");
+	
+	public static final MethodName STRING_CTOR = CsMethodName
+			.newMethodName("[java.lang.String, rt.jar, 1.8] [java.lang.String, rt.jar, 1.8]..ctor()");
+
+	
 	public static MethodName getHashCode(TypeName type) {
 		return CsMethodName.newMethodName("[%int, rt.jar, 1.8] [" + type.getIdentifier() + "].hashCode()");
 	}
@@ -59,7 +65,4 @@ public class SSTAnalysisFixture extends BaseSSTAnalysisTest {
 	public static final MethodName OBJECT_EQUALS = CsMethodName.newMethodName(
 			"[%boolean, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8].equals([java.lang.Object, rt.jar, 1.8] ?)");
 
-	// TODO: get name
-	public static final MethodName ARRAYLIST_CTOR = CsMethodName
-			.newMethodName("[java.util.ArrayList`1[[T -> T]], ?] [java.util.ArrayList`1[[T -> T]], ?]..ctor()");
 }

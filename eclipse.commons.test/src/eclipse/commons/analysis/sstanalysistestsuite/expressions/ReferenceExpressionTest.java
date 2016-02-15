@@ -12,6 +12,7 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
+import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
@@ -32,8 +33,7 @@ public class ReferenceExpressionTest extends BaseSSTAnalysisTest {
 		VariableDeclaration varDecl = newVariableDeclaration("c",
 				CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnReference, ?"));
 
-		VariableDeclaration tempVarDecl1 = newVariableDeclaration("$0",
-				type);
+		VariableDeclaration tempVarDecl1 = newVariableDeclaration("$0", type);
 
 		ISimpleExpression tempRef1 = newReferenceExpression(newFieldReference("a", type, "this"));
 
@@ -54,23 +54,15 @@ public class ReferenceExpressionTest extends BaseSSTAnalysisTest {
 	@Test
 	public void referenceOnInvocation() {
 		TypeName type = CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnInvocation, ?");
+		MethodName methodName = CsMethodName.newMethodName(
+				"[referenceexpressiontest.ReferenceOnInvocation, ?] [referenceexpressiontest.ReferenceOnInvocation, ?].getB()");
 
-		VariableDeclaration varDecl = newVariableDeclaration("c",
-				CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnInvocation, ?"));
+		VariableDeclaration varDecl = newVariableDeclaration("c", type);
+		VariableDeclaration tempVarDecl0 = newVariableDeclaration("$0", type);
+		Assignment assignTemp0 = newAssignment("$0", newInvokeExpression("a", methodName));
+		Assignment assignVar = newAssignment("c", newReferenceExpression(newFieldReference("b", type, "$0")));
 
-		VariableDeclaration tempVarDecl = newVariableDeclaration("$0",
-				CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnInvocation, ?"));
-
-		MethodName name = CsMethodName.newMethodName(
-				"[referenceexpressiontest.ReferenceOnInvocation, ?] [referenceexpressiontest.ReferenceOnInvocation, ?].getC()");
-		InvocationExpression tempInvocation = newInvokeExpression("a", name);
-
-		Assignment assignTemp = newAssignment("$0", tempInvocation);
-
-		ISimpleExpression fieldRef = newReferenceExpression(newFieldReference("a", type, "$0"));
-		Assignment assignVar = newAssignment("c", fieldRef);
-
-		assertMethod(varDecl, tempVarDecl, assignTemp, assignVar);
+		assertMethod(varDecl, tempVarDecl0, assignTemp0, assignVar);
 	}
 
 	@Test

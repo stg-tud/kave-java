@@ -23,12 +23,16 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -36,16 +40,24 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.eclipse.commons.analysis.util.UniqueVariableNameGenerator;
 import cc.kave.eclipse.namefactory.NodeFactory;
 import cc.kave.eclipse.namefactory.NodeFactory.BindingFactory;
@@ -98,13 +110,42 @@ public class BodyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(WhileStatement stmt) {
 		WhileLoop loop = new WhileLoop();
-		LoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
+		ILoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
 		ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, condition.getBody());
 
 		stmt.getExpression().accept(conditionVisitor);
 		loop.setCondition(conditionVisitor.getSimpleExpression());
-		
-		if(loop.getCondition() == null){
+
+		if (!condition.getBody().isEmpty()) {
+			cc.kave.commons.model.ssts.impl.statements.ReturnStatement returnStatement = new cc.kave.commons.model.ssts.impl.statements.ReturnStatement();
+			returnStatement.setExpression(conditionVisitor.getSimpleExpression());
+			condition.getBody().add(returnStatement);
+
+			loop.setCondition(condition);
+		}
+
+		body.add(loop);
+
+		BodyVisitor visitor = new BodyVisitor(nameGen, loop.getBody());
+		stmt.getBody().accept(visitor);
+
+		return false;
+	}
+
+	@Override
+	public boolean visit(DoStatement stmt) {
+		DoLoop loop = new DoLoop();
+		ILoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
+		ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, condition.getBody());
+
+		stmt.getExpression().accept(conditionVisitor);
+		loop.setCondition(conditionVisitor.getSimpleExpression());
+
+		if (!condition.getBody().isEmpty()) {
+			cc.kave.commons.model.ssts.impl.statements.ReturnStatement returnStatement = new cc.kave.commons.model.ssts.impl.statements.ReturnStatement();
+			returnStatement.setExpression(conditionVisitor.getSimpleExpression());
+			condition.getBody().add(returnStatement);
+
 			loop.setCondition(condition);
 		}
 
@@ -150,9 +191,20 @@ public class BodyVisitor extends ASTVisitor {
 		}
 
 		if (stmt.getExpression() != null) {
-			ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, body);
+			LoopHeaderBlockExpression condition = new LoopHeaderBlockExpression();
+			ExpressionVisitor conditionVisitor = new ExpressionVisitor(nameGen, condition.getBody());
+
 			stmt.getExpression().accept(conditionVisitor);
 			loop.setCondition(conditionVisitor.getSimpleExpression());
+
+			if (!condition.getBody().isEmpty()) {
+				cc.kave.commons.model.ssts.impl.statements.ReturnStatement returnStatement = new cc.kave.commons.model.ssts.impl.statements.ReturnStatement();
+				returnStatement.setExpression(conditionVisitor.getSimpleExpression());
+				condition.getBody().add(returnStatement);
+
+				loop.setCondition(condition);
+			}
+
 		}
 
 		List<Expression> updaters = stmt.updaters();
@@ -213,9 +265,71 @@ public class BodyVisitor extends ASTVisitor {
 				assignment.setReference(variableReference);
 				fragment.getInitializer().accept(exprVisitor);
 				assignment.setExpression(exprVisitor.getAssignableExpression());
-				body.add(assignment);
+
+				if (!isSelfAssign(exprVisitor.getAssignableExpression(), variableReference)) {
+					body.add(assignment);
+				}
 			}
 		}
+
+		return false;
+	}
+
+	@Override
+	public boolean visit(SwitchStatement node) {
+		node.getExpression().accept(exprVisitor);
+
+		SwitchBlock switchBlock = new SwitchBlock();
+
+		if (exprVisitor.getVariableReference() != null) {
+			switchBlock.setReference(exprVisitor.getVariableReference());
+		} else if (exprVisitor.getSimpleExpression() instanceof ConstantValueExpression) {
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
+			switchBlock.setReference(genVar);
+
+			VariableDeclaration varDecl = new VariableDeclaration();
+			varDecl.setType(BindingFactory.getTypeName(node.getExpression().resolveTypeBinding()));
+			varDecl.setReference(genVar);
+
+			body.add(varDecl);
+
+			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+			assignment.setReference(genVar);
+			assignment.setExpression(exprVisitor.getSimpleExpression());
+
+			body.add(assignment);
+		}
+
+		List<Statement> statements = node.statements();
+		CaseBlock caseBlock = null;
+		BodyVisitor visitor = null;
+
+		for (int i = 0; i < statements.size(); i++) {
+
+			if (statements.get(i) instanceof SwitchCase) {
+				SwitchCase label = (SwitchCase) statements.get(i);
+
+				if (label.getExpression() != null) {
+					label.getExpression().accept(exprVisitor);
+
+					if (caseBlock != null) {
+						switchBlock.getSections().add(caseBlock);
+					}
+
+					caseBlock = new CaseBlock();
+					caseBlock.setLabel(exprVisitor.getSimpleExpression());
+
+					visitor = new BodyVisitor(nameGen, caseBlock.getBody());
+				} else {
+					visitor = new BodyVisitor(nameGen, switchBlock.getDefaultSection());
+				}
+			} else {
+				statements.get(i).accept(visitor);
+			}
+		}
+
+		body.add(switchBlock);
 
 		return false;
 	}
@@ -226,9 +340,10 @@ public class BodyVisitor extends ASTVisitor {
 		return false;
 	}
 
-	public static ExpressionStatement getEmptyCompletionExpression() {
-		ExpressionStatement expressionStatement = new ExpressionStatement();
-		expressionStatement.setExpression(new CompletionExpression());
-		return expressionStatement;
+	private boolean isSelfAssign(IAssignableExpression assign, IVariableReference varRef) {
+		if (assign instanceof ReferenceExpression && varRef.equals(((ReferenceExpression) assign).getReference())) {
+			return true;
+		}
+		return false;
 	}
 }

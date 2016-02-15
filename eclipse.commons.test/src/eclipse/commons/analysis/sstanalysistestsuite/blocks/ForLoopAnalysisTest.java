@@ -17,18 +17,12 @@
 package eclipse.commons.analysis.sstanalysistestsuite.blocks;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
-import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
 import eclipse.commons.analysis.sstanalysistestsuite.SSTAnalysisFixture;
 
@@ -44,6 +38,17 @@ public class ForLoopAnalysisTest extends BaseSSTAnalysisTest {
 		ForLoop loop = new ForLoop();
 		loop.getInit().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
 		loop.getInit().add(newAssignment("i", newConstantValue("0")));
+
+		assertMethod(loop);
+	}
+
+	@Test
+	public void init_MultipleDeclaration() {
+		ForLoop loop = new ForLoop();
+		loop.getInit().add(newVariableDeclaration("i", SSTAnalysisFixture.INT));
+		loop.getInit().add(newAssignment("i", newConstantValue("0")));
+		loop.getInit().add(newVariableDeclaration("j", SSTAnalysisFixture.INT));
+		loop.getInit().add(newAssignment("j", newConstantValue("1")));
 
 		assertMethod(loop);
 	}

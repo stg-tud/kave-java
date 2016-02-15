@@ -36,6 +36,7 @@ import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
+import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -55,9 +56,11 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -137,10 +140,10 @@ public abstract class BaseSSTAnalysisTest {
 		return fieldRef;
 	}
 
-	protected FieldReference newFieldReference(FieldName name, IVariableReference declTypeRef) {
+	protected FieldReference newFieldReference(FieldName name, String target) {
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setFieldName(name);
-		fieldRef.setReference(declTypeRef);
+		fieldRef.setReference(newVariableReference(target));
 
 		return fieldRef;
 	}
@@ -185,18 +188,6 @@ public abstract class BaseSSTAnalysisTest {
 		return assignment;
 	}
 
-	protected static ExpressionStatement newInvokeStatement(String target, MethodName methodName,
-			ISimpleExpression... parameters) {
-		ExpressionStatement stmt = new ExpressionStatement();
-		assertThat("methodName is static", !methodName.isStatic());
-		InvocationExpression invocation = new InvocationExpression();
-		invocation.setReference(newVariableReference(target));
-		invocation.setMethodName(methodName);
-		invocation.setParameters(Arrays.asList(parameters));
-		stmt.setExpression(invocation);
-		return stmt;
-	}
-
 	protected static InvocationExpression newInvokeConstructor(MethodName methodName, ISimpleExpression... parameters) {
 		assertThat("methodName is not a constructor", methodName.isConstructor());
 		InvocationExpression invocation = new InvocationExpression();
@@ -206,7 +197,14 @@ public abstract class BaseSSTAnalysisTest {
 		return invocation;
 	}
 
-	protected InvocationExpression newInvokeExpression(String target, MethodName methodName,
+	protected static ExpressionStatement newInvokeStatement(String target, MethodName methodName,
+			ISimpleExpression... parameters) {
+		assertThat("methodName is static", !methodName.isStatic());
+		InvocationExpression invocation = newInvokeExpression(target, methodName, parameters);
+		return expressionToStatement(invocation);
+	}
+
+	protected static InvocationExpression newInvokeExpression(String target, MethodName methodName,
 			ISimpleExpression... parameters) {
 		assertThat("methodName is static", !methodName.isStatic());
 		InvocationExpression invocation = new InvocationExpression();
@@ -214,6 +212,19 @@ public abstract class BaseSSTAnalysisTest {
 		invocation.setMethodName(methodName);
 		invocation.setParameters(Arrays.asList(parameters));
 		return invocation;
+	}
+
+	protected static ReturnStatement newReturnStatement(ISimpleExpression expression, boolean isVoid) {
+		ReturnStatement returnStatement = new ReturnStatement();
+		returnStatement.setExpression(expression);
+		returnStatement.setIsVoid(isVoid);
+		return returnStatement;
+	}
+
+	protected static ExpressionStatement expressionToStatement(IAssignableExpression expression) {
+		ExpressionStatement stmt = new ExpressionStatement();
+		stmt.setExpression(expression);
+		return stmt;
 	}
 
 	protected IAssignableExpression newCastExpression(TypeName target, VariableReference reference) {
@@ -233,6 +244,14 @@ public abstract class BaseSSTAnalysisTest {
 		}
 
 		return comp;
+	}
+
+	protected static MethodReference newMethodRef(MethodName methodName, String target) {
+		MethodReference methodReference = new MethodReference();
+		methodReference.setMethodName(methodName);
+		methodReference.setReference(newVariableReference(target));
+
+		return methodReference;
 	}
 
 	protected IMethodDeclaration getFirstMethod() {
@@ -257,7 +276,10 @@ public abstract class BaseSSTAnalysisTest {
 
 		IMethodDeclaration actual = getFirstMethod();
 
-		assertEquals("Different amount of statements", expected.getBody().size(), actual.getBody().size());
+		assertEquals(
+				"Different amount of statements:\n---------------------------\n" + expected.getBody().toString()
+						+ "\n---------------------------\n" + actual.getBody().toString() + "\n",
+				expected.getBody().size(), actual.getBody().size());
 		assertEquals(expected, actual);
 	}
 
