@@ -1,11 +1,11 @@
 /**
- * Copyright 2014 Technische Universität Darmstadt
+ * Copyright 2016 Technische Universität Darmstadt
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,32 +27,14 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 
-public class Episode {
+public abstract class Episode {
 
-	private int frequency;
-	private int numberOfEvents;
 	private Set<Fact> facts = Sets.newHashSet();
-
+	
 	public Iterable<Fact> getFacts() {
 		return facts;
 	}
-
-	public int getNumEvents() {
-		return numberOfEvents;
-	}
-
-	public int getFrequency() {
-		return frequency;
-	}
-
-	public void setNumEvents(int numEvents) {
-		this.numberOfEvents = numEvents;
-	}
-
-	public void setFrequency(int frequency) {
-		this.frequency = frequency;
-	}
-
+	
 	public void addFact(Fact fact) {
 		facts.add(fact);
 	}
@@ -67,12 +49,12 @@ public class Episode {
 		}
 	}
 
-	public void addListOfFacts(List<Fact> rawFacts) {
-		for (Fact rawFact : rawFacts) {
-			addFact(rawFact);
+	public void addListOfFacts(List<Fact> facts) {
+		for (Fact fact : facts) {
+			addFact(fact);
 		}
 	}
-
+	
 	public boolean containsFact(Fact fact1) {
 		if (facts.contains(fact1)) {
 			return true;
@@ -80,8 +62,18 @@ public class Episode {
 		return false;
 	}
 
-	public int getNumberOfFacts() {
+	public int getNumFacts() {
 		return facts.size();
+	}
+	
+	public int getNumEvents() {
+		int numberEvents = 0;
+		for (Fact fact : facts) {
+			if (!fact.isRelation()) {
+				numberEvents++;
+			}
+		}
+		return numberEvents;
 	}
 
 	@Override
@@ -100,12 +92,6 @@ public class Episode {
 	}
 
 	public boolean equals(Episode episode) {
-		if (this.numberOfEvents != episode.numberOfEvents) {
-			return false;
-		}
-		if (this.frequency != episode.frequency) {
-			return false;
-		}
 		if (this.facts.size() != episode.facts.size()) {
 			return false;
 		}

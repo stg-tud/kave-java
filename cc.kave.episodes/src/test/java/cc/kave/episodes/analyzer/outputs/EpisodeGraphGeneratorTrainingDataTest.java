@@ -50,9 +50,9 @@ import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.mining.reader.PatternParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
@@ -68,7 +68,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private static final double BD = 0.8;
 
 	@Mock
-	private EpisodeParser episodeParser;
+	private PatternParser episodeParser;
 	@Mock
 	private EventMappingParser mappingParser;
 	@Mock
@@ -79,7 +79,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
-	private Map<Integer, List<Episode>> episodes;
+	private Map<Integer, List<Pattern>> episodes;
 	private File folderStructure;;
 	
 	private EpisodeGraphGeneratorTrainingData sut;
@@ -145,9 +145,9 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 
 		File fileName;
 		int epCounter = 0;
-		for (Map.Entry<Integer, List<Episode>> entry : episodes.entrySet()) {
+		for (Map.Entry<Integer, List<Pattern>> entry : episodes.entrySet()) {
 			if (entry.getKey() > 1) {
-				for (Episode e : entry.getValue()) {
+				for (Pattern e : entry.getValue()) {
 					List<String> types = getTypes(e, events);
 					for (String type : types) {
 						String folder = folderStructure.getAbsolutePath();
@@ -163,7 +163,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		verify(mappingParser).parse();
 	}
 
-	private List<String> getTypes(Episode e, List<Event> events) {
+	private List<String> getTypes(Pattern e, List<Event> events) {
 		List<String> types = new LinkedList<String>();
 		for (Fact fact : e.getFacts()) {
 			if (!fact.isRelation()) {
@@ -177,8 +177,8 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		return types;
 	}
 
-	private Map<Integer, List<Episode>> createEpisodes() {
-		Map<Integer, List<Episode>> episodes = new HashMap<Integer, List<Episode>>();
+	private Map<Integer, List<Pattern>> createEpisodes() {
+		Map<Integer, List<Pattern>> episodes = new HashMap<Integer, List<Pattern>>();
 		episodes.put(1, newArrayList(newEpisode("1"), newEpisode("2"), newEpisode("3")));
 		episodes.put(2, newArrayList(newEpisode("4", "5"), newEpisode("3", "4")));
 		episodes.put(3,
@@ -187,10 +187,9 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		return episodes;
 	}
 
-	private Episode newEpisode(String... facts) {
-		Episode episode = new Episode();
+	private Pattern newEpisode(String... facts) {
+		Pattern episode = new Pattern();
 		episode.setFrequency(3);
-		episode.setNumEvents(facts.length);
 		episode.addStringsOfFacts(facts);
 		if (facts.length > 1) {
 			for (int idx1 = 0; idx1 < facts.length - 1; idx1++) {

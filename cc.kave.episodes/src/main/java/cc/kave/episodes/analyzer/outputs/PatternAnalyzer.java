@@ -21,26 +21,26 @@ import java.util.Map;
 import com.google.inject.Inject;
 
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.mining.reader.PatternParser;
+import cc.kave.episodes.model.Pattern;
 
 public class PatternAnalyzer {
 
-	private EpisodeParser episodeParser;
+	private PatternParser episodeParser;
 	private MaximalEpisodes maxEpisodes;
 	
 	private static final int FREQTHRESH = 3;
 	private static final double BDTHRESH = 0.01;
 	
 	@Inject
-	public PatternAnalyzer(EpisodeParser parser, MaximalEpisodes me) {
+	public PatternAnalyzer(PatternParser parser, MaximalEpisodes me) {
 		this.episodeParser = parser;
 		this.maxEpisodes = me;
 	}
 	
 	public void readPatterns() {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
-		Map<Integer, List<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
+		Map<Integer, List<Pattern>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
+		Map<Integer, List<Pattern>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
 		
 		int allEpisodeCounter = 0;
 		int maxEpisodeCounter = 0;
@@ -48,7 +48,7 @@ public class PatternAnalyzer {
 		System.out.println("Maximal node-level is " + allEpisodes.size());
 		System.out.println();
 		
-		for (Map.Entry<Integer, List<Episode>> entry : allEpisodes.entrySet()) {
+		for (Map.Entry<Integer, List<Pattern>> entry : allEpisodes.entrySet()) {
 			System.out.println("Node level = " + entry.getKey());
 			System.out.println("All episodes = " + entry.getValue().size());
 			allEpisodeCounter += entry.getValue().size();
@@ -56,7 +56,7 @@ public class PatternAnalyzer {
 		System.out.println("Total number of maximal episodes is " + allEpisodeCounter);
 		System.out.println();
 		
-		for (Map.Entry<Integer, List<Episode>> entry : maximalEpisodes.entrySet()) {
+		for (Map.Entry<Integer, List<Pattern>> entry : maximalEpisodes.entrySet()) {
 			System.out.println("Node level = " + entry.getKey());
 			System.out.println("Maximal episodes = " + entry.getValue().size());
 			maxEpisodeCounter += entry.getValue().size();

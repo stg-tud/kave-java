@@ -25,131 +25,121 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 import cc.recommenders.datastructures.Tuple;
 
 public class ProposalHelperTest {
 	
-	private Episode episode1;
-	private Episode episode2;
-	private Episode episode3;
-	private Episode episode4;
-	private Episode episode5;
-	private Episode episode6;
-	private Episode episode7;
+	private Pattern pattern1;
+	private Pattern pattern2;
+	private Pattern pattern3;
+	private Pattern pattern4;
+	private Pattern pattern5;
+	private Pattern pattern6;
+	private Pattern pattern7;
 
-	private Set<Tuple<Episode, Double>> actuals;
-	private Set<Tuple<Episode, Double>> expecteds;
+	private Set<Tuple<Pattern, Double>> actuals;
+	private Set<Tuple<Pattern, Double>> expecteds;
 
 	@Before
 	public void setup() {
-		episode1 = new Episode();
-		episode1.addFact("1");
-		episode1.setNumEvents(1);
-		episode1.setFrequency(3);
-
-		episode2 = new Episode();
-		episode2.addStringsOfFacts("1", "2", "1>2");
-		episode2.setNumEvents(2);
-		episode2.setFrequency(3);
-
-		episode3 = new Episode();
-		episode3.addStringsOfFacts("1", "3", "1>3");
-		episode3.setNumEvents(2);
-		episode3.setFrequency(4);
+		pattern1 = createPattern("1");
+		pattern1.setFrequency(3);
 		
-		episode4 = new Episode();
-		episode4.addStringsOfFacts("2", "3", "2>3");
-		episode4.setNumEvents(2);
-		episode4.setFrequency(2);
+		pattern2 = createPattern("1", "2", "1>2");
+		pattern2.setFrequency(3);
+		pattern3 = createPattern("1", "3", "1>3");
+		pattern3.setFrequency(4);
+		pattern4 = createPattern("2", "3", "2>3");
+		pattern4.setFrequency(2);
 		
-		episode5 = new Episode();
-		episode5.addStringsOfFacts("1", "2", "3", "1>2");
-		episode5.setNumEvents(3);
-		episode5.setFrequency(3);
-		
-		episode6 = new Episode();
-		episode6.addStringsOfFacts("1", "2", "4", "2>4");
-		episode6.setNumEvents(3);
-		episode6.setFrequency(3);
-		
-		episode7 = new Episode();
-		episode7.addStringsOfFacts("1", "3", "4", "1>3");
-		episode7.setNumEvents(3);
-		episode7.setFrequency(3);
+		pattern5 = createPattern("1", "2", "3", "1>2");
+		pattern5.setFrequency(3);
+		pattern6 = createPattern("1", "2", "4", "2>4");
+		pattern6.setFrequency(3);
+		pattern7 = createPattern("1", "3", "4", "1>3");
+		pattern7.setFrequency(3);
 		
 		actuals = ProposalHelper.createEpisodesSortedSet();
 		expecteds = Sets.newLinkedHashSet();
 	}
 
+	private Pattern createPattern(String...string) {
+		Pattern pattern = new Pattern();
+		for (String s : string) {
+			pattern.addFact(s);
+		}
+		return pattern;
+	}
+
 	@Test
 	public void firstElemIsNUllAndSecondIsEqual() {
-		actuals.add(Tuple.newTuple(episode1, 1.0));
-		actuals.add(Tuple.newTuple(new Episode(), 1.0));
+		actuals.add(Tuple.newTuple(pattern1, 1.0));
+		actuals.add(Tuple.newTuple(new Pattern(), 1.0));
 	}
 
 	@Test
 	public void firstElemIsNUllAndSecondIsEqual_2() {
-		actuals.add(Tuple.newTuple(new Episode(), 1.0));
-		actuals.add(Tuple.newTuple(episode1, 1.0));
+		actuals.add(Tuple.newTuple(new Pattern(), 1.0));
+		actuals.add(Tuple.newTuple(pattern1, 1.0));
 	}
 
 	@Test
 	public void isInDescendingOrder() {
-		actuals.add(Tuple.newTuple(episode4, 0.5));
-		actuals.add(Tuple.newTuple(episode1, 1.0));
-		actuals.add(Tuple.newTuple(episode2, 0.7));
+		actuals.add(Tuple.newTuple(pattern4, 0.5));
+		actuals.add(Tuple.newTuple(pattern1, 1.0));
+		actuals.add(Tuple.newTuple(pattern2, 0.7));
 
-		expecteds.add(Tuple.newTuple(episode1, 1.0));
-		expecteds.add(Tuple.newTuple(episode2, 0.7));
-		expecteds.add(Tuple.newTuple(episode4, 0.5));
+		expecteds.add(Tuple.newTuple(pattern1, 1.0));
+		expecteds.add(Tuple.newTuple(pattern2, 0.7));
+		expecteds.add(Tuple.newTuple(pattern4, 0.5));
 
 		assertSets();
 	}
 
 	@Test
 	public void frequencySorting() {
-		actuals.add(Tuple.newTuple(episode2, 0.9));
-		actuals.add(Tuple.newTuple(episode3, 0.9));
-		actuals.add(Tuple.newTuple(episode4, 0.9));
+		actuals.add(Tuple.newTuple(pattern2, 0.9));
+		actuals.add(Tuple.newTuple(pattern3, 0.9));
+		actuals.add(Tuple.newTuple(pattern4, 0.9));
 
-		expecteds.add(Tuple.newTuple(episode3, 0.9));
-		expecteds.add(Tuple.newTuple(episode2, 0.9));
-		expecteds.add(Tuple.newTuple(episode4, 0.9));
+		expecteds.add(Tuple.newTuple(pattern3, 0.9));
+		expecteds.add(Tuple.newTuple(pattern2, 0.9));
+		expecteds.add(Tuple.newTuple(pattern4, 0.9));
 
 		assertSets();
 	}
 
 	@Test
 	public void numberOfEventsSorting() {
-		actuals.add(Tuple.newTuple(episode2, 0.9));
-		actuals.add(Tuple.newTuple(episode5, 0.9));
-		actuals.add(Tuple.newTuple(episode1, 0.9));
+		actuals.add(Tuple.newTuple(pattern2, 0.9));
+		actuals.add(Tuple.newTuple(pattern5, 0.9));
+		actuals.add(Tuple.newTuple(pattern1, 0.9));
 
-		expecteds.add(Tuple.newTuple(episode5, 0.9));
-		expecteds.add(Tuple.newTuple(episode2, 0.9));
-		expecteds.add(Tuple.newTuple(episode1, 0.9));
+		expecteds.add(Tuple.newTuple(pattern5, 0.9));
+		expecteds.add(Tuple.newTuple(pattern2, 0.9));
+		expecteds.add(Tuple.newTuple(pattern1, 0.9));
 
 		assertSets();
 	}
 	
 	@Test 
 	public void eventSorting() {
-		actuals.add(Tuple.newTuple(episode7, 0.9));
-		actuals.add(Tuple.newTuple(episode5, 0.9));
-		actuals.add(Tuple.newTuple(episode6, 0.9));
+		actuals.add(Tuple.newTuple(pattern7, 0.9));
+		actuals.add(Tuple.newTuple(pattern5, 0.9));
+		actuals.add(Tuple.newTuple(pattern6, 0.9));
 		
-		expecteds.add(Tuple.newTuple(episode5, 0.9));
-		expecteds.add(Tuple.newTuple(episode6, 0.9));
-		expecteds.add(Tuple.newTuple(episode7, 0.9));
+		expecteds.add(Tuple.newTuple(pattern5, 0.9));
+		expecteds.add(Tuple.newTuple(pattern6, 0.9));
+		expecteds.add(Tuple.newTuple(pattern7, 0.9));
 		
 		assertSets();
 	}
 
 	private void assertSets() {
 		assertEquals(expecteds.size(), actuals.size());
-		Iterator<Tuple<Episode, Double>> itA = expecteds.iterator();
-		Iterator<Tuple<Episode, Double>> itB = actuals.iterator();
+		Iterator<Tuple<Pattern, Double>> itA = expecteds.iterator();
+		Iterator<Tuple<Pattern, Double>> itB = actuals.iterator();
 		while (itA.hasNext()) {
 			assertEquals(itA.next(), itB.next());
 		}

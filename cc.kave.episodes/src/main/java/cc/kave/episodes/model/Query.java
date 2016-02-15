@@ -15,67 +15,42 @@
  */
 package cc.kave.episodes.model;
 
-import java.util.List;
+public class Query extends Episode {
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
-import com.google.common.collect.Lists;
-
-import cc.kave.commons.model.episodes.Fact;
-
-public class Query {
-
-	private List<Fact> facts = Lists.newLinkedList();
-	private int numberOfFacts;
-
-	public Iterable<Fact> getFacts() {
-		return facts;
+	private int numRemovedEvents;
+	private QueryTarget queryTarget;
+	
+	public int getNumRemovedEvents() {
+		return numRemovedEvents;
 	}
-
-	public void addStringsOfFacts(String... rawFacts) {
-		for (String rawFact : rawFacts) {
-			addFact(rawFact);
-		}
+	
+	public void setNumRemovedEvents(int numberOfEventsRemoved) {
+		this.numRemovedEvents = numberOfEventsRemoved;
 	}
-
-	public void addFact(String rawFact) {
-		facts.add(new Fact(rawFact));
+	
+	public QueryTarget getQueryTarget() {
+		return queryTarget;
 	}
-
-	public int getNumberOfFacts() {
-		return numberOfFacts;
+	
+	public void setQueryTarget(QueryTarget queryTarget) {
+		this.queryTarget = queryTarget;
 	}
-
-	public void setNumberOfFacts(int numberOfEvents) {
-		this.numberOfFacts = numberOfEvents;
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
-	}
-
+	
 	public boolean equals(Query query) {
-		if (this.facts.size() != query.facts.size()) {
+		if (this.getNumEvents() != query.getNumEvents()) {
 			return false;
 		}
-		for (Fact fact : this.facts) {
-			if (!query.facts.contains(fact)) {
-				return false;
-			}
+		if (this.getNumFacts() != query.getNumFacts()) {
+			return false;
+		}
+		if (!this.getFacts().equals(query.getFacts())) {
+			return false;
+		}
+		if (this.numRemovedEvents != query.numRemovedEvents) {
+			return false;
+		}
+		if (!this.queryTarget.equals(query.getQueryTarget())) {
+			return false;
 		}
 		return true;
 	}

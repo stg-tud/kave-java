@@ -35,6 +35,7 @@ import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.QueryTarget;
 import cc.recommenders.io.Logger;
 
 public class EpisodeGraphGeneratorValidationData {
@@ -71,10 +72,11 @@ public class EpisodeGraphGeneratorValidationData {
 		List<Event> eventMapping = mappingParser.parse();
 		
 		System.out.println("Readng Contexts");
-		List<Episode> allEpisodes = validationParser.parse(eventMapping);
+		List<QueryTarget> validationData = validationParser.parse(eventMapping);
 		
+		List<Episode> episodes = queryTargetsToEpisodesConverter(validationData);
 		System.out.println("Removing transitivity closures");
-		List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(allEpisodes);
+		List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(episodes);
 		
 		String directory = createDirectoryStructure();
 
@@ -91,9 +93,22 @@ public class EpisodeGraphGeneratorValidationData {
 		}
 	}
 
-	private List<String> getAPIType(Episode frequentEpisode, List<Event> eventMapper) {
+	private List<Episode> queryTargetsToEpisodesConverter(List<QueryTarget> validationData) {
+		List<Episode> episodes = new LinkedList<Episode>();
+		for (QueryTarget qt : validationData) {
+			Episode e = new Episode() {
+			};
+			for (Fact fact : qt.getFacts()) {
+				e.addFact(fact);
+			}
+			episodes.add(e);
+		}
+		return episodes;
+	}
+
+	private List<String> getAPIType(Episode episode, List<Event> eventMapper) {
 		List<String> apiTypes = new LinkedList<String>();
-		for (Fact fact : frequentEpisode.getFacts()) {
+		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
 				continue;
 			}

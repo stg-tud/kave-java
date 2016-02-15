@@ -34,14 +34,15 @@ import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.PatternParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 import cc.recommenders.io.Logger;
 
 public class EpisodeGraphGeneratorTrainingData {
 
-	private EpisodeParser episodeParser;
+	private PatternParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	private EventMappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
@@ -51,7 +52,7 @@ public class EpisodeGraphGeneratorTrainingData {
 	private File rootFolder;
 
 	@Inject
-	public EpisodeGraphGeneratorTrainingData(@Named("graph") File directory, EpisodeParser episodeParser,
+	public EpisodeGraphGeneratorTrainingData(@Named("graph") File directory, PatternParser episodeParser,
 			MaximalEpisodes episodeLearned, EventMappingParser mappingParser,
 			TransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {
@@ -69,19 +70,20 @@ public class EpisodeGraphGeneratorTrainingData {
 	}
 
 	public void generateGraphs(int frequencyThreshold, double bidirectionalThreshold) throws Exception {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
-		Map<Integer, List<Episode>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
+		Map<Integer, List<Pattern>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
+		Map<Integer, List<Pattern>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
 		List<Event> eventMapping = mappingParser.parse();
 
 		String directory = createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
 
 		int graphIndex = 0;
 
-		for (Map.Entry<Integer, List<Episode>> entry : maxEpisodes.entrySet()) {
+		for (Map.Entry<Integer, List<Pattern>> entry : maxEpisodes.entrySet()) {
 			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
 			Logger.append("\n");
 			if (entry.getKey() > 1) {
-				List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+				List<Episode> episodes = patternsToEpisodesConverter(entry.getValue());
+				List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(episodes);
 				
 				for (Episode e : learnedEpisodes) {
 					Logger.log("Writting episode number %s.\n", graphIndex);
@@ -94,6 +96,19 @@ public class EpisodeGraphGeneratorTrainingData {
 				}
 			}
 		}
+	}
+
+	private List<Episode> patternsToEpisodesConverter(List<Pattern> patterns) {
+		List<Episode> episodes = new LinkedList<Episode>();
+		for (Pattern pattern : patterns) {
+			Episode ep = new Episode() {
+			};
+			for (Fact fact : pattern.getFacts()) {
+				ep.addFact(fact);
+			}
+			episodes.add(ep);
+		}
+		return episodes;
 	}
 
 	private List<String> getAPIType(Episode episode, List<Event> events) {

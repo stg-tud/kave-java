@@ -26,17 +26,18 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
+import cc.kave.episodes.model.Query;
 import cc.recommenders.datastructures.Tuple;
 
 public class EpisodeRecommenderTest {
 	
 	private DecimalFormat df = new DecimalFormat("#.###");
 
-	private Set<Tuple<Episode, Double>> expectedProposals;
-	private Set<Tuple<Episode, Double>> actualProposals;
-	private Map<Integer, List<Episode>> learnedEpisodes;
-	private Map<Integer, List<Episode>> emptyEpisodes;
+	private Set<Tuple<Pattern, Double>> expectedProposals;
+	private Set<Tuple<Pattern, Double>> actualProposals;
+	private Map<Integer, List<Pattern>> learnedPatterns;
+	private Map<Integer, List<Pattern>> emptyEpisodes;
 
 	private EpisodeRecommender sut;
 
@@ -45,30 +46,39 @@ public class EpisodeRecommenderTest {
 		sut = new EpisodeRecommender();
 		expectedProposals = Sets.newLinkedHashSet();
 		actualProposals = Sets.newLinkedHashSet();
-		emptyEpisodes = new HashMap<Integer, List<Episode>>();
+		emptyEpisodes = new HashMap<Integer, List<Pattern>>();
 
-		learnedEpisodes = new HashMap<Integer, List<Episode>>();
-		learnedEpisodes.put(1, newArrayList(newEpisode(3, 1, "1"), newEpisode(3, 1, "2"), newEpisode(3, 1, "3")));
-		learnedEpisodes.put(2, newArrayList(newEpisode(3, 2, "4", "5", "4>5"), newEpisode(2, 2, "4", "6", "4>6")));
-		learnedEpisodes.put(3, newArrayList(newEpisode(1, 3, "6", "7", "8", "7>8"), newEpisode(3, 3, "10", "11", "12", "11>12")));
-		learnedEpisodes.put(4, newArrayList(newEpisode(3, 4, "10", "11", "12", "13")));
+		learnedPatterns = new HashMap<Integer, List<Pattern>>();
+		learnedPatterns.put(1, newArrayList(newPattern(3, "1"), newPattern(3, "2"), newPattern(3, "3")));
+		learnedPatterns.put(2, newArrayList(newPattern(3, "4", "5", "4>5"), newPattern(2, "4", "6", "4>6")));
+		learnedPatterns.put(3, newArrayList(newPattern(1, "6", "7", "8", "7>8"), newPattern(3, "10", "11", "12", "11>12")));
+		learnedPatterns.put(4, newArrayList(newPattern(3, "10", "11", "12", "13")));
+	}
+
+	private Pattern newPattern(int freq, String...string) {
+		Pattern pattern = new Pattern();
+		pattern.setFrequency(freq);
+		for (String s : string) {
+			pattern.addFact(s);
+		}
+		return pattern;
 	}
 
 	@Test(expected=Exception.class)
 	public void noLearnedEpisodes() throws Exception {
-		sut.getProposals(newEpisode(3, 1, "1"), emptyEpisodes, 5);
+		sut.getProposals(newQuery(3, 1, "1"), emptyEpisodes, 5);
 	}
 	
 	@Test(expected=Exception.class)
 	public void noProposalsToShow() throws Exception {
-		sut.getProposals(newEpisode(3, 1, "1"), learnedEpisodes, -1);
+		sut.getProposals(newQuery(3, 1, "1"), learnedPatterns, -1);
 	}
 	
 	@Test
 	public void queryBiggerThenEpisode() throws Exception {
 		queryWith(4, "4", "5", "6", "9", "4>5", "4>6");
 		
-		addProposal(newEpisode(1, 3, "6", "7", "8", "7>8"), Double.valueOf(df.format(1.0 / 5.0)));
+		addProposal(newPattern(1, "6", "7", "8", "7>8"), Double.valueOf(df.format(1.0 / 5.0)));
 		
 		assertProposals(actualProposals);
 	}
@@ -77,8 +87,8 @@ public class EpisodeRecommenderTest {
 	public void sameProbabilityDifferentEventsNumber() throws Exception {
 		queryWith(2, "10", "11");
 		
-		addProposal(newEpisode(3, 4, "10", "11", "12", "13"), Double.valueOf(df.format(2.0 / 3.0)));
-		addProposal(newEpisode(3, 3, "10", "11", "12", "11>12"), Double.valueOf(df.format(2.0 / 3.0)));
+		addProposal(newPattern(3, "10", "11", "12", "13"), Double.valueOf(df.format(2.0 / 3.0)));
+		addProposal(newPattern(3, "10", "11", "12", "11>12"), Double.valueOf(df.format(2.0 / 3.0)));
 		
 		assertProposals(actualProposals);
 	}
@@ -87,7 +97,7 @@ public class EpisodeRecommenderTest {
 	public void oneEventQuery() throws Exception {
 		queryWith(1, "1");
 
-		addProposal(newEpisode(3, 1, "1"), 1.0);
+		addProposal(newPattern(3, "1"), 1.0);
 
 		assertProposals(actualProposals);
 	}
@@ -98,9 +108,9 @@ public class EpisodeRecommenderTest {
 		// order relation is not counted in size
 		queryWith(2, "5", "6", "5>6");
 
-		addProposal(newEpisode(3, 2, "4", "5", "4>5"), Double.valueOf(df.format(1.0 / 3.0)));
-		addProposal(newEpisode(2, 2, "4", "6", "4>6"), Double.valueOf(df.format(1.0 / 3.0)));
-		addProposal(newEpisode(1, 3, "6", "7", "8", "7>8"), Double.valueOf(df.format(2.0 / 7.0)));
+		addProposal(newPattern(3, "4", "5", "4>5"), Double.valueOf(df.format(1.0 / 3.0)));
+		addProposal(newPattern(2, "4", "6", "4>6"), Double.valueOf(df.format(1.0 / 3.0)));
+		addProposal(newPattern(1, "6", "7", "8", "7>8"), Double.valueOf(df.format(2.0 / 7.0)));
 
 		assertProposals(actualProposals);
 	}
@@ -110,7 +120,7 @@ public class EpisodeRecommenderTest {
 
 		queryWith(2, "7", "8");
 
-		addProposal(newEpisode(1, 3, "6", "7", "8", "7>8"), Double.valueOf(df.format(2.0 / 3.0)));
+		addProposal(newPattern(1, "6", "7", "8", "7>8"), Double.valueOf(df.format(2.0 / 3.0)));
 
 		assertProposals(actualProposals);
 	}
@@ -123,23 +133,21 @@ public class EpisodeRecommenderTest {
 		assertProposals(actualProposals);
 	}
 
-	private Episode newEpisode(int frequency, int numberOfEvents, String... facts) {
-		Episode episode = new Episode();
-		episode.addStringsOfFacts(facts);
-		episode.setFrequency(frequency);
-		episode.setNumEvents(numberOfEvents);
-		return episode;
+	private Query newQuery(int frequency, int numberOfEvents, String... facts) {
+		Query query = new Query();
+		query.addStringsOfFacts(facts);
+		return query;
 	}
 
 	private void queryWith(int numberOfEvents, String... facts) throws Exception {
-		actualProposals = sut.getProposals(newEpisode(1, numberOfEvents, facts), learnedEpisodes, 3);
+		actualProposals = sut.getProposals(newQuery(1, numberOfEvents, facts), learnedPatterns, 3);
 	}
 
-	private void addProposal(Episode e, double probability) {
+	private void addProposal(Pattern e, double probability) {
 		expectedProposals.add(Tuple.newTuple(e, probability));
 	}
 
-	private void assertProposals(Set<Tuple<Episode, Double>> actualProposals) {
+	private void assertProposals(Set<Tuple<Pattern, Double>> actualProposals) {
 		if (expectedProposals.size() != actualProposals.size()) {
 			System.out.println("expected\n");
 			System.out.println(expectedProposals);
@@ -147,11 +155,11 @@ public class EpisodeRecommenderTest {
 			System.out.println(actualProposals);
 			fail();
 		}
-		Iterator<Tuple<Episode, Double>> itE = expectedProposals.iterator();
-		Iterator<Tuple<Episode, Double>> itA = actualProposals.iterator();
+		Iterator<Tuple<Pattern, Double>> itE = expectedProposals.iterator();
+		Iterator<Tuple<Pattern, Double>> itA = actualProposals.iterator();
 		while (itE.hasNext()) {
-			Tuple<Episode, Double> expected = itE.next();
-			Tuple<Episode, Double> actual = itA.next();
+			Tuple<Pattern, Double> expected = itE.next();
+			Tuple<Pattern, Double> actual = itA.next();
 			assertEquals(expected, actual);
 		}
 	}

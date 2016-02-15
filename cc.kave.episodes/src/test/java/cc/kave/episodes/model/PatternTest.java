@@ -27,13 +27,13 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 
-public class EpisodeTest {
+public class PatternTest {
 
-	private Episode sut;
+	private Pattern sut;
 
 	@Before
 	public void setup() {
-		sut = new Episode();
+		sut = new Pattern();
 	}
 
 	@Test
@@ -45,25 +45,24 @@ public class EpisodeTest {
 
 	@Test
 	public void valuesCanBeSet() {
-		sut.setNumEvents(2);
-		assertEquals(2, sut.getNumEvents());
 		sut.setFrequency(3);
 		assertEquals(3, sut.getFrequency());
 		sut.addFact("f");
 		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
+		assertEquals(1, sut.getNumEvents());
 	}
 
 	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("f", "g");
 		assertEquals(Sets.newHashSet(new Fact("f"), new Fact("g")), sut.getFacts());
-		assertTrue(sut.getNumberOfFacts() == 2);
+		assertTrue(sut.getNumFacts() == 2);
 	}
 
 	@Test
 	public void equality_default() {
-		Episode a = new Episode();
-		Episode b = new Episode();
+		Pattern a = new Pattern();
+		Pattern b = new Pattern();
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
@@ -71,10 +70,10 @@ public class EpisodeTest {
 
 	@Test
 	public void equality_reallyTheSame() {
-		Episode a = new Episode();
+		Pattern a = new Pattern();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Episode b = new Episode();
+		Pattern b = new Pattern();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertEquals(a, b);
@@ -85,10 +84,10 @@ public class EpisodeTest {
 
 	@Test
 	public void equality_diffEvents() {
-		Episode a = new Episode();
+		Pattern a = new Pattern();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Episode b = new Episode();
+		Pattern b = new Pattern();
 		b.addStringsOfFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
@@ -99,10 +98,10 @@ public class EpisodeTest {
 
 	@Test
 	public void equality_sameEventsDiffRelations() {
-		Episode a = new Episode();
+		Pattern a = new Pattern();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Episode b = new Episode();
+		Pattern b = new Pattern();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 
 		assertNotEquals(a, b);

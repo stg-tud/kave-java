@@ -32,7 +32,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.QueryTarget;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -46,8 +46,8 @@ public class ValidationContextsParser {
 		this.rootDir = directory;
 	}
 
-	public List<Episode> parse(List<Event> eventsList) throws ZipException, IOException {
-		List<Episode> validationEpisodes = new LinkedList<Episode>();
+	public List<QueryTarget> parse(List<Event> eventsList) throws ZipException, IOException {
+		List<QueryTarget> validationData = new LinkedList<QueryTarget>();
 
 		for (String zip : findZips()) {
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
@@ -68,41 +68,21 @@ public class ValidationContextsParser {
 
 					md.accept(tfv, facts);
 
-//					if (counter == 44) {
-						Logger.log("Creating episode " + ++counter);
-						Episode ep = createEpisode(facts);
-						validationEpisodes.add(ep);
-						
-//						showEpisode(ep, eventsList);
-//						return validationEpisodes;
-//					} else {
-//						counter++;
-//					}
+					Logger.log("Creating episode " + ++counter);
+					QueryTarget qt = createQueryTarget(facts);
+					validationData.add(qt);
 				}
 
 				if (i++ > 10) {
 					Logger.log("\t... (skipping the rest)");
 					ra.close();
-					return validationEpisodes;
+					return validationData;
 				}
 			}
 			ra.close();
 		}
-		return validationEpisodes;
+		return validationData;
 	}
-
-//	private void showEpisode(Episode ep, List<Event> allEvents) {
-//		int numEvents = 0;
-//		Iterable<Fact> allFacts = ep.getFacts();
-//		for (Fact fact : allFacts) {
-//			if (!fact.isRelation()) {
-//				numEvents++;
-//				int id = fact.getFactID();
-//				Logger.log("%d. %s", id, allEvents.get(id).toString());
-//			}
-//		}
-//		Logger.log("Total number of events: %d", numEvents);
-//	}
 
 	private Set<String> findZips() {
 		Set<String> zips = rootDir.findFiles(new Predicate<String>() {
@@ -115,25 +95,19 @@ public class ValidationContextsParser {
 		return zips;
 	}
 
-	private Episode createEpisode(Set<Fact> facts) {
-		int numberEvents = 0;
-
-		Episode episode = new Episode();
-		episode.setFrequency(1);
+	private QueryTarget createQueryTarget(Set<Fact> facts) {
+		QueryTarget qts = new QueryTarget();
 
 		for (Fact f : facts) {
 			if (!f.isRelation()) {
-				episode.addFact(f);
-				numberEvents++;
+				qts.addFact(f);
 			} else {
 				Tuple<Fact, Fact> factsTuple = f.getRelationFacts();
 				if (!factsTuple.getFirst().equals(factsTuple.getSecond())) {
-					episode.addFact(f);
+					qts.addFact(f);
 				}
 			}
 		}
-		episode.setNumEvents(numberEvents);
-
-		return episode;
+		return qts;
 	}
 }

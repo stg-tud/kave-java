@@ -35,20 +35,19 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 
 public class EpisodeToGraphConverterTest {
 
-	private Episode episode;
+	private Pattern pattern;
 	private List<Event> eventMapping;
 	private EpisodeToGraphConverter sut;
 
 	@Before
 	public void setup() {
-		episode = new Episode();
-		episode.setFrequency(3);
-		episode.setNumEvents(4);
-		episode.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
+		pattern = new Pattern();
+		pattern.setFrequency(3);
+		pattern.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
 
 		createMapping(eventMethodDecl("M1"), eventInvocation("M2"), eventMethodDecl("M3"), eventInvocation("M4"),
 				eventMethodDecl("M5"));
@@ -122,7 +121,7 @@ public class EpisodeToGraphConverterTest {
 		Fact labelNode = new Fact(labels);
 		expected.addVertex(labelNode);
 
-		DirectedGraph<Fact, DefaultEdge> actuals = sut.convert(episode, eventMapping);
+		DirectedGraph<Fact, DefaultEdge> actuals = sut.convert(pattern, eventMapping);
 
 		assertEquals(expected.toString(), actuals.toString());
 	}

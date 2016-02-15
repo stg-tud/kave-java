@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeParserTest {
@@ -44,19 +44,19 @@ public class EpisodeParserTest {
 	private static final double BD = 0.1;
 
 	private FileReader reader;
-	private EpisodeParser sut;
+	private PatternParser sut;
 
 	@Before
 	public void setup() {
 		reader = mock(FileReader.class);
-		sut = new EpisodeParser(rootFolder.getRoot(), reader);
+		sut = new PatternParser(rootFolder.getRoot(), reader);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder does not exist");
-		sut = new EpisodeParser(new File("does not exist"), reader);
+		sut = new PatternParser(new File("does not exist"), reader);
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class EpisodeParserTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequent episode folder is not a folder, but a file");
-		sut = new EpisodeParser(file, reader);
+		sut = new PatternParser(file, reader);
 	}
 
 	@Test
@@ -83,17 +83,17 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
+		Map<Integer, List<Pattern>> expected = new HashMap<Integer, List<Pattern>>();
+		List<Pattern> episodeList = new LinkedList<Pattern>();
 
-		Episode episode = createEpisode(3, 1, "1");
+		Pattern episode = createEpisode(3, 1, "1");
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, List<Pattern>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -119,17 +119,17 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
+		Map<Integer, List<Pattern>> expected = new HashMap<Integer, List<Pattern>>();
+		List<Pattern> episodeList = new LinkedList<Pattern>();
 
-		Episode episode = createEpisode(3, 1, "1");
+		Pattern episode = createEpisode(3, 1, "1");
 		episodeList.add(episode);
 
 		expected.put(1, episodeList);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, List<Pattern>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -156,10 +156,10 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
+		Map<Integer, List<Pattern>> expected = new HashMap<Integer, List<Pattern>>();
+		List<Pattern> episodeList = new LinkedList<Pattern>();
 
-		Episode episode = createEpisode(3, 1, "1");
+		Pattern episode = createEpisode(3, 1, "1");
 		episodeList.add(episode);
 
 		episode = createEpisode(2, 1, "2");
@@ -167,7 +167,7 @@ public class EpisodeParserTest {
 
 		expected.put(1, episodeList);
 
-		episodeList = new LinkedList<Episode>();
+		episodeList = new LinkedList<Pattern>();
 
 		episode = createEpisode(3, 2, "1", "2", "1>2");
 		episodeList.add(episode);
@@ -176,17 +176,16 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, List<Pattern>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
 
-	private Episode createEpisode(int freq, int numberOfExistenceFacts, String...strings) {
-		Episode episode = new Episode();
+	private Pattern createEpisode(int freq, int numberOfExistenceFacts, String...strings) {
+		Pattern episode = new Pattern();
 		episode.setFrequency(freq);
-		episode.setNumEvents(numberOfExistenceFacts);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}

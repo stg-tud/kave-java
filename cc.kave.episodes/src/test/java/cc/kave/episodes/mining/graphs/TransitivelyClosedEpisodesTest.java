@@ -59,9 +59,7 @@ public class TransitivelyClosedEpisodesTest {
 	}
 	
 	private Episode newEpisode(int freq, int numberElements, String...strings) {
-		Episode episode = new Episode();
-		episode.setFrequency(freq);
-		episode.setNumEvents(numberElements);
+		Episode episode = new Episode(){};
 		episode.addStringsOfFacts(strings);
 		return episode;
 	}
@@ -139,16 +137,10 @@ public class TransitivelyClosedEpisodesTest {
 	}
 
 	private Episode createEpisode(String... string) {
-		Episode episode = new Episode();
-		episode.setFrequency(3);
-		int numEvents = 0;
+		Episode episode = new Episode(){};
 		for (String s : string) {
 			episode.addFact(s);
-			if (s.length() == 1) {
-				numEvents++;
-			}
 		}
-		episode.setNumEvents(numEvents);
 		return episode;
 	}
 }

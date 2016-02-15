@@ -26,28 +26,28 @@ import java.util.Map;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Pattern;
 
-public class EpisodeParser {
+public class PatternParser {
 
 	private File rootFolder;
 	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(@Named("episode") File directory, FileReader reader) {
+	public PatternParser(@Named("episode") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Frequent episode folder does not exist");
 		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
 		this.rootFolder = directory;
 		this.reader = reader;
 	}
 
-	public Map<Integer, List<Episode>> parse(int freq, double bd) {
+	public Map<Integer, List<Pattern>> parse(int freq, double bd) {
 
 		File filePath = getFilePath(freq, bd);
 		List<String> lines = reader.readFile(filePath);
 
-		Map<Integer, List<Episode>> episodeIndexed = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodes = new LinkedList<Episode>();
+		Map<Integer, List<Pattern>> episodeIndexed = new HashMap<Integer, List<Pattern>>();
+		List<Pattern> episodes = new LinkedList<Pattern>();
 
 		String[] rowValues;
 		int numNodes = 0;
@@ -55,7 +55,7 @@ public class EpisodeParser {
 		for (String line : lines) {
 			if (line.contains(":")) {
 				rowValues = line.split(":");
-				Episode episode = readEpisode(numNodes, rowValues);
+				Pattern episode = readEpisode(numNodes, rowValues);
 				episodes.add(episode);
 			} else {
 				rowValues = line.split("\\s+");
@@ -65,7 +65,7 @@ public class EpisodeParser {
 				if (Integer.parseInt(rowValues[3]) > 0) {
 					String[] nodeString = rowValues[0].split("-");
 					numNodes = Integer.parseInt(nodeString[0]);
-					episodes = new LinkedList<Episode>();
+					episodes = new LinkedList<Pattern>();
 				}
 			}
 		}
@@ -73,9 +73,8 @@ public class EpisodeParser {
 		return episodeIndexed;
 	}
 
-	private Episode readEpisode(int numberOfNodes, String[] rowValues) {
-		Episode episode = new Episode();
-		episode.setNumEvents(numberOfNodes);
+	private Pattern readEpisode(int numberOfNodes, String[] rowValues) {
+		Pattern episode = new Pattern();
 		episode.setFrequency(Integer.parseInt(rowValues[1].trim()));
 		String[] events = rowValues[0].split("\\s+");
 		for (int idx = 0; idx < numberOfNodes; idx++) {

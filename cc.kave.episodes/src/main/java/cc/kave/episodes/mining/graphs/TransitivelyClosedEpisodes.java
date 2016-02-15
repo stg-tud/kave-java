@@ -33,7 +33,7 @@ public class TransitivelyClosedEpisodes {
 
 		List<Episode> updatedEpisodes = new LinkedList<Episode>();
 		for (Episode episode : allEpisodes) {
-			if (episode.getNumberOfFacts() != episode.getNumEvents()) {
+			if (episode.getNumFacts() != episode.getNumEvents()) {
 				Episode newEpisode = reduceRelations(episode);
 					updatedEpisodes.add(newEpisode);
 				} else {
@@ -45,9 +45,7 @@ public class TransitivelyClosedEpisodes {
 
 	private Episode reduceRelations(Episode episode) {
 		List<List<Fact>> allPaths = new LinkedList<List<Fact>>();
-		Episode episodeResult = new Episode();
-		episodeResult.setFrequency(episode.getFrequency());
-		episodeResult.setNumEvents(episode.getNumEvents());
+		Episode episodeResult = new Episode(){};
 		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
 				addFactPath(fact, allPaths);

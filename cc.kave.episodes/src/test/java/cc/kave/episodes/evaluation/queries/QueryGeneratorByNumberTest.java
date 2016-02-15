@@ -9,11 +9,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Query;
+import cc.kave.episodes.model.QueryTarget;
 
 public class QueryGeneratorByNumberTest {
 
-	private Episode episode = new Episode();
+	private QueryTarget queryTarget = new QueryTarget();
 	private QueryGeneratorByNumber sut;
 	
 	@Before
@@ -24,8 +25,8 @@ public class QueryGeneratorByNumberTest {
 	@Ignore
 	@Test
 	public void emptyEpisode() {
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		Map<Integer, List<Episode>> actuals = sut.generateQueries(episode, 5);
+		Map<Integer, List<Query>> expected = new HashMap<Integer, List<Query>>();
+		Map<Integer, List<Query>> actuals = sut.generateQueries(queryTarget, 5);
 		
 		Assert.assertEquals(expected, actuals);
 	}

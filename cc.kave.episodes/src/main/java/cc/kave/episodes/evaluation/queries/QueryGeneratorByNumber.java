@@ -6,23 +6,24 @@ import java.util.List;
 import java.util.Map;
 
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.Query;
+import cc.kave.episodes.model.QueryTarget;
 
 public class QueryGeneratorByNumber {
 
 	private SubsetsGenerator generator = new SubsetsGenerator();
 	
-	public Map<Integer, List<Episode>> generateQueries(Episode originalEpisode, int removeEvents) {
-		Map<Integer, List<Episode>> generatedQueries = new HashMap<Integer, List<Episode>>();
+	public Map<Integer, List<Query>> generateQueries(QueryTarget queryTarget, int removeEvents) {
+		Map<Integer, List<Query>> generatedQueries = new HashMap<Integer, List<Query>>();
 		
-		Iterable<Fact> allFacts = originalEpisode.getFacts();
+		Iterable<Fact> allFacts = queryTarget.getFacts();
 	
 		List<List<Fact>> subsets = generator.generateSubsets((List<Fact>) allFacts, removeEvents);
 		
 		for (List<Fact> query : subsets) {
-			Episode q = createEpisode(originalEpisode, query);
+			Query q = createEpisode(queryTarget, query);
 			if (generatedQueries.size() == 0) {
-				generatedQueries.put(removeEvents, new LinkedList<Episode>());
+				generatedQueries.put(removeEvents, new LinkedList<Query>());
 			}
 			generatedQueries.get(removeEvents).add(q);
 		}
@@ -30,10 +31,8 @@ public class QueryGeneratorByNumber {
 		return generatedQueries;
 	}
 
-	private Episode createEpisode(Episode episode, List<Fact> queryFacts) {
-		Episode query = new Episode();
-		query.setFrequency(1);
-		query.setNumEvents(queryFacts.size());
+	private Query createEpisode(QueryTarget queryTarget, List<Fact> queryFacts) {
+		Query query = new Query();
 		
 		for (Fact f : queryFacts) {
 			query.addFact(f);
