@@ -17,15 +17,15 @@ package cc.kave.episodes.model;
 
 public class Query extends Episode {
 
-	private int numRemovedEvents;
+	private double removedEvents;
 	private QueryTarget queryTarget;
 	
-	public int getNumRemovedEvents() {
-		return numRemovedEvents;
+	public double getPRemovedEvents() {
+		return removedEvents;
 	}
 	
-	public void setNumRemovedEvents(int numberOfEventsRemoved) {
-		this.numRemovedEvents = numberOfEventsRemoved;
+	public void setPRemovedEvents(double numberOfEventsRemoved) {
+		this.removedEvents = numberOfEventsRemoved;
 	}
 	
 	public QueryTarget getQueryTarget() {
@@ -46,7 +46,7 @@ public class Query extends Episode {
 		if (!this.getFacts().equals(query.getFacts())) {
 			return false;
 		}
-		if (this.numRemovedEvents != query.numRemovedEvents) {
+		if (this.removedEvents != query.removedEvents) {
 			return false;
 		}
 		if (!this.queryTarget.equals(query.getQueryTarget())) {

@@ -44,7 +44,7 @@ public class QueryTest {
 	public void defaultValues() {
 		assertEquals(0, sut.getNumEvents());
 		assertEquals(Sets.newHashSet(), sut.getFacts());
-		assertEquals(0, sut.getNumRemovedEvents());
+		assertTrue(0.0  == sut.getPRemovedEvents());
 		assertNull(sut.getQueryTarget());
 	}
 	
@@ -53,8 +53,8 @@ public class QueryTest {
 		sut.addStringsOfFacts("f");
 		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
 		assertEquals(1, sut.getNumEvents());
-		sut.setNumRemovedEvents(1);
-		assertEquals(1, sut.getNumRemovedEvents());
+		sut.setPRemovedEvents(1.0);
+		assertTrue(1.0 == sut.getPRemovedEvents());
 		sut.setQueryTarget(new QueryTarget());
 		assertEquals(new QueryTarget(), sut.getQueryTarget());
 	}
@@ -133,12 +133,12 @@ public class QueryTest {
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "1>2");
 		a.setQueryTarget(qt);
-		a.setNumRemovedEvents(3);
+		a.setPRemovedEvents(3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setQueryTarget(qt);
-		b.setNumRemovedEvents(5);
+		b.setPRemovedEvents(5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -155,12 +155,12 @@ public class QueryTest {
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setNumRemovedEvents(3);
+		a.setPRemovedEvents(3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setQueryTarget(qt);
-		b.setNumRemovedEvents(5);
+		b.setPRemovedEvents(5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -178,12 +178,12 @@ public class QueryTest {
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setNumRemovedEvents(3);
+		a.setPRemovedEvents(3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>3");
 		b.setQueryTarget(qt);
-		b.setNumRemovedEvents(5);
+		b.setPRemovedEvents(5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -201,12 +201,12 @@ public class QueryTest {
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setNumRemovedEvents(3);
+		a.setPRemovedEvents(3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 		b.setQueryTarget(qt);
-		b.setNumRemovedEvents(5);
+		b.setPRemovedEvents(5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -214,7 +214,7 @@ public class QueryTest {
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
-		assertNotEquals(a.getNumRemovedEvents(), b.getNumRemovedEvents());
+		assertNotEquals(a.getPRemovedEvents(), b.getPRemovedEvents());
 	}
 	
 	@Test
@@ -225,7 +225,7 @@ public class QueryTest {
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt1);
-		a.setNumRemovedEvents(1);
+		a.setPRemovedEvents(0.5);
 
 		QueryTarget qt2 = new QueryTarget();
 		qt2.addStringsOfFacts("1", "2", "3", "4", "1>2", "2>4");
@@ -233,7 +233,7 @@ public class QueryTest {
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 		b.setQueryTarget(qt2);
-		b.setNumRemovedEvents(1);
+		b.setPRemovedEvents(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -241,7 +241,7 @@ public class QueryTest {
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
-		assertEquals(a.getNumRemovedEvents(), b.getNumRemovedEvents());
+		assertTrue(a.getPRemovedEvents() == b.getPRemovedEvents());
 		assertNotEquals(a.getQueryTarget(), b.getQueryTarget());
 	}
 }
