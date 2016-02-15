@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.usages.Usage;
@@ -29,6 +30,8 @@ public interface UsageStore extends Closeable {
 	Set<ITypeName> getAllTypes();
 
 	List<Usage> load(ITypeName type) throws IOException;
+
+	List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException;
 
 	/**
 	 * Flushes internal buffers to disk.

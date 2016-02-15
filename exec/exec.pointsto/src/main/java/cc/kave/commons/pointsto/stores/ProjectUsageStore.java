@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -112,12 +113,17 @@ public class ProjectUsageStore implements UsageStore {
 	}
 
 	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ITypeName type) throws IOException {
+		return loadUsagesPerProject(type, x -> true);
+	}
+
+	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ITypeName type, Predicate<Usage> filter)
+			throws IOException {
 		Map<ProjectIdentifier, List<Usage>> projectUsages = new HashMap<>(getNumberOfProjects());
 
 		synchronized (projectDirToStore) {
 			for (Map.Entry<Path, ProjectStore> projectEntry : projectDirToStore.entrySet()) {
 				ProjectIdentifier identifier = new ProjectIdentifier(projectEntry.getKey());
-				projectUsages.put(identifier, projectEntry.getValue().load(type));
+				projectUsages.put(identifier, projectEntry.getValue().load(type, filter));
 			}
 		}
 
@@ -126,10 +132,15 @@ public class ProjectUsageStore implements UsageStore {
 
 	@Override
 	public List<Usage> load(ITypeName type) throws IOException {
+		return load(type, x -> true);
+	}
+
+	@Override
+	public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
 		List<Usage> usages = new ArrayList<>();
 		synchronized (projectDirToStore) {
 			for (ProjectStore store : projectDirToStore.values()) {
-				usages.addAll(store.load(type));
+				usages.addAll(store.load(type, filter));
 			}
 		}
 		return usages;
@@ -293,12 +304,18 @@ public class ProjectUsageStore implements UsageStore {
 
 		@Override
 		public List<Usage> load(ITypeName type) throws IOException {
+			return load(type, x -> true);
+		}
+
+		@Override
+		public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
 			List<Usage> usages = new ArrayList<>();
 
 			synchronized (typeToZipFiles) {
 				for (Path zipFile : typeToZipFiles.get(type)) {
 					ZipArchive archive = getArchive(zipFile);
-					usages.addAll(archive.stream(Usage.class, GsonUtil::deserialize).collect(Collectors.toList()));
+					usages.addAll(archive.stream(Usage.class, GsonUtil::deserialize).filter(filter)
+							.collect(Collectors.toList()));
 				}
 			}
 
@@ -320,6 +337,7 @@ public class ProjectUsageStore implements UsageStore {
 			flush();
 			typeToZipFiles.clear();
 		}
+
 	}
 
 }

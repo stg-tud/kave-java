@@ -18,16 +18,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.usages.Usage;
 
 public class NopUsageStore implements UsageStore {
-
-	@Override
-	public void close() throws IOException {
-
-	}
 
 	@Override
 	public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
@@ -45,7 +41,17 @@ public class NopUsageStore implements UsageStore {
 	}
 
 	@Override
+	public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
+		return Collections.emptyList();
+	}
+
+	@Override
 	public void flush() throws IOException {
+
+	}
+
+	@Override
+	public void close() throws IOException {
 
 	}
 

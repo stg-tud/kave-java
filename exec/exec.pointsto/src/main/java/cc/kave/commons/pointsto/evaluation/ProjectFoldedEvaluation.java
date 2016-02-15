@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
@@ -41,13 +42,15 @@ public class ProjectFoldedEvaluation {
 	private Path storePath;
 	private int numFolds;
 
+	private Predicate<Usage> usageFilter;
 	private CrossValidationFoldBuilder foldBuilder;
 	private CVEvaluator cvEvaluator;
 
-	public ProjectFoldedEvaluation(Path storePath, int numFolds, CrossValidationFoldBuilder foldBuilder,
+	public ProjectFoldedEvaluation(Path storePath, int numFolds, Predicate<Usage> usageFilter, CrossValidationFoldBuilder foldBuilder,
 			CVEvaluator cvEvaluator) {
 		this.storePath = storePath;
 		this.numFolds = numFolds;
+		this.usageFilter = usageFilter;
 		this.foldBuilder = foldBuilder;
 		this.cvEvaluator = cvEvaluator;
 	}
@@ -85,13 +88,21 @@ public class ProjectFoldedEvaluation {
 
 		log("%s:\n", Names.vm2srcQualifiedType(type));
 		if (numProjectsWithType < numFolds) {
-			log("\tSkipping because type is only used in %d projects...\n", numProjectsWithType);
+			log("\tSkipping because type is only used in %d projects\n", numProjectsWithType);
 			return false;
 		}
 		log("\tType is used in %d/%d (%.2f%%) projects\n", numProjectsWithType, numProjects,
 				((double) numProjectsWithType) / numProjects * 100);
 
-		Map<ProjectIdentifier, List<Usage>> projectUsages = usageStore.loadUsagesPerProject(type);
+		Map<ProjectIdentifier, List<Usage>> projectUsages = usageStore.loadUsagesPerProject(type, usageFilter);
+		// re-check whether enough projects with usages are available after filtering
+		projectUsages.values().removeIf(usages -> usages.isEmpty());
+		numProjectsWithType = projectUsages.size();
+		if (numProjectsWithType < numFolds) {
+			log("\tSkipping because type is only used in %d projects after filtering\n", numProjectsWithType);
+			return false;
+		}
+		
 		List<List<Usage>> folds = foldBuilder.createFolds(projectUsages);
 		double score = cvEvaluator.evaluate(folds);
 		log("\tF1: %.3f\n", score);
@@ -114,11 +125,11 @@ public class ProjectFoldedEvaluation {
 
 	public static void main(String[] args) throws IOException {
 		Locale.setDefault(Locale.US);
-		Path storePath = Paths.get("E:\\Coding\\MT\\Usages\\UnificationAnalysis_FULL");
+		Path storePath = Paths.get("E:\\Coding\\MT\\Usages\\TypeBasedAnalysis");//("E:\\Coding\\MT\\Usages\\UnificationAnalysis_FULL");
 		int numFolds = 10;
 		RandomGenerator rndGenerator = load(RandomGenerator.class);
 		CVEvaluator cvEvaluator = load(CVEvaluator.class);
-		new ProjectFoldedEvaluation(storePath, numFolds, new StratifiedCVFoldBuilder(numFolds, rndGenerator),
+		new ProjectFoldedEvaluation(storePath, numFolds, new PointsToUsageFilter(), new StratifiedCVFoldBuilder(numFolds, rndGenerator),
 				cvEvaluator).run();
 	}
 
