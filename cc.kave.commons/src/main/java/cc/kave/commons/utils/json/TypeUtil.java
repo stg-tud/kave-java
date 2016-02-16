@@ -28,9 +28,27 @@ public class TypeUtil {
 	}
 
 	public static String toJavaTypeNames(String json) {
-		return replacePattern(
-				replacePattern(json, "\\[SST:([.a-zA-Z0-9_]+)\\]", "cc.kave.commons.model.ssts.impl.", "", true),
-				"\"KaVE([.a-zA-Z0-9_]+), KaVE.Commons\"", "\"cc.kave", "\"", true);
+		return legacySupport_CompletionEvents(
+				completionEvent_formatting(toJavaPackages(legacySupport_PackageNames(json))));
+
+	}
+
+	private static String legacySupport_PackageNames(String json) {
+		return replacePattern(json, "\"KaVE.Model.([.a-zA-Z0-9_]+), KaVE.Model\"", "\"KaVE.Commons.Model.",
+				", KaVE.Commons\"", false);
+	}
+
+	private static String legacySupport_CompletionEvents(String json) {
+		return replacePattern(json, "cc\\.kave\\.commons\\.model\\.events\\.completionevent\\.([.a-zA-Z0-9_]+)",
+				"cc\\.kave\\.commons\\.model\\.events\\.completionevents\\.", "", true);
+	}
+
+	private static String completionEvent_formatting(String json) {
+		return replacePattern(json, "\"KaVE([.a-zA-Z0-9_]+), KaVE.Commons\"", "\"cc.kave", "\"", true);
+	}
+
+	private static String toJavaPackages(String json) {
+		return replacePattern(json, "\\[SST:([.a-zA-Z0-9_]+)\\]", "cc.kave.commons.model.ssts.impl.", "", true);
 	}
 
 	private static String replacePattern(String type, String pattern, String prefix, String suffix, boolean lower) {

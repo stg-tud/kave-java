@@ -42,7 +42,6 @@ public class SerializationTestSuite {
 	}
 
 	@Test
-	@Ignore
 	public void stringEquality_Compact() {
 		Object deserializedInput = JsonUtils.fromJson(testCase.input, testCase.serializedType);
 		String serializedInput = JsonUtils.toJson(deserializedInput);
@@ -50,7 +49,6 @@ public class SerializationTestSuite {
 	}
 
 	@Test
-	@Ignore
 	public void objectEquality_Compact() {
 		Object actual = JsonUtils.fromJson(testCase.input, testCase.serializedType);
 		Object expected = JsonUtils.fromJson(testCase.expectedCompact, testCase.serializedType);
