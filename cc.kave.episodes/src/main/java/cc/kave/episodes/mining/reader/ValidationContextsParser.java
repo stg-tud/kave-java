@@ -32,7 +32,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
-import cc.kave.episodes.model.QueryTarget;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -46,8 +46,8 @@ public class ValidationContextsParser {
 		this.rootDir = directory;
 	}
 
-	public List<QueryTarget> parse(List<Event> eventsList) throws ZipException, IOException {
-		List<QueryTarget> validationData = new LinkedList<QueryTarget>();
+	public List<Episode> parse(List<Event> eventsList) throws ZipException, IOException {
+		List<Episode> validationData = new LinkedList<Episode>();
 
 		for (String zip : findZips()) {
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
@@ -69,7 +69,7 @@ public class ValidationContextsParser {
 					md.accept(tfv, facts);
 
 					Logger.log("Creating episode " + ++counter);
-					QueryTarget qt = createQueryTarget(facts);
+					Episode qt = createEpisode(facts);
 					validationData.add(qt);
 				}
 
@@ -95,8 +95,8 @@ public class ValidationContextsParser {
 		return zips;
 	}
 
-	private QueryTarget createQueryTarget(Set<Fact> facts) {
-		QueryTarget qts = new QueryTarget();
+	private Episode createEpisode(Set<Fact> facts) {
+		Episode qts = new Episode();
 
 		for (Fact f : facts) {
 			if (!f.isRelation()) {

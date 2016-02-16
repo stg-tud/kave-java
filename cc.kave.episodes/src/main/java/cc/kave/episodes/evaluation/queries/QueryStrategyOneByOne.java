@@ -3,7 +3,7 @@ package cc.kave.episodes.evaluation.queries;
 import java.util.LinkedList;
 import java.util.List;
 
-import cc.kave.episodes.model.Pattern;
+import cc.kave.episodes.model.PatternWithFreq;
 
 public class QueryStrategyOneByOne {
 
@@ -17,8 +17,8 @@ public class QueryStrategyOneByOne {
 		return numberOfEventsToRemove;
 	}
 	
-	public List<Pattern> generateQuery(Pattern episode) {
-		List<Pattern> results = new LinkedList<Pattern>();
+	public List<PatternWithFreq> generateQuery(PatternWithFreq episode) {
+		List<PatternWithFreq> results = new LinkedList<PatternWithFreq>();
 		return results;
 	}
 }

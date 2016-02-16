@@ -52,8 +52,7 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.model.Pattern;
-import cc.kave.episodes.model.QueryTarget;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -134,15 +133,15 @@ public class ValidationContextsParserTest {
 	@Test
 	public void contextTest() throws ZipException, IOException {
 		List<Event> events = new LinkedList<Event>();
-		List<QueryTarget> expected = new LinkedList<QueryTarget>();
+		List<Episode> expected = new LinkedList<Episode>();
 
-		QueryTarget episode = createEpisode("0");
+		Episode episode = createEpisode("0");
 		expected.add(episode);
 
 		episode = createEpisode("1", "2", "3");
 		expected.add(episode);
 
-		List<QueryTarget> actuals = sut.parse(events);
+		List<Episode> actuals = sut.parse(events);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive("a");
@@ -180,9 +179,9 @@ public class ValidationContextsParserTest {
 		data.put("b", context);
 
 		List<Event> events = new LinkedList<Event>();
-		List<QueryTarget> expected = new LinkedList<QueryTarget>();
+		List<Episode> expected = new LinkedList<Episode>();
 
-		QueryTarget episode = createEpisode("0");
+		Episode episode = createEpisode("0");
 		expected.add(episode);
 
 		episode = createEpisode("1", "2", "3");
@@ -191,7 +190,7 @@ public class ValidationContextsParserTest {
 		episode = createEpisode("4", "5");
 		expected.add(episode);
 
-		List<QueryTarget> actuals = sut.parse(events);
+		List<Episode> actuals = sut.parse(events);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive("a");
@@ -211,8 +210,8 @@ public class ValidationContextsParserTest {
 		return p;
 	}
 
-	private QueryTarget createEpisode(String... strings) {
-		QueryTarget episode = new QueryTarget();
+	private Episode createEpisode(String... strings) {
+		Episode episode = new Episode();
 		int numEvents = strings.length;
 		for (String s : strings) {
 			episode.addFact(new Fact(s));

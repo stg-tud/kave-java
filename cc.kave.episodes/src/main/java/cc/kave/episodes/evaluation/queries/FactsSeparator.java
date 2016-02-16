@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.model;
+package cc.kave.episodes.evaluation.queries;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,60 +23,42 @@ import java.util.Set;
 import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.datastructures.Tuple;
 
-public class QueryTarget extends Pattern {
+public class FactsSeparator {
 	
-	private Fact methodDecl;
-
-	public Fact getMethodDecl() {
-		Tuple<Fact, Set<Fact>> tuple = separateFacts(this.getFacts());
-		return methodDecl;
-	}
-
-	public void setMethodDecl(Fact methodDecl) {
-		this.methodDecl = methodDecl;
-	}
-	
-	public boolean equals(QueryTarget queryTarget) {
-		if (!this.methodDecl.equals(queryTarget.getMethodDecl())) {
-			return false;
-		}
-		if (!this.getFacts().equals(queryTarget.getFacts())) {
-			return false;
-		}
-		return true;
-	}
-	
-	private Tuple<Fact, Set<Fact>> separateFacts(Iterable<Fact> facts) {
+	public Tuple<Fact, Set<Fact>> separate(Iterable<Fact> facts) {
 		Map<Fact, Integer> orderCounter = new HashMap<Fact, Integer>();
+		int numEvents = 0;
 		
 		for (Fact fact : facts) {
 			if (fact.isRelation()) {
 				Tuple<Fact, Fact> tuple = fact.getRelationFacts();
-				Fact fact1 = tuple.getFirst();
-				Fact fact2 = tuple.getSecond();
-				if (orderCounter.containsKey(fact1)) {
-					int counter = orderCounter.get(fact1);
-					orderCounter.put(fact1, counter + 1);
+				Fact existanceFact = tuple.getFirst();
+				if (orderCounter.containsKey(existanceFact)) {
+					int counter = orderCounter.get(existanceFact);
+					orderCounter.put(existanceFact, counter + 1);
 				} else {
-					orderCounter.put(fact1, 1);
-				}
-				if (orderCounter.containsKey(fact2)) {
-					int counter = orderCounter.get(fact2);
-					orderCounter.put(fact2, counter + 1);
-				} else {
-					orderCounter.put(fact2, 1);
+					orderCounter.put(existanceFact, 1);
 				}
 			}
+			else {
+				numEvents++;
+			}
 		}
-		Set<Fact> bodyFacts = new HashSet<Fact>();
+		
 		Fact methodDecl = new Fact();
 		for (Map.Entry<Fact, Integer> entry : orderCounter.entrySet()) {
-			if (entry.getValue() == (orderCounter.size() - 1)) {
+			if (entry.getValue() == (numEvents - 1)) {
 				methodDecl = entry.getKey();
-			} else {
-				bodyFacts.add(entry.getKey());
 			}
 		}
+		
+		Set<Fact> bodyFacts = new HashSet<Fact>();
+		for (Fact fact : facts) {
+			if (!fact.equals(methodDecl) && !fact.isRelation()) {
+				bodyFacts.add(fact);
+			}
+		}
+		
 		return Tuple.newTuple(methodDecl, bodyFacts);
-	} 
+	}
 }

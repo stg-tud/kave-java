@@ -15,17 +15,22 @@
  */
 package cc.kave.episodes.model;
 
-public class Query extends Episode {
+import static cc.recommenders.assertions.Asserts.assertTrue;
 
-	private double removedEvents;
+import cc.kave.commons.model.episodes.Fact;
+
+public class Query extends Pattern {
+
+	private double percRemoved;
 	private QueryTarget queryTarget;
 	
-	public double getPRemovedEvents() {
-		return removedEvents;
+	public double getPercRemoved() {
+		return percRemoved;
 	}
 	
-	public void setPRemovedEvents(double numberOfEventsRemoved) {
-		this.removedEvents = numberOfEventsRemoved;
+	public void setPercRemoved(double percRemoved) {
+		assertTrue(percRemoved >= 0.0 && percRemoved <= 1.0, "Give the probability of the dropped events!");
+		this.percRemoved = percRemoved;
 	}
 	
 	public QueryTarget getQueryTarget() {
@@ -36,6 +41,10 @@ public class Query extends Episode {
 		this.queryTarget = queryTarget;
 	}
 	
+	public Fact getMethodDecl() {
+		return this.getQueryTarget().getMethodDecl();
+	}
+	
 	public boolean equals(Query query) {
 		if (this.getNumEvents() != query.getNumEvents()) {
 			return false;
@@ -43,10 +52,13 @@ public class Query extends Episode {
 		if (this.getNumFacts() != query.getNumFacts()) {
 			return false;
 		}
+		if (!this.getMethodDecl().equals(query.getMethodDecl())) {
+			return false;
+		}
 		if (!this.getFacts().equals(query.getFacts())) {
 			return false;
 		}
-		if (this.removedEvents != query.removedEvents) {
+		if (this.percRemoved != query.percRemoved) {
 			return false;
 		}
 		if (!this.queryTarget.equals(query.getQueryTarget())) {

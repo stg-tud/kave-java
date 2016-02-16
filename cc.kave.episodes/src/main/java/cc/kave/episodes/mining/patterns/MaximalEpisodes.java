@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.model.Pattern;
+import cc.kave.episodes.model.Episode;
 
 public class MaximalEpisodes {
 	
-	public Map<Integer, List<Pattern>> getMaximalEpisodes(Map<Integer, List<Pattern>> episodes) {
+	public Map<Integer, List<Episode>> getMaximalEpisodes(Map<Integer, List<Episode>> episodes) {
 		assertTrue(!episodes.isEmpty(), "The list of learned episodes is empty!");
 		
-		Map<Integer, List<Pattern>> maximalEpisodes = new HashMap<Integer, List<Pattern>>();
+		Map<Integer, List<Episode>> maximalEpisodes = new HashMap<Integer, List<Episode>>();
 		
 		if (episodes.size() == 1) {
 			return episodes;
@@ -34,7 +34,7 @@ public class MaximalEpisodes {
 		int[] episodeLevels = getEpisodeLevels(episodes);
 		
 		for (int level = 1; level < episodeLevels.length; level++) {
-			List<Pattern> maximalEpisodesList = removeSubepisodes(episodes.get(episodeLevels[level - 1]), episodes.get(episodeLevels[level]));
+			List<Episode> maximalEpisodesList = removeSubepisodes(episodes.get(episodeLevels[level - 1]), episodes.get(episodeLevels[level]));
 			if (!maximalEpisodesList.isEmpty()) {
 				maximalEpisodes.put((episodeLevels[level - 1]), maximalEpisodesList);
 			}
@@ -43,22 +43,22 @@ public class MaximalEpisodes {
 		return maximalEpisodes;
 	}
 	
-	private int[] getEpisodeLevels(Map<Integer, List<Pattern>> allEpisodes) {
+	private int[] getEpisodeLevels(Map<Integer, List<Episode>> allEpisodes) {
 		int[] episodeLevels = new int[allEpisodes.size()];
 		int index = 0;
-		for (Map.Entry<Integer, List<Pattern>> entry : allEpisodes.entrySet()) {
+		for (Map.Entry<Integer, List<Episode>> entry : allEpisodes.entrySet()) {
 			episodeLevels[index] = entry.getKey();
 			index++;
 		}
 		return episodeLevels;
 	}
 	
-	private List<Pattern> removeSubepisodes(List<Pattern> smallerNodeEpisodeList, List<Pattern> biggerNodeEpisodeList) {
-		List<Pattern> reducedEpisodeList = new LinkedList<Pattern>();
+	private List<Episode> removeSubepisodes(List<Episode> smallerNodeEpisodeList, List<Episode> biggerNodeEpisodeList) {
+		List<Episode> reducedEpisodeList = new LinkedList<Episode>();
 		boolean isSubEpisode = false;
 		
-		for (Pattern smallerNodeEpisode : smallerNodeEpisodeList) {
-			for (Pattern biggerNodeEpisode : biggerNodeEpisodeList) {
+		for (Episode smallerNodeEpisode : smallerNodeEpisodeList) {
+			for (Episode biggerNodeEpisode : biggerNodeEpisodeList) {
 				if (subEpisode(smallerNodeEpisode, biggerNodeEpisode)) {
 					isSubEpisode = true;
 					break;
@@ -72,7 +72,7 @@ public class MaximalEpisodes {
 		return reducedEpisodeList;
 	}
 
-	private boolean subEpisode(Pattern smallerNodeEpisode, Pattern biggerNodeEpisode) {
+	private boolean subEpisode(Episode smallerNodeEpisode, Episode biggerNodeEpisode) {
 		for (Fact fact : smallerNodeEpisode.getFacts()) {
 			if (biggerNodeEpisode.containsFact(fact)) {
 				continue;

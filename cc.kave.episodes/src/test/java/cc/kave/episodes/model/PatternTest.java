@@ -29,11 +29,11 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class PatternTest {
 
-	private Pattern sut;
+	private PatternWithFreq sut;
 
 	@Before
 	public void setup() {
-		sut = new Pattern();
+		sut = new PatternWithFreq();
 	}
 
 	@Test
@@ -61,8 +61,8 @@ public class PatternTest {
 
 	@Test
 	public void equality_default() {
-		Pattern a = new Pattern();
-		Pattern b = new Pattern();
+		PatternWithFreq a = new PatternWithFreq();
+		PatternWithFreq b = new PatternWithFreq();
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
@@ -70,10 +70,10 @@ public class PatternTest {
 
 	@Test
 	public void equality_reallyTheSame() {
-		Pattern a = new Pattern();
+		PatternWithFreq a = new PatternWithFreq();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Pattern b = new Pattern();
+		PatternWithFreq b = new PatternWithFreq();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertEquals(a, b);
@@ -84,10 +84,10 @@ public class PatternTest {
 
 	@Test
 	public void equality_diffEvents() {
-		Pattern a = new Pattern();
+		PatternWithFreq a = new PatternWithFreq();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Pattern b = new Pattern();
+		PatternWithFreq b = new PatternWithFreq();
 		b.addStringsOfFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
@@ -98,10 +98,10 @@ public class PatternTest {
 
 	@Test
 	public void equality_sameEventsDiffRelations() {
-		Pattern a = new Pattern();
+		PatternWithFreq a = new PatternWithFreq();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
-		Pattern b = new Pattern();
+		PatternWithFreq b = new PatternWithFreq();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 
 		assertNotEquals(a, b);

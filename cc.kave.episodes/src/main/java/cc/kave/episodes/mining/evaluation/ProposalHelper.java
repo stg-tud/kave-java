@@ -20,7 +20,7 @@ import java.util.TreeSet;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.Pattern;
+import cc.kave.episodes.model.PatternWithFreq;
 import cc.recommenders.datastructures.Tuple;
 
 public class ProposalHelper {
@@ -42,10 +42,10 @@ public class ProposalHelper {
 		return res;
 	}
 	
-	public static TreeSet<Tuple<Pattern, Double>> createEpisodesSortedSet() {
-		final TreeSet<Tuple<Pattern, Double>> res = Sets.newTreeSet(new Comparator<Tuple<Pattern, Double>>() {
+	public static TreeSet<Tuple<PatternWithFreq, Double>> createEpisodesSortedSet() {
+		final TreeSet<Tuple<PatternWithFreq, Double>> res = Sets.newTreeSet(new Comparator<Tuple<PatternWithFreq, Double>>() {
 			@Override
-			public int compare(final Tuple<Pattern, Double> o1, final Tuple<Pattern, Double> o2) {
+			public int compare(final Tuple<PatternWithFreq, Double> o1, final Tuple<PatternWithFreq, Double> o2) {
 				int valueOrdering = Double.compare(o2.getSecond(), o1.getSecond());
 				boolean areValuesEqual = valueOrdering == 0;
 				if (areValuesEqual) {

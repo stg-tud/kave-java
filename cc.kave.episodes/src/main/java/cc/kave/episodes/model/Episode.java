@@ -15,6 +15,8 @@
  */
 package cc.kave.episodes.model;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.List;
 import java.util.Set;
 
@@ -27,12 +29,22 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 
-public abstract class Episode {
-
-	private Set<Fact> facts = Sets.newHashSet();
+public class Episode {
 	
-	public Iterable<Fact> getFacts() {
+	private Set<Fact> facts = Sets.newHashSet();
+	private int frequency;
+	
+	public Set<Fact> getFacts() {
 		return facts;
+	}
+	
+	public int getFrequency() {
+		return frequency;
+	}
+	
+	public void setFrequency(int freq) {
+		assertTrue(freq > 0, "Frequency should be a positive value!");
+		this.frequency = freq;
 	}
 	
 	public void addFact(Fact fact) {
@@ -90,13 +102,16 @@ public abstract class Episode {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
-
-	public boolean equals(Episode episode) {
-		if (this.facts.size() != episode.facts.size()) {
+	
+	public boolean equals(Episode ep) {
+		if (this.frequency != ep.frequency) {
 			return false;
 		}
-		for (Fact fact : this.facts) {
-			if (!episode.facts.contains(fact)) {
+		if (this.facts.size() != ep.facts.size()) {
+			return false;
+		}
+		for (Fact fact : ep.facts) {
+			if (!this.facts.contains(fact)) {
 				return false;
 			}
 		}

@@ -35,7 +35,6 @@ import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.QueryTarget;
 import cc.recommenders.io.Logger;
 
 public class EpisodeGraphGeneratorValidationData {
@@ -53,8 +52,8 @@ public class EpisodeGraphGeneratorValidationData {
 			EventMappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter) {
 
-		assertTrue(directory.exists(), "Episode-miner folder does not exist");
-		assertTrue(directory.isDirectory(), "Episode-miner folder is not a folder, but a file");
+		assertTrue(directory.exists(), "Validation data folder does not exist");
+		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");
 
 		this.rootFolder = directory;
 		this.validationParser = parser;
@@ -68,21 +67,20 @@ public class EpisodeGraphGeneratorValidationData {
 		
 		Logger.setPrinting(true);
 		
-		System.out.println("Reading the mapping file");
+		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
 		
-		System.out.println("Readng Contexts");
-		List<QueryTarget> validationData = validationParser.parse(eventMapping);
+		Logger.log("Readng Contexts");
+		List<Episode> validationData = validationParser.parse(eventMapping);
 		
-		List<Episode> episodes = queryTargetsToEpisodesConverter(validationData);
-		System.out.println("Removing transitivity closures");
-		List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(episodes);
+		Logger.log("Removing transitivity closures");
+		List<Episode> simplifiedValData = transitivityClosure.removeTransitivelyClosure(validationData);
 		
 		String directory = createDirectoryStructure();
 
 		int graphIndex = 0;
 
-		for (Episode e : learnedEpisodes) {
+		for (Episode e : simplifiedValData) {
 			Logger.log("Writting episode number %s.\n", graphIndex);
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
 			List<String> types = getAPIType(e, eventMapping);
@@ -91,19 +89,6 @@ public class EpisodeGraphGeneratorValidationData {
 			}
 			graphIndex++;
 		}
-	}
-
-	private List<Episode> queryTargetsToEpisodesConverter(List<QueryTarget> validationData) {
-		List<Episode> episodes = new LinkedList<Episode>();
-		for (QueryTarget qt : validationData) {
-			Episode e = new Episode() {
-			};
-			for (Fact fact : qt.getFacts()) {
-				e.addFact(fact);
-			}
-			episodes.add(e);
-		}
-		return episodes;
 	}
 
 	private List<String> getAPIType(Episode episode, List<Event> eventMapper) {

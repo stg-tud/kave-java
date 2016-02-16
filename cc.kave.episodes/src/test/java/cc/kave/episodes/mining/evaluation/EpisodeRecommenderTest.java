@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.Pattern;
+import cc.kave.episodes.model.PatternWithFreq;
 import cc.kave.episodes.model.Query;
 import cc.recommenders.datastructures.Tuple;
 
@@ -34,10 +34,10 @@ public class EpisodeRecommenderTest {
 	
 	private DecimalFormat df = new DecimalFormat("#.###");
 
-	private Set<Tuple<Pattern, Double>> expectedProposals;
-	private Set<Tuple<Pattern, Double>> actualProposals;
-	private Map<Integer, List<Pattern>> learnedPatterns;
-	private Map<Integer, List<Pattern>> emptyEpisodes;
+	private Set<Tuple<PatternWithFreq, Double>> expectedProposals;
+	private Set<Tuple<PatternWithFreq, Double>> actualProposals;
+	private Map<Integer, List<PatternWithFreq>> learnedPatterns;
+	private Map<Integer, List<PatternWithFreq>> emptyEpisodes;
 
 	private EpisodeRecommender sut;
 
@@ -46,17 +46,17 @@ public class EpisodeRecommenderTest {
 		sut = new EpisodeRecommender();
 		expectedProposals = Sets.newLinkedHashSet();
 		actualProposals = Sets.newLinkedHashSet();
-		emptyEpisodes = new HashMap<Integer, List<Pattern>>();
+		emptyEpisodes = new HashMap<Integer, List<PatternWithFreq>>();
 
-		learnedPatterns = new HashMap<Integer, List<Pattern>>();
+		learnedPatterns = new HashMap<Integer, List<PatternWithFreq>>();
 		learnedPatterns.put(1, newArrayList(newPattern(3, "1"), newPattern(3, "2"), newPattern(3, "3")));
 		learnedPatterns.put(2, newArrayList(newPattern(3, "4", "5", "4>5"), newPattern(2, "4", "6", "4>6")));
 		learnedPatterns.put(3, newArrayList(newPattern(1, "6", "7", "8", "7>8"), newPattern(3, "10", "11", "12", "11>12")));
 		learnedPatterns.put(4, newArrayList(newPattern(3, "10", "11", "12", "13")));
 	}
 
-	private Pattern newPattern(int freq, String...string) {
-		Pattern pattern = new Pattern();
+	private PatternWithFreq newPattern(int freq, String...string) {
+		PatternWithFreq pattern = new PatternWithFreq();
 		pattern.setFrequency(freq);
 		for (String s : string) {
 			pattern.addFact(s);
@@ -143,11 +143,11 @@ public class EpisodeRecommenderTest {
 		actualProposals = sut.getProposals(newQuery(1, numberOfEvents, facts), learnedPatterns, 3);
 	}
 
-	private void addProposal(Pattern e, double probability) {
+	private void addProposal(PatternWithFreq e, double probability) {
 		expectedProposals.add(Tuple.newTuple(e, probability));
 	}
 
-	private void assertProposals(Set<Tuple<Pattern, Double>> actualProposals) {
+	private void assertProposals(Set<Tuple<PatternWithFreq, Double>> actualProposals) {
 		if (expectedProposals.size() != actualProposals.size()) {
 			System.out.println("expected\n");
 			System.out.println(expectedProposals);
@@ -155,11 +155,11 @@ public class EpisodeRecommenderTest {
 			System.out.println(actualProposals);
 			fail();
 		}
-		Iterator<Tuple<Pattern, Double>> itE = expectedProposals.iterator();
-		Iterator<Tuple<Pattern, Double>> itA = actualProposals.iterator();
+		Iterator<Tuple<PatternWithFreq, Double>> itE = expectedProposals.iterator();
+		Iterator<Tuple<PatternWithFreq, Double>> itA = actualProposals.iterator();
 		while (itE.hasNext()) {
-			Tuple<Pattern, Double> expected = itE.next();
-			Tuple<Pattern, Double> actual = itA.next();
+			Tuple<PatternWithFreq, Double> expected = itE.next();
+			Tuple<PatternWithFreq, Double> actual = itA.next();
 			assertEquals(expected, actual);
 		}
 	}

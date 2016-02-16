@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +54,15 @@ public class QueryTargetTest {
 	}
 	
 	@Test
+	public void containsFactTest() {
+		sut.setMethodDecl(new Fact("a"));
+		sut.addStringsOfFacts("b", "c", "b>c");
+		
+		assertTrue(sut.containsFact(new Fact("b")));
+		assertFalse(sut.containsFact(new Fact("a")));
+	}
+	
+	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("a", "b");
 		assertEquals(Sets.newHashSet(new Fact("a"), new Fact("b")), sut.getFacts());
@@ -76,7 +84,11 @@ public class QueryTargetTest {
 	@Test
 	public void equality_default() {
 		QueryTarget a = new QueryTarget();
+		a.setMethodDecl(new Fact());
+		
 		QueryTarget b = new QueryTarget();
+		b.setMethodDecl(new Fact());
+		
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
@@ -86,9 +98,11 @@ public class QueryTargetTest {
 	public void equality_reallyTheSame() {
 		QueryTarget a = new QueryTarget();
 		a.addStringsOfFacts("a", "b", "c");
+		a.setMethodDecl(new Fact("d"));
 
 		QueryTarget b = new QueryTarget();
 		b.addStringsOfFacts("a", "b", "c");
+		b.setMethodDecl(new Fact("d"));
 
 		assertEquals(a, b);
 		assertTrue(a.equals(b));
@@ -99,12 +113,32 @@ public class QueryTargetTest {
 	}
 	
 	@Test
+	public void diffMethodDecl() {
+		QueryTarget a = new QueryTarget();
+		a.addStringsOfFacts("a", "b", "c");
+		a.setMethodDecl(new Fact("d"));
+
+		QueryTarget b = new QueryTarget();
+		b.addStringsOfFacts("a", "b", "c");
+		b.setMethodDecl(new Fact("e"));
+
+		assertFalse(a.equals(b));
+		assertFalse(a.hashCode() == b.hashCode());
+		assertEquals(a.getNumEvents(), b.getNumEvents());
+		assertEquals(a.getFacts(), b.getFacts());
+		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertFalse(a.getMethodDecl().equals(b.getMethodDecl()));
+	}
+	
+	@Test
 	public void differentFacts() {
 		QueryTarget a = new QueryTarget();
 		a.addStringsOfFacts("a", "b", "c");
+		a.setMethodDecl(new Fact("f"));
 
 		QueryTarget b = new QueryTarget();
 		b.addStringsOfFacts("d", "e");
+		b.setMethodDecl(new Fact("f"));
 		
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));

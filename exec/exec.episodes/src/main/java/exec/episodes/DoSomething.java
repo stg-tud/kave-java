@@ -29,7 +29,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
-import cc.kave.commons.model.episodes.Episode;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -37,6 +36,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.ReadingArchive;
 
 public class DoSomething {

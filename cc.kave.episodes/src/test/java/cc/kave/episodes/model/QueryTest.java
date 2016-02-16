@@ -25,14 +25,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.recommenders.exceptions.AssertionException;
 
 public class QueryTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	private Query sut;
 	
 	@Before
@@ -41,10 +47,17 @@ public class QueryTest {
 	}
 	
 	@Test
+	public void probIsDouble() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Give the probability of the dropped events!");
+		sut.setPercRemoved(3);;
+	}
+	
+	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getNumEvents());
 		assertEquals(Sets.newHashSet(), sut.getFacts());
-		assertTrue(0.0  == sut.getPRemovedEvents());
+		assertTrue(0.0  == sut.getPercRemoved());
 		assertNull(sut.getQueryTarget());
 	}
 	
@@ -53,8 +66,8 @@ public class QueryTest {
 		sut.addStringsOfFacts("f");
 		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
 		assertEquals(1, sut.getNumEvents());
-		sut.setPRemovedEvents(1.0);
-		assertTrue(1.0 == sut.getPRemovedEvents());
+		sut.setPercRemoved(1.0);
+		assertTrue(1.0 == sut.getPercRemoved());
 		sut.setQueryTarget(new QueryTarget());
 		assertEquals(new QueryTarget(), sut.getQueryTarget());
 	}
@@ -97,10 +110,13 @@ public class QueryTest {
 	
 	@Test
 	public void equality_default() {
+		QueryTarget qt = new QueryTarget();
+		qt.setMethodDecl(new Fact());
+		
 		Query a = new Query();
-		a.setQueryTarget(new QueryTarget());
+		a.setQueryTarget(qt);
 		Query b = new Query();
-		b.setQueryTarget(new QueryTarget());
+		b.setQueryTarget(qt);
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
@@ -110,6 +126,7 @@ public class QueryTest {
 	public void equality_reallyTheSame() {
 		QueryTarget qt = new QueryTarget();
 		qt.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
@@ -129,16 +146,17 @@ public class QueryTest {
 	public void diffNumEvents() {
 		QueryTarget qt = new QueryTarget();
 		qt.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "1>2");
 		a.setQueryTarget(qt);
-		a.setPRemovedEvents(3);
+		a.setPercRemoved(0.3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setQueryTarget(qt);
-		b.setPRemovedEvents(5);
+		b.setPercRemoved(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -151,16 +169,17 @@ public class QueryTest {
 	public void diffNumFacts() {
 		QueryTarget qt = new QueryTarget();
 		qt.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setPRemovedEvents(3);
+		a.setPercRemoved(0.3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setQueryTarget(qt);
-		b.setPRemovedEvents(5);
+		b.setPercRemoved(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -174,16 +193,17 @@ public class QueryTest {
 	public void diffFacts() {
 		QueryTarget qt = new QueryTarget();
 		qt.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setPRemovedEvents(3);
+		a.setPercRemoved(0.3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>3");
 		b.setQueryTarget(qt);
-		b.setPRemovedEvents(5);
+		b.setPercRemoved(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -197,16 +217,17 @@ public class QueryTest {
 	public void diffRemovedEvents() {
 		QueryTarget qt = new QueryTarget();
 		qt.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt);
-		a.setPRemovedEvents(3);
+		a.setPercRemoved(0.3);
 
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 		b.setQueryTarget(qt);
-		b.setPRemovedEvents(5);
+		b.setPercRemoved(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
@@ -214,34 +235,68 @@ public class QueryTest {
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
-		assertNotEquals(a.getPRemovedEvents(), b.getPRemovedEvents());
+		assertNotEquals(a.getPercRemoved(), b.getPercRemoved());
 	}
 	
 	@Test
 	public void diffQueryTarget() {
 		QueryTarget qt1 = new QueryTarget();
 		qt1.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4");
+		qt1.setMethodDecl(new Fact("5"));
 		
 		Query a = new Query();
 		a.addStringsOfFacts("1", "2", "3", "1>2");
 		a.setQueryTarget(qt1);
-		a.setPRemovedEvents(0.5);
+		a.setPercRemoved(0.5);
 
 		QueryTarget qt2 = new QueryTarget();
 		qt2.addStringsOfFacts("1", "2", "3", "4", "1>2", "2>4");
+		qt2.setMethodDecl(new Fact("5"));
 		
 		Query b = new Query();
 		b.addStringsOfFacts("1", "2", "3", "1>2");
 		b.setQueryTarget(qt2);
-		b.setPRemovedEvents(0.5);
+		b.setPercRemoved(0.5);
 
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertEquals(a.getMethodDecl(), b.getMethodDecl());
 		assertEquals(a.getFacts(), b.getFacts());
-		assertTrue(a.getPRemovedEvents() == b.getPRemovedEvents());
+		assertTrue(a.getPercRemoved() == b.getPercRemoved());
+		assertNotEquals(a.getQueryTarget(), b.getQueryTarget());
+	}
+	
+	@Test
+	public void diffMethodDecl() {
+		QueryTarget qt1 = new QueryTarget();
+		qt1.addStringsOfFacts("1", "2", "3", "4", "1>2", "2>4");
+		qt1.setMethodDecl(new Fact("5"));
+		
+		Query a = new Query();
+		a.addStringsOfFacts("1", "2", "3", "1>2");
+		a.setQueryTarget(qt1);
+		a.setPercRemoved(0.5);
+
+		QueryTarget qt2 = new QueryTarget();
+		qt2.addStringsOfFacts("1", "2", "3", "4", "1>2", "2>4");
+		qt2.setMethodDecl(new Fact("6"));
+		
+		Query b = new Query();
+		b.addStringsOfFacts("1", "2", "3", "1>2");
+		b.setQueryTarget(qt2);
+		b.setPercRemoved(0.5);
+
+		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
+		assertNotEquals(a.hashCode(), b.hashCode());
+		assertEquals(a.getNumEvents(), b.getNumEvents());
+		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertNotEquals(a.getMethodDecl(), b.getMethodDecl());
+		assertEquals(a.getFacts(), b.getFacts());
+		assertTrue(a.getPercRemoved() == b.getPercRemoved());
 		assertNotEquals(a.getQueryTarget(), b.getQueryTarget());
 	}
 }
