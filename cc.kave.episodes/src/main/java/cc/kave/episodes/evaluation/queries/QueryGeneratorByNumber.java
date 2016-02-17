@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Query;
@@ -18,7 +19,7 @@ public class QueryGeneratorByNumber {
 		
 		Iterable<Fact> allFacts = queryTarget.getFacts();
 	
-		List<List<Fact>> subsets = generator.generateSubsets((List<Fact>) allFacts, removeEvents);
+		List<List<Fact>> subsets = generator.generateSubsets((Set<Fact>) allFacts, removeEvents);
 		
 		for (List<Fact> query : subsets) {
 			Query q = createEpisode(queryTarget, query);

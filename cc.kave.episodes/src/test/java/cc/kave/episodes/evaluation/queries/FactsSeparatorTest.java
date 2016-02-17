@@ -16,6 +16,7 @@
 package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Set;
 
@@ -44,7 +45,26 @@ public class FactsSeparatorTest {
 		Set<Fact> invocations = Sets.newHashSet(new Fact("b"), new Fact("c"), new Fact("d"));
 		Tuple<Fact, Set<Fact>> expected = Tuple.newTuple(new Fact("a"), invocations);
 		
-		Tuple<Fact, Set<Fact>> actuals = sut.separate(episode.getFacts());
+		Tuple<Fact, Set<Fact>> actuals = sut.separate(episode);
+		
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void noInvTest() {
+		Episode ep = createEpisode("a");
+		
+		Tuple<Fact, Set<Fact>> actuals = sut.separate(ep);
+		
+		assertNull(actuals);
+	}
+	
+	@Test
+	public void oneInvTest() {
+		Episode ep = createEpisode("a", "b", "a>b");
+		Tuple<Fact, Set<Fact>> expected = Tuple.newTuple(new Fact("a"), Sets.newHashSet(new Fact("b")));
+		
+		Tuple<Fact, Set<Fact>> actuals = sut.separate(ep);
 		
 		assertEquals(expected, actuals);
 	}

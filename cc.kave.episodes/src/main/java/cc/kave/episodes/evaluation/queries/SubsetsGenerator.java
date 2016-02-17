@@ -4,14 +4,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetsGenerator {
 
-	public List<List<Fact>> generateSubsets(List<Fact> array, int subsetLength) {
+	public List<List<Fact>> generateSubsets(Set<Fact> setOfFacts, int subsetLength) {
 		
-		int N = array.size();
+		int N = setOfFacts.size();
 		List<List<Fact>> results = new LinkedList<List<Fact>>();
 		
 		assertTrue("You cannot remove more events than are present in episode", N >= subsetLength);
@@ -35,9 +36,9 @@ public class SubsetsGenerator {
 
 			if (count == subsetLength) {
 				List<Fact> subset = new LinkedList<>();
-				for (int j = 0; j < N; j++) {
+				for (Fact fact : setOfFacts) {
 					if (binary[i] % 10 == 1) {
-						subset.add(array.get(j));
+						subset.add(fact);
 					}
 					binary[i] /= 10;
 				}

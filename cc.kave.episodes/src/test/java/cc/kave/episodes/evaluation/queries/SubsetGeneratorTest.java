@@ -4,16 +4,19 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetGeneratorTest {
 
-	private List<Fact> originalList = new LinkedList<Fact>();
+	private Set<Fact> originalList = Sets.newHashSet();
 	
 	private List<List<Fact>> expected = new LinkedList<List<Fact>>();
 	private List<Fact> subSets = new LinkedList<Fact>();

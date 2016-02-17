@@ -21,15 +21,19 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
 public class FactsSeparator {
 	
-	public Tuple<Fact, Set<Fact>> separate(Iterable<Fact> facts) {
+	public Tuple<Fact, Set<Fact>> separate(Episode episode) {
 		Map<Fact, Integer> orderCounter = new HashMap<Fact, Integer>();
-		int numEvents = 0;
+
+		if (episode.getNumEvents() == 1) {
+			return null;
+		}
 		
-		for (Fact fact : facts) {
+		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
 				Tuple<Fact, Fact> tuple = fact.getRelationFacts();
 				Fact existanceFact = tuple.getFirst();
@@ -40,20 +44,17 @@ public class FactsSeparator {
 					orderCounter.put(existanceFact, 1);
 				}
 			}
-			else {
-				numEvents++;
-			}
 		}
 		
 		Fact methodDecl = new Fact();
 		for (Map.Entry<Fact, Integer> entry : orderCounter.entrySet()) {
-			if (entry.getValue() == (numEvents - 1)) {
+			if (entry.getValue() == (episode.getNumEvents() - 1)) {
 				methodDecl = entry.getKey();
 			}
 		}
 		
 		Set<Fact> bodyFacts = new HashSet<Fact>();
-		for (Fact fact : facts) {
+		for (Fact fact : episode.getFacts()) {
 			if (!fact.equals(methodDecl) && !fact.isRelation()) {
 				bodyFacts.add(fact);
 			}
