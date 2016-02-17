@@ -13,19 +13,20 @@ package cc.kave.episodes.mining.patterns;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
 
 public class MaximalEpisodes {
 	
-	public Map<Integer, List<Episode>> getMaximalEpisodes(Map<Integer, List<Episode>> episodes) {
+	public Map<Integer, Set<Episode>> getMaximalEpisodes(Map<Integer, Set<Episode>> episodes) {
 		assertTrue(!episodes.isEmpty(), "The list of learned episodes is empty!");
 		
-		Map<Integer, List<Episode>> maximalEpisodes = new HashMap<Integer, List<Episode>>();
+		Map<Integer, Set<Episode>> maximalEpisodes = new HashMap<Integer, Set<Episode>>();
 		
 		if (episodes.size() == 1) {
 			return episodes;
@@ -34,27 +35,27 @@ public class MaximalEpisodes {
 		int[] episodeLevels = getEpisodeLevels(episodes);
 		
 		for (int level = 1; level < episodeLevels.length; level++) {
-			List<Episode> maximalEpisodesList = removeSubepisodes(episodes.get(episodeLevels[level - 1]), episodes.get(episodeLevels[level]));
-			if (!maximalEpisodesList.isEmpty()) {
-				maximalEpisodes.put((episodeLevels[level - 1]), maximalEpisodesList);
+			Set<Episode> maximalEpisodesSet = removeSubepisodes(episodes.get(episodeLevels[level - 1]), episodes.get(episodeLevels[level]));
+			if (!maximalEpisodesSet.isEmpty()) {
+				maximalEpisodes.put((episodeLevels[level - 1]), maximalEpisodesSet);
 			}
 		}
 		maximalEpisodes.put(episodeLevels[episodeLevels.length - 1], episodes.get(episodeLevels[episodeLevels.length - 1]));
 		return maximalEpisodes;
 	}
 	
-	private int[] getEpisodeLevels(Map<Integer, List<Episode>> allEpisodes) {
+	private int[] getEpisodeLevels(Map<Integer, Set<Episode>> allEpisodes) {
 		int[] episodeLevels = new int[allEpisodes.size()];
 		int index = 0;
-		for (Map.Entry<Integer, List<Episode>> entry : allEpisodes.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
 			episodeLevels[index] = entry.getKey();
 			index++;
 		}
 		return episodeLevels;
 	}
 	
-	private List<Episode> removeSubepisodes(List<Episode> smallerNodeEpisodeList, List<Episode> biggerNodeEpisodeList) {
-		List<Episode> reducedEpisodeList = new LinkedList<Episode>();
+	private Set<Episode> removeSubepisodes(Set<Episode> smallerNodeEpisodeList, Set<Episode> biggerNodeEpisodeList) {
+		Set<Episode> reducedEpisodeList = Sets.newHashSet();
 		boolean isSubEpisode = false;
 		
 		for (Episode smallerNodeEpisode : smallerNodeEpisodeList) {

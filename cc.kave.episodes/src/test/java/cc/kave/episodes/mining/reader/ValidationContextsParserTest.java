@@ -40,6 +40,7 @@ import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
@@ -133,7 +134,7 @@ public class ValidationContextsParserTest {
 	@Test
 	public void contextTest() throws ZipException, IOException {
 		List<Event> events = new LinkedList<Event>();
-		List<Episode> expected = new LinkedList<Episode>();
+		Set<Episode> expected = Sets.newHashSet();
 
 		Episode episode = createEpisode("0");
 		expected.add(episode);
@@ -141,7 +142,7 @@ public class ValidationContextsParserTest {
 		episode = createEpisode("1", "2", "3");
 		expected.add(episode);
 
-		List<Episode> actuals = sut.parse(events);
+		Set<Episode> actuals = sut.parse(events);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive("a");
@@ -179,7 +180,7 @@ public class ValidationContextsParserTest {
 		data.put("b", context);
 
 		List<Event> events = new LinkedList<Event>();
-		List<Episode> expected = new LinkedList<Episode>();
+		Set<Episode> expected = Sets.newHashSet();
 
 		Episode episode = createEpisode("0");
 		expected.add(episode);
@@ -190,7 +191,7 @@ public class ValidationContextsParserTest {
 		episode = createEpisode("4", "5");
 		expected.add(episode);
 
-		List<Episode> actuals = sut.parse(events);
+		Set<Episode> actuals = sut.parse(events);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive("a");

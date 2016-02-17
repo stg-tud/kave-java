@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.junit.Before;
@@ -36,6 +37,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -73,7 +75,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
-	private List<Episode> episodes;
+	private Set<Episode> episodes;
 	private File folderStructure;
 	
 	private EpisodeGraphGeneratorValidationData sut;
@@ -85,8 +87,8 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		graphConverter = new EpisodeToGraphConverter();
 		transitivityClosure = new TransitivelyClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
-		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationSpecificAPI("M1"),
-				eventMethodDeclSpecificAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"), 
+		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationGeneralAPI("M1"),
+				eventMethodDeclGeneralAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"), 
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 		
@@ -205,8 +207,8 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		return TypeName.newTypeName("some.namespace." + name + ", P");
 	}
 	
-	private List<Episode> createEpisodes() {
-		List<Episode> episodes = new LinkedList<Episode>();
+	private Set<Episode> createEpisodes() {
+		Set<Episode> episodes = Sets.newHashSet();
 		episodes.add(newEpisode("1"));
 		episodes.add(newEpisode("2"));
 		episodes.add(newEpisode("3"));

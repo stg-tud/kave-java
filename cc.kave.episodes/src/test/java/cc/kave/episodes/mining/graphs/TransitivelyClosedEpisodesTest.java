@@ -15,19 +15,28 @@
  */
 package cc.kave.episodes.mining.graphs;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
+import cc.recommenders.exceptions.AssertionException;
 
 public class TransitivelyClosedEpisodesTest {
 
-	private List<Episode> maximalEpisodes;
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
+	private Set<Episode> maximalEpisodes;
+	
 	private TransitivelyClosedEpisodes sut;
 	
 	@Before
@@ -35,26 +44,29 @@ public class TransitivelyClosedEpisodesTest {
 		sut = new TransitivelyClosedEpisodes();
 	}
 
-	@Test(expected=Exception.class)
-	public void emptyEpisode() throws Exception {
-		sut.removeTransitivelyClosure(new LinkedList<Episode>());
+	@Test
+	public void emptyEpisode() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("The list of learned episodes is empty!");
+		
+		sut.removeTransitivelyClosure(Sets.newHashSet());
 	}
 	
 	@Test
-	public void sameEpisode() throws Exception {
+	public void sameEpisode() {
 		
-		maximalEpisodes = new LinkedList<Episode>();
+		maximalEpisodes = Sets.newHashSet();
 		Episode episode = newEpisode(3, 3, "a", "b", "c");
 		maximalEpisodes.add(episode);
 		
-		List<Episode> expected = new LinkedList<Episode>();
+		Set<Episode> expected = Sets.newHashSet();
 		episode = newEpisode(3, 3, "a", "b", "c");
 		expected.add(episode);
 		
-		List<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
 				
-		for (int idx = 0; idx < expected.size(); idx++) {
-			assertTrue(expected.get(idx).equals(actuals.get(idx)));
+		for (Episode ep : expected) {
+			assertTrue(actuals.contains(ep));
 		}
 	}
 	
@@ -65,46 +77,67 @@ public class TransitivelyClosedEpisodesTest {
 	}
 	
 	@Test
-	public void removeClosures3() throws Exception {
-		maximalEpisodes = createListOfEpisodes(3, true);
+	public void removeClosures3() {
+		maximalEpisodes = createSetOfEpisodes(3, true);
 		
-		List<Episode> expected = createListOfEpisodes(3, false);
+		Set<Episode> expected = createSetOfEpisodes(3, false);
 		
-		List<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
 		
-		for (int idx = 0; idx < expected.size(); idx++) {
-			assertTrue(expected.get(idx).equals(actuals.get(idx)));
+		assertEquals(expected.size(), actuals.size());
+		boolean comparison = false;
+		for (Episode epExp : expected) {
+			for (Episode epAct : actuals) {
+				if (epExp.equals(epAct)) {
+					comparison = true;
+				}
+			}
+			assertTrue(comparison);
 		}
 	}
 	
 	@Test
-	public void removeClosures4() throws Exception {
-		maximalEpisodes = createListOfEpisodes(4, true);
+	public void removeClosures4() {
+		maximalEpisodes = createSetOfEpisodes(4, true);
 		
-		List<Episode> expected = createListOfEpisodes(4, false);
+		Set<Episode> expected = createSetOfEpisodes(4, false);
 		
-		List<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
 		
-		for (int idx = 0; idx < expected.size(); idx++) {
-			assertTrue(expected.get(idx).equals(actuals.get(idx)));
+		assertEquals(expected.size(), actuals.size());
+		boolean comparison = false;
+		for (Episode epExp : expected) {
+			for (Episode epAct : actuals) {
+				if (epExp.equals(epAct)) {
+					comparison = true;
+				}
+			}
+			assertTrue(comparison);
 		}
 	}
 
 	@Test
-	public void removeClosures5() throws Exception {
-		maximalEpisodes = createListOfEpisodes(5, true);
+	public void removeClosures5() {
+		maximalEpisodes = createSetOfEpisodes(5, true);
 		
-		List<Episode> expected = createListOfEpisodes(5, false);
+		Set<Episode> expected = createSetOfEpisodes(5, false);
 		
-		List<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
 		
-		for (int idx = 0; idx < expected.size(); idx++) {
-			assertTrue(expected.get(idx).equals(actuals.get(idx)));
+		assertEquals(expected.size(), actuals.size());
+		boolean comparison = false;
+		for (Episode epExp : expected) {
+			for (Episode epAct : actuals) {
+				if (epExp.equals(epAct)) {
+					comparison = true;
+				}
+			}
+			assertTrue(comparison);
 		}
 	}
 	
-	private List<Episode> createListOfEpisodes(int i, boolean closure) {
-		List<Episode> episodes = new LinkedList<Episode>();
+	private Set<Episode> createSetOfEpisodes(int i, boolean closure) {
+		Set<Episode> episodes = Sets.newHashSet();
 		if (i == 1) {
 			episodes.add(createEpisode("a"));
 		} else if (i == 2) {

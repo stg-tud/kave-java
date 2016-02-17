@@ -10,6 +10,8 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.PatternWithFreq;
 import cc.kave.episodes.model.Query;
 import cc.recommenders.datastructures.Tuple;
@@ -25,28 +28,23 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
 
-	public Set<Tuple<PatternWithFreq, Double>> getProposals(Query query, Map<Integer, List<PatternWithFreq>> patterns,
+	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, Set<Episode>> patterns,
 			int numberOfProposals) throws Exception {
-		Map<PatternWithFreq, Double> episodesWithF1Value = new HashMap<PatternWithFreq, Double>();
+		Map<Episode, Double> episodesWithF1Value = new HashMap<Episode, Double>();
 
-		if (patterns.isEmpty()) {
-			throw new Exception("The list of learned episodes is empty");
-		}
+		assertTrue(!patterns.isEmpty(), "The list of learned episodes is empty");
+		assertTrue(numberOfProposals > 0, "Request a positive number of proposals to show");
 
-		if (numberOfProposals <= 0) {
-			throw new Exception("Request a miningful number of proposals to show");
-		}
-
-		for (Map.Entry<Integer, List<PatternWithFreq>> entry : patterns.entrySet()) {
-			for (PatternWithFreq e : entry.getValue()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			for (Episode e : entry.getValue()) {
 				episodesWithF1Value.put(e, calcF1(query, e));
 			}
 		}
-		Set<Tuple<PatternWithFreq, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value);
-		Set<Tuple<PatternWithFreq, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
+		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value);
+		Set<Tuple<Episode, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
 
 		int idx = 0;
-		for (Tuple<PatternWithFreq, Double> tuple : sortedEpisodes) {
+		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
 			if (idx < numberOfProposals && tuple.getSecond() > 0.0
 					&& !episodeIsPartOfQuery(query, tuple.getFirst())) {
 				finalProposals.add(tuple);
@@ -56,7 +54,7 @@ public class EpisodeRecommender {
 		return finalProposals;
 	}
 
-	private boolean episodeIsPartOfQuery(Query query, PatternWithFreq episode) {
+	private boolean episodeIsPartOfQuery(Episode query, Episode episode) {
 		if (query.getNumEvents() <= episode.getNumEvents()) {
 			return false;
 		}
@@ -70,7 +68,7 @@ public class EpisodeRecommender {
 		return true;
 	}
 
-	private double calcF1(Query query, PatternWithFreq e) {
+	private double calcF1(Episode query, Episode e) {
 		Set<Fact> factsEpisode = Sets.newHashSet(e.getFacts());
 		Set<Fact> factsQuery = Sets.newHashSet(query.getFacts());
 		Measure m = Measure.newMeasure(factsQuery, factsEpisode);
@@ -78,12 +76,12 @@ public class EpisodeRecommender {
 		return f1;
 	}
 
-	private Set<Tuple<PatternWithFreq, Double>> sortedProposals(Map<PatternWithFreq, Double> proposals) {
+	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals) {
 
-		Set<Tuple<PatternWithFreq, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
+		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
 
-		for (PatternWithFreq episode : proposals.keySet()) {
-			Tuple<PatternWithFreq, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
+		for (Episode episode : proposals.keySet()) {
+			Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
 			sortedProposals.add(tuple);
 		}
 		return sortedProposals;

@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -69,19 +70,19 @@ public class EpisodeGraphGeneratorTrainingData {
 	}
 
 	public void generateGraphs(int frequencyThreshold, double bidirectionalThreshold) throws Exception {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
-		Map<Integer, List<Episode>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
+		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
+		Map<Integer, Set<Episode>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
 		List<Event> eventMapping = mappingParser.parse();
 
 		String directory = createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
 
 		int graphIndex = 0;
 
-		for (Map.Entry<Integer, List<Episode>> entry : maxEpisodes.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : maxEpisodes.entrySet()) {
 			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
 			Logger.append("\n");
 			if (entry.getKey() > 1) {
-				List<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+				Set<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(entry.getValue());
 				
 				for (Episode e : learnedEpisodes) {
 					Logger.log("Writting episode number %s.\n", graphIndex);

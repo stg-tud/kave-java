@@ -15,8 +15,8 @@
  */
 package cc.kave.episodes.analyzer.outputs;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.inject.Inject;
 
@@ -39,8 +39,8 @@ public class PatternAnalyzer {
 	}
 	
 	public void readPatterns() {
-		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
-		Map<Integer, List<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
+		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
+		Map<Integer, Set<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
 		
 		int allEpisodeCounter = 0;
 		int maxEpisodeCounter = 0;
@@ -48,7 +48,7 @@ public class PatternAnalyzer {
 		System.out.println("Maximal node-level is " + allEpisodes.size());
 		System.out.println();
 		
-		for (Map.Entry<Integer, List<Episode>> entry : allEpisodes.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
 			System.out.println("Node level = " + entry.getKey());
 			System.out.println("All episodes = " + entry.getValue().size());
 			allEpisodeCounter += entry.getValue().size();
@@ -56,7 +56,7 @@ public class PatternAnalyzer {
 		System.out.println("Total number of maximal episodes is " + allEpisodeCounter);
 		System.out.println();
 		
-		for (Map.Entry<Integer, List<Episode>> entry : maximalEpisodes.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : maximalEpisodes.entrySet()) {
 			System.out.println("Node level = " + entry.getKey());
 			System.out.println("Maximal episodes = " + entry.getValue().size());
 			maxEpisodeCounter += entry.getValue().size();

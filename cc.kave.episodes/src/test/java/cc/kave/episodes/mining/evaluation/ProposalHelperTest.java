@@ -25,21 +25,21 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.PatternWithFreq;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
 public class ProposalHelperTest {
 	
-	private PatternWithFreq pattern1;
-	private PatternWithFreq pattern2;
-	private PatternWithFreq pattern3;
-	private PatternWithFreq pattern4;
-	private PatternWithFreq pattern5;
-	private PatternWithFreq pattern6;
-	private PatternWithFreq pattern7;
+	private Episode pattern1;
+	private Episode pattern2;
+	private Episode pattern3;
+	private Episode pattern4;
+	private Episode pattern5;
+	private Episode pattern6;
+	private Episode pattern7;
 
-	private Set<Tuple<PatternWithFreq, Double>> actuals;
-	private Set<Tuple<PatternWithFreq, Double>> expecteds;
+	private Set<Tuple<Episode, Double>> actuals;
+	private Set<Tuple<Episode, Double>> expecteds;
 
 	@Before
 	public void setup() {
@@ -64,8 +64,8 @@ public class ProposalHelperTest {
 		expecteds = Sets.newLinkedHashSet();
 	}
 
-	private PatternWithFreq createPattern(String...string) {
-		PatternWithFreq pattern = new PatternWithFreq();
+	private Episode createPattern(String...string) {
+		Episode pattern = new Episode();
 		for (String s : string) {
 			pattern.addFact(s);
 		}
@@ -75,12 +75,12 @@ public class ProposalHelperTest {
 	@Test
 	public void firstElemIsNUllAndSecondIsEqual() {
 		actuals.add(Tuple.newTuple(pattern1, 1.0));
-		actuals.add(Tuple.newTuple(new PatternWithFreq(), 1.0));
+		actuals.add(Tuple.newTuple(new Episode(), 1.0));
 	}
 
 	@Test
 	public void firstElemIsNUllAndSecondIsEqual_2() {
-		actuals.add(Tuple.newTuple(new PatternWithFreq(), 1.0));
+		actuals.add(Tuple.newTuple(new Episode(), 1.0));
 		actuals.add(Tuple.newTuple(pattern1, 1.0));
 	}
 
@@ -138,8 +138,8 @@ public class ProposalHelperTest {
 
 	private void assertSets() {
 		assertEquals(expecteds.size(), actuals.size());
-		Iterator<Tuple<PatternWithFreq, Double>> itA = expecteds.iterator();
-		Iterator<Tuple<PatternWithFreq, Double>> itB = actuals.iterator();
+		Iterator<Tuple<Episode, Double>> itA = expecteds.iterator();
+		Iterator<Tuple<Episode, Double>> itB = actuals.iterator();
 		while (itA.hasNext()) {
 			assertEquals(itA.next(), itB.next());
 		}

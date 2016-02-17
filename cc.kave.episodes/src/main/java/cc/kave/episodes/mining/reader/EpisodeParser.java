@@ -19,10 +19,11 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -41,13 +42,13 @@ public class EpisodeParser {
 		this.reader = reader;
 	}
 
-	public Map<Integer, List<Episode>> parse(int freq, double bd) {
+	public Map<Integer, Set<Episode>> parse(int freq, double bd) {
 
 		File filePath = getFilePath(freq, bd);
 		List<String> lines = reader.readFile(filePath);
 
-		Map<Integer, List<Episode>> episodeIndexed = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodes = new LinkedList<Episode>();
+		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
+		Set<Episode> episodes = Sets.newHashSet();
 
 		String[] rowValues;
 		int numNodes = 0;
@@ -65,7 +66,7 @@ public class EpisodeParser {
 				if (Integer.parseInt(rowValues[3]) > 0) {
 					String[] nodeString = rowValues[0].split("-");
 					numNodes = Integer.parseInt(nodeString[0]);
-					episodes = new LinkedList<Episode>();
+					episodes = Sets.newHashSet();
 				}
 			}
 		}

@@ -16,7 +16,6 @@
 package cc.kave.episodes.mining.reader;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipException;
@@ -46,8 +45,8 @@ public class ValidationContextsParser {
 		this.rootDir = directory;
 	}
 
-	public List<Episode> parse(List<Event> eventsList) throws ZipException, IOException {
-		List<Episode> validationData = new LinkedList<Episode>();
+	public Set<Episode> parse(List<Event> eventsList) throws ZipException, IOException {
+		Set<Episode> validationData = Sets.newHashSet();
 
 		for (String zip : findZips()) {
 			ReadingArchive ra = rootDir.getReadingArchive(zip);

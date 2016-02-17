@@ -19,9 +19,8 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -29,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
@@ -44,11 +45,17 @@ public class EpisodeParserTest {
 	private static final double BD = 0.1;
 
 	private FileReader reader;
+	private Map<Integer, Set<Episode>> expected;
+	private Set<Episode> episodes;
 	private EpisodeParser sut;
 
 	@Before
 	public void setup() {
 		reader = mock(FileReader.class);
+		
+		expected = new HashMap<Integer, Set<Episode>>();
+		episodes = Sets.newHashSet();
+		
 		sut = new EpisodeParser(rootFolder.getRoot(), reader);
 	}
 
@@ -83,17 +90,14 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
-
 		Episode episode = createEpisode(3, 1, "1");
-		episodeList.add(episode);
+		episodes.add(episode);
 
-		expected.put(1, episodeList);
+		expected.put(1, episodes);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -119,17 +123,14 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
-
 		Episode episode = createEpisode(3, 1, "1");
-		episodeList.add(episode);
+		episodes.add(episode);
 
-		expected.put(1, episodeList);
+		expected.put(1, episodes);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 
@@ -156,27 +157,24 @@ public class EpisodeParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Map<Integer, List<Episode>> expected = new HashMap<Integer, List<Episode>>();
-		List<Episode> episodeList = new LinkedList<Episode>();
-
 		Episode episode = createEpisode(3, 1, "1");
-		episodeList.add(episode);
+		episodes.add(episode);
 
 		episode = createEpisode(2, 1, "2");
-		episodeList.add(episode);
+		episodes.add(episode);
 
-		expected.put(1, episodeList);
+		expected.put(1, episodes);
 
-		episodeList = new LinkedList<Episode>();
+		episodes = Sets.newHashSet();
 
 		episode = createEpisode(3, 2, "1", "2", "1>2");
-		episodeList.add(episode);
+		episodes.add(episode);
 
-		expected.put(2, episodeList);
+		expected.put(2, episodes);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, List<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
 
 		verify(reader).readFile(file);
 

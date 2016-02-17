@@ -15,7 +15,6 @@
  */
 package cc.kave.episodes.analyzer.outputs;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,6 +38,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -79,7 +80,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
-	private Map<Integer, List<Episode>> episodes;
+	private Map<Integer, Set<Episode>> episodes;
 	private File folderStructure;
 	
 	private EpisodeGraphGeneratorTrainingData sut;
@@ -145,7 +146,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 
 		File fileName;
 		int epCounter = 0;
-		for (Map.Entry<Integer, List<Episode>> entry : episodes.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() > 1) {
 				for (Episode e : entry.getValue()) {
 					List<String> types = getTypes(e, events);
@@ -175,13 +176,13 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		return types;
 	}
 
-	private Map<Integer, List<Episode>> createEpisodes() {
-		Map<Integer, List<Episode>> episodes = new HashMap<Integer, List<Episode>>();
-		episodes.put(1, newArrayList(newEpisode("1"), newEpisode("2"), newEpisode("3")));
-		episodes.put(2, newArrayList(newEpisode("4", "5"), newEpisode("3", "4")));
+	private Map<Integer, Set<Episode>> createEpisodes() {
+		Map<Integer, Set<Episode>> episodes = new HashMap<Integer, Set<Episode>>();
+		episodes.put(1, Sets.newHashSet(newEpisode("1"), newEpisode("2"), newEpisode("3")));
+		episodes.put(2, Sets.newHashSet(newEpisode("4", "5"), newEpisode("3", "4")));
 		episodes.put(3,
-				newArrayList(newEpisode("1", "3", "5"), newEpisode("2", "3", "5")));
-		episodes.put(4, newArrayList(newEpisode("1", "2", "3", "6")));
+				Sets.newHashSet(newEpisode("1", "3", "5"), newEpisode("2", "3", "5")));
+		episodes.put(4, Sets.newHashSet(newEpisode("1", "2", "3", "6")));
 		return episodes;
 	}
 

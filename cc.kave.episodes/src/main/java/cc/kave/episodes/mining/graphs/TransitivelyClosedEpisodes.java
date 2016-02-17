@@ -15,8 +15,13 @@
  */
 package cc.kave.episodes.mining.graphs;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
@@ -24,14 +29,11 @@ import cc.recommenders.datastructures.Tuple;
 
 public class TransitivelyClosedEpisodes {
 
-	public List<Episode> removeTransitivelyClosure(List<Episode> allEpisodes)
-			throws Exception {
+	public Set<Episode> removeTransitivelyClosure(Set<Episode> allEpisodes) {
+		
+		assertTrue(!allEpisodes.isEmpty(), "The list of learned episodes is empty!");
 
-		if (allEpisodes.isEmpty()) {
-			throw new Exception("You passed an empty list of maximal episode!");
-		}
-
-		List<Episode> updatedEpisodes = new LinkedList<Episode>();
+		Set<Episode> updatedEpisodes = Sets.newHashSet();
 		for (Episode episode : allEpisodes) {
 			if (episode.getNumFacts() != episode.getNumEvents()) {
 				Episode newEpisode = reduceRelations(episode);

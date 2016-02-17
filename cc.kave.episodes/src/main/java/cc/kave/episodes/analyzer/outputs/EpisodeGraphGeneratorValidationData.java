@@ -20,6 +20,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -71,10 +72,10 @@ public class EpisodeGraphGeneratorValidationData {
 		List<Event> eventMapping = mappingParser.parse();
 		
 		Logger.log("Readng Contexts");
-		List<Episode> validationData = validationParser.parse(eventMapping);
+		Set<Episode> validationData = validationParser.parse(eventMapping);
 		
 		Logger.log("Removing transitivity closures");
-		List<Episode> simplifiedValData = transitivityClosure.removeTransitivelyClosure(validationData);
+		Set<Episode> simplifiedValData = transitivityClosure.removeTransitivelyClosure(validationData);
 		
 		String directory = createDirectoryStructure();
 
@@ -84,6 +85,7 @@ public class EpisodeGraphGeneratorValidationData {
 			Logger.log("Writting episode number %s.\n", graphIndex);
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
 			List<String> types = getAPIType(e, eventMapping);
+			System.out.println("In main:\tGraphIndex = " + graphIndex + "\ttypes = " + types.toString()); 
 			for (String t : types) {
 				writer.write(graph, getFilePath(directory, t, graphIndex));
 			}
@@ -108,15 +110,11 @@ public class EpisodeGraphGeneratorValidationData {
 	}
 
 	private String createDirectoryStructure() {
-		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/";
+		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/validationData/";
 		if (!(new File(targetDirectory).isDirectory())) {
-			new File(targetDirectory).mkdir();
+			new File(targetDirectory).mkdirs();
 		}
-		String configurationFolder = targetDirectory + "/validationData/";
-		if (!(new File(configurationFolder).isDirectory())) {
-			new File(configurationFolder).mkdir();
-		}
-		return configurationFolder;
+		return targetDirectory;
 	}
 
 	private String getFilePath(String folderPath, String apiType, int fileNumber) throws Exception {

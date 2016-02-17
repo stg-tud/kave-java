@@ -10,14 +10,12 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,18 +24,17 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.model.PatternWithFreq;
-import cc.kave.episodes.model.Query;
+import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
 public class EpisodeRecommenderTest {
 	
 	private DecimalFormat df = new DecimalFormat("#.###");
 
-	private Set<Tuple<PatternWithFreq, Double>> expectedProposals;
-	private Set<Tuple<PatternWithFreq, Double>> actualProposals;
-	private Map<Integer, List<PatternWithFreq>> learnedPatterns;
-	private Map<Integer, List<PatternWithFreq>> emptyEpisodes;
+	private Set<Tuple<Episode, Double>> expectedProposals;
+	private Set<Tuple<Episode, Double>> actualProposals;
+	private Map<Integer, Set<Episode>> learnedPatterns;
+	private Map<Integer, Set<Episode>> emptyEpisodes;
 
 	private EpisodeRecommender sut;
 
@@ -46,17 +43,17 @@ public class EpisodeRecommenderTest {
 		sut = new EpisodeRecommender();
 		expectedProposals = Sets.newLinkedHashSet();
 		actualProposals = Sets.newLinkedHashSet();
-		emptyEpisodes = new HashMap<Integer, List<PatternWithFreq>>();
+		emptyEpisodes = new HashMap<Integer, Set<Episode>>();
 
-		learnedPatterns = new HashMap<Integer, List<PatternWithFreq>>();
-		learnedPatterns.put(1, newArrayList(newPattern(3, "1"), newPattern(3, "2"), newPattern(3, "3")));
-		learnedPatterns.put(2, newArrayList(newPattern(3, "4", "5", "4>5"), newPattern(2, "4", "6", "4>6")));
-		learnedPatterns.put(3, newArrayList(newPattern(1, "6", "7", "8", "7>8"), newPattern(3, "10", "11", "12", "11>12")));
-		learnedPatterns.put(4, newArrayList(newPattern(3, "10", "11", "12", "13")));
+		learnedPatterns = new HashMap<Integer, Set<Episode>>();
+		learnedPatterns.put(1, Sets.newHashSet(newPattern(3, "1"), newPattern(3, "2"), newPattern(3, "3")));
+		learnedPatterns.put(2, Sets.newHashSet(newPattern(3, "4", "5", "4>5"), newPattern(2, "4", "6", "4>6")));
+		learnedPatterns.put(3, Sets.newHashSet(newPattern(1, "6", "7", "8", "7>8"), newPattern(3, "10", "11", "12", "11>12")));
+		learnedPatterns.put(4, Sets.newHashSet(newPattern(3, "10", "11", "12", "13")));
 	}
 
-	private PatternWithFreq newPattern(int freq, String...string) {
-		PatternWithFreq pattern = new PatternWithFreq();
+	private Episode newPattern(int freq, String...string) {
+		Episode pattern = new Episode();
 		pattern.setFrequency(freq);
 		for (String s : string) {
 			pattern.addFact(s);
@@ -133,8 +130,8 @@ public class EpisodeRecommenderTest {
 		assertProposals(actualProposals);
 	}
 
-	private Query newQuery(int frequency, int numberOfEvents, String... facts) {
-		Query query = new Query();
+	private Episode newQuery(int frequency, int numberOfEvents, String... facts) {
+		Episode query = new Episode();
 		query.addStringsOfFacts(facts);
 		return query;
 	}
@@ -143,11 +140,11 @@ public class EpisodeRecommenderTest {
 		actualProposals = sut.getProposals(newQuery(1, numberOfEvents, facts), learnedPatterns, 3);
 	}
 
-	private void addProposal(PatternWithFreq e, double probability) {
+	private void addProposal(Episode e, double probability) {
 		expectedProposals.add(Tuple.newTuple(e, probability));
 	}
 
-	private void assertProposals(Set<Tuple<PatternWithFreq, Double>> actualProposals) {
+	private void assertProposals(Set<Tuple<Episode, Double>> actualProposals) {
 		if (expectedProposals.size() != actualProposals.size()) {
 			System.out.println("expected\n");
 			System.out.println(expectedProposals);
@@ -155,11 +152,11 @@ public class EpisodeRecommenderTest {
 			System.out.println(actualProposals);
 			fail();
 		}
-		Iterator<Tuple<PatternWithFreq, Double>> itE = expectedProposals.iterator();
-		Iterator<Tuple<PatternWithFreq, Double>> itA = actualProposals.iterator();
+		Iterator<Tuple<Episode, Double>> itE = expectedProposals.iterator();
+		Iterator<Tuple<Episode, Double>> itA = actualProposals.iterator();
 		while (itE.hasNext()) {
-			Tuple<PatternWithFreq, Double> expected = itE.next();
-			Tuple<PatternWithFreq, Double> actual = itA.next();
+			Tuple<Episode, Double> expected = itE.next();
+			Tuple<Episode, Double> actual = itA.next();
 			assertEquals(expected, actual);
 		}
 	}
