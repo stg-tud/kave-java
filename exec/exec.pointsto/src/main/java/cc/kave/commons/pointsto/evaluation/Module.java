@@ -12,6 +12,9 @@
  */
 package cc.kave.commons.pointsto.evaluation;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
@@ -19,10 +22,12 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
-import cc.recommenders.evaluation.OptionsUtils;
 import cc.recommenders.mining.calls.MiningOptions;
+import cc.recommenders.mining.calls.MiningOptions.Algorithm;
+import cc.recommenders.mining.calls.MiningOptions.DistanceMeasure;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.QueryOptions;
+import cc.recommenders.mining.calls.QueryOptions.QueryType;
 import cc.recommenders.mining.calls.clustering.FeatureWeighter;
 import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
 import cc.recommenders.mining.features.FeatureExtractor;
@@ -37,17 +42,33 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		configOptions();
 
-		bind(RandomGenerator.class).toInstance(new Well19937c());
+		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		// ExecutorService executorService = Executors.newSingleThreadExecutor();
+		bind(ExecutorService.class).toInstance(executorService);
 	}
 
 	private void configOptions() {
-		String opts = OptionsUtils.pbn(10).c(true).d(true).p(false).useFloat().ignore(false).min(30).get();
 		QueryOptions qOpts = new QueryOptions();
-		MiningOptions mOpts = new MiningOptions();
-		qOpts.setFrom(opts);
-		mOpts.setFrom(opts);
+		qOpts.queryType = QueryType.NM;
+		qOpts.minProbability = 0.3;
+		qOpts.useClassContext = true;
+		qOpts.useMethodContext = true;
+		qOpts.useDefinition = true;
+		qOpts.useParameterSites = true;
+		qOpts.isIgnoringAfterFullRecall = false;
 		bind(QueryOptions.class).toInstance(qOpts);
+
+		MiningOptions mOpts = new MiningOptions();
+		mOpts.setDistanceMeasure(DistanceMeasure.COSINE);
+		mOpts.setAlgorithm(Algorithm.CANOPY);
+		mOpts.setT1(0.101);
+		mOpts.setT2(0.1);
 		bind(MiningOptions.class).toInstance(mOpts);
+	}
+
+	@Provides
+	public RandomGenerator provideRandomGenerator() {
+		return new Well19937c(1457288501271L);
 	}
 
 	@Provides

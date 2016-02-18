@@ -98,6 +98,20 @@ public class ProjectUsageStore implements UsageStore {
 		return projectDirToStore.size();
 	}
 
+	public Set<ProjectIdentifier> getProjects(ITypeName type) {
+		Set<ProjectIdentifier> projects = new HashSet<>();
+
+		synchronized (projectDirToStore) {
+			for (Map.Entry<Path, ProjectStore> entry : projectDirToStore.entrySet()) {
+				if (entry.getValue().getAllTypes().contains(type)) {
+					projects.add(new ProjectIdentifier(entry.getKey()));
+				}
+			}
+		}
+
+		return projects;
+	}
+
 	public Map<ProjectIdentifier, Integer> getNumberOfUsagesPerProject(ITypeName type) throws IOException {
 		Map<ProjectIdentifier, Integer> projectUsageCounts = new HashMap<>(projectDirToStore.size());
 
