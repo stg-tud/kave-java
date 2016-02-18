@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -27,22 +27,22 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
 
-import org.apache.commons.math3.random.RandomGenerator;
-
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
+import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.Names;
 import cc.recommenders.usages.Usage;
 
-public class ProjectFoldedEvaluation {
+public class UsageEvaluation {
 
 	private static final boolean HIDE_UNIQUE_TYPES = true;
 
-	private Path storePath;
 	private int numFolds;
 
 	private Predicate<Usage> usageFilter;
@@ -53,9 +53,9 @@ public class ProjectFoldedEvaluation {
 	private long skippedUsageFilter;
 	private Map<ITypeName, Double> results = new HashMap<>();
 
-	public ProjectFoldedEvaluation(Path storePath, int numFolds, Predicate<Usage> usageFilter,
+	@Inject
+	public UsageEvaluation(@NumberOfCVFolds int numFolds, @UsageFilter Predicate<Usage> usageFilter,
 			CrossValidationFoldBuilder foldBuilder, CVEvaluator cvEvaluator) {
-		this.storePath = storePath;
 		this.numFolds = numFolds;
 		this.usageFilter = usageFilter;
 		this.foldBuilder = foldBuilder;
@@ -68,20 +68,18 @@ public class ProjectFoldedEvaluation {
 		results.clear();
 	}
 
-	public void run() throws IOException {
+	public Map<ITypeName, Double> getResults() {
+		return Collections.unmodifiableMap(results);
+	}
+
+	public void run(Path storePath) throws IOException {
 		reset();
 
 		try (ProjectUsageStore usageStore = new ProjectUsageStore(storePath)) {
 			// store types in a list and sort it alphabetically to get a consistent ordering in which types are
 			// evaluated
 			List<ITypeName> types = new ArrayList<>(usageStore.getAllTypes());
-			types.sort(new Comparator<ITypeName>() {
-
-				@Override
-				public int compare(ITypeName o1, ITypeName o2) {
-					return o1.getIdentifier().compareTo(o2.getIdentifier());
-				}
-			});
+			types.sort(new TypeNameComparator());
 
 			int numProjects = usageStore.getNumberOfProjects();
 			log("Loaded usage store containing %d projects and %d types\n", numProjects, types.size());
@@ -140,20 +138,27 @@ public class ProjectFoldedEvaluation {
 
 	private static final Injector INJECTOR = Guice.createInjector(new Module());
 
+	public static UsageEvaluation run(Path storePath, Path exportFile) throws IOException {
+		UsageEvaluation evaluation = INJECTOR.getInstance(UsageEvaluation.class);
+		evaluation.run(storePath);
+
+		if (exportFile != null) {
+			INJECTOR.getInstance(ResultExporter.class).export(exportFile, evaluation.getResults());
+		}
+		
+		return evaluation;
+	}
+
+	public static void shutdown() {
+		INJECTOR.getInstance(ExecutorService.class).shutdown();
+	}
+
 	public static void main(String[] args) throws IOException {
 		Locale.setDefault(Locale.US);
 		Path storePath = Paths.get("E:\\Coding\\MT\\Usages\\UnificationAnalysis_FULL");
-		int numFolds = 10;
-		RandomGenerator rndGenerator = load(RandomGenerator.class);
-		CVEvaluator cvEvaluator = load(CVEvaluator.class);
-		new ProjectFoldedEvaluation(storePath, numFolds, new PointsToUsageFilter(),
-				new StratifiedCVFoldBuilder(numFolds, rndGenerator), cvEvaluator).run();
-
-		load(ExecutorService.class).shutdown();
-	}
-
-	private static <T> T load(Class<T> c) {
-		return INJECTOR.getInstance(c);
+		Path exportFile = Paths.get("E:\\Coding\\MT\\EvaluationResults\\UnificationAnalysis_FULL.txt");
+		run(storePath, exportFile);
+		shutdown();
 	}
 
 }

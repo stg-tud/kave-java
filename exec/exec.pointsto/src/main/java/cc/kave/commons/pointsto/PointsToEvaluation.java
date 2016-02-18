@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,6 +32,7 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
 import cc.kave.commons.pointsto.extraction.TypeHistogramUsageStatisticsCollector;
 import cc.kave.commons.pointsto.extraction.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
@@ -47,24 +49,21 @@ public class PointsToEvaluation {
 	private static final Path CONTEXT_DEST = BASE_PATH.resolve("annotatedContexts");
 	private static final Path USAGE_DEST = BASE_PATH.resolve("Usages");
 	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
+	private static final Path EVALUATION_RESULTS_DEST = BASE_PATH.resolve("EvaluationResults");
 
 	public static void main(String[] args) {
+
 		List<PointsToAnalysisFactory> factories = Arrays.asList(
 				// new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
-				// new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class)
+				// new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
 				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL));
-		Stopwatch stopwatch = Stopwatch.createStarted();
-		Map<PointsToAnalysisFactory, List<Usage>> usages = new PointsToEvaluation().generateUsages(factories);
-		stopwatch.stop();
 
-		LOGGER.info("Usage generation took {}", stopwatch.toString());
-		for (Map.Entry<PointsToAnalysisFactory, List<Usage>> entry : usages.entrySet()) {
-			LOGGER.info("{}: {} usages", entry.getKey().getName(), entry.getValue().size());
-		}
+		generateUsages(factories);
+		// evaluateUsages(factories);
 
 	}
 
-	private Map<PointsToAnalysisFactory, List<Usage>> generateUsages(List<PointsToAnalysisFactory> factories) {
+	private static Map<PointsToAnalysisFactory, List<Usage>> generateUsages(List<PointsToAnalysisFactory> factories) {
 		try {
 			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory = (PointsToAnalysisFactory factory) -> {
 				try {
@@ -77,8 +76,16 @@ public class PointsToEvaluation {
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, usageStoreFactory,
 					new TypeHistogramUsageStatisticsCollector());
 
+			Stopwatch stopwatch = Stopwatch.createStarted();
 			Map<PointsToAnalysisFactory, List<Usage>> usages = generator.getUsages();
+			stopwatch.stop();
+			LOGGER.info("Usage generation took {}", stopwatch.toString());
+
 			outputStatisticsCollectors(generator.getStatisticsCollectors());
+
+			for (Map.Entry<PointsToAnalysisFactory, List<Usage>> entry : usages.entrySet()) {
+				LOGGER.info("{}: {} usages", entry.getKey().getName(), entry.getValue().size());
+			}
 
 			return usages;
 		} catch (IOException e) {
@@ -88,7 +95,7 @@ public class PointsToEvaluation {
 		return Collections.emptyMap();
 	}
 
-	private void outputStatisticsCollectors(Map<PointsToAnalysisFactory, UsageStatisticsCollector> collectors) {
+	private static void outputStatisticsCollectors(Map<PointsToAnalysisFactory, UsageStatisticsCollector> collectors) {
 		try {
 			for (Map.Entry<PointsToAnalysisFactory, UsageStatisticsCollector> entry : collectors.entrySet()) {
 				Path statFile = STATISTICS_DEST.resolve(entry.getKey().getName() + ".txt");
@@ -99,6 +106,23 @@ public class PointsToEvaluation {
 		} catch (IOException e) {
 			LOGGER.error("Failed to write the results of the statistics collectors to disk", e);
 		}
+	}
+
+	private static void evaluateUsages(List<PointsToAnalysisFactory> factories) {
+		Locale.setDefault(Locale.US);
+
+		for (PointsToAnalysisFactory factory : factories) {
+			String factoryName = factory.getName();
+			Path store = USAGE_DEST.resolve(factoryName);
+			Path evaluationExport = EVALUATION_RESULTS_DEST.resolve(factoryName + ".txt");
+			try {
+				UsageEvaluation.run(store, evaluationExport);
+			} catch (IOException e) {
+				LOGGER.error("Failed to evaluate usages of " + factoryName, e);
+			}
+		}
+
+		UsageEvaluation.shutdown();
 	}
 
 }

@@ -23,15 +23,19 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 
+import com.google.inject.Inject;
+
+import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.recommenders.usages.Usage;
 
-public class StratifiedCVFoldBuilder implements CrossValidationFoldBuilder {
+public class StratifiedProjectsCVFoldBuilder implements CrossValidationFoldBuilder {
 
 	private int numFolds;
 	private RandomGenerator rndGenerator;
 
-	public StratifiedCVFoldBuilder(int numFolds, RandomGenerator rndGenerator) {
+	@Inject
+	public StratifiedProjectsCVFoldBuilder(@NumberOfCVFolds int numFolds, RandomGenerator rndGenerator) {
 		this.numFolds = numFolds;
 		this.rndGenerator = rndGenerator;
 	}

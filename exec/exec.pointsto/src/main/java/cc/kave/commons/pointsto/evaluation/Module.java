@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.evaluation;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
@@ -21,7 +22,10 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 
+import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
+import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;
 import cc.recommenders.mining.calls.MiningOptions.DistanceMeasure;
@@ -40,11 +44,21 @@ public class Module extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		configCrossValidation();
 		configOptions();
+
+		bind(new TypeLiteral<Predicate<Usage>>() {
+		}).annotatedWith(UsageFilter.class).to(PointsToUsageFilter.class);
+		bind(ResultExporter.class).to(CSVExporter.class);
 
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		// ExecutorService executorService = Executors.newSingleThreadExecutor();
 		bind(ExecutorService.class).toInstance(executorService);
+	}
+
+	private void configCrossValidation() {
+		bind(int.class).annotatedWith(NumberOfCVFolds.class).toInstance(10);
+		bind(CrossValidationFoldBuilder.class).to(StratifiedMethodsCVFoldBuilder.class);
 	}
 
 	private void configOptions() {
