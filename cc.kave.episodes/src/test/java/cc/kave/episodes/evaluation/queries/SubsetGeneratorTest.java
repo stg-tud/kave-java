@@ -2,90 +2,95 @@ package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.recommenders.exceptions.AssertionException;
 
 public class SubsetGeneratorTest {
+	
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-	private Set<Fact> originalList = Sets.newHashSet();
-	
-	private List<List<Fact>> expected = new LinkedList<List<Fact>>();
-	private List<Fact> subSets = new LinkedList<Fact>();
-	
-	private List<List<Fact>> actuals;
+	private Set<Fact> originalSet = Sets.newHashSet();
+	private Set<Fact> subSets;
+	private Set<Set<Fact>> expected = Sets.newHashSet(Sets.newHashSet());
+	private Set<Set<Fact>> actuals;
 	
 	private SubsetsGenerator sut;
 	
 	@Before
 	public void setup() {
-		originalList.add(new Fact("a"));
-		originalList.add(new Fact("b"));
-		originalList.add(new Fact("c"));
+		originalSet.add(new Fact(12));
+		originalSet.add(new Fact(13));
+		originalSet.add(new Fact(14));
 		
 		sut = new SubsetsGenerator();
 	}
 	
 	@Test
-	public void oneEvents() {
-		subSets.add(new Fact("a"));
+	public void emptySet() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Cannot subselect from less then one method invocation!");
+		sut.generateSubsets(Sets.newHashSet(), 1);
+	}
+	
+	@Test
+	public void oneEntry() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Cannot subselect from less then one method invocation!");
+		sut.generateSubsets(Sets.newHashSet(new Fact(15)), 1);
+	}
+	
+	@Test
+	public void subselectAllEntries() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("You cannot subselect less or equal than the total number of Facts!");
+		sut.generateSubsets(originalSet, 3);
+	}
+	
+	@Test
+	public void subselectMoreEntries() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("You cannot subselect less or equal than the total number of Facts!");
+		sut.generateSubsets(originalSet, 5);
+	}
+	
+	@Test
+	public void oneEvent() {
+		subSets = Sets.newHashSet(new Fact(12));
 		expected.add(subSets);
 		
-		subSets = new LinkedList<Fact>();
-		subSets.add(new Fact("b"));
+		subSets = Sets.newHashSet(new Fact(13));
 		expected.add(subSets);
 		
-		subSets = new LinkedList<Fact>();
-		subSets.add(new Fact("c"));
+		subSets = Sets.newHashSet(new Fact(14));
 		expected.add(subSets);
 		
-		actuals = sut.generateSubsets(originalList, 1);
+		actuals = sut.generateSubsets(originalSet, 1);
 		
 		assertEquals(expected, actuals);
 	}
 	
 	@Test
 	public void twoNodes() {
-		subSets.add(new Fact("a"));
-		subSets.add(new Fact("b"));
+		subSets = Sets.newHashSet(new Fact(12), new Fact(13));
 		expected.add(subSets);
 		
-		subSets = new LinkedList<Fact>();
-		subSets.add(new Fact("a"));
-		subSets.add(new Fact("c"));
+		subSets = Sets.newHashSet(new Fact(12), new Fact(14));
 		expected.add(subSets);
 		
-		subSets = new LinkedList<Fact>();
-		subSets.add(new Fact("b"));
-		subSets.add(new Fact("c"));
+		subSets = Sets.newHashSet(new Fact(13), new Fact(14));
 		expected.add(subSets);
 		
-		actuals = sut.generateSubsets(originalList, 2);
-		
-		assertEquals(expected, actuals);
-	}
-	
-	@Test
-	public void threeNodes() {
-		
-		actuals = sut.generateSubsets(originalList, 3);
-		
-		assertEquals(expected, actuals);
-	}
-	
-	@Ignore
-	@Test
-	public void wrongNumberOfSelection() {
-		
-		actuals = sut.generateSubsets(originalList, 5);
+		actuals = sut.generateSubsets(originalSet, 2);
 		
 		assertEquals(expected, actuals);
 	}

@@ -1,50 +1,68 @@
+/**
+ * Copyright 2016 Technische Universität Darmstadt
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cc.kave.episodes.evaluation.queries;
 
-import static org.junit.Assert.assertTrue;
+import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetsGenerator {
-
-	public List<List<Fact>> generateSubsets(Set<Fact> setOfFacts, int subsetLength) {
+	
+	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length) {
+		assertTrue((originalSet.size() > 1), "Cannot subselect from less then one method invocation!");
+		assertTrue(length < originalSet.size(), "You cannot subselect less or equal than the total number of Facts!");
 		
-		int N = setOfFacts.size();
-		List<List<Fact>> results = new LinkedList<List<Fact>>();
+		Set<Set<Fact>> allSubsets = powerSet(originalSet);
+		return selectLength(allSubsets, length);
+	}
+ 
+	private Set<Set<Fact>> powerSet(Set<Fact> originalSet) {
+		Set<Set<Fact>> sets = new HashSet<Set<Fact>>(); 
+		if (originalSet.isEmpty()) { 
+			sets.add(new HashSet<Fact>()); 
+			return sets; 
+		} 
+		List<Fact> list = new ArrayList<Fact>(originalSet); 
+		Fact head = list.get(0); 
+		Set<Fact> rest = new HashSet<Fact>(list.subList(1, list.size())); 
+		for (Set<Fact> set : powerSet(rest)) { 
+			Set<Fact> newSet = new HashSet<Fact>(); 
+			newSet.add(head); 
+			newSet.addAll(set); 
+			sets.add(newSet); 
+			sets.add(set); 
+		} 
+		return sets; 
+	}
+	
+	private Set<Set<Fact>> selectLength(Set<Set<Fact>> allSets, int length) {
+		Set<Set<Fact>> result = Sets.newHashSet(Sets.newHashSet());
 		
-		assertTrue("You cannot remove more events than are present in episode", N >= subsetLength);
-		
-		if (N == subsetLength) {
-			return results;
-		}
-
-		int[] binary = new int[(int) Math.pow(2, N)];
-		for (int i = 0; i < Math.pow(2, N); i++) {
-			int b = 1;
-			binary[i] = 0;
-			int num = i, count = 0;
-			while (num > 0) {
-				if (num % 2 == 1)
-					count++;
-				binary[i] += (num % 2) * b;
-				num /= 2;
-				b = b * 10;
+		for (Set<Fact> set : allSets) {
+			if (set.size() == length) {
+				result.add(set);
 			}
-
-			if (count == subsetLength) {
-				List<Fact> subset = new LinkedList<>();
-				for (Fact fact : setOfFacts) {
-					if (binary[i] % 10 == 1) {
-						subset.add(fact);
-					}
-					binary[i] /= 10;
-				}
-				results.add(subset);
-			}
 		}
-		return results;
+		return result;
 	}
 }

@@ -1,6 +1,5 @@
 package cc.kave.episodes.evaluation.queries;
 
-import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -34,16 +33,16 @@ public class QueryGeneratorByPercentage {
 		if (numRemoved == numInvs) {
 			return Sets.newHashSet(query);
 		}
+		Set<Set<Fact>> subsets = generator.generateSubsets(declInv.getSecond(), numInvs - numRemoved);
 		
-		List<List<Fact>> subsets = generator.generateSubsets(declInv.getSecond(), numInvs - numRemoved);
-		for (List<Fact> subset : subsets) {
+		for (Set<Fact> subset : subsets) {
 			Episode generatedQuery = createQuery(target, declInv.getFirst(), subset);
 			queries.add(generatedQuery);
 		}
 		return queries;
 	}
 
-	private Episode createQuery(Episode target, Fact methodDecl, List<Fact> subset) {
+	private Episode createQuery(Episode target, Fact methodDecl, Set<Fact> subset) {
 		Episode query = new Episode();
 		query.addFact(methodDecl);
 		for (Fact fact : subset) {

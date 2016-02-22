@@ -19,9 +19,9 @@ public class QueryGeneratorByNumber {
 		
 		Iterable<Fact> allFacts = queryTarget.getFacts();
 	
-		List<List<Fact>> subsets = generator.generateSubsets((Set<Fact>) allFacts, removeEvents);
+		Set<Set<Fact>> subsets = generator.generateSubsets((Set<Fact>) allFacts, removeEvents);
 		
-		for (List<Fact> query : subsets) {
+		for (Set<Fact> query : subsets) {
 			Query q = createEpisode(queryTarget, query);
 			if (generatedQueries.size() == 0) {
 				generatedQueries.put(removeEvents, new LinkedList<Query>());
@@ -32,19 +32,19 @@ public class QueryGeneratorByNumber {
 		return generatedQueries;
 	}
 
-	private Query createEpisode(QueryTarget queryTarget, List<Fact> queryFacts) {
+	private Query createEpisode(QueryTarget queryTarget, Set<Fact> queryFacts) {
 		Query query = new Query();
 		
 		for (Fact f : queryFacts) {
 			query.addFact(f);
 		}
-		if (queryFacts.size() > 2) {
-			for (int first = 0; first < queryFacts.size() - 1; first++) {
-				for (int second = first + 1; second < queryFacts.size(); second++) {
-					query.addFact(new Fact(queryFacts.get(first), queryFacts.get(second)));
-				}
-			}
-		}
+//		if (queryFacts.size() > 2) {
+//			for (int first = 0; first < queryFacts.size() - 1; first++) {
+//				for (int second = first + 1; second < queryFacts.size(); second++) {
+//					query.addFact(new Fact(queryFacts.get(first), queryFacts.get(second)));
+//				}
+//			}
+//		}
 		return query;
 	}
 }

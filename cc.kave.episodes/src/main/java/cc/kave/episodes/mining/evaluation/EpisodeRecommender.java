@@ -13,7 +13,6 @@ package cc.kave.episodes.mining.evaluation;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,8 +20,6 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.PatternWithFreq;
-import cc.kave.episodes.model.Query;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Measure;
 
@@ -45,10 +42,13 @@ public class EpisodeRecommender {
 
 		int idx = 0;
 		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
-			if (idx < numberOfProposals && tuple.getSecond() > 0.0
-					&& !episodeIsPartOfQuery(query, tuple.getFirst())) {
-				finalProposals.add(tuple);
-				idx++;
+			if (idx < numberOfProposals) {
+				if (tuple.getSecond() > 0.0 && !episodeIsPartOfQuery(query, tuple.getFirst())) {
+					finalProposals.add(tuple);
+					idx++;
+				}
+			} else {
+				return finalProposals;
 			}
 		}
 		return finalProposals;
