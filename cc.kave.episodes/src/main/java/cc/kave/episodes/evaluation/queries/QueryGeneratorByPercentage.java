@@ -18,7 +18,7 @@ public class QueryGeneratorByPercentage {
 		Tuple<Fact, Set<Fact>> declInv;
 		
 		if (target.getNumEvents() < 3) {
-			return null;
+			return queries;
 		}
 		declInv = separator.separate(target);
 		

@@ -70,7 +70,7 @@ public class QueriesGraphGenerator {
 
 	public void generateGraphs() throws Exception {
 		
-		Logger.setPrinting(false);
+		Logger.setPrinting(true);
 		
 		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
@@ -88,7 +88,6 @@ public class QueriesGraphGenerator {
 			if (e.getNumEvents() > 1) {
 				int queryID = 0;
 				
-				System.out.println("Episode number = " + episodeID);
 				Set<Episode> queries = queryGenerator.generateQueries(e, 0.5);
 				
 				Logger.log("Removing transitivity closures");
@@ -99,10 +98,13 @@ public class QueriesGraphGenerator {
 				DirectedGraph<Fact, DefaultEdge> epGraph = episodeGraphConverter.convert(ep, eventMapping);
 				writer.write(epGraph, getEpisodePath(directory, episodeID));
 				
-				for (Episode query : queries) {
-					DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
-					writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
-					queryID++;
+				if (!queries.isEmpty()) {
+					Set<Episode> simQueries = transitivityClosure.removeTransitivelyClosure(queries);
+					for (Episode query : simQueries) {
+						DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
+						writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
+						queryID++;
+					}
 				}
 				episodeID++;
 			}
