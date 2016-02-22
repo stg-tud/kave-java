@@ -114,7 +114,7 @@ public class NodeFactory {
 		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getType())).append("] ");
 		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getDeclaringClass())).append("].");
 		sb.append(fieldAccess.getName().getIdentifier());
-		
+
 		return CsFieldName.newFieldName(sb.toString());
 	}
 
@@ -470,7 +470,7 @@ public class NodeFactory {
 		private static boolean isPrimitivType(String name) {
 			String[] primitiveTypes = { "byte", "short", "char", "int", "long", "float", "double", "boolean", "void" };
 			for (String type : primitiveTypes) {
-				if (type.equals(name))
+				if (name.startsWith(type))
 					return true;
 			}
 			return false;

@@ -25,11 +25,8 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import cc.kave.commons.model.names.DelegateTypeName;
 import cc.kave.commons.model.names.FieldName;
-import cc.kave.commons.model.names.MemberName;
 import cc.kave.commons.model.names.MethodName;
-import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.eclipse.commons.analysis.util.UniqueVariableNameGenerator;
 import cc.kave.eclipse.namefactory.NodeFactory;

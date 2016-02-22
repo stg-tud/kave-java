@@ -32,9 +32,11 @@ import org.junit.rules.TestName;
 
 import cc.kave.commons.model.names.FieldName;
 import cc.kave.commons.model.names.MethodName;
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
@@ -204,9 +206,15 @@ public abstract class BaseSSTAnalysisTest {
 		return expressionToStatement(invocation);
 	}
 
+	protected static ExpressionStatement newInvokeStaticStatement(MethodName methodName,
+			ISimpleExpression... parameters) {
+		assertThat("methodName is static", methodName.isStatic());
+		InvocationExpression invocation = newInvokeExpression("", methodName, parameters);
+		return expressionToStatement(invocation);
+	}
+
 	protected static InvocationExpression newInvokeExpression(String target, MethodName methodName,
 			ISimpleExpression... parameters) {
-		assertThat("methodName is static", !methodName.isStatic());
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setReference(newVariableReference(target));
 		invocation.setMethodName(methodName);
@@ -283,6 +291,20 @@ public abstract class BaseSSTAnalysisTest {
 		assertEquals(expected, actual);
 	}
 
+	protected void assertMethod(MethodName name, IStatement... stmt) {
+		MethodDeclaration expected = newDefaultMethodDeclaration();
+		expected.setBody(Arrays.asList(stmt));
+		expected.setName(name);
+
+		IMethodDeclaration actual = getFirstMethod();
+
+		assertEquals(
+				"Different amount of statements:\n---------------------------\n" + expected.getBody().toString()
+						+ "\n---------------------------\n" + actual.getBody().toString() + "\n",
+				expected.getBody().size(), actual.getBody().size());
+		assertEquals(expected, actual);
+	}
+
 	protected TypeName getDeclaringType() {
 		return CsTypeName.newTypeName(packageName.toLowerCase() + "." + capitalizeString(name.getMethodName() + ", ?"));
 	}
@@ -323,5 +345,11 @@ public abstract class BaseSSTAnalysisTest {
 
 	protected String capitalizeString(String string) {
 		return string.substring(0, 1).toUpperCase() + string.substring(1);
+	}
+
+	protected ParameterName constructParameterName(TypeName type, String id) {
+		String name = "[" + type.getIdentifier() + "] " + id;
+
+		return CsParameterName.newParameterName(name);
 	}
 }

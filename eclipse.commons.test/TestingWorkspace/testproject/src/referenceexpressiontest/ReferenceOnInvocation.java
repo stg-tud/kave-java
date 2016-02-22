@@ -2,10 +2,9 @@ package referenceexpressiontest;
 
 public class ReferenceOnInvocation {
 
-	ReferenceOnInvocation a;
 	ReferenceOnInvocation b;
 
-	public void method() {
+	public void method(ReferenceOnInvocation a) {
 		ReferenceOnInvocation c = a.getB().b;
 	}
 

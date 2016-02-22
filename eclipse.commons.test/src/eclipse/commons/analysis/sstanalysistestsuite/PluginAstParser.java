@@ -71,7 +71,6 @@ public class PluginAstParser {
 		IWorkspaceRoot myWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 		for (IProject project : myWorkspaceRoot.getProjects()) {
-//			updateProject(project);
 			try {
 				if (project.isNatureEnabled(JAVA_NATURE)) {
 					IJavaProject javaProject = JavaCore.create(project);

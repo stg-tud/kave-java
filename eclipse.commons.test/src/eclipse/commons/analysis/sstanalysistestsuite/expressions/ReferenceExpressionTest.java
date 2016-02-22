@@ -28,6 +28,8 @@ public class ReferenceExpressionTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void referenceOnReference() {
+		MethodName analysedMethod = CsMethodName.newMethodName(
+				"[%void, rt.jar, 1.8] [referenceexpressiontest.ReferenceOnReference, ?].method([referenceexpressiontest.ReferenceOnReference, ?] a)");
 		TypeName type = CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnReference, ?");
 
 		VariableDeclaration varDecl = newVariableDeclaration("c",
@@ -35,24 +37,20 @@ public class ReferenceExpressionTest extends BaseSSTAnalysisTest {
 
 		VariableDeclaration tempVarDecl1 = newVariableDeclaration("$0", type);
 
-		ISimpleExpression tempRef1 = newReferenceExpression(newFieldReference("a", type, "this"));
+		ISimpleExpression tempRef1 = newReferenceExpression(newFieldReference("b", type, "a"));
 
 		Assignment assignTemp1 = newAssignment("$0", tempRef1);
 
-		VariableDeclaration tempVarDecl2 = newVariableDeclaration("$1", type);
-
-		ISimpleExpression tempRef2 = newReferenceExpression(newFieldReference("b", type, "$0"));
-
-		Assignment assignTemp2 = newAssignment("$1", tempRef2);
-
-		ISimpleExpression fieldRef = newReferenceExpression(newFieldReference("a", type, "$1"));
+		ISimpleExpression fieldRef = newReferenceExpression(newFieldReference("a", type, "$0"));
 		Assignment assignVar = newAssignment("c", fieldRef);
 
-		assertMethod(varDecl, tempVarDecl1, assignTemp1, tempVarDecl2, assignTemp2, assignVar);
+		assertMethod(analysedMethod, varDecl, tempVarDecl1, assignTemp1, assignVar);
 	}
 
 	@Test
 	public void referenceOnInvocation() {
+		MethodName analysedMethod = CsMethodName.newMethodName(
+				"[%void, rt.jar, 1.8] [referenceexpressiontest.ReferenceOnInvocation, ?].method([referenceexpressiontest.ReferenceOnInvocation, ?] a)");
 		TypeName type = CsTypeName.newTypeName("referenceexpressiontest.ReferenceOnInvocation, ?");
 		MethodName methodName = CsMethodName.newMethodName(
 				"[referenceexpressiontest.ReferenceOnInvocation, ?] [referenceexpressiontest.ReferenceOnInvocation, ?].getB()");
@@ -62,7 +60,7 @@ public class ReferenceExpressionTest extends BaseSSTAnalysisTest {
 		Assignment assignTemp0 = newAssignment("$0", newInvokeExpression("a", methodName));
 		Assignment assignVar = newAssignment("c", newReferenceExpression(newFieldReference("b", type, "$0")));
 
-		assertMethod(varDecl, tempVarDecl0, assignTemp0, assignVar);
+		assertMethod(analysedMethod, varDecl, tempVarDecl0, assignTemp0, assignVar);
 	}
 
 	@Test

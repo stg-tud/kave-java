@@ -2,6 +2,7 @@ package eclipse.commons.analysis.sstanalysistestsuite.blocks;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
@@ -37,5 +38,24 @@ public class SwitchBlockAnalysisTest extends BaseSSTAnalysisTest {
 				switchBlock);
 	}
 	
-	// WEITERMACHEN
+
+	@Test
+	public void Standard() {
+		SwitchBlock switchBlock = new SwitchBlock();
+		switchBlock.getDefaultSection().add(new BreakStatement());
+		switchBlock.setReference(newVariableReference("i"));
+		
+		CaseBlock caseBlock1 = new CaseBlock();
+		caseBlock1.setLabel(newConstantValue("0"));
+		
+		CaseBlock caseBlock2 = new CaseBlock();
+		caseBlock2.setLabel(newConstantValue("1"));
+		caseBlock2.getBody().add(new BreakStatement());
+		
+		switchBlock.getSections().add(caseBlock1);
+		switchBlock.getSections().add(caseBlock2);
+
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", newConstantValue("3")),
+				switchBlock);
+	}
 }

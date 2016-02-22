@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Assignment.Operator;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -33,7 +35,6 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -45,6 +46,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -62,6 +64,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
@@ -69,6 +72,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
@@ -157,21 +161,29 @@ public class ExpressionVisitor extends ASTVisitor {
 		node.getExpression().accept(this);
 
 		FieldReference fieldReference = new FieldReference();
-		fieldReference.setReference(this.getVariableReference());
 		fieldReference.setFieldName((FieldName) NodeFactory.createNodeName(node));
+		VariableReference fieldVarRef = new VariableReference();
+
+		if (node.getExpression() instanceof ThisExpression || node.getExpression() == null) {
+			fieldVarRef.setIdentifier("this");
+			fieldReference.setReference(fieldVarRef);
+		} else {
+			fieldReference.setReference(this.getVariableReference());
+		}
 
 		ReferenceExpression refExpr = new ReferenceExpression();
 		refExpr.setReference(fieldReference);
 
+		variableReference = fieldVarRef;
 		assignableExpression = refExpr;
 
-		if (!isParentStatement(node)) {
+		if (!isParentStatement(node) || node.getParent() instanceof MethodInvocation) {
 			VariableReference genVar = new VariableReference();
 			genVar.setIdentifier(nameGen.getNextVariableName());
+			variableReference = genVar;
 
 			createAndAssign(node.resolveTypeBinding(), genVar, refExpr);
 		}
-		// HIER WEITERMACHEN, siehe test referenceoninvocation
 		return false;
 	}
 
@@ -280,7 +292,8 @@ public class ExpressionVisitor extends ASTVisitor {
 			ExpressionStatement stmt = new ExpressionStatement();
 			stmt.setExpression(invocation);
 			body.add(stmt);
-		} else if (!isParentStatement(node) || node.getParent() instanceof EnhancedForStatement) {
+		} else if (!isParentStatement(node) || node.getParent() instanceof EnhancedForStatement
+				|| node.getParent() instanceof ThrowStatement) {
 			VariableReference varRef = new VariableReference();
 			varRef.setIdentifier(nameGen.getNextVariableName());
 			variableReference = varRef;
@@ -314,6 +327,10 @@ public class ExpressionVisitor extends ASTVisitor {
 			varRef = getVariableReference();
 		}
 
+		if (methodName.isStatic()) {
+			varRef = new VariableReference();
+		}
+
 		@SuppressWarnings("unchecked")
 		List<Expression> arguments = node.arguments();
 		List<ISimpleExpression> simpleExpressions = new ArrayList<ISimpleExpression>();
@@ -344,23 +361,19 @@ public class ExpressionVisitor extends ASTVisitor {
 
 		variableReference = varRef;
 
-		if (!isParentStatement(node) || isParentLoop(node) || node.getParent() instanceof InstanceofExpression) {
-			if (node.getExpression() instanceof SimpleName || isParentLoop(node)
-					|| node.getParent() instanceof InstanceofExpression) {
-				VariableReference genVar = new VariableReference();
-				genVar.setIdentifier(nameGen.getNextVariableName());
+		if (!isParentStatement(node) || isParentLoop(node) || node.getParent() instanceof InstanceofExpression
+				|| node.getParent() instanceof MethodInvocation) {
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
 
-				refExpr.setReference(genVar);
+			refExpr.setReference(genVar);
 
-				variableReference = genVar;
-				assignableReference = genVar;
-				simpleExpression = refExpr;
-				assignableExpression = invocation;
+			variableReference = genVar;
+			assignableReference = genVar;
+			simpleExpression = refExpr;
+			assignableExpression = invocation;
 
-				createAndAssign(node.resolveTypeBinding(), genVar, invocation);
-			} else {
-				createAndAssign(node.resolveTypeBinding(), varRef, invocation);
-			}
+			createAndAssign(node.resolveTypeBinding(), genVar, invocation);
 		} else if (node.getParent() instanceof Statement) {
 			body.add(stmt);
 		}
@@ -465,8 +478,12 @@ public class ExpressionVisitor extends ASTVisitor {
 
 		String lastVar = nameGen.getLastVariableName();
 
-		VariableReference targetRef = new VariableReference();
-		targetRef.setIdentifier(lastVar);
+		ExpressionVisitor visitor = new ExpressionVisitor(new UniqueVariableNameGenerator(), new ArrayList<>());
+		node.getQualifier().accept(visitor);
+
+		VariableReference targetRef = visitor.getVariableReference();
+		// new VariableReference();
+		// targetRef.setIdentifier(lastVar);
 
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setFieldName((FieldName) NodeFactory.createNodeName(node));
@@ -478,10 +495,11 @@ public class ExpressionVisitor extends ASTVisitor {
 		assignableExpression = refExpr;
 
 		if (!isParentStatement(node)) {
-			VariableReference varRef = new VariableReference();
-			varRef.setIdentifier(nameGen.getNextVariableName());
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
+			variableReference = genVar;
 
-			createAndAssign(node.resolveTypeBinding(), varRef, refExpr);
+			createAndAssign(node.resolveTypeBinding(), genVar, refExpr);
 		}
 
 		return false;
@@ -510,20 +528,22 @@ public class ExpressionVisitor extends ASTVisitor {
 
 				refExpr.setReference(fieldRef);
 
-				variableReference = varId;
 				assignableReference = fieldRef;
 			} else {
 
 				refExpr.setReference(varId);
 
-				variableReference = varId;
 				assignableReference = varId;
 			}
 
+			variableReference = varId;
 			simpleExpression = refExpr;
 			assignableExpression = refExpr;
 
-			if (!isParentStatement(node)) {
+			IVariableBinding var = (IVariableBinding) node.resolveBinding();
+
+			if ((!isParentStatement(node) && node.getParent() instanceof MethodInvocation && !var.isParameter()
+					&& !isArgument(node)) || (node.getParent() instanceof MethodInvocation && var.isField())) {
 				String identifier = nameGen.getNextVariableName();
 				VariableReference genVar = new VariableReference();
 				genVar.setIdentifier(identifier);
@@ -550,6 +570,43 @@ public class ExpressionVisitor extends ASTVisitor {
 	}
 
 	@Override
+	public boolean visit(ArrayInitializer node) {
+		IndexAccessExpression indexAccess = new IndexAccessExpression();
+
+		List<Expression> expressions = node.expressions();
+		for (Expression expression : expressions) {
+			ExpressionVisitor arrayVisitor = new ExpressionVisitor(nameGen, body);
+			expression.accept(arrayVisitor);
+
+			indexAccess.getIndices().add(arrayVisitor.getSimpleExpression());
+		}
+
+		assignableExpression = indexAccess;
+
+		return false;
+	}
+
+	@Override
+	public boolean visit(ArrayAccess node) {
+		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
+
+		node.getIndex().accept(this);
+		indexAccessExpression.getIndices().add(getSimpleExpression());
+
+		node.getArray().accept(this);
+		indexAccessExpression.setReference(getVariableReference());
+
+		assignableExpression = indexAccessExpression;
+
+		IndexAccessReference indexAccessReference = new IndexAccessReference();
+		indexAccessReference.setExpression(indexAccessExpression);
+
+		assignableReference = indexAccessReference;
+
+		return false;
+	}
+
+	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 
 		for (int i = 0; i < node.fragments().size(); i++) {
@@ -569,7 +626,10 @@ public class ExpressionVisitor extends ASTVisitor {
 				assignment.setReference(variableReference);
 				assignment.setExpression(this.getAssignableExpression());
 				body.add(assignment);
+
+				this.variableReference = variableReference;
 			}
+
 		}
 		return false;
 	}
@@ -631,10 +691,20 @@ public class ExpressionVisitor extends ASTVisitor {
 	}
 
 	private boolean isPreOrPostfixExpression(String operator) {
-		String[] prefixes = { "--", "++", "~" };
+		String[] exprString = { "--", "++", "~" };
 
-		for (int i = 0; i < prefixes.length; i++) {
-			if (operator.equals(prefixes[i])) {
+		for (int i = 0; i < exprString.length; i++) {
+			if (operator.equals(exprString[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isArgument(ASTNode node) {
+		if (node.getParent() instanceof MethodInvocation) {
+			MethodInvocation m = (MethodInvocation) node.getParent();
+			if (m.arguments().contains(node)) {
 				return true;
 			}
 		}
