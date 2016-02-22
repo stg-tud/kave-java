@@ -68,7 +68,7 @@ public class Module extends AbstractModule {
 		qOpts.useClassContext = true;
 		qOpts.useMethodContext = true;
 		qOpts.useDefinition = true;
-		qOpts.useParameterSites = true;
+		qOpts.useParameterSites = false;
 		qOpts.isIgnoringAfterFullRecall = false;
 		bind(QueryOptions.class).toInstance(qOpts);
 
