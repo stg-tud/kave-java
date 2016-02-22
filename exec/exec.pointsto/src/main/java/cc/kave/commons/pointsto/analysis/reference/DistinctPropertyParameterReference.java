@@ -16,8 +16,8 @@ import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.pointsto.LanguageOptions;
-import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 
 public class DistinctPropertyParameterReference implements DistinctReference {
 

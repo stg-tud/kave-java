@@ -20,8 +20,6 @@ import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.pointsto.LanguageOptions;
-import cc.kave.commons.pointsto.ScopedMap;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctLambdaParameterReference;
@@ -29,6 +27,8 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterRefere
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.ScopedMap;
 
 public abstract class DistinctReferenceVisitorContext implements ScopingVisitorContext {
 

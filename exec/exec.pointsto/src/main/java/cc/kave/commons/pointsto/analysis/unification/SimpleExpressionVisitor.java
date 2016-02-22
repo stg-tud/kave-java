@@ -22,7 +22,7 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
-import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.visitors.FailSafeNodeVisitor;
 
 class SimpleExpressionVisitor extends FailSafeNodeVisitor<ContextReferencePair, Void> {

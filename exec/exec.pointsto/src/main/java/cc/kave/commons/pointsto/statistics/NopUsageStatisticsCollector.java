@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.extraction;
+package cc.kave.commons.pointsto.statistics;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,6 +42,11 @@ public class NopUsageStatisticsCollector implements UsageStatisticsCollector {
 
 	@Override
 	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<? extends Usage> usages) {
+
+	}
+
+	@Override
+	public void process(List<? extends Usage> usages) {
 
 	}
 

@@ -17,13 +17,13 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.visitors.FailSafeNodeVisitor;
 
 class DestinationLocationVisitor extends FailSafeNodeVisitor<UnificationAnalysisVisitorContext, ReferenceLocation> {

@@ -33,8 +33,8 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.pointsto.LanguageOptions;
-import cc.kave.commons.pointsto.ScopedMap;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.ScopedMap;
 
 public class TypeCollectorVisitorContext {
 

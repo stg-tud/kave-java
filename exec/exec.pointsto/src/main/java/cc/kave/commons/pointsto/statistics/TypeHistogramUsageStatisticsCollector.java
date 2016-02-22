@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.extraction;
+package cc.kave.commons.pointsto.statistics;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +56,11 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 
 	@Override
 	public void onEntryPointUsagesExtracted(IMethodDeclaration entryPoint, List<? extends Usage> usages) {
+		process(usages);
+	}
+
+	@Override
+	public void process(List<? extends Usage> usages) {
 		for (Usage usage : usages) {
 			ITypeName type = usage.getType();
 
@@ -77,7 +81,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 		// }
 		// }
 
-		Collections.sort(entries, new Comparator<Map.Entry<ITypeName, Integer>>() {
+		entries.sort(new Comparator<Map.Entry<ITypeName, Integer>>() {
 
 			@Override
 			public int compare(Entry<ITypeName, Integer> o1, Entry<ITypeName, Integer> o2) {

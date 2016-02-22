@@ -24,6 +24,8 @@ import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
+import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;

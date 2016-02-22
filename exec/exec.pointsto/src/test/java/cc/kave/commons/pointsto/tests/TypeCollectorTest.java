@@ -44,8 +44,8 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.pointsto.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 
 public class TypeCollectorTest {
 

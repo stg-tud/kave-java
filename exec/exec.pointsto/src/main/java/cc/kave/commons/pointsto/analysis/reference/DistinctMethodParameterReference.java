@@ -18,7 +18,7 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 
 public class DistinctMethodParameterReference implements DistinctReference {
 

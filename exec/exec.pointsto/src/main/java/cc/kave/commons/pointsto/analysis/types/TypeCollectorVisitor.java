@@ -36,7 +36,7 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.pointsto.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
 public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitorContext, Void> {

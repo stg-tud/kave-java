@@ -43,12 +43,12 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.pointsto.LanguageOptions;
-import cc.kave.commons.pointsto.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.visitors.ScopingVisitor;
 
 public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalysisVisitorContext, Void> {

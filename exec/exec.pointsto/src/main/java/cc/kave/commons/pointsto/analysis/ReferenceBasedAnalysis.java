@@ -27,8 +27,8 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.pointsto.LanguageOptions;
-import cc.kave.commons.pointsto.SSTBuilder;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 
 public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 
