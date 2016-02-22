@@ -52,14 +52,14 @@ public class SubsetGeneratorTest {
 	@Test
 	public void subselectAllEntries() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("You cannot subselect less or equal than the total number of Facts!");
+		thrown.expectMessage("Please subselect less than the total number of Facts!");
 		sut.generateSubsets(originalSet, 3);
 	}
 	
 	@Test
 	public void subselectMoreEntries() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("You cannot subselect less or equal than the total number of Facts!");
+		thrown.expectMessage("Please subselect less than the total number of Facts!");
 		sut.generateSubsets(originalSet, 5);
 	}
 	

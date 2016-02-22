@@ -17,27 +17,18 @@ public class QueryGeneratorByPercentage {
 		Set<Episode> queries = Sets.newHashSet();
 		Tuple<Fact, Set<Fact>> declInv;
 		
-		if (target.getNumEvents() == 1) {
+		if (target.getNumEvents() < 3) {
 			return null;
 		}
-		
 		declInv = separator.separate(target);
-		Episode query = new Episode();
-		query.addFact(declInv.getFirst());
-		if (target.getNumEvents() == 2) {
-			return Sets.newHashSet(query);
-		}
 		
 		int numRemoved = calculateRemovals(declInv.getSecond().size(), percentage);
 		int numInvs = declInv.getSecond().size();
-		if (numRemoved == numInvs) {
-			return Sets.newHashSet(query);
-		}
 		Set<Set<Fact>> subsets = generator.generateSubsets(declInv.getSecond(), numInvs - numRemoved);
 		
 		for (Set<Fact> subset : subsets) {
-			Episode generatedQuery = createQuery(target, declInv.getFirst(), subset);
-			queries.add(generatedQuery);
+			Episode query = createQuery(target, declInv.getFirst(), subset);
+			queries.add(query);
 		}
 		return queries;
 	}

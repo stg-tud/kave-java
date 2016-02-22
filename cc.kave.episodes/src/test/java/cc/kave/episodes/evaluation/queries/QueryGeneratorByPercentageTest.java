@@ -40,8 +40,7 @@ public class QueryGeneratorByPercentageTest {
 	
 	@Test
 	public void noMethodInv() {
-		Episode target = createEpisode("a");
-		
+		Episode target = createEpisode("11");
 		Set<Episode> actuals = sut.generateQueries(target, 0.5);
 		
 		assertNull(actuals);
@@ -49,20 +48,17 @@ public class QueryGeneratorByPercentageTest {
 	
 	@Test
 	public void oneMethodInv() {
-		Episode target = createEpisode("a", "b", "a>b");
-		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("a"));
-		
+		Episode target = createEpisode("11", "12", "11>12");
 		Set<Episode> actuals = sut.generateQueries(target, 0.5);
 		
-		assertEquals(expected, actuals);
+		assertNull(actuals);
 	}
 	
 	@Test
 	public void twoMethodInv() {
-		Episode target = createEpisode("a", "b", "c", "a>b", "a>c", "b>c");
+		Episode target = createEpisode("11", "12", "13", "11>12", "11>13", "12>13");
 		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("a", "b", "a>b"), createEpisode("a", "c", "a>c"));
+		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"));
 		
 		Set<Episode> actuals = sut.generateQueries(target, 0.25);
 		
@@ -70,12 +66,12 @@ public class QueryGeneratorByPercentageTest {
 	}
 	
 	@Test
-	public void fourMethodInv() {
-		Episode target = createEpisode("a", "b", "c", "d", "e", "a>b", "a>c", "a>d", "a>e",
-											"b>c", "b>d");
+	public void fourMethod25pInv() {
+		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15",
+											"12>13", "12>14");
 		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("a", "b", "a>b"), createEpisode("a", "c", "a>c"), 
-													createEpisode("a", "d", "a>d"), createEpisode("a", "e", "a>e"));
+		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"), 
+													createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15"));
 		
 		Set<Episode> actuals = sut.generateQueries(target, 0.75);
 		
@@ -84,28 +80,17 @@ public class QueryGeneratorByPercentageTest {
 	
 	@Test
 	public void fourMethod50pInv() {
-		Episode target = createEpisode("a", "b", "c", "d", "e", "a>b", "a>c", "a>d", "a>e",
-											"b>c", "b>d");
+		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15",
+											"12>13", "12>14");
 		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("a", "b", "c", "a>b", "a>c", "b>c"), 
-												createEpisode("a", "b", "d", "a>b", "a>d", "b>d"), 
-												createEpisode("a", "b", "e", "a>b", "a>e"), 
-												createEpisode("a", "c", "d", "a>c", "a>d"),
-												createEpisode("a", "c", "e", "a>c", "a>e"),
-												createEpisode("a", "d", "e", "a>d", "a>e"));
+		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"), 
+												createEpisode("11", "12", "14", "11>12", "11>14", "12>14"), 
+												createEpisode("11", "12", "15", "11>12", "11>15"), 
+												createEpisode("11", "13", "14", "11>13", "11>14"),
+												createEpisode("11", "13", "15", "11>13", "11>15"),
+												createEpisode("11", "14", "15", "11>14", "11>15"));
 		
 		Set<Episode> actuals = sut.generateQueries(target, 0.5);
-		
-		assertEquals(expected, actuals);
-	}
-	
-	@Test
-	public void removeAllInvs() {
-		Episode target = createEpisode("a", "b", "c", "a>b", "a>c");
-		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("a"));
-		
-		Set<Episode> actuals = sut.generateQueries(target, 1.0);
 		
 		assertEquals(expected, actuals);
 	}

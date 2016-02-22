@@ -30,7 +30,7 @@ public class SubsetsGenerator {
 	
 	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length) {
 		assertTrue((originalSet.size() > 1), "Cannot subselect from less then one method invocation!");
-		assertTrue(length < originalSet.size(), "You cannot subselect less or equal than the total number of Facts!");
+		assertTrue(length < originalSet.size(), "Please subselect less than the total number of Facts!");
 		
 		Set<Set<Fact>> allSubsets = powerSet(originalSet);
 		return selectLength(allSubsets, length);
