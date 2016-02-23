@@ -59,15 +59,49 @@ public class IndexAccessExpressionAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void twoIndices() {
-		assertMethod(newAssignment("", newConstantValue("4")));
+		IndexAccessExpression arrayAccess = new IndexAccessExpression();
+		arrayAccess.setReference(newVariableReference("i"));
+		arrayAccess.getIndices().add(newConstantValue("1"));
+
+		IndexAccessExpression valueAccess = new IndexAccessExpression();
+		valueAccess.setReference(newVariableReference("$0"));
+		valueAccess.getIndices().add(newConstantValue("2"));
+
+		assertMethod(newVariableDeclaration("j", SSTAnalysisFixture.INT),
+				newVariableDeclaration("$0", SSTAnalysisFixture.INT_ARRAY), newAssignment("$0", arrayAccess),
+				newAssignment("j", valueAccess));
+	}
+
+	@Test
+	public void assigningValueToArrayElementTwoDimensional() {
+		IndexAccessExpression arrayAccess = new IndexAccessExpression();
+		arrayAccess.setReference(newVariableReference("i"));
+		arrayAccess.getIndices().add(newConstantValue("2"));
+
+		IndexAccessExpression valueAccess = new IndexAccessExpression();
+		valueAccess.setReference(newVariableReference("$0"));
+		valueAccess.getIndices().add(newConstantValue("1"));
+
+		IndexAccessReference indexAccessReference = new IndexAccessReference();
+		indexAccessReference.setExpression(valueAccess);
+
+		assertMethod(newVariableDeclaration("$0", SSTAnalysisFixture.INT_ARRAY), newAssignment("$0", arrayAccess),
+				newAssignment(indexAccessReference, newConstantValue("5")));
 	}
 
 	@Test
 	public void arrayDeclaration() {
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT_ARRAY));
 	}
 
 	@Test
 	public void arrayDeclarationWithParameters() {
+		// TODO
+	}
+
+	@Test
+	public void arrayDeclarationWithNew() {
+		// TODO
 	}
 
 }

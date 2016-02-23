@@ -1,8 +1,8 @@
 package indexaccessexpressionanalysistest;
 
-public class ArrayDeclarationWithParameters {
+public class ArrayDeclarationWithNew {
 
 	public void method() {
-		int[] i = { 1, 2, 3 };
+		int[] i = new int[] { 1, 2, 3 };
 	}
 }

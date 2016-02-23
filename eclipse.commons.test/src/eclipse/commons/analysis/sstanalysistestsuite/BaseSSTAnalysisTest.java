@@ -44,12 +44,14 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
@@ -107,7 +109,7 @@ public abstract class BaseSSTAnalysisTest {
 		return decl;
 	}
 
-	protected IConstantValueExpression newConstantValue(String v) {
+	protected ConstantValueExpression newConstantValue(String v) {
 		ConstantValueExpression constExpr = new ConstantValueExpression();
 		constExpr.setValue(v);
 		return constExpr;
@@ -254,12 +256,22 @@ public abstract class BaseSSTAnalysisTest {
 		return comp;
 	}
 
-	protected static MethodReference newMethodRef(MethodName methodName, String target) {
+	protected MethodReference newMethodRef(MethodName methodName, String target) {
 		MethodReference methodReference = new MethodReference();
 		methodReference.setMethodName(methodName);
 		methodReference.setReference(newVariableReference(target));
 
 		return methodReference;
+	}
+
+	protected BinaryExpression newBinaryExpression(ISimpleExpression leftOperand, ISimpleExpression rightOperand,
+			BinaryOperator operator) {
+		BinaryExpression binaryExpression = new BinaryExpression();
+		binaryExpression.setLeftOperand(leftOperand);
+		binaryExpression.setRightOperand(rightOperand);
+		binaryExpression.setOperator(operator);
+		
+		return binaryExpression;
 	}
 
 	protected IMethodDeclaration getFirstMethod() {

@@ -17,11 +17,13 @@
 package cc.kave.eclipse.commons.analysis.transformer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Assignment.Operator;
@@ -34,6 +36,7 @@ import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
@@ -60,8 +63,10 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
@@ -476,14 +481,10 @@ public class ExpressionVisitor extends ASTVisitor {
 	public boolean visit(QualifiedName node) {
 		node.getQualifier().accept(this);
 
-		String lastVar = nameGen.getLastVariableName();
-
 		ExpressionVisitor visitor = new ExpressionVisitor(new UniqueVariableNameGenerator(), new ArrayList<>());
 		node.getQualifier().accept(visitor);
 
 		VariableReference targetRef = visitor.getVariableReference();
-		// new VariableReference();
-		// targetRef.setIdentifier(lastVar);
 
 		FieldReference fieldRef = new FieldReference();
 		fieldRef.setFieldName((FieldName) NodeFactory.createNodeName(node));
@@ -570,18 +571,38 @@ public class ExpressionVisitor extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(ArrayInitializer node) {
-		IndexAccessExpression indexAccess = new IndexAccessExpression();
+	public boolean visit(ArrayCreation node) {
+		node.getInitializer().accept(this);
+		return false;
+	}
 
+	@Override
+	public boolean visit(ArrayInitializer node) {
+		IndexAccessExpression indexAccessExpr = new IndexAccessExpression();
+		VariableReference varRef = new VariableReference();
+
+		int i = 0;
 		List<Expression> expressions = node.expressions();
 		for (Expression expression : expressions) {
-			ExpressionVisitor arrayVisitor = new ExpressionVisitor(nameGen, body);
-			expression.accept(arrayVisitor);
+			expression.accept(this);
 
-			indexAccess.getIndices().add(arrayVisitor.getSimpleExpression());
+			ConstantValueExpression index = new ConstantValueExpression();
+			index.setValue(Integer.toString(i++));
+
+			indexAccessExpr.getIndices().add(index);
+			indexAccessExpr.setReference(varRef);
+
+			IndexAccessReference indexAccessReference = new IndexAccessReference();
+			indexAccessReference.setExpression(indexAccessExpr);
+
+			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+			assignment.setExpression(getAssignableExpression());
+			assignment.setReference(indexAccessReference);
+
+			body.add(assignment);
 		}
 
-		assignableExpression = indexAccess;
+		assignableExpression = indexAccessExpr;
 
 		return false;
 	}
@@ -590,12 +611,25 @@ public class ExpressionVisitor extends ASTVisitor {
 	public boolean visit(ArrayAccess node) {
 		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
 
-		node.getIndex().accept(this);
-		indexAccessExpression.getIndices().add(getSimpleExpression());
+		VariableReference genVar = new VariableReference();
+		if (!(node.getArray() instanceof ArrayAccess) && node.getParent() instanceof ArrayAccess) {
+			genVar.setIdentifier(nameGen.getNextVariableName());
+			variableReference = genVar;
+
+			createAndAssign(node.resolveTypeBinding(), genVar, indexAccessExpression);
+		}
 
 		node.getArray().accept(this);
-		indexAccessExpression.setReference(getVariableReference());
 
+		if (genVar.getIdentifier().equals("") && node.getArray() instanceof ArrayAccess) {
+			genVar.setIdentifier(nameGen.getLastVariableName());
+			indexAccessExpression.setReference(genVar);
+		} else {
+			indexAccessExpression.setReference(getVariableReference());
+		}
+
+		node.getIndex().accept(this);
+		indexAccessExpression.getIndices().add(getSimpleExpression());
 		assignableExpression = indexAccessExpression;
 
 		IndexAccessReference indexAccessReference = new IndexAccessReference();
@@ -631,6 +665,42 @@ public class ExpressionVisitor extends ASTVisitor {
 			}
 
 		}
+		return false;
+	}
+
+	@Override
+	public boolean visit(InfixExpression node) {
+		BinaryExpression binaryExpression = new BinaryExpression();
+		BinaryOperator binaryOperator = toBinaryOperator(node.getOperator().toString());
+		binaryExpression.setOperator(binaryOperator);
+
+		node.getLeftOperand().accept(this);
+		binaryExpression.setLeftOperand(getSimpleExpression());
+
+		node.getRightOperand().accept(this);
+		binaryExpression.setRightOperand(getSimpleExpression());
+
+		List<Expression> extendedOperands = node.extendedOperands();
+		for (int i = 0; i < extendedOperands.size(); i++) {
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
+
+			createAndAssign(node.resolveTypeBinding(), genVar, binaryExpression);
+
+			binaryExpression = new BinaryExpression();
+			binaryExpression.setOperator(binaryOperator);
+
+			ReferenceExpression leftOperand = new ReferenceExpression();
+			leftOperand.setReference(genVar);
+
+			binaryExpression.setLeftOperand(leftOperand);
+
+			extendedOperands.get(i).accept(this);
+			binaryExpression.setRightOperand(getSimpleExpression());
+		}
+
+		assignableExpression = binaryExpression;
+
 		return false;
 	}
 
@@ -716,5 +786,55 @@ public class ExpressionVisitor extends ASTVisitor {
 			return true;
 		}
 		return false;
+	}
+
+	private BinaryOperator toBinaryOperator(String operator) {
+
+		switch (operator) {
+		// arithmetic operators
+		case "+":
+			return BinaryOperator.Plus;
+		case "-":
+			return BinaryOperator.Minus;
+		case "*":
+			return BinaryOperator.Multiply;
+		case "/":
+			return BinaryOperator.Divide;
+		case "%":
+			return BinaryOperator.Modulo;
+
+		// logical operators
+		case "<":
+			return BinaryOperator.LessThan;
+		case "<=":
+			return BinaryOperator.LessThanOrEqual;
+		case ">":
+			return BinaryOperator.GreaterThan;
+		case ">=":
+			return BinaryOperator.GreaterThanOrEqual;
+		case "==":
+			return BinaryOperator.Equal;
+		case "!=":
+			return BinaryOperator.NotEqual;
+		case "&&":
+			return BinaryOperator.And;
+		case "||":
+			return BinaryOperator.Or;
+
+		// bitwise operators
+		case "&":
+			return BinaryOperator.BitwiseAnd;
+		case "|":
+			return BinaryOperator.BitwiseOr;
+		case "^":
+			return BinaryOperator.BitwiseXor;
+		case "<<":
+			return BinaryOperator.ShiftLeft;
+		case ">>":
+			return BinaryOperator.ShiftRight;
+
+		default:
+			return null;
+		}
 	}
 }
