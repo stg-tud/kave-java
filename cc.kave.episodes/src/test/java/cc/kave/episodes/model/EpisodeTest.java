@@ -48,7 +48,7 @@ public class EpisodeTest {
 	@Test
 	public void freqIsPositive() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Frequency should be a positive value!");
+		thrown.expectMessage("Frequency cannot be a negative value!");
 		sut.setFrequency(-1);;;
 	}
 	

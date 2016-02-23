@@ -7,20 +7,18 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
+import static cc.recommenders.assertions.Asserts.assertTrue;
 
 public class QueryGeneratorByPercentage {
 
 	private SubsetsGenerator generator = new SubsetsGenerator();
-	private FactsSeparator separator = new FactsSeparator();
+	private Separator separator = new Separator();
 	
 	public Set<Episode> generateQueries(Episode target, double percentage) {
-		Set<Episode> queries = Sets.newHashSet();
-		Tuple<Fact, Set<Fact>> declInv;
+		assertTrue(target.getNumEvents() > 2, "Not valid episode for query generation!");
 		
-		if (target.getNumEvents() < 3) {
-			return queries;
-		}
-		declInv = separator.separate(target);
+		Set<Episode> queries = Sets.newHashSet();
+		Tuple<Fact, Set<Fact>> declInv = separator.separateFacts(target);
 		
 		int numRemoved = calculateRemovals(declInv.getSecond().size(), percentage);
 		int numInvs = declInv.getSecond().size();

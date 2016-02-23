@@ -43,7 +43,7 @@ public class Episode {
 	}
 	
 	public void setFrequency(int freq) {
-		assertTrue(freq > 0, "Frequency should be a positive value!");
+		assertTrue(freq >= 0, "Frequency cannot be a negative value!");
 		this.frequency = freq;
 	}
 	

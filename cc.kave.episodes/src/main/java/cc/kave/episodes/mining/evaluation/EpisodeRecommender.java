@@ -12,54 +12,57 @@ package cc.kave.episodes.mining.evaluation;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.evaluation.queries.Separator;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
+	
+	private Separator separator = new Separator();
 
-	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, Set<Episode>> patterns,
-			int numberOfProposals) throws Exception {
-		Map<Episode, Double> episodesWithF1Value = new HashMap<Episode, Double>();
-
-		assertTrue(!patterns.isEmpty(), "The list of learned episodes is empty");
-		assertTrue(numberOfProposals > 0, "Request a positive number of proposals to show");
-
+	public Set<Tuple<Episode, Double>> calculateProposals(Episode query, Map<Integer, Set<Episode>> patterns, 
+															int numberOfProposals) {
+		assertTrue(query.getNumEvents() > 0, "Input a valid query!");
+		assertTrue(!patterns.isEmpty(), "The list of learned episodes is empty!");
+		assertTrue(numberOfProposals > 0, "Request a positive number of proposals to show!");
+		
+		Set<Tuple<Episode, Double>> allProposals = sortProposals(query, patterns);
+		Set<Tuple<Episode, Double>> limitedProposals = Sets.newLinkedHashSet();
+		
+		int counter = 0;
+		for (Tuple<Episode, Double> tuple : allProposals) {
+			if ((counter < numberOfProposals) && !episodeIsPartOfQuery(query, tuple.getFirst())) {
+				if ((tuple.getSecond() > 0.0) || (tuple.getSecond() == 0.0) && (query.getNumEvents() == 1)) {
+					limitedProposals.add(tuple);
+					counter++;
+				}
+			}
+		}
+		return limitedProposals;
+	}
+	
+	private Set<Tuple<Episode, Double>> sortProposals(Episode query, Map<Integer, Set<Episode>> patterns) {
+		Set<Tuple<Episode, Double>> allProposals = ProposalHelper.createEpisodesSortedSet();
+		
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode e : entry.getValue()) {
-				episodesWithF1Value.put(e, calcF1(query, e));
+				allProposals.add(Tuple.newTuple(e, calcF1(query, e)));
 			}
 		}
-		Set<Tuple<Episode, Double>> sortedEpisodes = sortedProposals(episodesWithF1Value);
-		Set<Tuple<Episode, Double>> finalProposals = ProposalHelper.createEpisodesSortedSet();
-
-		int idx = 0;
-		for (Tuple<Episode, Double> tuple : sortedEpisodes) {
-			if (idx < numberOfProposals) {
-				if (tuple.getSecond() > 0.0 && !episodeIsPartOfQuery(query, tuple.getFirst())) {
-					finalProposals.add(tuple);
-					idx++;
-				}
-			} else {
-				return finalProposals;
-			}
-		}
-		return finalProposals;
+		return allProposals;
 	}
 
 	private boolean episodeIsPartOfQuery(Episode query, Episode episode) {
-		if (query.getNumEvents() <= episode.getNumEvents()) {
-			return false;
-		}
+		Set<Fact> factsQuery = separator.getEpisodeBody(query);
 		for (Fact fact : episode.getFacts()) {
-			if (query.containsFact(fact)) {
+			if (factsQuery.contains(fact)) {
 				continue;
 			} else {
 				return false;
@@ -68,22 +71,11 @@ public class EpisodeRecommender {
 		return true;
 	}
 
-	private double calcF1(Episode query, Episode e) {
-		Set<Fact> factsEpisode = Sets.newHashSet(e.getFacts());
-		Set<Fact> factsQuery = Sets.newHashSet(query.getFacts());
-		Measure m = Measure.newMeasure(factsQuery, factsEpisode);
+	private double calcF1(Episode query, Episode episode) {
+		Set<Fact> factsQuery = separator.getEpisodeBody(query);
+		
+		Measure m = Measure.newMeasure(factsQuery, episode.getFacts());
 		double f1 = m.getF1();
 		return f1;
-	}
-
-	private Set<Tuple<Episode, Double>> sortedProposals(Map<Episode, Double> proposals) {
-
-		Set<Tuple<Episode, Double>> sortedProposals = ProposalHelper.createEpisodesSortedSet();
-
-		for (Episode episode : proposals.keySet()) {
-			Tuple<Episode, Double> tuple = Tuple.newTuple(episode, proposals.get(episode));
-			sortedProposals.add(tuple);
-		}
-		return sortedProposals;
 	}
 }

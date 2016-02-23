@@ -54,9 +54,9 @@ public class ProposalHelperTest {
 		pattern4.setFrequency(2);
 		
 		pattern5 = createPattern("1", "2", "3", "1>2");
-		pattern5.setFrequency(3);
+		pattern5.setFrequency(4);
 		pattern6 = createPattern("1", "2", "4", "2>4");
-		pattern6.setFrequency(3);
+		pattern6.setFrequency(2);
 		pattern7 = createPattern("1", "3", "4", "1>3");
 		pattern7.setFrequency(3);
 		
@@ -64,28 +64,19 @@ public class ProposalHelperTest {
 		expecteds = Sets.newLinkedHashSet();
 	}
 
-	private Episode createPattern(String...string) {
-		Episode pattern = new Episode();
-		for (String s : string) {
-			pattern.addFact(s);
-		}
-		return pattern;
-	}
-
 	@Test
-	public void firstElemIsNUllAndSecondIsEqual() {
-		actuals.add(Tuple.newTuple(pattern1, 1.0));
-		actuals.add(Tuple.newTuple(new Episode(), 1.0));
-	}
-
-	@Test
-	public void firstElemIsNUllAndSecondIsEqual_2() {
+	public void oneNodeEpisodes() {
 		actuals.add(Tuple.newTuple(new Episode(), 1.0));
 		actuals.add(Tuple.newTuple(pattern1, 1.0));
+		
+		expecteds.add(Tuple.newTuple(pattern1, 1.0));
+		expecteds.add(Tuple.newTuple(new Episode(), 1.0));
+		
+		assertSets();
 	}
 
 	@Test
-	public void isInDescendingOrder() {
+	public void probabilitySorting() {
 		actuals.add(Tuple.newTuple(pattern4, 0.5));
 		actuals.add(Tuple.newTuple(pattern1, 1.0));
 		actuals.add(Tuple.newTuple(pattern2, 0.7));
@@ -113,27 +104,22 @@ public class ProposalHelperTest {
 	@Test
 	public void numberOfEventsSorting() {
 		actuals.add(Tuple.newTuple(pattern2, 0.9));
-		actuals.add(Tuple.newTuple(pattern5, 0.9));
+		actuals.add(Tuple.newTuple(pattern7, 0.9));
 		actuals.add(Tuple.newTuple(pattern1, 0.9));
 
-		expecteds.add(Tuple.newTuple(pattern5, 0.9));
+		expecteds.add(Tuple.newTuple(pattern7, 0.9));
 		expecteds.add(Tuple.newTuple(pattern2, 0.9));
 		expecteds.add(Tuple.newTuple(pattern1, 0.9));
 
 		assertSets();
 	}
 	
-	@Test 
-	public void eventSorting() {
-		actuals.add(Tuple.newTuple(pattern7, 0.9));
-		actuals.add(Tuple.newTuple(pattern5, 0.9));
-		actuals.add(Tuple.newTuple(pattern6, 0.9));
-		
-		expecteds.add(Tuple.newTuple(pattern5, 0.9));
-		expecteds.add(Tuple.newTuple(pattern6, 0.9));
-		expecteds.add(Tuple.newTuple(pattern7, 0.9));
-		
-		assertSets();
+	private Episode createPattern(String...string) {
+		Episode pattern = new Episode();
+		for (String s : string) {
+			pattern.addFact(s);
+		}
+		return pattern;
 	}
 
 	private void assertSets() {

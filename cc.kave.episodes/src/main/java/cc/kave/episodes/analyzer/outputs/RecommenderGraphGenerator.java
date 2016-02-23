@@ -128,7 +128,7 @@ public class RecommenderGraphGenerator {
 					
 					int proposalID = 0;
 					
-					Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, simPatterns, PROPOSALS);
+					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, simPatterns, PROPOSALS);
 					for (Tuple<Episode, Double> tuple : proposals) {
 						DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(tuple.getFirst(), eventMapping);
 						writer.write(proposalGraph, getProposalPath(directory, queryID, proposalID));

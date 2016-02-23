@@ -95,7 +95,7 @@ public class Evaluation {
 					System.out.println("Query: " + query.toString());
 					queryCounter++;
 					
-					Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns, PROPOSALS);
+					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
 					for (Tuple<Episode, Double> tuple : proposals) {
 						System.out.println("Similarity value = " + tuple.getSecond());
 						metrics.add(tuple.getSecond());

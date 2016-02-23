@@ -16,20 +16,25 @@
 package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
+import cc.recommenders.exceptions.AssertionException;
 
 public class QueryGeneratorByPercentageTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	private QueryGeneratorByPercentage sut;
 	
 	@Before 
@@ -39,19 +44,10 @@ public class QueryGeneratorByPercentageTest {
 	}
 	
 	@Test
-	public void noMethodInv() {
-		Episode target = createEpisode("11");
-		Set<Episode> actuals = sut.generateQueries(target, 0.5);
-		
-		assertNull(actuals);
-	}
-	
-	@Test
-	public void oneMethodInv() {
-		Episode target = createEpisode("11", "12", "11>12");
-		Set<Episode> actuals = sut.generateQueries(target, 0.5);
-		
-		assertNull(actuals);
+	public void emptyTarget() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Not valid episode for query generation!");
+		sut.generateQueries(new Episode(), 0.5);
 	}
 	
 	@Test

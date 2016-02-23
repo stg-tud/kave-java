@@ -20,18 +20,50 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
+import static cc.recommenders.assertions.Asserts.assertTrue;
 
-public class FactsSeparator {
+public class Separator {
 	
-	public Tuple<Fact, Set<Fact>> separate(Episode episode) {
-		Map<Fact, Integer> orderCounter = new HashMap<Fact, Integer>();
-
-		if (episode.getNumEvents() == 1) {
-			return null;
+	public Tuple<Fact, Set<Fact>> separateFacts(Episode episode) {
+		assertTrue(episode.getNumEvents() > 1, "Episode contains only one event!");
+		
+		Fact methodDecl = getMethodDecl(episode);
+		
+		Set<Fact> bodyFacts = new HashSet<Fact>();
+		for (Fact fact : episode.getFacts()) {
+			if (!fact.equals(methodDecl) && !fact.isRelation()) {
+				bodyFacts.add(fact);
+			}
 		}
+		return Tuple.newTuple(methodDecl, bodyFacts);
+	}
+	
+	public Set<Fact> getEpisodeBody(Episode episode) {
+		if (episode.getNumEvents() == 1) {
+			return Sets.newHashSet();
+		}
+		Fact methodDecl = getMethodDecl(episode);
+		Set<Fact> episodeBody = new HashSet<Fact>();
+		
+		for (Fact fact : episode.getFacts()) {
+			if (fact.isRelation()) {
+				if ((!methodDecl.isContained(fact))) {
+					episodeBody.add(fact);
+				}
+			} else if (!fact.equals(methodDecl)) {
+				episodeBody.add(fact);
+			}
+		}
+		return episodeBody;
+	} 
+	
+	private Fact getMethodDecl(Episode episode) {
+		Map<Fact, Integer> orderCounter = new HashMap<Fact, Integer>();
 		
 		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
@@ -52,14 +84,6 @@ public class FactsSeparator {
 				methodDecl = entry.getKey();
 			}
 		}
-		
-		Set<Fact> bodyFacts = new HashSet<Fact>();
-		for (Fact fact : episode.getFacts()) {
-			if (!fact.equals(methodDecl) && !fact.isRelation()) {
-				bodyFacts.add(fact);
-			}
-		}
-		
-		return Tuple.newTuple(methodDecl, bodyFacts);
+		return methodDecl;
 	}
 }
