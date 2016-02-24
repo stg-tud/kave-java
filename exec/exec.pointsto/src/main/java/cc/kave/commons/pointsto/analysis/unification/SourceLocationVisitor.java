@@ -13,11 +13,13 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
@@ -68,6 +70,14 @@ class SourceLocationVisitor extends FailSafeNodeVisitor<UnificationAnalysisVisit
 	public ReferenceLocation visit(IMethodReference methodRef, UnificationAnalysisVisitorContext context) {
 		ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
 		context.storeFunction(tempLoc, methodRef);
+		return tempLoc;
+	}
+
+	@Override
+	public ReferenceLocation visit(IEventReference eventRef, UnificationAnalysisVisitorContext context) {
+		ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
+		DistinctEventReference distRef = (DistinctEventReference) context.getDistinctReference(eventRef);
+		context.readMember(tempLoc, distRef);
 		return tempLoc;
 	}
 }

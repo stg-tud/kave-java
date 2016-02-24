@@ -13,10 +13,12 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
@@ -65,6 +67,14 @@ class DestinationLocationVisitor extends FailSafeNodeVisitor<UnificationAnalysis
 		DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) context
 				.getDistinctReference(indexAccessRef);
 		context.writeArray(distRef, tempLoc);
+		return tempLoc;
+	}
+
+	@Override
+	public ReferenceLocation visit(IEventReference eventRef, UnificationAnalysisVisitorContext context) {
+		ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
+		DistinctEventReference distRef = (DistinctEventReference) context.getDistinctReference(eventRef);
+		context.writeMember(distRef, tempLoc);
 		return tempLoc;
 	}
 

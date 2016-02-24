@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -40,6 +41,15 @@ public class SteensgaardLocationIdentifierFactory extends AbstractLocationIdenti
 	@Override
 	public LocationIdentifier create(IIndexAccessReference indexAccessRef, ITypeName baseType) {
 		return LocationIdentifier.VALUE;
+	}
+
+	@Override
+	protected LocationIdentifier create(IEventReference eventRef) {
+		if (eventRef.getEventName().getHandlerType().isDelegateType()) {
+			return LocationIdentifier.FUNCTION;
+		} else {
+			return LocationIdentifier.VALUE;
+		}
 	}
 
 }

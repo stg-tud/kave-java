@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -25,6 +26,8 @@ public abstract class AbstractLocationIdentifierFactory implements LocationIdent
 			return create((IPropertyReference) memberRef);
 		} else if (memberRef instanceof IFieldReference) {
 			return create((IFieldReference) memberRef);
+		} else if (memberRef instanceof IEventReference) {
+			return create((IEventReference) memberRef);
 		} else {
 			throw new UnexpectedSSTNodeException(memberRef);
 		}
@@ -33,5 +36,7 @@ public abstract class AbstractLocationIdentifierFactory implements LocationIdent
 	protected abstract LocationIdentifier create(IFieldReference fieldRef);
 
 	protected abstract LocationIdentifier create(IPropertyReference propertyRef);
+
+	protected abstract LocationIdentifier create(IEventReference eventRef);
 
 }

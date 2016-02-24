@@ -98,6 +98,20 @@ public abstract class AssignmentHandler<T> {
 			} else {
 				throw new UnexpectedSSTNodeException(srcRef);
 			}
+		} else if (destRef instanceof IEventReference) {
+			if (srcRef instanceof IMethodReference) {
+				assignMethodToEvent(dest, src);
+			} else if (srcRef instanceof IVariableReference) {
+				assignVarToEvent(dest, src);
+			} else if (srcRef instanceof IFieldReference) {
+				assignFieldToEvent(dest, src);
+			} else if (srcRef instanceof IPropertyReference) {
+				assignPropToEvent(dest, src);
+			} else if (srcRef instanceof IEventReference) {
+				assignEventToEvent(dest, src);
+			} else {
+				throw new UnexpectedSSTNodeException(srcRef);
+			}
 		} else {
 			throw new UnexpectedSSTNodeException(destRef);
 		}
@@ -142,5 +156,15 @@ public abstract class AssignmentHandler<T> {
 	protected abstract void assignArrayToArray(T dest, T src);
 
 	protected abstract void assignMethodToArray(T dest, T src);
+
+	protected abstract void assignMethodToEvent(T dest, T src);
+
+	protected abstract void assignVarToEvent(T dest, T src);
+
+	protected abstract void assignFieldToEvent(T dest, T src);
+
+	protected abstract void assignPropToEvent(T dest, T src);
+
+	protected abstract void assignEventToEvent(T dest, T src);
 
 }

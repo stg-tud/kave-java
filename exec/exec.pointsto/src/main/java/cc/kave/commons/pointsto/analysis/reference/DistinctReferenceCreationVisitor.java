@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -80,6 +81,24 @@ public class DistinctReferenceCreationVisitor
 		IVariableReference baseRef = indexAccessRef.getExpression().getReference();
 
 		return new DistinctIndexAccessReference(indexAccessRef, baseRef.accept(this, context));
+	}
+
+	@Override
+	public DistinctReference visit(IEventReference eventRef, ScopedMap<String, DistinctReference> context) {
+		IVariableReference baseRef = eventRef.getReference();
+		DistinctReference distBaseRef = context.get(baseRef.getIdentifier());
+
+		if (!eventRef.getEventName().isStatic()) {
+			if (baseRef.isMissing()) {
+				throw new MissingBaseVariableException(eventRef);
+			}
+
+			if (distBaseRef == null) {
+				throw new UndeclaredVariableException(baseRef);
+			}
+		}
+
+		return new DistinctEventReference(eventRef, distBaseRef);
 	}
 
 }

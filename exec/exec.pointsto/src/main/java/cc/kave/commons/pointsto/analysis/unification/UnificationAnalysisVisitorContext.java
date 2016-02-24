@@ -43,6 +43,7 @@ import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
@@ -922,6 +923,27 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation tempLoc = createSimpleReferenceLocation();
 		readArray(tempLoc, src);
 		writeArray(dest, tempLoc);
+	}
+
+	public void assign(IEventReference dest, IFieldReference src) {
+		ReferenceLocation tempLoc = dest.accept(destLocationVisitor, this);
+		readMember(tempLoc, src);
+	}
+
+	public void assign(IEventReference dest, IPropertyReference src) {
+		ReferenceLocation tempLoc = dest.accept(destLocationVisitor, this);
+		if (treatPropertyAsField(src)) {
+			readMember(tempLoc, src);
+		} else {
+			ReferenceLocation returnLocation = getOrCreateReturnLocation(src.getPropertyName());
+			alias(tempLoc, returnLocation);
+		}
+	}
+
+	public void assign(IEventReference dest, IEventReference src) {
+		ReferenceLocation destLoc = dest.accept(destLocationVisitor, this);
+		ReferenceLocation srcLoc = src.accept(srcLocationVisitor, this);
+		alias(destLoc, srcLoc);
 	}
 
 	public void readField(IVariableReference destRef, IFieldReference fieldRef) {

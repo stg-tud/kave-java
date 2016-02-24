@@ -25,6 +25,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
+import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
@@ -67,8 +68,8 @@ public class QueryKeyTransformer
 
 	@Override
 	public List<PointsToQuery> visit(DistinctKeywordReference keywordRef, DistinctReferenceContextCollector context) {
-		return Arrays.asList(
-				new PointsToQuery(keywordRef.getReference(), null, normalizeType(keywordRef.getType()), null));
+		return Arrays
+				.asList(new PointsToQuery(keywordRef.getReference(), null, normalizeType(keywordRef.getType()), null));
 	}
 
 	@Override
@@ -101,8 +102,7 @@ public class QueryKeyTransformer
 	}
 
 	@Override
-	public List<PointsToQuery> visit(DistinctPropertyReference propertyRef,
-			DistinctReferenceContextCollector context) {
+	public List<PointsToQuery> visit(DistinctPropertyReference propertyRef, DistinctReferenceContextCollector context) {
 		return Arrays.asList(new PointsToQuery(propertyRef.getReference().accept(normalizationVisitor, null), null,
 				normalizeType(propertyRef.getType()), null));
 	}
@@ -187,6 +187,12 @@ public class QueryKeyTransformer
 	public List<PointsToQuery> visit(DistinctIndexAccessReference indexAccessRef,
 			DistinctReferenceContextCollector context) {
 		return indexAccessRef.getBaseReference().accept(this, context);
+	}
+
+	@Override
+	public List<PointsToQuery> visit(DistinctEventReference eventRef, DistinctReferenceContextCollector context) {
+		return Arrays.asList(new PointsToQuery(eventRef.getReference().accept(normalizationVisitor, null), null,
+				normalizeType(eventRef.getType()), null));
 	}
 
 }

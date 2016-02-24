@@ -40,9 +40,13 @@ import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
@@ -107,6 +111,17 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 			super.visit(stmt, context);
 		} catch (MissingVariableException | UndeclaredVariableException ex) {
 			LOGGER.error("Failed to process an expression statement: {}", ex.getMessage());
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visit(IEventSubscriptionStatement stmt, UnificationAnalysisVisitorContext context) {
+		// a flow-insensitive analysis is only interested in adding observers
+		if (stmt.getOperation() == EventSubscriptionOperation.Add) {
+			IAssignment assignment = new EventSubscriptionAssignment(stmt);
+			return assignment.accept(this, context);
 		}
 
 		return null;

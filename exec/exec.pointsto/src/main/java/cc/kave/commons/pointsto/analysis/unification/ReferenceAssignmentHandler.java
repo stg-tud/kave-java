@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
@@ -138,6 +139,31 @@ public class ReferenceAssignmentHandler extends AssignmentHandler<IReference> {
 	@Override
 	protected void assignMethodToArray(IReference dest, IReference src) {
 		context.storeFunction(dest, (IMethodReference) src);
+	}
+
+	@Override
+	protected void assignMethodToEvent(IReference dest, IReference src) {
+		context.storeFunction(dest, (IMethodReference) src);
+	}
+
+	@Override
+	protected void assignVarToEvent(IReference dest, IReference src) {
+		context.alias(dest, (IVariableReference) src);
+	}
+
+	@Override
+	protected void assignFieldToEvent(IReference dest, IReference src) {
+		context.assign((IEventReference) dest, (IFieldReference) src);
+	}
+
+	@Override
+	protected void assignPropToEvent(IReference dest, IReference src) {
+		context.assign((IEventReference) dest, (IPropertyReference) src);
+	}
+
+	@Override
+	protected void assignEventToEvent(IReference dest, IReference src) {
+		context.assign((IEventReference) dest, (IEventReference) src);
 	}
 
 }
