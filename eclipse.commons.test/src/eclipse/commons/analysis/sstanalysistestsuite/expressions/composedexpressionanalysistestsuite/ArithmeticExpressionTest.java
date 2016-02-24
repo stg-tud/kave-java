@@ -70,4 +70,25 @@ public class ArithmeticExpressionTest extends BaseSSTAnalysisTest {
 
 		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT), newAssignment("i", binaryExpression));
 	}
+
+	@Test
+	public void nestedArithmeticExpressions() {
+		BinaryExpression binaryExpression0 = newBinaryExpression(newConstantValue("2"), newConstantValue("3"),
+				BinaryOperator.Multiply);
+
+		BinaryExpression binaryExpression1 = newBinaryExpression(newConstantValue("4"), newConstantValue("5"),
+				BinaryOperator.Divide);
+
+		BinaryExpression binaryExpression2 = newBinaryExpression(newReferenceExpression("$0"),
+				newReferenceExpression("$1"), BinaryOperator.Minus);
+
+		BinaryExpression binaryExpression3 = newBinaryExpression(newConstantValue("1"), newReferenceExpression("$2"),
+				BinaryOperator.Plus);
+
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT),
+				newVariableDeclaration("$0", SSTAnalysisFixture.INT), newAssignment("$0", binaryExpression0),
+				newVariableDeclaration("$1", SSTAnalysisFixture.INT), newAssignment("$1", binaryExpression1),
+				newVariableDeclaration("$2", SSTAnalysisFixture.INT), newAssignment("$2", binaryExpression2),
+				newAssignment("i", binaryExpression3));
+	}
 }

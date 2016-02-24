@@ -105,7 +105,7 @@ public class PluginAstParser {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setSource(unit);
 		parser.setResolveBindings(true);
-		return (CompilationUnit) parser.createAST(null); // parse
+		return (CompilationUnit) parser.createAST(null);
 	}
 
 	private ICompilationUnit getCompilationunit(String project, String qualifiedName) {

@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Assignment.Operator;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -56,6 +57,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import cc.kave.commons.model.names.FieldName;
+import cc.kave.commons.model.names.LambdaName;
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
@@ -71,6 +73,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -81,6 +84,7 @@ import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -97,6 +101,7 @@ public class ExpressionVisitor extends ASTVisitor {
 	private ISimpleExpression simpleExpression;
 	private VariableReference variableReference;
 	private ILoopHeaderExpression loopHeaderExpression;
+	private VariableReference lastArrayAccess;
 
 	public ExpressionVisitor(UniqueVariableNameGenerator nameGen, List<IStatement> body) {
 		this.nameGen = nameGen;
@@ -125,10 +130,16 @@ public class ExpressionVisitor extends ASTVisitor {
 		ExpressionVisitor leftVisitor = new ExpressionVisitor(nameGen, body);
 		ExpressionVisitor rightVisitor = new ExpressionVisitor(nameGen, body);
 		stmt.getLeftHandSide().accept(leftVisitor);
+
+		if (isArrayCreation(stmt.getRightHandSide())) {
+			setLastArrayAccess(leftVisitor.getVariableReference());
+		}
+
 		stmt.getRightHandSide().accept(rightVisitor);
 
 		if (stmt.getOperator() == Operator.ASSIGN
-				&& !isSelfAssign(rightVisitor.getAssignableExpression(), leftVisitor.getAssignableReference())) {
+				&& !isSelfAssign(rightVisitor.getAssignableExpression(), leftVisitor.getAssignableReference())
+				&& !isArrayCreation(stmt.getRightHandSide())) {
 			cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
 			assignment.setReference(leftVisitor.getAssignableReference());
 			assignment.setExpression(rightVisitor.getAssignableExpression());
@@ -365,6 +376,7 @@ public class ExpressionVisitor extends ASTVisitor {
 		}
 
 		variableReference = varRef;
+		simpleExpression = methodRefExpr;
 
 		if (!isParentStatement(node) || isParentLoop(node) || node.getParent() instanceof InstanceofExpression
 				|| node.getParent() instanceof MethodInvocation) {
@@ -379,7 +391,8 @@ public class ExpressionVisitor extends ASTVisitor {
 			assignableExpression = invocation;
 
 			createAndAssign(node.resolveTypeBinding(), genVar, invocation);
-		} else if (node.getParent() instanceof Statement) {
+		} else if (node.getParent() instanceof Statement
+				|| node.getParent() instanceof org.eclipse.jdt.core.dom.LambdaExpression) {
 			body.add(stmt);
 		}
 
@@ -412,7 +425,7 @@ public class ExpressionVisitor extends ASTVisitor {
 			break;
 		}
 
-		if (isPreOrPostfixExpression(node.getOperator().toString())) {
+		if (isPreOrPostfixExpression(node.getOperator().toString()) && !isParentAssignment(node)) {
 			assignment.setExpression(unaryExpression);
 			assignment.setReference(visitor.getAssignableReference());
 			body.add(assignment);
@@ -469,7 +482,7 @@ public class ExpressionVisitor extends ASTVisitor {
 			break;
 		}
 
-		if (isPreOrPostfixExpression(node.getOperator().toString())) {
+		if (isPreOrPostfixExpression(node.getOperator().toString()) && !isParentAssignment(node)) {
 			assignment.setExpression(unaryExpression);
 			assignment.setReference(visitor.getAssignableReference());
 			body.add(assignment);
@@ -552,6 +565,10 @@ public class ExpressionVisitor extends ASTVisitor {
 				variableReference = genVar;
 
 				createAndAssign(node.resolveTypeBinding(), genVar, refExpr);
+			} else if (node.getParent() instanceof org.eclipse.jdt.core.dom.LambdaExpression) {
+				ExpressionStatement expressionStatement = new ExpressionStatement();
+				expressionStatement.setExpression(refExpr);
+				body.add(expressionStatement);
 			}
 		}
 		return false;
@@ -579,11 +596,12 @@ public class ExpressionVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ArrayInitializer node) {
 		IndexAccessExpression indexAccessExpr = new IndexAccessExpression();
-		VariableReference varRef = new VariableReference();
+		VariableReference varRef = lastArrayAccess;
 
 		int i = 0;
 		List<Expression> expressions = node.expressions();
 		for (Expression expression : expressions) {
+			indexAccessExpr = new IndexAccessExpression();
 			expression.accept(this);
 
 			ConstantValueExpression index = new ConstantValueExpression();
@@ -655,11 +673,18 @@ public class ExpressionVisitor extends ASTVisitor {
 			body.add(variableDeclaration);
 
 			if (fragment.getInitializer() != null) {
+				if (isArrayCreation(fragment.getInitializer())) {
+					setLastArrayAccess(variableReference);
+				}
 				fragment.getInitializer().accept(this);
-				cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
-				assignment.setReference(variableReference);
-				assignment.setExpression(this.getAssignableExpression());
-				body.add(assignment);
+
+				if (!isSelfAssign(getAssignableExpression(), variableReference)
+						&& !isArrayCreation(fragment.getInitializer())) {
+					cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+					assignment.setReference(variableReference);
+					assignment.setExpression(this.getAssignableExpression());
+					body.add(assignment);
+				}
 
 				this.variableReference = variableReference;
 			}
@@ -699,7 +724,47 @@ public class ExpressionVisitor extends ASTVisitor {
 			binaryExpression.setRightOperand(getSimpleExpression());
 		}
 
+		if (isParentInfixExpression(node) && extendedOperands.isEmpty()) {
+			VariableReference varRef = new VariableReference();
+			varRef.setIdentifier(nameGen.getNextVariableName());
+
+			createAndAssign(node.resolveTypeBinding(), varRef, binaryExpression);
+
+			ReferenceExpression refExpr = new ReferenceExpression();
+			refExpr.setReference(varRef);
+
+			simpleExpression = refExpr;
+		}
 		assignableExpression = binaryExpression;
+
+		return false;
+	}
+
+	@Override
+	public boolean visit(org.eclipse.jdt.core.dom.LambdaExpression node) {
+		LambdaExpression lambdaExpression = new LambdaExpression();
+		lambdaExpression.setName((LambdaName) NodeFactory.createNodeName(node));
+
+		if (node.getBody() instanceof Block) {
+			BodyVisitor lambdaVisitor = new BodyVisitor(nameGen, lambdaExpression.getBody());
+			node.getBody().accept(lambdaVisitor);
+		} else {
+			ExpressionVisitor exprVisitor = new ExpressionVisitor(nameGen, lambdaExpression.getBody());
+			node.getBody().accept(exprVisitor);
+
+			if (!BindingFactory.getBindingName(node.resolveMethodBinding().getReturnType())
+					.equals("%void, rt.jar, 1.8")) {
+				int size = lambdaExpression.getBody().size();
+				lambdaExpression.getBody().remove(size - 1);
+
+				ReturnStatement returnStatement = new ReturnStatement();
+				returnStatement.setExpression(exprVisitor.getSimpleExpression());
+
+				lambdaExpression.getBody().add(returnStatement);
+			}
+		}
+
+		assignableExpression = lambdaExpression;
 
 		return false;
 	}
@@ -729,8 +794,8 @@ public class ExpressionVisitor extends ASTVisitor {
 		if (parent instanceof Statement || parent instanceof VariableDeclarationFragment || parent instanceof Assignment
 				|| parent instanceof MethodInvocation || parent instanceof PrefixExpression
 				|| parent instanceof PostfixExpression || parent instanceof ConditionalExpression
-				|| parent instanceof InstanceofExpression
-				|| parent instanceof org.eclipse.jdt.core.dom.CastExpression) {
+				|| parent instanceof InstanceofExpression || parent instanceof org.eclipse.jdt.core.dom.CastExpression
+				|| node.getParent() instanceof org.eclipse.jdt.core.dom.LambdaExpression) {
 			return true;
 		}
 
@@ -788,6 +853,24 @@ public class ExpressionVisitor extends ASTVisitor {
 		return false;
 	}
 
+	private boolean isParentInfixExpression(ASTNode node) {
+		ASTNode parent = node.getParent();
+		while (!(parent instanceof Statement)) {
+			if (parent instanceof InfixExpression) {
+				return true;
+			}
+			parent = parent.getParent();
+		}
+		return false;
+	}
+
+	private boolean isArrayCreation(ASTNode node) {
+		if (node instanceof ArrayCreation || node instanceof ArrayInitializer) {
+			return true;
+		}
+		return false;
+	}
+
 	private BinaryOperator toBinaryOperator(String operator) {
 
 		switch (operator) {
@@ -836,5 +919,9 @@ public class ExpressionVisitor extends ASTVisitor {
 		default:
 			return null;
 		}
+	}
+
+	public void setLastArrayAccess(VariableReference lastArrayAccess) {
+		this.lastArrayAccess = lastArrayAccess;
 	}
 }

@@ -55,11 +55,13 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
@@ -270,8 +272,16 @@ public abstract class BaseSSTAnalysisTest {
 		binaryExpression.setLeftOperand(leftOperand);
 		binaryExpression.setRightOperand(rightOperand);
 		binaryExpression.setOperator(operator);
-		
+
 		return binaryExpression;
+	}
+
+	protected IndexAccessExpression newIndexAccessExpression(String target, ISimpleExpression... indices) {
+		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
+		indexAccessExpression.setReference(newVariableReference(target));
+		indexAccessExpression.setIndices(Arrays.asList(indices));
+
+		return indexAccessExpression;
 	}
 
 	protected IMethodDeclaration getFirstMethod() {

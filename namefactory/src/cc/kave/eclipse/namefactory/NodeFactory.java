@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -39,15 +40,18 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
+import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
+import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.kave.commons.model.names.csharp.CsNamespaceName;
@@ -101,6 +105,26 @@ public class NodeFactory {
 
 		case ASTNode.FIELD_ACCESS:
 			return createFieldAccessName(node);
+
+		case ASTNode.LAMBDA_EXPRESSION:
+			StringBuilder sb = new StringBuilder();
+			LambdaExpression lambda = (LambdaExpression) node;
+			IMethodBinding methodBinding = lambda.resolveMethodBinding();
+
+			sb.append("[").append(BindingFactory.getBindingName(methodBinding.getReturnType())).append("] (");
+
+			List<VariableDeclaration> parameters = lambda.parameters();
+			for (VariableDeclaration variableDeclaration : parameters) {
+				sb.append(createParameterName(variableDeclaration)).append(", ");
+			}
+
+			if (!parameters.isEmpty()) {
+				sb.setLength(sb.length() - 2);
+			}
+
+			sb.append(")");
+
+			return CsLambdaName.newLambdaName(sb.toString());
 
 		default:
 			return null;
@@ -319,13 +343,27 @@ public class NodeFactory {
 		return parameters;
 	}
 
+	private static String createParameterName(VariableDeclaration decl) {
+		StringBuilder param = new StringBuilder();
+
+		if (decl instanceof SingleVariableDeclaration && ((SingleVariableDeclaration) decl).isVarargs()) {
+			param.append("params ");
+		}
+
+		param.append("[");
+		param.append(BindingFactory.getBindingName(decl.resolveBinding().getType()));
+		param.append("] ").append(decl.getName().getIdentifier());
+
+		return param.toString();
+	}
+
 	/**
 	 * 
 	 * @param method
-	 *            The method binding whose superclasses are searched trough for
-	 *            this bindings super method
-	 * @return Returns an array with two MethodName. They can be null if they do
-	 *         not exist.
+	 *            The method binding whose superclasses are searched through for
+	 *            this bindings super method.
+	 * @return Returns an array with two MethodNames. They can be null if they
+	 *         do not exist.
 	 */
 	protected static MethodName[] getSuperMethodNames(IMethodBinding method) {
 		MethodName[] methodNames = new CsMethodName[2];
@@ -470,7 +508,7 @@ public class NodeFactory {
 		private static boolean isPrimitivType(String name) {
 			String[] primitiveTypes = { "byte", "short", "char", "int", "long", "float", "double", "boolean", "void" };
 			for (String type : primitiveTypes) {
-				if (name.startsWith(type))
+				if (name.equals(type) || name.startsWith(type + "[]"))
 					return true;
 			}
 			return false;

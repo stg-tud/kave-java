@@ -3,6 +3,7 @@ package eclipse.commons.analysis.sstanalysistestsuite.expressions;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.csharp.CsMethodName;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import eclipse.commons.analysis.sstanalysistestsuite.BaseSSTAnalysisTest;
@@ -17,7 +18,6 @@ public class IndexAccessExpressionAnalysisTest extends BaseSSTAnalysisTest {
 		indexAccess.getIndices().add(newConstantValue("0"));
 
 		assertMethod(newVariableDeclaration("j", SSTAnalysisFixture.INT), newAssignment("j", indexAccess));
-
 	}
 
 	@Test
@@ -96,12 +96,44 @@ public class IndexAccessExpressionAnalysisTest extends BaseSSTAnalysisTest {
 
 	@Test
 	public void arrayDeclarationWithParameters() {
-		// TODO
+		IndexAccessExpression indexAccessExpression0 = newIndexAccessExpression("i", newConstantValue("0"));
+		IndexAccessExpression indexAccessExpression1 = newIndexAccessExpression("i", newConstantValue("1"));
+		IndexAccessExpression indexAccessExpression2 = newIndexAccessExpression("i", newConstantValue("2"));
+
+		IndexAccessReference indexAccessReference0 = new IndexAccessReference();
+		indexAccessReference0.setExpression(indexAccessExpression0);
+
+		IndexAccessReference indexAccessReference1 = new IndexAccessReference();
+		indexAccessReference1.setExpression(indexAccessExpression1);
+
+		IndexAccessReference indexAccessReference2 = new IndexAccessReference();
+		indexAccessReference2.setExpression(indexAccessExpression2);
+
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT_ARRAY),
+				newAssignment(indexAccessReference0, newConstantValue("1")),
+				newAssignment(indexAccessReference1, newConstantValue("2")),
+				newAssignment(indexAccessReference2, newConstantValue("3")));
 	}
 
 	@Test
 	public void arrayDeclarationWithNew() {
-		// TODO
+		IndexAccessExpression indexAccessExpression0 = newIndexAccessExpression("i", newConstantValue("0"));
+		IndexAccessExpression indexAccessExpression1 = newIndexAccessExpression("i", newConstantValue("1"));
+		IndexAccessExpression indexAccessExpression2 = newIndexAccessExpression("i", newConstantValue("2"));
+
+		IndexAccessReference indexAccessReference0 = new IndexAccessReference();
+		indexAccessReference0.setExpression(indexAccessExpression0);
+
+		IndexAccessReference indexAccessReference1 = new IndexAccessReference();
+		indexAccessReference1.setExpression(indexAccessExpression1);
+
+		IndexAccessReference indexAccessReference2 = new IndexAccessReference();
+		indexAccessReference2.setExpression(indexAccessExpression2);
+
+		assertMethod(newVariableDeclaration("i", SSTAnalysisFixture.INT_ARRAY),
+				newAssignment(indexAccessReference0, newConstantValue("1")),
+				newAssignment(indexAccessReference1, newConstantValue("2")),
+				newAssignment(indexAccessReference2, newConstantValue("3")));
 	}
 
 }

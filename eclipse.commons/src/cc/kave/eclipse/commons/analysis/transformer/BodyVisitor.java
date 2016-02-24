@@ -18,7 +18,10 @@ package cc.kave.eclipse.commons.analysis.transformer;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ArrayCreation;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -264,12 +267,17 @@ public class BodyVisitor extends ASTVisitor {
 			body.add(variableDeclaration);
 
 			if (fragment.getInitializer() != null) {
-				cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+				if(isArrayCreation(fragment.getInitializer())){
+					exprVisitor.setLastArrayAccess(variableReference);
+				}
+			
 				fragment.getInitializer().accept(exprVisitor);
-				assignment.setReference(variableReference);
-				assignment.setExpression(exprVisitor.getAssignableExpression());
 
-				if (!isSelfAssign(exprVisitor.getAssignableExpression(), variableReference)) {
+				if (!isSelfAssign(exprVisitor.getAssignableExpression(), variableReference) && !isArrayCreation(fragment.getInitializer())) {
+					cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
+					assignment.setReference(variableReference);
+					assignment.setExpression(exprVisitor.getAssignableExpression());
+
 					body.add(assignment);
 				}
 			}
@@ -377,7 +385,7 @@ public class BodyVisitor extends ASTVisitor {
 				if (!hasCatchOrFinally && i == 0) {
 					lastBody = body;
 				}
-				
+
 				lastBody.add(usingBlock);
 
 				resourceVisitor = new ExpressionVisitor(nameGen, usingBlock.getBody());
@@ -424,6 +432,13 @@ public class BodyVisitor extends ASTVisitor {
 
 	private boolean isSelfAssign(IAssignableExpression assign, IVariableReference varRef) {
 		if (assign instanceof ReferenceExpression && varRef.equals(((ReferenceExpression) assign).getReference())) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isArrayCreation(ASTNode node) {
+		if (node instanceof ArrayCreation || node instanceof ArrayInitializer) {
 			return true;
 		}
 		return false;

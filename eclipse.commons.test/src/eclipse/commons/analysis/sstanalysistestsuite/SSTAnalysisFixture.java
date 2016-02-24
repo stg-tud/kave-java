@@ -27,6 +27,8 @@ public class SSTAnalysisFixture extends BaseSSTAnalysisTest {
 
 	public static final TypeName INT = CsTypeName.newTypeName("%int, rt.jar, 1.8");
 
+	public static final TypeName INT_OBJECT = CsTypeName.newTypeName("java.lang.Integer, rt.jar, 1.8");
+
 	public static final TypeName FLOAT = CsTypeName.newTypeName("%float, rt.jar, 1.8");
 
 	public static final TypeName DOUBLE = CsTypeName.newTypeName("%double, rt.jar, 1.8");
@@ -50,8 +52,16 @@ public class SSTAnalysisFixture extends BaseSSTAnalysisTest {
 	public static final TypeName EXCEPTION = CsTypeName.newTypeName("java.lang.Exception, rt.jar, 1.8");
 
 	public static final TypeName FILE_INPUT_STREAM = CsTypeName.newTypeName("java.io.FileInputStream, rt.jar, 1.8");
-	
+
+	public static final TypeName RUNNABLE = CsTypeName.newTypeName("i: java.lang.Runnable, rt.jar, 1.8");
+
 	public static final TypeName INT_ARRAY = CsTypeName.newTypeName("%int[], rt.jar, 1.8");
+
+	public static final TypeName FUNCTION = CsTypeName
+			.newTypeName("i: java.util.function.Function`2[[T -> T],[T -> T]], ?");
+	
+			public static final TypeName BIFUNCTION = CsTypeName
+			.newTypeName("i: java.util.function.BiFunction`3[[T -> T],[T -> T],[T -> T]], ?");
 
 	public static final MethodName OBJECT_CTOR = CsMethodName
 			.newMethodName("[java.lang.Object, rt.jar, 1.8] [java.lang.Object, rt.jar, 1.8]..ctor()");
