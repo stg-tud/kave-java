@@ -69,6 +69,15 @@ public class AveragerTest {
 	}
 	
 	@Test
+	public void clearAverager() {
+		sut.addValue(0.7);
+		sut.addValue(0.3);
+		sut.addValue(0.5);
+		
+		assertTrue(sut.clear().isEmpty());
+	}
+	
+	@Test
 	public void average() {
 		sut.addValue(0.7);
 		sut.addValue(0.3);

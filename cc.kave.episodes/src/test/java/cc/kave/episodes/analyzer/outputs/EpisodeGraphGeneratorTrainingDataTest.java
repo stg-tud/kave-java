@@ -83,7 +83,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private Map<Integer, Set<Episode>> episodes;
 	private File folderStructure;
 	
-	private EpisodeGraphGeneratorTrainingData sut;
+	private TrainingDataGraphGenerator sut;
 
 	@Before
 	public void setup() {
@@ -98,7 +98,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 		
-		sut = new EpisodeGraphGeneratorTrainingData(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser,
+		sut = new TrainingDataGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser,
 				transitivityClosure, writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
@@ -111,7 +111,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder does not exist");
-		sut = new EpisodeGraphGeneratorTrainingData(new File("does not exist"), episodeParser, episodeLearned, mappingParser,
+		sut = new TrainingDataGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, mappingParser,
 				transitivityClosure, writer, graphConverter);
 	}
 
@@ -120,7 +120,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
-		sut = new EpisodeGraphGeneratorTrainingData(file, episodeParser, episodeLearned, mappingParser, transitivityClosure,
+		sut = new TrainingDataGraphGenerator(file, episodeParser, episodeLearned, mappingParser, transitivityClosure,
 				writer, graphConverter);
 	}
 

@@ -24,7 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.episodes.analyzer.outputs.RecommenderGraphGenerator;
+import cc.kave.episodes.mining.evaluation.Evaluation;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -47,8 +47,8 @@ public class run_ervina {
 //		load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
 //		load(QueriesGraphGenerator.class).generateGraphs();
 //		load(EpisodeGraphGeneratorTrainingData.class).generateGraphs(5, 0.01);
-		load(RecommenderGraphGenerator.class).generateGraphs();
-//		load(Evaluation.class).evaluate();
+//		load(RecommenderGraphGenerator.class).generateGraphs();
+		load(Evaluation.class).evaluate();
 		
 //		load(Suggestions.class).run();
 //		load(EventStreamModifier.class).modify();

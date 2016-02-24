@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import cc.kave.episodes.analyzer.outputs.EpisodeGraphGeneratorTrainingData;
-import cc.kave.episodes.analyzer.outputs.EpisodeGraphGeneratorValidationData;
+import cc.kave.episodes.analyzer.outputs.TrainingDataGraphGenerator;
+import cc.kave.episodes.analyzer.outputs.ValidationDataGraphGenerator;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -92,8 +92,8 @@ public class Module extends AbstractModule {
 //		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 		EpisodeRecommender recommender = new EpisodeRecommender();
 //		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, transitivityClosure, query, mappingParser, recommender, graphConverter, graphWriter));
-		bind(EpisodeGraphGeneratorValidationData.class).toInstance(new EpisodeGraphGeneratorValidationData(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		bind(EpisodeGraphGeneratorTrainingData.class).toInstance(new EpisodeGraphGeneratorTrainingData(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

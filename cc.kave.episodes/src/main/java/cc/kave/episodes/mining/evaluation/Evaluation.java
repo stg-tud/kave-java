@@ -15,16 +15,12 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
-import java.io.File;
-import java.util.LinkedList;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
@@ -32,6 +28,7 @@ import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
+import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
@@ -40,24 +37,23 @@ public class Evaluation {
 	
 	private static final int PROPOSALS = 1;
 	private static final int FREQUENCY = 5;
-	private static final double BIDIRECTIONA = 0.01;
-	private static final double PROBABILITY = 1;
-
+	private static final double BIDIRECTIONAL = 0.01;
+	private static final double PROBABILITY = 0.5;
+	
 	private ValidationContextsParser validationParser;
 	private EventMappingParser mappingParser;
 	private QueryGeneratorByPercentage queryGenerator;
 	private EpisodeRecommender recommender;
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
+	
+	private Averager averager = new Averager();
+	private DecimalFormat df = new DecimalFormat("0.00"); 
 
 	@Inject
-	public Evaluation(@Named("graph") File directory, ValidationContextsParser parser,
-			EventMappingParser mappingParser, QueryGeneratorByPercentage queryGenerator, 
-			EpisodeRecommender recommender, EpisodeParser episodeParser, 
-			MaximalEpisodes maxEpisodeTracker) {
-
-		assertTrue(directory.exists(), "Validation data folder does not exist");
-		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");
+	public Evaluation(ValidationContextsParser parser, EventMappingParser mappingParser, 
+			QueryGeneratorByPercentage queryGenerator, EpisodeRecommender recommender, 
+			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
 
 		this.validationParser = parser;
 		this.mappingParser = mappingParser;
@@ -69,49 +65,49 @@ public class Evaluation {
 
 	public void evaluate() throws Exception {
 		
-		Logger.setPrinting(false);
+		Logger.setPrinting(true);
 		
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(FREQUENCY, BIDIRECTIONA);
+		Logger.log("Reading the learned patterns");
+		Map<Integer, Set<Episode>> patterns = episodeParser.parse(FREQUENCY, BIDIRECTIONAL);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		
 		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
 		
-		Logger.log("Readng Contexts");
+		Logger.log("Readng the validation data");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
+
+		Logger.log("Patterns configuration:");
+		Logger.log("Frequency = %d", FREQUENCY);
+		Logger.log("Bidirectional measure: " + df.format(BIDIRECTIONAL));
+		Logger.log("");
 		
-		List<Double> metrics = new LinkedList<>();
-		int queryCounter = 0;
-		int episodeCounter = 0;
+		Logger.log("Querying strategy: " + df.format(PROBABILITY));
+		Logger.log("Proposal strategy: %d", PROPOSALS);
+		Logger.log("");
 		
+		Logger.log("Episode\tF1-value");
+		
+		int targetCounter = 0;
 		for (Episode e : validationData) {
 			
-			if (e.getNumEvents() > 1) {
-				System.out.println("Epiode " + episodeCounter + ": " + e.toString());
+			if (e.getNumEvents() > 2) {
 				Set<Episode> queries = queryGenerator.generateQueries(e, PROBABILITY);
 				
 				for (Episode query : queries) {
-					System.out.println("Query: " + query.toString());
-					queryCounter++;
-					
 					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
-					for (Tuple<Episode, Double> tuple : proposals) {
-						System.out.println("Similarity value = " + tuple.getSecond());
-						metrics.add(tuple.getSecond());
+					if (proposals.size() > 0) {
+						for (Tuple<Episode, Double> tuple : proposals) {
+							averager.addValue(tuple.getSecond());
+						}
 					}
 				}
-				episodeCounter++;
+//				System.out.println("Episode = " + targetCounter + ", F1-value = " + averager.average());
+				Logger.log("" + targetCounter + "\t" + df.format(averager.average()));
+//				Logger.log("Episode =\t%d\tF1-value = %.00f", targetCounter, averager.average());
+				averager.clear();
+				targetCounter++;
 			}
 		}
-		Logger.log("Total number of queries = %d", queryCounter);
-		Logger.log("Proposals similarity = %d", getAverage(metrics));
-	}
-
-	private double getAverage(List<Double> values) {
-		int sum = 0;
-		for (double v : values) {
-			sum += v;
-		}
-		return (sum / values.size());
 	}
 }

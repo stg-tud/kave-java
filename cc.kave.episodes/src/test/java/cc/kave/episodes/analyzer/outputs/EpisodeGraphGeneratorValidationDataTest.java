@@ -78,7 +78,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	private Set<Episode> episodes;
 	private File folderStructure;
 	
-	private EpisodeGraphGeneratorValidationData sut;
+	private ValidationDataGraphGenerator sut;
 	
 	@Before
 	public void setup() throws ZipException, IOException {
@@ -92,7 +92,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 		
-		sut = new EpisodeGraphGeneratorValidationData(rootFolder.getRoot(), contextParser, mappingParser,
+		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, mappingParser,
 				transitivityClosure, writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/ValidationData/");
@@ -105,7 +105,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Validation data folder does not exist");
-		sut = new EpisodeGraphGeneratorValidationData(new File("does not exist"), contextParser, mappingParser,
+		sut = new ValidationDataGraphGenerator(new File("does not exist"), contextParser, mappingParser,
 				transitivityClosure, writer, graphConverter);
 	}
 	
@@ -114,7 +114,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Validation data folder is not a folder, but a file");
-		sut = new EpisodeGraphGeneratorValidationData(file, contextParser, mappingParser,
+		sut = new ValidationDataGraphGenerator(file, contextParser, mappingParser,
 				transitivityClosure, writer, graphConverter);
 	}
 	

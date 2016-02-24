@@ -40,7 +40,7 @@ import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
 
-public class EpisodeGraphGeneratorTrainingData {
+public class TrainingDataGraphGenerator {
 
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
@@ -52,7 +52,7 @@ public class EpisodeGraphGeneratorTrainingData {
 	private File rootFolder;
 
 	@Inject
-	public EpisodeGraphGeneratorTrainingData(@Named("graph") File directory, EpisodeParser episodeParser,
+	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
 			MaximalEpisodes episodeLearned, EventMappingParser mappingParser,
 			TransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {

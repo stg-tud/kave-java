@@ -38,7 +38,7 @@ import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
 
-public class EpisodeGraphGeneratorValidationData {
+public class ValidationDataGraphGenerator {
 
 	private ValidationContextsParser validationParser;
 	private EventMappingParser mappingParser;
@@ -49,7 +49,7 @@ public class EpisodeGraphGeneratorValidationData {
 	private File rootFolder;
 
 	@Inject
-	public EpisodeGraphGeneratorValidationData(@Named("graph") File directory, ValidationContextsParser parser,
+	public ValidationDataGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
 			EventMappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter) {
 

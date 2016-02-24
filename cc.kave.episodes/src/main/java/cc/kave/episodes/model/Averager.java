@@ -48,6 +48,11 @@ public class Averager {
 		return (sum / this.data.size());
 	}
 	
+	public List<Double> clear() {
+		this.data = new LinkedList<>();
+		return this.data;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
