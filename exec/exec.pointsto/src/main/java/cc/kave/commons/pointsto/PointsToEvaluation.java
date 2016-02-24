@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +36,6 @@ import cc.kave.commons.pointsto.statistics.TypeHistogramUsageStatisticsCollector
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.recommenders.usages.Usage;
 
 public class PointsToEvaluation {
 
@@ -63,7 +61,7 @@ public class PointsToEvaluation {
 
 	}
 
-	private static Map<PointsToAnalysisFactory, List<Usage>> generateUsages(List<PointsToAnalysisFactory> factories) {
+	private static void generateUsages(List<PointsToAnalysisFactory> factories) {
 		try {
 			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory = (PointsToAnalysisFactory factory) -> {
 				try {
@@ -77,22 +75,15 @@ public class PointsToEvaluation {
 					new TypeHistogramUsageStatisticsCollector());
 
 			Stopwatch stopwatch = Stopwatch.createStarted();
-			Map<PointsToAnalysisFactory, List<Usage>> usages = generator.getUsages();
+			generator.generateUsages();
 			stopwatch.stop();
 			LOGGER.info("Usage generation took {}", stopwatch.toString());
 
 			outputStatisticsCollectors(generator.getStatisticsCollectors());
 
-			for (Map.Entry<PointsToAnalysisFactory, List<Usage>> entry : usages.entrySet()) {
-				LOGGER.info("{}: {} usages", entry.getKey().getName(), entry.getValue().size());
-			}
-
-			return usages;
 		} catch (IOException e) {
 			LOGGER.error("Error during usage generation", e);
 		}
-
-		return Collections.emptyMap();
 	}
 
 	private static void outputStatisticsCollectors(Map<PointsToAnalysisFactory, UsageStatisticsCollector> collectors) {

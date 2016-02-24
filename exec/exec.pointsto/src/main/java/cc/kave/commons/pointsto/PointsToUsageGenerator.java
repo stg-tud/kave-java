@@ -14,7 +14,6 @@ package cc.kave.commons.pointsto;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -76,12 +75,10 @@ public class PointsToUsageGenerator {
 		return Collections.unmodifiableMap(statisticsCollectors);
 	}
 
-	public Map<PointsToAnalysisFactory, List<Usage>> getUsages() {
-		Map<PointsToAnalysisFactory, List<Usage>> usages = new HashMap<>();
-
+	public void generateUsages() {
 		for (Path zipFile : sources) {
 			try {
-				usages.putAll(processZipFile(zipFile));
+				processZipFile(zipFile);
 			} catch (IOException e) {
 				LOGGER.error("Failed to process zip " + zipFile.toString(), e);
 			}
@@ -95,23 +92,23 @@ public class PointsToUsageGenerator {
 				LOGGER.error("Failed to close a UsageStore", e);
 			}
 		}
-
-		return usages;
 	}
 
-	private Map<PointsToAnalysisFactory, List<Usage>> processZipFile(Path path) throws IOException {
-		final Map<PointsToAnalysisFactory, List<Usage>> usages = new HashMap<>();
+	private void processZipFile(Path inputZipFile) throws IOException {
 		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
 
-		final Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters = new HashMap<>(
-				factories.size());
+		final Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters = new HashMap<>(factories.size());
 
 		// initialize writers for the annotated contexts to TARGET/FACTORY_NAME/RELATIVE_INPUT
-		final Path relativeInput = srcDir.relativize(path);
+		final Path relativeInput = srcDir.relativize(inputZipFile);
 		initializeWriters(relativeInput, annotatedContextWriters);
 
-		StreamingZipReader reader = new StreamingZipReader(path.toFile());
+		StreamingZipReader reader = new StreamingZipReader(inputZipFile.toFile());
 		reader.stream(Context.class).forEach((Context context) -> {
+			if (context == null) {
+				LOGGER.debug("Found a 'null' context");
+				return;
+			}
 
 			for (PointsToAnalysisFactory factory : this.factories) {
 				PointsToAnalysis pa = factory.create();
@@ -142,8 +139,6 @@ public class PointsToUsageGenerator {
 				} catch (Exception e) {
 					LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
 				}
-
-				usages.getOrDefault(factory, new ArrayList<>()).addAll(extractedUsages);
 			}
 		});
 
@@ -155,8 +150,6 @@ public class PointsToUsageGenerator {
 		for (UsageStore store : usageStores.values()) {
 			store.flush();
 		}
-
-		return usages;
 	}
 
 	private void initializeWriters(final Path relativeInput,

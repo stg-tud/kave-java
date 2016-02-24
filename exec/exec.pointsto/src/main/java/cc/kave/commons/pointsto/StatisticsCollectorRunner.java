@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto;
 
+import static cc.kave.commons.pointsto.evaluation.Logger.log;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -44,8 +46,12 @@ public class StatisticsCollectorRunner {
 				}
 
 				statisticsCollector = statisticsCollector.create();
+				log("Collecting %s...\n", dir.toString());
 
 				try (UsageStore usageStore = new ProjectUsageStore(dir)) {
+					int numTypes = usageStore.getAllTypes().size();
+					log("\tStore contains %d types\n", numTypes);
+					
 					for (ITypeName type : usageStore.getAllTypes()) {
 						List<Usage> usages = usageStore.load(type);
 						statisticsCollector.process(usages);
