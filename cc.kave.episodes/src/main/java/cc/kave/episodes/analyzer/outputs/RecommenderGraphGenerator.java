@@ -47,7 +47,7 @@ import cc.recommenders.io.Logger;
 
 public class RecommenderGraphGenerator {
 	
-	private static final int PROPOSALS = 1;
+	private static final int PROPOSALS = 3;
 
 	private ValidationContextsParser validationParser;
 	private EventMappingParser mappingParser;
@@ -90,50 +90,50 @@ public class RecommenderGraphGenerator {
 		Map<Integer, Set<Episode>> patterns = episodeParser.parse(5, 0.01);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		
-		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
 		
-		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
 		
+		Map<Integer, Set<Episode>> simPatterns = new HashMap<Integer, Set<Episode>>();
+		for (Map.Entry<Integer, Set<Episode>> entry : maxPatterns.entrySet()) {
+			Set<Episode> setPatterns = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+			simPatterns.put(entry.getKey(), setPatterns);
+		}
 		String directory = createDirectoryStructure();
 
 		int episodeID = 0;
 
 		for (Episode e : validationData) {
 			
-			if (e.getNumEvents() > 1) {
+			if (e.getNumEvents() > 2) {
 				int queryID = 0;
 				
-				System.out.println("Episode number = " + episodeID);
 				Set<Episode> queries = queryGenerator.generateQueries(e, 0.5);
 				
-				Logger.log("Removing transitivity closures");
 				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
-				Episode ep = wrap(simpEpisode);
+				Episode targetQuery = wrap(simpEpisode);
 				
-				Map<Integer, Set<Episode>> simPatterns = new HashMap<Integer, Set<Episode>>();
-				for (Map.Entry<Integer, Set<Episode>> entry : maxPatterns.entrySet()) {
-					Set<Episode> setPatterns = transitivityClosure.removeTransitivelyClosure(entry.getValue());
-					simPatterns.put(entry.getKey(), setPatterns);
-				}
-				
-				Logger.log("Writting episode number %s.\n", episodeID);
-				DirectedGraph<Fact, DefaultEdge> epGraph = graphConverter.convert(ep, eventMapping);
+				DirectedGraph<Fact, DefaultEdge> epGraph = graphConverter.convert(targetQuery, eventMapping);
 				writer.write(epGraph, getEpisodePath(directory, episodeID));
 				
 				for (Episode query : queries) {
-					DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(query, eventMapping);
-					writer.write(queryGraph, getQueryPath(directory, queryID));
+					Set<Episode> simpQuery = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(query));
+					DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(wrap(simpQuery), eventMapping);
+					writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
 					
 					int proposalID = 0;
 					
-					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, simPatterns, PROPOSALS);
+					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
+					Set<Double> probProposals = Sets.newLinkedHashSet();
 					for (Tuple<Episode, Double> tuple : proposals) {
-						DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(tuple.getFirst(), eventMapping);
-						writer.write(proposalGraph, getProposalPath(directory, queryID, proposalID));
+						probProposals.add(tuple.getSecond());
+						Set<Episode> proposal = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(tuple.getFirst()));
+						DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(wrap(proposal), eventMapping);
+						writer.write(proposalGraph, getProposalPath(directory, episodeID, queryID, proposalID));
 						proposalID++;
 					}
+					Logger.log("Episode = %d\tQuery = %d", episodeID, queryID);
+					System.out.println("Proposals: " + probProposals.toString());
 					queryID++;
 				}
 				episodeID++;
@@ -148,13 +148,17 @@ public class RecommenderGraphGenerator {
 		return null;
 	}
 
-	private String getQueryPath(String directory, int queryID) {
-		String fileName = directory + "/query" + queryID + "/query" + queryID + ".dot";
+	private String getQueryPath(String directory, int episodeID, int queryID) {
+		String queryFolder = directory + "/episode" + episodeID + "/query" + queryID + "/";
+		if (!(new File(queryFolder).isDirectory())) {
+			new File(queryFolder).mkdirs();
+		}
+		String fileName = directory + "/episode" + episodeID + "/query" + queryID + "/query" + queryID + ".dot";
 		return fileName;
 	}
 	
-	private String getProposalPath(String directory, int queryNumber, int proposalNumber) {
-		String fileName = directory + "/query" + queryNumber + "/query" + proposalNumber + ".dot";
+	private String getProposalPath(String directory, int episodeNumber, int queryNumber, int proposalNumber) {
+		String fileName = directory + "/episode" + episodeNumber + "/query" + queryNumber + "/proposal" + proposalNumber + ".dot";
 		return fileName;
 	}
 
@@ -167,11 +171,11 @@ public class RecommenderGraphGenerator {
 	}
 
 	private String getEpisodePath(String folderPath, int episodeNumber) throws Exception {
-		String typeFolder = folderPath + "/episode" + episodeNumber + "/";
-		if (!(new File(typeFolder).isDirectory())) {
-			new File(typeFolder).mkdirs();
+		String episodeFolder = folderPath + "/episode" + episodeNumber + "/";
+		if (!(new File(episodeFolder).isDirectory())) {
+			new File(episodeFolder).mkdirs();
 		}
-		String fileName = typeFolder + "/episode" + episodeNumber + ".dot";
+		String fileName = episodeFolder + "/episode" + episodeNumber + ".dot";
 
 		return fileName;
 	}

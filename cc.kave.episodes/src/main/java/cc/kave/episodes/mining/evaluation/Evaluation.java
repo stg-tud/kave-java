@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer.outputs;
+package cc.kave.episodes.mining.evaluation;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -28,7 +28,6 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
-import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;

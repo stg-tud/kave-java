@@ -66,7 +66,7 @@ public class EpisodeGraphGeneratorValidationData {
 
 	public void generateGraphs() throws Exception {
 		
-		Logger.setPrinting(true);
+		Logger.setPrinting(false);
 		
 		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse();
@@ -85,7 +85,6 @@ public class EpisodeGraphGeneratorValidationData {
 			Logger.log("Writting episode number %s.\n", graphIndex);
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
 			List<String> types = getAPIType(e, eventMapping);
-			System.out.println("In main:\tGraphIndex = " + graphIndex + "\ttypes = " + types.toString()); 
 			for (String t : types) {
 				writer.write(graph, getFilePath(directory, t, graphIndex));
 			}
