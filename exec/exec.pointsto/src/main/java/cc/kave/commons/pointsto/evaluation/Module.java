@@ -58,7 +58,7 @@ public class Module extends AbstractModule {
 
 	private void configCrossValidation() {
 		bind(int.class).annotatedWith(NumberOfCVFolds.class).toInstance(10);
-		bind(CrossValidationFoldBuilder.class).to(StratifiedMethodsCVFoldBuilder.class);
+		bind(CrossValidationFoldBuilder.class).to(ProjectCVFoldBuilder.class);
 	}
 
 	private void configOptions() {
@@ -77,6 +77,8 @@ public class Module extends AbstractModule {
 		mOpts.setAlgorithm(Algorithm.CANOPY);
 		mOpts.setT1(0.101);
 		mOpts.setT2(0.1);
+
+		mOpts.setFeatureDropping(true);
 		bind(MiningOptions.class).toInstance(mOpts);
 	}
 

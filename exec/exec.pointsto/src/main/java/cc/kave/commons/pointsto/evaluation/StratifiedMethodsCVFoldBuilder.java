@@ -13,13 +13,11 @@
 package cc.kave.commons.pointsto.evaluation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
@@ -35,15 +33,11 @@ import cc.recommenders.names.IMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Usage;
 
-public class StratifiedMethodsCVFoldBuilder implements CrossValidationFoldBuilder {
-
-	private int numFolds;
-	private RandomGenerator rndGenerator;
+public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 
 	@Inject
 	public StratifiedMethodsCVFoldBuilder(@NumberOfCVFolds int numFolds, RandomGenerator rndGenerator) {
-		this.numFolds = numFolds;
-		this.rndGenerator = rndGenerator;
+		super(numFolds, rndGenerator);
 	}
 
 	@Override
@@ -54,7 +48,7 @@ public class StratifiedMethodsCVFoldBuilder implements CrossValidationFoldBuilde
 		MethodRegistry registry = new MethodRegistry(Iterables.concat(projectUsages.values()), methods.size());
 
 		List<List<Usage>> folds = new ArrayList<>(numFolds);
-		int avgFoldSize = (int) (projectUsages.values().stream().mapToLong(usages -> usages.size()).sum() / numFolds);
+		int avgFoldSize = calcAvgFoldSize(projectUsages.values());
 		for (int f = 0; f < numFolds - 1; ++f) {
 			List<Usage> fold = new ArrayList<>(avgFoldSize);
 			folds.add(fold);
@@ -73,13 +67,6 @@ public class StratifiedMethodsCVFoldBuilder implements CrossValidationFoldBuilde
 		folds.add(registry.remaining());
 
 		return folds;
-	}
-
-	private void shuffleUsages(Iterable<List<Usage>> usageLists) {
-		Random rnd = new Random(rndGenerator.nextLong());
-		for (List<Usage> usages : usageLists) {
-			Collections.shuffle(usages, rnd);
-		}
 	}
 
 	private Map<IMethodName, Integer> countMethods(Iterable<Usage> usages) {

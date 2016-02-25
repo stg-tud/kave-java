@@ -42,7 +42,7 @@ public class CSVExporter implements ResultExporter {
 				writer.append(typeName);
 				writer.append(SEPARATOR);
 				writer.append(String.format(Locale.US, "%.3f", results.get(type)));
-				writer.append("\n");
+				writer.newLine();
 			}
 		}
 	}

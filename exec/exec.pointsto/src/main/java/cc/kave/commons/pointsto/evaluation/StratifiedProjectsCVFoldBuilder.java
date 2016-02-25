@@ -13,7 +13,6 @@
 package cc.kave.commons.pointsto.evaluation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +28,11 @@ import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.recommenders.usages.Usage;
 
-public class StratifiedProjectsCVFoldBuilder implements CrossValidationFoldBuilder {
-
-	private int numFolds;
-	private RandomGenerator rndGenerator;
+public class StratifiedProjectsCVFoldBuilder extends AbstractCVFoldBuilder {
 
 	@Inject
 	public StratifiedProjectsCVFoldBuilder(@NumberOfCVFolds int numFolds, RandomGenerator rndGenerator) {
-		this.numFolds = numFolds;
-		this.rndGenerator = rndGenerator;
+		super(numFolds, rndGenerator);
 	}
 
 	@Override
@@ -86,13 +81,6 @@ public class StratifiedProjectsCVFoldBuilder implements CrossValidationFoldBuild
 		Collections.shuffle(lastFold, new Random(rndGenerator.nextLong()));
 
 		return folds;
-	}
-
-	private void shuffleUsages(Collection<List<Usage>> projectUsages) {
-		Random rnd = new Random(rndGenerator.nextLong());
-		for (List<Usage> usages : projectUsages) {
-			Collections.shuffle(usages, rnd);
-		}
 	}
 
 }
