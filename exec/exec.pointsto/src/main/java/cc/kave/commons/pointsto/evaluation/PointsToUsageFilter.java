@@ -12,12 +12,20 @@
  */
 package cc.kave.commons.pointsto.evaluation;
 
+import java.util.Set;
 import java.util.function.Predicate;
 
+import com.google.common.collect.Sets;
+
 import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.Names;
 import cc.recommenders.usages.Usage;
 
 public class PointsToUsageFilter implements Predicate<Usage> {
+
+	private static final Set<String> PRIMITIVE_TYPE_NAMES = Sets.newHashSet("System.Byte", "System.SByte",
+			"System.Int32", "System.UInt32", "System.UInt64", "System.Int64", "System.Single", "System.Double",
+			"System.Decimal", "System.Char", "System.Boolean");
 
 	@Override
 	public boolean test(Usage usage) {
@@ -29,6 +37,10 @@ public class PointsToUsageFilter implements Predicate<Usage> {
 		}
 
 		if (usage.getReceiverCallsites().isEmpty()) {
+			return false;
+		}
+
+		if (PRIMITIVE_TYPE_NAMES.contains(Names.vm2srcQualifiedType(type))) {
 			return false;
 		}
 
