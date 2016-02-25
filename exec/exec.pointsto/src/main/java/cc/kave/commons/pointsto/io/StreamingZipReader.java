@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.io;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.utils.json.JsonUtils;
 
-public class StreamingZipReader {
+public class StreamingZipReader implements Closeable {
 
 	private final ZipFile zip;
 
@@ -55,5 +56,10 @@ public class StreamingZipReader {
 				return JsonUtils.fromJson(builder.toString(), targetType);
 			}
 		});
+	}
+
+	@Override
+	public void close() throws IOException {
+		zip.close();
 	}
 }

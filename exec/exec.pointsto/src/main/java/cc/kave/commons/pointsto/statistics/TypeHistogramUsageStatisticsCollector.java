@@ -43,9 +43,11 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	public void merge(UsageStatisticsCollector other) {
 		TypeHistogramUsageStatisticsCollector otherHistoCollector = (TypeHistogramUsageStatisticsCollector) other;
 
-		for (Map.Entry<ITypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
-			Integer oldCount = histrogram.getOrDefault(entry.getKey(), 0);
-			histrogram.put(entry.getKey(), oldCount + entry.getValue());
+		synchronized (histrogram) {
+			for (Map.Entry<ITypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
+				Integer oldCount = histrogram.getOrDefault(entry.getKey(), 0);
+				histrogram.put(entry.getKey(), oldCount + entry.getValue());
+			}
 		}
 	}
 

@@ -19,7 +19,9 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,52 +97,16 @@ public class PointsToUsageGenerator {
 	}
 
 	private void processZipFile(Path inputZipFile) throws IOException {
-		final PointsToUsageExtractor extractor = new PointsToUsageExtractor();
-
 		final Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters = new HashMap<>(factories.size());
 
 		// initialize writers for the annotated contexts to TARGET/FACTORY_NAME/RELATIVE_INPUT
 		final Path relativeInput = srcDir.relativize(inputZipFile);
 		initializeWriters(relativeInput, annotatedContextWriters);
 
-		StreamingZipReader reader = new StreamingZipReader(inputZipFile.toFile());
-		reader.stream(Context.class).forEach((Context context) -> {
-			if (context == null) {
-				LOGGER.debug("Found a 'null' context");
-				return;
-			}
-
-			for (PointsToAnalysisFactory factory : this.factories) {
-				PointsToAnalysis pa = factory.create();
-				PointsToContext ptContext = null;
-
-				// guard against exception in MethodName:getSignature()
-				try {
-					ptContext = pa.compute(context);
-				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException | NullPointerException
-						| ConcurrentModificationException | StackOverflowError ex) {
-					throw ex;
-				} catch (RuntimeException ex) {
-					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);
-					continue;
-				}
-
-				try {
-					writePointsToContext(ptContext, factory, annotatedContextWriters);
-				} catch (Exception e) {
-					LOGGER.error("Failed to serialize an annotated context from " + relativeInput.toString(), e);
-				}
-
-				extractor.setStatisticsCollector(statisticsCollectors.get(factory));
-				List<Usage> extractedUsages = extractor.extract(ptContext);
-				UsageStore usageStore = usageStores.get(factory);
-				try {
-					usageStore.store(extractedUsages, relativeInput);
-				} catch (Exception e) {
-					LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
-				}
-			}
-		});
+		try (StreamingZipReader reader = new StreamingZipReader(inputZipFile.toFile())) {
+			Stream<Context> contextStream = reader.stream(Context.class);
+			contextStream.forEach(new ContextConsumer(relativeInput, annotatedContextWriters));
+		}
 
 		// close writers
 		for (ZipArchive archive : annotatedContextWriters.values()) {
@@ -171,6 +137,62 @@ public class PointsToUsageGenerator {
 		if (archive != null) {
 			archive.store(ptCtxt, PointsToContext.class, JsonUtils::toJson);
 		}
+	}
+
+	private class ContextConsumer implements Consumer<Context> {
+
+		private Path relativeInput;
+		private Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters;
+
+		public ContextConsumer(Path relativeInput, Map<PointsToAnalysisFactory, ZipArchive> annotatedContextWriters) {
+			this.relativeInput = relativeInput;
+			this.annotatedContextWriters = annotatedContextWriters;
+		}
+
+		@Override
+		public void accept(Context context) {
+			if (context == null) {
+				LOGGER.debug("Found a 'null' context");
+				return;
+			}
+
+			PointsToUsageExtractor extractor = new PointsToUsageExtractor();
+
+			for (PointsToAnalysisFactory factory : factories) {
+				PointsToAnalysis pa = factory.create();
+				PointsToContext ptContext = null;
+
+				// guard against exception in MethodName:getSignature()
+				try {
+					ptContext = pa.compute(context);
+				} catch (UnexpectedSSTNodeException | AssertionException | ClassCastException | NullPointerException
+						| ConcurrentModificationException | StackOverflowError ex) {
+					throw ex;
+				} catch (RuntimeException ex) {
+					LOGGER.error("Failed to compute pointer analysis " + factory.getName(), ex);
+					continue;
+				}
+
+				try {
+					writePointsToContext(ptContext, factory, annotatedContextWriters);
+				} catch (Exception e) {
+					LOGGER.error("Failed to serialize an annotated context from " + relativeInput.toString(), e);
+				}
+
+				UsageStatisticsCollector statsCollector = statisticsCollectors.get(factory).create();
+				extractor.setStatisticsCollector(statsCollector);
+				List<Usage> extractedUsages = extractor.extract(ptContext);
+				statisticsCollectors.get(factory).merge(statsCollector);
+
+				UsageStore usageStore = usageStores.get(factory);
+				try {
+					usageStore.store(extractedUsages, relativeInput);
+				} catch (Exception e) {
+					LOGGER.error("Failed to serialize an extracted usage from " + relativeInput.toString(), e);
+				}
+			}
+		}
+
 	}
 
 }

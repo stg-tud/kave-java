@@ -53,18 +53,21 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 	@Override
 	public void merge(UsageStatisticsCollector other) {
 		TypeStatisticsCollector otherTypeCollector = (TypeStatisticsCollector) other;
-		for (Map.Entry<ITypeName, Statistics> entry : otherTypeCollector.typeStatistics.entrySet()) {
-			Statistics otherStats = entry.getValue();
-			Statistics myStats = typeStatistics.get(entry.getKey());
-			if (myStats == null) {
-				myStats = new Statistics();
-				typeStatistics.put(entry.getKey(), myStats);
-			}
 
-			myStats.numUsages += otherStats.numUsages;
-			myStats.numFilteredUsages = otherStats.numFilteredUsages;
-			myStats.sumCallsites += otherStats.sumCallsites;
-			myStats.sumFilteredCallsites += otherStats.sumFilteredCallsites;
+		synchronized (typeStatistics) {
+			for (Map.Entry<ITypeName, Statistics> entry : otherTypeCollector.typeStatistics.entrySet()) {
+				Statistics otherStats = entry.getValue();
+				Statistics myStats = typeStatistics.get(entry.getKey());
+				if (myStats == null) {
+					myStats = new Statistics();
+					typeStatistics.put(entry.getKey(), myStats);
+				}
+
+				myStats.numUsages += otherStats.numUsages;
+				myStats.numFilteredUsages = otherStats.numFilteredUsages;
+				myStats.sumCallsites += otherStats.sumCallsites;
+				myStats.sumFilteredCallsites += otherStats.sumFilteredCallsites;
+			}
 		}
 	}
 
