@@ -24,8 +24,8 @@ import cc.recommenders.usages.Usage;
 public class PointsToUsageFilter implements Predicate<Usage> {
 
 	private static final Set<String> PRIMITIVE_TYPE_NAMES = Sets.newHashSet("System.Byte", "System.SByte",
-			"System.Int32", "System.UInt32", "System.UInt64", "System.Int64", "System.Single", "System.Double",
-			"System.Decimal", "System.Char", "System.Boolean");
+			"System.Int16", "System.UInt16", "System.Int32", "System.UInt32", "System.UInt64", "System.Int64",
+			"System.Single", "System.Double", "System.Decimal", "System.Char", "System.Boolean");
 
 	@Override
 	public boolean test(Usage usage) {
