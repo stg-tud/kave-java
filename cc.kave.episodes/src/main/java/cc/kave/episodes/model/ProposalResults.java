@@ -15,37 +15,39 @@
  */
 package cc.kave.episodes.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import cc.kave.commons.model.episodes.Fact;
+
 public class ProposalResults {
 
-	private int targetNo;
-	private List<Double> results = new LinkedList<Double>();
+	private Episode target = new Episode();
+	Map<Double, Double> results = new HashMap<Double, Double>();
 	
-	public int getTargetNo() {
-		return this.targetNo;
+	public Episode getTarget() {
+		return this.target;
 	}
 	
-	public void setTargetNo(int targetNo) {
-		this.targetNo = targetNo;
+	public void setTarget(Episode ep) {
+		this.target.setFrequency(ep.getFrequency());
+		
+		for (Fact fact : ep.getFacts()) {
+			this.target.addFact(fact);
+		}
 	}
 	
-	public List<Double> getAllResults() {
+	public Map<Double, Double> getResults() {
 		return this.results;
 	}
 	
-	public double getResult(int proposal) {
-		return this.results.get(proposal);
-	}
-	
-	public void setResult(double result) {
-		this.results.add(result);
+	public void addResult(double qp, double tp) {
+		this.results.put(qp, tp);
 	}
 	
 	@Override
@@ -64,16 +66,14 @@ public class ProposalResults {
 	}
 	
 	public boolean equals(ProposalResults ps) {
-		if (this.targetNo != ps.targetNo) {
+		if (!this.target.equals(ps.target)) {
 			return false;
 		}
 		if (this.results.size() != ps.results.size()) {
 			return false;
 		}
-		for (int ind = 0; ind < this.results.size(); ind++) {
-			if (this.results.get(ind) != ps.getResult(ind)) {
-				return false;
-			}
+		if (!this.results.equals(ps.getResults())) {
+			return false;
 		}
 		return true;
 	}

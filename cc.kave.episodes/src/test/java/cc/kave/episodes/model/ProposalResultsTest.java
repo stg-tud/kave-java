@@ -21,8 +21,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,31 +38,36 @@ public class ProposalResultsTest {
 	
 	@Test
 	public void defaultValues() {
-		assertTrue(sut.getTargetNo() == 0);
-		assertTrue(sut.getAllResults().isEmpty());
+		assertTrue(sut.getTarget().equals(new Episode()));
+		assertTrue(sut.getResults().equals(new HashMap<Double, Double>()));
 	}
 	
 	@Test
 	public void valuesCanBeSet() {
-		sut.setTargetNo(1);;
-		assertEquals(1, sut.getTargetNo());
+		sut.setTarget(createEpisode(2, "11", "12", "11>12"));
+		assertEquals(createEpisode(2, "11", "12", "11>12"), sut.getTarget());
 		
-		sut.setResult(0.8);
-		sut.setResult(0.5);
-		sut.setResult(0.3);
+		sut.addResult(0.8, 0.7);
+		sut.addResult(0.5, 0.4);
+		sut.addResult(0.3, 0.2);
 		
-		List<Double> expected = new LinkedList<Double>();
-		expected.add(0.8);
-		expected.add(0.5);
-		expected.add(0.3);
+		Map<Double, Double> expected = new HashMap<Double, Double>();
+		expected.put(0.8, 0.7);
+		expected.put(0.5, 0.4);
+		expected.put(0.3, 0.2);
 		
-		assertEquals(expected, sut.getAllResults());
+		assertEquals(expected, sut.getResults());
 	}
 	
 	@Test
 	public void equality_default() {
 		ProposalResults a = new ProposalResults();
+		a.setTarget(new Episode());
+		a.addResult(0.0, 0.0);
+		
 		ProposalResults b = new ProposalResults();
+		b.setTarget(new Episode());
+		b.addResult(0.0, 0.0);
 		
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
@@ -72,55 +77,60 @@ public class ProposalResultsTest {
 	@Test
 	public void equality_reallyTheSame() {
 		ProposalResults a = new ProposalResults();
-		a.setTargetNo(2);
-		a.setResult(0.7);
-		a.setResult(0.4);
-		a.setResult(0.2);
+		a.setTarget(createEpisode(2, "11", "12", "11>12"));
+		a.addResult(0.9, 0.7);
+		a.addResult(0.6, 0.4);
+		a.addResult(0.4, 0.2);
 		
 		ProposalResults b = new ProposalResults();
-		b.setTargetNo(2);
-		b.setResult(0.7);
-		b.setResult(0.4);
-		b.setResult(0.2);
+		b.setTarget(createEpisode(2, "11", "12", "11>12"));
+		b.addResult(0.9, 0.7);
+		b.addResult(0.6, 0.4);
+		b.addResult(0.4, 0.2);
 		
-		assertEquals(a, b);
+		assertTrue(a.equals(b));
 	}
 	
 	@Test
 	public void diffResults() {
 		ProposalResults a = new ProposalResults();
-		a.setTargetNo(2);
-		a.setResult(0.8);
-		a.setResult(0.5);
-		a.setResult(0.3);
+		a.setTarget(createEpisode(2, "11", "12", "11>12"));
+		a.addResult(0.9, 0.7);
+		a.addResult(0.6, 0.4);
+		a.addResult(0.4, 0.2);
 		
 		ProposalResults b = new ProposalResults();
-		b.setTargetNo(2);
-		b.setResult(0.7);
-		b.setResult(0.4);
-		b.setResult(0.2);
+		b.setTarget(createEpisode(2, "11", "12", "11>12"));
+		b.addResult(0.9, 0.5);
+		b.addResult(0.5, 0.4);
+		b.addResult(0.3, 0.2);
 		
 		assertNotEquals(a, b);
-		assertTrue(a.getTargetNo() == b.getTargetNo());
-		assertNotEquals(a.getAllResults(), b.getAllResults());
+		assertFalse(a.equals(b));
 	}
 	
 	@Test
 	public void diffTargets() {
 		ProposalResults a = new ProposalResults();
-		a.setTargetNo(1);
-		a.setResult(0.7);
-		a.setResult(0.4);
-		a.setResult(0.2);
+		a.setTarget(createEpisode(2, "11", "12", "11>12"));
+		a.addResult(0.9, 0.7);
+		a.addResult(0.6, 0.4);
+		a.addResult(0.4, 0.2);
 		
 		ProposalResults b = new ProposalResults();
-		b.setTargetNo(2);
-		b.setResult(0.7);
-		b.setResult(0.4);
-		b.setResult(0.2);
+		b.setTarget(createEpisode(2, "11", "13", "11>13"));
+		b.addResult(0.9, 0.7);
+		b.addResult(0.6, 0.4);
+		b.addResult(0.4, 0.2);
 		
 		assertNotEquals(a, b);
-		assertFalse(a.getTargetNo() == b.getTargetNo());
-		assertEquals(a.getAllResults(), b.getAllResults());
+		assertFalse(a.equals(b));
+	}
+	
+	private Episode createEpisode(int freq, String...strings) {
+		Episode episode = new Episode();
+		episode.setFrequency(freq);
+		episode.addStringsOfFacts(strings);
+		return episode;
 	}
 }
