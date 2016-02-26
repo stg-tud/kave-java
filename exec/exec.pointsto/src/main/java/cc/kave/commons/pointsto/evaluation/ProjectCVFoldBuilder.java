@@ -35,8 +35,6 @@ public class ProjectCVFoldBuilder extends AbstractCVFoldBuilder {
 
 	@Override
 	public List<List<Usage>> createFolds(Map<ProjectIdentifier, List<Usage>> projectUsages) {
-		shuffleUsages(projectUsages.values());
-
 		List<ProjectIdentifier> projects = new ArrayList<>(projectUsages.keySet());
 		// sort projects in ascending order according to the number of usages
 		projects.sort(new Comparator<ProjectIdentifier>() {

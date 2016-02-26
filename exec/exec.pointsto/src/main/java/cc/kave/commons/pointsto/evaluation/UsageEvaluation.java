@@ -145,7 +145,7 @@ public class UsageEvaluation {
 		if (exportFile != null) {
 			INJECTOR.getInstance(ResultExporter.class).export(exportFile, evaluation.getResults());
 		}
-		
+
 		return evaluation;
 	}
 

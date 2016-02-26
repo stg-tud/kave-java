@@ -15,8 +15,11 @@ package cc.kave.commons.pointsto.stores;
 import static com.google.common.io.Files.getNameWithoutExtension;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,11 +30,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
@@ -42,17 +47,66 @@ import cc.recommenders.utils.gson.GsonUtil;
 
 public class ProjectUsageStore implements UsageStore {
 
+	private static final String CACHE_FILENAME = "cache.dat";
+
 	private Path baseDir;
 
 	private Map<Path, ProjectStore> projectDirToStore = Collections.synchronizedMap(new HashMap<>());
 
+	private boolean cacheInvalidated;
+
 	public ProjectUsageStore(Path baseDir) throws IOException {
 		this.baseDir = baseDir;
-
 		Files.createDirectories(baseDir);
-		Set<Path> projectDirs = ProjectStore.getProjectDirs(baseDir);
-		for (Path projectDir : projectDirs) {
-			projectDirToStore.put(projectDir, new ProjectStore(projectDir));
+
+		if (!loadCache()) {
+			// manually load projects
+			Set<Path> projectDirs = ProjectStore.getProjectDirs(baseDir);
+			for (Path projectDir : projectDirs) {
+				projectDirToStore.put(projectDir, new ProjectStore(projectDir));
+			}
+
+			invalidateCache();
+		}
+
+	}
+
+	private boolean loadCache() throws IOException {
+		Path cacheFile = baseDir.resolve(CACHE_FILENAME);
+		if (!Files.exists(cacheFile)) {
+			return false;
+		}
+
+		try (Stream<String> lines = Files.lines(cacheFile, StandardCharsets.UTF_8)) {
+			projectDirToStore
+					.putAll(lines.parallel().map(line -> Paths.get(line)).collect(Collectors.toMap(p -> p, p -> {
+						try {
+							return new ProjectStore(p);
+						} catch (IOException e) {
+							throw new UncheckedIOException(e);
+						}
+					})));
+
+			return true;
+		} catch (UncheckedIOException e) {
+			throw e.getCause();
+		}
+	}
+
+	private void storeCache() throws IOException {
+		Path cacheFile = baseDir.resolve(CACHE_FILENAME);
+
+		try (Stream<String> lines = projectDirToStore.keySet().stream().map(p -> p.toString())) {
+			Files.write(cacheFile, (Iterable<String>) lines::iterator, StandardCharsets.UTF_8);
+		}
+		cacheInvalidated = false;
+	}
+
+	private void invalidateCache() throws IOException {
+		cacheInvalidated = true;
+		Path cacheFile = baseDir.resolve(CACHE_FILENAME);
+		if (Files.exists(cacheFile)) {
+			Files.delete(cacheFile);
 		}
 	}
 
@@ -75,8 +129,17 @@ public class ProjectUsageStore implements UsageStore {
 		return store;
 	}
 
+	public void store(Collection<Usage> usages, ProjectIdentifier project) throws IOException {
+		invalidateCache();
+
+		ProjectStore store = getProjectStore(project.getProjectDirectory());
+		store.store(usages, null);
+	}
+
 	@Override
 	public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
+		invalidateCache();
+
 		Path projectDir = getProjectDir(relativeInput);
 		ProjectStore store = getProjectStore(projectDir);
 
@@ -175,6 +238,11 @@ public class ProjectUsageStore implements UsageStore {
 			for (ProjectStore store : projectDirToStore.values()) {
 				store.close();
 			}
+
+			if (cacheInvalidated) {
+				storeCache();
+			}
+
 			projectDirToStore.clear();
 		}
 	}
@@ -189,13 +257,54 @@ public class ProjectUsageStore implements UsageStore {
 		private Multimap<ITypeName, Path> typeToZipFiles = Multimaps.synchronizedMultimap(HashMultimap.create());
 		private Map<Path, ZipArchive> openArchives = Collections.synchronizedMap(new HashMap<>());
 
+		private boolean cacheInvalidated;
+
 		public ProjectStore(Path projectDir) throws IOException {
 			this.projectDir = projectDir;
 			if (!Files.exists(projectDir)) {
 				Files.createDirectories(projectDir);
 			}
 
-			loadTypes();
+			if (!loadCache()) {
+				loadTypes();
+				invalidateCache();
+			}
+		}
+
+		private boolean loadCache() throws IOException {
+			Path cacheFile = projectDir.resolve(CACHE_FILENAME);
+			if (!Files.exists(cacheFile)) {
+				return false;
+			}
+
+			Map<ITypeName, Collection<String>> typeFiles = GsonUtil.deserialize(cacheFile.toFile(),
+					new TypeToken<Map<ITypeName, Collection<String>>>() {
+						private static final long serialVersionUID = 1L;
+					}.getType());
+			for (Map.Entry<ITypeName, Collection<String>> typeFile : typeFiles.entrySet()) {
+				for (String file : typeFile.getValue()) {
+					typeToZipFiles.put(typeFile.getKey(), Paths.get(file));
+				}
+			}
+
+			return true;
+		}
+
+		private void storeCache() throws IOException {
+			Multimap<ITypeName, String> typeFiles = HashMultimap.create(typeToZipFiles.keys().size(), 1);
+			for (Map.Entry<ITypeName, Path> typeFile : typeToZipFiles.entries()) {
+				typeFiles.put(typeFile.getKey(), typeFile.getValue().toString());
+			}
+			GsonUtil.serialize(typeFiles.asMap(), projectDir.resolve(CACHE_FILENAME).toFile());
+			cacheInvalidated = false;
+		}
+
+		private void invalidateCache() throws IOException {
+			cacheInvalidated = true;
+			Path cacheFile = projectDir.resolve(CACHE_FILENAME);
+			if (Files.exists(cacheFile)) {
+				Files.delete(cacheFile);
+			}
 		}
 
 		private static Set<Path> getProjectDirs(Path basePath) throws IOException {
@@ -267,6 +376,7 @@ public class ProjectUsageStore implements UsageStore {
 
 		@Override
 		public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
+			invalidateCache();
 			Multimap<ITypeName, Usage> typeToUsages = ArrayListMultimap.create(); // keep duplicate key-value pairs
 
 			for (Usage usage : usages) {
@@ -299,21 +409,6 @@ public class ProjectUsageStore implements UsageStore {
 			}
 
 			return count;
-		}
-
-		public Map<ITypeName, Integer> getNumberOfUsages() throws IOException {
-			Map<ITypeName, Integer> counts = new HashMap<>(typeToZipFiles.keySet().size());
-
-			synchronized (typeToZipFiles) {
-				for (Map.Entry<ITypeName, Path> entry : typeToZipFiles.entries()) {
-					ITypeName type = entry.getKey();
-					ZipArchive archive = getArchive(entry.getValue());
-					Integer count = counts.getOrDefault(type, 0) + archive.countFiles();
-					counts.put(type, count);
-				}
-			}
-
-			return counts;
 		}
 
 		@Override
@@ -349,6 +444,11 @@ public class ProjectUsageStore implements UsageStore {
 		@Override
 		public void close() throws IOException {
 			flush();
+
+			if (cacheInvalidated) {
+				storeCache();
+			}
+
 			typeToZipFiles.clear();
 		}
 
