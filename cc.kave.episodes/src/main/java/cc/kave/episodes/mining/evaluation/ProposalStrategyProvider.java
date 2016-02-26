@@ -54,6 +54,10 @@ public class ProposalStrategyProvider {
 	
 	private Map<Integer, Averager> avgQueryProposal = new HashMap<Integer, Averager>();
 	private Map<Integer, Averager> avgTargetProposal = new HashMap<Integer, Averager>();
+	
+	private Map<Integer, Double> resultsQP = new HashMap<Integer, Double>();
+	private Map<Integer, Double> resultsTP = new HashMap<Integer, Double>();
+	
 	private DecimalFormat df = new DecimalFormat("0.00"); 
 
 	@Inject
