@@ -82,7 +82,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private List<Event> events;
 	private Map<Integer, Set<Episode>> episodes;
 	private File folderStructure;
-	
+
 	private TrainingDataGraphGenerator sut;
 
 	@Before
@@ -94,10 +94,10 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		transitivityClosure = new TransitivelyClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
 		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationSpecificAPI("M1"),
-				eventMethodDeclSpecificAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"), 
+				eventMethodDeclSpecificAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
-		
+
 		sut = new TrainingDataGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser,
 				transitivityClosure, writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
@@ -140,7 +140,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	public void patternsStored() throws Exception {
 
 		sut.generateGraphs(FREQ, BD);
-		
+
 		verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse();
 
@@ -167,7 +167,8 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		for (Fact fact : e.getFacts()) {
 			if (!fact.isRelation()) {
 				int factID = fact.getFactID();
-				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".", "/");
+				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".",
+						"/");
 				if (!types.contains(type)) {
 					types.add(type);
 				}
@@ -180,8 +181,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		Map<Integer, Set<Episode>> episodes = new HashMap<Integer, Set<Episode>>();
 		episodes.put(1, Sets.newHashSet(newEpisode("1"), newEpisode("2"), newEpisode("3")));
 		episodes.put(2, Sets.newHashSet(newEpisode("4", "5"), newEpisode("3", "4")));
-		episodes.put(3,
-				Sets.newHashSet(newEpisode("1", "3", "5"), newEpisode("2", "3", "5")));
+		episodes.put(3, Sets.newHashSet(newEpisode("1", "3", "5"), newEpisode("2", "3", "5")));
 		episodes.put(4, Sets.newHashSet(newEpisode("1", "2", "3", "6")));
 		return episodes;
 	}
@@ -197,7 +197,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 					Fact fact2 = new Fact(facts[idx2]);
 					episode.addFact(new Fact(fact1, fact2));
 				}
-			} 
+			}
 		}
 		return episode;
 	}

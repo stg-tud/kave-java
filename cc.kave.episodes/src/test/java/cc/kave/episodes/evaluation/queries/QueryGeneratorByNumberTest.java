@@ -16,18 +16,18 @@ public class QueryGeneratorByNumberTest {
 
 	private QueryTarget queryTarget = new QueryTarget();
 	private QueryGeneratorByNumber sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new QueryGeneratorByNumber();
 	}
-	
+
 	@Ignore
 	@Test
 	public void emptyEpisode() {
 		Map<Integer, List<Query>> expected = new HashMap<Integer, List<Query>>();
 		Map<Integer, List<Query>> actuals = sut.generateQueries(queryTarget, 5);
-		
+
 		Assert.assertEquals(expected, actuals);
 	}
 }

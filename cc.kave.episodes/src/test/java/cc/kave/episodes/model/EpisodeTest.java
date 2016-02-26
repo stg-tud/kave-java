@@ -37,29 +37,31 @@ public class EpisodeTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private Episode sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new Episode();
 	}
-	
+
 	@Test
 	public void freqIsPositive() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Frequency cannot be a negative value!");
-		sut.setFrequency(-1);;;
+		sut.setFrequency(-1);
+		;
+		;
 	}
-	
+
 	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getFrequency());
 		assertEquals(0, sut.getNumFacts());
-		
+
 		assertEquals(Sets.newHashSet(), sut.getFacts());
 	}
-	
+
 	@Test
 	public void valuesCanBeSet() {
 		sut.setFrequency(3);
@@ -69,7 +71,7 @@ public class EpisodeTest {
 		assertEquals(1, sut.getNumEvents());
 		assertEquals(1, sut.getNumFacts());
 	}
-	
+
 	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("f", "g", "f>g");
@@ -77,35 +79,35 @@ public class EpisodeTest {
 		assertEquals(sut.getNumEvents(), 2);
 		assertEquals(sut.getNumFacts(), 3);
 	}
-	
+
 	@Test
 	public void addFactTest() {
 		Fact fact = new Fact("f");
 		sut.addFact(fact);
 		sut.setFrequency(3);
-		
+
 		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
 		assertEquals(1, sut.getNumEvents());
 		assertEquals(1, sut.getNumFacts());
 		assertEquals(3, sut.getFrequency());
-	} 
-	
+	}
+
 	@Test
 	public void addListOfFactTest() {
 		List<Fact> facts = new LinkedList<Fact>();
 		facts.add(new Fact("f"));
 		facts.add(new Fact("g"));
 		facts.add(new Fact("f>g"));
-		
+
 		sut.addListOfFacts(facts);
 		sut.setFrequency(3);
-		
+
 		assertEquals(Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g")), sut.getFacts());
 		assertEquals(2, sut.getNumEvents());
 		assertEquals(3, sut.getNumFacts());
 		assertEquals(3, sut.getFrequency());
 	}
-	
+
 	@Test
 	public void equality_default() {
 		Episode a = new Episode();
@@ -114,7 +116,7 @@ public class EpisodeTest {
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
 	}
-	
+
 	@Test
 	public void equality_reallyTheSame() {
 		Episode a = new Episode();
@@ -128,13 +130,13 @@ public class EpisodeTest {
 		assertEquals(a, b);
 		assertTrue(a.equals(b));
 		assertEquals(a.hashCode(), b.hashCode());
-		
+
 		assertEquals(a.getFrequency(), b.getFrequency());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
 	}
-	
+
 	@Test
 	public void equality_diffEvents() {
 		Episode a = new Episode();
@@ -148,13 +150,13 @@ public class EpisodeTest {
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
-		
+
 		assertEquals(a.getFrequency(), b.getFrequency());
 		assertNotEquals(a.getNumEvents(), b.getNumEvents());
 		assertNotEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());
 	}
-	
+
 	@Test
 	public void equality_sameEventsDiffRelations() {
 		Episode a = new Episode();
@@ -168,13 +170,13 @@ public class EpisodeTest {
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
-		
+
 		assertEquals(a.getFrequency(), b.getFrequency());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());
 	}
-	
+
 	@Test
 	public void diffFreq() {
 		Episode a = new Episode();
@@ -188,13 +190,13 @@ public class EpisodeTest {
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());
-		
+
 		assertNotEquals(a.getFrequency(), b.getFrequency());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
 	}
-	
+
 	@Test
 	public void containFactTest() {
 		sut.addStringsOfFacts("1", "2", "1>2");

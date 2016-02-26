@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.episodes.mining.reader.FileReader;
 import cc.recommenders.exceptions.AssertionException;
 
 public class FileReaderTest {

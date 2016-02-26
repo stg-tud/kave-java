@@ -61,25 +61,25 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private String tmpFolderName;
-	
+
 	@Mock
 	private ValidationContextsParser contextParser;
 	@Mock
 	private EventMappingParser mappingParser;
 	@Mock
 	private Directory episodeDirectory;
-	
+
 	private EpisodeToGraphConverter graphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
 	private Set<Episode> episodes;
 	private File folderStructure;
-	
+
 	private ValidationDataGraphGenerator sut;
-	
+
 	@Before
 	public void setup() throws ZipException, IOException {
 		initMocks(this);
@@ -88,19 +88,19 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		transitivityClosure = new TransitivelyClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
 		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationGeneralAPI("M1"),
-				eventMethodDeclGeneralAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"), 
+				eventMethodDeclGeneralAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
-		
-		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, mappingParser,
-				transitivityClosure, writer, graphConverter);
+
+		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, mappingParser, transitivityClosure,
+				writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/ValidationData/");
 
 		when(mappingParser.parse()).thenReturn(events);
 		when(contextParser.parse(eq(events))).thenReturn(episodes);
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
@@ -108,16 +108,16 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		sut = new ValidationDataGraphGenerator(new File("does not exist"), contextParser, mappingParser,
 				transitivityClosure, writer, graphConverter);
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Validation data folder is not a folder, but a file");
-		sut = new ValidationDataGraphGenerator(file, contextParser, mappingParser,
-				transitivityClosure, writer, graphConverter);
+		sut = new ValidationDataGraphGenerator(file, contextParser, mappingParser, transitivityClosure, writer,
+				graphConverter);
 	}
-	
+
 	@Test
 	public void structureIsCreated() throws Exception {
 
@@ -129,12 +129,12 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		verify(mappingParser).parse();
 		verify(contextParser).parse(events);
 	}
-	
+
 	@Test
 	public void validationGraphStored() throws Exception {
 
 		sut.generateGraphs();
-		
+
 		verify(mappingParser).parse();
 		verify(contextParser).parse(events);
 
@@ -151,7 +151,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 			epCounter++;
 		}
 	}
-	
+
 	private List<Event> createMapping(Event... events) {
 		List<Event> eventMapping = Lists.newArrayList(events);
 		return eventMapping;
@@ -184,7 +184,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		e.setMethod(methodSpecificAPI(method));
 		return e;
 	}
-	
+
 	private static IMethodName methodGeneralAPI(String name) {
 		ITypeName declType = typeGeneralAPI("T");
 		ITypeName retType = typeGeneralAPI("R");
@@ -206,7 +206,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	private static ITypeName typeSpecificAPI(String name) {
 		return TypeName.newTypeName("some.namespace." + name + ", P");
 	}
-	
+
 	private Set<Episode> createEpisodes() {
 		Set<Episode> episodes = Sets.newHashSet();
 		episodes.add(newEpisode("1"));
@@ -220,7 +220,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 
 		return episodes;
 	}
-	
+
 	private Episode newEpisode(String... facts) {
 		Episode episode = new Episode();
 		episode.setFrequency(3);
@@ -232,17 +232,18 @@ public class EpisodeGraphGeneratorValidationDataTest {
 					Fact fact2 = new Fact(facts[idx2]);
 					episode.addFact(new Fact(fact1, fact2));
 				}
-			} 
+			}
 		}
 		return episode;
 	}
-	
+
 	private List<String> getTypes(Episode e, List<Event> events) {
 		List<String> types = new LinkedList<String>();
 		for (Fact fact : e.getFacts()) {
 			if (!fact.isRelation()) {
 				int factID = fact.getFactID();
-				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".", "/");
+				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".",
+						"/");
 				if (!types.contains(type)) {
 					types.add(type);
 				}

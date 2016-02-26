@@ -51,7 +51,7 @@ public class ValidationContextsParser {
 		for (String zip : findZips()) {
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
 
-			int i = 0;
+//			int i = 0;
 			int counter = 0;
 
 			while (ra.hasNext()) {
@@ -72,11 +72,11 @@ public class ValidationContextsParser {
 					validationData.add(qt);
 				}
 
-				if (i++ > 10) {
-					Logger.log("\t... (skipping the rest)");
-					ra.close();
-					return validationData;
-				}
+//				if (i++ > 10) {
+//					Logger.log("\t... (skipping the rest)");
+//					ra.close();
+//					return validationData;
+//				}
 			}
 			ra.close();
 		}

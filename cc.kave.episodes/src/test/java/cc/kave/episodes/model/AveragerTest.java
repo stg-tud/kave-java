@@ -32,59 +32,59 @@ public class AveragerTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private Averager sut;
-	
-	@Before 
+
+	@Before
 	public void setup() {
 		sut = new Averager();
 	}
-	
+
 	@Test
 	public void valueTest() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Enter a proper similarity value, between 0 and 1!");
 		sut.addValue(2.0);
 	}
-	
+
 	@Test
 	public void value2Test() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Enter a proper similarity value, between 0 and 1!");
 		sut.addValue(-2.0);
 	}
-	
+
 	@Test
 	public void addValues() {
 		sut.addValue(0.7);
 		sut.addValue(0.3);
 		sut.addValue(0.5);
-		
+
 		List<Double> expected = new LinkedList<Double>();
 		expected.add(0.7);
 		expected.add(0.3);
 		expected.add(0.5);
-		
+
 		assertEquals(expected, sut.getValues());
 	}
-	
+
 	@Test
 	public void clearAverager() {
 		sut.addValue(0.7);
 		sut.addValue(0.3);
 		sut.addValue(0.5);
-		
+
 		assertTrue(sut.clear().isEmpty());
 	}
-	
+
 	@Test
 	public void average() {
 		sut.addValue(0.7);
 		sut.addValue(0.3);
 		sut.addValue(0.5);
-		
+
 		double expected = 0.5;
-		
+
 		assertTrue(expected == sut.average());
 	}
 }

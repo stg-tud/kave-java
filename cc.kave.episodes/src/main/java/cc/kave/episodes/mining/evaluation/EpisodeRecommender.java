@@ -71,7 +71,7 @@ public class EpisodeRecommender {
 		return true;
 	}
 
-	private double calcF1(Episode query, Episode episode) {
+	public double calcF1(Episode query, Episode episode) {
 		Set<Fact> factsQuery = separator.getEpisodeBody(query);
 		
 		Measure m = Measure.newMeasure(factsQuery, episode.getFacts());

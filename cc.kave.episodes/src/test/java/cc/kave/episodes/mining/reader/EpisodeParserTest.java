@@ -40,7 +40,7 @@ public class EpisodeParserTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private static final int FREQ = 2;
 	private static final double BD = 0.1;
 
@@ -52,10 +52,10 @@ public class EpisodeParserTest {
 	@Before
 	public void setup() {
 		reader = mock(FileReader.class);
-		
+
 		expected = new HashMap<Integer, Set<Episode>>();
 		episodes = Sets.newHashSet();
-		
+
 		sut = new EpisodeParser(rootFolder.getRoot(), reader);
 	}
 
@@ -181,7 +181,7 @@ public class EpisodeParserTest {
 		assertEquals(expected, actual);
 	}
 
-	private Episode createEpisode(int freq, int numberOfExistenceFacts, String...strings) {
+	private Episode createEpisode(int freq, int numberOfExistenceFacts, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
 		for (String fact : strings) {

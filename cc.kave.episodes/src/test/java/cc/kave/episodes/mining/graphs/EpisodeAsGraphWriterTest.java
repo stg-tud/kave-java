@@ -41,19 +41,19 @@ public class EpisodeAsGraphWriterTest {
 	@Before
 	public void setup() {
 		sut = new EpisodeAsGraphWriter();
-		
+
 		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
-		
+
 		Fact f1 = new Fact("1");
 		Fact f2 = new Fact("2");
 		Fact f3 = new Fact("3");
 		Fact f4 = new Fact("4");
-		
+
 		graph.addVertex(f1);
 		graph.addVertex(f2);
 		graph.addVertex(f3);
 		graph.addVertex(f4);
-		
+
 		graph.addEdge(f1, f2);
 		graph.addEdge(f1, f3);
 		graph.addEdge(f1, f4);
@@ -70,7 +70,7 @@ public class EpisodeAsGraphWriterTest {
 		assertTrue(file.exists());
 		file.delete();
 	}
-	
+
 	private String getFilePath(int index) {
 		String dirPath = rootFolder.getRoot().getAbsolutePath() + "/graphs/";
 		new File(dirPath).mkdirs();

@@ -32,10 +32,10 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
 public class EpisodeRecommenderTest {
-	
+
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private DecimalFormat df = new DecimalFormat("#.###");
 
 	private Set<Tuple<Episode, Double>> expectedProposals;
@@ -54,7 +54,8 @@ public class EpisodeRecommenderTest {
 		learnedPatterns = new HashMap<Integer, Set<Episode>>();
 		learnedPatterns.put(1, Sets.newHashSet(newPattern(2, "1"), newPattern(1, "2"), newPattern(3, "3")));
 		learnedPatterns.put(2, Sets.newHashSet(newPattern(3, "4", "5", "4>5"), newPattern(2, "4", "6", "4>6")));
-		learnedPatterns.put(3, Sets.newHashSet(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), newPattern(3, "10", "11", "12", "10>11", "10>12", "11>12")));
+		learnedPatterns.put(3, Sets.newHashSet(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"),
+				newPattern(3, "10", "11", "12", "10>11", "10>12", "11>12")));
 		learnedPatterns.put(4, Sets.newHashSet(newPattern(2, "10", "11", "12", "13", "10>11", "10>12", "10>13")));
 	}
 
@@ -64,42 +65,43 @@ public class EpisodeRecommenderTest {
 		thrown.expectMessage("Input a valid query!");
 		sut.calculateProposals(new Episode(), learnedPatterns, 2);
 	}
-	
+
 	@Test
 	public void emptyPatterns() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
 		sut.calculateProposals(newQuery("11", "12", "11>12"), emptyEpisodes, 2);
 	}
-	
+
 	@Test
 	public void proposalsNumber() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Request a positive number of proposals to show!");
 		sut.calculateProposals(newQuery("11", "12", "11>12"), learnedPatterns, 0);
 	}
-	
+
 	@Test
 	public void diffProbabilitydiffFrequency() {
 		queryWith("4", "5", "6", "9", "4>5", "4>6", "4>9");
-		
+
 		addProposal(newPattern(3, "4", "5", "4>5"), Double.valueOf(df.format(1.0 / 3.0)));
 		addProposal(newPattern(2, "4", "6", "4>6"), Double.valueOf(df.format(1.0 / 3.0)));
 		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), Double.valueOf(df.format(2.0 / 9.0)));
-		
+
 		assertProposals();
 	}
-	
+
 	@Test
 	public void diffProbability() {
 		queryWith("10", "11", "10>11");
-		
+
 		addProposal(newPattern(3, "10", "11", "12", "10>11", "10>12", "11>12"), Double.valueOf(df.format(2.0 / 7.0)));
-		addProposal(newPattern(2, "10", "11", "12", "13", "10>11", "10>12", "10>13"), Double.valueOf(df.format(1.0 / 4.0)));
-		
+		addProposal(newPattern(2, "10", "11", "12", "13", "10>11", "10>12", "10>13"),
+				Double.valueOf(df.format(1.0 / 4.0)));
+
 		assertProposals();
 	}
-	
+
 	@Test
 	public void oneEventQuery() {
 		queryWith("1");
@@ -136,15 +138,15 @@ public class EpisodeRecommenderTest {
 
 		assertProposals();
 	}
-	
+
 	@Test
 	public void unrelatedQuery() {
 		queryWith("20", "21", "20>21");
-		
+
 		assertProposals();
 	}
-	
-	private Episode newPattern(int freq, String...string) {
+
+	private Episode newPattern(int freq, String... string) {
 		Episode pattern = new Episode();
 		pattern.setFrequency(freq);
 		for (String s : string) {

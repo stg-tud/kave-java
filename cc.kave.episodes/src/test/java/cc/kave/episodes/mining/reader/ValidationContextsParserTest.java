@@ -164,13 +164,13 @@ public class ValidationContextsParserTest {
 		ie3.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie3));
-		
+
 		InvocationExpression ie4 = new InvocationExpression();
 		methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie4.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie4));
-		
+
 		md3.getBody().add(new ExpressionStatement());
 
 		sst.getMethods().add(md3);

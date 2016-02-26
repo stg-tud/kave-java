@@ -29,7 +29,7 @@ import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
 public class ProposalHelperTest {
-	
+
 	private Episode pattern1;
 	private Episode pattern2;
 	private Episode pattern3;
@@ -45,21 +45,21 @@ public class ProposalHelperTest {
 	public void setup() {
 		pattern1 = createPattern("1");
 		pattern1.setFrequency(3);
-		
+
 		pattern2 = createPattern("1", "2", "1>2");
 		pattern2.setFrequency(3);
 		pattern3 = createPattern("1", "3", "1>3");
 		pattern3.setFrequency(4);
 		pattern4 = createPattern("2", "3", "2>3");
 		pattern4.setFrequency(2);
-		
+
 		pattern5 = createPattern("1", "2", "3", "1>2");
 		pattern5.setFrequency(4);
 		pattern6 = createPattern("1", "2", "4", "2>4");
 		pattern6.setFrequency(2);
 		pattern7 = createPattern("1", "3", "4", "1>3");
 		pattern7.setFrequency(3);
-		
+
 		actuals = ProposalHelper.createEpisodesSortedSet();
 		expecteds = Sets.newLinkedHashSet();
 	}
@@ -68,10 +68,10 @@ public class ProposalHelperTest {
 	public void oneNodeEpisodes() {
 		actuals.add(Tuple.newTuple(new Episode(), 1.0));
 		actuals.add(Tuple.newTuple(pattern1, 1.0));
-		
+
 		expecteds.add(Tuple.newTuple(pattern1, 1.0));
 		expecteds.add(Tuple.newTuple(new Episode(), 1.0));
-		
+
 		assertSets();
 	}
 
@@ -113,8 +113,8 @@ public class ProposalHelperTest {
 
 		assertSets();
 	}
-	
-	private Episode createPattern(String...string) {
+
+	private Episode createPattern(String... string) {
 		Episode pattern = new Episode();
 		for (String s : string) {
 			pattern.addFact(s);

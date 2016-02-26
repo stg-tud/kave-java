@@ -31,20 +31,19 @@ import org.junit.rules.TemporaryFolder;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.episodes.mining.reader.EventMappingParser;
 
 public class EventMappingParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
-	
+
 	private EventMappingParser sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new EventMappingParser(rootFolder.getRoot());
 	}
-	
+
 	@Test
 	public void readMapping() throws IOException {
 		Event e1 = new Event();
@@ -54,17 +53,17 @@ public class EventMappingParserTest {
 		List<Event> expected = new LinkedList<Event>();
 		expected.add(e1);
 		expected.add(e2);
-		
+
 		String jsonString = JsonUtils.toJson(expected);
 		File file = getFilePath();
 
 		FileUtils.writeStringToFile(file, jsonString);
-		
+
 		List<Event> actuals = sut.parse();
-		
+
 		assertEquals(expected, actuals);
 	}
-	
+
 	private File getFilePath() {
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/eventMapping.txt");
 		return fileName;

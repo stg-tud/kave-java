@@ -34,11 +34,11 @@ public class TransitivelyClosedEpisodesTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private Set<Episode> maximalEpisodes;
-	
+
 	private TransitivelyClosedEpisodes sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new TransitivelyClosedEpisodes();
@@ -48,42 +48,43 @@ public class TransitivelyClosedEpisodesTest {
 	public void emptyEpisode() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
-		
+
 		sut.removeTransitivelyClosure(Sets.newHashSet());
 	}
-	
+
 	@Test
 	public void sameEpisode() {
-		
+
 		maximalEpisodes = Sets.newHashSet();
 		Episode episode = newEpisode(3, 3, "a", "b", "c");
 		maximalEpisodes.add(episode);
-		
+
 		Set<Episode> expected = Sets.newHashSet();
 		episode = newEpisode(3, 3, "a", "b", "c");
 		expected.add(episode);
-		
+
 		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
-				
+
 		for (Episode ep : expected) {
 			assertTrue(actuals.contains(ep));
 		}
 	}
-	
-	private Episode newEpisode(int freq, int numberElements, String...strings) {
-		Episode episode = new Episode(){};
+
+	private Episode newEpisode(int freq, int numberElements, String... strings) {
+		Episode episode = new Episode() {
+		};
 		episode.addStringsOfFacts(strings);
 		return episode;
 	}
-	
+
 	@Test
 	public void removeClosures3() {
 		maximalEpisodes = createSetOfEpisodes(3, true);
-		
+
 		Set<Episode> expected = createSetOfEpisodes(3, false);
-		
+
 		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
-		
+
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;
 		for (Episode epExp : expected) {
@@ -95,15 +96,15 @@ public class TransitivelyClosedEpisodesTest {
 			assertTrue(comparison);
 		}
 	}
-	
+
 	@Test
 	public void removeClosures4() {
 		maximalEpisodes = createSetOfEpisodes(4, true);
-		
+
 		Set<Episode> expected = createSetOfEpisodes(4, false);
-		
+
 		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
-		
+
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;
 		for (Episode epExp : expected) {
@@ -119,11 +120,11 @@ public class TransitivelyClosedEpisodesTest {
 	@Test
 	public void removeClosures5() {
 		maximalEpisodes = createSetOfEpisodes(5, true);
-		
+
 		Set<Episode> expected = createSetOfEpisodes(5, false);
-		
+
 		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
-		
+
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;
 		for (Episode epExp : expected) {
@@ -135,7 +136,7 @@ public class TransitivelyClosedEpisodesTest {
 			assertTrue(comparison);
 		}
 	}
-	
+
 	private Set<Episode> createSetOfEpisodes(int i, boolean closure) {
 		Set<Episode> episodes = Sets.newHashSet();
 		if (i == 1) {
@@ -160,7 +161,8 @@ public class TransitivelyClosedEpisodesTest {
 		} else if (i == 5) {
 			if (closure) {
 				episodes.add(createEpisode("a", "b", "c", "d", "e", "a>d", "a>e", "b>a", "b>c", "b>d", "b>e"));
-				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "f>h", "f>i", "f>j", "g>h", "g>i", "g>j", "h>j", "i>h", "i>j"));
+				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "f>h", "f>i", "f>j", "g>h", "g>i", "g>j",
+						"h>j", "i>h", "i>j"));
 			} else {
 				episodes.add(createEpisode("a", "b", "c", "d", "e", "a>d", "a>e", "b>a", "b>c"));
 				episodes.add(createEpisode("f", "g", "h", "i", "j", "f>g", "g>i", "i>h", "h>j"));
@@ -170,7 +172,8 @@ public class TransitivelyClosedEpisodesTest {
 	}
 
 	private Episode createEpisode(String... string) {
-		Episode episode = new Episode(){};
+		Episode episode = new Episode() {
+		};
 		for (String s : string) {
 			episode.addFact(s);
 		}

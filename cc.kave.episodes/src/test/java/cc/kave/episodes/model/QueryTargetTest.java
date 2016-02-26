@@ -33,67 +33,67 @@ import cc.kave.commons.model.episodes.Fact;
 public class QueryTargetTest {
 
 	private QueryTarget sut;
-	
+
 	@Before
 	public void setup() {
 		sut = new QueryTarget();
 	}
-	
+
 	@Test
 	public void defaultValues() {
 		assertEquals(Sets.newHashSet(), sut.getFacts());
 		assertEquals(0, sut.getNumFacts());
 		assertEquals(0, sut.getNumEvents());
 	}
-	
+
 	@Test
 	public void valuesCanBeSet() {
 		sut.addFact("a");
 		assertEquals(Sets.newHashSet(new Fact("a")), sut.getFacts());
 		assertEquals(1, sut.getNumEvents());
 	}
-	
+
 	@Test
 	public void containsFactTest() {
 		sut.setMethodDecl(new Fact("a"));
 		sut.addStringsOfFacts("b", "c", "b>c");
-		
+
 		assertTrue(sut.containsFact(new Fact("b")));
 		assertFalse(sut.containsFact(new Fact("a")));
 	}
-	
+
 	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("a", "b");
 		assertEquals(Sets.newHashSet(new Fact("a"), new Fact("b")), sut.getFacts());
 		assertTrue(sut.getNumFacts() == 2);
 	}
-	
+
 	@Test
 	public void addListOfFacts() {
 		List<Fact> facts = new LinkedList<Fact>();
 		facts.add(new Fact("a"));
 		facts.add(new Fact("b"));
 		facts.add(new Fact("a>b"));
-		
+
 		sut.addListOfFacts(facts);
-		
+
 		assertEquals(Sets.newHashSet(new Fact("a"), new Fact("b"), new Fact("a>b")), sut.getFacts());
 	}
-	
+
 	@Test
 	public void equality_default() {
 		QueryTarget a = new QueryTarget();
 		a.setMethodDecl(new Fact());
-		
+
 		QueryTarget b = new QueryTarget();
 		b.setMethodDecl(new Fact());
-		
+
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
 	}
-	
+
 	@Test
 	public void equality_reallyTheSame() {
 		QueryTarget a = new QueryTarget();
@@ -111,7 +111,7 @@ public class QueryTargetTest {
 		assertEquals(a.getFacts(), b.getFacts());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 	}
-	
+
 	@Test
 	public void diffMethodDecl() {
 		QueryTarget a = new QueryTarget();
@@ -129,7 +129,7 @@ public class QueryTargetTest {
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertFalse(a.getMethodDecl().equals(b.getMethodDecl()));
 	}
-	
+
 	@Test
 	public void differentFacts() {
 		QueryTarget a = new QueryTarget();
@@ -139,7 +139,7 @@ public class QueryTargetTest {
 		QueryTarget b = new QueryTarget();
 		b.addStringsOfFacts("d", "e");
 		b.setMethodDecl(new Fact("f"));
-		
+
 		assertNotEquals(a, b);
 		assertFalse(a.equals(b));
 		assertNotEquals(a.hashCode(), b.hashCode());

@@ -34,64 +34,62 @@ public class QueryGeneratorByPercentageTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private QueryGeneratorByPercentage sut;
-	
-	@Before 
+
+	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		sut = new QueryGeneratorByPercentage();
 	}
-	
+
 	@Test
 	public void emptyTarget() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Not valid episode for query generation!");
 		sut.generateQueries(new Episode(), 0.5);
 	}
-	
+
 	@Test
 	public void twoMethodInv() {
 		Episode target = createEpisode("11", "12", "13", "11>12", "11>13", "12>13");
-		
+
 		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"));
-		
+
 		Set<Episode> actuals = sut.generateQueries(target, 0.25);
-		
-		assertEquals(expected, actuals);
-	}
-	
-	@Test
-	public void fourMethod25pInv() {
-		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15",
-											"12>13", "12>14");
-		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"), 
-													createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15"));
-		
-		Set<Episode> actuals = sut.generateQueries(target, 0.75);
-		
-		assertEquals(expected, actuals);
-	}
-	
-	@Test
-	public void fourMethod50pInv() {
-		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15",
-											"12>13", "12>14");
-		
-		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"), 
-												createEpisode("11", "12", "14", "11>12", "11>14", "12>14"), 
-												createEpisode("11", "12", "15", "11>12", "11>15"), 
-												createEpisode("11", "13", "14", "11>13", "11>14"),
-												createEpisode("11", "13", "15", "11>13", "11>15"),
-												createEpisode("11", "14", "15", "11>14", "11>15"));
-		
-		Set<Episode> actuals = sut.generateQueries(target, 0.5);
-		
+
 		assertEquals(expected, actuals);
 	}
 
-	private Episode createEpisode(String...strings) {
+	@Test
+	public void fourMethod25pInv() {
+		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
+				"12>14");
+
+		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"),
+				createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15"));
+
+		Set<Episode> actuals = sut.generateQueries(target, 0.75);
+
+		assertEquals(expected, actuals);
+	}
+
+	@Test
+	public void fourMethod50pInv() {
+		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
+				"12>14");
+
+		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"),
+				createEpisode("11", "12", "14", "11>12", "11>14", "12>14"),
+				createEpisode("11", "12", "15", "11>12", "11>15"), createEpisode("11", "13", "14", "11>13", "11>14"),
+				createEpisode("11", "13", "15", "11>13", "11>15"), createEpisode("11", "14", "15", "11>14", "11>15"));
+
+		Set<Episode> actuals = sut.generateQueries(target, 0.5);
+
+		assertEquals(expected, actuals);
+	}
+
+	private Episode createEpisode(String... strings) {
 		Episode episode = new Episode();
 		for (String string : strings) {
 			episode.addFact(string);

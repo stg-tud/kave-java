@@ -46,10 +46,10 @@ public class MaximalEpisodesTest {
 	private Map<Integer, Set<Episode>> episodes;
 	private Map<Integer, Set<Episode>> initialEpisodes;
 	private Set<Episode> episodeSet;
-	
+
 	private Map<Integer, Set<Episode>> expecteds;
 	private Map<Integer, Set<Episode>> actuals;
-	
+
 	private MaximalEpisodes sut;
 
 	@Before
@@ -62,71 +62,71 @@ public class MaximalEpisodesTest {
 		episode5 = createEpisode(4, 2, "1", "3", "1>3");
 		episode6 = createEpisode(2, 2, "2", "3", "2>3");
 		episode7 = createEpisode(3, 3, "1", "2", "3", "1>2", "1>3");
-		
+
 		episodes = new HashMap<Integer, Set<Episode>>();
 		initialEpisodes = new HashMap<Integer, Set<Episode>>();
 		episodeSet = Sets.newHashSet();
-		
+
 		expecteds = new HashMap<Integer, Set<Episode>>();
-		
+
 		sut = new MaximalEpisodes();
 	}
-	
+
 	@Test
 	public void cannotGetEmptyListOfEpisodes() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
-		
+
 		sut.getMaximalEpisodes(episodes);
 	}
-	
+
 	@Test
 	public void oneLevelNodeEpisodes() {
-		
+
 		episodeSet.add(episode41);
 		episodeSet.add(episode5);
 		episodeSet.add(episode6);
-		
+
 		initialEpisodes.put(2, episodeSet);
-		
+
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode41);
 		episodeSet.add(episode5);
 		episodeSet.add(episode6);
-		
+
 		expecteds.put(2, episodeSet);
-		
+
 		actuals = sut.getMaximalEpisodes(initialEpisodes);
-		
+
 		assertEquals(expecteds, actuals);
 	}
-	
+
 	@Test
 	public void reduceOneNodeLevelEpisode() {
-		
+
 		episodeSet.add(episode1);
 		episodeSet.add(episode2);
 		episodeSet.add(episode3);
-		
+
 		initialEpisodes.put(1, episodeSet);
-		
+
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode41);
 		episodeSet.add(episode5);
-		
+
 		initialEpisodes.put(2, episodeSet);
-		
+
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode41);
 		episodeSet.add(episode5);
-		
+
 		expecteds.put(2, episodeSet);
-		
+
 		actuals = sut.getMaximalEpisodes(initialEpisodes);
-		
+
 		assertEquals(expecteds, actuals);
 	}
 
@@ -140,7 +140,7 @@ public class MaximalEpisodesTest {
 		initialEpisodes.put(1, episodeSet);
 
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode41);
 
 		initialEpisodes.put(2, episodeSet);
@@ -152,7 +152,7 @@ public class MaximalEpisodesTest {
 		expecteds.put(1, episodeListExp);
 
 		episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode41);
 
 		expecteds.put(2, episodeListExp);
@@ -164,7 +164,7 @@ public class MaximalEpisodesTest {
 
 	@Test
 	public void twoNodeEpisodeEx2() throws Exception {
-		
+
 		episodeSet.add(episode1);
 		episodeSet.add(episode2);
 		episodeSet.add(episode3);
@@ -178,13 +178,13 @@ public class MaximalEpisodesTest {
 		initialEpisodes.put(2, episodeSet);
 
 		Set<Episode> episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode2);
 
 		expecteds.put(1, episodeListExp);
 
 		episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode5);
 
 		expecteds.put(2, episodeListExp);
@@ -196,7 +196,7 @@ public class MaximalEpisodesTest {
 
 	@Test
 	public void twoNodeEpisodeEx3() throws Exception {
-		
+
 		episodeSet.add(episode1);
 		episodeSet.add(episode2);
 		episodeSet.add(episode3);
@@ -204,19 +204,19 @@ public class MaximalEpisodesTest {
 		initialEpisodes.put(1, episodeSet);
 
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode6);
 
 		initialEpisodes.put(2, episodeSet);
 
 		Set<Episode> episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode1);
 
 		expecteds.put(1, episodeListExp);
 
 		episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode6);
 
 		expecteds.put(2, episodeListExp);
@@ -225,29 +225,29 @@ public class MaximalEpisodesTest {
 
 		assertEquals(expecteds, actuals);
 	}
-	
+
 	@Test
 	public void sameEventsDiffOrder() throws Exception {
-		
+
 		episodeSet.add(episode41);
 		episodeSet.add(episode42);
 
 		initialEpisodes.put(2, episodeSet);
 
 		episodeSet = Sets.newHashSet();
-		
+
 		episodeSet.add(episode7);
 
 		initialEpisodes.put(3, episodeSet);
 
 		Set<Episode> episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode42);
 
 		expecteds.put(2, episodeListExp);
 
 		episodeListExp = Sets.newHashSet();
-		
+
 		episodeListExp.add(episode7);
 
 		expecteds.put(3, episodeListExp);
@@ -256,7 +256,7 @@ public class MaximalEpisodesTest {
 
 		assertEquals(expecteds, actuals);
 	}
-	
+
 	private Episode createEpisode(int frequency, int numberOfEvents, String... facts) {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts(facts);
