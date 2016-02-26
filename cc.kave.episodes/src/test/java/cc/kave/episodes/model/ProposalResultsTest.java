@@ -21,11 +21,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import cc.recommenders.datastructures.Tuple;
 
 public class ProposalResultsTest {
 
@@ -39,7 +41,7 @@ public class ProposalResultsTest {
 	@Test
 	public void defaultValues() {
 		assertTrue(sut.getTarget().equals(new Episode()));
-		assertTrue(sut.getResults().equals(new HashMap<Double, Double>()));
+		assertTrue(sut.getResults().equals(new LinkedList<Tuple<Double, Double>>()));
 	}
 	
 	@Test
@@ -51,10 +53,11 @@ public class ProposalResultsTest {
 		sut.addResult(0.5, 0.4);
 		sut.addResult(0.3, 0.2);
 		
-		Map<Double, Double> expected = new HashMap<Double, Double>();
-		expected.put(0.8, 0.7);
-		expected.put(0.5, 0.4);
-		expected.put(0.3, 0.2);
+		List<Tuple<Double, Double>> expected = new LinkedList<Tuple<Double, Double>>();
+		
+		expected.add(Tuple.newTuple(0.8, 0.7));
+		expected.add(Tuple.newTuple(0.5, 0.4));
+		expected.add(Tuple.newTuple(0.3, 0.2));
 		
 		assertEquals(expected, sut.getResults());
 	}

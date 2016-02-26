@@ -1,5 +1,7 @@
 package cc.kave.episodes.evaluation.queries;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -7,7 +9,6 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
-import static cc.recommenders.assertions.Asserts.assertTrue;
 
 public class QueryGeneratorByPercentage {
 

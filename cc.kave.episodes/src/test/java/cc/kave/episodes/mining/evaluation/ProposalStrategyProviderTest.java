@@ -56,12 +56,11 @@ public class ProposalStrategyProviderTest {
 	private EventMappingParser mappingParser;
 	@Mock
 	private EpisodeParser episodeParser;
-//	@Mock
-	private QueryGeneratorByPercentage queryGenerator;
-//	@Mock
-	private EpisodeRecommender recommender;
 	@Mock
 	private MaximalEpisodes maxEpisodeTracker;
+	
+	private QueryGeneratorByPercentage queryGenerator;
+	private EpisodeRecommender recommender;
 
 	private Set<Episode> validationData = Sets.newLinkedHashSet();
 	private List<Event> events = new LinkedList<Event>();
@@ -135,7 +134,6 @@ public class ProposalStrategyProviderTest {
 		
 		assertLogContains(13, "0\t", "0.39\t0.28\t", "0.29\t0.22\t", "0.00\t0.00\t", "\n");
 		assertLogContains(18, "1\t", "0.29\t0.22\t", "0.00\t0.00\t", "0.00\t0.00\t", "\n");
-		assertLogContains(23, "2\t", "0.00\t0.00\t", "0.00\t0.00\t", "0.00\t0.00\t", "\n");
 	}
 
 	private Episode createQuery(String... strings) {

@@ -34,7 +34,6 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class ValidationContextsParser {
@@ -51,7 +50,6 @@ public class ValidationContextsParser {
 		for (String zip : findZips()) {
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
 
-			int counter = 0;
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 
@@ -65,7 +63,6 @@ public class ValidationContextsParser {
 
 					md.accept(tfv, facts);
 
-					Logger.log("Creating episode " + ++counter);
 					Episode qt = createEpisode(facts);
 					validationData.add(qt);
 				}

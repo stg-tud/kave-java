@@ -20,6 +20,8 @@ import static cc.recommenders.io.Logger.append;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +37,7 @@ import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.ProposalResults;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
@@ -52,11 +55,11 @@ public class ProposalStrategyProvider {
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	
-	private Map<Integer, Averager> avgQueryProposal = new HashMap<Integer, Averager>();
+	private Map<Integer, Averager> avgQueryProposal = new LinkedHashMap<Integer, Averager>();
 	private Map<Integer, Averager> avgTargetProposal = new HashMap<Integer, Averager>();
+	private Map<Integer, Integer> targetStruct = new HashMap<Integer, Integer>();
 	
-	private Map<Integer, Double> resultsQP = new HashMap<Integer, Double>();
-	private Map<Integer, Double> resultsTP = new HashMap<Integer, Double>();
+	private List<ProposalResults> results = new LinkedList<ProposalResults>();
 	
 	private DecimalFormat df = new DecimalFormat("0.00"); 
 
@@ -79,17 +82,15 @@ public class ProposalStrategyProvider {
 		Map<Integer, Set<Episode>> maxPatterns = readPatterns();
 		List<Event> eventMapping = readMapper();
 		Set<Episode> validationData = readValidationData(eventMapping);
-		setPrinting();
+		configurations();
 		
-		for (int idx = 0; idx < PROPOSALS; idx++) {
-			avgQueryProposal.put(idx + 1, new Averager());
-			avgTargetProposal.put(idx + 1, new Averager());
-		}
-		
-		int targetCounter = 0;
+		initAverager();
+		int episodeNo = 0;
 		for (Episode e : validationData) {
+			getStructure(e);
 			
-			if (e.getNumEvents() > 2) {
+			if (e.getNumEvents() > 2 && e.getNumEvents() < 12) {
+				Logger.log("Generating queries for episode %d with %d number of invocations:", episodeNo, e.getNumEvents() - 1);
 				Set<Episode> queries = queryGenerator.generateQueries(e, PROBABILITY);
 				for (Episode query : queries) {
 					int proposalCounter = 1;
@@ -104,43 +105,83 @@ public class ProposalStrategyProvider {
 						
 					}
 				}
-				logResults(targetCounter);
+				storeResults(e);
 				updateAveragers();
-				targetCounter++;
+				episodeNo++;
 			}
+		}
+		logResults();
+	}
+	
+	private void getStructure(Episode e) {
+		int numInv = e.getNumEvents() - 1;
+		
+		if (targetStruct.containsKey(numInv)) {
+			int counter = targetStruct.get(numInv);
+			targetStruct.put(numInv, counter + 1);
+		} else {
+			targetStruct.put(numInv, 1);
+		}
+	}
+
+	private void initAverager() {
+		for (int idx = 0; idx < PROPOSALS; idx++) {
+			avgQueryProposal.put(idx + 1, new Averager());
+			avgTargetProposal.put(idx + 1, new Averager());
 		}
 	}
 
 	private void updateAveragers() {
 		for (int ind = 0; ind < PROPOSALS; ind++) {
-			avgQueryProposal.get(ind + 1).clear();
-			avgTargetProposal.get(ind + 1).clear();
+		avgQueryProposal.get(ind + 1).clear();
+		avgTargetProposal.get(ind + 1).clear();
 		}
 	}
-
-	private void logResults(int targetNo) {
-		append("%d\t", targetNo);
+	
+	private void storeResults(Episode episode) {
+		ProposalResults episodeResults = new ProposalResults();
+		episodeResults.setTarget(episode);
+		
 		for (int ind = 0; ind < PROPOSALS; ind++) {
-			double queryProposals = avgQueryProposal.get(ind + 1).average();
-			double targetProposals = avgTargetProposal.get(ind + 1).average();
-			append("%s\t%s\t", df.format(queryProposals), df.format(targetProposals));
+			episodeResults.addResult(avgQueryProposal.get(ind + 1).average(), avgTargetProposal.get(ind + 1).average());
+		}
+		results.add(episodeResults);
+	}
+
+	private void logResults() {
+		append("Invocations\ttotal\n");
+		for (Map.Entry<Integer, Integer> entry : targetStruct.entrySet()) {
+			if (entry.getKey() > 10) {
+				append("%d\t%d\n", entry.getKey(), entry.getValue());
+			}
 		}
 		append("\n");
-	}
-
-	private void setPrinting() {
-		append("%% - Patterns configuration:\n");
-		append("%% - Frequency = %d\n", FREQUENCY);
-		append("%% - Bidirectional measure: %s\n\n", df.format(BIDIRECTIONAL));
-		
-		append("%% - Querying strategy: %s\n", df.format(PROBABILITY));
-		append("%% - Proposal strategy: %d\n\n", PROPOSALS);
 		
 		append("Episode\t");
 		for (int i = 0; i < PROPOSALS; i++) {
 			append("F1-QPTop%d\tF1-TPTop%d\t", i + 1, i + 1);
 		}
 		append("\n");
+		for (int tId = 0; tId < results.size(); tId++) {
+			List<Tuple<Double, Double>> episodeResults = results.get(tId).getResults();
+
+			if (episodeResults.get(0).getFirst() > 0.0) {
+				append("%d\t", tId);
+				for (Tuple<Double, Double> tuple : episodeResults) {
+					append("%s\t%s\t", df.format(tuple.getFirst()), df.format(tuple.getSecond()));
+				}
+				append("\n");
+			}
+		}
+	}
+
+	private void configurations() {
+		append("%% - Patterns configuration:\n");
+		append("%% - Frequency = %d\n", FREQUENCY);
+		append("%% - Bidirectional measure: %s\n\n", df.format(BIDIRECTIONAL));
+		
+		append("%% - Querying strategy: %s\n", df.format(PROBABILITY));
+		append("%% - Proposal strategy: %d\n\n", PROPOSALS);
 	}
 
 	private Set<Episode> readValidationData(List<Event> eventMapping) throws ZipException, IOException {

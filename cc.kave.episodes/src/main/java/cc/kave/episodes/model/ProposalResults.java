@@ -15,8 +15,8 @@
  */
 package cc.kave.episodes.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -24,11 +24,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import cc.kave.commons.model.episodes.Fact;
+import cc.recommenders.datastructures.Tuple;
 
 public class ProposalResults {
 
 	private Episode target = new Episode();
-	Map<Double, Double> results = new HashMap<Double, Double>();
+	List<Tuple<Double, Double>> results = new LinkedList<Tuple<Double, Double>>();
 	
 	public Episode getTarget() {
 		return this.target;
@@ -42,12 +43,12 @@ public class ProposalResults {
 		}
 	}
 	
-	public Map<Double, Double> getResults() {
+	public List<Tuple<Double, Double>> getResults() {
 		return this.results;
 	}
 	
 	public void addResult(double qp, double tp) {
-		this.results.put(qp, tp);
+		this.results.add(Tuple.newTuple(qp, tp));
 	}
 	
 	@Override
