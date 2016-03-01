@@ -123,15 +123,15 @@ public class EvaluationTest {
 		assertLogContains(1, "Reading the mapping file");
 		assertLogContains(2, "Readng the validation data\n");
 		
-		assertLogContains(3, "% - Patterns configuration:\n");
-		assertLogContains(4, "% - Frequency = 5\n");
-		assertLogContains(5, "% - Bidirectional measure = 0.01\n");
-		assertLogContains(6, "% - Querying strategy = [25%, 50%, 75%]\n");
-		assertLogContains(7, "% - Proposal strategy = 3\n\n");
+		assertLogContains(3, "Generating queries for episode 0 with 2 number of invocations");
+		assertLogContains(4, "Generating queries for episode 1 with 2 number of invocations");
+		assertLogContains(5, "Generating queries for episode 2 with 2 number of invocations");
 		
-		assertLogContains(8, "Generating queries for episode 0 with 2 number of invocations");
-		assertLogContains(9, "Generating queries for episode 1 with 2 number of invocations");
-		assertLogContains(10, "Generating queries for episode 2 with 2 number of invocations");
+		assertLogContains(6, "% - Patterns configuration:\n");
+		assertLogContains(7, "% - Frequency = 5\n");
+		assertLogContains(8, "% - Bidirectional measure = 0.01\n");
+		assertLogContains(9, "% - Querying strategy = [25%, 50%, 75%]\n");
+		assertLogContains(10, "% - Proposal strategy = 3\n\n");
 		
 		assertLogContains(11, "\nEpisode:\n");
 		assertLogContains(12, "0\t", "0.25: [ ", "<0.39, 0.28> ", "<0.29, 0.22> ", "]\t", "2\n");
@@ -142,33 +142,6 @@ public class EvaluationTest {
 		assertLogContains(32, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
 		assertLogContains(37, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
 	}
-
-//	@Test
-//	public void logger() throws ZipException, IOException {
-//		Logger.clearLog();
-//		sut.evaluate();
-//
-//		verify(episodeParser).parse(eq(FREQUENCY), eq(BIDIRECTIONAL));
-//		verify(mappingParser).parse();
-//		verify(validationParser).parse(events);
-//		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);
-//		
-//		assertLogContains(0, "Reading the learned patterns");
-//		assertLogContains(1, "Reading the mapping file");
-//		assertLogContains(2, "Readng the validation data\n");
-//		
-//		assertLogContains(3, "% - Patterns configuration:\n");
-//		assertLogContains(4, "% - Frequency = 5\n");
-//		assertLogContains(5, "% - Bidirectional measure: 0.01\n\n");
-//		assertLogContains(6, "% - Querying strategy: 0.50\n");
-//		assertLogContains(7, "% - Proposal strategy: 3\n\n");
-//		
-//		assertLogContains(8, "Episode\t", "F1-QPTop1\tF1-TPTop1\t");
-//		assertLogContains(10, "F1-QPTop2\tF1-TPTop2\t", "F1-QPTop3\tF1-TPTop3", "\n");
-//		
-//		assertLogContains(13, "0\t", "0.39\t0.28\t", "0.29\t0.22\t", "0.00\t0.00\t", "\n");
-//		assertLogContains(18, "1\t", "0.29\t0.22\t", "0.00\t0.00\t", "0.00\t0.00\t", "\n");
-//	}
 
 	private Episode createQuery(String... strings) {
 		Episode query = new Episode();

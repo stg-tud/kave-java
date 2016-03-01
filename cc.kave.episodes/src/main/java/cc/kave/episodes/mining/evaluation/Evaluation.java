@@ -82,7 +82,6 @@ public class Evaluation {
 		Map<Integer, Set<Episode>> maxPatterns = readPatterns();
 		List<Event> eventMapping = readMapper();
 		Set<Episode> validationData = readValidationData(eventMapping);
-		configurations();
 		
 		int episodeNo = 0;
 		for (Episode e : validationData) {
@@ -112,6 +111,7 @@ public class Evaluation {
 				episodeNo++;
 			}
 		}
+		configurations();
 		logPerEpisode();
 		synthesizeResults();
 		logSynthesized();
