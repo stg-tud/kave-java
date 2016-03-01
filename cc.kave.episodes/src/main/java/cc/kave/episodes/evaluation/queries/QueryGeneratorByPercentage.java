@@ -2,6 +2,8 @@ package cc.kave.episodes.evaluation.queries;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -15,21 +17,34 @@ public class QueryGeneratorByPercentage {
 	private SubsetsGenerator generator = new SubsetsGenerator();
 	private Separator separator = new Separator();
 	
-	public Set<Episode> generateQueries(Episode target, double percentage) {
+	public Map<Double, Set<Episode>> generateQueries(Episode target) {
 		assertTrue(target.getNumEvents() > 2, "Not valid episode for query generation!");
 		
-		Set<Episode> queries = Sets.newHashSet();
+		Map<Double, Set<Episode>> queries = new HashMap<Double, Set<Episode>>();
 		Tuple<Fact, Set<Fact>> declInv = separator.separateFacts(target);
 		
-		int numRemoved = calculateRemovals(declInv.getSecond().size(), percentage);
 		int numInvs = declInv.getSecond().size();
-		Set<Set<Fact>> subsets = generator.generateSubsets(declInv.getSecond(), numInvs - numRemoved);
+		Map<Double, Integer> removals = calcPercNumbers(numInvs);
+		Map<Integer, Set<Set<Fact>>> subsets = generator.generateSubsets(declInv.getSecond(), 
+															wrap(removals));
 		
-		for (Set<Fact> subset : subsets) {
-			Episode query = createQuery(target, declInv.getFirst(), subset);
-			queries.add(query);
+		for (Map.Entry<Double, Integer> entry : removals.entrySet()) {
+			Set<Set<Fact>> querySubsets = subsets.get(entry.getValue());
+			for (Set<Fact> subset : querySubsets) {
+				Episode query = createQuery(target, declInv.getFirst(), subset);
+				if (queries.containsKey(entry.getKey())) {
+					queries.get(entry.getKey()).add(query);
+				} else {
+					queries.put(entry.getKey(), Sets.newHashSet(query));
+				}
+			}
 		}
 		return queries;
+	}
+
+	private Set<Integer> wrap(Map<Double, Integer> removals) {
+		Set<Integer> set = Sets.newHashSet(removals.values());
+		return set;
 	}
 
 	private Episode createQuery(Episode target, Fact methodDecl, Set<Fact> subset) {
@@ -51,8 +66,22 @@ public class QueryGeneratorByPercentage {
 		return query;
 	}
 
-	private int calculateRemovals(int size, double percentage) {
-		return (int) Math.ceil(percentage * (double) size) ;
+	private Map<Double, Integer> calcPercNumbers(int size) {
+		Map<Double, Integer> removals = new HashMap<Double, Integer>();
+		
+		int first = size - (int) Math.ceil(0.25 * (double) size);
+		int second = size - (int) Math.ceil(0.5 * (double) size);
+		int third = size - (int) Math.ceil(0.75 * (double) size);
+		
+		if (first > 0) {
+			removals.put(0.25, first);
+		}
+		if (!removals.values().contains(second) && (second > 0 && second < size)) {
+			removals.put(0.5, second);
+		}
+		if (!removals.values().contains(third) && (third > 0 && third < size)) {
+			removals.put(0.75, third);
+		}
+		return removals;
 	}
-
 }

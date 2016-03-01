@@ -108,7 +108,7 @@ public class RecommenderGraphGenerator {
 			if (e.getNumEvents() > 2) {
 				int queryID = 0;
 				
-				Set<Episode> queries = queryGenerator.generateQueries(e, 0.5);
+				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
 				
 				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
 				Episode targetQuery = wrap(simpEpisode);
@@ -116,26 +116,28 @@ public class RecommenderGraphGenerator {
 				DirectedGraph<Fact, DefaultEdge> epGraph = graphConverter.convert(targetQuery, eventMapping);
 				writer.write(epGraph, getEpisodePath(directory, episodeID));
 				
-				for (Episode query : queries) {
-					Set<Episode> simpQuery = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(query));
-					DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(wrap(simpQuery), eventMapping);
-					writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
+				for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
+					for (Episode query : entry.getValue()) {
+						Set<Episode> simpQuery = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(query));
+						DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(wrap(simpQuery), eventMapping);
+						writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
 					
-					int proposalID = 0;
+						int proposalID = 0;
 					
-					Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
-					Set<Double> probProposals = Sets.newLinkedHashSet();
-					for (Tuple<Episode, Double> tuple : proposals) {
-						probProposals.add(tuple.getSecond());
-						Set<Episode> proposal = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(tuple.getFirst()));
-						DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(wrap(proposal), eventMapping);
-						writer.write(proposalGraph, getProposalPath(directory, episodeID, queryID, proposalID));
-						proposalID++;
+						Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
+						Set<Double> probProposals = Sets.newLinkedHashSet();
+						for (Tuple<Episode, Double> tuple : proposals) {
+							probProposals.add(tuple.getSecond());
+							Set<Episode> proposal = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(tuple.getFirst()));
+							DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(wrap(proposal), eventMapping);
+							writer.write(proposalGraph, getProposalPath(directory, episodeID, queryID, proposalID));
+							proposalID++;
+						}
+						Logger.log("Episode = %d\tQuery = %d", episodeID, queryID);
+						System.out.println("Proposals: " + probProposals.toString());
+						queryID++;
 					}
-					Logger.log("Episode = %d\tQuery = %d", episodeID, queryID);
-					System.out.println("Proposals: " + probProposals.toString());
-					queryID++;
-				}
+				} 
 				episodeID++;
 			}
 		}

@@ -17,6 +17,8 @@ package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -34,12 +36,18 @@ public class QueryGeneratorByPercentageTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
+	
+	private Map<Double, Set<Episode>> expected;
+	private Map<Double, Set<Episode>> actuals;
+	
 	private QueryGeneratorByPercentage sut;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
+		
+		expected = new HashMap<Double, Set<Episode>>();
+		
 		sut = new QueryGeneratorByPercentage();
 	}
 
@@ -47,44 +55,41 @@ public class QueryGeneratorByPercentageTest {
 	public void emptyTarget() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Not valid episode for query generation!");
-		sut.generateQueries(new Episode(), 0.5);
+		sut.generateQueries(new Episode());
 	}
 
 	@Test
 	public void twoMethodInv() {
 		Episode target = createEpisode("11", "12", "13", "11>12", "11>13", "12>13");
 
-		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"));
+		expected.put(0.25, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13")));
 
-		Set<Episode> actuals = sut.generateQueries(target, 0.25);
-
-		assertEquals(expected, actuals);
-	}
-
-	@Test
-	public void fourMethod25pInv() {
-		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
-				"12>14");
-
-		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"),
-				createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15"));
-
-		Set<Episode> actuals = sut.generateQueries(target, 0.75);
+		actuals = sut.generateQueries(target);
 
 		assertEquals(expected, actuals);
 	}
 
 	@Test
-	public void fourMethod50pInv() {
+	public void fourMethodInv() {
 		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
 				"12>14");
+		
+		expected.put(0.25, Sets.newHashSet(createEpisode("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13", "12>14"), 
+											createEpisode("11", "12", "13", "15", "11>12", "11>13", "11>15", "12>13"), 
+											createEpisode("11", "12", "14", "15", "11>12", "11>14", "11>15", "12>14"),
+											createEpisode("11", "13", "14", "15", "11>13", "11>14", "11>15")));
+		
+		expected.put(0.5, Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"), 
+											createEpisode("11", "12", "14", "11>12", "11>14", "12>14"), 
+											createEpisode("11", "12", "15", "11>12", "11>15"), 
+											createEpisode("11", "13", "14", "11>13", "11>14"),
+											createEpisode("11", "13", "15", "11>13", "11>15"), 
+											createEpisode("11", "14", "15", "11>14", "11>15")));
+		
+		expected.put(0.75, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"), 
+											createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15")));
 
-		Set<Episode> expected = Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"),
-				createEpisode("11", "12", "14", "11>12", "11>14", "12>14"),
-				createEpisode("11", "12", "15", "11>12", "11>15"), createEpisode("11", "13", "14", "11>13", "11>14"),
-				createEpisode("11", "13", "15", "11>13", "11>15"), createEpisode("11", "14", "15", "11>14", "11>15"));
-
-		Set<Episode> actuals = sut.generateQueries(target, 0.5);
+		actuals = sut.generateQueries(target);
 
 		assertEquals(expected, actuals);
 	}

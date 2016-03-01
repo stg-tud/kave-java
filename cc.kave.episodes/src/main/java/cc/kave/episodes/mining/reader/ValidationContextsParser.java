@@ -16,7 +16,9 @@
 package cc.kave.episodes.mining.reader;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
@@ -34,7 +36,10 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
+
+import static cc.recommenders.io.Logger.append;
 
 public class ValidationContextsParser {
 
@@ -70,6 +75,29 @@ public class ValidationContextsParser {
 			ra.close();
 		}
 		return validationData;
+	}
+	
+	public void logStructure(List<Event> eventsList) throws ZipException, IOException {
+		Logger.setPrinting(true);
+		
+		Set<Episode> validations = parse(eventsList);
+		Map<Integer, Integer> targetStruct = new HashMap<Integer, Integer>();
+		
+		for (Episode target : validations) {
+			int numInv = target.getNumEvents() - 1;
+			
+			if (targetStruct.containsKey(numInv)) {
+				int counter = targetStruct.get(numInv);
+				targetStruct.put(numInv, counter + 1);
+			} else {
+				targetStruct.put(numInv, 1);
+			}
+		}
+		
+		append("#Invocations\t#Targets\n");
+		for (Map.Entry<Integer, Integer> entry : targetStruct.entrySet()) {
+			append("%d\t%d\n", entry.getKey(), entry.getValue());
+		}
 	}
 
 	private Set<String> findZips() {

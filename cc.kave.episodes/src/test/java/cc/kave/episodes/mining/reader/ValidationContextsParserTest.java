@@ -57,6 +57,7 @@ import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
+import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
 
 public class ValidationContextsParserTest {
 
@@ -70,6 +71,9 @@ public class ValidationContextsParserTest {
 
 	@Before
 	public void setup() throws IOException {
+		Logger.reset();
+		Logger.setCapturing(true);
+		
 		MockitoAnnotations.initMocks(this);
 		data = Maps.newHashMap();
 		ras = Maps.newHashMap();
@@ -122,7 +126,7 @@ public class ValidationContextsParserTest {
 
 	@After
 	public void teardown() {
-		Logger.setPrinting(false);
+		Logger.reset();
 	}
 
 	private static ExpressionStatement wrap(InvocationExpression ie1) {
@@ -134,13 +138,7 @@ public class ValidationContextsParserTest {
 	@Test
 	public void contextTest() throws ZipException, IOException {
 		List<Event> events = new LinkedList<Event>();
-		Set<Episode> expected = Sets.newHashSet();
-
-		Episode episode = createEpisode("0");
-		expected.add(episode);
-
-		episode = createEpisode("1", "2", "3");
-		expected.add(episode);
+		Set<Episode> expected = Sets.newHashSet(createEpisode("0"), createEpisode("1", "2", "3"));
 
 		Set<Episode> actuals = sut.parse(events);
 
@@ -150,6 +148,24 @@ public class ValidationContextsParserTest {
 		verify(ras.get("a")).getNext(Context.class);
 
 		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void logTest() throws ZipException, IOException {
+		List<Event> events = new LinkedList<Event>();
+		Logger.clearLog();
+
+		sut.logStructure(events);
+
+		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
+		verify(rootDirectory).getReadingArchive("a");
+		verify(ras.get("a"), times(2)).hasNext();
+		verify(ras.get("a")).getNext(Context.class);
+
+		assertLogContains(0, "#Invocations\t#Targets\n");
+		assertLogContains(1, "0\t1\n");
+		assertLogContains(2, "2\t1\n");
+		
 	}
 
 	@Test

@@ -20,20 +20,24 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetsGenerator {
 	
-	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length) {
+	public Map<Integer, Set<Set<Fact>>> generateSubsets(Set<Fact> originalSet, Set<Integer> lengths) {
 		assertTrue((originalSet.size() > 1), "Cannot subselect from less then one method invocation!");
-		assertTrue(length < originalSet.size(), "Please subselect less than the total number of Facts!");
+		for (int num : lengths) {
+			assertTrue(num < originalSet.size(), "Please subselect less than the total number of Facts!");
+		}
 		
 		Set<Set<Fact>> allSubsets = powerSet(originalSet);
-		return selectLength(allSubsets, length);
+		return subsets(allSubsets, lengths);
 	}
  
 	private Set<Set<Fact>> powerSet(Set<Fact> originalSet) {
@@ -55,14 +59,18 @@ public class SubsetsGenerator {
 		return sets; 
 	}
 	
-	private Set<Set<Fact>> selectLength(Set<Set<Fact>> allSets, int length) {
-		Set<Set<Fact>> result = Sets.newHashSet(Sets.newHashSet());
+	private Map<Integer, Set<Set<Fact>>> subsets(Set<Set<Fact>> allSets, Set<Integer> lengths) {
+		Map<Integer, Set<Set<Fact>>> results = Maps.newHashMap();
+		
+		for (int num : lengths) {
+			results.put(num, Sets.newHashSet());
+		}
 		
 		for (Set<Fact> set : allSets) {
-			if (set.size() == length) {
-				result.add(set);
+			if (results.containsKey(set.size())) {
+				results.get(set.size()).add(set);
 			}
 		}
-		return result;
+		return results;
 	}
 }

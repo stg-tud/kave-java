@@ -19,6 +19,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -88,7 +89,7 @@ public class QueriesGraphGenerator {
 			if (e.getNumEvents() > 1) {
 				int queryID = 0;
 				
-				Set<Episode> queries = queryGenerator.generateQueries(e, 0.5);
+				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
 				
 				Logger.log("Removing transitivity closures");
 				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
@@ -99,11 +100,13 @@ public class QueriesGraphGenerator {
 				writer.write(epGraph, getEpisodePath(directory, episodeID));
 				
 				if (!queries.isEmpty()) {
-					Set<Episode> simQueries = transitivityClosure.removeTransitivelyClosure(queries);
-					for (Episode query : simQueries) {
-						DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
-						writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
-						queryID++;
+					for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
+						Set<Episode> simQueries = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+						for (Episode query : simQueries) {
+							DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
+							writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
+							queryID++;
+						}
 					}
 				}
 				episodeID++;
