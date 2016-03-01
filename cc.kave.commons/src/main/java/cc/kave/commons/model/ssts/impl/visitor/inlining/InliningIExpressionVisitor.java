@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
@@ -44,18 +43,13 @@ import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -204,28 +198,22 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	public IExpression visit(IReferenceExpression expr, InliningContext context) {
 		// TODO: changed
-		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(expr.getReference());
 		expr.getReference().accept(context.getReferenceVisitor(), context);
-		return refExpr;
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(IConstantValueExpression expr, InliningContext context) {
-		ConstantValueExpression constant = new ConstantValueExpression();
-		constant.setValue(expr.getValue());
-		return constant;
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(IComposedExpression expr, InliningContext context) {
 		// TODO: changed
-		ComposedExpression composed = new ComposedExpression();
 		for (IVariableReference ref : expr.getReferences()) {
-			composed.getReferences().add(ref);
 			ref.accept(context.getReferenceVisitor(), context);
 		}
-		return composed;
+		return expr;
 	}
 
 	@Override
@@ -249,14 +237,12 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	@Override
 	public IExpression visit(INullExpression expr, InliningContext context) {
-		NullExpression expression = new NullExpression();
-		return expression;
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(IUnknownExpression unknownExpr, InliningContext context) {
-		UnknownExpression expression = new UnknownExpression();
-		return expression;
+		return unknownExpr;
 	}
 
 	@Override
@@ -270,16 +256,10 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 	@Override
 	public IExpression visit(ICompletionExpression entity, InliningContext context) {
 		// TODO: changed
-		CompletionExpression expression = new CompletionExpression();
-		IVariableReference objectReference = entity.getVariableReference();
-		if (objectReference != null){
-			expression.setObjectReference(
-					objectReference);
-			objectReference.accept(context.getReferenceVisitor(), context);
+		if (entity.getVariableReference() != null) {
+			entity.getVariableReference().accept(context.getReferenceVisitor(), context);
 		}
-		expression.setTypeReference(entity.getTypeReference());
-		expression.setToken(entity.getToken());
-		return expression;
+		return entity;
 		// TODO tests
 	}
 
@@ -294,24 +274,15 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 	@Override
 	public IExpression visit(ICastExpression expr, InliningContext context) {
 		// TODO: changed
-		CastExpression expression = new CastExpression();
-		expression.setOperator(expr.getOperator());
-		expression.setTargetType(expr.getTargetType());
-		expression
-				.setReference(expr.getReference());
 		expr.getReference().accept(context.getReferenceVisitor(), context);
-		return expression;
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(ITypeCheckExpression expr, InliningContext context) {
 		// TODO: changed
-		TypeCheckExpression expression = new TypeCheckExpression();
-		expression
-				.setReference(expr.getReference());
 		expr.getReference().accept(context.getReferenceVisitor(), context);
-		expression.setType(expr.getType());
-		return expression;
+		return expr;
 	}
 
 	@Override
@@ -331,8 +302,7 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 		IndexAccessExpression expression = new IndexAccessExpression();
 		for (ISimpleExpression e : expr.getIndices())
 			expression.getIndices().add((ISimpleExpression) e.accept(context.getExpressionVisitor(), context));
-		expression
-				.setReference(expr.getReference());
+		expression.setReference(expr.getReference());
 		expr.getReference().accept(context.getReferenceVisitor(), context);
 		return expression;
 	}
