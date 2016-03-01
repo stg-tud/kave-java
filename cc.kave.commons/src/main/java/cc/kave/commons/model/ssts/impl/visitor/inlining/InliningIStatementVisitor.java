@@ -16,7 +16,10 @@
 package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
@@ -82,19 +85,21 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.utils.SSTCloneUtil;
 
 public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<InliningContext, Void> {
 
 	@Override
 	public Void visit(ISST sst, InliningContext context) {
-		context.setNonEntryPoints(sst.getNonEntryPoints());
-		context.createSST(sst);
-		if (sst.getEntryPoints().size() > 0) {
-			for (IMethodDeclaration method : sst.getEntryPoints()) {
+		ISST clone = SSTCloneUtil.clone(sst, ISST.class);
+		context.setNonEntryPoints(clone.getNonEntryPoints());
+		context.createSST(clone);
+		if (clone.getEntryPoints().size() > 0) {
+			for (IMethodDeclaration method : clone.getEntryPoints()) {
 				method.accept(this, context);
 			}
 		} else {
-			for (IMethodDeclaration method : sst.getMethods()) {
+			for (IMethodDeclaration method : clone.getMethods()) {
 				context.addMethod(method);
 			}
 		}
@@ -144,17 +149,16 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	}
 
 	public Void visit(IVariableDeclaration stmt, InliningContext context) {
-		VariableDeclaration var = new VariableDeclaration();
-		var.setReference((IVariableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
-		var.setType(stmt.getType());
-		context.addStatement(var);
+		// TODO: changed
+		stmt.getReference().accept(context.getReferenceVisitor(), context);
+		context.addStatement(stmt);
 		return null;
 	}
 
 	public Void visit(IAssignment stmt, InliningContext context) {
-		Assignment assignment = new Assignment();
-		assignment.setReference(
-				(IAssignableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
+		// TODO: changed
+		Assignment assignment = (Assignment) stmt;
+		stmt.getReference().accept(context.getReferenceVisitor(), context);
 		assignment.setExpression(
 				(IAssignableExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
 		context.addStatement(assignment);
@@ -228,46 +232,57 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(IForEachLoop block, InliningContext context) {
-		ForEachLoop loop = new ForEachLoop();
+		// TODO: changed
+		ForEachLoop loop = (ForEachLoop) block;
 		loop.setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
-		loop.setLoopedReference(
-				(IVariableReference) block.getLoopedReference().accept(context.getReferenceVisitor(), context));
-		context.visitBlock(block.getBody(), loop.getBody());
+		block.getLoopedReference().accept(context.getReferenceVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getBody(), newBody);
+		loop.getBody().clear();
+		loop.getBody().addAll(newBody);
 		context.addStatement(loop);
 		return null;
 	}
 
 	@Override
 	public Void visit(ISwitchBlock block, InliningContext context) {
-		SwitchBlock switchBlock = new SwitchBlock();
-		switchBlock
-				.setReference((IVariableReference) block.getReference().accept(context.getReferenceVisitor(), context));
+		// TODO: changed
+		SwitchBlock switchBlock = (SwitchBlock) block;
+		block.getReference().accept(context.getReferenceVisitor(), context);
 		context.visitBlock(block.getDefaultSection(), switchBlock.getDefaultSection());
+		List<ICaseBlock> caseblocks = Lists.newArrayList();
 		for (ICaseBlock caseBlock : block.getSections()) {
 			CaseBlock newCase = new CaseBlock();
 			context.visitBlock(caseBlock.getBody(), newCase.getBody());
 			newCase.setLabel(caseBlock.getLabel());
-			switchBlock.getSections().add(newCase);
+			caseblocks.add(newCase);
 		}
+		switchBlock.getSections().clear();
+		switchBlock.getSections().addAll(caseblocks);
 		context.addStatement(switchBlock);
 		return null;
 	}
 
 	@Override
 	public Void visit(ILockBlock stmt, InliningContext context) {
-		LockBlock block = new LockBlock();
-		block.setReference((IVariableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
-		context.visitBlock(stmt.getBody(), block.getBody());
+		// TODO: changed
+		LockBlock block = (LockBlock) stmt;
+		stmt.getReference().accept(context.getReferenceVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(stmt.getBody(), newBody);
+		block.setBody(newBody);
 		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IUsingBlock block, InliningContext context) {
-		UsingBlock usingBlock = new UsingBlock();
-		usingBlock
-				.setReference((IVariableReference) block.getReference().accept(context.getReferenceVisitor(), context));
-		context.visitBlock(block.getBody(), usingBlock.getBody());
+		// TODO: changed
+		UsingBlock usingBlock = (UsingBlock) block;
+		block.getReference().accept(context.getReferenceVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getBody(), newBody);
+		usingBlock.setBody(newBody);
 		context.addStatement(usingBlock);
 		return null;
 	}
@@ -355,12 +370,12 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(IEventSubscriptionStatement stmt, InliningContext context) {
-		EventSubscriptionStatement statement = new EventSubscriptionStatement();
+		// TODO: changed
+		EventSubscriptionStatement statement = (EventSubscriptionStatement) stmt;
 		statement.setExpression(
 				(IAssignableExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
 		statement.setOperation(stmt.getOperation());
-		statement.setReference(
-				(IAssignableReference) stmt.getReference().accept(context.getReferenceVisitor(), context));
+		stmt.getReference().accept(context.getReferenceVisitor(), context);
 		context.addStatement(statement);
 		return null;
 	}
