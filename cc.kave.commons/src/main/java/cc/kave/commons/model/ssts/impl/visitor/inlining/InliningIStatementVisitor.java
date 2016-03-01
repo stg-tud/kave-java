@@ -40,9 +40,6 @@ import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
-import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
-import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -66,14 +63,10 @@ import cc.kave.commons.model.ssts.impl.statements.EventSubscriptionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
-import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.InvocationMethodNameVisitor;
-import cc.kave.commons.model.ssts.references.IAssignableReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
@@ -138,12 +131,11 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	}
 
 	public Void visit(IExpressionStatement stmt, InliningContext context) {
-		ExpressionStatement expr = new ExpressionStatement();
 		IAssignableExpression assExpr = (IAssignableExpression) stmt.getExpression()
 				.accept(context.getExpressionVisitor(), context);
 		if (assExpr != null) {
-			expr.setExpression(assExpr);
-			context.addStatement(expr);
+			((ExpressionStatement) stmt).setExpression(assExpr);
+			context.addStatement(stmt);
 		}
 		return null;
 	}
@@ -157,11 +149,13 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	public Void visit(IAssignment stmt, InliningContext context) {
 		// TODO: changed
-		Assignment assignment = (Assignment) stmt;
 		stmt.getReference().accept(context.getReferenceVisitor(), context);
-		assignment.setExpression(
-				(IAssignableExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
-		context.addStatement(assignment);
+		IAssignableExpression assExpr = (IAssignableExpression) stmt.getExpression()
+				.accept(context.getExpressionVisitor(), context);
+		if (assExpr != null) {
+			((Assignment) stmt).setExpression(assExpr);
+		}
+		context.addStatement(stmt);
 		return null;
 	}
 
@@ -182,51 +176,59 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 			context.setGuardNeeded(true);
 			context.setGlobalGuardNeeded(true);
 		} else {
-			ReturnStatement statement = new ReturnStatement();
-			statement.setIsVoid(stmt.isVoid());
-			statement.setExpression(
-					(ISimpleExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
-			context.addStatement(statement);
+			stmt.getExpression().accept(context.getExpressionVisitor(), context);
+			context.addStatement(stmt);
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(IForLoop block, InliningContext context) {
-		ForLoop loop = new ForLoop();
-		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		context.visitBlock(block.getInit(), loop.getInit());
-		context.visitBlock(block.getStep(), loop.getStep());
-		context.visitBlock(block.getBody(), loop.getBody());
-		context.addStatement(loop);
+		ForLoop stmt = (ForLoop) block;
+		block.getCondition().accept(context.getExpressionVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getInit(), newBody);
+		stmt.setInit(newBody);
+		newBody = Lists.newArrayList();
+		context.visitBlock(block.getStep(), newBody);
+		stmt.setStep(newBody);
+		newBody = Lists.newArrayList();
+		context.visitBlock(block.getBody(), newBody);
+		stmt.setBody(newBody);
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IWhileLoop block, InliningContext context) {
-		WhileLoop loop = new WhileLoop();
-		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		context.visitBlock(block.getBody(), loop.getBody());
-		context.addStatement(loop);
+		block.getCondition().accept(context.getExpressionVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getBody(), newBody);
+		((WhileLoop) block).setBody(newBody);
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IIfElseBlock block, InliningContext context) {
-		IfElseBlock ifelse = new IfElseBlock();
-		ifelse.setCondition((ISimpleExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		context.visitBlock(block.getElse(), ifelse.getElse());
-		context.visitBlock(block.getThen(), ifelse.getThen());
-		context.addStatement(ifelse);
+		block.getCondition().accept(context.getExpressionVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getElse(), newBody);
+		((IfElseBlock) block).setElse(newBody);
+		newBody = Lists.newArrayList();
+		context.visitBlock(block.getThen(), newBody);
+		((IfElseBlock) block).setThen(newBody);
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IDoLoop block, InliningContext context) {
-		DoLoop loop = new DoLoop();
-		loop.setCondition((ILoopHeaderExpression) block.getCondition().accept(context.getExpressionVisitor(), context));
-		context.visitBlock(block.getBody(), loop.getBody());
-		context.addStatement(loop);
+		block.getCondition().accept(context.getExpressionVisitor(), context);
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(block.getBody(), newBody);
+		((DoLoop) block).setBody(newBody);
+		context.addStatement(block);
 		return null;
 	}
 
@@ -371,13 +373,14 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(IEventSubscriptionStatement stmt, InliningContext context) {
 		// TODO: changed
-		EventSubscriptionStatement statement = (EventSubscriptionStatement) stmt;
-		statement.setExpression(
-				(IAssignableExpression) stmt.getExpression().accept(context.getExpressionVisitor(), context));
-		statement.setOperation(stmt.getOperation());
+		IAssignableExpression assExpr = (IAssignableExpression) stmt.getExpression()
+				.accept(context.getExpressionVisitor(), context);
+		if (assExpr != null) {
+			((EventSubscriptionStatement) stmt).setExpression(assExpr);
+		}
 		stmt.getReference().accept(context.getReferenceVisitor(), context);
-		context.addStatement(statement);
+		context.addStatement(stmt);
 		return null;
 	}
-	
+
 }

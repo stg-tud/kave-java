@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.IExpression;
@@ -42,12 +44,8 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
@@ -108,10 +106,11 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 				context.visitBlock(body, context.getBody());
 				context.leaveScope();
 				context.setInline(false);
-				if (!context.isVoid())
+				if (!context.isVoid()) {
 					return SSTUtil.referenceExprToVariable(context.getResultName());
-				else
+				} else {
 					return null;
+				}
 			}
 			context.leaveScope();
 			context.setInline(false);
@@ -125,7 +124,6 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 			// TODO: changed
 			expression.setReference(expr.getReference());
 			expr.getReference().accept(context.getReferenceVisitor(), context);
-
 			return expression;
 		}
 	}
@@ -218,21 +216,18 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	@Override
 	public IExpression visit(ILoopHeaderBlockExpression expr, InliningContext context) {
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		context.visitBlock(expr.getBody(), loopHeader.getBody());
-		return loopHeader;
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(expr.getBody(), newBody);
+		((LoopHeaderBlockExpression) expr).setBody(newBody);
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(IIfElseExpression expr, InliningContext context) {
-		IfElseExpression expression = new IfElseExpression();
-		expression
-				.setCondition((ISimpleExpression) expr.getCondition().accept(context.getExpressionVisitor(), context));
-		expression.setElseExpression(
-				(ISimpleExpression) expr.getElseExpression().accept(context.getExpressionVisitor(), context));
-		expression.setThenExpression(
-				(ISimpleExpression) expr.getThenExpression().accept(context.getExpressionVisitor(), context));
-		return expression;
+		expr.getCondition().accept(context.getExpressionVisitor(), context);
+		expr.getElseExpression().accept(context.getExpressionVisitor(), context);
+		expr.getThenExpression().accept(context.getExpressionVisitor(), context);
+		return expr;
 	}
 
 	@Override
@@ -247,10 +242,10 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	@Override
 	public IExpression visit(ILambdaExpression expr, InliningContext context) {
-		LambdaExpression expression = new LambdaExpression();
-		expression.setName(expr.getName());
-		context.visitBlock(expr.getBody(), expression.getBody());
-		return expression;
+		List<IStatement> newBody = Lists.newArrayList();
+		context.visitBlock(expr.getBody(), newBody);
+		((LambdaExpression) expr).setBody(newBody);
+		return expr;
 	}
 
 	@Override
@@ -265,10 +260,8 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	@Override
 	public IExpression visit(IUnaryExpression expr, InliningContext context) {
-		UnaryExpression expression = new UnaryExpression();
-		expression.setOperator(expr.getOperator());
-		expression.setOperand((ISimpleExpression) expr.getOperand().accept(context.getExpressionVisitor(), context));
-		return expression;
+		expr.getOperand().accept(context.getExpressionVisitor(), context);
+		return expr;
 	}
 
 	@Override
@@ -287,23 +280,17 @@ public class InliningIExpressionVisitor extends AbstractThrowingNodeVisitor<Inli
 
 	@Override
 	public IExpression visit(IBinaryExpression expr, InliningContext context) {
-		BinaryExpression expression = new BinaryExpression();
-		expression.setOperator(expr.getOperator());
-		expression.setLeftOperand(
-				(ISimpleExpression) expr.getLeftOperand().accept(context.getExpressionVisitor(), context));
-		expression.setRightOperand(
-				(ISimpleExpression) expr.getRightOperand().accept(context.getExpressionVisitor(), context));
-		return expression;
+		expr.getLeftOperand().accept(context.getExpressionVisitor(), context);
+		expr.getRightOperand().accept(context.getExpressionVisitor(), context);
+		return expr;
 	}
 
 	@Override
 	public IExpression visit(IIndexAccessExpression expr, InliningContext context) {
 		// TODO: changed
-		IndexAccessExpression expression = new IndexAccessExpression();
 		for (ISimpleExpression e : expr.getIndices())
-			expression.getIndices().add((ISimpleExpression) e.accept(context.getExpressionVisitor(), context));
-		expression.setReference(expr.getReference());
+			e.accept(context.getExpressionVisitor(), context);
 		expr.getReference().accept(context.getReferenceVisitor(), context);
-		return expression;
+		return expr;
 	}
 }

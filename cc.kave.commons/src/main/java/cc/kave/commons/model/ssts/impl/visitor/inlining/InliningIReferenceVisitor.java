@@ -15,14 +15,6 @@
  */
 package cc.kave.commons.model.ssts.impl.visitor.inlining;
 
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
-import cc.kave.commons.model.ssts.impl.references.EventReference;
-import cc.kave.commons.model.ssts.impl.references.FieldReference;
-import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
-import cc.kave.commons.model.ssts.impl.references.MethodReference;
-import cc.kave.commons.model.ssts.impl.references.PropertyReference;
-import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
@@ -33,43 +25,42 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
-public class InliningIReferenceVisitor extends AbstractThrowingNodeVisitor<InliningContext, IReference> {
+public class InliningIReferenceVisitor extends AbstractThrowingNodeVisitor<InliningContext, Void> {
 
-	public IReference visit(IVariableReference ref, InliningContext context) {
+	public Void visit(IVariableReference ref, InliningContext context) {
 		((VariableReference) ref).setIdentifier(((IVariableReference) context.resolve(ref)).getIdentifier());
 		return null;
 	}
 
 	@Override
-	public IReference visit(IUnknownReference unknownRef, InliningContext context) {
+	public Void visit(IUnknownReference unknownRef, InliningContext context) {
 		return null;
 	}
 
 	@Override
-	public IReference visit(IEventReference eventRef, InliningContext context) {
+	public Void visit(IEventReference eventRef, InliningContext context) {
 		return null;
 	}
 
 	@Override
-	public IReference visit(IFieldReference fieldRef, InliningContext context) {
+	public Void visit(IFieldReference fieldRef, InliningContext context) {
 		return null;
 	}
 
 	@Override
-	public IReference visit(IPropertyReference methodRef, InliningContext context) {
+	public Void visit(IPropertyReference methodRef, InliningContext context) {
 		return null;
 	}
 
 	@Override
-	public IReference visit(IMethodReference methodRef, InliningContext context) {
+	public Void visit(IMethodReference methodRef, InliningContext context) {
 		return null;
 	}
 
 	@Override
-	public IReference visit(IIndexAccessReference indexAccessRef, InliningContext context) {
-		IndexAccessReference ref = new IndexAccessReference();
-		ref.setExpression((IIndexAccessExpression) indexAccessRef.getExpression().accept(context.getExpressionVisitor(), context));;
-		return ref;
+	public Void visit(IIndexAccessReference indexAccessRef, InliningContext context) {
+		indexAccessRef.getExpression().accept(context.getExpressionVisitor(), context);
+		return null;
 	}
 
 }
