@@ -66,11 +66,10 @@ import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
-import cc.kave.commons.utils.ParentChildrenUtil;
+import cc.kave.commons.utils.SSTNodeHierarchy;
 
-public class ParentChildrenUtilTest {
+public class SSTNodeHierarchyTest {
 
-	ParentChildrenUtil sut;
 	IStatement stmt = new ContinueStatement();
 	IStatement stmt2 = new BreakStatement();
 	IVariableReference ref = new VariableReference();
@@ -453,7 +452,7 @@ public class ParentChildrenUtilTest {
 	}
 
 	private void assertChildrenParent(ISSTNode uut, List<ISSTNode> expected) {
-		sut = new ParentChildrenUtil(uut);
+		SSTNodeHierarchy sut = new SSTNodeHierarchy(uut);
 		List<ISSTNode> children = Lists.newArrayList(sut.getChildren(uut));
 		assertThat(children, equalTo(expected));
 		for (int i = 0; i < children.size(); i++) {

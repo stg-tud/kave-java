@@ -1,9 +1,32 @@
+/**
+ * Copyright 2016 Technische Universität Darmstadt
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cc.kave.commons.utils.clone;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
 
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.names.csharp.FieldName;
@@ -14,6 +37,7 @@ import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
@@ -56,6 +80,7 @@ import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -69,8 +94,12 @@ import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.utils.SSTCloneUtil;
+import cc.kave.commons.utils.SSTNodeHierarchy;
 
-public class SSTCloneUtilTest extends SSTCloneUtilBaseTest {
+public class SSTCloneUtilTest {
 
 	@Test
 	public void variableReference() {
@@ -465,6 +494,64 @@ public class SSTCloneUtilTest extends SSTCloneUtilBaseTest {
 		original.setSet(Lists.newArrayList(new ContinueStatement()));
 		original.setName(PropertyName.newPropertyName("P"));
 		assertClone(original);
+	}
+	
+	private static void assertClone(ISSTNode original) {
+		assertClone(original, SSTCloneUtil.clone(original, ISSTNode.class));
+	}
+
+	private static void assertClone(Iterable<ISSTNode> o, Iterable<ISSTNode> c) {
+		List<ISSTNode> original = Lists.newArrayList(o);
+		List<ISSTNode> clone = Lists.newArrayList(c);
+		assertThat(clone, equalTo(original));
+		assertThat(clone, not(sameInstance(original)));
+		for (int i = 0; i < original.size(); i++) {
+			assertClone(original.get(i), clone.get(i));
+		}
+	}
+
+	private static void assertClone(ISSTNode original, ISSTNode clone) {
+		assertThat(clone, equalTo(original));
+		assertThat(clone, not(sameInstance(original)));
+		SSTNodeHierarchy originalUtil = new SSTNodeHierarchy(original);
+		SSTNodeHierarchy cloneUtil = new SSTNodeHierarchy(clone);
+		assertClone(originalUtil.getChildren(original), cloneUtil.getChildren(clone));
+	}
+
+	private static ISST defaultSST() {
+		SST sst = new SST();
+		sst.setEnclosingType(TypeName.newTypeName("SST"));
+		sst.setPartialClassIdentifier("SST");
+		return sst;
+	}
+
+	private static IVariableReference someVarRef() {
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier("a");
+		return ref;
+	}
+
+	private static ConstantValueExpression constant() {
+		ConstantValueExpression expr = new ConstantValueExpression();
+		expr.setValue("a");
+		return expr;
+	}
+
+	private static ITypeName someType() {
+		return TypeName.newTypeName("t");
+	}
+
+	private static IAssignableExpression someExpr() {
+		UnaryExpression expr = new UnaryExpression();
+		expr.setOperand(constant());
+		return expr;
+	}
+
+	private static IVariableDeclaration someVarDec() {
+		VariableDeclaration var = new VariableDeclaration();
+		var.setReference(someVarRef());
+		var.setType(someType());
+		return var;
 	}
 
 }
