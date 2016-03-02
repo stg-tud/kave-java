@@ -78,10 +78,10 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		try (Stream<String> lines = Files.lines(cacheFile, StandardCharsets.UTF_8)) {
-			projectDirToStore
-					.putAll(lines.parallel().map(line -> Paths.get(line)).collect(Collectors.toMap(p -> p, p -> {
+			projectDirToStore.putAll(lines.parallel().map(line -> Paths.get(line))
+					.collect(Collectors.toMap(p -> baseDir.resolve(p), p -> {
 						try {
-							return new ProjectStore(p);
+							return new ProjectStore(baseDir.resolve(p));
 						} catch (IOException e) {
 							throw new UncheckedIOException(e);
 						}
@@ -96,7 +96,7 @@ public class ProjectUsageStore implements UsageStore {
 	private void storeCache() throws IOException {
 		Path cacheFile = baseDir.resolve(CACHE_FILENAME);
 
-		try (Stream<String> lines = projectDirToStore.keySet().stream().map(p -> p.toString())) {
+		try (Stream<String> lines = projectDirToStore.keySet().stream().map(p -> baseDir.relativize(p).toString())) {
 			Files.write(cacheFile, (Iterable<String>) lines::iterator, StandardCharsets.UTF_8);
 		}
 		cacheInvalidated = false;
@@ -127,6 +127,21 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		return store;
+	}
+
+	public ProjectIdentifier convert(ProjectIdentifier project, ProjectUsageStore other) {
+		if (!projectDirToStore.containsKey(project.getProjectDirectory())) {
+			return null;
+		}
+
+		Path relativeProjectDir = baseDir.relativize(project.getProjectDirectory());
+		Path otherProjectDir = other.baseDir.resolve(relativeProjectDir);
+
+		if (other.projectDirToStore.containsKey(otherProjectDir)) {
+			return new ProjectIdentifier(otherProjectDir);
+		} else {
+			return null;
+		}
 	}
 
 	public void store(Collection<Usage> usages, ProjectIdentifier project) throws IOException {
@@ -283,7 +298,7 @@ public class ProjectUsageStore implements UsageStore {
 					}.getType());
 			for (Map.Entry<ITypeName, Collection<String>> typeFile : typeFiles.entrySet()) {
 				for (String file : typeFile.getValue()) {
-					typeToZipFiles.put(typeFile.getKey(), Paths.get(file));
+					typeToZipFiles.put(typeFile.getKey(), projectDir.resolve(file));
 				}
 			}
 
@@ -293,7 +308,7 @@ public class ProjectUsageStore implements UsageStore {
 		private void storeCache() throws IOException {
 			Multimap<ITypeName, String> typeFiles = HashMultimap.create(typeToZipFiles.keys().size(), 1);
 			for (Map.Entry<ITypeName, Path> typeFile : typeToZipFiles.entries()) {
-				typeFiles.put(typeFile.getKey(), typeFile.getValue().toString());
+				typeFiles.put(typeFile.getKey(), projectDir.relativize(typeFile.getValue()).toString());
 			}
 			GsonUtil.serialize(typeFiles.asMap(), projectDir.resolve(CACHE_FILENAME).toFile());
 			cacheInvalidated = false;

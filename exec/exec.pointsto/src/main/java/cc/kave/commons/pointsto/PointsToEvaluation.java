@@ -31,8 +31,9 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
-import cc.kave.commons.pointsto.statistics.TypeHistogramUsageStatisticsCollector;
+import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
@@ -72,7 +73,7 @@ public class PointsToEvaluation {
 			};
 
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, usageStoreFactory,
-					new TypeHistogramUsageStatisticsCollector());
+					new TypeStatisticsCollector(new PointsToUsageFilter()));
 
 			Stopwatch stopwatch = Stopwatch.createStarted();
 			generator.generateUsages();
