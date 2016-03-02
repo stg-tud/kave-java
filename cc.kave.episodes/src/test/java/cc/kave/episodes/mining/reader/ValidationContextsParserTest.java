@@ -57,7 +57,6 @@ import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
 
 public class ValidationContextsParserTest {
 
@@ -148,24 +147,6 @@ public class ValidationContextsParserTest {
 		verify(ras.get("a")).getNext(Context.class);
 
 		assertEquals(expected, actuals);
-	}
-	
-	@Test
-	public void logTest() throws ZipException, IOException {
-		List<Event> events = new LinkedList<Event>();
-		Logger.clearLog();
-
-		sut.logStructure(events);
-
-		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
-		verify(rootDirectory).getReadingArchive("a");
-		verify(ras.get("a"), times(2)).hasNext();
-		verify(ras.get("a")).getNext(Context.class);
-
-		assertLogContains(0, "#Invocations\t#Targets\n");
-		assertLogContains(1, "0\t1\n");
-		assertLogContains(2, "2\t1\n");
-		
 	}
 
 	@Test
