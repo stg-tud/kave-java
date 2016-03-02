@@ -77,7 +77,18 @@ public class CVEvaluator {
 
 		}
 
+		log("\tFold size σ: %.1f\n", calcFoldSizeStdDev(folds));
+
 		return StatUtils.mean(evaluationResults);
+	}
+
+	private <T> double calcFoldSizeStdDev(List<List<T>> folds) {
+		DescriptiveStatistics statistics = new DescriptiveStatistics();
+		for (List<T> fold : folds) {
+			statistics.addValue(fold.size());
+		}
+
+		return statistics.getStandardDeviation();
 	}
 
 	private static List<Usage> getTraining(int validationIndex, List<List<Usage>> folds) {
