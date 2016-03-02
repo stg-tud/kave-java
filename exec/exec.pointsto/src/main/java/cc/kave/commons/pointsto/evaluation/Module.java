@@ -26,6 +26,8 @@ import com.google.inject.TypeLiteral;
 
 import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
+import cc.kave.commons.pointsto.evaluation.cv.CrossValidationFoldBuilder;
+import cc.kave.commons.pointsto.evaluation.cv.ProjectCVFoldBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;
 import cc.recommenders.mining.calls.MiningOptions.DistanceMeasure;

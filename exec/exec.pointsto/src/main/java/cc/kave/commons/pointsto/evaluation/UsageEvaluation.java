@@ -33,6 +33,8 @@ import com.google.inject.Injector;
 
 import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
+import cc.kave.commons.pointsto.evaluation.cv.CVEvaluator;
+import cc.kave.commons.pointsto.evaluation.cv.CrossValidationFoldBuilder;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.recommenders.names.ITypeName;
