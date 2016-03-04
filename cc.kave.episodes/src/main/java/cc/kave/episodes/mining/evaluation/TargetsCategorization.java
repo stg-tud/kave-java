@@ -48,9 +48,13 @@ public class TargetsCategorization {
 	public void categorize() throws ZipException, IOException {
 		Logger.setPrinting(true);
 		
+		Logger.log("Reading the events mapping file ...");
 		List<Event> events = mappingParser.parse();
+		
+		Logger.log("Reading validation data ...");
 		Set<Episode> targets = validationParser.parse(events);
 		
+		Logger.log("Categorizing targets ...");
 		for (Episode target : targets) {
 			int numInv = target.getNumEvents() - 1;
 			
@@ -62,7 +66,7 @@ public class TargetsCategorization {
 			}
 		}
 		
-		append("#Invocations\t#Targets\n");
+		append("\n#Invocations\t#Targets\n");
 		for (Map.Entry<Integer, Integer> entry : structure.entrySet()) {
 			append("%d\t%d\n", entry.getKey(), entry.getValue());
 		}

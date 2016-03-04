@@ -79,10 +79,14 @@ public class TargetsCategorizationTest {
 		verify(mappingParser).parse();
 		verify(validationParser).parse(events);
 		
-		assertLogContains(0, "#Invocations\t#Targets\n");
-		assertLogContains(1, "0\t1\n");
-		assertLogContains(2, "1\t2\n");
-		assertLogContains(3, "2\t1\n");
+		assertLogContains(0, "Reading the events mapping file ...");
+		assertLogContains(1, "Reading validation data ...");
+		assertLogContains(2, "Categorizing targets ...");
+		
+		assertLogContains(3, "\n#Invocations\t#Targets\n");
+		assertLogContains(4, "0\t1\n");
+		assertLogContains(5, "1\t2\n");
+		assertLogContains(6, "2\t1\n");
 	}
 	
 	private Episode createTarget(String...strings) {

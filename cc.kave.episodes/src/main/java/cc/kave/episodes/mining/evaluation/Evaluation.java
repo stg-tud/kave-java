@@ -85,7 +85,7 @@ public class Evaluation {
 		
 		int episodeNo = 0;
 		for (Episode e : validationData) {
-			if (e.getNumEvents() > 2 && e.getNumEvents() < 7) {
+			if (e.getNumEvents() > 10 && e.getNumEvents() < 21) {
 				Logger.log("Generating queries for episode %d with %d number of invocations", episodeNo, e.getNumEvents() - 1);
 				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
 				
