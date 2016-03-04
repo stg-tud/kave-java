@@ -17,9 +17,12 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -129,26 +132,12 @@ public class ProjectUsageStore implements UsageStore {
 		return store;
 	}
 
-	public ProjectIdentifier convert(ProjectIdentifier project, ProjectUsageStore other) {
-		if (!projectDirToStore.containsKey(project.getProjectDirectory())) {
-			return null;
-		}
-
-		Path relativeProjectDir = baseDir.relativize(project.getProjectDirectory());
-		Path otherProjectDir = other.baseDir.resolve(relativeProjectDir);
-
-		if (other.projectDirToStore.containsKey(otherProjectDir)) {
-			return new ProjectIdentifier(otherProjectDir);
-		} else {
-			return null;
-		}
+	public String getName() {
+		return baseDir.getFileName().toString();
 	}
 
 	public void store(Collection<Usage> usages, ProjectIdentifier project) throws IOException {
-		invalidateCache();
-
-		ProjectStore store = getProjectStore(project.getProjectDirectory());
-		store.store(usages, null);
+		store(usages, project.getProjectDirectory());
 	}
 
 	@Override
@@ -182,7 +171,8 @@ public class ProjectUsageStore implements UsageStore {
 		synchronized (projectDirToStore) {
 			for (Map.Entry<Path, ProjectStore> entry : projectDirToStore.entrySet()) {
 				if (entry.getValue().getAllTypes().contains(type)) {
-					projects.add(new ProjectIdentifier(entry.getKey()));
+					Path relativeProjectDir = baseDir.relativize(entry.getKey());
+					projects.add(new ProjectIdentifier(relativeProjectDir));
 				}
 			}
 		}
@@ -195,7 +185,8 @@ public class ProjectUsageStore implements UsageStore {
 
 		synchronized (projectDirToStore) {
 			for (Map.Entry<Path, ProjectStore> entry : projectDirToStore.entrySet()) {
-				ProjectIdentifier identifier = new ProjectIdentifier(entry.getKey());
+				Path relativeProjectDir = baseDir.relativize(entry.getKey());
+				ProjectIdentifier identifier = new ProjectIdentifier(relativeProjectDir);
 				int count = entry.getValue().getNumberOfUsages(type);
 				projectUsageCounts.put(identifier, count);
 			}
@@ -214,7 +205,8 @@ public class ProjectUsageStore implements UsageStore {
 
 		synchronized (projectDirToStore) {
 			for (Map.Entry<Path, ProjectStore> projectEntry : projectDirToStore.entrySet()) {
-				ProjectIdentifier identifier = new ProjectIdentifier(projectEntry.getKey());
+				Path relativeProjectDir = baseDir.relativize(projectEntry.getKey());
+				ProjectIdentifier identifier = new ProjectIdentifier(relativeProjectDir);
 				projectUsages.put(identifier, projectEntry.getValue().load(type, filter));
 			}
 		}
@@ -323,8 +315,30 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		private static Set<Path> getProjectDirs(Path basePath) throws IOException {
-			return IOHelper.streamFiles(TYPE_FILE_PATTERN, basePath).map(typeFile -> typeFile.getParent().getParent())
-					.collect(Collectors.toSet());
+			Set<Path> projectDirs = new HashSet<>();
+			Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					if (file.getFileName().toString().matches(TYPE_FILE_PATTERN)) {
+						projectDirs.add(file.getParent().getParent());
+						return FileVisitResult.SKIP_SIBLINGS;
+					} else {
+						return FileVisitResult.CONTINUE;
+					}
+				}
+
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+					if (projectDirs.contains(dir.getParent())) {
+						return FileVisitResult.SKIP_SIBLINGS;
+					} else {
+						return FileVisitResult.CONTINUE;
+					}
+				}
+			});
+
+			return projectDirs;
 		}
 
 		private Path getTypePath(ITypeName type) {
