@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.recommenders.names.ITypeName;
@@ -28,7 +29,7 @@ import cc.recommenders.names.Names;
 
 public class CSVExporter implements ResultExporter {
 
-	private static final char SEPARATOR = ' ';
+	private static final String SEPARATOR = " ";
 
 	@Override
 	public void export(Path target, Map<ITypeName, Double> results) throws IOException {
@@ -45,6 +46,12 @@ public class CSVExporter implements ResultExporter {
 				writer.newLine();
 			}
 		}
+	}
+
+	@Override
+	public void export(Path target, Stream<String[]> lines) throws IOException {
+		Stream<String> sortedLines = lines.map(l -> String.join(SEPARATOR, l)).sorted();
+		Files.write(target, (Iterable<String>) sortedLines::iterator, StandardCharsets.UTF_8);
 	}
 
 }

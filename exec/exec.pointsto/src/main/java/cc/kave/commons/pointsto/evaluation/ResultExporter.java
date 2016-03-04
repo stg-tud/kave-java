@@ -15,10 +15,13 @@ package cc.kave.commons.pointsto.evaluation;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import cc.recommenders.names.ITypeName;
 
 public interface ResultExporter {
 
 	void export(Path target, Map<ITypeName, Double> results) throws IOException;
+
+	void export(Path target, Stream<String[]> lines) throws IOException;
 }
