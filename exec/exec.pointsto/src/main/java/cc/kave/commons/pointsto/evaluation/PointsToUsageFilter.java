@@ -30,21 +30,28 @@ public class PointsToUsageFilter implements Predicate<Usage> {
 	@Override
 	public boolean test(Usage usage) {
 
-		ITypeName type = usage.getType();
-
-		if (type.isArrayType()) {
-			return false;
-		}
-
 		if (usage.getReceiverCallsites().isEmpty()) {
 			return false;
 		}
 
-		if (PRIMITIVE_TYPE_NAMES.contains(Names.vm2srcQualifiedType(type))) {
+		ITypeName type = usage.getType();
+		if (!test(type)) {
 			return false;
 		}
 
 		return true;
+	}
+
+	public boolean test(ITypeName type) {
+		if (type.isArrayType()) {
+			return false;
+		}
+
+		return !isPrimitiveType(type);
+	}
+
+	public boolean isPrimitiveType(ITypeName type) {
+		return PRIMITIVE_TYPE_NAMES.contains(Names.vm2srcQualifiedType(type));
 	}
 
 }
