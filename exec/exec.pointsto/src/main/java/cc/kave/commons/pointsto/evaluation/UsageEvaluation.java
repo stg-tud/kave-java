@@ -35,6 +35,8 @@ import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
 import cc.kave.commons.pointsto.evaluation.cv.CVEvaluator;
 import cc.kave.commons.pointsto.evaluation.cv.CrossValidationFoldBuilder;
+import cc.kave.commons.pointsto.evaluation.cv.SetProvider;
+import cc.kave.commons.pointsto.evaluation.cv.UsageSetProvider;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.recommenders.names.ITypeName;
@@ -133,9 +135,11 @@ public class UsageEvaluation {
 		log("\t%d usages in total\n", numUsages);
 
 		List<List<Usage>> folds = foldBuilder.createFolds(projectUsages);
-		double score = cvEvaluator.evaluate(folds);
+		SetProvider setProvider = new UsageSetProvider(folds);
+		double score = cvEvaluator.evaluate(setProvider);
 		results.put(type, score);
 		log("\tF1: %.3f\n", score);
+		log("\tFold size deviation: %.1f\n", setProvider.getAbsoluteFoldSizeDeviation());
 	}
 
 	private static final Injector INJECTOR = Guice.createInjector(new Module());

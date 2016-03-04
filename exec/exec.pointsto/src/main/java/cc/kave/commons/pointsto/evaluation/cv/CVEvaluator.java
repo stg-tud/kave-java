@@ -31,6 +31,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Measure;
 import cc.recommenders.evaluation.queries.QueryBuilder;
@@ -44,25 +45,26 @@ import cc.recommenders.usages.Usage;
 
 public class CVEvaluator {
 
+	private final int numFolds;
 	private Provider<PBNMiner> pbnMinerProvider;
 	private QueryBuilderFactory queryBuilderFactory;
 	private ExecutorService executorService;
 
 	@Inject
-	public CVEvaluator(Provider<PBNMiner> pbnMinerProvider, QueryBuilderFactory queryBuilderFactory,
-			ExecutorService executorService) {
+	public CVEvaluator(@NumberOfCVFolds int numFolds, Provider<PBNMiner> pbnMinerProvider,
+			QueryBuilderFactory queryBuilderFactory, ExecutorService executorService) {
+		this.numFolds = numFolds;
 		this.pbnMinerProvider = pbnMinerProvider;
 		this.queryBuilderFactory = queryBuilderFactory;
 		this.executorService = executorService;
 	}
 
-	public double evaluate(List<List<Usage>> folds) {
-		int numFolds = folds.size();
+	public double evaluate(SetProvider setProvider) {
 		List<Future<Pair<Integer, Double>>> futures = new ArrayList<>(numFolds);
 		double[] evaluationResults = new double[numFolds];
 
 		for (int i = 0; i < numFolds; ++i) {
-			futures.add(executorService.submit(new FoldEvaluation(i, folds)));
+			futures.add(executorService.submit(new FoldEvaluation(i, setProvider)));
 		}
 
 		for (int i = 0; i < evaluationResults.length; ++i) {
@@ -70,38 +72,16 @@ public class CVEvaluator {
 				Pair<Integer, Double> result = futures.get(i).get();
 				evaluationResults[i] = result.getValue();
 				log("\tFold %d: %.3f\n", i + 1, evaluationResults[i]);
-			} catch (InterruptedException | ExecutionException e) {
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e.getCause());
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return Double.NaN;
 			}
 
 		}
 
-		log("\tFold size σ: %.1f\n", calcFoldSizeStdDev(folds));
-
 		return StatUtils.mean(evaluationResults);
-	}
-
-	private <T> double calcFoldSizeStdDev(List<List<T>> folds) {
-		DescriptiveStatistics statistics = new DescriptiveStatistics();
-		for (List<T> fold : folds) {
-			statistics.addValue(fold.size());
-		}
-
-		return statistics.getStandardDeviation();
-	}
-
-	private static List<Usage> getTraining(int validationIndex, List<List<Usage>> folds) {
-		int numFolds = folds.size();
-		List<Usage> training = new ArrayList<>((numFolds - 1) * folds.get(0).size());
-
-		for (int i = 0; i < numFolds; ++i) {
-			if (i != validationIndex) {
-				training.addAll(folds.get(i));
-			}
-		}
-
-		return training;
 	}
 
 	private static Set<IMethodName> getExpectation(Usage validationUsage, Query q) {
@@ -126,18 +106,22 @@ public class CVEvaluator {
 
 	private class FoldEvaluation implements Callable<Pair<Integer, Double>> {
 
-		private int validationFoldIndex;
-		private List<List<Usage>> folds;
+		private final int validationFoldIndex;
+		private final SetProvider setProvider;
 
-		public FoldEvaluation(int validationFoldIndex, List<List<Usage>> folds) {
+		public FoldEvaluation(int validationFoldIndex, SetProvider setProvider) {
 			this.validationFoldIndex = validationFoldIndex;
-			this.folds = folds;
+			this.setProvider = setProvider;
 		}
 
 		@Override
 		public Pair<Integer, Double> call() throws Exception {
-			List<Usage> training = getTraining(validationFoldIndex, folds);
-			List<Usage> validation = folds.get(validationFoldIndex);
+			List<Usage> training = setProvider.getTrainingSet(validationFoldIndex);
+			List<Usage> validation = setProvider.getValidationSet(validationFoldIndex);
+
+			if (training.isEmpty() || validation.isEmpty()) {
+				throw new EmptySetException();
+			}
 
 			PBNMiner pbnMiner = pbnMinerProvider.get();
 			ICallsRecommender<Query> recommender = pbnMiner.createRecommender(training);
