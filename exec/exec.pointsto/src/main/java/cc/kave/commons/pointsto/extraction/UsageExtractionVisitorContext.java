@@ -96,6 +96,10 @@ public class UsageExtractionVisitorContext {
 		return new ArrayList<>(locationUsages.values());
 	}
 
+	public Query getUsage(AbstractLocation location) {
+		return locationUsages.get(location);
+	}
+
 	public void setEntryPoint(IMethodName method) {
 		currentCallpath = new Callpath(method);
 		currentStatement = null;
@@ -269,7 +273,8 @@ public class UsageExtractionVisitorContext {
 
 		PointsToQuery query = new PointsToQuery(SSTBuilder.variableReference(parameter.getName()), null,
 				parameter.getValueType(), currentCallpath);
-		DefinitionSite newDefinition = DefinitionSites.createDefinitionByParam(CoReNameConverter.convert(method), argIndex);
+		DefinitionSite newDefinition = DefinitionSites.createDefinitionByParam(CoReNameConverter.convert(method),
+				argIndex);
 
 		updateDefinitions(query, newDefinition);
 	}

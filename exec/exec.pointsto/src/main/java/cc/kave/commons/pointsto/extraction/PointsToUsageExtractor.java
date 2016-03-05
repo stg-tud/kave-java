@@ -14,16 +14,27 @@ package cc.kave.commons.pointsto.extraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.pointsto.analysis.AbstractLocation;
+import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.analysis.PointsToQuery;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.recommenders.exceptions.AssertionException;
@@ -37,13 +48,20 @@ public class PointsToUsageExtractor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageExtractor.class);
 
+	private final DescentStrategy descentStrategy;
+
 	private UsageStatisticsCollector collector;
 
 	public PointsToUsageExtractor() {
-		this.collector = new NopUsageStatisticsCollector();
+		this(new SimpleDescentStrategy(), new NopUsageStatisticsCollector());
 	}
 
 	public PointsToUsageExtractor(UsageStatisticsCollector collector) {
+		this(new SimpleDescentStrategy(), collector);
+	}
+
+	public PointsToUsageExtractor(DescentStrategy descentStrategy, UsageStatisticsCollector collector) {
+		this.descentStrategy = descentStrategy;
 		this.collector = collector;
 	}
 
@@ -60,8 +78,7 @@ public class PointsToUsageExtractor {
 
 		List<Usage> contextUsages = new ArrayList<>();
 		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
-		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context,
-				new SimpleDescentStrategy());
+		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context, descentStrategy);
 		String className = context.getSST().getEnclosingType().getName();
 		for (IMethodDeclaration methodDecl : context.getSST().getEntryPoints()) {
 			try {
@@ -83,6 +100,54 @@ public class PointsToUsageExtractor {
 		}
 
 		return contextUsages;
+	}
+
+	public List<Usage> extractQueries(ICompletionExpression completionExpression, PointsToContext context) {
+		if (completionExpression.getTypeReference() == null && completionExpression.getVariableReference() == null) {
+			LOGGER.error("Cannot extract queries if neither type nor variable information is available");
+			return Collections.emptyList();
+		}
+
+		// find enclosing method and statement
+		Map<Class<? extends ISSTNode>, ISSTNode> completionContext = new HashMap<>();
+		completionContext.put(ICompletionExpression.class, completionExpression);
+		context.getSST().accept(new CompletionExpressionContextVisitor(), completionContext);
+		IMethodDeclaration enclosingMethod = (IMethodDeclaration) completionContext.get(IMethodDeclaration.class);
+		if (enclosingMethod == null) {
+			LOGGER.error("Failed to find enclosing method of completion expression");
+			return Collections.emptyList();
+		}
+		IStatement enclosingStatement = (IStatement) completionContext.get(IStatement.class);
+
+		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
+		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context, descentStrategy);
+
+		try {
+			// treat the enclosing method as entry point although it might not be one
+			visitor.visitEntryPoint(enclosingMethod, visitorContext);
+
+			PointsToQuery ptQuery = new PointsToQuery(completionExpression.getVariableReference(), enclosingStatement,
+					completionExpression.getTypeReference(), new Callpath(enclosingMethod.getName()));
+			Set<AbstractLocation> locations = context.getPointerAnalysis().query(ptQuery);
+			List<Query> usages = new ArrayList<>();
+			for (AbstractLocation location : locations) {
+				Query usage = visitorContext.getUsage(location);
+				if (usage != null) {
+					usages.add(usage);
+				}
+			}
+
+			// just rewrite, do not prune
+			rewriteUsages(usages, context.getTypeShape());
+
+			return new ArrayList<Usage>(usages);
+		} catch (AssertionException | UnexpectedSSTNodeException ex) {
+			throw ex;
+		} catch (RuntimeException ex) {
+			LOGGER.error("Failed to extract queries", ex);
+			return Collections.emptyList();
+		}
+
 	}
 
 	private List<Query> processUsages(List<Query> rawUsages, ITypeShape typeShape) {

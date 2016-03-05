@@ -90,7 +90,11 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 	}
 
 	protected IReference normalizeReference(IReference reference) {
-		return reference.accept(referenceNormalizationVisitor, null);
+		if (reference == null) {
+			return null;
+		} else {
+			return reference.accept(referenceNormalizationVisitor, null);
+		}
 	}
 
 }

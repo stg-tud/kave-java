@@ -266,7 +266,10 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 
 	@Override
 	public TReturn visit(ICompletionExpression entity, TContext context) {
-		return entity.getVariableReference().accept(this, context);
+		if (entity.getVariableReference() != null) {
+			return entity.getVariableReference().accept(this, context);
+		}
+		return null;
 	}
 
 	@Override
