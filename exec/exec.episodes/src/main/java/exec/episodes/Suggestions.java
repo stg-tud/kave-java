@@ -33,12 +33,13 @@ public class Suggestions {
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
 	private EpisodeAsGraphWriter graphWriter;
-	
+
 	private File rootFolder;
-	 
+
 	@Inject
-	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalEpisodes maximalEpisodes, TransitivelyClosedEpisodes transitivityClosure,
-			EventMappingParser eventMapping, EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter,  EpisodeAsGraphWriter graphWriter) {
+	public Suggestions(@Named("graph") File directory, EpisodeParser episodeParser, MaximalEpisodes maximalEpisodes,
+			TransitivelyClosedEpisodes transitivityClosure, EventMappingParser eventMapping,
+			EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.maximalEpisodes = maximalEpisodes;
@@ -48,40 +49,47 @@ public class Suggestions {
 		this.graphConverter = graphConverter;
 		this.graphWriter = graphWriter;
 	}
-	
-//	public void run() throws Exception {
-//		Map<Integer, List<Episode>> allEpisodes = episodeParser.parse();
-//		Map<Integer, List<Episode>> maxEpisodes = maximalEpisodes.getMaximalFrequentEpisodes(allEpisodes);
-//		Map<Integer, List<Episode>> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(maxEpisodes);
-//		List<Event> eventMapper = eventMappingParser.parse();
-//		List<Method> listOfQueries = queryGenerator.parse();
-//		
-//		int queryIndex = 0;
-//		
-//		for (Episode query : listOfQueries) {
-//			if (queryIndex == 1489) {
-//				queryIndex++;
-//				continue;
-//			}
-//			int proposalIndex = 0;
-//			Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, learnedEpisodes, 3); 
-//			if (proposals.size() > 0) {
-//				continue;
-//			}
-//			DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(query, eventMapper);
-//			graphWriter.write(queryGraph, getFilePath("query", queryIndex, proposalIndex));
-//			Iterator<Tuple<Episode, Double>> iterator = proposals.iterator();
-//			while (iterator.hasNext()) {
-//				Tuple<Episode, Double> p = iterator.next();
-//				DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(p.getFirst(), eventMapper);
-//				graphWriter.write(proposalGraph, getFilePath("proposal", queryIndex, proposalIndex));
-//				proposalIndex++;
-//			}
-//			Logger.log("Finished writting query%d", queryIndex);
-//			queryIndex++;
-//		}
-//	}
-	
+
+	// public void run() throws Exception {
+	// Map<Integer, List<Episode>> allEpisodes = episodeParser.parse();
+	// Map<Integer, List<Episode>> maxEpisodes =
+	// maximalEpisodes.getMaximalFrequentEpisodes(allEpisodes);
+	// Map<Integer, List<Episode>> learnedEpisodes =
+	// transitivityClosure.removeTransitivelyClosure(maxEpisodes);
+	// List<Event> eventMapper = eventMappingParser.parse();
+	// List<Method> listOfQueries = queryGenerator.parse();
+	//
+	// int queryIndex = 0;
+	//
+	// for (Episode query : listOfQueries) {
+	// if (queryIndex == 1489) {
+	// queryIndex++;
+	// continue;
+	// }
+	// int proposalIndex = 0;
+	// Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query,
+	// learnedEpisodes, 3);
+	// if (proposals.size() > 0) {
+	// continue;
+	// }
+	// DirectedGraph<Fact, DefaultEdge> queryGraph =
+	// graphConverter.convert(query, eventMapper);
+	// graphWriter.write(queryGraph, getFilePath("query", queryIndex,
+	// proposalIndex));
+	// Iterator<Tuple<Episode, Double>> iterator = proposals.iterator();
+	// while (iterator.hasNext()) {
+	// Tuple<Episode, Double> p = iterator.next();
+	// DirectedGraph<Fact, DefaultEdge> proposalGraph =
+	// graphConverter.convert(p.getFirst(), eventMapper);
+	// graphWriter.write(proposalGraph, getFilePath("proposal", queryIndex,
+	// proposalIndex));
+	// proposalIndex++;
+	// }
+	// Logger.log("Finished writting query%d", queryIndex);
+	// queryIndex++;
+	// }
+	// }
+
 	private String getFilePath(String fileName, int queryIndex, int proposalIndex) {
 		String directory = rootFolder.getAbsolutePath() + "/queries/";
 		if (!(new File(directory).isDirectory())) {

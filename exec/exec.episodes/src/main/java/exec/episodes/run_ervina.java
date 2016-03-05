@@ -37,28 +37,29 @@ public class run_ervina {
 	public static void main(String[] args) throws Exception {
 		initLogger();
 		printAvailableMemory();
-		
+
 		String rootFolder = readPropertyFromFile(PROPERTY_NAME);
 		injector = Guice.createInjector(new Module(rootFolder));
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-//		load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
-//		load(QueriesGraphGenerator.class).generateGraphs();
-//		load(EpisodeGraphGeneratorTrainingData.class).generateGraphs(5, 0.01);
-//		load(RecommenderGraphGenerator.class).generateGraphs();
-//		load(ProposalStrategyProvider.class).evaluate();
+		// load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
+		// load(QueriesGraphGenerator.class).generateGraphs();
+		// load(EpisodeGraphGeneratorTrainingData.class).generateGraphs(5,
+		// 0.01);
+		// load(RecommenderGraphGenerator.class).generateGraphs();
+		// load(ProposalStrategyProvider.class).evaluate();
 		load(Evaluation.class).evaluate();
-//		load(TargetsCategorization.class).categorize();
-		
-//		load(Suggestions.class).run();
-//		load(EventStreamModifier.class).modify();
-//		load(EventStreamReader.class).read();
-//		load(MappingReader.class).read();
-	
-//		load(PatternAnalyzer.class).readPatterns();
-		
+		// load(TargetsCategorization.class).categorize();
+
+		// load(Suggestions.class).run();
+		// load(EventStreamModifier.class).modify();
+		// load(EventStreamReader.class).read();
+		// load(MappingReader.class).read();
+
+		// load(PatternAnalyzer.class).readPatterns();
+
 		Logger.log("done");
 	}
 

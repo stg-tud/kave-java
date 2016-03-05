@@ -43,7 +43,7 @@ public class DoSomething {
 
 	public void run(String fileEventStream, String fileEventMapping, String dirContexts) throws IOException {
 		readAllContexts(dirContexts);
-//		readMapping(fileEventMapping);
+		// readMapping(fileEventMapping);
 	}
 
 	private void readAllContexts(String dirContexts) throws ZipException, IOException {
@@ -55,23 +55,23 @@ public class DoSomething {
 			System.out.println("found contexts for the following classes:");
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				
-				
-				
-				List<Event> events = Lists.newLinkedList(); // get from somewhere ("eventMapping.txt")
+
+				List<Event> events = Lists.newLinkedList(); // get from
+															// somewhere
+															// ("eventMapping.txt")
 				ToFactsVisitor tfv = new ToFactsVisitor(events);
-				
+
 				ISST sst = ctx.getSST();
-				for(IMethodDeclaration md : sst.getMethods()) {
+				for (IMethodDeclaration md : sst.getMethods()) {
 					Episode ep = new Episode();
 					Set<Fact> facts = Sets.newHashSet();
 					md.accept(tfv, facts);
-					
-					for(Fact f : facts){
+
+					for (Fact f : facts) {
 						ep.addFact(f);
 					}
 				}
-				
+
 				System.out.println("\t- " + ctx.getSST().getEnclosingType());
 
 				if (i++ > 10) {
@@ -101,7 +101,7 @@ public class DoSomething {
 
 		System.out.printf("found %s events:\n", events.size());
 		int i = 1;
-//		events.indexOf(event)
+		// events.indexOf(event)
 		for (Event e : events) {
 			if (i == 4978 || i == 8698 || i == 8708 || i == 8718 || i == 8725 || i == 4641) {
 				i++;

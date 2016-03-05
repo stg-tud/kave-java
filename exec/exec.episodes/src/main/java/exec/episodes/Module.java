@@ -70,30 +70,38 @@ public class Module extends AbstractModule {
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
-		
+
 		File eventStreamRoot = eventStreamData;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
-		
+
 		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
 		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
 		File graphRoot = graphFile;
-		
+
 		Directory vcr = new Directory(validationContexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
-		
+
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
-		
+
 		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
-//		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, validationParser, episodeLearned, mappingParser, transitivityClosure, writer, graphConverter));
-//		bind(EpisodeGraphGenerator.class).toInstance(new EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		// bind(EpisodeGraphGenerator.class).toInstance(new
+		// EpisodeGraphGenerator(graphRoot, validationParser, episodeLearned,
+		// mappingParser, transitivityClosure, writer, graphConverter));
+		// bind(EpisodeGraphGenerator.class).toInstance(new
+		// EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned,
+		// mappingParser, transitivityClosure, graphWriter, graphConverter));
 		EpisodeRecommender recommender = new EpisodeRecommender();
-//		bind(Suggestions.class).toInstance(new Suggestions(graphRoot, episodeParser, episodeLearned, transitivityClosure, query, mappingParser, recommender, graphConverter, graphWriter));
-		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		// bind(Suggestions.class).toInstance(new Suggestions(graphRoot,
+		// episodeParser, episodeLearned, transitivityClosure, query,
+		// mappingParser, recommender, graphConverter, graphWriter));
+		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot,
+				validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser,
+				episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {
