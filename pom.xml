@@ -16,7 +16,7 @@
 		<module>cc.recommenders.nativelibs</module>
 		<module>cc.recommenders.mining.calls</module>
 		<module>exec</module>
-
+		<!-- -->
 		<module>org.eclipse.recommenders.jayes</module>
 	</modules>
 
@@ -24,13 +24,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>eclipse-luna</id>
-			<url>http://download.eclipse.org/releases/luna/</url>
-			<layout>p2</layout>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

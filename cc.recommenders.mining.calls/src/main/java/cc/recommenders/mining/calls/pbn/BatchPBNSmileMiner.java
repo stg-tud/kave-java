@@ -65,8 +65,8 @@ public class BatchPBNSmileMiner {
 		for (ITypeName t : types) {
 			Logger.log("%s", t);
 
-			if (t.equals(unknownType) || t.isArrayType()) {
-				Logger.log("skipping...");
+			if (t.equals(unknownType) || t.isArrayType() || !isInteresting(t)) {
+				Logger.log("skipping '%s'...", t);
 				continue;
 			}
 
@@ -101,6 +101,10 @@ public class BatchPBNSmileMiner {
 
 		Logger.log("");
 		Logger.log("--> mined models for %d type from %d total usages", numMined, numUsages);
+	}
+
+	private boolean isInteresting(ITypeName t) {
+		return true;// t.getIdentifier().startsWith("LSystem/");
 	}
 
 	private void write(String xml, String nameOfFileInZip, String zipFile, Directory modelDir) {

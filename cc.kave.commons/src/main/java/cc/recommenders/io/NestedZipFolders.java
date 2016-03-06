@@ -16,6 +16,8 @@
 package cc.recommenders.io;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +34,10 @@ public class NestedZipFolders<T> {
 	public NestedZipFolders(Directory root, Class<T> classOfMetaData) {
 		this.root = root;
 		this.classOfMetaData = classOfMetaData;
+	}
+
+	public URL getUrl() throws MalformedURLException {
+		return root.getUrl();
 	}
 
 	public Set<T> findKeys() {

@@ -9,6 +9,7 @@
   <artifactId>exec</artifactId>
   <packaging>pom</packaging>
   <modules>
+  	<module>exec.validate_evaluation</module>
   	<module>exec.episodes</module>
   	<module>exec.inlining</module>
   	<module>exec.pointsto</module>

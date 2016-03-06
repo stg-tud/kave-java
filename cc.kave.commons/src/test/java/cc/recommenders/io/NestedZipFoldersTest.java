@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2014 Technische Universität Darmstadt
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,20 @@
  */
 package cc.recommenders.io;
 
+import static cc.recommenders.assertions.Asserts.assertFalse;
+import static cc.recommenders.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +51,14 @@ public class NestedZipFoldersTest {
 		String tempFileName = tempFolder.getRoot().getAbsolutePath();
 		rootDir = new Directory(tempFileName);
 		sut = new NestedZipFolders<String>(rootDir, String.class);
+	}
+
+	@Test
+	public void getUrl() throws MalformedURLException {
+		String folder = tempFolder.getRoot().getAbsolutePath() + "/";
+		URL actual = sut.getUrl();
+		URL expected = new URL("file:" + folder);
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -125,9 +137,7 @@ public class NestedZipFoldersTest {
 		wa2.close();
 
 		List<String> actuals = sut.readAllZips("a", String.class);
-		// TODO: check test, changed to get green tests
 		List<String> expecteds = Lists.newArrayList("1-1", "1-2", "2-1");
-		//List<String> expecteds = Lists.newArrayList("2-1", "1-1", "1-2");
 		assertEquals(expecteds, actuals);
 	}
 
@@ -150,6 +160,11 @@ public class NestedZipFoldersTest {
 		@Override
 		public int hashCode() {
 			return HashCodeBuilder.reflectionHashCode(this);
+		}
+
+		@Override
+		public String toString() {
+			return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 		}
 	}
 }
