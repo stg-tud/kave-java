@@ -84,9 +84,9 @@ public class EpisodeRecommenderTest {
 	public void diffProbabilitydiffFrequency() {
 		queryWith("4", "5", "6", "9", "4>5", "4>6", "4>9");
 
-		addProposal(newPattern(3, "4", "5", "4>5"), Double.valueOf(df.format(1.0 / 3.0)));
-		addProposal(newPattern(2, "4", "6", "4>6"), Double.valueOf(df.format(1.0 / 3.0)));
-		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), Double.valueOf(df.format(2.0 / 9.0)));
+		addProposal(newPattern(3, "4", "5", "4>5"), 1.0 / 3.0);
+		addProposal(newPattern(2, "4", "6", "4>6"), 1.0 / 3.0);
+		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), fract(2, 9));
 
 		assertProposals();
 	}
@@ -95,11 +95,15 @@ public class EpisodeRecommenderTest {
 	public void diffProbability() {
 		queryWith("10", "11", "10>11");
 
-		addProposal(newPattern(3, "10", "11", "12", "10>11", "10>12", "11>12"), Double.valueOf(df.format(2.0 / 7.0)));
-		addProposal(newPattern(2, "10", "11", "12", "13", "10>11", "10>12", "10>13"),
-				Double.valueOf(df.format(1.0 / 4.0)));
+		addProposal(newPattern(3, "10", "11", "12", "10>11", "10>12", "11>12"), fract(2, 7));
+		addProposal(newPattern(2, "10", "11", "12", "13", "10>11", "10>12", "10>13"), fract(1, 4));
 
 		assertProposals();
+	}
+
+	private Double fract(double numerator, double denominator) {
+		// return Double.valueOf(df.format(numerator / denominator));
+		return numerator / denominator;
 	}
 
 	@Test
@@ -117,8 +121,8 @@ public class EpisodeRecommenderTest {
 	public void twoEventQuery() {
 		queryWith("5", "6", "5>6");
 
-		addProposal(newPattern(2, "4", "6", "4>6"), Double.valueOf(df.format(1.0 / 2.0)));
-		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), Double.valueOf(df.format(2.0 / 7.0)));
+		addProposal(newPattern(2, "4", "6", "4>6"), fract(1, 2));
+		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), fract(2, 7));
 
 		assertProposals();
 	}
@@ -127,7 +131,7 @@ public class EpisodeRecommenderTest {
 	public void oneProposal() {
 		queryWith("7", "8", "7>8");
 
-		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), Double.valueOf(df.format(2.0 / 7.0)));
+		addProposal(newPattern(1, "6", "7", "8", "6>7", "6>8", "7>8"), fract(2, 7));
 
 		assertProposals();
 	}
