@@ -19,6 +19,7 @@ import static cc.recommenders.assertions.Asserts.assertFalse;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,7 +58,7 @@ public class NestedZipFoldersTest {
 	public void getUrl() throws MalformedURLException {
 		String folder = tempFolder.getRoot().getAbsolutePath() + "/";
 		URL actual = sut.getUrl();
-		URL expected = new URL("file:" + folder);
+		URL expected = new File(folder).toURI().toURL();
 		assertEquals(expected, actual);
 	}
 

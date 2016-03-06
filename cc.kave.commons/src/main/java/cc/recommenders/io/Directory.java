@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -191,7 +192,7 @@ public class Directory {
 	}
 
 	public URL getUrl(String fileName) throws MalformedURLException {
-		return new URL("file://" + rootDir + fileName);
+		return Paths.get(rootDir, fileName).toUri().toURL();
 	}
 
 	public static String createFileName(String s) {
