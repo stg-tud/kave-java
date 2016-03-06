@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,7 +77,7 @@ public class StorageHelperTest {
 		try {
 			Directory d = sut.getDirectory(storageCase);
 			String actual = d.getUrl().getPath();
-			String expected = tempFileName + "/" + folder;
+			String expected = Paths.get(tempFileName, folder).toFile().getAbsolutePath() + "/";
 			assertEquals(expected, actual);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -89,7 +90,7 @@ public class StorageHelperTest {
 		try {
 			NestedZipFolders<ITypeName> f = sut.getNestedZipFolder(storageCase);
 			String actual = f.getUrl().getPath();
-			String expected = tempFileName + "/" + folder;
+			String expected = Paths.get(tempFileName, folder).toFile().getAbsolutePath() + "/";
 			assertEquals(expected, actual);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
