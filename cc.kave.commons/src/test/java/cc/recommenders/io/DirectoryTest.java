@@ -178,7 +178,7 @@ public class DirectoryTest {
 		setup();
 
 		File newFile = tempFolder.newFile("test");
-		URL expected = new URL("file://" + newFile.getAbsolutePath());
+		URL expected = new File(newFile.getAbsolutePath()).toURI().toURL();
 
 		URL actual = uut.getUrl("test");
 
