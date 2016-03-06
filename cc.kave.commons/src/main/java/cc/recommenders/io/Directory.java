@@ -187,7 +187,7 @@ public class Directory {
 	}
 
 	public URL getUrl() throws MalformedURLException {
-		return new URL("file://" + rootDir);
+		return new File(rootDir).toURI().toURL();
 	}
 
 	public URL getUrl(String fileName) throws MalformedURLException {

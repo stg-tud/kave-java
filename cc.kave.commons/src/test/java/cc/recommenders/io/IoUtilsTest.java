@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,9 +77,20 @@ public class IoUtilsTest {
 	}
 
 	@Test
-	public void parentOfRoot() throws MalformedURLException {
+	public void parentOfRoot_Unixoid() throws MalformedURLException {
+		Assume.assumeFalse("test cannot be run in Windows", SystemUtils.IS_OS_WINDOWS);
+
 		URL actual = sut.getParentDirectory("/").getUrl();
 		URL expected = new Directory("/").getUrl();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void parentOfRoot_Windows() throws MalformedURLException {
+		Assume.assumeTrue("test can only be run in Windows", SystemUtils.IS_OS_WINDOWS);
+
+		URL actual = sut.getParentDirectory("c:\\").getUrl();
+		URL expected = new Directory("c:\\").getUrl();
 		assertEquals(expected, actual);
 	}
 

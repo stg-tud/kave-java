@@ -50,7 +50,7 @@ public class IoUtils {
 		Asserts.assertTrue(file.isAbsolute());
 		String parent = file.getParent();
 		if (parent == null) {
-			return new Directory("/");
+			return new Directory(absoluteFileName);
 		} else {
 			return new Directory(parent);
 		}
