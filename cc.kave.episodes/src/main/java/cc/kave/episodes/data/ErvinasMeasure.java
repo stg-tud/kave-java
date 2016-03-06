@@ -8,7 +8,7 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.evaluation.data;
+package cc.kave.episodes.data;
 
 import static cc.recommenders.assertions.Asserts.assertLessOrEqual;
 import static cc.recommenders.assertions.Asserts.assertNotNegative;
@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
 
-public class Measure {
+public class ErvinasMeasure {
 
 	private double precision = 0.0;
 	private double recall = 0.0;
@@ -54,7 +54,7 @@ public class Measure {
 		return precision != 0.0 || recall != 0.0;
 	}
 
-	public static <T> Measure newMeasure(Set<T> expected, Set<T> proposed) {
+	public static <T> ErvinasMeasure newMeasure(Set<T> expected, Set<T> proposed) {
 
 		double numExpected = expected.size();
 		double numProposed = proposed.size();
@@ -66,14 +66,14 @@ public class Measure {
 			}
 		}
 
-		Measure m = new Measure();
+		ErvinasMeasure m = new ErvinasMeasure();
 		m.precision = saveDivision(numHits, numProposed);
 		m.recall = saveDivision(numHits, numExpected);
 
 		return m;
 	}
 
-	public static <T> Measure new2Measure(List<T> expected, List<T> proposed) {
+	public static <T> ErvinasMeasure new2Measure(List<T> expected, List<T> proposed) {
 
 		double numExpected = expected.size();
 		double numProposed = proposed.size();
@@ -85,7 +85,7 @@ public class Measure {
 			}
 		}
 
-		Measure m = new Measure();
+		ErvinasMeasure m = new ErvinasMeasure();
 		m.precision = saveDivision(numHits, numProposed);
 		m.recall = saveDivision(numHits, numExpected);
 
