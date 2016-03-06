@@ -9,7 +9,6 @@
 		<module>cc.kave.commons</module>
 		<module>cc.kave.episodes</module>
 		<module>cc.kave.histories</module>
-		<module>cc.recommenders.model</module>
 		<module>cc.recommenders.evaluation</module>
 		<module>cc.recommenders.io</module>
 		<module>cc.recommenders.utils</module>

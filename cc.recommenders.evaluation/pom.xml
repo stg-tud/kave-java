@@ -48,11 +48,6 @@
 		</dependency>
 		<dependency>
 			<groupId>cc.kave</groupId>
-			<artifactId>cc.recommenders.model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>cc.kave</groupId>
 			<artifactId>cc.recommenders.testutils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
