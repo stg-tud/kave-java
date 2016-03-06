@@ -34,12 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.WritingArchive;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
-
 import com.codetrails.data.CallSite;
 import com.codetrails.data.CallSiteKind;
 import com.codetrails.data.DefinitionSite;
@@ -50,6 +44,13 @@ import com.codetrails.data.ObjectUsageFilter;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+
+import cc.kave.commons.utils.json.JsonUtils;
+import cc.recommenders.io.Directory;
+import cc.recommenders.io.WritingArchive;
+import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.VmTypeName;
 
 public class ObjectUsageStoreTest {
 

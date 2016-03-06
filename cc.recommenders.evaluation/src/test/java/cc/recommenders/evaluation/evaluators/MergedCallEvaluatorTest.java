@@ -26,6 +26,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.codetrails.data.DecoratedObjectUsage;
+
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.queries.PartialUsageQueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
@@ -33,7 +35,6 @@ import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;
-import cc.recommenders.usages.DecoratedObjectUsage;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;

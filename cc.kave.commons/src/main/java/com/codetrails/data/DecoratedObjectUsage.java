@@ -8,17 +8,16 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.usages;
+package com.codetrails.data;
 
 import java.util.Set;
 
 import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.VmMethodName;
-
-import com.codetrails.data.EnclosingMethodContext;
-import com.codetrails.data.ObjectUsage;
-import com.codetrails.data.UsageConverter;
+import cc.recommenders.usages.AbstractUsage;
+import cc.recommenders.usages.CallSite;
+import cc.recommenders.usages.DefinitionSite;
 
 public class DecoratedObjectUsage extends AbstractUsage {
 

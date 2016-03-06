@@ -31,5 +31,10 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
 		</dependency>
+		<dependency>
+			<groupId>cc.kave</groupId>
+			<artifactId>cc.kave.commons</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

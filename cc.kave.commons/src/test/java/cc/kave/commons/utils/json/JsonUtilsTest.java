@@ -27,9 +27,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.VmTypeName;
+import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.DefinitionSites;
+import cc.recommenders.usages.Query;
 
 public class JsonUtilsTest {
 
@@ -67,6 +72,20 @@ public class JsonUtilsTest {
 		JsonUtils.toJson(data, tmpFile);
 		String actual = FileUtils.readFileToString(tmpFile);
 		String expected = "{\"A\":3}";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	@Ignore("currently fails with stack overflow")
+	public void integrationTestWithUsage() {
+		Query u = new Query();
+		u.setDefinition(DefinitionSites.createDefinitionByConstant());
+		u.setMethodContext(VmMethodName.get("LT.m()V"));
+		u.setClassContext(VmTypeName.get("LSuperType"));
+		u.addCallSite(CallSites.createReceiverCallSite("LContext.m1()V"));
+
+		String actual = JsonUtils.toJson(u);
+		String expected = "TODO";
 		assertEquals(expected, actual);
 	}
 

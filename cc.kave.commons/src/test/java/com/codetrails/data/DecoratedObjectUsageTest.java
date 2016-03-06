@@ -8,7 +8,7 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.usages;
+package com.codetrails.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -25,6 +25,9 @@ import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.VmMethodName;
 import cc.recommenders.names.VmTypeName;
+import cc.recommenders.usages.CallSite;
+import cc.recommenders.usages.DefinitionSite;
+import cc.recommenders.usages.DefinitionSites;
 
 import com.codetrails.data.EnclosingMethodContext;
 import com.codetrails.data.ObjectUsage;

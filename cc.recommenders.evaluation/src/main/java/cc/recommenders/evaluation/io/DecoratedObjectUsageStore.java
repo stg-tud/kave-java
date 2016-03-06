@@ -18,9 +18,9 @@ import java.util.Set;
 import cc.recommenders.io.DataStore;
 import cc.recommenders.io.Directory;
 import cc.recommenders.names.ITypeName;
-import cc.recommenders.usages.DecoratedObjectUsage;
 import cc.recommenders.usages.Usage;
 
+import com.codetrails.data.DecoratedObjectUsage;
 import com.codetrails.data.ObjectUsage;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
