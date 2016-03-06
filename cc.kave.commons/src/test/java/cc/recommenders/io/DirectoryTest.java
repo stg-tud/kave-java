@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -166,7 +167,7 @@ public class DirectoryTest {
 	public void validUrlsAreCreatedForTheDirectory() throws IOException {
 		setup();
 
-		URL expected = new URL("file://" + tempFileName + "/");
+		URL expected = new File(tempFileName).toURI().toURL();
 		URL actual = uut.getUrl();
 
 		assertEquals(expected, actual);
@@ -209,7 +210,7 @@ public class DirectoryTest {
 		setup();
 		Directory blubbDir = uut.createDirectory("blubb");
 
-		URL expected = new URL("file://" + tempFileName + "/blubb/");
+		URL expected = Paths.get(tempFileName, "blubb").toUri().toURL();
 		URL actual = blubbDir.getUrl();
 
 		assertEquals(expected, actual);
@@ -390,7 +391,7 @@ public class DirectoryTest {
 
 		Directory sut = new Directory(tempFileName);
 		Set<String> actual = sut.findFiles(f -> true);
-		Set<String> expected = Sets.newHashSet("a.zip", combine("b","b.zip"), combine("c","c","c.zip"));
+		Set<String> expected = Sets.newHashSet("a.zip", combine("b", "b.zip"), combine("c", "c", "c.zip"));
 		assertEquals(expected, actual);
 	}
 
