@@ -27,11 +27,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.recommenders.names.VmMethodName;
 import cc.recommenders.names.VmTypeName;
+import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
@@ -76,7 +76,7 @@ public class JsonUtilsTest {
 	}
 
 	@Test
-	@Ignore("currently fails with stack overflow")
+	// @Ignore("currently fails with stack overflow")
 	public void integrationTestWithUsage() {
 		Query u = new Query();
 		u.setDefinition(DefinitionSites.createDefinitionByConstant());
@@ -85,7 +85,16 @@ public class JsonUtilsTest {
 		u.addCallSite(CallSites.createReceiverCallSite("LContext.m1()V"));
 
 		String actual = JsonUtils.toJson(u);
-		String expected = "TODO";
+		String expected = "{\"classCtx\":\"LSuperType\",\"methodCtx\":\"LT.m()V\",\"definition\":{\"kind\":\"CONSTANT\"},\"sites\":[{\"kind\":\"RECEIVER\",\"method\":\"LContext.m1()V\"}]}";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	// @Ignore("currently fails with stack overflow")
+	public void integrationTestWithCallSite() {
+		CallSite c = CallSites.createReceiverCallSite("LContext.m1()V");
+		String actual = JsonUtils.toJson(c);
+		String expected = "{\"Kind\":\"RECEIVER\",\"Method\":\"LContext.m1()V\",\"ArgIndex\":0}";
 		assertEquals(expected, actual);
 	}
 

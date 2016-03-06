@@ -8,7 +8,7 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.utils.json.legacy.GsonUtil;
 import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.VmMethodName;

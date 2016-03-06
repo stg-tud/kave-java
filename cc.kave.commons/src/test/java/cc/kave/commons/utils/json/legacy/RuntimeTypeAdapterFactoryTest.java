@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.gson.typeadapters;
+package cc.kave.commons.utils.json.legacy;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
+
+import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import junit.framework.TestCase;
 
 public final class RuntimeTypeAdapterFactoryTest extends TestCase {
@@ -33,10 +35,10 @@ public final class RuntimeTypeAdapterFactoryTest extends TestCase {
         .create();
 
     CreditCard original = new CreditCard("Jesse", 234);
-    assertEquals("{\"type\":\"CreditCard\",\"cvv\":234,\"ownerName\":\"Jesse\"}",
+    assertEquals("{\"type\":\"cc.kave.commons.utils.json.legacy.RuntimeTypeAdapterFactoryTest$CreditCard\",\"cvv\":234,\"ownerName\":\"Jesse\"}",
         gson.toJson(original, BillingInstrument.class));
     BillingInstrument deserialized = gson.fromJson(
-        "{type:'CreditCard',cvv:234,ownerName:'Jesse'}", BillingInstrument.class);
+        "{type:'cc.kave.commons.utils.json.legacy.RuntimeTypeAdapterFactoryTest$CreditCard',cvv:234,ownerName:'Jesse'}", BillingInstrument.class);
     assertEquals("Jesse", deserialized.ownerName);
     assertTrue(deserialized instanceof CreditCard);
   }
@@ -50,10 +52,10 @@ public final class RuntimeTypeAdapterFactoryTest extends TestCase {
         .create();
 
     BillingInstrument original = new BillingInstrument("Jesse");
-    assertEquals("{\"type\":\"BillingInstrument\",\"ownerName\":\"Jesse\"}",
+    assertEquals("{\"type\":\"cc.kave.commons.utils.json.legacy.RuntimeTypeAdapterFactoryTest$BillingInstrument\",\"ownerName\":\"Jesse\"}",
         gson.toJson(original, BillingInstrument.class));
     BillingInstrument deserialized = gson.fromJson(
-        "{type:'BillingInstrument',ownerName:'Jesse'}", BillingInstrument.class);
+        "{type:'cc.kave.commons.utils.json.legacy.RuntimeTypeAdapterFactoryTest$BillingInstrument',ownerName:'Jesse'}", BillingInstrument.class);
     assertEquals("Jesse", deserialized.ownerName);
   }
 

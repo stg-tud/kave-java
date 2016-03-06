@@ -8,24 +8,24 @@
  * Contributors:
  *    Marcel Bruch - initial API and implementation.
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import java.lang.reflect.Type;
 
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.VmMethodName;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
-public class GsonTypeNameDeserializer implements JsonDeserializer<ITypeName> {
+public class GsonMethodNameDeserializer implements JsonDeserializer<IMethodName> {
 
     @Override
-    public ITypeName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public IMethodName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         String identifier = json.getAsString();
-        return VmTypeName.get(identifier);
+        return VmMethodName.get(identifier);
     }
 }

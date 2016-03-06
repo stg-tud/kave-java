@@ -8,7 +8,7 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import java.io.IOException;
 import java.util.Set;

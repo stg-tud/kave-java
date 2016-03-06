@@ -7,7 +7,7 @@
  *
  * Contributors:
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import java.io.File;
 import java.lang.reflect.Type;

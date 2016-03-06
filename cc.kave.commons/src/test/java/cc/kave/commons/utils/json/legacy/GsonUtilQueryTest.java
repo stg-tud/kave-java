@@ -8,7 +8,7 @@
  * Contributors:
  *     Dennis Albrecht
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import cc.kave.commons.utils.json.legacy.GsonUtil;
 import cc.recommenders.names.VmFieldName;
 import cc.recommenders.names.VmMethodName;
 import cc.recommenders.names.VmTypeName;

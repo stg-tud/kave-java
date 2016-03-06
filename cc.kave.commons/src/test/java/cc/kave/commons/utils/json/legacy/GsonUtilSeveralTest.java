@@ -8,7 +8,7 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import static cc.recommenders.usages.CallSites.createReceiverCallSite;
 import static cc.recommenders.usages.DefinitionSites.createDefinitionByConstant;
@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import cc.kave.commons.utils.json.legacy.GsonUtil;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.VmFieldName;
 import cc.recommenders.names.VmMethodName;

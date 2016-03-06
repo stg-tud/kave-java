@@ -152,6 +152,7 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
+import cc.kave.commons.utils.json.legacy.GsonUtil;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.assertions.Throws;
 
@@ -161,6 +162,8 @@ public abstract class JsonUtils {
 
 	static {
 		GsonBuilder gb = new GsonBuilder();
+
+		GsonUtil.addTypeAdapters(gb);
 
 		// name interface types
 		registerName(gb, IAliasName.class);

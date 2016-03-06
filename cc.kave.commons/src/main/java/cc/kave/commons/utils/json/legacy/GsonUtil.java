@@ -8,7 +8,7 @@
  * Contributors:
  *    Marcel Bruch - initial API and implementation.
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.assertions.Throws.throwUnhandledException;
@@ -26,11 +26,15 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import cc.recommenders.assertions.Throws;
 import cc.recommenders.names.IFieldName;
 import cc.recommenders.names.IMethodName;
@@ -49,16 +53,6 @@ import cc.recommenders.usages.features.SuperMethodFeature;
 import cc.recommenders.usages.features.TypeFeature;
 import cc.recommenders.usages.features.UsageFeature;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.io.Closeables;
-import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-
 public class GsonUtil {
 	public static final Type T_LIST_STRING = new TypeToken<List<String>>() {
 	}.getType();
@@ -68,50 +62,52 @@ public class GsonUtil {
 	public static synchronized Gson getInstance() {
 		if (gson == null) {
 			final GsonBuilder builder = new GsonBuilder();
-			builder.registerTypeAdapter(VmMethodName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(IMethodName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(VmMethodName.class, new GsonMethodNameDeserializer());
-			builder.registerTypeAdapter(IMethodName.class, new GsonMethodNameDeserializer());
-			builder.registerTypeAdapter(VmTypeName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(ITypeName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(VmTypeName.class, new GsonTypeNameDeserializer());
-			builder.registerTypeAdapter(ITypeName.class, new GsonTypeNameDeserializer());
-			builder.registerTypeAdapter(VmFieldName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(IFieldName.class, new GsonNameSerializer());
-			builder.registerTypeAdapter(VmFieldName.class, new GsonFieldNameDeserializer());
-			builder.registerTypeAdapter(IFieldName.class, new GsonFieldNameDeserializer());
-			//
-			builder.registerTypeAdapter(File.class, new GsonFileDeserializer());
-			builder.registerTypeAdapter(File.class, new GsonFileSerializer());
-			// builder.setPrettyPrinting();
-			// builder.setDateFormat("dd.MM.yyyy HH:mm:ss");
-			builder.registerTypeAdapter(Date.class, new ISO8601DateParser());
-			builder.registerTypeAdapter(Multimap.class, new MultimapTypeAdapter());
-			//
-			builder.registerTypeAdapter(Usage.class, new UsageTypeAdapter());
-			builder.registerTypeAdapter(Query.class, new UsageTypeAdapter());
-
-			RuntimeTypeAdapterFactory<UsageFeature> rtaf = RuntimeTypeAdapterFactory.of(UsageFeature.class, "$type")
-					.registerSubtype(CallFeature.class).registerSubtype(ClassFeature.class)
-					.registerSubtype(DefinitionFeature.class).registerSubtype(FirstMethodFeature.class)
-					.registerSubtype(ParameterFeature.class).registerSubtype(SuperMethodFeature.class)
-					.registerSubtype(TypeFeature.class);
-			builder.registerTypeAdapterFactory(rtaf);
-
-			builder.registerTypeAdapter(CallFeature.class, new ObjectUsageFeatureRedirector<CallFeature>());
-			builder.registerTypeAdapter(ClassFeature.class, new ObjectUsageFeatureRedirector<ClassFeature>());
-			builder.registerTypeAdapter(DefinitionFeature.class, new ObjectUsageFeatureRedirector<DefinitionFeature>());
-			builder.registerTypeAdapter(FirstMethodFeature.class,
-					new ObjectUsageFeatureRedirector<FirstMethodFeature>());
-			builder.registerTypeAdapter(ParameterFeature.class, new ObjectUsageFeatureRedirector<ParameterFeature>());
-			builder.registerTypeAdapter(SuperMethodFeature.class,
-					new ObjectUsageFeatureRedirector<SuperMethodFeature>());
-			builder.registerTypeAdapter(TypeFeature.class, new ObjectUsageFeatureRedirector<TypeFeature>());
+			addTypeAdapters(builder);
 
 			builder.enableComplexMapKeySerialization();
 			gson = builder.create();
 		}
 		return gson;
+	}
+
+	public static void addTypeAdapters(final GsonBuilder builder) {
+		builder.registerTypeAdapter(VmMethodName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(IMethodName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(VmMethodName.class, new GsonMethodNameDeserializer());
+		builder.registerTypeAdapter(IMethodName.class, new GsonMethodNameDeserializer());
+		builder.registerTypeAdapter(VmTypeName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(ITypeName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(VmTypeName.class, new GsonTypeNameDeserializer());
+		builder.registerTypeAdapter(ITypeName.class, new GsonTypeNameDeserializer());
+		builder.registerTypeAdapter(VmFieldName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(IFieldName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(VmFieldName.class, new GsonFieldNameDeserializer());
+		builder.registerTypeAdapter(IFieldName.class, new GsonFieldNameDeserializer());
+		//
+		builder.registerTypeAdapter(File.class, new GsonFileDeserializer());
+		builder.registerTypeAdapter(File.class, new GsonFileSerializer());
+		// builder.setPrettyPrinting();
+		// builder.setDateFormat("dd.MM.yyyy HH:mm:ss");
+		builder.registerTypeAdapter(Date.class, new ISO8601DateParser());
+		builder.registerTypeAdapter(Multimap.class, new MultimapTypeAdapter());
+		//
+		builder.registerTypeAdapter(Usage.class, new UsageTypeAdapter());
+		builder.registerTypeAdapter(Query.class, new UsageTypeAdapter());
+
+		RuntimeTypeAdapterFactory<UsageFeature> rtaf = RuntimeTypeAdapterFactory.of(UsageFeature.class, "$type")
+				.registerSubtype(CallFeature.class).registerSubtype(ClassFeature.class)
+				.registerSubtype(DefinitionFeature.class).registerSubtype(FirstMethodFeature.class)
+				.registerSubtype(ParameterFeature.class).registerSubtype(SuperMethodFeature.class)
+				.registerSubtype(TypeFeature.class);
+		builder.registerTypeAdapterFactory(rtaf);
+
+		builder.registerTypeAdapter(CallFeature.class, new ObjectUsageFeatureRedirector<CallFeature>());
+		builder.registerTypeAdapter(ClassFeature.class, new ObjectUsageFeatureRedirector<ClassFeature>());
+		builder.registerTypeAdapter(DefinitionFeature.class, new ObjectUsageFeatureRedirector<DefinitionFeature>());
+		builder.registerTypeAdapter(FirstMethodFeature.class, new ObjectUsageFeatureRedirector<FirstMethodFeature>());
+		builder.registerTypeAdapter(ParameterFeature.class, new ObjectUsageFeatureRedirector<ParameterFeature>());
+		builder.registerTypeAdapter(SuperMethodFeature.class, new ObjectUsageFeatureRedirector<SuperMethodFeature>());
+		builder.registerTypeAdapter(TypeFeature.class, new ObjectUsageFeatureRedirector<TypeFeature>());
 	}
 
 	public static <T> T deserialize(final CharSequence json, final Type classOfT) {
@@ -170,26 +166,5 @@ public class GsonUtil {
 		} finally {
 			IOUtils.closeQuietly(fw);
 		}
-	}
-
-	public static <T> List<T> deserializeZip(File zip, Class<T> classOfT) throws IOException {
-
-		List<T> res = Lists.newLinkedList();
-		ZipInputStream zis = null;
-		try {
-			InputSupplier<FileInputStream> fis = Files.newInputStreamSupplier(zip);
-			zis = new ZipInputStream(fis.getInput());
-			ZipEntry entry;
-			while ((entry = zis.getNextEntry()) != null) {
-				if (!entry.isDirectory()) {
-					final InputStreamReader reader = new InputStreamReader(zis);
-					final T data = getInstance().fromJson(reader, classOfT);
-					res.add(data);
-				}
-			}
-		} finally {
-			Closeables.closeQuietly(zis);
-		}
-		return res;
 	}
 }

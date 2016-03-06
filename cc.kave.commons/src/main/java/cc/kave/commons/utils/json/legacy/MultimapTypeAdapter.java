@@ -8,7 +8,7 @@
  * Contributors:
  *    Johannes Lerch - initial API and implementation.
  */
-package cc.recommenders.utils.gson;
+package cc.kave.commons.utils.json.legacy;
 
 import static cc.recommenders.assertions.Checks.ensureEquals;
 import static cc.recommenders.assertions.Checks.ensureIsInstanceOf;
