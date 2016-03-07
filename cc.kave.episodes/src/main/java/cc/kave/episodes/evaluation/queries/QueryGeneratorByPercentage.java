@@ -68,7 +68,9 @@ public class QueryGeneratorByPercentage {
 
 	private Map<Double, Integer> calcPercNumbers(int size) {
 		Map<Double, Integer> removals = new HashMap<Double, Integer>();
+		int[] nums = new int[9];
 		
+		int p10 = size - (int) Math.ceil(0.10 * (double) size);
 		int first = size - (int) Math.ceil(0.25 * (double) size);
 		int second = size - (int) Math.ceil(0.5 * (double) size);
 		int third = size - (int) Math.ceil(0.75 * (double) size);
