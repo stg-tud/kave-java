@@ -16,11 +16,12 @@
 package exec.validate_evaluation.streaks;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -36,7 +37,7 @@ public class StreakGeneration {
 	private final StreakIo io;
 	private final StreakLogger log;
 
-	private Map<Tuple<IMethodName, ITypeName>, List<Edit>> editStreaks;
+	private Map<Tuple<IMethodName, ITypeName>, EditStreak> editStreaks;
 	private IUsageExtractor usageExtractor;
 
 	public StreakGeneration(StreakIo io, StreakLogger log, IUsageExtractor usageExtractor) {
@@ -60,11 +61,25 @@ public class StreakGeneration {
 				extractEdits(e);
 			}
 
+			removeSingleEdits();
+
 			log.endZip(editStreaks);
 			io.store(editStreaks.values(), zip);
 		}
 
 		log.finish();
+	}
+
+	private void removeSingleEdits() {
+		log.startRemoveSingleEdits();
+		Iterator<Entry<Tuple<IMethodName, ITypeName>, EditStreak>> entries = editStreaks.entrySet().iterator();
+		while (entries.hasNext()) {
+			Entry<Tuple<IMethodName, ITypeName>, EditStreak> entry = entries.next();
+			if (entry.getValue().isSingleEdit()) {
+				entries.remove();
+				log.removeSingleEdit();
+			}
+		}
 	}
 
 	private void extractEdits(ICompletionEvent e) {
@@ -99,14 +114,14 @@ public class StreakGeneration {
 		return NameUtils.toCoReName(m);
 	}
 
-	private List<Edit> getEdits(Usage u) {
+	private EditStreak getEdits(Usage u) {
 		Tuple<IMethodName, ITypeName> key = getKey(u);
-		List<Edit> edits = editStreaks.get(key);
-		if (edits == null) {
-			edits = Lists.newLinkedList();
-			editStreaks.put(key, edits);
+		EditStreak streak = editStreaks.get(key);
+		if (streak == null) {
+			streak = new EditStreak();
+			editStreaks.put(key, streak);
 		}
-		return edits;
+		return streak;
 	}
 
 	private Tuple<IMethodName, ITypeName> getKey(Usage u) {

@@ -15,30 +15,16 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+public class EditStreak {
 
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-
-public class StreakIo {
-
-	public StreakIo(String dirEventsCompletion, String dirEditStreaks) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Set<String> findZips() {
+	public void add(Edit se) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
-	public Set<ICompletionEvent> read(String zip) {
+	public boolean isSingleEdit() {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
-	public void store(Collection<EditStreak> collection, String zip) {
-		// TODO Auto-generated method stub
-
-	}
 }

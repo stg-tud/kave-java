@@ -40,8 +40,18 @@ public class StreakLogger {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void startRemoveSingleEdits() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void removeSingleEdit() {
+		// TODO Auto-generated method stub
+		
+	}
 
-	public void endZip(Map<Tuple<IMethodName, ITypeName>, List<Edit>> editStreaks) {
+	public void endZip(Map<Tuple<IMethodName, ITypeName>, EditStreak> editStreaks) {
 		// TODO Auto-generated method stub
 		
 	}
