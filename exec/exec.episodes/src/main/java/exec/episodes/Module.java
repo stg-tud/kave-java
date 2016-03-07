@@ -24,7 +24,9 @@ import com.google.inject.name.Names;
 
 import cc.kave.episodes.analyzer.outputs.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.outputs.ValidationDataGraphGenerator;
+import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
+import cc.kave.episodes.mining.evaluation.Evaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -54,18 +56,23 @@ public class Module extends AbstractModule {
 		Directory validationCtxtDir = new Directory(validationContexts.getAbsolutePath());
 		File graphFile = new File(rootFolder);
 		Directory graphDir = new Directory(graphFile.getAbsolutePath());
+		File evaluationFile = new File(rootFolder + "Evaluations/");
+		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
 		dirs.put("contexts", validationCtxtDir);
 		dirs.put("graph", graphDir);
+		dirs.put("evaluation", evaluationDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(validationContexts);
 		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
+		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
+		
 
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
@@ -88,20 +95,13 @@ public class Module extends AbstractModule {
 		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
 
 		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
-		// bind(EpisodeGraphGenerator.class).toInstance(new
-		// EpisodeGraphGenerator(graphRoot, validationParser, episodeLearned,
-		// mappingParser, transitivityClosure, writer, graphConverter));
-		// bind(EpisodeGraphGenerator.class).toInstance(new
-		// EpisodeGraphGenerator(graphRoot, episodeParser, episodeLearned,
-		// mappingParser, transitivityClosure, graphWriter, graphConverter));
 		EpisodeRecommender recommender = new EpisodeRecommender();
-		// bind(Suggestions.class).toInstance(new Suggestions(graphRoot,
-		// episodeParser, episodeLearned, transitivityClosure, query,
-		// mappingParser, recommender, graphConverter, graphWriter));
-		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot,
-				validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser,
-				episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+
+		File evaluationRoot = evaluationFile;
+		QueryGeneratorByPercentage queryGenerator = new QueryGeneratorByPercentage();
+		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser, queryGenerator, recommender, episodeParser, episodeLearned));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {

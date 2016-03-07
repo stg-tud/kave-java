@@ -15,19 +15,25 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
 import static cc.recommenders.io.Logger.append;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
@@ -42,6 +48,8 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 public class Evaluation {
+	
+	private File rootFolder;
 	
 	private static final int PROPOSALS = 5;
 	private static final int FREQUENCY = 5;
@@ -62,12 +70,17 @@ public class Evaluation {
 	private Map<Double, List<Tuple<Double, Double>>> categoryResults = new HashMap<Double, List<Tuple<Double, Double>>>();
 	
 	private DecimalFormat df = new DecimalFormat("0.00"); 
+	private StringBuilder sb = new StringBuilder();
 
 	@Inject
-	public Evaluation(ValidationContextsParser parser, EventMappingParser mappingParser, 
-			QueryGeneratorByPercentage queryGenerator, EpisodeRecommender recommender, 
-			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
-
+	public Evaluation(@Named("evaluation") File directory, ValidationContextsParser parser, 
+			EventMappingParser mappingParser, QueryGeneratorByPercentage queryGenerator, 
+			EpisodeRecommender recommender, EpisodeParser episodeParser, 
+			MaximalEpisodes maxEpisodeTracker) {
+		
+		assertTrue(directory.exists(), "Evaluations folder does not exist");
+		assertTrue(directory.isDirectory(), "Evaluations folder is not a folder, but a file");
+		this.rootFolder = directory;
 		this.validationParser = parser;
 		this.mappingParser = mappingParser;
 		this.queryGenerator = queryGenerator;
@@ -83,14 +96,17 @@ public class Evaluation {
 		List<Event> eventMapping = readMapper();
 		Set<Episode> validationData = readValidationData(eventMapping);
 		Map<String, Set<Episode>> targets = categorizeTargets(validationData);
+		configurations();
 		
 		for (Map.Entry<String, Set<Episode>> categoryEntry : targets.entrySet()) {
-			if (categoryEntry.getKey().equalsIgnoreCase("0 - 1")) {
+			if (categoryEntry.getKey().equalsIgnoreCase("0-1")) {
+				continue;
+			}
+			if (categoryEntry.getValue().isEmpty()) {
 				continue;
 			}
 			int targetID = 0;
 			int targetsWithoutProposals = 0;
-			configurations();
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
 				boolean hasProposals = false;
@@ -105,15 +121,18 @@ public class Evaluation {
 						
 						if (proposals.size() > 0) {
 							hasProposals = true;
-							List<Double> topEvaluations = new LinkedList<Double>();
+							double maxEval = 0.0;
+							
 							for (Tuple<Episode, Double> tuple : proposals) {
 								avgQueryProposal.get(queryEntry.getKey()).get(propCount).addValue(tuple.getSecond());
 								
 								double eval = recommender.calcF1(e, tuple.getFirst());
-								double bestEval = getMax(topEvaluations, eval);
-								avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(bestEval);
-								
-								topEvaluations.add(eval);
+								if (eval > maxEval) {
+									avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(eval);
+									maxEval = eval;
+								} else {
+									avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(maxEval);
+								}
 								propCount++;
 							}
 						}
@@ -127,101 +146,74 @@ public class Evaluation {
 					targetsWithoutProposals++;
 				}
 			}
+			writeCategoryResults(categoryEntry.getKey());
+			
 			append("\nNumber of targets with no proposals = %d\n\n", targetsWithoutProposals);
 			synthesizeResults();
 			logSynthesized();
 		}
 	}
 	
-	private double getMax(List<Double> propEvals, double eval) {
-		if (propEvals.isEmpty()) {
-			return eval;
+	private void writeCategoryResults(String fileName) {
+		File filePath = new File(rootFolder.getAbsolutePath() + "/" + fileName + ".txt");
+		String content = sb.toString();
+		
+		try {
+			FileUtils.writeStringToFile(filePath, content);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		double max = eval;
-		for (double value : propEvals) {
-			if (value > max) {
-				max = value;
-			}
-		}
-		return max;
 	}
 
 	private Map<String, Set<Episode>> categorizeTargets(Set<Episode> validationData) {
-		Map<String, Set<Episode>> categories = new HashMap<String, Set<Episode>>();
+		Map<String, Set<Episode>> categories = new LinkedHashMap<String, Set<Episode>>();
+		categories.put("0-1", Sets.newHashSet());
+		categories.put("2", Sets.newHashSet());
+		categories.put("3", Sets.newHashSet());
+		categories.put("4", Sets.newHashSet());
+		categories.put("5", Sets.newHashSet());
+		categories.put("6-9", Sets.newHashSet());
+		categories.put("10-19", Sets.newHashSet());
+		categories.put("20-29", Sets.newHashSet());
+		categories.put("30-66", Sets.newHashSet());
 		
 		for (Episode target : validationData) {
 			int numInvoc = target.getNumEvents() - 1;
 			
 			if (numInvoc == 0 || numInvoc == 1) {
-				if (categories.containsKey("0 - 1")) {
-					categories.get("0 - 1").add(target);
-				} else {
-					categories.put("0 - 1", Sets.newHashSet(target));
-				}
+				categories.get("0-1").add(target);
 				continue;
 			}
 			if (numInvoc == 2) {
-				if (categories.containsKey("2")) {
-					categories.get("2").add(target);
-				} else {
-					categories.put("2", Sets.newHashSet(target));
-				}
+				categories.get("2").add(target);
 				continue;
 			}
 			if (numInvoc == 3) {
-				if (categories.containsKey("3")) {
-					categories.get("3").add(target);
-				} else {
-					categories.put("3", Sets.newHashSet(target));
-				}
+				categories.get("3").add(target);
 				continue;
 			}
 			if (numInvoc == 4) {
-				if (categories.containsKey("4")) {
-					categories.get("4").add(target);
-				} else {
-					categories.put("4", Sets.newHashSet(target));
-				}
+				categories.get("4").add(target);
 				continue;
 			}
 			if (numInvoc == 5) {
-				if (categories.containsKey("5")) {
-					categories.get("5").add(target);
-				} else {
-					categories.put("5", Sets.newHashSet(target));
-				}
+				categories.get("5").add(target);
 				continue;
 			}
 			if (numInvoc > 5 && numInvoc < 10) {
-				if (categories.containsKey("6 - 9")) {
-					categories.get("6 - 9").add(target);
-				} else {
-					categories.put("6 - 9", Sets.newHashSet(target));
-				}
+				categories.get("6-9").add(target);
 				continue;
 			}
 			if (numInvoc > 9 && numInvoc < 20) {
-				if (categories.containsKey("10 - 19")) {
-					categories.get("10 - 19").add(target);
-				} else {
-					categories.put("10 - 19", Sets.newHashSet(target));
-				}
+				categories.get("10-19").add(target);
 				continue;
 			}
 			if (numInvoc > 19 && numInvoc < 30) {
-				if (categories.containsKey("20 - 29")) {
-					categories.get("20 - 29").add(target);
-				} else {
-					categories.put("20 - 29", Sets.newHashSet(target));
-				}
+				categories.get("20-29").add(target);
 				continue;
 			}
 			if (numInvoc > 29) {
-				if (categories.containsKey("30 - 66")) {
-					categories.get("30 - 66").add(target);
-				} else {
-					categories.put("30 - 66", Sets.newHashSet(target));
-				}
+				categories.get("30-66").add(target);
 				continue;
 			}
 		}
@@ -298,22 +290,22 @@ public class Evaluation {
 		ProposalResults episodeResults = new ProposalResults();
 		episodeResults.setTarget(target);
 		
-		append("Target query %d\t", targetID);
+		sb.append("Target query " + targetID + "\t");
 		for (Map.Entry<Double, List<Averager>> entry : avgQueryProposal.entrySet()) {
 			
-			append("%s: [ ", df.format(entry.getKey()));
+			sb.append(df.format(entry.getKey()) + ": [ ");
 			for (int p = 0; p < PROPOSALS; p++) {
 				double qp = entry.getValue().get(p).average();
 				
 				if (qp > 0.0) {
 					double tp = avgTargetProposal.get(entry.getKey()).get(p).average();
 					episodeResults.addResult(entry.getKey(), qp, tp);
-					append("<%s, %s>; ", df.format(qp), df.format(tp));
+					sb.append("<" + df.format(qp) + ", " + df.format(tp) + ">; ");
 				}
 			}
-			append("]\t");
+			sb.append("]\t");
 		}
-		append("%d\n", target.getNumEvents() - 1);
+		sb.append(target.getNumEvents() - 1 + "\n");
 		results.add(episodeResults);
 	}
 
