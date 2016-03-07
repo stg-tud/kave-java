@@ -43,7 +43,7 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 		this.selections = Lists.newArrayList();
 		this.proposalCollection = Lists.newArrayList();
 		this.context = new Context();
-		this.terminatedState = terminatedState.Unknown;
+		this.terminatedState = TerminationState.Unknown;
 		this.proposalCount = 0;
 	}
 
