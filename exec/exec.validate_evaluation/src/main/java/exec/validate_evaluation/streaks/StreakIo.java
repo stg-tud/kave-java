@@ -15,29 +15,45 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.recommenders.io.Directory;
+import cc.recommenders.io.ReadingArchive;
 
 public class StreakIo {
 
-	public StreakIo(String dirEventsCompletion, String dirEditStreaks) {
-		// TODO Auto-generated constructor stub
+	private String dirIn;
+	private String dirOut;
+
+	public StreakIo(String dirIn, String dirOut) {
+		this.dirIn = dirIn;
+		this.dirOut = dirOut;
 	}
 
 	public Set<String> findZips() {
-		// TODO Auto-generated method stub
-		return null;
+		Directory dir = new Directory(dirIn);
+		return dir.findFiles(s -> s.endsWith(".zip"));
 	}
 
 	public Set<ICompletionEvent> read(String zip) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<ICompletionEvent> es = Sets.newLinkedHashSet();
+		Directory dir = new Directory(dirIn);
+		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+			while (ra.hasNext()) {
+				es.add(ra.getNext(ICompletionEvent.class));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return es;
 	}
 
-	public void store(Collection<EditStreak> collection, String zip) {
+	public void store(Iterable<EditStreak> collection, String zip) {
 		// TODO Auto-generated method stub
 
 	}
