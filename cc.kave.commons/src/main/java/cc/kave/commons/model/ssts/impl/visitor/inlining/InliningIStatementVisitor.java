@@ -22,11 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -61,35 +58,16 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
-import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
-import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
-import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
-import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
-import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
-import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
-import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
-import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
-import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
-import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
-import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
-import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.EventSubscriptionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
-import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
-import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
@@ -120,17 +98,12 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(ISST sst, InliningContext context) {
 		ISST clone = SSTCloneUtil.clone(sst, ISST.class);
-		context.setNonEntryPoints(clone.getNonEntryPoints());
-		context.createSST(clone);
-		if (clone.getEntryPoints().size() > 0) {
-			for (IMethodDeclaration method : clone.getEntryPoints()) {
-				method.accept(this, context);
-			}
-		} else {
-			for (IMethodDeclaration method : clone.getMethods()) {
-				context.addMethod(method);
-			}
-		}
+		visitMethods(context, clone);
+		removeInlinedMethods(context);
+		return null;
+	}
+
+	private void removeInlinedMethods(InliningContext context) {
 		Set<IMethodDeclaration> notInlinedMethods = new HashSet<>();
 		Set<IMethodName> calls = new HashSet<>();
 		for (IMethodDeclaration method : context.getNonEntryPoints()) {
@@ -148,8 +121,20 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 				context.addMethod(method);
 			}
 		}
+	}
 
-		return null;
+	private void visitMethods(InliningContext context, ISST clone) {
+		context.setNonEntryPoints(clone.getNonEntryPoints());
+		context.createSST(clone);
+		if (clone.getEntryPoints().size() > 0) {
+			for (IMethodDeclaration method : clone.getEntryPoints()) {
+				method.accept(this, context);
+			}
+		} else {
+			for (IMethodDeclaration method : clone.getMethods()) {
+				context.addMethod(method);
+			}
+		}
 	}
 
 	public Void visit(IMethodDeclaration stmt, InliningContext context) {
@@ -157,7 +142,7 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 		context.visitScope(stmt.getBody());
 		method.getBody().addAll(context.getBody());
 		method.setEntryPoint(true);
-		method.setName(MethodName.newMethodName(stmt.getName().getIdentifier()));
+		method.setName(stmt.getName());
 		context.addMethod(method);
 
 		// Clear body for next Method
@@ -166,62 +151,45 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	}
 
 	public Void visit(IExpressionStatement stmt, InliningContext context) {
+		stmt.getExpression().accept(this, context);
 		if (stmt.getExpression() instanceof IInvocationExpression) {
-			stmt.getExpression().accept(this, context);
-			IAssignableExpression assExpr = context.getReturnExpression();
-			context.setReturnExpression(null);
-			if (assExpr != null) {
-				((ExpressionStatement) stmt).setExpression(assExpr);
+			if (context.getReturnExpression() != null) {
+				ExpressionStatement expressionStatement = (ExpressionStatement) stmt;
+				expressionStatement.setExpression(context.getReturnExpression());
+				context.setReturnExpression(null);
 				context.addStatement(stmt);
 			}
-		} else {
-			stmt.getExpression().accept(this, context);
-			context.addStatement(stmt);
+			return null;
 		}
+		context.addStatement(stmt);
 		return null;
 	}
 
 	public Void visit(IVariableDeclaration stmt, InliningContext context) {
-		// TODO: changed
 		stmt.getReference().accept(this, context);
 		context.addStatement(stmt);
 		return null;
 	}
 
 	public Void visit(IAssignment stmt, InliningContext context) {
-		// TODO: changed
 		stmt.getReference().accept(this, context);
+		stmt.getExpression().accept(this, context);
 		if (stmt.getExpression() instanceof IInvocationExpression) {
-			stmt.getExpression().accept(this, context);
-			IAssignableExpression assExpr = context.getReturnExpression();
-			context.setReturnExpression(null);
-			if (assExpr != null) {
-				((Assignment) stmt).setExpression(assExpr);
+			if (context.getReturnExpression() != null) {
+				Assignment assignment = (Assignment) stmt;
+				assignment.setExpression(context.getReturnExpression());
+				context.setReturnExpression(null);
 				context.addStatement(stmt);
 			}
-		} else {
-			stmt.getExpression().accept(this, context);
-			context.addStatement(stmt);
+			return null;
 		}
+		context.addStatement(stmt);
 		return null;
 	}
 
 	public Void visit(IReturnStatement stmt, InliningContext context) {
 		if (context.isInline()) {
-			if (!context.isVoid()) {
-				Assignment assignment = new Assignment();
-				assignment.setReference(SSTUtil.variableReference(context.getResultName()));
-				assignment.setExpression(stmt.getExpression());
-				context.addStatement(assignment);
-			}
-			Assignment resultAssignment = new Assignment();
-			resultAssignment.setReference(SSTUtil.variableReference(context.getGotResultName()));
-			ConstantValueExpression constant = new ConstantValueExpression();
-			constant.setValue("false");
-			resultAssignment.setExpression(constant);
-			context.addStatement(resultAssignment);
-			context.setGuardNeeded(true);
-			context.setGlobalGuardNeeded(true);
+			inlineReturnStatement(stmt, context);
 		} else {
 			stmt.getExpression().accept(this, context);
 			context.addStatement(stmt);
@@ -229,19 +197,30 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 		return null;
 	}
 
+	private void inlineReturnStatement(IReturnStatement stmt, InliningContext context) {
+		if (!context.isVoid()) {
+			Assignment assignment = new Assignment();
+			assignment.setReference(SSTUtil.variableReference(context.getResultName()));
+			assignment.setExpression(stmt.getExpression());
+			context.addStatement(assignment);
+		}
+		Assignment resultAssignment = new Assignment();
+		resultAssignment.setReference(SSTUtil.variableReference(context.getGotResultName()));
+		ConstantValueExpression constant = new ConstantValueExpression();
+		constant.setValue("false");
+		resultAssignment.setExpression(constant);
+		context.addStatement(resultAssignment);
+		context.setGuardNeeded(true);
+		context.setGlobalGuardNeeded(true);
+	}
+
 	@Override
 	public Void visit(IForLoop block, InliningContext context) {
-		ForLoop stmt = (ForLoop) block;
 		block.getCondition().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getInit(), newBody);
-		stmt.setInit(newBody);
-		newBody = Lists.newArrayList();
-		context.visitBlock(block.getStep(), newBody);
-		stmt.setStep(newBody);
-		newBody = Lists.newArrayList();
-		context.visitBlock(block.getBody(), newBody);
-		stmt.setBody(newBody);
+		// TODO: remove List
+		context.visitBlock(block.getInit());
+		context.visitBlock(block.getStep());
+		context.visitBlock(block.getBody());
 		context.addStatement(block);
 		return null;
 	}
@@ -249,9 +228,7 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(IWhileLoop block, InliningContext context) {
 		block.getCondition().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getBody(), newBody);
-		((WhileLoop) block).setBody(newBody);
+		context.visitBlock(block.getBody());
 		context.addStatement(block);
 		return null;
 	}
@@ -259,12 +236,8 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(IIfElseBlock block, InliningContext context) {
 		block.getCondition().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getElse(), newBody);
-		((IfElseBlock) block).setElse(newBody);
-		newBody = Lists.newArrayList();
-		context.visitBlock(block.getThen(), newBody);
-		((IfElseBlock) block).setThen(newBody);
+		context.visitBlock(block.getElse());
+		context.visitBlock(block.getThen());
 		context.addStatement(block);
 		return null;
 	}
@@ -272,154 +245,111 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(IDoLoop block, InliningContext context) {
 		block.getCondition().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getBody(), newBody);
-		((DoLoop) block).setBody(newBody);
+		context.visitBlock(block.getBody());
 		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IForEachLoop block, InliningContext context) {
-		// TODO: changed
-		ForEachLoop loop = (ForEachLoop) block;
-		loop.setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
+		((ForEachLoop) block).setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
 		block.getLoopedReference().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getBody(), newBody);
-		loop.getBody().clear();
-		loop.getBody().addAll(newBody);
-		context.addStatement(loop);
-		return null;
-	}
-
-	@Override
-	public Void visit(ISwitchBlock block, InliningContext context) {
-		// TODO: changed
-		SwitchBlock switchBlock = (SwitchBlock) block;
-		block.getReference().accept(this, context);
-		context.visitBlock(block.getDefaultSection(), switchBlock.getDefaultSection());
-		List<ICaseBlock> caseblocks = Lists.newArrayList();
-		for (ICaseBlock caseBlock : block.getSections()) {
-			CaseBlock newCase = new CaseBlock();
-			context.visitBlock(caseBlock.getBody(), newCase.getBody());
-			newCase.setLabel(caseBlock.getLabel());
-			caseblocks.add(newCase);
-		}
-		switchBlock.getSections().clear();
-		switchBlock.getSections().addAll(caseblocks);
-		context.addStatement(switchBlock);
-		return null;
-	}
-
-	@Override
-	public Void visit(ILockBlock stmt, InliningContext context) {
-		// TODO: changed
-		LockBlock block = (LockBlock) stmt;
-		stmt.getReference().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(stmt.getBody(), newBody);
-		block.setBody(newBody);
+		context.visitBlock(block.getBody());
 		context.addStatement(block);
 		return null;
 	}
 
 	@Override
-	public Void visit(IUsingBlock block, InliningContext context) {
-		// TODO: changed
-		UsingBlock usingBlock = (UsingBlock) block;
+	public Void visit(ISwitchBlock block, InliningContext context) {
 		block.getReference().accept(this, context);
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(block.getBody(), newBody);
-		usingBlock.setBody(newBody);
-		context.addStatement(usingBlock);
+		context.visitBlock(block.getDefaultSection());
+		for (ICaseBlock caseBlock : block.getSections()) {
+			context.visitBlock(caseBlock.getBody());
+		}
+		context.addStatement(block);
+		return null;
+	}
+
+	@Override
+	public Void visit(ILockBlock stmt, InliningContext context) {
+		stmt.getReference().accept(this, context);
+		context.visitBlock(stmt.getBody());
+		context.addStatement(stmt);
+		return null;
+	}
+
+	@Override
+	public Void visit(IUsingBlock block, InliningContext context) {
+		block.getReference().accept(this, context);
+		context.visitBlock(block.getBody());
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(ITryBlock block, InliningContext context) {
-		TryBlock tryBlock = new TryBlock();
-		context.enterBlock();
-		for (IStatement statement : block.getBody()) {
-			statement.accept(this, context);
-		}
-		context.leaveBlock(tryBlock.getBody());
-		context.visitBlock(block.getFinally(), tryBlock.getFinally());
+		context.visitBlock(block.getBody());
+		context.visitBlock(block.getFinally());
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			CatchBlock newCatch = new CatchBlock();
-			context.visitBlock(catchBlock.getBody(), newCatch.getBody());
-			newCatch.setKind(catchBlock.getKind());
-			newCatch.setParameter(catchBlock.getParameter());
-			tryBlock.getCatchBlocks().add(newCatch);
+			context.visitBlock(catchBlock.getBody());
 		}
-		context.addStatement(tryBlock);
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IUncheckedBlock block, InliningContext context) {
-		UncheckedBlock unchecked = new UncheckedBlock();
-		context.visitBlock(block.getBody(), unchecked.getBody());
-		context.addStatement(unchecked);
+		context.visitBlock(block.getBody());
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IUnsafeBlock block, InliningContext context) {
-		UnsafeBlock unsafe = new UnsafeBlock();
-		context.addStatement(unsafe);
+		context.addStatement(block);
 		return null;
 	}
 
 	@Override
 	public Void visit(IContinueStatement stmt, InliningContext context) {
-		ContinueStatement statement = new ContinueStatement();
-		context.addStatement(statement);
+		context.addStatement(stmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(IBreakStatement stmt, InliningContext context) {
-		BreakStatement statement = new BreakStatement();
-		context.addStatement(statement);
+		context.addStatement(stmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(IUnknownStatement unknownStmt, InliningContext context) {
-		UnknownStatement statement = new UnknownStatement();
-		context.addStatement(statement);
+		context.addStatement(unknownStmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(ILabelledStatement stmt, InliningContext context) {
-		LabelledStatement statement = new LabelledStatement();
-		statement.setLabel(stmt.getLabel());
-		statement.setStatement(context.visit(stmt.getStatement(), context));
-		context.addStatement(statement);
+		((LabelledStatement) stmt).setStatement(context.visit(stmt.getStatement(), context));
+		context.addStatement(stmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(IGotoStatement stmt, InliningContext context) {
-		GotoStatement statement = new GotoStatement();
-		statement.setLabel(stmt.getLabel());
-		context.addStatement(statement);
+		context.addStatement(stmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(IThrowStatement stmt, InliningContext context) {
-		ThrowStatement statement = new ThrowStatement();
-		statement.setReference(stmt.getReference());
-		context.addStatement(statement);
+		stmt.getReference();
+		context.addStatement(stmt);
 		return null;
 	}
 
 	@Override
 	public Void visit(IEventSubscriptionStatement stmt, InliningContext context) {
-		// TODO: changed
 		stmt.getReference().accept(this, context);
 		if (stmt.getExpression() instanceof IInvocationExpression) {
 			stmt.getExpression().accept(this, context);
@@ -478,11 +408,15 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 					statement.accept(this, context);
 				}
 			} else {
-				context.visitBlock(body, context.getBody());
+				context.visitBlock(body);
 				context.leaveScope();
 				context.setInline(false);
+				for (IStatement statement : body) {
+					context.addStatement(statement);
+				}
 				if (!context.isVoid()) {
 					context.setReturnExpression(SSTUtil.referenceExprToVariable(context.getResultName()));
+					return null;
 				} else {
 					return null;
 				}
@@ -564,7 +498,6 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	}
 
 	public Void visit(IReferenceExpression expr, InliningContext context) {
-		// TODO: changed
 		expr.getReference().accept(this, context);
 		return null;
 	}
@@ -576,7 +509,6 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(IComposedExpression expr, InliningContext context) {
-		// TODO: changed
 		for (IVariableReference ref : expr.getReferences()) {
 			ref.accept(this, context);
 		}
@@ -585,9 +517,7 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(ILoopHeaderBlockExpression expr, InliningContext context) {
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(expr.getBody(), newBody);
-		((LoopHeaderBlockExpression) expr).setBody(newBody);
+		context.visitBlock(expr.getBody());
 		return null;
 	}
 
@@ -611,15 +541,12 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(ILambdaExpression expr, InliningContext context) {
-		List<IStatement> newBody = Lists.newArrayList();
-		context.visitBlock(expr.getBody(), newBody);
-		((LambdaExpression) expr).setBody(newBody);
+		context.visitBlock(expr.getBody());
 		return null;
 	}
 
 	@Override
 	public Void visit(ICompletionExpression entity, InliningContext context) {
-		// TODO: changed
 		if (entity.getVariableReference() != null) {
 			entity.getVariableReference().accept(this, context);
 		}
@@ -635,14 +562,12 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(ICastExpression expr, InliningContext context) {
-		// TODO: changed
 		expr.getReference().accept(this, context);
 		return null;
 	}
 
 	@Override
 	public Void visit(ITypeCheckExpression expr, InliningContext context) {
-		// TODO: changed
 		expr.getReference().accept(this, context);
 		return null;
 	}
@@ -656,7 +581,6 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(IIndexAccessExpression expr, InliningContext context) {
-		// TODO: changed
 		for (ISimpleExpression e : expr.getIndices())
 			e.accept(this, context);
 		expr.getReference().accept(this, context);

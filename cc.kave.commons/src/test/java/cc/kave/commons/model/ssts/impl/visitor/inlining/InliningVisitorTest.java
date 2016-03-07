@@ -35,9 +35,6 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpress
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningIStatementVisitor;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
@@ -967,68 +964,63 @@ public class InliningVisitorTest extends InliningBaseTest {
 								declareVar("$0_a"))));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testUnaryBinaryExpressionInline(){
+	public void testUnaryBinaryExpressionInline() {
 		ISST sst = buildSST(//
 				declareEntryPoint("ep1", //
 						invocationStatement("ep2")),
 				declareNonEntryPoint("ep2", //
-						declareVar("a"),
-						assign(ref("a"), new BinaryExpression()),
+						declareVar("a"), assign(ref("a"), new BinaryExpression()),
 						assign(ref("a"), new UnaryExpression())));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //
-						assign(ref("a"), new BinaryExpression()),
-						assign(ref("a"), new UnaryExpression())));
+						assign(ref("a"), new BinaryExpression()), assign(ref("a"), new UnaryExpression())));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testCastExpressionInline(){
+	public void testCastExpressionInline() {
 		CastExpression expr = new CastExpression();
 		expr.setReference(ref("b"));
 		ISST sst = buildSST(//
 				declareEntryPoint("ep1", //
 						invocationStatement("ep2")),
 				declareNonEntryPoint("ep2", //
-						declareVar("a"),
-						assign(ref("a"), expr)));
+						declareVar("a"), assign(ref("a"), expr)));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //
 						assign(ref("a"), expr)));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testTypeCheckExpressionInline(){
+	public void testTypeCheckExpressionInline() {
 		TypeCheckExpression expr = new TypeCheckExpression();
 		expr.setReference(ref("b"));
 		ISST sst = buildSST(//
 				declareEntryPoint("ep1", //
 						invocationStatement("ep2")),
 				declareNonEntryPoint("ep2", //
-						declareVar("a"),
-						assign(ref("a"), expr)));
+						declareVar("a"), assign(ref("a"), expr)));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //
 						assign(ref("a"), expr)));
 		assertSSTs(sst, inlinedSST);
 	}
-	
+
 	@Test
-	public void testIndexAccessExpressionInline(){
+	public void testIndexAccessExpressionInline() {
 		IndexAccessExpression expr = new IndexAccessExpression();
 		expr.setReference(ref("b"));
 		ISST sst = buildSST(//
 				declareEntryPoint("ep1", //
 						invocationStatement("ep2")),
 				declareNonEntryPoint("ep2", //
-						declareVar("a"),
-						assign(ref("a"), expr)));
+						declareVar("a"), assign(ref("a"), expr)));
 		ISST inlinedSST = buildSST( //
 				declareEntryPoint("ep1", //
 						declareVar("a"), //
@@ -1039,7 +1031,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningIStatementVisitor(), context);
-		//System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

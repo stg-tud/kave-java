@@ -125,6 +125,7 @@ public class InliningContext {
 	}
 
 	public void leaveBlock(List<IStatement> body) {
+		body.clear();
 		body.addAll(scope.body);
 		scope.parent.resultName = scope.resultName;
 		scope.parent.gotResultName = scope.gotResultName;
@@ -220,12 +221,12 @@ public class InliningContext {
 	}
 
 	public IStatement visit(IStatement statement, InliningContext context) {
-		List<IStatement> body = new ArrayList<>();
-		visitBlock(Lists.newArrayList(statement), body);
+		ArrayList<IStatement> body = Lists.newArrayList(statement);
+		visitBlock(body);
 		return body.get(0);
 	}
 
-	public void visitBlock(List<IStatement> body, List<IStatement> blockBody) {
+	public void visitBlock(List<IStatement> body) {
 		enterBlock();
 		int index = 0;
 		for (IStatement statement : body) {
@@ -234,14 +235,15 @@ public class InliningContext {
 				IfElseBlock block = new IfElseBlock();
 				block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
 				setGuardNeeded(false);
-				visitBlock(body.subList(index + 1, body.size()), block.getThen());
+				block.setThen(body.subList(index + 1, body.size()));
+				visitBlock(block.getThen());
 				addStatement(block);
 				break;
 			}
 			index++;
 
 		}
-		leaveBlock(blockBody);
+		leaveBlock(body);
 	}
 
 	public void visitScope(List<IStatement> body) {
@@ -258,7 +260,8 @@ public class InliningContext {
 				block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
 				setGuardNeeded(false);
 				setGlobalGuardNeeded(false);
-				visitBlock(body.subList(index + 1, body.size()), block.getThen());
+				block.setThen(body.subList(index + 1, body.size()));
+				visitBlock(block.getThen());
 				addStatement(block);
 				break;
 			}
