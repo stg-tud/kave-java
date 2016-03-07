@@ -33,6 +33,7 @@ import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
@@ -56,8 +57,7 @@ public class InliningContext {
 	private boolean guardNeeded = false;
 	private boolean globalGuardNeed = false;
 	private final InliningIStatementVisitor statementVisitor;
-	private final InliningIReferenceVisitor referenceVisitor;
-	private final InliningIExpressionVisitor expressionVisitor;
+	private IAssignableExpression returnExpression = null;
 
 	private Set<IMethodDeclaration> inlinedMethods;
 	private boolean isVoid;
@@ -70,8 +70,6 @@ public class InliningContext {
 		this.visitor = new NameScopeVisitor();
 		this.counter = 0;
 		this.statementVisitor = new InliningIStatementVisitor();
-		this.referenceVisitor = new InliningIReferenceVisitor();
-		this.expressionVisitor = new InliningIExpressionVisitor();
 		this.inlinedMethods = new HashSet<>();
 	}
 
@@ -307,10 +305,6 @@ public class InliningContext {
 		return scope.body;
 	}
 
-	public InliningIExpressionVisitor getExpressionVisitor() {
-		return expressionVisitor;
-	}
-
 	public String getGotResultName() {
 		return scope.gotResultName;
 	}
@@ -328,10 +322,6 @@ public class InliningContext {
 
 	public Set<IMethodDeclaration> getNonEntryPoints() {
 		return nonEntryPoints;
-	}
-
-	public InliningIReferenceVisitor getReferenceVisitor() {
-		return referenceVisitor;
 	}
 
 	public String getResultName() {
@@ -365,4 +355,13 @@ public class InliningContext {
 	public IReference resolve(IVariableReference ref) {
 		return scope.resolve(ref);
 	}
+
+	public IAssignableExpression getReturnExpression() {
+		return returnExpression;
+	}
+
+	public void setReturnExpression(IAssignableExpression returnExpression) {
+		this.returnExpression = returnExpression;
+	}
+
 }
