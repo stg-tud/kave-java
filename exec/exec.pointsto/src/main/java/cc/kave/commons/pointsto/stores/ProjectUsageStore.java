@@ -43,10 +43,10 @@ import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
+import cc.kave.commons.utils.json.legacy.GsonUtil;
 import cc.recommenders.names.ITypeName;
 import cc.recommenders.names.Names;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.gson.GsonUtil;
 
 public class ProjectUsageStore implements UsageStore {
 
@@ -406,7 +406,10 @@ public class ProjectUsageStore implements UsageStore {
 		@Override
 		public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
 			invalidateCache();
-			Multimap<ITypeName, Usage> typeToUsages = ArrayListMultimap.create(); // keep duplicate key-value pairs
+			Multimap<ITypeName, Usage> typeToUsages = ArrayListMultimap.create(); // keep
+																					// duplicate
+																					// key-value
+																					// pairs
 
 			for (Usage usage : usages) {
 				typeToUsages.put(usage.getType(), usage);
