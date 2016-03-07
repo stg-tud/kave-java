@@ -15,30 +15,9 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import cc.kave.commons.model.events.completionevents.Context;
 
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+public interface IUsageExtractor {
 
-public class StreakIo {
-
-	public StreakIo(String dirEventsCompletion, String dirEditStreaks) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Set<String> findZips() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Set<ICompletionEvent> read(String zip) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void store(Collection<List<Edit>> values, String zip) {
-		// TODO Auto-generated method stub
-
-	}
+	IAnalysisResult analyse(Context ctx);
 }

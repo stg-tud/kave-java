@@ -19,54 +19,33 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
+import exec.validate_evaluation.streaks.IUsageExtractor;
 import exec.validate_evaluation.streaks.StreakGeneration;
 import exec.validate_evaluation.streaks.StreakIo;
 import exec.validate_evaluation.streaks.StreakLogger;
+import exec.validate_evaluation.streaks.UsageExtractor;
 
 public class run_me {
 
 	private static String root = "/Volumes/Data/";
 	private static String dirEventsCompletion = root + "Events/OnlyCompletion/";
-	private static String dirEventsCompletionInlined = root + "Events/OnlyCompletion-inlined/";
-	private static String dirContexts = root + "Contexts/";
-	private static String dirContextsInlined = root + "Contexts-inlined/";
-	private static String zipTestCases = root + "AnalysisTestCases.sln-contexts.zip";
+	private static String dirEditStreaks = root + "EditStreaks/";
 
 	public static void main(String[] args) {
 		/* data preparation */
 		generateStreaks();
-//		runContextBatchInlining();
-		// runConmpletionEventBatchInlining();
 
 		/* evaluation results */
-		// runSSTComparison();
-		//runReadAllContexts();
-
 	}
 
 	private static void generateStreaks() {
-		StreakIo io = new StreakIo();
+		cleanDirs(dirEditStreaks);
+
+		StreakIo io = new StreakIo(dirEventsCompletion, dirEditStreaks);
+		IUsageExtractor ue = new UsageExtractor();
 		StreakLogger logger = new StreakLogger();
-		StreakGeneration gen = new StreakGeneration(io, logger);
-		gen.run();
-	}
-
-	private static void runReadAllContexts() {
-		new ReadAllContextsRunner().run(null, null, dirContexts);
-	}
-
-	private static void runContextBatchInlining() {
-		cleanDirs(dirContextsInlined);
-		new ContextBatchInlining(dirContexts, dirContextsInlined).run();
-	}
-
-	private static void runConmpletionEventBatchInlining() {
-		cleanDirs(dirEventsCompletionInlined);
-		new CompletionEventProcessor(dirEventsCompletion, dirEventsCompletionInlined).run();
-	}
-
-	private static void runSSTComparison() {
-		new SSTComparison(zipTestCases).run();
+		
+		new StreakGeneration(io, logger, ue).run();
 	}
 
 	private static void cleanDirs(String... dirs) {

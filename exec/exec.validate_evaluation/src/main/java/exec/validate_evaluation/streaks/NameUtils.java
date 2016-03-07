@@ -15,40 +15,13 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
 
-public class StreakLogger {
+public class NameUtils {
 
-	public void foundZips(Set<String> zips) {
+	public static IMethodName toCoReName(cc.kave.commons.model.names.IMethodName m) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	public void foundEvents(Set<ICompletionEvent> events) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void processingEvent(ICompletionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void endZip(Map<Tuple<IMethodName, ITypeName>, List<Edit>> editStreaks) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void finish() {
-		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 }

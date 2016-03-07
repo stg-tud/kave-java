@@ -15,40 +15,42 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Date;
 
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.usages.Usage;
 
-public class StreakLogger {
+public class Edit {
 
-	public void foundZips(Set<String> zips) {
-		// TODO Auto-generated method stub
-		
+	private Date date;
+	private Usage usage;
+	private IMethodName selection;
+
+	private Edit() {
+		// for de-/serialization
 	}
 
-	public void foundEvents(Set<ICompletionEvent> events) {
-		// TODO Auto-generated method stub
-		
+	public Date getDate() {
+		return date;
 	}
 
-	public void processingEvent(ICompletionEvent e) {
-		// TODO Auto-generated method stub
-		
+	public Usage getUsage() {
+		return usage;
 	}
 
-	public void endZip(Map<Tuple<IMethodName, ITypeName>, List<Edit>> editStreaks) {
-		// TODO Auto-generated method stub
-		
+	public IMethodName getSelection() {
+		return selection;
 	}
 
-	public void finish() {
-		// TODO Auto-generated method stub
-		
+	public boolean isQuery() {
+		return false;
 	}
 
+	public static Edit create(Date date, Usage usage, IMethodName selection) {
+		Edit e = new Edit();
+		e.date = date;
+		e.usage = usage;
+		e.selection = selection;
+		return e;
+	}
 }

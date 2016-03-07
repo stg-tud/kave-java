@@ -26,5 +26,10 @@
 			<artifactId>cc.recommenders.testutils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>exec</groupId>
+			<artifactId>exec.pointsto</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
