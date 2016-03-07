@@ -36,8 +36,8 @@ import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.mining.features.RareFeatureDropper;
 import cc.recommenders.mining.features.UsageFeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
@@ -243,13 +243,13 @@ public class PBNMinerIntegrationTest {
 
 	private Usage createUsageWithDefinition(String def) {
 		Query query = createQuery("a", "b");
-		query.setDefinition(DefinitionSites.createDefinitionByReturn(VmMethodName.get(def)));
+		query.setDefinition(DefinitionSites.createDefinitionByReturn(CoReMethodName.get(def)));
 		return query;
 	}
 
 	private Usage createUsageInMethod(String name) {
 		Query query = createQuery("a", "b");
-		query.setMethodContext(VmMethodName.get(name));
+		query.setMethodContext(CoReMethodName.get(name));
 		return query;
 	}
 
@@ -266,16 +266,16 @@ public class PBNMinerIntegrationTest {
 
 	private static Usage createUsageInClass(String inClass) {
 		Query query = createQuery("a", "b");
-		query.setClassContext(VmTypeName.get(inClass));
+		query.setClassContext(CoReTypeName.get(inClass));
 		return query;
 	}
 
 	private static Query createQuery(String... methods) {
 		Query q = new Query();
-		q.setClassContext(VmTypeName.get("Lmy/Type"));
+		q.setClassContext(CoReTypeName.get("Lmy/Type"));
 		q.setDefinition(DefinitionSites.createUnknownDefinitionSite());
-		q.setType(VmTypeName.get("Lfw/Type"));
-		q.setMethodContext(VmMethodName.get("Lmy/Type.doit()V"));
+		q.setType(CoReTypeName.get("Lfw/Type"));
+		q.setMethodContext(CoReMethodName.get("Lmy/Type.doit()V"));
 
 		for (String methodName : methods) {
 			q.addCallSite(CallSites.createReceiverCallSite("Lfw/Type." + methodName + "()V"));

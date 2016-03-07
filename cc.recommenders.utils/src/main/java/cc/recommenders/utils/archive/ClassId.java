@@ -10,10 +10,10 @@
  */
 package cc.recommenders.utils.archive;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class ClassId {
 
-    public ITypeName typeName;
+    public ICoReTypeName typeName;
     public String fingerprint;
 }

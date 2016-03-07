@@ -32,7 +32,7 @@ import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.testutils.LoggerUtils;
 import cc.recommenders.usages.Usage;
 
@@ -149,7 +149,7 @@ public class QueryPerformanceProviderTest {
 
 	private int[] assertTasksAndGetSizes(int num) {
 		String typeName = "LType";
-		Collection<QueryPerformanceTask> tasks = sut.createTasksFor("APP", VmTypeName.get(typeName), 3,
+		Collection<QueryPerformanceTask> tasks = sut.createTasksFor("APP", CoReTypeName.get(typeName), 3,
 				createTrainingData(num));
 		int i = 0;
 		int[] sizes = new int[tasks.size()];
@@ -228,8 +228,8 @@ public class QueryPerformanceProviderTest {
 
 	@Test
 	public void onlyButtons() {
-		assertTrue(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button")));
-		assertFalse(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/Other")));
+		assertTrue(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button")));
+		assertFalse(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Other")));
 	}
 
 	@Test

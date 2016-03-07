@@ -46,8 +46,8 @@ import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.Names;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -59,7 +59,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 	private final Provider<PBNMiner> pbnMinerProvider;
 
-	private final Map<Triple<ITypeName, String, String>, Double> results = new HashMap<>();
+	private final Map<Triple<ICoReTypeName, String, String>, Double> results = new HashMap<>();
 
 	@Inject
 	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter,
@@ -71,7 +71,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 	public void exportResults(Path target, ResultExporter exporter) throws IOException {
 		exporter.export(target, results.entrySet().stream().map(entry -> {
-			ITypeName type = entry.getKey().getLeft();
+			ICoReTypeName type = entry.getKey().getLeft();
 			return new String[] { Names.vm2srcQualifiedType(type), entry.getKey().getMiddle(),
 					entry.getKey().getRight(), String.format(Locale.US, "%.3f", entry.getValue()) };
 		}));
@@ -81,19 +81,19 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	protected void evaluate(List<ICompletionEvent> completionEvents, List<PointsToAnalysisFactory> ptFactories)
 			throws IOException {
 		for (PointsToAnalysisFactory ptFactory : ptFactories) {
-			Map<ITypeName, Map<ICompletionEvent, List<Usage>>> queries = createQueries(completionEvents, ptFactory);
-			Set<ITypeName> types = getQueryTypes(queries.values());
+			Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries = createQueries(completionEvents, ptFactory);
+			Set<ICoReTypeName> types = getQueryTypes(queries.values());
 			types.retainAll(getStoreTypes());
 			log("%s: %d types\n", ptFactory.getName(), types.size());
 
-			for (ITypeName type : types) {
+			for (ICoReTypeName type : types) {
 				evaluateType(ptFactory.getName(), type, queries);
 			}
 		}
 	}
 
-	private void evaluateType(String validationAnalysisName, ITypeName type,
-			Map<ITypeName, Map<ICompletionEvent, List<Usage>>> queries) throws IOException {
+	private void evaluateType(String validationAnalysisName, ICoReTypeName type,
+			Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries) throws IOException {
 		for (UsageStore store : usageStores) {
 			ICallsRecommender<Query> recommender = trainRecommender(store.load(type, usageFilter));
 			store.flush();
@@ -102,9 +102,9 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		}
 	}
 
-	private Map<ITypeName, Map<ICompletionEvent, List<Usage>>> createQueries(List<ICompletionEvent> completionEvents,
-			PointsToAnalysisFactory ptFactory) {
-		Map<ITypeName, Map<ICompletionEvent, List<Usage>>> queries = new HashMap<>();
+	private Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> createQueries(
+			List<ICompletionEvent> completionEvents, PointsToAnalysisFactory ptFactory) {
+		Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries = new HashMap<>();
 		CompletionExpressionCollector completionExprCollector = new CompletionExpressionCollector();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 
@@ -137,12 +137,12 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		return queries;
 	}
 
-	private Set<ITypeName> getQueryTypes(Collection<Map<ICompletionEvent, List<Usage>>> eventUsages) {
+	private Set<ICoReTypeName> getQueryTypes(Collection<Map<ICompletionEvent, List<Usage>>> eventUsages) {
 		return eventUsages.stream().flatMap(eu -> eu.values().stream()).flatMap(u -> u.stream()).map(u -> u.getType())
 				.collect(Collectors.toSet());
 	}
 
-	private Set<ITypeName> getStoreTypes() {
+	private Set<ICoReTypeName> getStoreTypes() {
 		return usageStores.stream().flatMap(store -> store.getAllTypes().stream()).filter(t -> usageFilter.test(t))
 				.collect(Collectors.toSet());
 	}
@@ -157,7 +157,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		for (Map.Entry<ICompletionEvent, List<Usage>> eventEntry : eventQueries.entrySet()) {
 			ICompletionEvent event = eventEntry.getKey();
 			IProposal expectedProposal = event.getLastSelectedProposal();
-			IMethodName expectedMethod = CoReNameConverter
+			ICoReMethodName expectedMethod = CoReNameConverter
 					.convert((cc.kave.commons.model.names.IMethodName) expectedProposal.getName());
 
 			for (Usage query : eventEntry.getValue()) {
@@ -173,9 +173,9 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		return reciprocalRank.getMean();
 	}
 
-	private int getRank(IMethodName expectedMethod, List<Tuple<IMethodName, Double>> recommendations) {
+	private int getRank(ICoReMethodName expectedMethod, List<Tuple<ICoReMethodName, Double>> recommendations) {
 		for (int r = 0; r < recommendations.size(); ++r) {
-			IMethodName method = recommendations.get(r).getFirst();
+			ICoReMethodName method = recommendations.get(r).getFirst();
 			if (expectedMethod.equals(method)) {
 				return r + 1;
 			}

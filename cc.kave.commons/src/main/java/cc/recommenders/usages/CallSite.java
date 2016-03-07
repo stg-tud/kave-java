@@ -10,7 +10,7 @@
  */
 package cc.recommenders.usages;
 
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 
 /**
  * @see cc.recommenders.usages.CallSites
@@ -20,7 +20,7 @@ public class CallSite {
 	// ensure consistent naming with hard-coded names in "UsageTypeAdapter"
 
 	private CallSiteKind kind;
-	private IMethodName method;
+	private ICoReMethodName method;
 	private int argIndex = 0;
 
 	CallSite() {
@@ -35,11 +35,11 @@ public class CallSite {
 		this.kind = kind;
 	}
 
-	public IMethodName getMethod() {
+	public ICoReMethodName getMethod() {
 		return method;
 	}
 
-	public void setMethod(IMethodName method) {
+	public void setMethod(ICoReMethodName method) {
 		this.method = method;
 	}
 

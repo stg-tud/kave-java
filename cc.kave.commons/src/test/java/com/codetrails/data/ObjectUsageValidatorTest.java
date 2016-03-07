@@ -24,10 +24,10 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -47,14 +47,14 @@ public class ObjectUsageValidatorTest {
 		ObjectUsage ou = new ObjectUsage();
 		ou.setUuid(UUID.randomUUID());
 
-		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(VmMethodName.get("LType.get()V"));
-		definition.setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button"));
+		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(CoReMethodName.get("LType.get()V"));
+		definition.setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button"));
 		ou.setDef(definition);
 
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
-		ctx.setSuperclass(VmTypeName.get("LSuperType"));
-		ctx.setIntroducedBy(mock(ITypeName.class));
-		ctx.setName(mock(IMethodName.class));
+		ctx.setSuperclass(CoReTypeName.get("LSuperType"));
+		ctx.setIntroducedBy(mock(ICoReTypeName.class));
+		ctx.setName(mock(ICoReMethodName.class));
 		ou.setContext(ctx);
 
 		Set<List<CallSite>> paths = Sets.newHashSet();
@@ -69,7 +69,7 @@ public class ObjectUsageValidatorTest {
 	private static CallSite createReceiverCallSite() {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.RECEIVER_CALL_SITE);
-		site.setCall(mock(IMethodName.class));
+		site.setCall(mock(ICoReMethodName.class));
 		return site;
 	}
 
@@ -80,19 +80,19 @@ public class ObjectUsageValidatorTest {
 
 	@Test
 	public void arraysPass() {
-		ou.getDef().setType(VmTypeName.get("[LSomeType"));
+		ou.getDef().setType(CoReTypeName.get("[LSomeType"));
 		assertValid();
 	}
 
 	@Test
 	public void anonymousClassesPass() {
-		ou.getDef().setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
+		ou.getDef().setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
 		assertValid();
 	}
 
 	@Test
 	public void nestedClassesPass() {
-		ou.getDef().setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
+		ou.getDef().setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
 		assertValid();
 	}
 

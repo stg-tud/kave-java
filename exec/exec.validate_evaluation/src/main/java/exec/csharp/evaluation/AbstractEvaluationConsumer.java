@@ -18,7 +18,7 @@ package exec.csharp.evaluation;
 import java.util.List;
 
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Usage;
 import exec.csharp.queries.QueryMode;
@@ -27,13 +27,13 @@ import exec.csharp.utils.MicroCommit;
 public abstract class AbstractEvaluationConsumer implements IEvaluationConsumer {
 
 	@Override
-	public void skippingType(ITypeName type, List<Usage> us, List<MicroCommit> histories) {
+	public void skippingType(ICoReTypeName type, List<Usage> us, List<MicroCommit> histories) {
 		Logger.log("");
 		Logger.log("--- skipping %s (%d usage, %d micro commits)", type, us.size(), histories.size());
 	}
 
 	@Override
-	public void startingType(ITypeName type, List<Usage> usages, List<MicroCommit> histories) {
+	public void startingType(ICoReTypeName type, List<Usage> usages, List<MicroCommit> histories) {
 		Logger.log("");
 		Logger.log("###");
 		Logger.log("### %s (%d usages, %d histories)", type, usages.size(), histories.size());

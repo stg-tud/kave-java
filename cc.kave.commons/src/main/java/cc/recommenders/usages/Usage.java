@@ -12,16 +12,16 @@ package cc.recommenders.usages;
 
 import java.util.Set;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 public interface Usage {
 
-	public ITypeName getType();
+	public ICoReTypeName getType();
 
-	public ITypeName getClassContext();
+	public ICoReTypeName getClassContext();
 
-	public IMethodName getMethodContext();
+	public ICoReMethodName getMethodContext();
 
 	public DefinitionSite getDefinitionSite();
 

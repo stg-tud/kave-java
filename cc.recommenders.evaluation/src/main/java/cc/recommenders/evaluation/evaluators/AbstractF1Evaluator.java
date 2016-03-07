@@ -21,7 +21,7 @@ import cc.recommenders.evaluation.data.Measure;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -43,8 +43,8 @@ public abstract class AbstractF1Evaluator {
 
 			for (Query query : queryBuilder.get().createQueries(usage)) {
 
-				Set<IMethodName> expected = getExpected(usage, query);
-				Set<IMethodName> proposed = getProposed(rec, query);
+				Set<ICoReMethodName> expected = getExpected(usage, query);
+				Set<ICoReMethodName> proposed = getProposed(rec, query);
 
 				if (qOpts.isIgnoringAfterFullRecall) {
 					proposed = Measure.dropAfterTotalRecall(expected, proposed);
@@ -59,8 +59,8 @@ public abstract class AbstractF1Evaluator {
 		}
 	}
 
-	private Set<IMethodName> getExpected(Usage usage, Query query) {
-		Set<IMethodName> expected = newLinkedHashSet();
+	private Set<ICoReMethodName> getExpected(Usage usage, Query query) {
+		Set<ICoReMethodName> expected = newLinkedHashSet();
 
 		for (CallSite site : usage.getReceiverCallsites()) {
 			boolean isQueried = query.getReceiverCallsites().contains(site);
@@ -72,10 +72,10 @@ public abstract class AbstractF1Evaluator {
 		return expected;
 	}
 
-	private Set<IMethodName> getProposed(ICallsRecommender<Query> rec, Query query) {
-		Set<Tuple<IMethodName, Double>> proposals = rec.query(query);
-		Set<IMethodName> ms = newLinkedHashSet();
-		for (Tuple<IMethodName, ?> t : proposals) {
+	private Set<ICoReMethodName> getProposed(ICallsRecommender<Query> rec, Query query) {
+		Set<Tuple<ICoReMethodName, Double>> proposals = rec.query(query);
+		Set<ICoReMethodName> ms = newLinkedHashSet();
+		for (Tuple<ICoReMethodName, ?> t : proposals) {
 			ms.add(t.getFirst());
 		}
 		return ms;

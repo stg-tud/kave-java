@@ -18,10 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-public class VmFieldName implements IFieldName {
+public class CoReFieldName implements ICoReFieldName {
     private static final long serialVersionUID = 5067244907255465328L;
 
-    private static Map<String /* vmTypeName */, VmFieldName> index = new MapMaker().weakValues().makeMap();
+    private static Map<String /* vmTypeName */, CoReFieldName> index = new MapMaker().weakValues().makeMap();
 
     /**
      * Format: DeclaringType'.'fieldName;FieldType, i.e., &lt;VmTypeName&gt;.&lt;String&gt;;&lt;VmTypeName&gt;
@@ -29,11 +29,11 @@ public class VmFieldName implements IFieldName {
      * @param fieldName
      * @return
      */
-    public static VmFieldName get(final String fieldName) {
+    public static CoReFieldName get(final String fieldName) {
         // typeName = removeGenerics(typeName);
-        VmFieldName res = index.get(fieldName);
+        CoReFieldName res = index.get(fieldName);
         if (res == null) {
-            res = new VmFieldName(fieldName);
+            res = new CoReFieldName(fieldName);
             index.put(fieldName, res);
         }
         return res;
@@ -41,14 +41,14 @@ public class VmFieldName implements IFieldName {
 
     private String identifier;
 
-    protected VmFieldName() {
+    protected CoReFieldName() {
         // no-one should instantiate this class. O
     }
 
     /**
      * @see #get(String)
      */
-    protected VmFieldName(final String vmFieldName) {
+    protected CoReFieldName(final String vmFieldName) {
         identifier = vmFieldName;
         ensureIsNotNull(identifier);
         ensureIsNotNull(getDeclaringType());
@@ -57,9 +57,9 @@ public class VmFieldName implements IFieldName {
     }
 
     @Override
-    public ITypeName getDeclaringType() {
+    public ICoReTypeName getDeclaringType() {
         final String declaringType = StringUtils.substringBeforeLast(identifier, ".");
-        return VmTypeName.get(declaringType);
+        return CoReTypeName.get(declaringType);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class VmFieldName implements IFieldName {
     }
 
     @Override
-    public ITypeName getFieldType() {
+    public ICoReTypeName getFieldType() {
         final String fieldType = StringUtils.substringAfter(identifier, ";");
-        return VmTypeName.get(fieldType);
+        return CoReTypeName.get(fieldType);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class VmFieldName implements IFieldName {
     }
 
     @Override
-    public int compareTo(final IFieldName other) {
+    public int compareTo(final ICoReFieldName other) {
         return identifier.compareTo(other.getIdentifier());
     }
 

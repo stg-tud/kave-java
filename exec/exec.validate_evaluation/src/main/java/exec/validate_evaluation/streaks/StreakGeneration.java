@@ -28,8 +28,8 @@ import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 public class StreakGeneration {
@@ -37,7 +37,7 @@ public class StreakGeneration {
 	private final StreakIo io;
 	private final StreakLogger log;
 
-	private Map<Tuple<IMethodName, ITypeName>, EditStreak> editStreaks;
+	private Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks;
 	private IUsageExtractor usageExtractor;
 
 	public StreakGeneration(StreakIo io, StreakLogger log, IUsageExtractor usageExtractor) {
@@ -72,9 +72,9 @@ public class StreakGeneration {
 
 	private void removeSingleEdits() {
 		log.startRemoveSingleEdits();
-		Iterator<Entry<Tuple<IMethodName, ITypeName>, EditStreak>> entries = editStreaks.entrySet().iterator();
+		Iterator<Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak>> entries = editStreaks.entrySet().iterator();
 		while (entries.hasNext()) {
-			Entry<Tuple<IMethodName, ITypeName>, EditStreak> entry = entries.next();
+			Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> entry = entries.next();
 			if (entry.getValue().isSingleEdit()) {
 				entries.remove();
 				log.removeSingleEdit();
@@ -91,7 +91,7 @@ public class StreakGeneration {
 
 		if (e.getTerminatedState() == TerminationState.Applied) {
 			usages.remove(query);
-			IMethodName selection = getSelection(e.getLastSelectedProposal());
+			ICoReMethodName selection = getSelection(e.getLastSelectedProposal());
 			register(date, query, selection);
 		}
 
@@ -100,12 +100,12 @@ public class StreakGeneration {
 		}
 	}
 
-	private void register(Date d, Usage u, IMethodName selection) {
+	private void register(Date d, Usage u, ICoReMethodName selection) {
 		Edit se = Edit.create(d, u, selection);
 		getEdits(u).add(se);
 	}
 
-	private IMethodName getSelection(IProposal p) {
+	private ICoReMethodName getSelection(IProposal p) {
 		boolean isMethodName = p.getName() instanceof cc.kave.commons.model.names.IMethodName;
 		if (!isMethodName) {
 			return null;
@@ -115,7 +115,7 @@ public class StreakGeneration {
 	}
 
 	private EditStreak getEdits(Usage u) {
-		Tuple<IMethodName, ITypeName> key = getKey(u);
+		Tuple<ICoReMethodName, ICoReTypeName> key = getKey(u);
 		EditStreak streak = editStreaks.get(key);
 		if (streak == null) {
 			streak = new EditStreak();
@@ -124,7 +124,7 @@ public class StreakGeneration {
 		return streak;
 	}
 
-	private Tuple<IMethodName, ITypeName> getKey(Usage u) {
+	private Tuple<ICoReMethodName, ICoReTypeName> getKey(Usage u) {
 		return Tuple.newTuple(u.getMethodContext(), u.getType());
 	}
 }

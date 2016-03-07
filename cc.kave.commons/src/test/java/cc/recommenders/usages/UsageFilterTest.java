@@ -19,9 +19,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.collect.Sets;
 
@@ -42,28 +42,28 @@ public class UsageFilterTest {
 	@Test
 	public void arraysAreFiltered() {
 		Query q = createValidUsage();
-		q.setType(VmTypeName.get("[LSomeType"));
+		q.setType(CoReTypeName.get("[LSomeType"));
 		assertFalse(sut.apply(q));
 	}
 
 	@Test
 	public void anonymqsClassesAreFiltered() {
 		Query q = createValidUsage();
-		q.setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
+		q.setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
 		assertFalse(sut.apply(q));
 	}
 
 	@Test
 	public void nestedClassesAreNotFiltered() {
 		Query q = createValidUsage();
-		q.setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
+		q.setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
 		assertTrue(sut.apply(q));
 	}
 
 	@Test
 	public void nonSwtTypesAreFiltered() {
 		Query q = createValidUsage();
-		q.setType(VmTypeName.get("LType"));
+		q.setType(CoReTypeName.get("LType"));
 		assertFalse(sut.apply(q));
 	}
 
@@ -84,12 +84,12 @@ public class UsageFilterTest {
 	private static Query createValidUsage() {
 		Query q = new Query();
 
-		q.setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button"));
-		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(VmMethodName.get("LType.get()V"));
+		q.setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button"));
+		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(CoReMethodName.get("LType.get()V"));
 		q.setDefinition(definition);
 
-		q.setClassContext(VmTypeName.get("LSuperType"));
-		q.setMethodContext(mock(IMethodName.class));
+		q.setClassContext(CoReTypeName.get("LSuperType"));
+		q.setMethodContext(mock(ICoReMethodName.class));
 
 		Set<CallSite> calls = Sets.newHashSet();
 		calls.add(createParameterCallSite());
@@ -102,7 +102,7 @@ public class UsageFilterTest {
 	private static CallSite createParameterCallSite() {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.PARAMETER);
-		site.setMethod(mock(IMethodName.class));
+		site.setMethod(mock(ICoReMethodName.class));
 		site.setArgIndex(12);
 		return site;
 	}
@@ -110,7 +110,7 @@ public class UsageFilterTest {
 	private static CallSite createReceiverCallSite() {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.RECEIVER);
-		site.setMethod(mock(IMethodName.class));
+		site.setMethod(mock(ICoReMethodName.class));
 		return site;
 	}
 }

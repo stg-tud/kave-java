@@ -14,12 +14,12 @@ package cc.kave.commons.pointsto.evaluation;
 
 import java.util.Comparator;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
-public final class TypeNameComparator implements Comparator<ITypeName> {
+public final class TypeNameComparator implements Comparator<ICoReTypeName> {
 
 	@Override
-	public int compare(ITypeName o1, ITypeName o2) {
+	public int compare(ICoReTypeName o1, ICoReTypeName o2) {
 		return o1.getIdentifier().compareTo(o2.getIdentifier());
 	}
 }

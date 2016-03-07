@@ -11,9 +11,9 @@
 package cc.recommenders.names;
 
 /**
- * A {@link IPackageName} is simply a special formatted string that expresses a package path.
+ * A {@link ICoRePackageName} is simply a special formatted string that expresses a package path.
  */
-public interface IPackageName extends IName, Comparable<IPackageName> {
+public interface ICoRePackageName extends ICoReName, Comparable<ICoRePackageName> {
 
     /**
      * @return True, if the package is the default package, i.e. its identifier is empty.

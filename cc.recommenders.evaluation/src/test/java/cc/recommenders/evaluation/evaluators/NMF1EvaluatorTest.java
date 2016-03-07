@@ -32,8 +32,8 @@ import cc.recommenders.evaluation.queries.PartialUsageQueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -132,10 +132,10 @@ public class NMF1EvaluatorTest {
 	}
 
 	private void addProposals(Query q, int... calls) {
-		Set<Tuple<IMethodName, Double>> proposals = Sets.newLinkedHashSet();
+		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
 		for (int i = 0; i < calls.length; i++) {
 
-			Tuple<IMethodName, Double> prop = Tuple.newTuple(m(calls[i]), 0.123);
+			Tuple<ICoReMethodName, Double> prop = Tuple.newTuple(m(calls[i]), 0.123);
 			proposals.add(prop);
 		}
 		when(rec.query(eq(q))).thenReturn(proposals);
@@ -154,7 +154,7 @@ public class NMF1EvaluatorTest {
 		return u;
 	}
 
-	private VmMethodName m(int num) {
-		return VmMethodName.get("LType.m" + num + "()V");
+	private CoReMethodName m(int num) {
+		return CoReMethodName.get("LType.m" + num + "()V");
 	}
 }

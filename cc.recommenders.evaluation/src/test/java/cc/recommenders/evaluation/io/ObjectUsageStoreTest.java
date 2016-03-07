@@ -48,9 +48,9 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.WritingArchive;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 public class ObjectUsageStoreTest {
 
@@ -94,10 +94,10 @@ public class ObjectUsageStoreTest {
 		sut.close();
 
 		sut = createSUT(directory);
-		Set<ITypeName> actual = sut.getKeys();
-		Set<ITypeName> expected = newHashSet();
-		expected.add(VmTypeName.get(TYPE1));
-		expected.add(VmTypeName.get(TYPE2));
+		Set<ICoReTypeName> actual = sut.getKeys();
+		Set<ICoReTypeName> expected = newHashSet();
+		expected.add(CoReTypeName.get(TYPE1));
+		expected.add(CoReTypeName.get(TYPE2));
 		assertEquals(expected, actual);
 	}
 
@@ -110,7 +110,7 @@ public class ObjectUsageStoreTest {
 		sut.close();
 
 		sut = createSUT(directory);
-		List<ObjectUsage> actual = sut.read(VmTypeName.get(TYPE1));
+		List<ObjectUsage> actual = sut.read(CoReTypeName.get(TYPE1));
 		List<ObjectUsage> expected = newArrayList(usage1, usage2);
 		// input is shuffled
 		assertFalse(actual.equals(expected));
@@ -139,7 +139,7 @@ public class ObjectUsageStoreTest {
 	public void exceptionIsThrownIfTypeIsNotKnown() {
 		ObjectUsage usage1 = createUsage(TYPE1, "LContext.m1()V");
 		sut.store(newArrayList(usage1));
-		sut.read(VmTypeName.get(TYPE2));
+		sut.read(CoReTypeName.get(TYPE2));
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -150,13 +150,13 @@ public class ObjectUsageStoreTest {
 		WritingArchive archive = mock(WritingArchive.class);
 		when(dir.getWritingArchive(anyString())).thenReturn(archive);
 		when(dir.reopenWritingArchive(anyString(), any(Type.class))).thenReturn(archive);
-		when(dir.read(any(String.class), any(Type.class))).thenReturn(newHashSet(VmTypeName.get(TYPE1)));
+		when(dir.read(any(String.class), any(Type.class))).thenReturn(newHashSet(CoReTypeName.get(TYPE1)));
 
 		sut = createSUT(dir);
 		sut.store(newArrayList(usage1));
 		sut.close();
 
-		sut.read(VmTypeName.get(TYPE1));
+		sut.read(CoReTypeName.get(TYPE1));
 	}
 
 	@Test
@@ -179,16 +179,16 @@ public class ObjectUsageStoreTest {
 	private ObjectUsage createUsage(String typeName, String methodName) {
 
 		DefinitionSite def = DefinitionSites.createDefinitionByConstant();
-		def.setType(VmTypeName.get(typeName));
+		def.setType(CoReTypeName.get(typeName));
 
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
-		ctx.setSuperclass(VmTypeName.get("LSuperType"));
-		ctx.setName(VmMethodName.get(methodName));
-		ctx.setIntroducedBy(VmTypeName.get("LSuperType"));
+		ctx.setSuperclass(CoReTypeName.get("LSuperType"));
+		ctx.setName(CoReMethodName.get(methodName));
+		ctx.setIntroducedBy(CoReTypeName.get("LSuperType"));
 
 		CallSite call = new CallSite();
 		call.setKind(CallSiteKind.RECEIVER_CALL_SITE);
-		call.setCall(VmMethodName.get(methodName));
+		call.setCall(CoReMethodName.get(methodName));
 
 		List<CallSite> path = Lists.newLinkedList();
 		path.add(call);

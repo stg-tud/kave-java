@@ -10,8 +10,8 @@
  */
 package cc.recommenders.usages;
 
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
 
 /**
  * @see cc.recommenders.usages.DefinitionSites
@@ -21,8 +21,8 @@ public class DefinitionSite {
 	// ensure consistent naming with hard-coded names in "UsageTypeAdapter"
 
 	private DefinitionSiteKind kind;
-	private IMethodName method;
-	private IFieldName field;
+	private ICoReMethodName method;
+	private ICoReFieldName field;
 	private int argIndex = -1;
 
 	DefinitionSite() {
@@ -37,19 +37,19 @@ public class DefinitionSite {
 		this.kind = kind;
 	}
 
-	public IMethodName getMethod() {
+	public ICoReMethodName getMethod() {
 		return method;
 	}
 
-	public void setMethod(final IMethodName method) {
+	public void setMethod(final ICoReMethodName method) {
 		this.method = method;
 	}
 
-	public IFieldName getField() {
+	public ICoReFieldName getField() {
 		return field;
 	}
 
-	public void setField(final IFieldName field) {
+	public void setField(final ICoReFieldName field) {
 		this.field = field;
 	}
 

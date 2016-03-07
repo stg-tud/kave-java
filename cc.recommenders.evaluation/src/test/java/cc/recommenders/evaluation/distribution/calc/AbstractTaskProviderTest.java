@@ -41,8 +41,8 @@ import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Lists;
@@ -51,9 +51,9 @@ import com.google.common.collect.Sets;
 
 public class AbstractTaskProviderTest {
 
-	private static final ITypeName TYPE1 = VmTypeName.get("LT1");
-	private static final ITypeName TYPE2 = VmTypeName.get("LT2");
-	private static final ITypeName TYPE3 = VmTypeName.get("LT3");
+	private static final ICoReTypeName TYPE1 = CoReTypeName.get("LT1");
+	private static final ICoReTypeName TYPE2 = CoReTypeName.get("LT2");
+	private static final ICoReTypeName TYPE3 = CoReTypeName.get("LT3");
 
 	private ProjectFoldedUsageStore store;
 	private OutputUtils output;
@@ -65,7 +65,7 @@ public class AbstractTaskProviderTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 		store = mock(ProjectFoldedUsageStore.class);
-		Set<ITypeName> types = Sets.newLinkedHashSet();
+		Set<ICoReTypeName> types = Sets.newLinkedHashSet();
 		types.add(TYPE1);
 		types.add(TYPE2);
 		types.add(TYPE3);
@@ -87,7 +87,7 @@ public class AbstractTaskProviderTest {
 		Logger.reset();
 	}
 
-	private void mockStore(ITypeName type, boolean isAvailable, int... sizes) throws IOException {
+	private void mockStore(ICoReTypeName type, boolean isAvailable, int... sizes) throws IOException {
 
 		TypeStore typeStore = mock(TypeStore.class);
 		for (int i = 0; i < sizes.length; i++) {
@@ -112,7 +112,7 @@ public class AbstractTaskProviderTest {
 		Set<TestTask> actuals = sut.createTasks();
 
 		Set<TestTask> expecteds = Sets.newLinkedHashSet();
-		for (ITypeName type : new ITypeName[] { TYPE1, TYPE2 }) {
+		for (ICoReTypeName type : new ICoReTypeName[] { TYPE1, TYPE2 }) {
 			for (String app : options.keySet()) {
 				for (int foldNum : new int[] { 0, 1 }) {
 					TestTask task = new TestTask();
@@ -169,7 +169,7 @@ public class AbstractTaskProviderTest {
 
 	@Test(expected = RuntimeException.class)
 	public void ioCrashesForTypeStoreAreCascaded() throws IOException {
-		when(store.createTypeStore(any(ITypeName.class), anyInt())).thenThrow(new IOException());
+		when(store.createTypeStore(any(ICoReTypeName.class), anyInt())).thenThrow(new IOException());
 		sut.createWorkers();
 	}
 
@@ -310,7 +310,7 @@ public class AbstractTaskProviderTest {
 		}
 
 		@Override
-		protected boolean useType(ITypeName type) {
+		protected boolean useType(ICoReTypeName type) {
 			return TYPE2.equals(type) ? useType : super.useType(type);
 		}
 

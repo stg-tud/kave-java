@@ -38,7 +38,7 @@ import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -84,21 +84,21 @@ public class CVEvaluator {
 		return StatUtils.mean(evaluationResults);
 	}
 
-	private static Set<IMethodName> getExpectation(Usage validationUsage, Query q) {
+	private static Set<ICoReMethodName> getExpectation(Usage validationUsage, Query q) {
 		Set<CallSite> missingCallsites = new HashSet<>(validationUsage.getReceiverCallsites());
 		missingCallsites.removeAll(q.getAllCallsites());
 
-		Set<IMethodName> expectation = new HashSet<>(missingCallsites.size());
+		Set<ICoReMethodName> expectation = new HashSet<>(missingCallsites.size());
 		for (CallSite callsite : missingCallsites) {
 			expectation.add(callsite.getMethod());
 		}
 		return expectation;
 	}
 
-	private static Set<IMethodName> getProposals(ICallsRecommender<Query> recommender, Query q) {
-		Set<Tuple<IMethodName, Double>> recommendations = recommender.query(q);
-		Set<IMethodName> proposals = new HashSet<>(recommendations.size());
-		for (Tuple<IMethodName, Double> rec : recommendations) {
+	private static Set<ICoReMethodName> getProposals(ICallsRecommender<Query> recommender, Query q) {
+		Set<Tuple<ICoReMethodName, Double>> recommendations = recommender.query(q);
+		Set<ICoReMethodName> proposals = new HashSet<>(recommendations.size());
+		for (Tuple<ICoReMethodName, Double> rec : recommendations) {
 			proposals.add(rec.getFirst());
 		}
 		return proposals;
@@ -136,8 +136,8 @@ public class CVEvaluator {
 				}
 
 				for (Query q : queries) {
-					Set<IMethodName> expectation = getExpectation(validationUsage, q);
-					Set<IMethodName> proposals = getProposals(recommender, q);
+					Set<ICoReMethodName> expectation = getExpectation(validationUsage, q);
+					Set<ICoReMethodName> proposals = getProposals(recommender, q);
 					Measure measure = Measure.newMeasure(expectation, proposals);
 					statistics.addValue(measure.getF1());
 				}

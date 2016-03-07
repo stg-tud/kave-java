@@ -17,18 +17,18 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.features.UsageFeature.ObjectUsageFeatureVisitor;
 
 public class ParameterFeatureTest {
 
-	private IMethodName method;
+	private ICoReMethodName method;
 	private int argNum;
 	private ParameterFeature sut;
 
 	@Before
 	public void setup() {
-		method = mock(IMethodName.class);
+		method = mock(ICoReMethodName.class);
 		argNum = 12345;
 		sut = new ParameterFeature(method, argNum);
 	}
@@ -45,8 +45,8 @@ public class ParameterFeatureTest {
 
 	@Test
 	public void assignedMethodIsReturned() {
-		IMethodName actual = sut.getMethodName();
-		IMethodName expected = method;
+		ICoReMethodName actual = sut.getMethodName();
+		ICoReMethodName expected = method;
 
 		assertEquals(expected, actual);
 	}

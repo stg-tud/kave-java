@@ -17,18 +17,18 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
 
 public class DefinitionSiteTest {
 
-	private static final IFieldName FIELD1 = VmFieldName.get("Lsome/Type.name;Lfield1/Type");
-	private static final IFieldName FIELD2 = VmFieldName.get("Lsome/Type.name;Lfield2/Type");
+	private static final ICoReFieldName FIELD1 = CoReFieldName.get("Lsome/Type.name;Lfield1/Type");
+	private static final ICoReFieldName FIELD2 = CoReFieldName.get("Lsome/Type.name;Lfield2/Type");
 
-	private static final IMethodName METHOD1 = VmMethodName.get("Lsome/Type.m1()V");
-	private static final IMethodName METHOD2 = VmMethodName.get("Lsome/Type.m2()V");
+	private static final ICoReMethodName METHOD1 = CoReMethodName.get("Lsome/Type.m1()V");
+	private static final ICoReMethodName METHOD2 = CoReMethodName.get("Lsome/Type.m2()V");
 
 	// toString implementation is tested in DefinitionSitesTest
 

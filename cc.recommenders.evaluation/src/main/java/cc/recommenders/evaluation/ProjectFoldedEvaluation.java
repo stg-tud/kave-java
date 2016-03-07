@@ -22,7 +22,7 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.utils.DateProvider;
 
@@ -39,9 +39,9 @@ public abstract class ProjectFoldedEvaluation {
 	private final DateProvider dateProvider;
 
 	private int total = 0;
-	private Map<ITypeName, Integer> totals = Maps.newLinkedHashMap();
-	private Multimap<ITypeName, Integer> counts = LinkedListMultimap.create();
-	private Set<Tuple<ITypeName, Integer>> alreadyCountedTypeAndFolds = Sets.newLinkedHashSet();
+	private Map<ICoReTypeName, Integer> totals = Maps.newLinkedHashMap();
+	private Multimap<ICoReTypeName, Integer> counts = LinkedListMultimap.create();
+	private Set<Tuple<ICoReTypeName, Integer>> alreadyCountedTypeAndFolds = Sets.newLinkedHashSet();
 
 	@Inject
 	public ProjectFoldedEvaluation(@Named("projectFolded") ProjectFoldedUsageStore foldedStore,
@@ -72,12 +72,12 @@ public abstract class ProjectFoldedEvaluation {
 	}
 
 	protected void foldAllTypes() throws IOException {
-		for (ITypeName type : foldedStore.getTypes()) {
+		for (ICoReTypeName type : foldedStore.getTypes()) {
 			foldType(type);
 		}
 	}
 
-	protected void foldType(ITypeName type) throws IOException {
+	protected void foldType(ICoReTypeName type) throws IOException {
 		if (foldedStore.isAvailable(type, getNumFolds())) {
 			TypeStore typeStore = foldedStore.createTypeStore(type, getNumFolds());
 			if (shouldAnalyze(type, typeStore)) {
@@ -99,15 +99,15 @@ public abstract class ProjectFoldedEvaluation {
 		}
 	}
 
-	protected void notAvailable(ITypeName type) {
+	protected void notAvailable(ICoReTypeName type) {
 	}
 
-	protected boolean shouldAnalyze(ITypeName type, TypeStore typeStore) {
+	protected boolean shouldAnalyze(ICoReTypeName type, TypeStore typeStore) {
 		return true;
 	}
 
-	protected void count(ITypeName type, int foldNum, int size) {
-		Tuple<ITypeName, Integer> typeAndFold = Tuple.newTuple(type, foldNum);
+	protected void count(ICoReTypeName type, int foldNum, int size) {
+		Tuple<ICoReTypeName, Integer> typeAndFold = Tuple.newTuple(type, foldNum);
 		if (!alreadyCountedTypeAndFolds.contains(typeAndFold)) {
 			alreadyCountedTypeAndFolds.add(typeAndFold);
 			total += size;
@@ -121,7 +121,7 @@ public abstract class ProjectFoldedEvaluation {
 		}
 	}
 
-	protected abstract void runFold(ITypeName type, int foldNum, List<Usage> training, List<Usage> validation);
+	protected abstract void runFold(ICoReTypeName type, int foldNum, List<Usage> training, List<Usage> validation);
 
 	private void logResultsHeader() {
 		append("\n\n--> put outputs into: %s\n\n", getFileHint());
@@ -138,7 +138,7 @@ public abstract class ProjectFoldedEvaluation {
 	protected void logResultsTypeCounts() {
 		append("\n%% %12d usages total (from types seen in >= %d projects with >=1 usage)\n", total, getNumFolds());
 		append("%% ------------\n");
-		for (ITypeName type : totals.keySet()) {
+		for (ICoReTypeName type : totals.keySet()) {
 			append("%% %12d %s (", totals.get(type), type);
 
 			boolean isFirst = true;

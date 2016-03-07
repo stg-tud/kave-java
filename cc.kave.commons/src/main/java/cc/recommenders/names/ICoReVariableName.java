@@ -13,15 +13,15 @@ package cc.recommenders.names;
 import java.io.Serializable;
 
 /**
- * A {@link IVariableName} is basically the full qualified method name. This
+ * A {@link ICoReVariableName} is basically the full qualified method name. This
  * class provides an easy way to access the information available in such a
  * method name (like isInit, isSyntetic etc.) and provides some safety checks
  * for the format of such a full qualified name.
  */
-public interface IVariableName extends IName, Comparable<IVariableName>, Serializable {
+public interface ICoReVariableName extends ICoReName, Comparable<ICoReVariableName>, Serializable {
 
     public abstract String getName();
 
-    public abstract IMethodName getDeclaringMethod();
+    public abstract ICoReMethodName getDeclaringMethod();
 
 }

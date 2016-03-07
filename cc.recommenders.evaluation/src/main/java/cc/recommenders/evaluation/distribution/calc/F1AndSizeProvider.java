@@ -28,8 +28,8 @@ import cc.recommenders.evaluation.data.Averager;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
@@ -38,7 +38,7 @@ import com.google.inject.Inject;
 
 public class F1AndSizeProvider extends AbstractTaskProvider<F1AndSizeTask> {
 
-	private static final ITypeName BUTTON = VmTypeName.get("Lorg/eclipse/swt/widgets/Button");
+	private static final ICoReTypeName BUTTON = CoReTypeName.get("Lorg/eclipse/swt/widgets/Button");
 
 	private Map<String, Averager> sizes = Maps.newLinkedHashMap();
 	private Map<String, BoxplotData> quality = Maps.newLinkedHashMap();
@@ -49,7 +49,7 @@ public class F1AndSizeProvider extends AbstractTaskProvider<F1AndSizeTask> {
 	}
 
 	@Override
-	protected boolean useType(ITypeName type) {
+	protected boolean useType(ICoReTypeName type) {
 		return BUTTON.equals(type);
 	}
 

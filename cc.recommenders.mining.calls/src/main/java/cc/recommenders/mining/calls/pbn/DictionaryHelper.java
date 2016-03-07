@@ -20,7 +20,7 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Set;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ClassFeature;
 import cc.recommenders.usages.features.DefinitionFeature;
@@ -114,7 +114,7 @@ public class DictionaryHelper {
 		return params;
 	}
 
-	public ITypeName getType() {
+	public ICoReTypeName getType() {
 		IMatcher<UsageFeature> matcher = new IMatcher<UsageFeature>() {
 			@Override
 			public boolean matches(UsageFeature entry) {

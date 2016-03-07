@@ -10,16 +10,16 @@
  */
 package com.codetrails.data;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 
 public class CallSites {
 	public static CallSite createParameterCallSite(String methodName, int argIndex) {
-		IMethodName method = VmMethodName.get(methodName);
+		ICoReMethodName method = CoReMethodName.get(methodName);
 		return createParameterCallSite(method, argIndex);
 	}
 
-	public static CallSite createParameterCallSite(IMethodName method, int argIndex) {
+	public static CallSite createParameterCallSite(ICoReMethodName method, int argIndex) {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.PARAM_CALL_SITE);
 		site.setCall(method);
@@ -28,11 +28,11 @@ public class CallSites {
 	}
 
 	public static CallSite createReceiverCallSite(String methodName) {
-		IMethodName method = VmMethodName.get(methodName);
+		ICoReMethodName method = CoReMethodName.get(methodName);
 		return createReceiverCallSite(method);
 	}
 
-	public static CallSite createReceiverCallSite(IMethodName method) {
+	public static CallSite createReceiverCallSite(ICoReMethodName method) {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.RECEIVER_CALL_SITE);
 		site.setCall(method);

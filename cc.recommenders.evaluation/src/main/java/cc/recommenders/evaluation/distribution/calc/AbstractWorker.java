@@ -23,7 +23,7 @@ import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.MinerFactory;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.utils.Timer;
 
@@ -95,7 +95,7 @@ public abstract class AbstractWorker<TTask extends AbstractTask> implements Call
 	private void lazyLoadData() {
 		if (trainingData == null) {
 			try {
-				TypeStore typeStore = usageStore.createTypeStore(VmTypeName.get(task.typeName), task.numFolds);
+				TypeStore typeStore = usageStore.createTypeStore(CoReTypeName.get(task.typeName), task.numFolds);
 				trainingData = typeStore.getTrainingData(task.currentFold);
 				validationData = typeStore.getValidationData(task.currentFold);
 				log("number of usages:");

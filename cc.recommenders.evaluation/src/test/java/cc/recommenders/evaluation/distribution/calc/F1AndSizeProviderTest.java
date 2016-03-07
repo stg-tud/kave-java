@@ -28,7 +28,7 @@ import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.testutils.LoggerUtils;
 
 import com.google.common.collect.Maps;
@@ -96,8 +96,8 @@ public class F1AndSizeProviderTest {
 
 	@Test
 	public void useTypeIsOverridden() {
-		assertTrue(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button")));
-		assertFalse(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/SomethingElse")));
+		assertTrue(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button")));
+		assertFalse(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/SomethingElse")));
 	}
 
 	private String opt(OptionsBuilder algo, boolean hasC, boolean hasD, boolean hasP) {

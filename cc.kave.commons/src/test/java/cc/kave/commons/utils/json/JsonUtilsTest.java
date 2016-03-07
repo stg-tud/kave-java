@@ -29,8 +29,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -80,8 +80,8 @@ public class JsonUtilsTest {
 	public void integrationTestWithUsage() {
 		Query u = new Query();
 		u.setDefinition(DefinitionSites.createDefinitionByConstant());
-		u.setMethodContext(VmMethodName.get("LT.m()V"));
-		u.setClassContext(VmTypeName.get("LSuperType"));
+		u.setMethodContext(CoReMethodName.get("LT.m()V"));
+		u.setClassContext(CoReTypeName.get("LSuperType"));
 		u.addCallSite(CallSites.createReceiverCallSite("LContext.m1()V"));
 
 		String actual = JsonUtils.toJson(u);

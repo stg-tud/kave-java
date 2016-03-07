@@ -17,9 +17,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import cc.kave.commons.utils.json.legacy.GsonUtil;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -33,10 +33,10 @@ public class GsonUtilQueryTest {
 	@Test
 	public void checkDeSerializationOfQuery() {
 		Query expected = new Query();
-		expected.setType(VmTypeName.get("Lusages/Query"));
+		expected.setType(CoReTypeName.get("Lusages/Query"));
 		expected.setDefinition(getDefinition());
-		expected.setClassContext(VmTypeName.get("LContext"));
-		expected.setMethodContext(VmMethodName.get("LReceiver.equals(LArgument;)LResult;"));
+		expected.setClassContext(CoReTypeName.get("LContext"));
+		expected.setMethodContext(CoReMethodName.get("LReceiver.equals(LArgument;)LResult;"));
 		expected.setAllCallsites(getCallSites());
 
 		String json = GsonUtil.serialize(expected);
@@ -61,8 +61,8 @@ public class GsonUtilQueryTest {
 
 	private DefinitionSite getDefinition() {
 		DefinitionSite site = DefinitionSites.createDefinitionByThis();
-		site.setMethod(VmMethodName.get("LDefiner.define(LScheme;)LPattern;"));
-		site.setField(VmFieldName.get("LField.field;LType"));
+		site.setMethod(CoReMethodName.get("LDefiner.define(LScheme;)LPattern;"));
+		site.setField(CoReFieldName.get("LField.field;LType"));
 		site.setArgIndex(42);
 		return site;
 	}

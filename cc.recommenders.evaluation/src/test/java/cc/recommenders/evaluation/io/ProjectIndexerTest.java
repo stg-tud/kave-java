@@ -41,8 +41,8 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;
 import cc.recommenders.usages.Usage;
@@ -56,7 +56,7 @@ import com.google.common.collect.Sets;
 
 public class ProjectIndexerTest {
 
-	private static final ITypeName TYPE = VmTypeName.get("Lpackage/Type");
+	private static final ICoReTypeName TYPE = CoReTypeName.get("Lpackage/Type");
 	private static final String TYPE_FILENAME = "Lpackage_Type.zip";
 
 	@Captor
@@ -269,8 +269,8 @@ public class ProjectIndexerTest {
 		verify(out).write(pfiCaptor.capture(), eq("index.json"));
 		ProjectFoldingIndex index = pfiCaptor.getValue();
 
-		Set<ITypeName> actual = index.getTypes();
-		Set<ITypeName> expected = Sets.newHashSet(TYPE);
+		Set<ICoReTypeName> actual = index.getTypes();
+		Set<ICoReTypeName> expected = Sets.newHashSet(TYPE);
 		assertEquals(expected, actual);
 
 		Map<String, Integer> actCounts = index.getCounts(TYPE);

@@ -19,12 +19,12 @@ import java.util.Set;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 
 public class AbstractCallsRecommender<T> implements ICallsRecommender<T> {
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> query(T query) {
+	public Set<Tuple<ICoReMethodName, Double>> query(T query) {
 		Asserts.fail("not implemented yet");
 		return null;
 	}
@@ -36,7 +36,7 @@ public class AbstractCallsRecommender<T> implements ICallsRecommender<T> {
 	}
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> queryPattern(String patternName) {
+	public Set<Tuple<ICoReMethodName, Double>> queryPattern(String patternName) {
 		Asserts.fail("not implemented yet");
 		return null;
 	}

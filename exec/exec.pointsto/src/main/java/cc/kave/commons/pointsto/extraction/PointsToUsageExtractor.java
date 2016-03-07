@@ -41,8 +41,8 @@ import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -132,13 +132,15 @@ public class PointsToUsageExtractor {
 		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context, descentStrategy);
 
 		try {
-			// treat the enclosing method as entry point although it might not be one
+			// treat the enclosing method as entry point although it might not
+			// be one
 			visitor.visitEntryPoint(enclosingMethod, visitorContext);
 
 			PointsToQuery ptQuery;
 			Callpath callpath = new Callpath(enclosingMethod.getName());
 			if (completionExpression.getVariableReference() == null) {
-				// the query builder cannot infer the type of references that are not part of the original SST
+				// the query builder cannot infer the type of references that
+				// are not part of the original SST
 				cc.kave.commons.model.names.ITypeName type = context.getTypeShape().getTypeHierarchy().getElement();
 				ptQuery = new PointsToQuery(receiverVarRef, enclosingStatement, type, callpath);
 			} else {
@@ -179,7 +181,7 @@ public class PointsToUsageExtractor {
 
 		for (Query usage : usages) {
 			// prune usages that have no call sites or have an unknown type
-			ITypeName usageType = usage.getType();
+			ICoReTypeName usageType = usage.getType();
 			if (usage.getReceiverCallsites().isEmpty() || CoReNameConverter.isUnknown(usageType)) {
 				++numPruned;
 			} else {
@@ -201,12 +203,14 @@ public class PointsToUsageExtractor {
 
 		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 		if (typeHierarchy.hasSuperclass()) {
-			ITypeName superType = CoReNameConverter.convert(typeHierarchy.getExtends().getElement());
+			ICoReTypeName superType = CoReNameConverter.convert(typeHierarchy.getExtends().getElement());
 
 			for (Query usage : usages) {
-				// change type of usages referring to the enclosing class to the super class
+				// change type of usages referring to the enclosing class to the
+				// super class
 				if (usage.getDefinitionSite().getKind() == DefinitionSiteKind.THIS) {
-					// TODO maybe add check whether this is safe (call sites do not refer to 'this')
+					// TODO maybe add check whether this is safe (call sites do
+					// not refer to 'this')
 					usage.setType(superType);
 				}
 			}
@@ -221,11 +225,11 @@ public class PointsToUsageExtractor {
 		}
 	}
 
-	private ITypeName getClassContext(ITypeName currentContext, ITypeHierarchy typeHierarchy) {
+	private ICoReTypeName getClassContext(ICoReTypeName currentContext, ITypeHierarchy typeHierarchy) {
 		boolean wasLambdaContext = CoReNameConverter.isLambdaName(currentContext);
 
 		if (typeHierarchy.hasSuperclass()) {
-			ITypeName superType = CoReNameConverter.convert(typeHierarchy.getExtends().getElement());
+			ICoReTypeName superType = CoReNameConverter.convert(typeHierarchy.getExtends().getElement());
 
 			if (wasLambdaContext && !CoReNameConverter.isLambdaName(superType)) {
 				return CoReNameConverter.addLambda(superType);
@@ -237,22 +241,23 @@ public class PointsToUsageExtractor {
 		}
 	}
 
-	private IMethodName getMethodContext(IMethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
+	private ICoReMethodName getMethodContext(ICoReMethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
 		boolean wasLambdaContext = CoReNameConverter.isLambdaName(currentContext);
-		IMethodName restoredMethod = currentContext;
+		ICoReMethodName restoredMethod = currentContext;
 		if (wasLambdaContext) {
-			// remove lambda qualifiers in order to find the fitting method hierarchy
+			// remove lambda qualifiers in order to find the fitting method
+			// hierarchy
 			restoredMethod = CoReNameConverter.removeLambda(currentContext);
 		}
 
 		for (IMethodHierarchy methodHierarchy : hierarchies) {
-			IMethodName method = CoReNameConverter.convert(methodHierarchy.getElement());
+			ICoReMethodName method = CoReNameConverter.convert(methodHierarchy.getElement());
 
 			if (restoredMethod.equals(method)) {
-				IMethodName firstMethod = CoReNameConverter.convert(methodHierarchy.getFirst());
-				IMethodName superMethod = CoReNameConverter.convert(methodHierarchy.getSuper());
+				ICoReMethodName firstMethod = CoReNameConverter.convert(methodHierarchy.getFirst());
+				ICoReMethodName superMethod = CoReNameConverter.convert(methodHierarchy.getSuper());
 
-				IMethodName newMethodContext = currentContext;
+				ICoReMethodName newMethodContext = currentContext;
 				if (firstMethod != null) {
 					newMethodContext = firstMethod;
 				} else if (superMethod != null) {

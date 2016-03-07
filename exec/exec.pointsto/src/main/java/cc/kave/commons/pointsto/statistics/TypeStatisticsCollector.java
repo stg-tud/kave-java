@@ -32,8 +32,8 @@ import java.util.function.Predicate;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.pointsto.io.IOHelper;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.CoReNames;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 public class TypeStatisticsCollector implements UsageStatisticsCollector {
@@ -42,7 +42,7 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 
 	private final Predicate<Usage> usageFilter;
 
-	private Map<ITypeName, Statistics> typeStatistics = new HashMap<>();
+	private Map<ICoReTypeName, Statistics> typeStatistics = new HashMap<>();
 	private long numPrunedUsages = 0;
 
 	public TypeStatisticsCollector(Predicate<Usage> usageFilter) {
@@ -59,7 +59,7 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 		TypeStatisticsCollector otherTypeCollector = (TypeStatisticsCollector) other;
 
 		synchronized (typeStatistics) {
-			for (Map.Entry<ITypeName, Statistics> entry : otherTypeCollector.typeStatistics.entrySet()) {
+			for (Map.Entry<ICoReTypeName, Statistics> entry : otherTypeCollector.typeStatistics.entrySet()) {
 				Statistics otherStats = entry.getValue();
 				Statistics myStats = typeStatistics.get(entry.getKey());
 				if (myStats == null) {
@@ -113,11 +113,11 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 
 	@Override
 	public void output(Path file) throws IOException {
-		List<Map.Entry<ITypeName, Statistics>> entries = new ArrayList<>(typeStatistics.entrySet());
-		entries.sort(new Comparator<Map.Entry<ITypeName, Statistics>>() {
+		List<Map.Entry<ICoReTypeName, Statistics>> entries = new ArrayList<>(typeStatistics.entrySet());
+		entries.sort(new Comparator<Map.Entry<ICoReTypeName, Statistics>>() {
 
 			@Override
-			public int compare(Entry<ITypeName, Statistics> o1, Entry<ITypeName, Statistics> o2) {
+			public int compare(Entry<ICoReTypeName, Statistics> o1, Entry<ICoReTypeName, Statistics> o2) {
 				int diff = o2.getValue().numUsages - o1.getValue().numUsages;
 
 				if (diff == 0) {
@@ -130,8 +130,8 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 
 		IOHelper.createParentDirs(file);
 		try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-			for (Map.Entry<ITypeName, Statistics> entry : entries) {
-				writer.append(Names.vm2srcQualifiedType(entry.getKey()));
+			for (Map.Entry<ICoReTypeName, Statistics> entry : entries) {
+				writer.append(CoReNames.vm2srcQualifiedType(entry.getKey()));
 				writer.append(SEPARATOR);
 
 				Statistics stats = entry.getValue();

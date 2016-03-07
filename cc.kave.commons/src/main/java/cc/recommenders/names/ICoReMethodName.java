@@ -13,13 +13,13 @@ package cc.recommenders.names;
 import java.io.Serializable;
 
 /**
- * A {@link IMethodName} is basically the full qualified method name. This class provides an easy way to access the
+ * A {@link ICoReMethodName} is basically the full qualified method name. This class provides an easy way to access the
  * information available in such a method name (like isInit, isSyntetic etc.) and provides some safety checks for the
  * format of such a full qualified name.
  */
-public interface IMethodName extends IName, Comparable<IMethodName>, Serializable {
+public interface ICoReMethodName extends ICoReName, Comparable<ICoReMethodName>, Serializable {
 
-    IMethodName[] EMPTY = {};
+    ICoReMethodName[] EMPTY = {};
 
     /**
      * Returns the a string containing the argument and return types.
@@ -44,22 +44,22 @@ public interface IMethodName extends IName, Comparable<IMethodName>, Serializabl
      * declaring type. This kind of similarity is used to check whether one method may override another method (but note
      * this criterion is required but not sufficient to check the overrides relation between two methods!).
      */
-    public abstract boolean similar(final IMethodName other);
+    public abstract boolean similar(final ICoReMethodName other);
 
     /**
-     * Returns the {@link ITypeName} of the declaring class, i.e., the class that statically defines this method.
+     * Returns the {@link ICoReTypeName} of the declaring class, i.e., the class that statically defines this method.
      */
-    public abstract ITypeName getDeclaringType();
+    public abstract ICoReTypeName getDeclaringType();
 
     /**
      * Returns the declared parameter types of this method.
      */
-    public abstract ITypeName[] getParameterTypes();
+    public abstract ICoReTypeName[] getParameterTypes();
 
     /**
      * Returns the declared return type of this method.
      */
-    public abstract ITypeName getReturnType();
+    public abstract ICoReTypeName getReturnType();
 
     /**
      * Returns {@code true} if the method's identifier equals <i>&lt;init&gt;</i>.

@@ -16,8 +16,8 @@ import integration.AbstractIntegrationTest;
 import java.util.List;
 
 import cc.recommenders.evaluation.data.Boxplot;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
@@ -79,11 +79,11 @@ public class InDifferentContextsWithoutFeature extends AbstractIntegrationTest {
 	private static Usage createUsageWithC() {
 		Query usage = new Query();
 
-		usage.setType(VmTypeName.get("Lmy/Type"));
-		usage.setClassContext(VmTypeName.get("Lmy/Container"));
-		usage.setMethodContext(VmMethodName.get("Lmy/Container.doitC()V"));
+		usage.setType(CoReTypeName.get("Lmy/Type"));
+		usage.setClassContext(CoReTypeName.get("Lmy/Container"));
+		usage.setMethodContext(CoReMethodName.get("Lmy/Container.doitC()V"));
 
-		DefinitionSite ds = DefinitionSites.createDefinitionByConstructor(VmMethodName.get("Lmy/Type.<init>()V"));
+		DefinitionSite ds = DefinitionSites.createDefinitionByConstructor(CoReMethodName.get("Lmy/Type.<init>()V"));
 		usage.setDefinition(ds);
 
 		usage.addCallSite(newReceiverCallSite("Lmy/Type.a()V"));

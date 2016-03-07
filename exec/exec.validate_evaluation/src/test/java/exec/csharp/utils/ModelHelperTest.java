@@ -38,7 +38,7 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.NoCallRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -49,16 +49,16 @@ public class ModelHelperTest {
 	@Mock
 	private StorageHelper storageHelper;
 	@Mock
-	private NestedZipFolders<ITypeName> folder;
+	private NestedZipFolders<ICoReTypeName> folder;
 
 	@Mock
-	private ITypeName typeWithoutUsages;
+	private ICoReTypeName typeWithoutUsages;
 	@Mock
-	private ITypeName typeWithEmptyList;
+	private ICoReTypeName typeWithEmptyList;
 	@Mock
-	private ITypeName regularType;
+	private ICoReTypeName regularType;
 	@Mock
-	private ITypeName typeWithManyUsages;
+	private ICoReTypeName typeWithManyUsages;
 	@Mock
 	private ICallsRecommender<Query> recommender;
 

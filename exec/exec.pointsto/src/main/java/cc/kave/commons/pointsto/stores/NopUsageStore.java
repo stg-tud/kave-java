@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 public class NopUsageStore implements UsageStore {
@@ -36,17 +36,17 @@ public class NopUsageStore implements UsageStore {
 	}
 
 	@Override
-	public Set<ITypeName> getAllTypes() {
+	public Set<ICoReTypeName> getAllTypes() {
 		return Collections.emptySet();
 	}
 
 	@Override
-	public List<Usage> load(ITypeName type) throws IOException {
+	public List<Usage> load(ICoReTypeName type) throws IOException {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
+	public List<Usage> load(ICoReTypeName type, Predicate<Usage> filter) throws IOException {
 		return Collections.emptyList();
 	}
 

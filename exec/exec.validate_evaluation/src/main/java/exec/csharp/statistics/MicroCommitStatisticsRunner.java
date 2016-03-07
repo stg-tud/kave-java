@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -40,10 +40,10 @@ public class MicroCommitStatisticsRunner {
 	private int numRemovals = 0;
 	private int numBoth = 0;
 	private int numNeither = 0;
-	private Map<ITypeName, Integer> counts = Maps.newLinkedHashMap();
-	private Map<ITypeName, Integer> allNumCommits = Maps.newLinkedHashMap();
+	private Map<ICoReTypeName, Integer> counts = Maps.newLinkedHashMap();
+	private Map<ICoReTypeName, Integer> allNumCommits = Maps.newLinkedHashMap();
 
-	private NestedZipFolders<ITypeName> zipsUsages;
+	private NestedZipFolders<ICoReTypeName> zipsUsages;
 
 	@Inject
 	public MicroCommitStatisticsRunner(StorageHelper storageHelper) {
@@ -67,7 +67,7 @@ public class MicroCommitStatisticsRunner {
 				Query a = t.Item1;
 				Query b = t.Item2;
 
-				ITypeName type = a.getType();
+				ICoReTypeName type = a.getType();
 
 				countCommitFor(type);
 
@@ -97,7 +97,7 @@ public class MicroCommitStatisticsRunner {
 				"totals:\n-------\n%d tuples - additions: %d (+both: %d), removals: %d (both: %d, neither: %d, sanity: %d)\n",
 				numTotal, numAdditions, (numAdditions + numBoth), numRemovals, numBoth, numNeither, numSanity);
 
-		Map<ITypeName, Integer> sortedCounts = MapSorter.sortByCount(counts);
+		Map<ICoReTypeName, Integer> sortedCounts = MapSorter.sortByCount(counts);
 
 		int numTypesWithCommitsAndUsages = 0;
 		int totalUsages = 0;
@@ -106,7 +106,7 @@ public class MicroCommitStatisticsRunner {
 		System.out.printf("\nwithout any filtering, we found %d micro commits for %d different types:\n", numTotal,
 				counts.size());
 		System.out.printf("count - type\n");
-		for (ITypeName type : sortedCounts.keySet()) {
+		for (ICoReTypeName type : sortedCounts.keySet()) {
 			int count = counts.get(type);
 			int numUsages = getNumUsages(type);
 			totalUsages += numUsages;
@@ -142,7 +142,7 @@ public class MicroCommitStatisticsRunner {
 		counttEqualOrSmallerThan(sortedCounts, 1000, 10000);
 	}
 
-	private void countCommitFor(ITypeName type) {
+	private void countCommitFor(ICoReTypeName type) {
 		Integer i = allNumCommits.get(type);
 		if (i == null) {
 			allNumCommits.put(type, 1);
@@ -204,9 +204,9 @@ public class MicroCommitStatisticsRunner {
 		return "" + num;
 	}
 
-	private static void counttEqualOrSmallerThan(Map<ITypeName, Integer> counts, int lowerBound, int upperBound) {
-		Map<ITypeName, Integer> matches = Maps.newLinkedHashMap();
-		for (ITypeName type : counts.keySet()) {
+	private static void counttEqualOrSmallerThan(Map<ICoReTypeName, Integer> counts, int lowerBound, int upperBound) {
+		Map<ICoReTypeName, Integer> matches = Maps.newLinkedHashMap();
+		for (ICoReTypeName type : counts.keySet()) {
 			int count = counts.get(type);
 			if (count >= lowerBound && count < upperBound) {
 				matches.put(type, count);
@@ -216,12 +216,12 @@ public class MicroCommitStatisticsRunner {
 		System.out.printf("%5dx %5d <= N < %d\n", matches.size(), lowerBound, upperBound);
 	}
 
-	private int getNumUsages(ITypeName type) {
+	private int getNumUsages(ICoReTypeName type) {
 		List<Usage> usages = readTrainingData(type, zipsUsages);
 		return usages.size();
 	}
 
-	private List<Usage> readTrainingData(ITypeName type, NestedZipFolders<ITypeName> zipsUsages) {
+	private List<Usage> readTrainingData(ICoReTypeName type, NestedZipFolders<ICoReTypeName> zipsUsages) {
 		List<Query> qs = zipsUsages.readAllZips(type, Query.class);
 		return Lists.newLinkedList(qs);
 	}

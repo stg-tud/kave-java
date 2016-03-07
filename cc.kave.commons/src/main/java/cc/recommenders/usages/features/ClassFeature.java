@@ -11,18 +11,18 @@
 package cc.recommenders.usages.features;
 
 import static cc.recommenders.assertions.Asserts.assertNotNull;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class ClassFeature extends UsageFeature {
 
-	private final ITypeName typeName;
+	private final ICoReTypeName typeName;
 
-	public ClassFeature(ITypeName typeName) {
+	public ClassFeature(ICoReTypeName typeName) {
 		assertNotNull(typeName);
 		this.typeName = typeName;
 	}
 
-	public ITypeName getTypeName() {
+	public ICoReTypeName getTypeName() {
 		return typeName;
 	}
 

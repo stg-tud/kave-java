@@ -23,35 +23,35 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
-import cc.recommenders.usages.Query;
-import cc.recommenders.usages.Usage;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 @SuppressWarnings("unchecked")
 public class UsageConverterTest {
 
-	private ITypeName usageType;
-	private ITypeName superType;
-	private ITypeName firstType;
-	private IMethodName firstMethod;
-	private IMethodName enclosingMethod;
+	private ICoReTypeName usageType;
+	private ICoReTypeName superType;
+	private ICoReTypeName firstType;
+	private ICoReMethodName firstMethod;
+	private ICoReMethodName enclosingMethod;
 	private Set<List<CallSite>> paths;
 
 	private UsageConverter sut;
 
 	@Before
 	public void setup() {
-		usageType = VmTypeName.get("LU");
-		enclosingMethod = VmMethodName.get("LT.m()V");
-		firstType = VmTypeName.get("LI");
-		firstMethod = VmMethodName.get("LI.m()V");
-		superType = VmTypeName.get("LS");
+		usageType = CoReTypeName.get("LU");
+		enclosingMethod = CoReMethodName.get("LT.m()V");
+		firstType = CoReTypeName.get("LI");
+		firstMethod = CoReMethodName.get("LI.m()V");
+		superType = CoReTypeName.get("LS");
 		paths = Sets.newLinkedHashSet();
 		addPaths(path(r(1), r(2), p(3)), path(p(4), r(5)));
 
@@ -104,7 +104,7 @@ public class UsageConverterTest {
 
 	@Test
 	public void initsAreNotCopiedAsCallSites() {
-		IMethodName init = VmMethodName.get("LT.<init>()V");
+		ICoReMethodName init = CoReMethodName.get("LT.<init>()V");
 		assertTrue(init.isInit());
 		CallSite initCS = CallSites.createReceiverCallSite(init);
 		ObjectUsage ou = createUsage();
@@ -119,7 +119,7 @@ public class UsageConverterTest {
 
 	@Test
 	public void nonInitDefinitionsWithConstructorCallAreRewritten() {
-		IMethodName init = VmMethodName.get("LT.<init>()V");
+		ICoReMethodName init = CoReMethodName.get("LT.<init>()V");
 		assertTrue(init.isInit());
 		ObjectUsage ou = createUsage();
 		ou.setDef(DefinitionSites.createUnknownDefinitionSite());
@@ -146,8 +146,8 @@ public class UsageConverterTest {
 
 	private ObjectUsage createUsage() {
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
-		ctx.setAnnotations(new ITypeName[0]);
-		ctx.setImplementors(new ITypeName[0]);
+		ctx.setAnnotations(new ICoReTypeName[0]);
+		ctx.setImplementors(new ICoReTypeName[0]);
 		ctx.setIntroducedBy(firstType);
 		ctx.setName(enclosingMethod);
 		ctx.setSuperclass(superType);

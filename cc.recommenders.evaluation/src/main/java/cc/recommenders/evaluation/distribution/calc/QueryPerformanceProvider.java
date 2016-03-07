@@ -26,8 +26,8 @@ import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Lists;
@@ -39,7 +39,7 @@ public class QueryPerformanceProvider extends AbstractTaskProvider<QueryPerforma
 
 	protected static final int[] ALL_SIZES = new int[] { 10, 30, 100, 300, 1000, 3000, 10000, 15000, 20000, 30000,
 			40000, 100000 };
-	protected static final ITypeName TYPE = VmTypeName.get("Lorg/eclipse/swt/widgets/Button");
+	protected static final ICoReTypeName TYPE = CoReTypeName.get("Lorg/eclipse/swt/widgets/Button");
 
 	private Set<Integer> inputSizes = Sets.newLinkedHashSet();
 	private Map2D<String, Integer, BoxplotData> resSize = Map2D.create();
@@ -95,7 +95,7 @@ public class QueryPerformanceProvider extends AbstractTaskProvider<QueryPerforma
 	}
 
 	@Override
-	protected Collection<QueryPerformanceTask> createTasksFor(String app, ITypeName type, int foldNum,
+	protected Collection<QueryPerformanceTask> createTasksFor(String app, ICoReTypeName type, int foldNum,
 			List<Usage> training) {
 		Set<QueryPerformanceTask> tasks = Sets.newLinkedHashSet();
 		for (int inputSize : getApplicableSizes(training)) {
@@ -146,7 +146,7 @@ public class QueryPerformanceProvider extends AbstractTaskProvider<QueryPerforma
 	}
 
 	@Override
-	protected boolean useType(ITypeName type) {
+	protected boolean useType(ICoReTypeName type) {
 		return TYPE.equals(type);
 	}
 

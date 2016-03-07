@@ -44,8 +44,8 @@ import com.google.common.reflect.TypeToken;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.legacy.GsonUtil;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;
 
 public class ProjectUsageStore implements UsageStore {
@@ -152,8 +152,8 @@ public class ProjectUsageStore implements UsageStore {
 	}
 
 	@Override
-	public Set<ITypeName> getAllTypes() {
-		Set<ITypeName> types = new HashSet<>();
+	public Set<ICoReTypeName> getAllTypes() {
+		Set<ICoReTypeName> types = new HashSet<>();
 		synchronized (projectDirToStore) {
 			for (ProjectStore store : projectDirToStore.values()) {
 				types.addAll(store.getAllTypes());
@@ -166,7 +166,7 @@ public class ProjectUsageStore implements UsageStore {
 		return projectDirToStore.size();
 	}
 
-	public Set<ProjectIdentifier> getProjects(ITypeName type) {
+	public Set<ProjectIdentifier> getProjects(ICoReTypeName type) {
 		Set<ProjectIdentifier> projects = new HashSet<>();
 
 		synchronized (projectDirToStore) {
@@ -181,7 +181,7 @@ public class ProjectUsageStore implements UsageStore {
 		return projects;
 	}
 
-	public Map<ProjectIdentifier, Integer> getNumberOfUsagesPerProject(ITypeName type) throws IOException {
+	public Map<ProjectIdentifier, Integer> getNumberOfUsagesPerProject(ICoReTypeName type) throws IOException {
 		Map<ProjectIdentifier, Integer> projectUsageCounts = new HashMap<>(projectDirToStore.size());
 
 		synchronized (projectDirToStore) {
@@ -196,11 +196,11 @@ public class ProjectUsageStore implements UsageStore {
 		return projectUsageCounts;
 	}
 
-	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ITypeName type) throws IOException {
+	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ICoReTypeName type) throws IOException {
 		return loadUsagesPerProject(type, x -> true);
 	}
 
-	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ITypeName type, Predicate<Usage> filter)
+	public Map<ProjectIdentifier, List<Usage>> loadUsagesPerProject(ICoReTypeName type, Predicate<Usage> filter)
 			throws IOException {
 		Map<ProjectIdentifier, List<Usage>> projectUsages = new HashMap<>(getNumberOfProjects());
 
@@ -216,12 +216,12 @@ public class ProjectUsageStore implements UsageStore {
 	}
 
 	@Override
-	public List<Usage> load(ITypeName type) throws IOException {
+	public List<Usage> load(ICoReTypeName type) throws IOException {
 		return load(type, x -> true);
 	}
 
 	@Override
-	public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
+	public List<Usage> load(ICoReTypeName type, Predicate<Usage> filter) throws IOException {
 		List<Usage> usages = new ArrayList<>();
 		synchronized (projectDirToStore) {
 			for (ProjectStore store : projectDirToStore.values()) {
@@ -262,7 +262,7 @@ public class ProjectUsageStore implements UsageStore {
 
 		private Path projectDir;
 
-		private Multimap<ITypeName, Path> typeToZipFiles = Multimaps.synchronizedMultimap(HashMultimap.create());
+		private Multimap<ICoReTypeName, Path> typeToZipFiles = Multimaps.synchronizedMultimap(HashMultimap.create());
 		private Map<Path, ZipArchive> openArchives = Collections.synchronizedMap(new HashMap<>());
 
 		private boolean cacheInvalidated;
@@ -285,11 +285,11 @@ public class ProjectUsageStore implements UsageStore {
 				return false;
 			}
 
-			Map<ITypeName, Collection<String>> typeFiles = GsonUtil.deserialize(cacheFile.toFile(),
-					new TypeToken<Map<ITypeName, Collection<String>>>() {
+			Map<ICoReTypeName, Collection<String>> typeFiles = GsonUtil.deserialize(cacheFile.toFile(),
+					new TypeToken<Map<ICoReTypeName, Collection<String>>>() {
 						private static final long serialVersionUID = 1L;
 					}.getType());
-			for (Map.Entry<ITypeName, Collection<String>> typeFile : typeFiles.entrySet()) {
+			for (Map.Entry<ICoReTypeName, Collection<String>> typeFile : typeFiles.entrySet()) {
 				for (String file : typeFile.getValue()) {
 					typeToZipFiles.put(typeFile.getKey(), projectDir.resolve(file));
 				}
@@ -299,8 +299,8 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		private void storeCache() throws IOException {
-			Multimap<ITypeName, String> typeFiles = HashMultimap.create(typeToZipFiles.keys().size(), 1);
-			for (Map.Entry<ITypeName, Path> typeFile : typeToZipFiles.entries()) {
+			Multimap<ICoReTypeName, String> typeFiles = HashMultimap.create(typeToZipFiles.keys().size(), 1);
+			for (Map.Entry<ICoReTypeName, Path> typeFile : typeToZipFiles.entries()) {
 				typeFiles.put(typeFile.getKey(), projectDir.relativize(typeFile.getValue()).toString());
 			}
 			GsonUtil.serialize(typeFiles.asMap(), projectDir.resolve(CACHE_FILENAME).toFile());
@@ -342,8 +342,8 @@ public class ProjectUsageStore implements UsageStore {
 			return projectDirs;
 		}
 
-		private Path getTypePath(ITypeName type) {
-			String typeName = Names.vm2srcQualifiedType(type).replace("[]", "__").replace("$", "_");
+		private Path getTypePath(ICoReTypeName type) {
+			String typeName = CoReNames.vm2srcQualifiedType(type).replace("[]", "__").replace("$", "_");
 			return projectDir.resolve(typeName);
 		}
 
@@ -368,7 +368,7 @@ public class ProjectUsageStore implements UsageStore {
 				typeToZipFiles.clear();
 
 				for (Path typeFile : typeFiles) {
-					ITypeName type = GsonUtil.deserialize(typeFile.toFile(), ITypeName.class);
+					ICoReTypeName type = GsonUtil.deserialize(typeFile.toFile(), ICoReTypeName.class);
 					Path typeDir = typeFile.getParent();
 
 					for (Path zipFile : IOHelper.getZipFiles(typeDir)) {
@@ -378,7 +378,7 @@ public class ProjectUsageStore implements UsageStore {
 			}
 		}
 
-		private Path initZipFile(ITypeName type) throws IOException {
+		private Path initZipFile(ICoReTypeName type) throws IOException {
 			Path zipFile = getTypePath(type).resolve("usages.zip");
 			typeToZipFiles.put(type, zipFile);
 
@@ -390,7 +390,7 @@ public class ProjectUsageStore implements UsageStore {
 			return zipFile;
 		}
 
-		private Path getZipFile(ITypeName type) throws IOException {
+		private Path getZipFile(ICoReTypeName type) throws IOException {
 			Path zipFile;
 			synchronized (typeToZipFiles) {
 				Collection<Path> zipFiles = typeToZipFiles.get(type);
@@ -412,7 +412,7 @@ public class ProjectUsageStore implements UsageStore {
 		@Override
 		public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
 			invalidateCache();
-			Multimap<ITypeName, Usage> typeToUsages = ArrayListMultimap.create(); // keep
+			Multimap<ICoReTypeName, Usage> typeToUsages = ArrayListMultimap.create(); // keep
 																					// duplicate
 																					// key-value
 																					// pairs
@@ -421,7 +421,7 @@ public class ProjectUsageStore implements UsageStore {
 				typeToUsages.put(usage.getType(), usage);
 			}
 
-			for (ITypeName type : typeToUsages.keySet()) {
+			for (ICoReTypeName type : typeToUsages.keySet()) {
 				Path zipFile = getZipFile(type);
 
 				ZipArchive archive = getArchive(zipFile);
@@ -432,11 +432,11 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		@Override
-		public Set<ITypeName> getAllTypes() {
+		public Set<ICoReTypeName> getAllTypes() {
 			return Collections.unmodifiableSet(typeToZipFiles.keySet());
 		}
 
-		public int getNumberOfUsages(ITypeName type) throws IOException {
+		public int getNumberOfUsages(ICoReTypeName type) throws IOException {
 			int count = 0;
 
 			synchronized (typeToZipFiles) {
@@ -450,12 +450,12 @@ public class ProjectUsageStore implements UsageStore {
 		}
 
 		@Override
-		public List<Usage> load(ITypeName type) throws IOException {
+		public List<Usage> load(ICoReTypeName type) throws IOException {
 			return load(type, x -> true);
 		}
 
 		@Override
-		public List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException {
+		public List<Usage> load(ICoReTypeName type, Predicate<Usage> filter) throws IOException {
 			List<Usage> usages = new ArrayList<>();
 
 			synchronized (typeToZipFiles) {

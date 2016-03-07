@@ -29,7 +29,7 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 import com.codetrails.data.CallSite;
 import com.codetrails.data.CallSiteKind;
@@ -40,11 +40,11 @@ import com.google.gson.reflect.TypeToken;
 /**
  * store that can be used to read and write the old ObjectUsages
  */
-public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
+public class ObjectUsageStore implements DataStore<ICoReTypeName, ObjectUsage> {
 
 	private final Predicate<ObjectUsage> ouFilter;
 
-	private Map<ITypeName, WritingArchive> archives = newHashMap();
+	private Map<ICoReTypeName, WritingArchive> archives = newHashMap();
 	private Directory directory;
 
 	public ObjectUsageStore(Directory directory, Predicate<ObjectUsage> ouFilter) {
@@ -93,7 +93,7 @@ public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
 		return false;
 	}
 
-	private WritingArchive getArchive(ITypeName type) throws IOException {
+	private WritingArchive getArchive(ICoReTypeName type) throws IOException {
 		WritingArchive archive = archives.get(type);
 		boolean archiveCurrentlyNotOpened = archive == null;
 		if (archiveCurrentlyNotOpened) {
@@ -118,7 +118,7 @@ public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
 	}
 
 	private void closeAllArchivesThatAreCurrentlyOpen() throws IOException {
-		for (ITypeName type : archives.keySet()) {
+		for (ICoReTypeName type : archives.keySet()) {
 			WritingArchive archive = archives.get(type);
 			if (archive != null) {
 				archive.close();
@@ -128,16 +128,16 @@ public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
 	}
 
 	private void storeTypesInFile() throws IOException {
-		Set<ITypeName> types = archives.keySet();
+		Set<ICoReTypeName> types = archives.keySet();
 		directory.write(types, "types.json");
 	}
 
 	@Override
-	public Set<ITypeName> getKeys() {
+	public Set<ICoReTypeName> getKeys() {
 		try {
-			Type type = new TypeToken<Set<ITypeName>>() {
+			Type type = new TypeToken<Set<ICoReTypeName>>() {
 			}.getType();
-			Set<ITypeName> types = directory.read("types.json", type);
+			Set<ICoReTypeName> types = directory.read("types.json", type);
 			return types;
 		} catch (IOException e) {
 			Throws.throwUnhandledException(e);
@@ -146,13 +146,13 @@ public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
 	}
 
 	@Override
-	public List<ObjectUsage> read(ITypeName type) {
+	public List<ObjectUsage> read(ICoReTypeName type) {
 		Predicate<ObjectUsage> all = alwaysTrue();
 		return read(type, all);
 	}
 
 	@Override
-	public List<ObjectUsage> read(ITypeName type, Predicate<ObjectUsage> predicates) {
+	public List<ObjectUsage> read(ICoReTypeName type, Predicate<ObjectUsage> predicates) {
 
 		ensureTypeExists(type);
 
@@ -177,7 +177,7 @@ public class ObjectUsageStore implements DataStore<ITypeName, ObjectUsage> {
 		return null;
 	}
 
-	private void ensureTypeExists(ITypeName type) {
+	private void ensureTypeExists(ICoReTypeName type) {
 		boolean isTypeKnown = getKeys().contains(type);
 		if (!isTypeKnown) {
 			throwIllegalArgumentException("type %s does not exist", type);

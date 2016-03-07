@@ -26,7 +26,7 @@ import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 public class StatisticsCollectorRunner {
@@ -52,7 +52,7 @@ public class StatisticsCollectorRunner {
 					int numTypes = usageStore.getAllTypes().size();
 					log("\tStore contains %d types\n", numTypes);
 					
-					for (ITypeName type : usageStore.getAllTypes()) {
+					for (ICoReTypeName type : usageStore.getAllTypes()) {
 						List<Usage> usages = usageStore.load(type);
 						statisticsCollector.process(usages);
 						usageStore.flush();

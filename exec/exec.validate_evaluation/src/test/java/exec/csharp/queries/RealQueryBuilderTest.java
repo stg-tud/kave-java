@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -59,9 +59,9 @@ public class RealQueryBuilderTest {
 
 	@Test
 	public void basicInfoAreCopiedFromEnd() {
-		ITypeName type = mock(ITypeName.class);
-		ITypeName cctx = mock(ITypeName.class);
-		IMethodName mctx = mock(IMethodName.class);
+		ICoReTypeName type = mock(ICoReTypeName.class);
+		ICoReTypeName cctx = mock(ICoReTypeName.class);
+		ICoReMethodName mctx = mock(ICoReMethodName.class);
 		DefinitionSite defSite = mock(DefinitionSite.class);
 
 		start = new Query();
@@ -103,7 +103,7 @@ public class RealQueryBuilderTest {
 	}
 
 	private CallSite callSite(int mId) {
-		IMethodName m = VmMethodName.get("LT.m" + mId + "()V");
+		ICoReMethodName m = CoReMethodName.get("LT.m" + mId + "()V");
 		return CallSites.createReceiverCallSite(m);
 	}
 

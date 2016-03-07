@@ -25,10 +25,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -85,9 +85,9 @@ public abstract class AbstractQueryBuilderTest {
 
 	protected Query createUsage(String... methodNames) {
 		Query q = new Query();
-		q.setType(VmTypeName.get("LT"));
-		q.setClassContext(VmTypeName.get("LC"));
-		q.setMethodContext(VmMethodName.get("LC.ctx()V"));
+		q.setType(CoReTypeName.get("LT"));
+		q.setClassContext(CoReTypeName.get("LC"));
+		q.setMethodContext(CoReMethodName.get("LC.ctx()V"));
 		q.setDefinition(DefinitionSites.createDefinitionByConstant());
 		for (String m : methodNames) {
 			q.addCallSite(call(m));
@@ -113,7 +113,7 @@ public abstract class AbstractQueryBuilderTest {
 		}
 
 		@Override
-		public ITypeName getType() {
+		public ICoReTypeName getType() {
 			throw new RuntimeException();
 		}
 
@@ -128,7 +128,7 @@ public abstract class AbstractQueryBuilderTest {
 		}
 
 		@Override
-		public IMethodName getMethodContext() {
+		public ICoReMethodName getMethodContext() {
 			throw new RuntimeException();
 		}
 
@@ -138,7 +138,7 @@ public abstract class AbstractQueryBuilderTest {
 		}
 
 		@Override
-		public ITypeName getClassContext() {
+		public ICoReTypeName getClassContext() {
 			throw new RuntimeException();
 		}
 

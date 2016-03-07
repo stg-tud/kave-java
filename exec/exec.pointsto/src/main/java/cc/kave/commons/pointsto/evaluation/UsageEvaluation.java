@@ -39,8 +39,8 @@ import cc.kave.commons.pointsto.evaluation.cv.SetProvider;
 import cc.kave.commons.pointsto.evaluation.cv.UsageSetProvider;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;
 
 public class UsageEvaluation {
@@ -55,7 +55,7 @@ public class UsageEvaluation {
 
 	private long skippedNumProjects;
 	private long skippedUsageFilter;
-	private Map<ITypeName, Double> results = new HashMap<>();
+	private Map<ICoReTypeName, Double> results = new HashMap<>();
 
 	@Inject
 	public UsageEvaluation(@NumberOfCVFolds int numFolds, @UsageFilter Predicate<Usage> usageFilter,
@@ -72,7 +72,7 @@ public class UsageEvaluation {
 		results.clear();
 	}
 
-	public Map<ITypeName, Double> getResults() {
+	public Map<ICoReTypeName, Double> getResults() {
 		return Collections.unmodifiableMap(results);
 	}
 
@@ -82,13 +82,13 @@ public class UsageEvaluation {
 		try (ProjectUsageStore usageStore = new ProjectUsageStore(storePath)) {
 			// store types in a list and sort it alphabetically to get a consistent ordering in which types are
 			// evaluated
-			List<ITypeName> types = new ArrayList<>(usageStore.getAllTypes());
+			List<ICoReTypeName> types = new ArrayList<>(usageStore.getAllTypes());
 			types.sort(new TypeNameComparator());
 
 			int numProjects = usageStore.getNumberOfProjects();
 			log("Loaded usage store containing %d projects and %d types\n", numProjects, types.size());
 
-			for (ITypeName type : types) {
+			for (ICoReTypeName type : types) {
 				evaluateType(usageStore, type);
 				usageStore.flush();
 			}
@@ -102,7 +102,7 @@ public class UsageEvaluation {
 
 	}
 
-	private void evaluateType(ProjectUsageStore usageStore, ITypeName type) throws IOException {
+	private void evaluateType(ProjectUsageStore usageStore, ICoReTypeName type) throws IOException {
 		int numProjects = usageStore.getNumberOfProjects();
 		Set<ProjectIdentifier> projects = usageStore.getProjects(type);
 		int numProjectsWithType = projects.size();
@@ -112,7 +112,7 @@ public class UsageEvaluation {
 			return;
 		}
 
-		log("%s:\n", Names.vm2srcQualifiedType(type));
+		log("%s:\n", CoReNames.vm2srcQualifiedType(type));
 		if (numProjectsWithType < numFolds) {
 			log("\tSkipping because type is only used in %d projects\n", numProjectsWithType);
 			++skippedNumProjects;

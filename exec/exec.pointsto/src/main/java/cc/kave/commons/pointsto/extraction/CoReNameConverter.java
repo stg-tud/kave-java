@@ -23,10 +23,10 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingTypeNameException;
 import cc.kave.commons.pointsto.analysis.utils.LambdaNameHelper;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
-import cc.recommenders.names.IName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 public class CoReNameConverter {
 
@@ -66,15 +66,15 @@ public class CoReNameConverter {
 		return "L" + toName(sstType.getNamespace()) + sstType.getName();
 	}
 
-	public static cc.recommenders.names.ITypeName convert(ITypeName sstType) {
+	public static cc.recommenders.names.ICoReTypeName convert(ITypeName sstType) {
 		if (sstType == null) {
 			return null;
 		}
 
-		return VmTypeName.get(toName(sstType));
+		return CoReTypeName.get(toName(sstType));
 	}
 
-	public static cc.recommenders.names.IFieldName convert(IFieldName sstField) {
+	public static cc.recommenders.names.ICoReFieldName convert(IFieldName sstField) {
 		if (sstField == null) {
 			return null;
 		}
@@ -85,10 +85,10 @@ public class CoReNameConverter {
 		builder.append(sstField.isUnknown() ? "unknown" : sstField.getName());
 		builder.append(';');
 		builder.append(toName(sstField.getValueType()));
-		return VmFieldName.get(builder.toString());
+		return CoReFieldName.get(builder.toString());
 	}
 
-	public static cc.recommenders.names.IFieldName convert(IPropertyName sstProperty) {
+	public static cc.recommenders.names.ICoReFieldName convert(IPropertyName sstProperty) {
 		if (sstProperty == null) {
 			return null;
 		}
@@ -99,10 +99,10 @@ public class CoReNameConverter {
 		builder.append(sstProperty.isUnknown() ? "unknown" : sstProperty.getName());
 		builder.append(';');
 		builder.append(toName(sstProperty.getValueType()));
-		return VmFieldName.get(builder.toString());
+		return CoReFieldName.get(builder.toString());
 	}
 
-	public static cc.recommenders.names.IMethodName convert(IMethodName sstMethod) {
+	public static cc.recommenders.names.ICoReMethodName convert(IMethodName sstMethod) {
 		if (sstMethod == null) {
 			return null;
 		}
@@ -140,28 +140,28 @@ public class CoReNameConverter {
 
 		String identifier = builder.toString();
 		if (isLambda) {
-			return addLambda(VmMethodName.get(identifier));
+			return addLambda(CoReMethodName.get(identifier));
 		}
-		return VmMethodName.get(identifier);
+		return CoReMethodName.get(identifier);
 	}
 
-	public static boolean isUnknown(cc.recommenders.names.ITypeName type) {
+	public static boolean isUnknown(cc.recommenders.names.ICoReTypeName type) {
 		return type.getIdentifier().equals(UNKNOWN_NAME);
 	}
 
-	public static boolean isLambdaName(IName name) {
+	public static boolean isLambdaName(ICoReName name) {
 		return LambdaNameHelper.isLambdaName(name.getIdentifier());
 	}
 
-	public static cc.recommenders.names.IMethodName addLambda(cc.recommenders.names.IMethodName method) {
-		return VmMethodName.get(LambdaNameHelper.addLambdaToMethodName(method.getIdentifier(), method.getName()));
+	public static cc.recommenders.names.ICoReMethodName addLambda(cc.recommenders.names.ICoReMethodName method) {
+		return CoReMethodName.get(LambdaNameHelper.addLambdaToMethodName(method.getIdentifier(), method.getName()));
 	}
 
-	public static cc.recommenders.names.ITypeName addLambda(cc.recommenders.names.ITypeName type) {
-		return VmTypeName.get(LambdaNameHelper.addLambdaToTypeName(type.getIdentifier()));
+	public static cc.recommenders.names.ICoReTypeName addLambda(cc.recommenders.names.ICoReTypeName type) {
+		return CoReTypeName.get(LambdaNameHelper.addLambdaToTypeName(type.getIdentifier()));
 	}
 
-	public static cc.recommenders.names.IMethodName removeLambda(cc.recommenders.names.IMethodName method) {
-		return VmMethodName.get(LambdaNameHelper.addLambdaToMethodName(method.getIdentifier(), method.getName()));
+	public static cc.recommenders.names.ICoReMethodName removeLambda(cc.recommenders.names.ICoReMethodName method) {
+		return CoReMethodName.get(LambdaNameHelper.addLambdaToMethodName(method.getIdentifier(), method.getName()));
 	}
 }

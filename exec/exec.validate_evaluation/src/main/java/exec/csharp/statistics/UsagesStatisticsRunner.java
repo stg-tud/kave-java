@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.csharp.utils.MapSorter;
@@ -29,7 +29,7 @@ import exec.csharp.utils.StorageHelper;
 public class UsagesStatisticsRunner {
 
 	private Directory dirUsages;
-	private Map<ITypeName, Integer> counts = Maps.newLinkedHashMap();
+	private Map<ICoReTypeName, Integer> counts = Maps.newLinkedHashMap();
 
 	@Inject
 	public UsagesStatisticsRunner(StorageHelper storageHelper) {
@@ -47,7 +47,7 @@ public class UsagesStatisticsRunner {
 			while (ra.hasNext()) {
 				Usage u = ra.getNext(Query.class);
 
-				ITypeName type = u.getType();
+				ICoReTypeName type = u.getType();
 
 				Integer i = counts.get(type);
 				if (i == null) {
@@ -58,9 +58,9 @@ public class UsagesStatisticsRunner {
 			}
 		}
 
-		Map<ITypeName, Integer> sortedCounts = MapSorter.sortByCount(counts);
+		Map<ICoReTypeName, Integer> sortedCounts = MapSorter.sortByCount(counts);
 
-		for (ITypeName type : sortedCounts.keySet()) {
+		for (ICoReTypeName type : sortedCounts.keySet()) {
 			int count = counts.get(type);
 
 			System.out.printf("%10dx %s\n", count, type);
@@ -80,9 +80,9 @@ public class UsagesStatisticsRunner {
 		counttEqualOrSmallerThan(sortedCounts, 1000, 10000);
 	}
 
-	private static void counttEqualOrSmallerThan(Map<ITypeName, Integer> counts, int lowerBound, int upperBound) {
-		Map<ITypeName, Integer> matches = Maps.newLinkedHashMap();
-		for (ITypeName type : counts.keySet()) {
+	private static void counttEqualOrSmallerThan(Map<ICoReTypeName, Integer> counts, int lowerBound, int upperBound) {
+		Map<ICoReTypeName, Integer> matches = Maps.newLinkedHashMap();
+		for (ICoReTypeName type : counts.keySet()) {
 			int count = counts.get(type);
 			if (count >= lowerBound && count < upperBound) {
 				matches.put(type, count);

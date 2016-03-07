@@ -18,7 +18,7 @@ import java.util.Set;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;
 
@@ -41,12 +41,12 @@ public class ProjectFoldedUsageStore {
 		this.foldingStrategy = foldingStrategy;
 	}
 
-	public Set<ITypeName> getTypes() {
+	public Set<ICoReTypeName> getTypes() {
 		lazyReadIndex();
 		return index.getTypes();
 	}
 
-	public boolean isAvailable(ITypeName type, int numFolds) {
+	public boolean isAvailable(ICoReTypeName type, int numFolds) {
 		lazyReadIndex();
 		int projectsWithAtLeastOneUsage = 0;
 		for (int count : index.getCounts(type).values()) {
@@ -57,7 +57,7 @@ public class ProjectFoldedUsageStore {
 		return projectsWithAtLeastOneUsage >= numFolds;
 	}
 
-	public TypeStore createTypeStore(ITypeName type, int numFolds) throws IOException {
+	public TypeStore createTypeStore(ICoReTypeName type, int numFolds) throws IOException {
 		Asserts.assertGreaterThan(numFolds, 0);
 		Asserts.assertTrue(isAvailable(type, numFolds));
 

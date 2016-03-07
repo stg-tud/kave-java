@@ -15,7 +15,7 @@
  */
 package com.codetrails.data;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 import com.codetrails.data.CallSite;
 import com.codetrails.data.DefinitionKind;
@@ -60,7 +60,7 @@ public class ObjectUsage implements Uuidable {
 		this._uuid = uuid;
 	}
 
-	public ITypeName getType() {
+	public ICoReTypeName getType() {
 		DefinitionSite _def = this.getDef();
 		return _def.getType();
 	}
@@ -153,7 +153,7 @@ public class ObjectUsage implements Uuidable {
 
 	public String toString() {
 		ToStringHelper _stringHelper = Objects.toStringHelper(this);
-		ITypeName _type = this.getType();
+		ICoReTypeName _type = this.getType();
 		ToStringHelper _add = _stringHelper.add("type", _type);
 		Set<List<CallSite>> _paths = this.getPaths();
 		ToStringHelper _add_1 = _add.add("paths", _paths.size());

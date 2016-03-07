@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 
 import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Usage;
 
@@ -43,8 +43,8 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 	@Override
 	public List<List<Usage>> createFolds(Map<ProjectIdentifier, List<Usage>> projectUsages) {
 		shuffleUsages(projectUsages.values());
-		Map<IMethodName, Integer> methods = countMethods(Iterables.concat(projectUsages.values()));
-		EnumeratedDistribution<IMethodName> distribution = buildDistribution(methods);
+		Map<ICoReMethodName, Integer> methods = countMethods(Iterables.concat(projectUsages.values()));
+		EnumeratedDistribution<ICoReMethodName> distribution = buildDistribution(methods);
 		MethodRegistry registry = new MethodRegistry(Iterables.concat(projectUsages.values()), methods.size());
 
 		List<List<Usage>> folds = new ArrayList<>(numFolds);
@@ -53,7 +53,7 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 			List<Usage> fold = new ArrayList<>(avgFoldSize);
 			folds.add(fold);
 			for (int i = 0; i < avgFoldSize; ++i) {
-				IMethodName method;
+				ICoReMethodName method;
 				Usage usage;
 
 				do {
@@ -69,12 +69,12 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 		return folds;
 	}
 
-	private Map<IMethodName, Integer> countMethods(Iterable<Usage> usages) {
-		Map<IMethodName, Integer> methods = new HashMap<>();
+	private Map<ICoReMethodName, Integer> countMethods(Iterable<Usage> usages) {
+		Map<ICoReMethodName, Integer> methods = new HashMap<>();
 
 		for (Usage usage : usages) {
 			for (CallSite callsite : usage.getReceiverCallsites()) {
-				IMethodName method = callsite.getMethod();
+				ICoReMethodName method = callsite.getMethod();
 				int count = methods.getOrDefault(method, 0) + 1;
 				methods.put(method, count);
 			}
@@ -83,10 +83,10 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 		return methods;
 	}
 
-	private EnumeratedDistribution<IMethodName> buildDistribution(Map<IMethodName, Integer> methods) {
-		List<Pair<IMethodName, Double>> methodProbabilities = new ArrayList<>(methods.size());
+	private EnumeratedDistribution<ICoReMethodName> buildDistribution(Map<ICoReMethodName, Integer> methods) {
+		List<Pair<ICoReMethodName, Double>> methodProbabilities = new ArrayList<>(methods.size());
 
-		for (Map.Entry<IMethodName, Integer> methodEntry : methods.entrySet()) {
+		for (Map.Entry<ICoReMethodName, Integer> methodEntry : methods.entrySet()) {
 			methodProbabilities.add(Pair.create(methodEntry.getKey(), (double) methodEntry.getValue()));
 		}
 
@@ -96,22 +96,22 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 
 	private static class MethodRegistry {
 
-		private Map<IMethodName, List<Usage>> methodUsages; // usages that use a specific method
-		private Map<Usage, Set<IMethodName>> usageMethods; // methods of a specific usage
+		private Map<ICoReMethodName, List<Usage>> methodUsages; // usages that use a specific method
+		private Map<Usage, Set<ICoReMethodName>> usageMethods; // methods of a specific usage
 
 		public MethodRegistry(Iterable<Usage> usages, int numMethods) {
 			methodUsages = new HashMap<>(numMethods);
 			usageMethods = new IdentityHashMap<>();
 
 			for (Usage usage : usages) {
-				Set<IMethodName> methods = usageMethods.get(usage);
+				Set<ICoReMethodName> methods = usageMethods.get(usage);
 				if (methods == null) {
 					methods = new HashSet<>();
 					usageMethods.put(usage, methods);
 				}
 
 				for (CallSite callsite : usage.getReceiverCallsites()) {
-					IMethodName method = callsite.getMethod();
+					ICoReMethodName method = callsite.getMethod();
 					List<Usage> mu = methodUsages.get(method);
 					if (mu == null) {
 						mu = new ArrayList<>();
@@ -123,7 +123,7 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 			}
 		}
 
-		public Usage next(IMethodName method) {
+		public Usage next(ICoReMethodName method) {
 			List<Usage> mu = methodUsages.get(method);
 
 			if (mu == null || mu.isEmpty()) {
@@ -132,7 +132,7 @@ public class StratifiedMethodsCVFoldBuilder extends AbstractCVFoldBuilder {
 
 			int lastIndex = mu.size() - 1;
 			Usage usage = mu.remove(lastIndex);
-			Set<IMethodName> methods = usageMethods.get(usage);
+			Set<ICoReMethodName> methods = usageMethods.get(usage);
 			if (methods == null) {
 				// usage has been used for another method and is no longer available
 				return null;

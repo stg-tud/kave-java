@@ -17,14 +17,14 @@ package exec.validate_evaluation.streaks;
 
 import java.util.Date;
 
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Usage;
 
 public class Edit {
 
 	private Date date;
 	private Usage usage;
-	private IMethodName selection;
+	private ICoReMethodName selection;
 
 	private Edit() {
 		// for de-/serialization
@@ -38,7 +38,7 @@ public class Edit {
 		return usage;
 	}
 
-	public IMethodName getSelection() {
+	public ICoReMethodName getSelection() {
 		return selection;
 	}
 
@@ -46,7 +46,7 @@ public class Edit {
 		return false;
 	}
 
-	public static Edit create(Date date, Usage usage, IMethodName selection) {
+	public static Edit create(Date date, Usage usage, ICoReMethodName selection) {
 		Edit e = new Edit();
 		e.date = date;
 		e.usage = usage;

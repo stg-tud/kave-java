@@ -39,15 +39,15 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 import smile.Network;
 
 public class BatchPBNSmileMinerTest {
 
 	@Mock
-	private NestedZipFolders<ITypeName> usageDir;
+	private NestedZipFolders<ICoReTypeName> usageDir;
 
 	@Mock
 	private List<Usage> usages;
@@ -70,13 +70,13 @@ public class BatchPBNSmileMinerTest {
 	@Mock
 	private WritingArchive writingArchive;
 
-	private ITypeName type;
+	private ICoReTypeName type;
 
 	private BatchPBNSmileMiner sut;
 
 	@Before
 	public void setup() throws IOException {
-		type = VmTypeName.get("Lp/T");
+		type = CoReTypeName.get("Lp/T");
 
 		MockitoAnnotations.initMocks(this);
 
@@ -125,7 +125,7 @@ public class BatchPBNSmileMinerTest {
 
 	@Test
 	public void unknownTypeIsIgnored() throws IOException {
-		when(usageDir.findKeys()).thenReturn(Sets.newHashSet(VmTypeName.get("LUnknown")));
+		when(usageDir.findKeys()).thenReturn(Sets.newHashSet(CoReTypeName.get("LUnknown")));
 		sut.run(usageDir, modelDir);
 		verify(usageDir).findKeys();
 		verifyNoMoreInteractions(usageDir);
@@ -133,7 +133,7 @@ public class BatchPBNSmileMinerTest {
 
 	@Test
 	public void arraysAreIgnored() throws IOException {
-		when(usageDir.findKeys()).thenReturn(Sets.newHashSet(VmTypeName.get("[LSomeArrayType")));
+		when(usageDir.findKeys()).thenReturn(Sets.newHashSet(CoReTypeName.get("[LSomeArrayType")));
 		sut.run(usageDir, modelDir);
 		verify(usageDir).findKeys();
 		verifyNoMoreInteractions(usageDir);

@@ -29,10 +29,8 @@ import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.Logger;
-import cc.kave.commons.pointsto.evaluation.Module;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.JsonUtils;
@@ -63,11 +61,16 @@ public abstract class AbstractCompletionEventEvaluation {
 	public static void main(String[] args) throws IOException {
 		Path baseDir = Paths.get("E:\\Coding\\MT");
 		Path completionEventsArchive = baseDir.resolve("CompletionEvents.zip");
-		List<PointsToAnalysisFactory> ptFactories = Arrays.asList(
-				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
-				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)/*,
-				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)*/);
+		List<PointsToAnalysisFactory> ptFactories = Arrays
+				.asList(new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
+						new SimplePointsToAnalysisFactory<>(
+								TypeBasedAnalysis.class),
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class,
+						FieldSensitivity.FULL)/*
+												 * , new
+												 * SimplePointsToAnalysisFactory
+												 * <>(InclusionAnalysis.class)
+												 */);
 		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;
@@ -79,7 +82,8 @@ public abstract class AbstractCompletionEventEvaluation {
 		evaluation.close();
 
 		// injector = Guice.createInjector(new Module());
-		// TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
+		// TimeEvaluation evaluation =
+		// injector.getInstance(TimeEvaluation.class);
 		// evaluation.run(completionEventsArchive, ptFactories);
 		// evaluation.exportResults(evaluationResultsDir,
 		// injector.getInstance(ResultExporter.class));

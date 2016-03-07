@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -45,7 +45,7 @@ public class F1ByQueryMode extends AbstractEvaluationConsumer {
 	private int numFilteredNoAddition;
 	private int numFiltered01;
 	private Map<String, Integer> queryTypeCounts;
-	private Map<ITypeName, Integer> typeCounts;
+	private Map<ICoReTypeName, Integer> typeCounts;
 	private Map<DefinitionSiteKind, Integer> defCounts;
 	private Map<Integer, Integer> beforeCounts;
 	private Map<Integer, Integer> addCounts;
@@ -81,14 +81,14 @@ public class F1ByQueryMode extends AbstractEvaluationConsumer {
 	}
 
 	@Override
-	public void skippingType(ITypeName type, List<Usage> us, List<MicroCommit> histories) {
+	public void skippingType(ICoReTypeName type, List<Usage> us, List<MicroCommit> histories) {
 		super.skippingType(type, us, histories);
 		queriesTotal += histories.size();
 		numFilteredNoUsages += histories.size();
 	}
 
 	@Override
-	public void startingType(ITypeName type, List<Usage> usages, List<MicroCommit> histories) {
+	public void startingType(ICoReTypeName type, List<Usage> usages, List<MicroCommit> histories) {
 		super.startingType(type, usages, histories);
 		queriesTotal += histories.size();
 	}
@@ -163,7 +163,7 @@ public class F1ByQueryMode extends AbstractEvaluationConsumer {
 		Map<String, Integer> sortedQueryTypeCounts = MapSorter.sort(queryTypeCounts);
 		printMap(sortedQueryTypeCounts, "kind of queries");
 
-		Map<ITypeName, Integer> sortedTypeCounts = MapSorter.sort(typeCounts);
+		Map<ICoReTypeName, Integer> sortedTypeCounts = MapSorter.sort(typeCounts);
 		printMap(sortedTypeCounts, "usages per type");
 	}
 

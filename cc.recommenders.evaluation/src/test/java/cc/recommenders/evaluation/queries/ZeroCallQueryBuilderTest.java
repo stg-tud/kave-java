@@ -17,10 +17,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -32,10 +32,10 @@ import com.google.common.collect.Sets;
 
 public class ZeroCallQueryBuilderTest {
 
-	private ITypeName expectedType = VmTypeName.get("Lorg/bla/blubb/SomeClass");
-	private ITypeName expectedClassContext = VmTypeName.get("Lorg/bla/blubb/SomeClass");
-	private IMethodName expectedMethodContext = VmMethodName.get("Lorg/bla/blubb/FirstClass.method(I)V");
-	private DefinitionSite expectedDefinition = DefinitionSites.createDefinitionByReturn(VmMethodName
+	private ICoReTypeName expectedType = CoReTypeName.get("Lorg/bla/blubb/SomeClass");
+	private ICoReTypeName expectedClassContext = CoReTypeName.get("Lorg/bla/blubb/SomeClass");
+	private ICoReMethodName expectedMethodContext = CoReMethodName.get("Lorg/bla/blubb/FirstClass.method(I)V");
+	private DefinitionSite expectedDefinition = DefinitionSites.createDefinitionByReturn(CoReMethodName
 			.get("Lorg/bla/Creator.get(I)V"));
 
 	private Usage example;
@@ -102,7 +102,7 @@ public class ZeroCallQueryBuilderTest {
 	}
 
 	private static CallSite createCallSite(int i) {
-		CallSite site = CallSites.createReceiverCallSite(VmMethodName.get("Lorg/bla/blubb/FirstClass.m" + i + "(I)V"));
+		CallSite site = CallSites.createReceiverCallSite(CoReMethodName.get("Lorg/bla/blubb/FirstClass.m" + i + "(I)V"));
 		return site;
 	}
 }

@@ -29,8 +29,8 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -47,8 +47,8 @@ public class Evaluation implements IEvaluation {
 
 	private ModelHelper models;
 	private QueryBuilderFactory queryBuilderFactory;
-	private NestedZipFolders<ITypeName> historyDir;
-	private NestedZipFolders<ITypeName> usages;
+	private NestedZipFolders<ICoReTypeName> historyDir;
+	private NestedZipFolders<ICoReTypeName> usages;
 	private MiningOptions mOpts;
 	private QueryOptions qOpts;
 	private ICallsRecommender<Query> rec;
@@ -74,7 +74,7 @@ public class Evaluation implements IEvaluation {
 		Logger.log("options: %s%s", mOpts, qOpts);
 		Logger.log("");
 
-		for (ITypeName type : historyDir.findKeys()) {
+		for (ICoReTypeName type : historyDir.findKeys()) {
 			List<MicroCommit> histories = historyDir.readAllZips(type, MicroCommit.class);
 			List<Usage> us = usages.readAllZips(type, Usage.class);
 			if (us.size() < 1) {
@@ -130,17 +130,17 @@ public class Evaluation implements IEvaluation {
 		List<Query> queries = queryBuilder.createQueries(start, end);
 		BoxplotData res = new BoxplotData();
 		for (Query q : queries) {
-			Set<IMethodName> proposals = getProposals(rec, q);
-			Set<IMethodName> expectation = getExpectation(q, end);
+			Set<ICoReMethodName> proposals = getProposals(rec, q);
+			Set<ICoReMethodName> expectation = getExpectation(q, end);
 			Measure measure = Measure.newMeasure(expectation, proposals);
 			res.add(measure.getF1());
 		}
 		return res.getMean();
 	}
 
-	private Set<IMethodName> getExpectation(Query q, Query end) {
+	private Set<ICoReMethodName> getExpectation(Query q, Query end) {
 
-		Set<IMethodName> expectation = Sets.newLinkedHashSet();
+		Set<ICoReMethodName> expectation = Sets.newLinkedHashSet();
 		for (CallSite cs : end.getReceiverCallsites()) {
 			if (!q.getAllCallsites().contains(cs)) {
 				expectation.add(cs.getMethod());
@@ -149,9 +149,9 @@ public class Evaluation implements IEvaluation {
 		return expectation;
 	}
 
-	private Set<IMethodName> getProposals(ICallsRecommender<Query> rec, Query query) {
-		Set<IMethodName> proposals = Sets.newHashSet();
-		for (Tuple<IMethodName, Double> p : rec.query(query)) {
+	private Set<ICoReMethodName> getProposals(ICallsRecommender<Query> rec, Query query) {
+		Set<ICoReMethodName> proposals = Sets.newHashSet();
+		for (Tuple<ICoReMethodName, Double> p : rec.query(query)) {
 			proposals.add(p.getFirst());
 		}
 		return proposals;

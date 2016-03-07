@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class ProjectFoldedUsageTest {
 
@@ -31,19 +31,19 @@ public class ProjectFoldedUsageTest {
 	private static final String PROJECT_NAME2 = "SOME_PROJECT_NAME2";
 
 	private Usage usage;
-	private ITypeName type;
+	private ICoReTypeName type;
 	private Usage usage2;
-	private ITypeName type2;
+	private ICoReTypeName type2;
 
 	private ProjectFoldedUsage sut;
 
 	@Before
 	public void setup() {
-		type = mock(ITypeName.class);
+		type = mock(ICoReTypeName.class);
 		usage = mock(Usage.class);
 		when(usage.getType()).thenReturn(type);
 
-		type2 = mock(ITypeName.class);
+		type2 = mock(ICoReTypeName.class);
 		usage2 = mock(Usage.class);
 		when(usage2.getType()).thenReturn(type2);
 	}

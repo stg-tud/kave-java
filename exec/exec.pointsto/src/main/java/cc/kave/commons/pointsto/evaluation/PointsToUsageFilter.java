@@ -17,8 +17,8 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;
 
 public class PointsToUsageFilter implements Predicate<Usage> {
@@ -34,7 +34,7 @@ public class PointsToUsageFilter implements Predicate<Usage> {
 			return false;
 		}
 
-		ITypeName type = usage.getType();
+		ICoReTypeName type = usage.getType();
 		if (!test(type)) {
 			return false;
 		}
@@ -42,7 +42,7 @@ public class PointsToUsageFilter implements Predicate<Usage> {
 		return true;
 	}
 
-	public boolean test(ITypeName type) {
+	public boolean test(ICoReTypeName type) {
 		if (type.isArrayType()) {
 			return false;
 		}
@@ -50,8 +50,8 @@ public class PointsToUsageFilter implements Predicate<Usage> {
 		return !isPrimitiveType(type);
 	}
 
-	public boolean isPrimitiveType(ITypeName type) {
-		return PRIMITIVE_TYPE_NAMES.contains(Names.vm2srcQualifiedType(type));
+	public boolean isPrimitiveType(ICoReTypeName type) {
+		return PRIMITIVE_TYPE_NAMES.contains(CoReNames.vm2srcQualifiedType(type));
 	}
 
 }

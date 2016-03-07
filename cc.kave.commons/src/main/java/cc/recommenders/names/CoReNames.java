@@ -19,15 +19,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import cc.kave.commons.model.names.IName;
-
 /**
  * 
  * Contains utility methods for parsing and converting plain vm strings (or
- * their corresponding {@link IName}s respectively) to source strings.
+ * their corresponding {@link ICoReName}s respectively) to source strings.
  * 
  */
-public class Names {
+public class CoReNames {
 	public static enum PrimitiveType {
 		BOOLEAN('Z', "boolean"), VOID('V', "void"), CHAR('C', "char"), BYTE('B', "byte"), SHORT('S', "short"), INT('I',
 				"int"), FLOAT('F', "float"), LONG('J', "long"), DOUBLE('D', "double");
@@ -279,10 +277,10 @@ public class Names {
 		return res;
 	}
 
-	// public static String vm2srcPackage(final IPackageName pkg) {
-	// ensureIsNotNull(pkg, "pkg");
-	// return pkg.getIdentifier().replace('/', '.');
-	// }
+	public static String vm2srcPackage(final ICoRePackageName pkg) {
+		ensureIsNotNull(pkg, "pkg");
+		return pkg.getIdentifier().replace('/', '.');
+	}
 
 	public static String vm2srcQualifiedMethod(final ICoReMethodName method) {
 		final StringBuilder sb = new StringBuilder();
@@ -303,7 +301,7 @@ public class Names {
 
 	public static String vm2srcQualifiedType(final ICoReTypeName type) {
 		if (type.isPrimitiveType()) {
-			return Names.vm2srcSimpleTypeName(type);
+			return CoReNames.vm2srcSimpleTypeName(type);
 		}
 		if (type.isArrayType()) {
 			return vm2srcQualifiedType(type.getArrayBaseType()) + StringUtils.repeat("[]", type.getArrayDimensions());
@@ -339,10 +337,10 @@ public class Names {
 		return sb.toString();
 	}
 
-	public static String vm2srcSimpleTypeName(final String CoReTypeName) {
-		ensureIsNotNull(CoReTypeName, "CoReTypeName");
+	public static String vm2srcSimpleTypeName(final String vmTypeName) {
+		ensureIsNotNull(vmTypeName, "vmTypeName");
 		//
-		final String type = internal_vm2srcTypeName(CoReTypeName.toCharArray(), 0);
+		final String type = internal_vm2srcTypeName(vmTypeName.toCharArray(), 0);
 		final int lastDot = type.lastIndexOf('.');
 		if (lastDot == -1) {
 			return type;
@@ -394,10 +392,10 @@ public class Names {
 	 * <li>I --&gt; int
 	 * </ul>
 	 */
-	public static String vm2srcTypeName(final String CoReTypeName) {
-		ensureIsNotNull(CoReTypeName, "CoReTypeName");
+	public static String vm2srcTypeName(final String vmTypeName) {
+		ensureIsNotNull(vmTypeName, "vmTypeName");
 		//
-		return internal_vm2srcTypeName(CoReTypeName.toCharArray(), 0);
+		return internal_vm2srcTypeName(vmTypeName.toCharArray(), 0);
 	}
 
 	public static ICoReTypeName java2vmType(final Class<?> clazz) {

@@ -15,9 +15,9 @@
  */
 package exec.csharp.evaluation.impl;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -27,8 +27,8 @@ public class AbstractEvalTest {
 
 	protected Query createQuery(int... callNums) {
 		Query q = new Query();
-		q.setType(VmTypeName.get("LT"));
-		q.setClassContext(VmTypeName.get("LCtx"));
+		q.setType(CoReTypeName.get("LT"));
+		q.setClassContext(CoReTypeName.get("LCtx"));
 		q.setMethodContext(method("Ctx", "m"));
 		q.setDefinition(DefinitionSites.createDefinitionByThis());
 		for (int callNum : callNums) {
@@ -39,7 +39,7 @@ public class AbstractEvalTest {
 		return q;
 	}
 
-	private IMethodName method(String cName, String mName) {
-		return VmMethodName.get(String.format("L%s.%s()V", cName, mName));
+	private ICoReMethodName method(String cName, String mName) {
+		return CoReMethodName.get(String.format("L%s.%s()V", cName, mName));
 	}
 }

@@ -21,10 +21,10 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
@@ -56,36 +56,36 @@ public class DecoratedObjectUsageTest {
 
 	@Test
 	public void typeIsPropagated() {
-		ITypeName expected = mock(ITypeName.class);
+		ICoReTypeName expected = mock(ICoReTypeName.class);
 		com.codetrails.data.DefinitionSite ds = new com.codetrails.data.DefinitionSite();
 		ds.setType(expected);
 		usage.setDef(ds);
-		ITypeName actual = sut.getType();
+		ICoReTypeName actual = sut.getType();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void classContextIsPropagated() {
-		ITypeName expected = mock(ITypeName.class);
+		ICoReTypeName expected = mock(ICoReTypeName.class);
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
 		ctx.setSuperclass(expected);
 		usage.setContext(ctx);
-		ITypeName actual = sut.getClassContext();
+		ICoReTypeName actual = sut.getClassContext();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void methodContextIsPropagated() {
-		IMethodName method = VmMethodName.get("LClient.doit()V");
-		ITypeName intro = VmTypeName.get("LFramework");
-		IMethodName expected = VmMethodName.get("LFramework.doit()V");
+		ICoReMethodName method = CoReMethodName.get("LClient.doit()V");
+		ICoReTypeName intro = CoReTypeName.get("LFramework");
+		ICoReMethodName expected = CoReMethodName.get("LFramework.doit()V");
 
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
 		ctx.setName(method);
 		ctx.setIntroducedBy(intro);
 		usage.setContext(ctx);
 
-		IMethodName actual = sut.getMethodContext();
+		ICoReMethodName actual = sut.getMethodContext();
 		assertEquals(expected, actual);
 	}
 
@@ -168,19 +168,19 @@ public class DecoratedObjectUsageTest {
 		assertSites(sut.getParameterCallsites(), "b", "c");
 	}
 
-	private static IMethodName getMethodName(String name) {
-		return VmMethodName.get(String.format("LType.method_%s()V", name));
+	private static ICoReMethodName getMethodName(String name) {
+		return CoReMethodName.get(String.format("LType.method_%s()V", name));
 	}
 
 	private static void assertSites(Set<CallSite> sites, String... names) {
 		assertEquals(names.length, sites.size());
 		for (String suffix : names) {
-			IMethodName methodName = getMethodName(suffix);
+			ICoReMethodName methodName = getMethodName(suffix);
 			assertTrue(containsMethod(sites, methodName));
 		}
 	}
 
-	private static boolean containsMethod(Set<CallSite> path, IMethodName methodName) {
+	private static boolean containsMethod(Set<CallSite> path, ICoReMethodName methodName) {
 		for (CallSite site : path) {
 			if (site.getMethod().equals(methodName)) {
 				return true;
@@ -197,14 +197,14 @@ public class DecoratedObjectUsageTest {
 			ObjectUsage result = new ObjectUsage();
 
 			com.codetrails.data.DefinitionSite ds = com.codetrails.data.DefinitionSites.createUnknownDefinitionSite();
-			ds.setType(VmTypeName.get("LType"));
+			ds.setType(CoReTypeName.get("LType"));
 			result.setDef(ds);
 
 			EnclosingMethodContext ctx = new EnclosingMethodContext();
 
-			ctx.setSuperclass(VmTypeName.get("LSuperType"));
-			ctx.setName(VmMethodName.get("LType.method()V"));
-			ctx.setIntroducedBy(VmTypeName.get("LFirstType"));
+			ctx.setSuperclass(CoReTypeName.get("LSuperType"));
+			ctx.setName(CoReMethodName.get("LType.method()V"));
+			ctx.setIntroducedBy(CoReTypeName.get("LFirstType"));
 
 			Set<List<com.codetrails.data.CallSite>> paths = Sets.newLinkedHashSet();
 

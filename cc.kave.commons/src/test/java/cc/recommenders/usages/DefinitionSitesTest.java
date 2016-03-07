@@ -15,10 +15,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
 
 public class DefinitionSitesTest {
 
@@ -194,11 +194,11 @@ public class DefinitionSitesTest {
 		assertEquals(expected, actual);
 	}
 
-	private static IFieldName f(String field) {
-		return VmFieldName.get(field);
+	private static ICoReFieldName f(String field) {
+		return CoReFieldName.get(field);
 	}
 
-	private static IMethodName m(String method) {
-		return VmMethodName.get(method);
+	private static ICoReMethodName m(String method) {
+		return CoReMethodName.get(method);
 	}
 }

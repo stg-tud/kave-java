@@ -24,7 +24,7 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.pbn.BatchPBNSmileMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
 
@@ -70,7 +70,7 @@ public class run {
 	}
 
 	private static void runBatchPBNSmileMiner() {
-		NestedZipFolders<ITypeName> zipsUsages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
+		NestedZipFolders<ICoReTypeName> zipsUsages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
 		Directory dirNetworks = storageHelper.getDirectory(StorageCase.NETWORKS);
 		load(BatchPBNSmileMiner.class).run(zipsUsages, dirNetworks);
 	}

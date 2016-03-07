@@ -17,18 +17,18 @@ import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import java.util.Set;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 import com.google.common.collect.Sets;
 
 public abstract class AbstractUsage implements Usage {
 
-	public abstract ITypeName getType();
+	public abstract ICoReTypeName getType();
 
-	public abstract ITypeName getClassContext();
+	public abstract ICoReTypeName getClassContext();
 
-	public abstract IMethodName getMethodContext();
+	public abstract ICoReMethodName getMethodContext();
 
 	public abstract DefinitionSite getDefinitionSite();
 

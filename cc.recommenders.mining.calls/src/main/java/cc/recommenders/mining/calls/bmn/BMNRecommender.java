@@ -24,7 +24,7 @@ import cc.recommenders.mining.calls.AbstractCallsRecommender;
 import cc.recommenders.mining.calls.ProposalHelper;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.features.FeatureExtractor;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.CallFeature;
@@ -54,8 +54,8 @@ public class BMNRecommender extends AbstractCallsRecommender<Query> {
 	}
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> query(Query query) {
-		Set<Tuple<IMethodName, Double>> res = ProposalHelper.createSortedSet();
+	public Set<Tuple<ICoReMethodName, Double>> query(Query query) {
+		Set<Tuple<ICoReMethodName, Double>> res = ProposalHelper.createSortedSet();
 
 		List<UsageFeature> fs = featureExtractor.extract(query);
 		QueryState[] states = convert(fs);
@@ -64,10 +64,10 @@ public class BMNRecommender extends AbstractCallsRecommender<Query> {
 		for (Tuple<Integer, Double> proposal : proposals) {
 			int idx = proposal.getFirst();
 			CallFeature feature = (CallFeature) dictionary.getEntry(idx);
-			IMethodName methodName = feature.getMethodName();
+			ICoReMethodName methodName = feature.getMethodName();
 			double probability = proposal.getSecond();
 			if (probability > qOpts.minProbability) {
-				Tuple<IMethodName, Double> tuple = Tuple.newTuple(methodName, probability);
+				Tuple<ICoReMethodName, Double> tuple = Tuple.newTuple(methodName, probability);
 				res.add(tuple);
 			}
 		}

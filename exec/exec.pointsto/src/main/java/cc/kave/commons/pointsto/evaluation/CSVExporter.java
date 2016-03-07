@@ -24,22 +24,22 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import cc.kave.commons.pointsto.io.IOHelper;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 
 public class CSVExporter implements ResultExporter {
 
 	private static final String SEPARATOR = " ";
 
 	@Override
-	public void export(Path target, Map<ITypeName, Double> results) throws IOException {
-		List<ITypeName> types = new ArrayList<>(results.keySet());
+	public void export(Path target, Map<ICoReTypeName, Double> results) throws IOException {
+		List<ICoReTypeName> types = new ArrayList<>(results.keySet());
 		types.sort(new TypeNameComparator());
 
 		IOHelper.createParentDirs(target);
 		try (BufferedWriter writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8)) {
-			for (ITypeName type : types) {
-				String typeName = Names.vm2srcQualifiedType(type);
+			for (ICoReTypeName type : types) {
+				String typeName = CoReNames.vm2srcQualifiedType(type);
 				writer.append(typeName);
 				writer.append(SEPARATOR);
 				writer.append(String.format(Locale.US, "%.3f", results.get(type)));

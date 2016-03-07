@@ -36,8 +36,8 @@ import org.junit.Test;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;
 import cc.recommenders.usages.Usage;
@@ -48,7 +48,7 @@ import com.google.common.collect.Sets;
 
 public class ProjectFoldedUsageStoreTest {
 
-	private static final ITypeName TYPE = VmTypeName.get("LA/B/C");
+	private static final ICoReTypeName TYPE = CoReTypeName.get("LA/B/C");
 	private Directory dir;
 	private ProjectFoldingIndex index;
 	private HashSet<String> files;
@@ -81,7 +81,7 @@ public class ProjectFoldedUsageStoreTest {
 		when(dir.read(eq("index.json"), eq(ProjectFoldingIndex.class))).thenReturn(index);
 		when(dir.getReadingArchive(anyString())).thenReturn(readingArchive);
 
-		when(index.getCounts(any(ITypeName.class))).thenReturn(counts);
+		when(index.getCounts(any(ICoReTypeName.class))).thenReturn(counts);
 
 		when(readingArchive.hasNext()).thenReturn(true).thenReturn(false);
 		when(readingArchive.getNext(any(Class.class))).thenReturn(usages.get(0));
@@ -139,10 +139,10 @@ public class ProjectFoldedUsageStoreTest {
 
 	@Test
 	public void getTypesIsPropagatedToIndex() {
-		ITypeName t = mock(ITypeName.class);
+		ICoReTypeName t = mock(ICoReTypeName.class);
 		when(index.getTypes()).thenReturn(Sets.newHashSet(t));
 
-		Set<ITypeName> actual = sut.getTypes();
+		Set<ICoReTypeName> actual = sut.getTypes();
 
 		verify(index).getTypes();
 		assertEquals(Sets.newHashSet(t), actual);

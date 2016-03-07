@@ -30,8 +30,8 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Maps;
@@ -62,7 +62,7 @@ public class OverviewOfSizeLambdas {
 
 	public void run() {
 
-		ITypeName type = VmTypeName.get("Lorg/eclipse/swt/widgets/Button");
+		ICoReTypeName type = CoReTypeName.get("Lorg/eclipse/swt/widgets/Button");
 		List<Usage> usages = ouStore.read(type);
 		List<Usage> sublist = pickRandomSublist(usages, 100);
 		Logger.log("found %d usages for type %s...\n", usages.size(), type);

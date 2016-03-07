@@ -27,10 +27,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import cc.recommenders.annotations.Nullable;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -77,17 +77,17 @@ public class Zips {
         }
     }
 
-    public static String path(ITypeName type, @Nullable String suffix) {
+    public static String path(ICoReTypeName type, @Nullable String suffix) {
         String name = StringUtils.removeStart(type.getIdentifier(), "L");
         return suffix == null ? name : name + suffix;
     }
 
-    public static ITypeName type(ZipEntry entry, @Nullable String suffix) {
+    public static ICoReTypeName type(ZipEntry entry, @Nullable String suffix) {
         String name = StringUtils.removeEnd(entry.getName(), suffix);
-        return VmTypeName.get("L" + name);
+        return CoReTypeName.get("L" + name);
     }
 
-    public static IMethodName method(ZipEntry e, String suffix) {
+    public static ICoReMethodName method(ZipEntry e, String suffix) {
         String name = "L" + StringUtils.substringBefore(e.getName(), suffix);
         int start = name.lastIndexOf('/');
         char[] chars = name.toCharArray();
@@ -96,11 +96,11 @@ public class Zips {
             if (chars[i] == '.')
                 chars[i] = '/';
         }
-        return VmMethodName.get(new String(chars));
+        return CoReMethodName.get(new String(chars));
     }
 
-    public static String path(IMethodName method, @Nullable String suffix) {
-        ITypeName type = method.getDeclaringType();
+    public static String path(ICoReMethodName method, @Nullable String suffix) {
+        ICoReTypeName type = method.getDeclaringType();
         String name = path(type, null) + "/" + method.getSignature().replaceAll("/", ".");
         return suffix == null ? name : name + suffix;
     }

@@ -35,8 +35,8 @@ import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.testutils.LoggerUtils;
 
 import com.google.common.collect.Lists;
@@ -79,31 +79,31 @@ public class F1ForInputSeveralProviderTest {
 	public void typesAreCompleteAndOrderIsCorrect() {
 		assertEquals(20, F1ForInputSeveralProvider.TYPES.size());
 
-		Iterator<ITypeName> it = F1ForInputSeveralProvider.TYPES.iterator();
+		Iterator<ICoReTypeName> it = F1ForInputSeveralProvider.TYPES.iterator();
 
-		assertEquals(VmTypeName.get(BUTTON), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Composite"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Text"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Label"), it.next());
+		assertEquals(CoReTypeName.get(BUTTON), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Composite"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Text"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Label"), it.next());
 		// ---------------------------------
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Display"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Table"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Combo"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Display"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Table"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Combo"), it.next());
 		// ---------------------------------
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Control"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Shell"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Tree"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Control"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Shell"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Tree"), it.next());
 		// ---------------------------------
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Menu"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Group"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/TableColumn"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/ToolItem"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/MenuItem"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/ScrollBar"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/Canvas"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/List"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/TableItem"), it.next());
-		assertEquals(VmTypeName.get("Lorg/eclipse/swt/widgets/TreeItem"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Menu"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Group"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/TableColumn"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/ToolItem"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/MenuItem"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/ScrollBar"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/Canvas"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/List"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/TableItem"), it.next());
+		assertEquals(CoReTypeName.get("Lorg/eclipse/swt/widgets/TreeItem"), it.next());
 	}
 
 	@Test
@@ -113,8 +113,8 @@ public class F1ForInputSeveralProviderTest {
 
 	@Test
 	public void useType() {
-		assertTrue(sut.useType(VmTypeName.get(BUTTON)));
-		assertFalse(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/SomethingElse")));
+		assertTrue(sut.useType(CoReTypeName.get(BUTTON)));
+		assertFalse(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/SomethingElse")));
 	}
 
 	@Test
@@ -141,8 +141,8 @@ public class F1ForInputSeveralProviderTest {
 	public void logResultsLogging() {
 		sut = new F1ForInputSeveralProvider(store, output) {
 			@Override
-			protected void logResults(Map2D<ITypeName, Integer, BoxplotData> results, String filter,
-					List<ITypeName> types) {
+			protected void logResults(Map2D<ICoReTypeName, Integer, BoxplotData> results, String filter,
+					List<ICoReTypeName> types) {
 				Logger.append("%s\n", filter);
 			}
 		};
@@ -176,8 +176,8 @@ public class F1ForInputSeveralProviderTest {
 		final List<Params> actualParams = Lists.newLinkedList();
 		sut = new F1ForInputSeveralProvider(store, output) {
 			@Override
-			protected void logResults(Map2D<ITypeName, Integer, BoxplotData> results, String filter,
-					List<ITypeName> types) {
+			protected void logResults(Map2D<ICoReTypeName, Integer, BoxplotData> results, String filter,
+					List<ICoReTypeName> types) {
 				assertNotNull(results);
 				Params p = new Params(filter, types);
 				actualParams.add(p);
@@ -200,8 +200,8 @@ public class F1ForInputSeveralProviderTest {
 		assertEquals(expectedParams, actualParams);
 	}
 
-	private List<ITypeName> types(int... idxs) {
-		List<ITypeName> types = Lists.newArrayListWithCapacity(idxs.length);
+	private List<ICoReTypeName> types(int... idxs) {
+		List<ICoReTypeName> types = Lists.newArrayListWithCapacity(idxs.length);
 		for (int idx : idxs) {
 			types.add(TYPES.get(idx));
 		}
@@ -212,9 +212,9 @@ public class F1ForInputSeveralProviderTest {
 	public void mergingAndLoggingOfResults() {
 		sut = new F1ForInputSeveralProvider(store, output) {
 			@Override
-			protected void logResults(Map2D<ITypeName, Integer, BoxplotData> results, String filter,
-					List<ITypeName> types) {
-				if (types.contains(VmTypeName.get(BUTTON))) {
+			protected void logResults(Map2D<ICoReTypeName, Integer, BoxplotData> results, String filter,
+					List<ICoReTypeName> types) {
+				if (types.contains(CoReTypeName.get(BUTTON))) {
 					super.logResults(results, filter, types);
 				}
 			}
@@ -259,11 +259,11 @@ public class F1ForInputSeveralProviderTest {
 	@SuppressWarnings("unused")
 	private static class Params {
 
-		public Map2D<ITypeName, Integer, BoxplotData> results;
+		public Map2D<ICoReTypeName, Integer, BoxplotData> results;
 		public String filter;
-		public List<ITypeName> types;
+		public List<ICoReTypeName> types;
 
-		public Params(String filter, List<ITypeName> types) {
+		public Params(String filter, List<ICoReTypeName> types) {
 			this.filter = filter;
 			this.types = types;
 

@@ -31,12 +31,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.features.FeatureExtractor;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.CallFeature;
@@ -46,9 +49,6 @@ import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
 import cc.recommenders.utils.dictionary.Dictionary;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @SuppressWarnings("unchecked")
 public class BMNRecommenderTest {
@@ -80,8 +80,8 @@ public class BMNRecommenderTest {
 	@Mock
 	private FeatureExtractor<Usage, UsageFeature> featureExtractor;
 	private Dictionary<UsageFeature> dict;
-	private Set<Tuple<IMethodName, Double>> expecteds;
-	private Set<Tuple<IMethodName, Double>> actuals;
+	private Set<Tuple<ICoReMethodName, Double>> expecteds;
+	private Set<Tuple<ICoReMethodName, Double>> actuals;
 	private Table table;
 	private BMNRecommender sut;
 	private QueryOptions qOpts;
@@ -120,7 +120,7 @@ public class BMNRecommenderTest {
 
 	private CallFeature mockMethod(int i) {
 		CallFeature f = mock(CallFeature.class, "call" + i);
-		when(f.getMethodName()).thenReturn(VmMethodName.get("LSomeType.m" + i + "()V"));
+		when(f.getMethodName()).thenReturn(CoReMethodName.get("LSomeType.m" + i + "()V"));
 		return f;
 	}
 
@@ -253,7 +253,7 @@ public class BMNRecommenderTest {
 	public void sizeIsCalculated() {
 		bmnModel.table = mock(Table.class);
 		sut = new BMNRecommender(featureExtractor, bmnModel, qOpts);
-		
+
 		when(bmnModel.table.getSize()).thenReturn(152637);
 		int actual = sut.getSize();
 		int expected = 152637;
@@ -375,15 +375,15 @@ public class BMNRecommenderTest {
 		return q;
 	}
 
-	private Set<Tuple<IMethodName, Double>> __(Tuple<IMethodName, Double>... tuples) {
-		Set<Tuple<IMethodName, Double>> res = Sets.newLinkedHashSet();
-		for (Tuple<IMethodName, Double> t : tuples) {
+	private Set<Tuple<ICoReMethodName, Double>> __(Tuple<ICoReMethodName, Double>... tuples) {
+		Set<Tuple<ICoReMethodName, Double>> res = Sets.newLinkedHashSet();
+		for (Tuple<ICoReMethodName, Double> t : tuples) {
 			res.add(t);
 		}
 		return res;
 	}
 
-	private Tuple<IMethodName, Double> $(int indexOfFeature, double probability) {
+	private Tuple<ICoReMethodName, Double> $(int indexOfFeature, double probability) {
 		UsageFeature f = dict.getEntry(indexOfFeature);
 		if (!(f instanceof CallFeature)) {
 			throw new RuntimeException("CallFeature expected");
@@ -409,14 +409,14 @@ public class BMNRecommenderTest {
 		return res;
 	}
 
-	private static void assertProposals(Set<Tuple<IMethodName, Double>> expecteds,
-			Set<Tuple<IMethodName, Double>> actuals) {
+	private static void assertProposals(Set<Tuple<ICoReMethodName, Double>> expecteds,
+			Set<Tuple<ICoReMethodName, Double>> actuals) {
 		assertEquals(expecteds.size(), actuals.size());
-		Iterator<Tuple<IMethodName, Double>> itE = expecteds.iterator();
-		Iterator<Tuple<IMethodName, Double>> itA = actuals.iterator();
+		Iterator<Tuple<ICoReMethodName, Double>> itE = expecteds.iterator();
+		Iterator<Tuple<ICoReMethodName, Double>> itA = actuals.iterator();
 		while (itE.hasNext()) {
-			Tuple<IMethodName, Double> expected = itE.next();
-			Tuple<IMethodName, Double> actual = itA.next();
+			Tuple<ICoReMethodName, Double> expected = itE.next();
+			Tuple<ICoReMethodName, Double> actual = itA.next();
 			assertEquals(expected, actual);
 		}
 	}

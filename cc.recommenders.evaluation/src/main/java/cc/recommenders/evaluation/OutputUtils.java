@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.utils.DateProvider;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -32,9 +32,9 @@ import com.google.inject.Inject;
 
 public class OutputUtils {
 
-	private Set<Pair<ITypeName, Integer>> alreadyCounted = Sets.newHashSet();
-	private Map<ITypeName, Integer> typeTotals = Maps.newLinkedHashMap();
-	private Multimap<ITypeName, Integer> typeNums = LinkedListMultimap.create();
+	private Set<Pair<ICoReTypeName, Integer>> alreadyCounted = Sets.newHashSet();
+	private Map<ICoReTypeName, Integer> typeTotals = Maps.newLinkedHashMap();
+	private Multimap<ICoReTypeName, Integer> typeNums = LinkedListMultimap.create();
 
 	private long started;
 	private Date startedAt;
@@ -82,8 +82,8 @@ public class OutputUtils {
 		append("%%\t--> speed up of %.1f through distribution\n\n", (aggregatedProcessingTimeInS / (1.0 * durationInS)));
 	}
 
-	public void count(ITypeName type, int foldNum, int num) {
-		Pair<ITypeName, Integer> p = Pair.of(type, foldNum);
+	public void count(ICoReTypeName type, int foldNum, int num) {
+		Pair<ICoReTypeName, Integer> p = Pair.of(type, foldNum);
 		if (!alreadyCounted.contains(p)) {
 			alreadyCounted.add(p);
 			if (typeTotals.containsKey(type)) {
@@ -99,7 +99,7 @@ public class OutputUtils {
 	public void printTypeCounts() {
 		int total = 0;
 		Logger.append("\n%% types:\n");
-		for (ITypeName type : typeTotals.keySet()) {
+		for (ICoReTypeName type : typeTotals.keySet()) {
 			boolean isFirst = true;
 			int num = typeTotals.get(type);
 			total += num;

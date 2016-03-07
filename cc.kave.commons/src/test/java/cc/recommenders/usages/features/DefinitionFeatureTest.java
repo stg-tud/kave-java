@@ -19,9 +19,9 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.features.UsageFeature.ObjectUsageFeatureVisitor;
@@ -69,8 +69,8 @@ public class DefinitionFeatureTest {
 	@Test
 	public void parameterFeaturesAreEqualIfMethodIsOnlyDifference() {
 
-		IMethodName m1 = VmMethodName.get("LBla.blubb()V");
-		IMethodName m2 = VmMethodName.get("LBla.blubb()V");
+		ICoReMethodName m1 = CoReMethodName.get("LBla.blubb()V");
+		ICoReMethodName m2 = CoReMethodName.get("LBla.blubb()V");
 
 		DefinitionFeature df1 = createParamDefinition(m1, 1);
 		DefinitionFeature df2 = createParamDefinition(m2, 1);
@@ -83,7 +83,7 @@ public class DefinitionFeatureTest {
 	@Test
 	public void parameterFeaturesAreUnequalIfArgIndexIsDifferent() {
 
-		IMethodName methodName = mock(IMethodName.class);
+		ICoReMethodName methodName = mock(ICoReMethodName.class);
 		DefinitionFeature df1 = createParamDefinition(methodName, 1);
 		DefinitionFeature df2 = createParamDefinition(methodName, 2);
 
@@ -105,11 +105,11 @@ public class DefinitionFeatureTest {
 	}
 
 	private static DefinitionFeature createDefinition(String fieldName) {
-		VmFieldName vmFieldName = VmFieldName.get("LType." + fieldName + ";LOther");
+		CoReFieldName vmFieldName = CoReFieldName.get("LType." + fieldName + ";LOther");
 		return new DefinitionFeature(DefinitionSites.createDefinitionByField(vmFieldName));
 	}
 
-	private static DefinitionFeature createParamDefinition(IMethodName methodName, int argIndex) {
+	private static DefinitionFeature createParamDefinition(ICoReMethodName methodName, int argIndex) {
 		DefinitionSite ds = DefinitionSites.createDefinitionByParam(methodName, argIndex);
 		return new DefinitionFeature(ds);
 	}

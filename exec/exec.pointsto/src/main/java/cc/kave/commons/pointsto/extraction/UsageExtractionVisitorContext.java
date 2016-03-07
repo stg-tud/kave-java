@@ -65,7 +65,7 @@ public class UsageExtractionVisitorContext {
 	private TypeCollector typeCollector;
 
 	private DeclarationMapper declarationMapper;
-	private Map<cc.recommenders.names.IMethodName, IMethodName> returnDefinitionMethodToSSTMethod = new HashMap<>();
+	private Map<cc.recommenders.names.ICoReMethodName, IMethodName> returnDefinitionMethodToSSTMethod = new HashMap<>();
 
 	private ITypeName enclosingClass;
 	private Deque<ITypeName> classContextStack = new ArrayDeque<>();
@@ -329,7 +329,7 @@ public class UsageExtractionVisitorContext {
 	}
 
 	public void registerPotentialReturnDefinitionSite(IMethodName method) {
-		cc.recommenders.names.IMethodName definitionMethod = CoReNameConverter.convert(method);
+		cc.recommenders.names.ICoReMethodName definitionMethod = CoReNameConverter.convert(method);
 		returnDefinitionMethodToSSTMethod.put(definitionMethod, method);
 		DefinitionSite newDefinition = DefinitionSites.createDefinitionByReturn(definitionMethod);
 		registerMethodDefinition(newDefinition, method.getReturnType());

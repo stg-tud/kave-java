@@ -24,10 +24,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.utils.json.legacy.GsonUtil;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.features.CallFeature;
@@ -44,8 +44,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class GsonUtilTest {
 
-	private static final ITypeName SOME_TYPE = VmTypeName.get("LA");
-	private static final IMethodName SOME_METHOD = VmMethodName.get("LA.m()V");
+	private static final ICoReTypeName SOME_TYPE = CoReTypeName.get("LA");
+	private static final ICoReMethodName SOME_METHOD = CoReMethodName.get("LA.m()V");
 
 	@Rule
 	public TemporaryFolder temp = new TemporaryFolder();

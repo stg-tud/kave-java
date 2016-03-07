@@ -18,9 +18,9 @@ package com.codetrails.data;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 import com.google.common.base.Objects;
 
@@ -29,9 +29,9 @@ public class DefinitionSite {
 	// make sure the naming is consistent to the hardcoded names in "UsageTypeAdapter"
 
 	private DefinitionKind kind;
-	private ITypeName type;
-	private IMethodName method;
-	private IFieldName field;
+	private ICoReTypeName type;
+	private ICoReMethodName method;
+	private ICoReFieldName field;
 	private int arg = -1;
 
 	public DefinitionKind getKind() {
@@ -42,27 +42,27 @@ public class DefinitionSite {
 		this.kind = kind;
 	}
 
-	public ITypeName getType() {
+	public ICoReTypeName getType() {
 		return type;
 	}
 
-	public void setType(final ITypeName type) {
+	public void setType(final ICoReTypeName type) {
 		this.type = type;
 	}
 
-	public IMethodName getMethod() {
+	public ICoReMethodName getMethod() {
 		return method;
 	}
 
-	public void setMethod(final IMethodName method) {
+	public void setMethod(final ICoReMethodName method) {
 		this.method = method;
 	}
 
-	public IFieldName getField() {
+	public ICoReFieldName getField() {
 		return field;
 	}
 
-	public void setField(final IFieldName field) {
+	public void setField(final ICoReFieldName field) {
 		this.field = field;
 	}
 
@@ -98,7 +98,7 @@ public class DefinitionSite {
 	}
 
 	public boolean isArray() {
-		ITypeName _type = this.getType();
+		ICoReTypeName _type = this.getType();
 		boolean _isArrayType = _type.isArrayType();
 		return _isArrayType;
 	}

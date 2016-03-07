@@ -12,9 +12,9 @@ package com.codetrails.data;
 
 import java.util.Set;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.AbstractUsage;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.DefinitionSite;
@@ -28,12 +28,12 @@ public class DecoratedObjectUsage extends AbstractUsage {
 		this.usage = usage;
 	}
 
-	public ITypeName getType() {
+	public ICoReTypeName getType() {
 		return usage.getType();
 	}
 
-	public ITypeName getClassContext() {
-		ITypeName superclass = usage.getContext().getSuperclass();
+	public ICoReTypeName getClassContext() {
+		ICoReTypeName superclass = usage.getContext().getSuperclass();
 		if (superclass == null) {
 			// Logger.log("rewriting class context");
 			return usage.getContext().getName().getDeclaringType();
@@ -42,15 +42,15 @@ public class DecoratedObjectUsage extends AbstractUsage {
 		}
 	}
 
-	public IMethodName getMethodContext() {
+	public ICoReMethodName getMethodContext() {
 		EnclosingMethodContext context = usage.getContext();
-		IMethodName method = context.getName();
-		ITypeName firstType = context.getIntroducedBy();
+		ICoReMethodName method = context.getName();
+		ICoReTypeName firstType = context.getIntroducedBy();
 		if (firstType == null) {
 			// Logger.log("rewriting method context");
 			return method;
 		} else {
-			IMethodName firstDeclaration = VmMethodName.rebase(firstType, method);
+			ICoReMethodName firstDeclaration = CoReMethodName.rebase(firstType, method);
 			return firstDeclaration;
 		}
 	}

@@ -26,7 +26,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import cc.recommenders.io.NestedZipFolders;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import exec.csharp.utils.MapSorter;
 import exec.csharp.utils.MicroCommit;
@@ -35,8 +35,8 @@ import exec.csharp.utils.StorageHelper;
 
 public class UsageToMicroCommitRatioCalculator {
 
-	private final NestedZipFolders<ITypeName> dirMicroCommits;
-	private final NestedZipFolders<ITypeName> dirUsages;
+	private final NestedZipFolders<ICoReTypeName> dirMicroCommits;
+	private final NestedZipFolders<ICoReTypeName> dirUsages;
 
 	@Inject
 	public UsageToMicroCommitRatioCalculator(StorageHelper storageHelper) {
@@ -63,8 +63,8 @@ public class UsageToMicroCommitRatioCalculator {
 		int numTuplesWithout = 0;
 		int numUsagesWithout = 0;
 
-		Set<ITypeName> keys = dirMicroCommits.findKeys();
-		for (ITypeName t : keys) {
+		Set<ICoReTypeName> keys = dirMicroCommits.findKeys();
+		for (ICoReTypeName t : keys) {
 			System.out.printf("reading %s... ", t);
 
 			List<MicroCommit> histories = dirMicroCommits.readAllZips(t, MicroCommit.class);
@@ -121,7 +121,7 @@ public class UsageToMicroCommitRatioCalculator {
 
 	}
 
-	private static boolean isDatev(ITypeName t) {
+	private static boolean isDatev(ICoReTypeName t) {
 		return StringUtils.containsIgnoreCase(t.toString(), "datev");
 	}
 }

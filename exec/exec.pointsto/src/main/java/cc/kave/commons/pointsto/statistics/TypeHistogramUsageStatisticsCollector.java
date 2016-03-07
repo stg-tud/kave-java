@@ -26,13 +26,13 @@ import java.util.Map.Entry;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;
 
 public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCollector {
 
-	private Map<ITypeName, Integer> histrogram = new HashMap<>();
+	private Map<ICoReTypeName, Integer> histrogram = new HashMap<>();
 
 	@Override
 	public UsageStatisticsCollector create() {
@@ -44,7 +44,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 		TypeHistogramUsageStatisticsCollector otherHistoCollector = (TypeHistogramUsageStatisticsCollector) other;
 
 		synchronized (histrogram) {
-			for (Map.Entry<ITypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
+			for (Map.Entry<ICoReTypeName, Integer> entry : otherHistoCollector.histrogram.entrySet()) {
 				Integer oldCount = histrogram.getOrDefault(entry.getKey(), 0);
 				histrogram.put(entry.getKey(), oldCount + entry.getValue());
 			}
@@ -64,7 +64,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	@Override
 	public void process(List<? extends Usage> usages) {
 		for (Usage usage : usages) {
-			ITypeName type = usage.getType();
+			ICoReTypeName type = usage.getType();
 
 			Integer oldCount = histrogram.getOrDefault(type, 0);
 			histrogram.put(type, oldCount + 1);
@@ -79,7 +79,7 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 
 	@Override
 	public void output(Path file) throws IOException {
-		List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
+		List<Map.Entry<ICoReTypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
 		// List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.size());
 		//
 		// // skip entries that occur only once
@@ -89,18 +89,18 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 		// }
 		// }
 
-		entries.sort(new Comparator<Map.Entry<ITypeName, Integer>>() {
+		entries.sort(new Comparator<Map.Entry<ICoReTypeName, Integer>>() {
 
 			@Override
-			public int compare(Entry<ITypeName, Integer> o1, Entry<ITypeName, Integer> o2) {
+			public int compare(Entry<ICoReTypeName, Integer> o1, Entry<ICoReTypeName, Integer> o2) {
 				return o2.getValue() - o1.getValue();
 			}
 		});
 
 		try (BufferedWriter writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"))) {
-			for (Map.Entry<ITypeName, Integer> entry : entries) {
-				ITypeName type = entry.getKey();
-				writer.write(Names.vm2srcQualifiedType(type));
+			for (Map.Entry<ICoReTypeName, Integer> entry : entries) {
+				ICoReTypeName type = entry.getKey();
+				writer.write(CoReNames.vm2srcQualifiedType(type));
 				writer.write(' ');
 				writer.write(Integer.toString(entry.getValue()));
 				writer.newLine();

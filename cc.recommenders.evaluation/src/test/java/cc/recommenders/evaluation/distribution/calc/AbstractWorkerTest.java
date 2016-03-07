@@ -38,8 +38,8 @@ import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.utils.Timer;
@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
 
 public class AbstractWorkerTest {
 
-	private static final ITypeName TYPE = VmTypeName.get("LT");
+	private static final ICoReTypeName TYPE = CoReTypeName.get("LT");
 
 	@Mock
 	private Miner<Usage, Query> miner;
@@ -102,7 +102,7 @@ public class AbstractWorkerTest {
 		TypeStore typeStore = mock(TypeStore.class);
 		when(typeStore.getTrainingData(anyInt())).thenReturn(listOf(numTraining));
 		when(typeStore.getValidationData(anyInt())).thenReturn(listOf(numValidation));
-		when(sut.usageStore.createTypeStore(any(ITypeName.class), anyInt())).thenReturn(typeStore);
+		when(sut.usageStore.createTypeStore(any(ICoReTypeName.class), anyInt())).thenReturn(typeStore);
 	}
 
 	private List<Usage> listOf(int num) {
@@ -176,7 +176,7 @@ public class AbstractWorkerTest {
 		mockUsages(1, 2);
 		sut.getTrainingData();
 		sut.getTrainingData();
-		verify(sut.usageStore).createTypeStore(any(ITypeName.class), anyInt());
+		verify(sut.usageStore).createTypeStore(any(ICoReTypeName.class), anyInt());
 		assertEquals(3, Logger.getCapturedLog().size());
 	}
 
@@ -196,7 +196,7 @@ public class AbstractWorkerTest {
 		mockUsages(1, 2);
 		sut.getValidationData();
 		sut.getValidationData();
-		verify(sut.usageStore).createTypeStore(any(ITypeName.class), anyInt());
+		verify(sut.usageStore).createTypeStore(any(ICoReTypeName.class), anyInt());
 		assertEquals(3, Logger.getCapturedLog().size());
 	}
 
@@ -209,13 +209,13 @@ public class AbstractWorkerTest {
 		sut.getValidationData();
 		sut.getTrainingData();
 		sut.getValidationData();
-		verify(sut.usageStore).createTypeStore(any(ITypeName.class), anyInt());
+		verify(sut.usageStore).createTypeStore(any(ICoReTypeName.class), anyInt());
 		assertEquals(3, Logger.getCapturedLog().size());
 	}
 
 	@Test(expected = RuntimeException.class)
 	public void ioExceptionsOnLoadDoNotVanish() throws IOException {
-		when(sut.usageStore.createTypeStore(any(ITypeName.class), anyInt())).thenThrow(new IOException());
+		when(sut.usageStore.createTypeStore(any(ICoReTypeName.class), anyInt())).thenThrow(new IOException());
 		sut.getTrainingData();
 	}
 

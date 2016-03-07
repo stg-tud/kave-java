@@ -19,7 +19,7 @@ import cc.recommenders.evaluation.io.DecoratedObjectUsageStore;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.inject.Inject;
@@ -47,7 +47,7 @@ public class OptimizingEvaluationDraft {
 
 			evaluator.reinit();
 
-			for (ITypeName type : ouStore.getKeys()) {
+			for (ICoReTypeName type : ouStore.getKeys()) {
 				List<Usage> observations = ouStore.read(type);
 				if (observations.size() >= 3) {
 					nFoldCrossValidation(3, ouMiner, evaluator, observations);

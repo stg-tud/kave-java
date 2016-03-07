@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 public interface UsageStore extends Closeable {
@@ -29,11 +29,11 @@ public interface UsageStore extends Closeable {
 
 	void store(Collection<Usage> usages, Path relativeInput) throws IOException;
 
-	Set<ITypeName> getAllTypes();
+	Set<ICoReTypeName> getAllTypes();
 
-	List<Usage> load(ITypeName type) throws IOException;
+	List<Usage> load(ICoReTypeName type) throws IOException;
 
-	List<Usage> load(ITypeName type, Predicate<Usage> filter) throws IOException;
+	List<Usage> load(ICoReTypeName type, Predicate<Usage> filter) throws IOException;
 
 	/**
 	 * Flushes internal buffers to disk.

@@ -13,9 +13,9 @@ package com.codetrails.data;
 import java.util.List;
 import java.util.Set;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
@@ -25,10 +25,10 @@ import com.google.common.collect.Sets;
 
 public class UsageConverter {
 	public Usage toRecommenderUsage(ObjectUsage ou) {
-		ITypeName declaringType = ou.getContext().getName().getDeclaringType();
-		ITypeName superclass = ou.getContext().getSuperclass();
-		ITypeName firstMethodType = ou.getContext().getIntroducedBy();
-		IMethodName enclosingMethod = ou.getContext().getName();
+		ICoReTypeName declaringType = ou.getContext().getName().getDeclaringType();
+		ICoReTypeName superclass = ou.getContext().getSuperclass();
+		ICoReTypeName firstMethodType = ou.getContext().getIntroducedBy();
+		ICoReMethodName enclosingMethod = ou.getContext().getName();
 
 		Query q = new Query();
 		q.setType(ou.getType());
@@ -40,10 +40,10 @@ public class UsageConverter {
 		if (firstMethodType == null) {
 			q.setMethodContext(enclosingMethod);
 		} else {
-			IMethodName firstMethod = VmMethodName.rebase(firstMethodType, enclosingMethod);
+			ICoReMethodName firstMethod = CoReMethodName.rebase(firstMethodType, enclosingMethod);
 			q.setMethodContext(firstMethod);
 		}
-		IMethodName init = findInit(ou.getPaths());
+		ICoReMethodName init = findInit(ou.getPaths());
 		if (init == null) {
 			q.setDefinition(toRecommenderDefinition(ou.getDef()));
 		} else {
@@ -53,10 +53,10 @@ public class UsageConverter {
 		return q;
 	}
 
-	private IMethodName findInit(Set<List<CallSite>> paths) {
+	private ICoReMethodName findInit(Set<List<CallSite>> paths) {
 		for (List<CallSite> path : paths) {
 			for (CallSite cs : path) {
-				IMethodName call = cs.getCall();
+				ICoReMethodName call = cs.getCall();
 				if (call != null && call.isInit()) {
 					return call;
 				}
@@ -95,7 +95,7 @@ public class UsageConverter {
 					calls.add(CallSites.createParameterCallSite(cs.getCall(), cs.getArgumentIndex()));
 					break;
 				case RECEIVER_CALL_SITE:
-					IMethodName method = cs.getCall();
+					ICoReMethodName method = cs.getCall();
 					if (method != null && !method.isInit()) {
 						calls.add(CallSites.createReceiverCallSite(cs.getCall()));
 					}

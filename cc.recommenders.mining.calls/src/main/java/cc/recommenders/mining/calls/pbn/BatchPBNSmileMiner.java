@@ -29,15 +29,15 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 import smile.Network;
 
 public class BatchPBNSmileMiner {
 
 	private int MAX_NUM_OF_USAGES = 20000;
-	private static final ITypeName unknownType = VmTypeName.get("LUnknown");
+	private static final ICoReTypeName unknownType = CoReTypeName.get("LUnknown");
 
 	private IoUtils io;
 	private SmileUtils smileUtils;
@@ -55,14 +55,14 @@ public class BatchPBNSmileMiner {
 		this.qOpts = qOpts;
 	}
 
-	public void run(NestedZipFolders<ITypeName> usagesDir, Directory modelDir) {
+	public void run(NestedZipFolders<ICoReTypeName> usagesDir, Directory modelDir) {
 		int numMined = 0;
 		int numUsages = 0;
 
 		Logger.log("options for learning: %s%s\n", mOpts, qOpts);
 
-		Set<ITypeName> types = usagesDir.findKeys();
-		for (ITypeName t : types) {
+		Set<ICoReTypeName> types = usagesDir.findKeys();
+		for (ICoReTypeName t : types) {
 			Logger.log("%s", t);
 
 			if (t.equals(unknownType) || t.isArrayType() || !isInteresting(t)) {
@@ -103,7 +103,7 @@ public class BatchPBNSmileMiner {
 		Logger.log("--> mined models for %d type from %d total usages", numMined, numUsages);
 	}
 
-	private boolean isInteresting(ITypeName t) {
+	private boolean isInteresting(ICoReTypeName t) {
 		return true;// t.getIdentifier().startsWith("LSystem/");
 	}
 

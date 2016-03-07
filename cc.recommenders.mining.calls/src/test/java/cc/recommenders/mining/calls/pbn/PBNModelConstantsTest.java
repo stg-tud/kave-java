@@ -24,11 +24,11 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 
@@ -44,7 +44,7 @@ public class PBNModelConstantsTest {
 
 	@Test
 	public void classContext() {
-		ITypeName type = VmTypeName.get("Lorg/bla/Blubb");
+		ICoReTypeName type = CoReTypeName.get("Lorg/bla/Blubb");
 		String actual = newClassContext(type);
 		String expected = type.toString();
 		assertEquals(expected, actual);
@@ -52,7 +52,7 @@ public class PBNModelConstantsTest {
 
 	@Test
 	public void methodContext() {
-		IMethodName method = VmMethodName.get("Lorg/bla/Blubb.method()V");
+		ICoReMethodName method = CoReMethodName.get("Lorg/bla/Blubb.method()V");
 		String actual = newMethodContext(method);
 		String expected = method.toString();
 		assertEquals(expected, actual);
@@ -99,7 +99,7 @@ public class PBNModelConstantsTest {
 
 	@Test
 	public void parameterSite() {
-		IMethodName method = VmMethodName.get("Lorg/bla/Blubb.m1()V");
+		ICoReMethodName method = CoReMethodName.get("Lorg/bla/Blubb.m1()V");
 		int argNum = 2345;
 		String actual = newParameterSite(method, argNum);
 		String expected = "P_Lorg/bla/Blubb.m1()V#2345";
@@ -108,26 +108,26 @@ public class PBNModelConstantsTest {
 
 	@Test
 	public void callSite() {
-		IMethodName method = VmMethodName.get("Lorg/bla/Blubb.m2()V");
+		ICoReMethodName method = CoReMethodName.get("Lorg/bla/Blubb.m2()V");
 		String actual = newCallSite(method);
 		String expected = "C_Lorg/bla/Blubb.m2()V";
 		assertEquals(expected, actual);
 	}
 
 	private static DefinitionSite createInitDefinitionSite(String method) {
-		return DefinitionSites.createDefinitionByConstructor(VmMethodName.get(method));
+		return DefinitionSites.createDefinitionByConstructor(CoReMethodName.get(method));
 	}
 
 	private static DefinitionSite createMethodReturnDefinitionSite(String method) {
-		return DefinitionSites.createDefinitionByReturn(VmMethodName.get(method));
+		return DefinitionSites.createDefinitionByReturn(CoReMethodName.get(method));
 	}
 
 	private static DefinitionSite createFieldDefinitionSite(String fieldName) {
-		return DefinitionSites.createDefinitionByField(VmFieldName.get(fieldName));
+		return DefinitionSites.createDefinitionByField(CoReFieldName.get(fieldName));
 	}
 
 	private static DefinitionSite createParameterDefinitionSite(String method, int argNum) {
-		return DefinitionSites.createDefinitionByParam(VmMethodName.get(method), argNum);
+		return DefinitionSites.createDefinitionByParam(CoReMethodName.get(method), argNum);
 	}
 
 	private static DefinitionSite createUnknownDefinitionSite() {

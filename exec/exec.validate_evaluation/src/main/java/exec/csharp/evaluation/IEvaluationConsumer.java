@@ -17,7 +17,7 @@ package exec.csharp.evaluation;
 
 import java.util.List;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -28,9 +28,9 @@ public interface IEvaluationConsumer {
 
 	void run();
 
-	void startingType(ITypeName type, List<Usage> usages, List<MicroCommit> histories);
+	void startingType(ICoReTypeName type, List<Usage> usages, List<MicroCommit> histories);
 
-	void skippingType(ITypeName type, List<Usage> us, List<MicroCommit> histories);
+	void skippingType(ICoReTypeName type, List<Usage> us, List<MicroCommit> histories);
 
 	void startingQueryMode(QueryMode mode);
 

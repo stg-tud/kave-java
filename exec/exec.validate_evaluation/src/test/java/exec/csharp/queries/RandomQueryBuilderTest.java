@@ -26,8 +26,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -95,9 +95,9 @@ public class RandomQueryBuilderTest {
 
 	private Query q(int... mIds) {
 		Query q = new Query();
-		q.setType(VmTypeName.get("LT"));
-		q.setClassContext(VmTypeName.get("LC"));
-		q.setMethodContext(VmMethodName.get("LC.m()V"));
+		q.setType(CoReTypeName.get("LT"));
+		q.setClassContext(CoReTypeName.get("LC"));
+		q.setMethodContext(CoReMethodName.get("LC.m()V"));
 		q.setDefinition(DefinitionSites.createDefinitionByThis());
 		for (int mId : mIds) {
 			CallSite cs = CallSites.createReceiverCallSite("LT.m" + mId + "()V");

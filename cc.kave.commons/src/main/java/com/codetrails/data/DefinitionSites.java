@@ -10,36 +10,36 @@
  */
 package com.codetrails.data;
 
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
 
 import com.codetrails.data.DefinitionSite;
 import com.codetrails.data.DefinitionKind;;
 
 public class DefinitionSites {
 
-	public static DefinitionSite createDefinitionByConstructor(final IMethodName constructor) {
+	public static DefinitionSite createDefinitionByConstructor(final ICoReMethodName constructor) {
 		final DefinitionSite definitionSite = new DefinitionSite();
 		definitionSite.setKind(DefinitionKind.NEW);
 		definitionSite.setMethod(constructor);
 		return definitionSite;
 	}
 
-	public static DefinitionSite createDefinitionByReturn(final IMethodName method) {
+	public static DefinitionSite createDefinitionByReturn(final ICoReMethodName method) {
 		final DefinitionSite definitionSite = new DefinitionSite();
 		definitionSite.setKind(DefinitionKind.RETURN);
 		definitionSite.setMethod(method);
 		return definitionSite;
 	}
 
-	public static DefinitionSite createDefinitionByField(final IFieldName field) {
+	public static DefinitionSite createDefinitionByField(final ICoReFieldName field) {
 		final DefinitionSite definitionSite = new DefinitionSite();
 		definitionSite.setKind(DefinitionKind.FIELD);
 		definitionSite.setField(field);
 		return definitionSite;
 	}
 
-	public static DefinitionSite createDefinitionByParam(final IMethodName method, final int argumentIndex) {
+	public static DefinitionSite createDefinitionByParam(final ICoReMethodName method, final int argumentIndex) {
 		final DefinitionSite definitionSite = new DefinitionSite();
 		definitionSite.setKind(DefinitionKind.PARAM);
 		definitionSite.setMethod(method);

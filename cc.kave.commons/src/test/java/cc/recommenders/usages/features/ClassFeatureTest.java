@@ -17,17 +17,17 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.features.UsageFeature.ObjectUsageFeatureVisitor;
 
 public class ClassFeatureTest {
 
-	private ITypeName type;
+	private ICoReTypeName type;
 	private ClassFeature sut;
 
 	@Before
 	public void setup() {
-		type = mock(ITypeName.class);
+		type = mock(ICoReTypeName.class);
 		sut = new ClassFeature(type);
 	}
 
@@ -38,8 +38,8 @@ public class ClassFeatureTest {
 
 	@Test
 	public void assignedMethodIsReturned() {
-		ITypeName actual = sut.getTypeName();
-		ITypeName expected = type;
+		ICoReTypeName actual = sut.getTypeName();
+		ICoReTypeName expected = type;
 
 		assertEquals(expected, actual);
 	}

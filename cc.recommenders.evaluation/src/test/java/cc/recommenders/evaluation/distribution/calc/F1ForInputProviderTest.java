@@ -32,7 +32,7 @@ import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Lists;
@@ -94,8 +94,8 @@ public class F1ForInputProviderTest {
 
 	@Test
 	public void useType() {
-		assertTrue(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button")));
-		assertFalse(sut.useType(VmTypeName.get("Lorg/eclipse/swt/widgets/Composite")));
+		assertTrue(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button")));
+		assertFalse(sut.useType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Composite")));
 	}
 
 	@Test
@@ -179,7 +179,7 @@ public class F1ForInputProviderTest {
 
 	private int[] assertTasksAndGetSizes(int num) {
 		String typeName = "LType";
-		Collection<F1ForInputTask> tasks = sut.createTasksFor("APP", VmTypeName.get(typeName), 3,
+		Collection<F1ForInputTask> tasks = sut.createTasksFor("APP", CoReTypeName.get(typeName), 3,
 				createTrainingData(num));
 		int i = 0;
 		int[] sizes = new int[tasks.size()];

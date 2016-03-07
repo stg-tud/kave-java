@@ -20,10 +20,10 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.codetrails.data.CallSite;
 import com.codetrails.data.CallSiteKind;
@@ -53,21 +53,21 @@ public class ObjectUsageFilterTest {
 	@Test
 	public void arraysAreFiltered() {
 		ObjectUsage ou = createValidObjectUsage();
-		ou.getDef().setType(VmTypeName.get("[LSomeType"));
+		ou.getDef().setType(CoReTypeName.get("[LSomeType"));
 		assertFalse(sut.apply(ou));
 	}
 
 	@Test
 	public void anonymousClassesAreFiltered() {
 		ObjectUsage ou = createValidObjectUsage();
-		ou.getDef().setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
+		ou.getDef().setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$1"));
 		assertFalse(sut.apply(ou));
 	}
 
 	@Test
 	public void nestedClassesAreNotFiltered() {
 		ObjectUsage ou = createValidObjectUsage();
-		ou.getDef().setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
+		ou.getDef().setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button$Nested"));
 		assertTrue(sut.apply(ou));
 	}
 
@@ -88,7 +88,7 @@ public class ObjectUsageFilterTest {
 	@Test
 	public void nonSwtTypesAreFiltered() {
 		ObjectUsage ou = createValidObjectUsage();
-		ou.getDef().setType(VmTypeName.get("LType"));
+		ou.getDef().setType(CoReTypeName.get("LType"));
 		assertFalse(sut.apply(ou));
 	}
 
@@ -109,14 +109,14 @@ public class ObjectUsageFilterTest {
 	private static ObjectUsage createValidObjectUsage() {
 		ObjectUsage ou = new ObjectUsage();
 
-		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(VmMethodName.get("LType.get()V"));
-		definition.setType(VmTypeName.get("Lorg/eclipse/swt/widgets/Button"));
+		DefinitionSite definition = DefinitionSites.createDefinitionByReturn(CoReMethodName.get("LType.get()V"));
+		definition.setType(CoReTypeName.get("Lorg/eclipse/swt/widgets/Button"));
 		ou.setDef(definition);
 
 		EnclosingMethodContext ctx = new EnclosingMethodContext();
-		ctx.setSuperclass(VmTypeName.get("LSuperType"));
-		ctx.setIntroducedBy(mock(ITypeName.class));
-		ctx.setName(mock(IMethodName.class));
+		ctx.setSuperclass(CoReTypeName.get("LSuperType"));
+		ctx.setIntroducedBy(mock(ICoReTypeName.class));
+		ctx.setName(mock(ICoReMethodName.class));
 		ou.setContext(ctx);
 
 		Set<List<CallSite>> paths = Sets.newHashSet();
@@ -132,7 +132,7 @@ public class ObjectUsageFilterTest {
 	private static CallSite createParameterCallSite() {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.PARAM_CALL_SITE);
-		site.setCall(mock(IMethodName.class));
+		site.setCall(mock(ICoReMethodName.class));
 		site.setArgumentIndex(12);
 		return site;
 	}
@@ -140,7 +140,7 @@ public class ObjectUsageFilterTest {
 	private static CallSite createReceiverCallSite() {
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.RECEIVER_CALL_SITE);
-		site.setCall(mock(IMethodName.class));
+		site.setCall(mock(ICoReMethodName.class));
 		return site;
 	}
 }

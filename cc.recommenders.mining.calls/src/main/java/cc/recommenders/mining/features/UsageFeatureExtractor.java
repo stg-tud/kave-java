@@ -15,7 +15,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import cc.recommenders.mining.calls.MiningOptions;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSiteKind;
 import cc.recommenders.usages.DefinitionSiteKind;
@@ -78,11 +78,11 @@ public class UsageFeatureExtractor implements FeatureExtractor<Usage, UsageFeatu
 
 	private static UsageFeature getSiteFeature(CallSite site) {
 		if (site.getKind() == CallSiteKind.PARAMETER) {
-			IMethodName param = site.getMethod();
+			ICoReMethodName param = site.getMethod();
 			int argNum = site.getArgIndex();
 			return new ParameterFeature(param, argNum);
 		} else {
-			IMethodName call = site.getMethod();
+			ICoReMethodName call = site.getMethod();
 			return new CallFeature(call);
 		}
 	}

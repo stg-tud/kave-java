@@ -39,7 +39,7 @@ import cc.recommenders.assertions.Asserts;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
 import cc.recommenders.mining.calls.Pattern;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
@@ -153,7 +153,7 @@ public class PBNSmileModelBuilder implements ModelBuilder<UsageFeature, Network>
 
 		for (CallFeature call : dictionary.getCallSites()) {
 
-			IMethodName methodName = call.getMethodName();
+			ICoReMethodName methodName = call.getMethodName();
 			String nodeId = newCallSite(methodName);
 			String nodeName = nodeId.substring(PBNModelConstants.CALL_PREFIX.length());
 
@@ -163,7 +163,7 @@ public class PBNSmileModelBuilder implements ModelBuilder<UsageFeature, Network>
 	
 	private void createParameterNodes() {
 		for (ParameterFeature param : dictionary.getParameterSites()) {
-			IMethodName methodName = param.getMethodName();
+			ICoReMethodName methodName = param.getMethodName();
 			int argNum = param.getArgNum();
 			String nodeId = newParameterSite(methodName, argNum);
 			String nodeName = nodeId.substring(PBNModelConstants.PARAMETER_PREFIX.length());

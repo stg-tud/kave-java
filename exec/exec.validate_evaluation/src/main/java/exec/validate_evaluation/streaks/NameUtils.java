@@ -18,19 +18,19 @@ package exec.validate_evaluation.streaks;
 import java.util.List;
 
 import cc.kave.commons.model.names.IParameterName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class NameUtils {
 
-	public static IMethodName toCoReName(cc.kave.commons.model.names.IMethodName m) {
-		ITypeName dt = toCoReName(m.getDeclaringType());
-		ITypeName rt = toCoReName(m.getReturnType());
+	public static ICoReMethodName toCoReName(cc.kave.commons.model.names.IMethodName m) {
+		ICoReTypeName dt = toCoReName(m.getDeclaringType());
+		ICoReTypeName rt = toCoReName(m.getReturnType());
 		String simpleName = m.getName();
 		String parameterList = createParameterList(m.getParameters());
-		return VmMethodName.get(String.format("%s.%s(%s)%s", dt, simpleName, parameterList, rt));
+		return CoReMethodName.get(String.format("%s.%s(%s)%s", dt, simpleName, parameterList, rt));
 	}
 
 	private static String createParameterList(List<IParameterName> parameters) {
@@ -43,7 +43,7 @@ public class NameUtils {
 		return null;
 	}
 
-	public static ITypeName toCoReName(cc.kave.commons.model.names.ITypeName t) {
-		return VmTypeName.get(String.format("%s.%s", t.getNamespace(), t.getName()));
+	public static ICoReTypeName toCoReName(cc.kave.commons.model.names.ITypeName t) {
+		return CoReTypeName.get(String.format("%s.%s", t.getNamespace(), t.getName()));
 	}
 }

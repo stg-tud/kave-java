@@ -16,7 +16,7 @@ import java.util.List;
 import cc.recommenders.evaluation.io.DecoratedObjectUsageStore;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.pbn.ExportMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.inject.Inject;
@@ -36,7 +36,7 @@ public class ExportToMatlab {
 
 	public void run() {
 
-		for (ITypeName type : usageStore.getKeys()) {
+		for (ICoReTypeName type : usageStore.getKeys()) {
 
 			List<Usage> usages = usageStore.read(type);
 

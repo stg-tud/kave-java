@@ -16,26 +16,26 @@ import java.util.Set;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 
-public class VmPackageName implements IPackageName {
+public class CoRePackageName implements ICoRePackageName {
 
-    private static Map<String/* name 2 */, VmPackageName> index = new MapMaker().weakValues().makeMap();
-    public static IPackageName DEFAULT_PACKAGE = get("");
+    private static Map<String/* name 2 */, CoRePackageName> index = new MapMaker().weakValues().makeMap();
+    public static ICoRePackageName DEFAULT_PACKAGE = get("");
 
-    public static VmPackageName get(final String vmPackageName) {
-        VmPackageName res = index.get(vmPackageName);
+    public static CoRePackageName get(final String vmPackageName) {
+        CoRePackageName res = index.get(vmPackageName);
         if (res == null) {
-            res = new VmPackageName(vmPackageName);
+            res = new CoRePackageName(vmPackageName);
             index.put(vmPackageName, res);
         }
         return res;
     }
 
     /**
-     * @return the packages of the given types as returned by {@link ITypeName#getPackage()}
+     * @return the packages of the given types as returned by {@link ICoReTypeName#getPackage()}
      */
-    public static Set<IPackageName> packages(Set<ITypeName> types) {
-        Set<IPackageName> res = Sets.newTreeSet();
-        for (ITypeName type : types) {
+    public static Set<ICoRePackageName> packages(Set<ICoReTypeName> types) {
+        Set<ICoRePackageName> res = Sets.newTreeSet();
+        for (ICoReTypeName type : types) {
             res.add(type.getPackage());
         }
         return res;
@@ -46,7 +46,7 @@ public class VmPackageName implements IPackageName {
     /**
      * @see #get(String)
      */
-    private VmPackageName(final String vmPackageName) {
+    private CoRePackageName(final String vmPackageName) {
         identifier = vmPackageName;
     }
 
@@ -60,7 +60,7 @@ public class VmPackageName implements IPackageName {
         return getIdentifier().isEmpty();
     }
 
-    public int compareTo(final IPackageName o) {
+    public int compareTo(final ICoRePackageName o) {
         return getIdentifier().compareTo(o.getIdentifier());
     }
 

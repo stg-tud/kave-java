@@ -12,20 +12,20 @@ package cc.kave.commons.utils.json.legacy;
 
 import java.lang.reflect.Type;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
-public class GsonMethodNameDeserializer implements JsonDeserializer<IMethodName> {
+public class GsonMethodNameDeserializer implements JsonDeserializer<ICoReMethodName> {
 
     @Override
-    public IMethodName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public ICoReMethodName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         String identifier = json.getAsString();
-        return VmMethodName.get(identifier);
+        return CoReMethodName.get(identifier);
     }
 }

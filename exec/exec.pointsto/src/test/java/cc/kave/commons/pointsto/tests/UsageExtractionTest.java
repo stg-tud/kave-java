@@ -32,7 +32,7 @@ import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSiteKind;
 import cc.recommenders.usages.DefinitionSite;
@@ -173,7 +173,7 @@ public class UsageExtractionTest {
 				CallSite callsite = callsites.iterator().next();
 				assertEquals(CallSiteKind.PARAMETER, callsite.getKind());
 				assertEquals(0, callsite.getArgIndex());
-				IMethodName method = callsite.getMethod();
+				ICoReMethodName method = callsite.getMethod();
 				assertTrue(method.isInit());
 				assertEquals("FileStream", method.getDeclaringType().getClassName());
 

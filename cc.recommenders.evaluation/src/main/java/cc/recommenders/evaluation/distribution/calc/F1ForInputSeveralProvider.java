@@ -24,8 +24,8 @@ import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -34,35 +34,35 @@ import com.google.inject.Inject;
 
 public class F1ForInputSeveralProvider extends F1ForInputProvider {
 
-	public static final List<ITypeName> TYPES = Lists.<ITypeName> newArrayList(
+	public static final List<ICoReTypeName> TYPES = Lists.<ICoReTypeName> newArrayList(
 			// 20000 ---------------------------------
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Button"), // 47014
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Composite"), // 26631
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Text"), // 24289
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Button"), // 47014
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Composite"), // 26631
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Text"), // 24289
 			// 9000 ---------------------------------
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Label"), // 16593
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Display"), // 10585
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Table"), // 10526
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Combo"), // 10127
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Label"), // 16593
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Display"), // 10585
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Table"), // 10526
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Combo"), // 10127
 			// 3000 ---------------------------------
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Control"), // 8649
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Shell"), // 7452
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Tree"), // 4791
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Control"), // 8649
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Shell"), // 7452
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Tree"), // 4791
 			// 1000 ---------------------------------
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Menu"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Group"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/TableColumn"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/ToolItem"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/MenuItem"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/ScrollBar"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/Canvas"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/List"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/TableItem"), // ??
-			VmTypeName.get("Lorg/eclipse/swt/widgets/TreeItem") // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Menu"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Group"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/TableColumn"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/ToolItem"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/MenuItem"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/ScrollBar"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/Canvas"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/List"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/TableItem"), // ??
+			CoReTypeName.get("Lorg/eclipse/swt/widgets/TreeItem") // ??
 			);
 
 	private final Set<Integer> usedSizes = Sets.newTreeSet();
-	private final Map3D<String, ITypeName, Integer, BoxplotData> results = Map3D.create();
+	private final Map3D<String, ICoReTypeName, Integer, BoxplotData> results = Map3D.create();
 
 	@Inject
 	public F1ForInputSeveralProvider(ProjectFoldedUsageStore store, OutputUtils output) {
@@ -81,14 +81,14 @@ public class F1ForInputSeveralProvider extends F1ForInputProvider {
 	}
 
 	@Override
-	protected boolean useType(ITypeName type) {
+	protected boolean useType(ICoReTypeName type) {
 		return TYPES.contains(type);
 	}
 
 	@Override
 	protected void addResult2(F1ForInputTask r) {
 		usedSizes.add(r.inputSize);
-		ITypeName type = VmTypeName.get(r.typeName);
+		ICoReTypeName type = CoReTypeName.get(r.typeName);
 		BoxplotData bpd = results.getOrAdd(r.app, type, r.inputSize, new BoxplotData());
 		bpd.addAll(r.f1s);
 
@@ -107,10 +107,10 @@ public class F1ForInputSeveralProvider extends F1ForInputProvider {
 		}
 	}
 
-	protected void logResults(Map2D<ITypeName, Integer, BoxplotData> results, String filter, List<ITypeName> types) {
+	protected void logResults(Map2D<ICoReTypeName, Integer, BoxplotData> results, String filter, List<ICoReTypeName> types) {
 		append("%% «num» == %s\n", filter);
 		append("input");
-		for (ITypeName type : types) {
+		for (ICoReTypeName type : types) {
 			if (results.containsKey(type)) {
 				append("\t%s", type.getClassName());
 			}
@@ -119,7 +119,7 @@ public class F1ForInputSeveralProvider extends F1ForInputProvider {
 
 		for (int size : usedSizes) {
 			append("%d", size);
-			for (ITypeName type : types) {
+			for (ICoReTypeName type : types) {
 				if (results.containsKey(type)) {
 					BoxplotData bpd = results.getOrAdd(type, size, BoxplotData.from(new double[] { 0.0 }));
 					Boxplot bp = bpd.getBoxplot();

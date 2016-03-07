@@ -40,7 +40,7 @@ import cc.recommenders.assertions.Asserts;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
 import cc.recommenders.mining.calls.Pattern;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
@@ -151,7 +151,7 @@ public class PBNModelBuilder implements ModelBuilder<UsageFeature, BayesianNetwo
 
 		for (CallFeature call : dictionary.getCallSites()) {
 
-			IMethodName methodName = call.getMethodName();
+			ICoReMethodName methodName = call.getMethodName();
 			// TODO re-enable rebasing to fix test (here and in
 			// UsageRecommender)
 			// ITypeName baseType = dictionary.getType();
@@ -167,7 +167,7 @@ public class PBNModelBuilder implements ModelBuilder<UsageFeature, BayesianNetwo
 
 	private void createParameterNodes() {
 		for (ParameterFeature param : dictionary.getParameterSites()) {
-			IMethodName methodName = param.getMethodName();
+			ICoReMethodName methodName = param.getMethodName();
 			int argNum = param.getArgNum();
 			String title = newParameterSite(methodName, argNum);
 			addBooleanNode(param, title);

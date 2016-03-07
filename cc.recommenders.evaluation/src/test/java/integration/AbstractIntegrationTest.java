@@ -36,10 +36,10 @@ import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.mining.features.RareFeatureDropper;
 import cc.recommenders.mining.features.UsageFeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.Usage;
@@ -113,12 +113,12 @@ public abstract class AbstractIntegrationTest {
 
 	public abstract Boxplot getExpectation();
 
-	public static ITypeName newType(String typeName) {
-		return VmTypeName.get(typeName);
+	public static ICoReTypeName newType(String typeName) {
+		return CoReTypeName.get(typeName);
 	}
 
-	public static IMethodName newMethod(String methodName) {
-		return VmMethodName.get(methodName);
+	public static ICoReMethodName newMethod(String methodName) {
+		return CoReMethodName.get(methodName);
 	}
 
 	public static CallSite newReceiverCallSite(String methodName) {

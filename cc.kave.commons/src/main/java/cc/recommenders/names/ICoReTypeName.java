@@ -15,36 +15,36 @@ package cc.recommenders.names;
  * type name an array type, a primitive etc. This information is made available here.
  * <p>
  */
-public interface ITypeName extends IName, Comparable<ITypeName> {
+public interface ICoReTypeName extends ICoReName, Comparable<ICoReTypeName> {
 
-    ITypeName[] EMPTY = {};
+    ICoReTypeName[] EMPTY = {};
 
     /**
      * Returns the base-type of this array-type. Note, this requires {@link #isArrayType()} to return {@code true}.
      */
-    public abstract ITypeName getArrayBaseType();
+    public abstract ICoReTypeName getArrayBaseType();
 
     /**
-     * Returns the {@link IMethodName} within this type was declared.
+     * Returns the {@link ICoReMethodName} within this type was declared.
      * <p>
      * Note, this is only valid for nested classes and might throw an exception if this type was not declared within a
      * method.
      */
-    public abstract IMethodName getDeclaringMethod();
+    public abstract ICoReMethodName getDeclaringMethod();
 
     /**
-     * Returns the {@link ITypeName} within this type was declared.
+     * Returns the {@link ICoReTypeName} within this type was declared.
      * <p>
      * Note, this is only valid for nested classes and might throw an exception if this type was not declared directly
      * within a type.
      */
-    public abstract ITypeName getDeclaringType();
+    public abstract ICoReTypeName getDeclaringType();
 
     /**
      * Returns the package of this {@code ITypeName}. This method always returns a non-null object. In the case of
      * primitive or array types a package name representing the default package is returned.
      */
-    public abstract IPackageName getPackage();
+    public abstract ICoRePackageName getPackage();
 
     /**
      * Returns the name of the class without its package name.

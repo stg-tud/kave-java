@@ -14,17 +14,17 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class Query extends AbstractUsage {
 
 	// make sure the naming is consistent to the hardcoded names in
 	// "UsageTypeAdapter"
 
-	private ITypeName type;
-	private ITypeName classCtx;
-	private IMethodName methodCtx;
+	private ICoReTypeName type;
+	private ICoReTypeName classCtx;
+	private ICoReMethodName methodCtx;
 	private DefinitionSite definition;
 	private Set<CallSite> sites = Sets.newLinkedHashSet();
 
@@ -40,19 +40,19 @@ public class Query extends AbstractUsage {
 		return q;
 	}
 
-	public void setType(ITypeName typeName) {
+	public void setType(ICoReTypeName typeName) {
 		this.type = typeName;
 	}
 
-	public ITypeName getType() {
+	public ICoReTypeName getType() {
 		return type;
 	}
 
-	public ITypeName getClassContext() {
+	public ICoReTypeName getClassContext() {
 		return classCtx;
 	}
 
-	public IMethodName getMethodContext() {
+	public ICoReMethodName getMethodContext() {
 		return methodCtx;
 	}
 
@@ -81,11 +81,11 @@ public class Query extends AbstractUsage {
 		return sites;
 	}
 
-	public void setClassContext(ITypeName typeName) {
+	public void setClassContext(ICoReTypeName typeName) {
 		this.classCtx = typeName;
 	}
 
-	public void setMethodContext(IMethodName methodName) {
+	public void setMethodContext(ICoReMethodName methodName) {
 		this.methodCtx = methodName;
 	}
 

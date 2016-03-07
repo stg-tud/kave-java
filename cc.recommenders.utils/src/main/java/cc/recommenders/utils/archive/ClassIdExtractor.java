@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.utils.Fingerprints;
 import cc.recommenders.utils.GenericEnumerationUtils;
 
@@ -44,8 +44,8 @@ public class ClassIdExtractor implements IExtractor {
         return filename.endsWith(".class");
     }
 
-    private VmTypeName getTypeName(final String filename) {
-        return VmTypeName.get("L" + filename.substring(0, filename.length() - ".class".length()));
+    private CoReTypeName getTypeName(final String filename) {
+        return CoReTypeName.get("L" + filename.substring(0, filename.length() - ".class".length()));
     }
 
     public Collection<ClassId> getClassIds() {

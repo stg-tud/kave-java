@@ -31,8 +31,8 @@ import cc.recommenders.evaluation.queries.PartialUsageQueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.Query;
@@ -43,15 +43,15 @@ import com.google.common.collect.Sets;
 
 public class F1EvaluatorTest {
 
-	private IMethodName callQueried1;
-	private IMethodName callQueried2;
-	private IMethodName callProposal1;
-	private IMethodName callProposal2;
-	private IMethodName callProposal3;
+	private ICoReMethodName callQueried1;
+	private ICoReMethodName callQueried2;
+	private ICoReMethodName callProposal1;
+	private ICoReMethodName callProposal2;
+	private ICoReMethodName callProposal3;
 
 	private PartialUsageQueryBuilder queryBuilder;
 	private ICallsRecommender<Query> recommender;
-	private OngoingStubbing<Set<Tuple<IMethodName, Double>>> queryStub;
+	private OngoingStubbing<Set<Tuple<ICoReMethodName, Double>>> queryStub;
 	private List<Usage> usages;
 
 	private QueryOptions queryOptions;
@@ -60,11 +60,11 @@ public class F1EvaluatorTest {
 	@Before
 	@SuppressWarnings("unchecked")
 	public void setup() {
-		callQueried1 = VmMethodName.get("Lmy/Type.mQ1()V");
-		callQueried2 = VmMethodName.get("Lmy/Type.mQ2()V");
-		callProposal1 = VmMethodName.get("Lmy/Type.mP1()V");
-		callProposal2 = VmMethodName.get("Lmy/Type.mP2()V");
-		callProposal3 = VmMethodName.get("Lmy/Type.mP3()V");
+		callQueried1 = CoReMethodName.get("Lmy/Type.mQ1()V");
+		callQueried2 = CoReMethodName.get("Lmy/Type.mQ2()V");
+		callProposal1 = CoReMethodName.get("Lmy/Type.mP1()V");
+		callProposal2 = CoReMethodName.get("Lmy/Type.mP2()V");
+		callProposal3 = CoReMethodName.get("Lmy/Type.mP3()V");
 
 		mockQueryBuilder();
 
@@ -161,7 +161,7 @@ public class F1EvaluatorTest {
 		assertEquals(expected, actual);
 	}
 
-	private void addUsages(int numUsages, IMethodName... calls) {
+	private void addUsages(int numUsages, ICoReMethodName... calls) {
 		for (int i = 0; i < numUsages; i++) {
 			Query q = createQuery(calls);
 
@@ -169,26 +169,26 @@ public class F1EvaluatorTest {
 		}
 	}
 
-	private static Query createQuery(IMethodName... calls) {
+	private static Query createQuery(ICoReMethodName... calls) {
 		Query q = new Query();
 
-		for (IMethodName call : calls) {
+		for (ICoReMethodName call : calls) {
 			CallSite site = CallSites.createReceiverCallSite(call);
 			q.addCallSite(site);
 		}
 		return q;
 	}
 
-	private void addProposals(int numCalls, IMethodName... calls) {
+	private void addProposals(int numCalls, ICoReMethodName... calls) {
 
 		if (queryStub == null) {
 			queryStub = when(recommender.query(any(Query.class)));
 		}
 
-		Set<Tuple<IMethodName, Double>> proposals = Sets.newLinkedHashSet();
+		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
 
-		for (IMethodName call : calls) {
-			Tuple<IMethodName, Double> tuple = newTuple(call, 1.0);
+		for (ICoReMethodName call : calls) {
+			Tuple<ICoReMethodName, Double> tuple = newTuple(call, 1.0);
 			proposals.add(tuple);
 		}
 

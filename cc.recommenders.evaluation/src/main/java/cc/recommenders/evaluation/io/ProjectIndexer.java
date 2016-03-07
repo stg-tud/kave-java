@@ -18,7 +18,7 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;
 import cc.recommenders.usages.Usage;
@@ -38,7 +38,7 @@ public class ProjectIndexer {
 	private final Directory out;
 	private final UsageConverter converter;
 
-	private Map<ITypeName, WritingArchive> archives = Maps.newHashMap();
+	private Map<ICoReTypeName, WritingArchive> archives = Maps.newHashMap();
 	private Predicate<Usage> isInterestingPredicate;
 	private ObjectUsageValidator ouValidator;
 

@@ -20,13 +20,13 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Query;
 
 public class NoCallRecommender implements ICallsRecommender<Query> {
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> query(Query query) {
+	public Set<Tuple<ICoReMethodName, Double>> query(Query query) {
 		return Sets.newHashSet();
 	}
 
@@ -36,7 +36,7 @@ public class NoCallRecommender implements ICallsRecommender<Query> {
 	}
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> queryPattern(String patternName) {
+	public Set<Tuple<ICoReMethodName, Double>> queryPattern(String patternName) {
 		return Sets.newHashSet();
 	}
 

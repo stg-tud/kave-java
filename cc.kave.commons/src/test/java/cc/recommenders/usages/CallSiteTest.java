@@ -18,13 +18,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 
 public class CallSiteTest {
 
-	private static final IMethodName METHOD1 = VmMethodName.get("LT.m1()V");
-	private static final IMethodName METHOD2 = VmMethodName.get("LT.m2()V");
+	private static final ICoReMethodName METHOD1 = CoReMethodName.get("LT.m1()V");
+	private static final ICoReMethodName METHOD2 = CoReMethodName.get("LT.m2()V");
 
 	@Test
 	public void defaultValues() {

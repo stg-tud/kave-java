@@ -21,10 +21,10 @@ import org.junit.Test;
 
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class NameUtilsTest {
 
@@ -60,14 +60,14 @@ public class NameUtilsTest {
 	}
 
 	private void assertTypeConversion() {
-		ITypeName expected = VmTypeName.get(core);
-		ITypeName actual = NameUtils.toCoReName(TypeName.newTypeName(kave));
+		ICoReTypeName expected = CoReTypeName.get(core);
+		ICoReTypeName actual = NameUtils.toCoReName(TypeName.newTypeName(kave));
 		assertEquals(expected, actual);
 	}
 
 	private void assertMethodConversion() {
-		IMethodName expected = VmMethodName.get(core);
-		IMethodName actual = NameUtils.toCoReName(MethodName.newMethodName(kave));
+		ICoReMethodName expected = CoReMethodName.get(core);
+		ICoReMethodName actual = NameUtils.toCoReName(MethodName.newMethodName(kave));
 		assertEquals(expected, actual);
 	}
 

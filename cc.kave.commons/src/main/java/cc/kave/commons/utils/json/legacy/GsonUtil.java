@@ -36,12 +36,12 @@ import com.google.gson.reflect.TypeToken;
 
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import cc.recommenders.assertions.Throws;
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.CallFeature;
@@ -71,18 +71,18 @@ public class GsonUtil {
 	}
 
 	public static void addTypeAdapters(final GsonBuilder builder) {
-		builder.registerTypeAdapter(VmMethodName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(IMethodName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(VmMethodName.class, new GsonMethodNameDeserializer());
-		builder.registerTypeAdapter(IMethodName.class, new GsonMethodNameDeserializer());
-		builder.registerTypeAdapter(VmTypeName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(ITypeName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(VmTypeName.class, new GsonTypeNameDeserializer());
-		builder.registerTypeAdapter(ITypeName.class, new GsonTypeNameDeserializer());
-		builder.registerTypeAdapter(VmFieldName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(IFieldName.class, new GsonNameSerializer());
-		builder.registerTypeAdapter(VmFieldName.class, new GsonFieldNameDeserializer());
-		builder.registerTypeAdapter(IFieldName.class, new GsonFieldNameDeserializer());
+		builder.registerTypeAdapter(CoReMethodName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(ICoReMethodName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(CoReMethodName.class, new GsonMethodNameDeserializer());
+		builder.registerTypeAdapter(ICoReMethodName.class, new GsonMethodNameDeserializer());
+		builder.registerTypeAdapter(CoReTypeName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(ICoReTypeName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(CoReTypeName.class, new GsonTypeNameDeserializer());
+		builder.registerTypeAdapter(ICoReTypeName.class, new GsonTypeNameDeserializer());
+		builder.registerTypeAdapter(CoReFieldName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(ICoReFieldName.class, new GsonNameSerializer());
+		builder.registerTypeAdapter(CoReFieldName.class, new GsonFieldNameDeserializer());
+		builder.registerTypeAdapter(ICoReFieldName.class, new GsonFieldNameDeserializer());
 		//
 		builder.registerTypeAdapter(File.class, new GsonFileDeserializer());
 		builder.registerTypeAdapter(File.class, new GsonFileSerializer());

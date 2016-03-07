@@ -33,8 +33,8 @@ import cc.recommenders.evaluation.queries.PartialUsageQueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -102,9 +102,9 @@ public class MergedCallEvaluatorTest {
 
 	private static Query createUsage() {
 		Query q = new Query();
-		q.setType(mock(ITypeName.class));
-		q.setClassContext(mock(ITypeName.class));
-		q.setMethodContext(mock(IMethodName.class));
+		q.setType(mock(ICoReTypeName.class));
+		q.setClassContext(mock(ICoReTypeName.class));
+		q.setMethodContext(mock(ICoReMethodName.class));
 		q.setDefinition(mock(DefinitionSite.class));
 		return q;
 	}

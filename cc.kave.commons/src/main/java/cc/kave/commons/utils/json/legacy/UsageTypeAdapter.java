@@ -13,9 +13,9 @@ package cc.kave.commons.utils.json.legacy;
 import java.io.IOException;
 import java.util.Set;
 
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSiteKind;
 import cc.recommenders.usages.CallSites;
@@ -89,11 +89,11 @@ public class UsageTypeAdapter extends TypeAdapter<Usage> {
 		while (in.hasNext()) {
 			String name = in.nextName();
 			if (TYPE.equals(name)) {
-				q.setType(VmTypeName.get(in.nextString()));
+				q.setType(CoReTypeName.get(in.nextString()));
 			} else if (CLASS_CTX.equals(name)) {
-				q.setClassContext(VmTypeName.get(in.nextString()));
+				q.setClassContext(CoReTypeName.get(in.nextString()));
 			} else if (METHOD_CTX.equals(name)) {
-				q.setMethodContext(VmMethodName.get(in.nextString()));
+				q.setMethodContext(CoReMethodName.get(in.nextString()));
 			} else if (DEFINITION.equals(name)) {
 				q.setDefinition(readDefinition(in));
 			} else if (SITES.equals(name)) {
@@ -137,9 +137,9 @@ public class UsageTypeAdapter extends TypeAdapter<Usage> {
 			} else if (DEF_ARG.equals(name)) {
 				def.setArgIndex(in.nextInt());
 			} else if (DEF_FIELD.equals(name)) {
-				def.setField(VmFieldName.get(in.nextString()));
+				def.setField(CoReFieldName.get(in.nextString()));
 			} else if (DEF_METHOD.equals(name)) {
-				def.setMethod(VmMethodName.get(in.nextString()));
+				def.setMethod(CoReMethodName.get(in.nextString()));
 			}
 		}
 		in.endObject();
@@ -183,7 +183,7 @@ public class UsageTypeAdapter extends TypeAdapter<Usage> {
 			if (CS_ARG.equals(name)) {
 				site.setArgIndex(in.nextInt());
 			} else if (CS_CALL.equals(name)) {
-				site.setMethod(VmMethodName.get(in.nextString()));
+				site.setMethod(CoReMethodName.get(in.nextString()));
 			} else if (CS_KIND.equals(name)) {
 				site.setKind(CallSiteKind.valueOf(in.nextString()));
 			}

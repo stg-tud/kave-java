@@ -25,7 +25,7 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.NoCallRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -34,7 +34,7 @@ public class ModelHelper {
 	public static final int MAX_NUM_USAGES = 40000;
 
 	private PBNMiner miner;
-	private NestedZipFolders<ITypeName> zipsUsages;
+	private NestedZipFolders<ICoReTypeName> zipsUsages;
 
 	@Inject
 	public ModelHelper(PBNMiner miner, StorageHelper storageHelper) {
@@ -42,7 +42,7 @@ public class ModelHelper {
 		zipsUsages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
 	}
 
-	public ICallsRecommender<Query> get(ITypeName type) {
+	public ICallsRecommender<Query> get(ICoReTypeName type) {
 
 		if (!zipsUsages.hasZips(type)) {
 			return new NoCallRecommender();
@@ -61,7 +61,7 @@ public class ModelHelper {
 		return recommender;
 	}
 
-	private List<Usage> readTrainingData(ITypeName type, NestedZipFolders<ITypeName> zipsUsages) {
+	private List<Usage> readTrainingData(ICoReTypeName type, NestedZipFolders<ICoReTypeName> zipsUsages) {
 		List<Query> qs = zipsUsages.readAllZips(type, Query.class);
 		return Lists.newLinkedList(qs);
 	}

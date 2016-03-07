@@ -26,7 +26,7 @@ import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.features.FeatureExtractor;
 import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.mining.features.RareFeatureDropper;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
 import cc.recommenders.utils.dictionary.Dictionary;
@@ -60,7 +60,7 @@ public class ExportMiner extends PBNMiner {
 		throw new RuntimeException("not implemented");
 	}
 
-	public void export(ITypeName type, List<Usage> usages) throws IOException {
+	public void export(ICoReTypeName type, List<Usage> usages) throws IOException {
 
 		List<List<UsageFeature>> features = extractFeatures(usages);
 		Dictionary<UsageFeature> dictionary = createDictionary(usages, features);

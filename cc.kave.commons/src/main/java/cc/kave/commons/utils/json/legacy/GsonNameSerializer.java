@@ -12,16 +12,16 @@ package cc.kave.commons.utils.json.legacy;
 
 import java.lang.reflect.Type;
 
-import cc.recommenders.names.IName;
+import cc.recommenders.names.ICoReName;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class GsonNameSerializer implements JsonSerializer<IName> {
+public class GsonNameSerializer implements JsonSerializer<ICoReName> {
     @Override
-    public JsonElement serialize(final IName src, final Type typeOfSrc, final JsonSerializationContext context) {
+    public JsonElement serialize(final ICoReName src, final Type typeOfSrc, final JsonSerializationContext context) {
         return new JsonPrimitive(src.getIdentifier());
     }
 }

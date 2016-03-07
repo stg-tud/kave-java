@@ -45,8 +45,8 @@ import cc.kave.commons.pointsto.evaluation.cv.ProjectTrainValidateSetProvider;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;
 
 public class ProjectTrainValidateEvaluation {
@@ -60,7 +60,7 @@ public class ProjectTrainValidateEvaluation {
 	private long skippedNumProjects;
 	private long skippedUsageFilter;
 
-	private Map<ITypeName, List<EvaluationResult>> results = new HashMap<>();
+	private Map<ICoReTypeName, List<EvaluationResult>> results = new HashMap<>();
 
 	@Inject
 	public ProjectTrainValidateEvaluation(@NumberOfCVFolds int numFolds, PointsToUsageFilter usageFilter,
@@ -78,14 +78,14 @@ public class ProjectTrainValidateEvaluation {
 		results.clear();
 	}
 
-	public Map<ITypeName, List<EvaluationResult>> getResults() {
+	public Map<ICoReTypeName, List<EvaluationResult>> getResults() {
 		return Collections.unmodifiableMap(results);
 	}
 
 	private void printSummary(List<String> names) {
 		double[][] grid = new double[names.size()][names.size()];
 
-		for (Map.Entry<ITypeName, List<EvaluationResult>> resultEntry : results.entrySet()) {
+		for (Map.Entry<ICoReTypeName, List<EvaluationResult>> resultEntry : results.entrySet()) {
 			for (EvaluationResult result : resultEntry.getValue()) {
 				grid[names.indexOf(result.training)][names.indexOf(result.validation)] += result.score;
 			}
@@ -109,16 +109,16 @@ public class ProjectTrainValidateEvaluation {
 
 		List<ProjectUsageStore> usageStores = getUsageStores(usageStoresDir);
 		try {
-			List<ITypeName> types = new ArrayList<>(
+			List<ICoReTypeName> types = new ArrayList<>(
 					usageStores.stream().flatMap(store -> store.getAllTypes().stream()).collect(Collectors.toSet()));
 			types.sort(new TypeNameComparator());
 
-			for (ITypeName type : types) {
+			for (ICoReTypeName type : types) {
 				// if (!Names.vm2srcQualifiedType(type).equals("System.Collections.Generic.Stack")) {
 				// continue;
 				// }
 
-				if (!usageFilter.test(type) || !Names.vm2srcQualifiedType(type).startsWith("System.")) {
+				if (!usageFilter.test(type) || !CoReNames.vm2srcQualifiedType(type).startsWith("System.")) {
 					continue;
 				}
 
@@ -152,7 +152,7 @@ public class ProjectTrainValidateEvaluation {
 		return stores;
 	}
 
-	private void evaluateType(ITypeName type, List<ProjectUsageStore> usageStores) throws IOException {
+	private void evaluateType(ICoReTypeName type, List<ProjectUsageStore> usageStores) throws IOException {
 		Set<ProjectIdentifier> projects = usageStores.stream().flatMap(store -> store.getProjects(type).stream())
 				.collect(Collectors.toSet());
 
@@ -161,7 +161,7 @@ public class ProjectTrainValidateEvaluation {
 			return;
 		}
 
-		log("%s:\n", Names.vm2srcQualifiedType(type));
+		log("%s:\n", CoReNames.vm2srcQualifiedType(type));
 
 		List<List<ProjectIdentifier>> projectFolds = createProjectFolds(projects, type, usageStores);
 		List<EvaluationResult> localResults = new ArrayList<>(usageStores.size() * usageStores.size());
@@ -194,7 +194,7 @@ public class ProjectTrainValidateEvaluation {
 
 	}
 
-	private List<List<ProjectIdentifier>> createProjectFolds(Set<ProjectIdentifier> projects, ITypeName type,
+	private List<List<ProjectIdentifier>> createProjectFolds(Set<ProjectIdentifier> projects, ICoReTypeName type,
 			List<ProjectUsageStore> usageStores) throws IOException {
 		Map<ProjectIdentifier, Double> numberOfUsages = new HashMap<>(projects.size());
 		for (ProjectUsageStore store : usageStores) {
@@ -246,7 +246,7 @@ public class ProjectTrainValidateEvaluation {
 
 		INJECTOR.getInstance(ResultExporter.class).export(resultFile, evaluator.getResults().entrySet().stream()
 				.flatMap(e -> e.getValue().stream().map(er -> ImmutablePair.of(e.getKey(), er))).map(p -> {
-					return new String[] { Names.vm2srcQualifiedType(p.left), p.right.training, p.right.validation,
+					return new String[] { CoReNames.vm2srcQualifiedType(p.left), p.right.training, p.right.validation,
 							String.format(Locale.US, "%.3f", p.right.score) };
 				}));
 

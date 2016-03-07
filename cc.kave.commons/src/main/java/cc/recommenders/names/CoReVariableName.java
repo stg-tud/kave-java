@@ -18,11 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-public class VmVariableName implements IVariableName {
+public class CoReVariableName implements ICoReVariableName {
 
     private static final long serialVersionUID = 5067244907255465328L;
 
-    private static Map<String /* vmTypeName */, VmVariableName> index = new MapMaker().weakValues().makeMap();
+    private static Map<String /* vmTypeName */, CoReVariableName> index = new MapMaker().weakValues().makeMap();
 
     /**
      * Format: DeclaringType'.'fieldName;FieldType, i.e., &lt;VmTypeName&gt;.&lt;String&gt;;&lt;VmTypeName&gt;
@@ -30,11 +30,11 @@ public class VmVariableName implements IVariableName {
      * @param variableName
      * @return
      */
-    public static VmVariableName get(final String variableName) {
+    public static CoReVariableName get(final String variableName) {
 
-        VmVariableName res = index.get(variableName);
+        CoReVariableName res = index.get(variableName);
         if (res == null) {
-            res = new VmVariableName(variableName);
+            res = new CoReVariableName(variableName);
             index.put(variableName, res);
         }
         return res;
@@ -42,14 +42,14 @@ public class VmVariableName implements IVariableName {
 
     private String identifier;
 
-    protected VmVariableName() {
+    protected CoReVariableName() {
         // no-one should instantiate this class. O
     }
 
     /**
      * @see #get(String)
      */
-    protected VmVariableName(final String vmVariableName) {
+    protected CoReVariableName(final String vmVariableName) {
         identifier = vmVariableName;
         ensureIsNotNull(identifier);
         ensureIsNotNull(getDeclaringMethod());
@@ -62,9 +62,9 @@ public class VmVariableName implements IVariableName {
     }
 
     @Override
-    public IMethodName getDeclaringMethod() {
+    public ICoReMethodName getDeclaringMethod() {
         final String declaringType = StringUtils.substringBeforeLast(identifier, "#");
-        return VmMethodName.get(declaringType);
+        return CoReMethodName.get(declaringType);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class VmVariableName implements IVariableName {
     }
 
     @Override
-    public int compareTo(final IVariableName other) {
+    public int compareTo(final ICoReVariableName other) {
         return identifier.compareTo(other.getIdentifier());
     }
 }

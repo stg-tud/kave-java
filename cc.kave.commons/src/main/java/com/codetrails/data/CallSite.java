@@ -20,8 +20,8 @@ import static com.codetrails.data.CallSiteKind.RECEIVER_CALL_SITE;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.Names;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReNames;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -31,7 +31,7 @@ public class CallSite {
 	// make sure the naming is consistent to the hardcoded names in "UsageTypeAdapter"
 
 	private CallSiteKind kind;
-	private IMethodName call;
+	private ICoReMethodName call;
 	private int argumentIndex;
 
 	public CallSiteKind getKind() {
@@ -42,11 +42,11 @@ public class CallSite {
 		this.kind = kind;
 	}
 
-	public IMethodName getCall() {
+	public ICoReMethodName getCall() {
 		return call;
 	}
 
-	public void setCall(final IMethodName call) {
+	public void setCall(final ICoReMethodName call) {
 		this.call = call;
 	}
 
@@ -73,8 +73,8 @@ public class CallSite {
 		{
 			String key = kind == RECEIVER_CALL_SITE ? "call" : "param";
 			ToStringHelper _stringHelper = Objects.toStringHelper(this);
-			IMethodName _call = this.getCall();
-			String _sourceName = Names.vm2srcQualifiedMethod(_call);
+			ICoReMethodName _call = this.getCall();
+			String _sourceName = CoReNames.vm2srcQualifiedMethod(_call);
 			ToStringHelper _add = _stringHelper.add(key, _sourceName);
 			String _string = _add.toString();
 			_xblockexpression = (_string);

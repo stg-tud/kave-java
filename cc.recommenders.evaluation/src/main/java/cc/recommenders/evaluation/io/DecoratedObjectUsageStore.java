@@ -17,7 +17,7 @@ import java.util.Set;
 
 import cc.recommenders.io.DataStore;
 import cc.recommenders.io.Directory;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.codetrails.data.DecoratedObjectUsage;
@@ -29,7 +29,7 @@ import com.google.common.base.Predicates;
  * Stores that can be used to read ObjectUsages and convert them to Usages
  * on-the-fly
  */
-public class DecoratedObjectUsageStore implements DataStore<ITypeName, Usage> {
+public class DecoratedObjectUsageStore implements DataStore<ICoReTypeName, Usage> {
 
 	private ObjectUsageStore ouStore;
 
@@ -48,18 +48,18 @@ public class DecoratedObjectUsageStore implements DataStore<ITypeName, Usage> {
 	}
 
 	@Override
-	public Set<ITypeName> getKeys() {
+	public Set<ICoReTypeName> getKeys() {
 		return ouStore.getKeys();
 	}
 
 	@Override
-	public List<Usage> read(ITypeName key) {
+	public List<Usage> read(ICoReTypeName key) {
 		Predicate<Usage> alwaysTrue = Predicates.alwaysTrue();
 		return read(key, alwaysTrue);
 	}
 
 	@Override
-	public List<Usage> read(ITypeName key, Predicate<Usage> predicate) {
+	public List<Usage> read(ICoReTypeName key, Predicate<Usage> predicate) {
 		List<Usage> usages = newLinkedList();
 		for (ObjectUsage usage : ouStore.read(key)) {
 			Usage decorated = new DecoratedObjectUsage(usage);

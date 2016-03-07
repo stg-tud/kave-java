@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.utils.DateProvider;
 
 import com.google.common.collect.Maps;
@@ -104,11 +104,11 @@ public class OutputUtilsTest {
 
 	@Test
 	public void typeCounts() {
-		sut.count(VmTypeName.get("LType1"), 1, 3);
-		sut.count(VmTypeName.get("LType1"), 1, 4);
-		sut.count(VmTypeName.get("LType1"), 2, 3);
-		sut.count(VmTypeName.get("LType1"), 3, 4);
-		sut.count(VmTypeName.get("LType2"), 1, 6);
+		sut.count(CoReTypeName.get("LType1"), 1, 3);
+		sut.count(CoReTypeName.get("LType1"), 1, 4);
+		sut.count(CoReTypeName.get("LType1"), 2, 3);
+		sut.count(CoReTypeName.get("LType1"), 3, 4);
+		sut.count(CoReTypeName.get("LType2"), 1, 6);
 
 		sut.printTypeCounts();
 

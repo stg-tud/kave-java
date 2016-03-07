@@ -28,7 +28,7 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.NestedZipFolders;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class StorageHelperTest {
 
@@ -88,7 +88,7 @@ public class StorageHelperTest {
 
 	private void assertNestedZip(StorageCase storageCase, String folder) {
 		try {
-			NestedZipFolders<ITypeName> f = sut.getNestedZipFolder(storageCase);
+			NestedZipFolders<ICoReTypeName> f = sut.getNestedZipFolder(storageCase);
 			String actual = f.getUrl().getPath();
 			String expected = Paths.get(tempFileName, folder).toFile().getAbsolutePath() + "/";
 			assertEquals(expected, actual);

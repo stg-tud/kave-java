@@ -18,58 +18,58 @@ package com.codetrails.data;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
 public class EnclosingMethodContext {
-	private IMethodName name;
+	private ICoReMethodName name;
 	@Nullable
-	private ITypeName introducedBy;
+	private ICoReTypeName introducedBy;
 	@Nullable
-	private ITypeName superclass;
-	private ITypeName[] implementedBy;
-	private ITypeName[] annotations;
+	private ICoReTypeName superclass;
+	private ICoReTypeName[] implementedBy;
+	private ICoReTypeName[] annotations;
 
-	public IMethodName getName() {
+	public ICoReMethodName getName() {
 		return name;
 	}
 
-	public void setName(final IMethodName name) {
+	public void setName(final ICoReMethodName name) {
 		this.name = name;
 	}
 
-	public ITypeName getSuperclass() {
+	public ICoReTypeName getSuperclass() {
 		return superclass;
 	}
 
-	public void setSuperclass(final ITypeName superclass) {
+	public void setSuperclass(final ICoReTypeName superclass) {
 		this.superclass = superclass;
 	}
 
-	public ITypeName getIntroducedBy() {
+	public ICoReTypeName getIntroducedBy() {
 		return introducedBy;
 	}
 
-	public void setIntroducedBy(final ITypeName introducedBy) {
+	public void setIntroducedBy(final ICoReTypeName introducedBy) {
 		this.introducedBy = introducedBy;
 	}
 
-	public ITypeName[] getImplementors() {
+	public ICoReTypeName[] getImplementors() {
 		return implementedBy;
 	}
 
-	public void setImplementors(final ITypeName[] implementors) {
+	public void setImplementors(final ICoReTypeName[] implementors) {
 		this.implementedBy = implementors;
 	}
 
-	public ITypeName[] getAnnotations() {
+	public ICoReTypeName[] getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(final ITypeName[] annotations) {
+	public void setAnnotations(final ICoReTypeName[] annotations) {
 		this.annotations = annotations;
 	}
 
@@ -89,9 +89,9 @@ public class EnclosingMethodContext {
 
 	public String toString() {
 		ToStringHelper _stringHelper = Objects.toStringHelper(this);
-		IMethodName _name = this.getName();
+		ICoReMethodName _name = this.getName();
 		ToStringHelper _add = _stringHelper.add("name", _name);
-		ITypeName[] _implementors = this.getImplementors();
+		ICoReTypeName[] _implementors = this.getImplementors();
 		ToStringHelper _add_1 = _add.add("implementors", _implementors.length);
 		String _string = _add_1.toString();
 		return _string;

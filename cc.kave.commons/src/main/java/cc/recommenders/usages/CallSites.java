@@ -11,18 +11,18 @@
 package cc.recommenders.usages;
 
 import cc.recommenders.assertions.Asserts;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 
 public class CallSites {
 
 	public static CallSite createParameterCallSite(String methodName, int argIndex) {
 		Asserts.assertNotNull(methodName);
 		Asserts.assertGreaterOrEqual(argIndex, 0);
-		return createParameterCallSite(VmMethodName.get(methodName), argIndex);
+		return createParameterCallSite(CoReMethodName.get(methodName), argIndex);
 	}
 
-	public static CallSite createParameterCallSite(IMethodName method, int argIndex) {
+	public static CallSite createParameterCallSite(ICoReMethodName method, int argIndex) {
 		Asserts.assertNotNull(method);
 		Asserts.assertGreaterOrEqual(argIndex, 0);
 		CallSite site = new CallSite();
@@ -34,10 +34,10 @@ public class CallSites {
 
 	public static CallSite createReceiverCallSite(String methodName) {
 		Asserts.assertNotNull(methodName);
-		return createReceiverCallSite(VmMethodName.get(methodName));
+		return createReceiverCallSite(CoReMethodName.get(methodName));
 	}
 
-	public static CallSite createReceiverCallSite(IMethodName method) {
+	public static CallSite createReceiverCallSite(ICoReMethodName method) {
 		Asserts.assertNotNull(method);
 		CallSite site = new CallSite();
 		site.setKind(CallSiteKind.RECEIVER);

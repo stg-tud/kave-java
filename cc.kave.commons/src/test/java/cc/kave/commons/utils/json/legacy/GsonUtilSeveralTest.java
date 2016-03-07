@@ -21,10 +21,10 @@ import java.util.Set;
 import org.junit.Test;
 
 import cc.kave.commons.utils.json.legacy.GsonUtil;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -39,8 +39,8 @@ import com.google.common.collect.Sets;
 public class GsonUtilSeveralTest {
 	@Test
 	public void serializationTest() {
-		ITypeName T1 = VmTypeName.get("LT1");
-		ITypeName T2 = VmTypeName.get("LT2");
+		ICoReTypeName T1 = CoReTypeName.get("LT1");
+		ICoReTypeName T2 = CoReTypeName.get("LT2");
 
 		ProjectFoldingIndex in = new ProjectFoldingIndex();
 		in.setCount(T1, "P1", 1);
@@ -136,18 +136,18 @@ public class GsonUtilSeveralTest {
 	private Query createUsage() {
 		DefinitionSite ds = DefinitionSites.createUnknownDefinitionSite();
 		ds.setArgIndex(14);
-		ds.setField(VmFieldName.get("LDS1.field;LDS2"));
-		ds.setMethod(VmMethodName.get("LDS3.m()V"));
+		ds.setField(CoReFieldName.get("LDS1.field;LDS2"));
+		ds.setMethod(CoReMethodName.get("LDS3.m()V"));
 
 		Set<CallSite> calls = Sets.newHashSet();
 		calls.add(CallSites.createParameterCallSite("LDS5.m()V", 3));
 
 		Query q = new Query();
 		q.setAllCallsites(calls);
-		q.setClassContext(VmTypeName.get("LS"));
+		q.setClassContext(CoReTypeName.get("LS"));
 		q.setDefinition(ds);
-		q.setMethodContext(VmMethodName.get("LT.m()V"));
-		q.setType(VmTypeName.get("Lpackage/Type"));
+		q.setMethodContext(CoReMethodName.get("LT.m()V"));
+		q.setType(CoReTypeName.get("Lpackage/Type"));
 		return q;
 	}
 }

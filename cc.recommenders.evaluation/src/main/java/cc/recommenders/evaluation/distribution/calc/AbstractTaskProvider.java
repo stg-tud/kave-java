@@ -24,7 +24,7 @@ import cc.recommenders.evaluation.distribution.ITaskProvider;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Sets;
@@ -61,7 +61,7 @@ public abstract class AbstractTaskProvider<TTask extends AbstractTask> implement
 		int numTasks = 0;
 		Logger.log("## creating tasks");
 		Set<TTask> tasks = Sets.newLinkedHashSet();
-		for (ITypeName type : store.getTypes()) {
+		for (ICoReTypeName type : store.getTypes()) {
 			if (useType(type)) {
 				if (store.isAvailable(type, getNumFolds())) {
 					for (int foldNum = 0; foldNum < getNumFolds(); foldNum++) {
@@ -84,11 +84,11 @@ public abstract class AbstractTaskProvider<TTask extends AbstractTask> implement
 		return tasks;
 	}
 
-	protected boolean useType(ITypeName type) {
+	protected boolean useType(ICoReTypeName type) {
 		return true;
 	}
 
-	private TypeStore createTypeStore(ITypeName type) {
+	private TypeStore createTypeStore(ICoReTypeName type) {
 		try {
 			return store.createTypeStore(type, getNumFolds());
 		} catch (IOException e) {
@@ -96,13 +96,13 @@ public abstract class AbstractTaskProvider<TTask extends AbstractTask> implement
 		}
 	}
 
-	protected Collection<TTask> createTasksFor(String app, ITypeName type, int foldNum, List<Usage> training) {
+	protected Collection<TTask> createTasksFor(String app, ICoReTypeName type, int foldNum, List<Usage> training) {
 		Collection<TTask> tasks = Sets.newHashSet();
 		tasks.add(getAbstractTask(app, type, foldNum));
 		return tasks;
 	}
 
-	protected TTask getAbstractTask(String app, ITypeName type, int foldNum) {
+	protected TTask getAbstractTask(String app, ICoReTypeName type, int foldNum) {
 		TTask task = newTask();
 		task.app = app;
 		task.options = getOptions().get(app);

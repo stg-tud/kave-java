@@ -16,8 +16,8 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
 
 public class CallSitesTest {
 
@@ -28,7 +28,7 @@ public class CallSitesTest {
 
 	@Test(expected = AssertionException.class)
 	public void nullValuesParam2() {
-		CallSites.createParameterCallSite((IMethodName) null, 1);
+		CallSites.createParameterCallSite((ICoReMethodName) null, 1);
 	}
 
 	@Test(expected = AssertionException.class)
@@ -38,7 +38,7 @@ public class CallSitesTest {
 
 	@Test(expected = AssertionException.class)
 	public void incorrectArgIndex2() {
-		CallSites.createParameterCallSite(mock(IMethodName.class), -1);
+		CallSites.createParameterCallSite(mock(ICoReMethodName.class), -1);
 	}
 
 	@Test(expected = AssertionException.class)
@@ -48,7 +48,7 @@ public class CallSitesTest {
 
 	@Test(expected = AssertionException.class)
 	public void nullValuesCall2() {
-		CallSites.createReceiverCallSite((IMethodName) null);
+		CallSites.createReceiverCallSite((ICoReMethodName) null);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class CallSitesTest {
 		assertEquals(expected, actual);
 	}
 
-	private static IMethodName m(String method) {
-		return VmMethodName.get(method);
+	private static ICoReMethodName m(String method) {
+		return CoReMethodName.get(method);
 	}
 }

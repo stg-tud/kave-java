@@ -42,9 +42,9 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.ProposalHelper;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 
@@ -56,13 +56,13 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 	private BayesNode methodContextNode;
 	private BayesNode definitionNode;
 
-	private Map<IMethodName, BayesNode> callNodes = newHashMap();
+	private Map<ICoReMethodName, BayesNode> callNodes = newHashMap();
 	private Map<String, BayesNode> paramNodes = newHashMap();
 
 	private JunctionTreeAlgorithm junctionTreeAlgorithm;
 	private QueryOptions options;
 
-	private Set<IMethodName> queriedMethods = newHashSet();
+	private Set<ICoReMethodName> queriedMethods = newHashSet();
 
 	public PBNRecommender(BayesianNetwork network, QueryOptions options) {
 		this.options = options;
@@ -114,7 +114,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 		} else if (nodeTitle.equals(PATTERN_TITLE)) {
 			patternNode = bayesNode;
 		} else if (nodeTitle.startsWith(CALL_PREFIX)) {
-			IMethodName call = VmMethodName.get(nodeTitle.substring(CALL_PREFIX.length()));
+			ICoReMethodName call = CoReMethodName.get(nodeTitle.substring(CALL_PREFIX.length()));
 			callNodes.put(call, bayesNode);
 		} else {
 			paramNodes.put(nodeTitle, bayesNode);
@@ -147,7 +147,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 	}
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> query(Query u) {
+	public Set<Tuple<ICoReMethodName, Double>> query(Query u) {
 		clearEvidence();
 
 		if (options.useClassContext) {
@@ -160,7 +160,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 			addEvidenceIfAvailableInNetwork(definitionNode, newDefinition(u.getDefinitionSite()));
 		}
 
-		ITypeName type = u.getType();
+		ICoReTypeName type = u.getType();
 		for (CallSite site : u.getAllCallsites()) {
 			markRebasedSite(type, site);
 		}
@@ -177,7 +177,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 		}
 	}
 
-	private void markRebasedSite(ITypeName type, CallSite site) {
+	private void markRebasedSite(ICoReTypeName type, CallSite site) {
 		switch (site.getKind()) {
 		case PARAMETER:
 			if (options.useParameterSites) {
@@ -212,10 +212,10 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 		}
 	}
 
-	private Set<Tuple<IMethodName, Double>> collectCallProbabilities() {
-		Set<Tuple<IMethodName, Double>> res = ProposalHelper.createSortedSet();
+	private Set<Tuple<ICoReMethodName, Double>> collectCallProbabilities() {
+		Set<Tuple<ICoReMethodName, Double>> res = ProposalHelper.createSortedSet();
 		try {
-			for (IMethodName methodName : callNodes.keySet()) {
+			for (ICoReMethodName methodName : callNodes.keySet()) {
 				if (!isPartOfQuery(methodName)) {
 					BayesNode node = callNodes.get(methodName);
 					if (node == null) {
@@ -224,7 +224,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 						double[] beliefs = junctionTreeAlgorithm.getBeliefs(node);
 						boolean isGreaterOrEqualToMinProbability = beliefs[0] >= options.minProbability;
 						if (isGreaterOrEqualToMinProbability) {
-							Tuple<IMethodName, Double> tuple = newTuple(methodName, beliefs[0]);
+							Tuple<ICoReMethodName, Double> tuple = newTuple(methodName, beliefs[0]);
 							res.add(tuple);
 						}
 					}
@@ -236,7 +236,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 		return res;
 	}
 
-	private boolean isPartOfQuery(IMethodName methodName) {
+	private boolean isPartOfQuery(ICoReMethodName methodName) {
 		return queriedMethods.contains(methodName);
 	}
 
@@ -254,7 +254,7 @@ public class PBNRecommender implements ICallsRecommender<Query> {
 	}
 
 	@Override
-	public Set<Tuple<IMethodName, Double>> queryPattern(String patternName) {
+	public Set<Tuple<ICoReMethodName, Double>> queryPattern(String patternName) {
 		clearEvidence();
 		junctionTreeAlgorithm.addEvidence(patternNode, patternName);
 		return collectCallProbabilities();

@@ -21,8 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -95,7 +95,7 @@ public class QueryUtilsTest {
 	@Test
 	public void toDiffString_differentType() {
 		Query a = q(1);
-		a.setType(VmTypeName.get("LT2"));
+		a.setType(CoReTypeName.get("LT2"));
 		Query b = q(1);
 
 		assertDiffToString(a, b, "1~T");
@@ -104,7 +104,7 @@ public class QueryUtilsTest {
 	@Test
 	public void toDiffString_differentClassContext() {
 		Query a = q(1);
-		a.setClassContext(VmTypeName.get("LSome2"));
+		a.setClassContext(CoReTypeName.get("LSome2"));
 		Query b = q(1);
 
 		assertDiffToString(a, b, "1~C");
@@ -113,7 +113,7 @@ public class QueryUtilsTest {
 	@Test
 	public void toDiffString_differentMethodContext() {
 		Query a = q(1);
-		a.setMethodContext(VmMethodName.get("LS2.m()V"));
+		a.setMethodContext(CoReMethodName.get("LS2.m()V"));
 		Query b = q(1);
 
 		assertDiffToString(a, b, "1~M");
@@ -131,9 +131,9 @@ public class QueryUtilsTest {
 	@Test
 	public void toDiffString_integration() {
 		Query a = q(1, 2);
-		a.setType(VmTypeName.get("LT2"));
-		a.setClassContext(VmTypeName.get("LSome2"));
-		a.setMethodContext(VmMethodName.get("LS2.m()V"));
+		a.setType(CoReTypeName.get("LT2"));
+		a.setClassContext(CoReTypeName.get("LSome2"));
+		a.setMethodContext(CoReMethodName.get("LS2.m()V"));
 		a.setDefinition(DefinitionSites.createDefinitionByThis());
 		Query b = q(1, 3, 4);
 
@@ -147,9 +147,9 @@ public class QueryUtilsTest {
 
 	private Query q(int... mIds) {
 		Query q = new Query();
-		q.setType(VmTypeName.get("Ln/T"));
-		q.setClassContext(VmTypeName.get("LSome"));
-		q.setMethodContext(VmMethodName.get("LS.m()V"));
+		q.setType(CoReTypeName.get("Ln/T"));
+		q.setClassContext(CoReTypeName.get("LSome"));
+		q.setMethodContext(CoReMethodName.get("LS.m()V"));
 		q.setDefinition(DefinitionSites.createDefinitionByConstant());
 		for (int mId : mIds) {
 			CallSite cs = CallSites.createReceiverCallSite("Ln/T.m" + mId + "()V");

@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 public class ObjectUsageTest {
 
@@ -58,13 +58,13 @@ public class ObjectUsageTest {
         ObjectUsage usage = new ObjectUsage();
 
         DefinitionSite def = DefinitionSites.createUnknownDefinitionSite();
-        def.setType(VmTypeName.get(typeName));
+        def.setType(CoReTypeName.get(typeName));
         usage.setDef(def);
         
         EnclosingMethodContext ctx = new EnclosingMethodContext();
-        ctx.setSuperclass(VmTypeName.get("LSuperType"));
-        ctx.setName(VmMethodName.get(methodName));
-        ctx.setIntroducedBy(VmTypeName.get("LSuperType"));
+        ctx.setSuperclass(CoReTypeName.get("LSuperType"));
+        ctx.setName(CoReMethodName.get(methodName));
+        ctx.setIntroducedBy(CoReTypeName.get("LSuperType"));
         usage.setContext(ctx);
         
         Set<List<CallSite>> paths = newHashSet();

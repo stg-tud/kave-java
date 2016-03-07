@@ -11,18 +11,18 @@
 package cc.recommenders.usages.features;
 
 import static cc.recommenders.assertions.Asserts.assertNotNull;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 
 public class CallFeature extends UsageFeature {
 
-	private final IMethodName call;
+	private final ICoReMethodName call;
 
-	public CallFeature(IMethodName call) {
+	public CallFeature(ICoReMethodName call) {
 		assertNotNull(call);
 		this.call = call;
 	}
 
-	public IMethodName getMethodName() {
+	public ICoReMethodName getMethodName() {
 		return call;
 	}
 

@@ -24,9 +24,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSiteKind;
 import cc.recommenders.usages.CallSites;
@@ -246,12 +246,12 @@ public class PartialUsageQueryBuilderTest {
 	private void assertCallSites(Collection<CallSite> path, String... suffixes) {
 		assertEquals(suffixes.length, path.size());
 		for (String suffix : suffixes) {
-			IMethodName methodName = getMethodName(suffix);
+			ICoReMethodName methodName = getMethodName(suffix);
 			assertTrue(containsMethod(path, methodName));
 		}
 	}
 
-	private boolean containsMethod(Collection<CallSite> path, IMethodName methodName) {
+	private boolean containsMethod(Collection<CallSite> path, ICoReMethodName methodName) {
 		for (CallSite site : path) {
 			if (site.getMethod().equals(methodName)) {
 				return true;
@@ -260,8 +260,8 @@ public class PartialUsageQueryBuilderTest {
 		return false;
 	}
 
-	public static IMethodName getMethodName(String name) {
-		return VmMethodName.get(String.format("LType.method_%s()V", name));
+	public static ICoReMethodName getMethodName(String name) {
+		return CoReMethodName.get(String.format("LType.method_%s()V", name));
 	}
 
 	private static int count(CallSiteKind kind, Iterable<CallSite> cs) {
@@ -282,9 +282,9 @@ public class PartialUsageQueryBuilderTest {
 
 		public Usage build() {
 			Query q = new Query();
-			q.setType(VmTypeName.get("LType"));
-			q.setClassContext(VmTypeName.get("LSuperType"));
-			q.setMethodContext(VmMethodName.get("LFirstType.method()V"));
+			q.setType(CoReTypeName.get("LType"));
+			q.setClassContext(CoReTypeName.get("LSuperType"));
+			q.setMethodContext(CoReMethodName.get("LFirstType.method()V"));
 			q.setDefinition(DefinitionSites.createDefinitionByConstant());
 			q.setAllCallsites(sites);
 			return q;

@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ClassFeature;
 import cc.recommenders.usages.features.DefinitionFeature;
@@ -51,7 +51,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void classContextIsWeighted() {
-		ClassFeature feature = new ClassFeature(mock(ITypeName.class));
+		ClassFeature feature = new ClassFeature(mock(ICoReTypeName.class));
 		double actual = sut.getWeight(feature);
 		double expected = W_CLASS;
 		assertEquals(expected, actual, 0.001);
@@ -59,7 +59,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void classContextIsUnweighted() {
-		ClassFeature feature = new ClassFeature(mock(ITypeName.class));
+		ClassFeature feature = new ClassFeature(mock(ICoReTypeName.class));
 		double actual = sut.getUnweighted(feature, 0.1);
 		double expected = 0.1 / W_CLASS;
 		assertEquals(expected, actual, 0.001);
@@ -67,7 +67,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void methodContextIsWeighted() {
-		FirstMethodFeature feature = new FirstMethodFeature(mock(IMethodName.class));
+		FirstMethodFeature feature = new FirstMethodFeature(mock(ICoReMethodName.class));
 		double actual = sut.getWeight(feature);
 		double expected = W_METHOD;
 		assertEquals(expected, actual, 0.001);
@@ -75,7 +75,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void methodContextIsUnweighted() {
-		FirstMethodFeature feature = new FirstMethodFeature(mock(IMethodName.class));
+		FirstMethodFeature feature = new FirstMethodFeature(mock(ICoReMethodName.class));
 		double actual = sut.getUnweighted(feature, 0.1);
 		double expected = 0.1 / W_METHOD;
 		assertEquals(expected, actual, 0.001);
@@ -99,7 +99,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void callAreWeightedNormalized() {
-		CallFeature feature = new CallFeature(mock(IMethodName.class));
+		CallFeature feature = new CallFeature(mock(ICoReMethodName.class));
 		double actual = sut.getWeight(feature);
 		double expected = 1.0;
 		assertEquals(expected, actual, 0.001);
@@ -107,7 +107,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void paramIsWeighted() {
-		ParameterFeature feature = new ParameterFeature(mock(IMethodName.class), 0);
+		ParameterFeature feature = new ParameterFeature(mock(ICoReMethodName.class), 0);
 		double actual = sut.getWeight(feature);
 		double expected = W_PARAM;
 		assertEquals(expected, actual, 0.001);
@@ -115,7 +115,7 @@ public class UsageFeatureWeighterTest {
 
 	@Test
 	public void paramIsUnweighted() {
-		ParameterFeature feature = new ParameterFeature(mock(IMethodName.class), 0);
+		ParameterFeature feature = new ParameterFeature(mock(ICoReMethodName.class), 0);
 		double actual = sut.getUnweighted(feature, 0.1);
 		double expected = 0.1 / W_PARAM;
 		assertEquals(expected, actual, 0.001);

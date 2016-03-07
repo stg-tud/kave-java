@@ -21,9 +21,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.Usage;
 
@@ -81,13 +81,13 @@ public class TypeStoreTest {
 		for (int projectNum : projectNums) {
 			String projectName = "p" + projectNum;
 			Usage u = mock(Usage.class, projectName);
-			when(u.getType()).thenReturn(VmTypeName.get("LT"));
+			when(u.getType()).thenReturn(CoReTypeName.get("LT"));
 			when(u.getMethodContext()).thenReturn(m(projectName));
 			usages.add(new ProjectFoldedUsage(u, projectName));
 		}
 	}
 
-	private IMethodName m(String projectName) {
-		return VmMethodName.get("LT." + projectName + "()V");
+	private ICoReMethodName m(String projectName) {
+		return CoReMethodName.get("LT." + projectName + "()V");
 	}
 }

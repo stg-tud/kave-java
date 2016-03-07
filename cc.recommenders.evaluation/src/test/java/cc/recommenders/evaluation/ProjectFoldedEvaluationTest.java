@@ -34,8 +34,8 @@ import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.utils.DateProvider;
 
@@ -45,8 +45,8 @@ import com.google.common.collect.Sets;
 public class ProjectFoldedEvaluationTest {
 
 	public static final Date EXPECTED_DATE = new Date();
-	public static final ITypeName TYPE1 = VmTypeName.get("La/Type1");
-	public static final ITypeName TYPE2 = VmTypeName.get("Lb/Type2");
+	public static final ICoReTypeName TYPE1 = CoReTypeName.get("La/Type1");
+	public static final ICoReTypeName TYPE2 = CoReTypeName.get("Lb/Type2");
 
 	@Mock
 	private ProjectFoldedUsageStore store;
@@ -65,11 +65,11 @@ public class ProjectFoldedEvaluationTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 
-		Set<ITypeName> types = Sets.newLinkedHashSet();
+		Set<ICoReTypeName> types = Sets.newLinkedHashSet();
 		types.add(TYPE1);
 		types.add(TYPE2);
 		when(store.getTypes()).thenReturn(types);
-		when(store.isAvailable(any(ITypeName.class), anyInt())).thenReturn(true);
+		when(store.isAvailable(any(ICoReTypeName.class), anyInt())).thenReturn(true);
 		when(store.createTypeStore(eq(TYPE1), anyInt())).thenReturn(type1Store);
 		when(store.createTypeStore(eq(TYPE2), anyInt())).thenReturn(type2Store);
 		when(dateProvider.getDate()).thenReturn(EXPECTED_DATE);
@@ -130,7 +130,7 @@ public class ProjectFoldedEvaluationTest {
 
 	@Test
 	public void headerContainsDefaultInformation() throws IOException {
-		when(store.isAvailable(any(ITypeName.class), anyInt())).thenReturn(false);
+		when(store.isAvailable(any(ICoReTypeName.class), anyInt())).thenReturn(false);
 
 		sut.run();
 
@@ -209,7 +209,7 @@ public class ProjectFoldedEvaluationTest {
 	public void typeLoadingCanBeDeactivated() throws IOException {
 		sut = new ProjectFoldedEvaluationImpl() {
 			@Override
-			protected void foldType(ITypeName type) throws IOException {
+			protected void foldType(ICoReTypeName type) throws IOException {
 				if (!TYPE1.equals(type)) {
 					super.foldType(type);
 				}
@@ -226,7 +226,7 @@ public class ProjectFoldedEvaluationTest {
 	public void typeLoadingCanBeDeactivatedasd() throws IOException {
 		sut = new ProjectFoldedEvaluationImpl() {
 			@Override
-			protected boolean shouldAnalyze(ITypeName type, TypeStore typeStore) {
+			protected boolean shouldAnalyze(ICoReTypeName type, TypeStore typeStore) {
 				return !TYPE1.equals(type);
 			}
 		};
@@ -241,16 +241,16 @@ public class ProjectFoldedEvaluationTest {
 	public void unavailableTypesCauseNotAvailableCall() throws IOException {
 		when(store.isAvailable(eq(TYPE1), anyInt())).thenReturn(false);
 
-		final Set<ITypeName> actual = Sets.newHashSet();
+		final Set<ICoReTypeName> actual = Sets.newHashSet();
 		sut = new ProjectFoldedEvaluationImpl() {
 			@Override
-			protected void notAvailable(ITypeName type) {
+			protected void notAvailable(ICoReTypeName type) {
 				actual.add(type);
 			}
 		};
 		sut.foldAllTypes();
 
-		Set<ITypeName> expected = Sets.newHashSet(TYPE1);
+		Set<ICoReTypeName> expected = Sets.newHashSet(TYPE1);
 		assertEquals(expected, actual);
 	}
 
@@ -277,7 +277,7 @@ public class ProjectFoldedEvaluationTest {
 	@Test(expected = AssertionException.class)
 	public void atLeastTwoFolds() {
 		new ProjectFoldedEvaluation(store, dateProvider) {
-			protected void runFold(ITypeName type, int foldNum, List<Usage> training, List<Usage> validation) {
+			protected void runFold(ICoReTypeName type, int foldNum, List<Usage> training, List<Usage> validation) {
 			}
 
 			protected void logResults() {
@@ -323,19 +323,19 @@ public class ProjectFoldedEvaluationTest {
 		}
 
 		@Override
-		protected void notAvailable(ITypeName type) {
+		protected void notAvailable(ICoReTypeName type) {
 			hasCalledNotAvailable = true;
 			super.notAvailable(type);
 		}
 
 		@Override
-		protected boolean shouldAnalyze(ITypeName type, TypeStore typeStore) {
+		protected boolean shouldAnalyze(ICoReTypeName type, TypeStore typeStore) {
 			hasCalledShouldAnalyze = true;
 			return super.shouldAnalyze(type, typeStore);
 		}
 
 		@Override
-		protected void runFold(ITypeName type, int foldNum, List<Usage> training, List<Usage> validation) {
+		protected void runFold(ICoReTypeName type, int foldNum, List<Usage> training, List<Usage> validation) {
 			Arguments p = new Arguments();
 			p.type = type;
 			p.foldNum = foldNum;
@@ -366,7 +366,7 @@ public class ProjectFoldedEvaluationTest {
 	}
 
 	public class Arguments {
-		public ITypeName type;
+		public ICoReTypeName type;
 		public int foldNum;
 		public List<Usage> training;
 		public List<Usage> validation;

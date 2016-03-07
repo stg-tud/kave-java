@@ -10,12 +10,12 @@
  */
 package cc.recommenders.utils;
 
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 
 public interface Constants {
 
@@ -85,17 +85,17 @@ public interface Constants {
     /*
      * Type and method name constants. Used in many different locations: analysis, networks, etc.
      */
-    ITypeName UNKNOWN_TYPE = VmTypeName.get("LUnkown");
-    ITypeName NULL_TYPE = VmTypeName.NULL;
+    ICoReTypeName UNKNOWN_TYPE = CoReTypeName.get("LUnkown");
+    ICoReTypeName NULL_TYPE = CoReTypeName.NULL;
 
-    IMethodName UNKNOWN_METHOD = VmMethodName.get("LECR.unknown()V");
-    IMethodName NULL_METHOD = VmMethodName.get("LNull.null()V");
-    IMethodName NO_METHOD = VmMethodName.get("LNo.nothing()V");
-    IMethodName ANY_METHOD = VmMethodName.get("LAny.any()V");
-    IMethodName DUMMY_METHOD = VmMethodName.get("LDummy.dummy()V");
+    ICoReMethodName UNKNOWN_METHOD = CoReMethodName.get("LECR.unknown()V");
+    ICoReMethodName NULL_METHOD = CoReMethodName.get("LNull.null()V");
+    ICoReMethodName NO_METHOD = CoReMethodName.get("LNo.nothing()V");
+    ICoReMethodName ANY_METHOD = CoReMethodName.get("LAny.any()V");
+    ICoReMethodName DUMMY_METHOD = CoReMethodName.get("LDummy.dummy()V");
 
 //    DefinitionSite.Kind UNKNOWN_KIND = DefinitionSite.Kind.UNKNOWN;
-    IFieldName UNKNOWN_FIELD = VmFieldName.get("LNo.field;LNoType");
+    ICoReFieldName UNKNOWN_FIELD = CoReFieldName.get("LNo.field;LNoType");
 
     /*
      * Network constants. Node names, state names, etc.

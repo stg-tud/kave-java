@@ -23,7 +23,7 @@ import cc.recommenders.evaluation.optimization.raster.RasterSearch;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
 import com.google.inject.Inject;
@@ -51,7 +51,7 @@ public class AllTypesOptimized {
 	public void run() {
 		evaluator.reinit();
 
-		for (ITypeName type : ouStore.getKeys()) {
+		for (ICoReTypeName type : ouStore.getKeys()) {
 			if (isInteresting(type)) {
 				List<Usage> usages = ouStore.read(type);
 				if (usages.size() >= 3) {
@@ -72,7 +72,7 @@ public class AllTypesOptimized {
 		qOpts.setFrom(optimum.queryOptions);
 	}
 
-	private boolean isInteresting(ITypeName type) {
+	private boolean isInteresting(ICoReTypeName type) {
 		return type.toString().startsWith("Lorg/eclipse/swt/widgets/Button");
 	}
 }

@@ -36,7 +36,7 @@ import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
 import cc.recommenders.mining.features.FeatureExtractor;
 import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.mining.features.RareFeatureDropper;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.UsageFeature;
@@ -109,7 +109,7 @@ public class PBNMinerTest {
 	private Dictionary<UsageFeature> createDict(String... names) {
 		Dictionary<UsageFeature> d = new Dictionary<UsageFeature>();
 		for (String name : names) {
-			d.add(new FirstMethodFeature(VmMethodName.get("Lsome/Type." + name + "()V")));
+			d.add(new FirstMethodFeature(CoReMethodName.get("Lsome/Type." + name + "()V")));
 		}
 		return d;
 	}

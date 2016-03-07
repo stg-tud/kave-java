@@ -12,14 +12,14 @@ package cc.recommenders.usages.features;
 
 import static cc.recommenders.assertions.Asserts.assertNotNegative;
 import static cc.recommenders.assertions.Asserts.assertNotNull;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 
 public class ParameterFeature extends UsageFeature {
 
-	private final IMethodName param;
+	private final ICoReMethodName param;
 	private final int argNum;
 
-	public ParameterFeature(IMethodName param, int argNum) {
+	public ParameterFeature(ICoReMethodName param, int argNum) {
 		assertNotNull(param);
 		this.param = param;
 		assertNotNegative(argNum);
@@ -30,7 +30,7 @@ public class ParameterFeature extends UsageFeature {
 		return argNum;
 	}
 
-	public IMethodName getMethodName() {
+	public ICoReMethodName getMethodName() {
 		return param;
 	}
 

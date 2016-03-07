@@ -21,9 +21,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmMethodName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReMethodName;
 
 import com.google.common.collect.Sets;
 
@@ -38,25 +38,25 @@ public class QueryTest {
 
 	@Test
 	public void typeCanBeSet() {
-		ITypeName expected = mock(ITypeName.class);
+		ICoReTypeName expected = mock(ICoReTypeName.class);
 		sut.setType(expected);
-		ITypeName actual = sut.getType();
+		ICoReTypeName actual = sut.getType();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void classContextCanBeSet() {
-		ITypeName expected = mock(ITypeName.class);
+		ICoReTypeName expected = mock(ICoReTypeName.class);
 		sut.setClassContext(expected);
-		ITypeName actual = sut.getClassContext();
+		ICoReTypeName actual = sut.getClassContext();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void methodContextCanBeSet() {
-		IMethodName expected = mock(IMethodName.class);
+		ICoReMethodName expected = mock(ICoReMethodName.class);
 		sut.setMethodContext(expected);
-		IMethodName actual = sut.getMethodContext();
+		ICoReMethodName actual = sut.getMethodContext();
 		assertEquals(expected, actual);
 	}
 
@@ -187,22 +187,22 @@ public class QueryTest {
 	}
 
 	private static CallSite createReceiverCallSite() {
-		IMethodName m = VmMethodName.get("LType.receiverMethod()V");
+		ICoReMethodName m = CoReMethodName.get("LType.receiverMethod()V");
 		CallSite site = CallSites.createReceiverCallSite(m);
 		return site;
 	}
 
 	private static CallSite createParameterCallSite() {
-		IMethodName m = VmMethodName.get("LType.paramMethod(LParam;)V");
+		ICoReMethodName m = CoReMethodName.get("LType.paramMethod(LParam;)V");
 		CallSite site = CallSites.createParameterCallSite(m, 1);
 		return site;
 	}
 
 	private static Usage createUsage() {
 		Query q = new Query();
-		q.setType(mock(ITypeName.class));
-		q.setClassContext(mock(ITypeName.class));
-		q.setMethodContext(mock(IMethodName.class));
+		q.setType(mock(ICoReTypeName.class));
+		q.setClassContext(mock(ICoReTypeName.class));
+		q.setMethodContext(mock(ICoReMethodName.class));
 		q.setDefinition(mock(DefinitionSite.class));
 		q.addCallSite(mock(CallSite.class));
 		q.addCallSite(mock(CallSite.class));

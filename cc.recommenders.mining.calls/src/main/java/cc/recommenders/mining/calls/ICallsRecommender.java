@@ -13,15 +13,15 @@ package cc.recommenders.mining.calls;
 import java.util.Set;
 
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.IMethodName;
+import cc.recommenders.names.ICoReMethodName;
 
 public interface ICallsRecommender<Query> {
 
-	Set<Tuple<IMethodName, Double>> query(Query query);
+	Set<Tuple<ICoReMethodName, Double>> query(Query query);
 
 	Set<Tuple<String, Double>> getPatternsWithProbability();
 
-	Set<Tuple<IMethodName, Double>> queryPattern(String patternName);
+	Set<Tuple<ICoReMethodName, Double>> queryPattern(String patternName);
 
 	/**
 	 * @return the number of bytes necessary to store the model

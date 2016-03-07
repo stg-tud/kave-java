@@ -11,12 +11,12 @@
 package cc.recommenders.mining.calls.pbn;
 
 import static java.lang.String.format;
-import cc.recommenders.names.IFieldName;
-import cc.recommenders.names.IMethodName;
-import cc.recommenders.names.ITypeName;
-import cc.recommenders.names.VmFieldName;
-import cc.recommenders.names.VmMethodName;
-import cc.recommenders.names.VmTypeName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.names.CoReFieldName;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.features.CallFeature;
@@ -37,23 +37,23 @@ public class PBNModelConstants {
 	public static final String STATE_TRUE = "t";
 	public static final String STATE_FALSE = "f";
 
-	public static final ITypeName DUMMY_TYPE = VmTypeName.get("LDummy");
-	public static final IMethodName DUMMY_METHOD = VmMethodName.get("LDummy.dummy()V");
-	public static final IFieldName DUMMY_FIELD = VmFieldName.get("LDummy.dummy;LDummy2");
+	public static final ICoReTypeName DUMMY_TYPE = CoReTypeName.get("LDummy");
+	public static final ICoReMethodName DUMMY_METHOD = CoReMethodName.get("LDummy.dummy()V");
+	public static final ICoReFieldName DUMMY_FIELD = CoReFieldName.get("LDummy.dummy;LDummy2");
 	public static final DefinitionSite DUMMY_DEFINITION = DefinitionSites.createDefinitionByReturn(DUMMY_METHOD);
 
-	public static final ITypeName UNKNOWN_TYPE = VmTypeName.get("LUnknown");
-	public static final IMethodName UNKNOWN_METHOD = VmMethodName.get("LUnknown.unknown()V");
+	public static final ICoReTypeName UNKNOWN_TYPE = CoReTypeName.get("LUnknown");
+	public static final ICoReMethodName UNKNOWN_METHOD = CoReMethodName.get("LUnknown.unknown()V");
 	public static final DefinitionSite UNKNOWN_DEFINITION = DefinitionSites.createUnknownDefinitionSite();
 
 	public static final String CALL_PREFIX = "C_";
 	public static final String PARAMETER_PREFIX = "P_";
 
-	public static String newClassContext(ITypeName type) {
+	public static String newClassContext(ICoReTypeName type) {
 		return type.toString();
 	}
 
-	public static String newMethodContext(IMethodName method) {
+	public static String newMethodContext(ICoReMethodName method) {
 		return method.toString();
 	}
 
@@ -74,11 +74,11 @@ public class PBNModelConstants {
 		// }
 	}
 
-	public static String newParameterSite(IMethodName param, int argNum) {
+	public static String newParameterSite(ICoReMethodName param, int argNum) {
 		return format("%s%s#%d", PARAMETER_PREFIX, param.toString(), argNum);
 	}
 
-	public static String newCallSite(IMethodName site) {
+	public static String newCallSite(ICoReMethodName site) {
 		return format("%s%s", CALL_PREFIX, site.toString());
 	}
 

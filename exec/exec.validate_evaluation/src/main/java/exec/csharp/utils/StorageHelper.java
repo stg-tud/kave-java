@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.NestedZipFolders;
-import cc.recommenders.names.ITypeName;
+import cc.recommenders.names.ICoReTypeName;
 
 public class StorageHelper {
 
@@ -50,8 +50,8 @@ public class StorageHelper {
 		modifier = "";
 	}
 
-	public NestedZipFolders<ITypeName> getNestedZipFolder(StorageCase storageCase) {
-		return new NestedZipFolders<ITypeName>(getDirectory(storageCase), ITypeName.class);
+	public NestedZipFolders<ICoReTypeName> getNestedZipFolder(StorageCase storageCase) {
+		return new NestedZipFolders<ICoReTypeName>(getDirectory(storageCase), ICoReTypeName.class);
 	}
 
 	public Directory getDirectory(StorageCase storageCase) {
