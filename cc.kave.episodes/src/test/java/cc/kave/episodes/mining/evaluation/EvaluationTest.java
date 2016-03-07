@@ -53,6 +53,7 @@ import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
+import cc.recommenders.utils.LocaleUtils;
 
 public class EvaluationTest {
 
@@ -87,6 +88,8 @@ public class EvaluationTest {
 
 	@Before
 	public void setup() throws ZipException, IOException {
+		LocaleUtils.setDefaultLocale();
+		
 		Logger.reset();
 		Logger.setCapturing(true);
 
