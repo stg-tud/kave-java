@@ -20,9 +20,10 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.Trigger;
 
-public interface ICompletionEvent {
+public interface ICompletionEvent extends IIDEEvent {
 
 	@Nonnull
 	public Context getContext();
@@ -32,6 +33,9 @@ public interface ICompletionEvent {
 
 	@Nonnull
 	public List<IProposalSelection> getSelections();
+
+	@Nonnull
+	public IProposal getLastSelectedProposal();
 
 	@Nonnull
 	public Trigger getTerminatedBy();

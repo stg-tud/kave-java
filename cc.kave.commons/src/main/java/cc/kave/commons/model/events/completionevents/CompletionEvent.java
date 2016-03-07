@@ -36,17 +36,17 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 	public Trigger terminatedBy;
 
 	public TerminationState terminatedState;
-	
+
 	private int proposalCount;
-	
-	public CompletionEvent(){
+
+	public CompletionEvent() {
 		this.selections = Lists.newArrayList();
 		this.proposalCollection = Lists.newArrayList();
 		this.context = new Context();
 		this.terminatedState = terminatedState.Unknown;
 		this.proposalCount = 0;
 	}
-	
+
 	@Override
 	public Context getContext() {
 		return context;
@@ -60,6 +60,20 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 	@Override
 	public List<IProposalSelection> getSelections() {
 		return selections;
+	}
+
+	@Override
+	public IProposal getLastSelectedProposal() {
+		if (selections.isEmpty()) {
+			if (proposalCollection.isEmpty()) {
+				return null;
+			} else {
+				return proposalCollection.iterator().next();
+			}
+		} else {
+			IProposalSelection last = selections.get(selections.size() - 1);
+			return last.getProposal();
+		}
 	}
 
 	@Override

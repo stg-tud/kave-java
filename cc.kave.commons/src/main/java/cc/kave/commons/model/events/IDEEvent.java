@@ -16,6 +16,8 @@
 
 package cc.kave.commons.model.events;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -24,7 +26,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 // TODO use correct types instead of just "String"
-public abstract class IDEEvent {
+public abstract class IDEEvent implements IIDEEvent {
 
 	public String Id;
 
@@ -34,6 +36,10 @@ public abstract class IDEEvent {
 
 	@Nullable
 	public String TriggeredAt;
+	
+	public Date getTriggeredAt() {
+		return null;
+	}
 
 	public Trigger TriggeredBy;
 
