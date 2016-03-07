@@ -111,7 +111,7 @@ public class StreakGeneration {
 			return null;
 		}
 		cc.kave.commons.model.names.IMethodName m = (cc.kave.commons.model.names.IMethodName) p.getName();
-		return NameUtils.toCoReName(m);
+		return CoReNameUtils.toCoReName(m);
 	}
 
 	private EditStreak getEdits(Usage u) {
