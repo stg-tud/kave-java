@@ -34,6 +34,7 @@ import cc.kave.eclipse.namefactory.NodeFactory;
 public class DeclarationVisitor extends ASTVisitor {
 
 	private SST context;
+	private UniqueVariableNameGenerator nameGen = new UniqueVariableNameGenerator();
 
 	public DeclarationVisitor(SST context) {
 		this.context = context;
@@ -65,7 +66,7 @@ public class DeclarationVisitor extends ASTVisitor {
 
 		}
 
-		return super.visit(node);
+		return false;
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class DeclarationVisitor extends ASTVisitor {
 			methodDeclHelper(decl);
 		}
 
-		return super.visit(decl);
+		return false;
 	}
 
 	private void methodDeclHelper(MethodDeclaration decl) {
@@ -87,10 +88,11 @@ public class DeclarationVisitor extends ASTVisitor {
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 		methodDecl.setName(methodName);
 
-		if (!Modifier.isAbstract(decl.getModifiers())) {
-			BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), methodDecl.getBody());
+		if (!Modifier.isAbstract(decl.getModifiers()) && decl.getBody() != null) {
+			BodyVisitor bodyVisitor = new BodyVisitor(nameGen, methodDecl.getBody());
 			decl.getBody().accept(bodyVisitor);
 		}
+
 		context.getMethods().add(methodDecl);
 	}
 
@@ -100,8 +102,10 @@ public class DeclarationVisitor extends ASTVisitor {
 		cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration methodDecl = new cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration();
 		methodDecl.setName(methodName);
 
-		BodyVisitor bodyVisitor = new BodyVisitor(new UniqueVariableNameGenerator(), methodDecl.getBody());
-		decl.getBody().accept(bodyVisitor);
+		if (!Modifier.isAbstract(decl.getModifiers()) && decl.getBody() != null) {
+			BodyVisitor bodyVisitor = new BodyVisitor(nameGen, methodDecl.getBody());
+			decl.getBody().accept(bodyVisitor);
+		}
 
 		context.getMethods().add(methodDecl);
 	}

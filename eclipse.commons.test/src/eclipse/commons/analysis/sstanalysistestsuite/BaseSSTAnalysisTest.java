@@ -361,7 +361,7 @@ public abstract class BaseSSTAnalysisTest {
 		String cu = capitalizeString(name.getMethodName());
 		String qualifiedName = packageName.toLowerCase() + ";" + cu + ".java";
 
-		PluginAstParser parser = new PluginAstParser(projectName, qualifiedName);
+		AstParser parser = new AstParser(projectName, qualifiedName);
 		context = parser.getContext();
 	}
 

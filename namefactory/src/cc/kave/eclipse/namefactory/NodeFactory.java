@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -47,7 +46,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
-import cc.kave.commons.model.names.ParameterName;
 import cc.kave.commons.model.names.TypeName;
 import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
@@ -100,7 +98,19 @@ public class NodeFactory {
 			return createVariableName(node);
 
 		case ASTNode.CLASS_INSTANCE_CREATION:
-			String newName = methodNameHelper(null, ((ClassInstanceCreation) node).resolveConstructorBinding(), false);
+
+			// TODO: Bindings are sometimes null
+			IMethodBinding ctorBinding = ((ClassInstanceCreation) node).resolveConstructorBinding();
+			
+			if(ctorBinding == null){
+				System.out.println("BINDING NULL");
+			}
+			String newName = "";
+
+			if (ctorBinding != null) {
+				newName = methodNameHelper(null, ctorBinding, false);
+			}
+
 			return CsMethodName.newMethodName(newName);
 
 		case ASTNode.FIELD_ACCESS:
@@ -111,18 +121,20 @@ public class NodeFactory {
 			LambdaExpression lambda = (LambdaExpression) node;
 			IMethodBinding methodBinding = lambda.resolveMethodBinding();
 
-			sb.append("[").append(BindingFactory.getBindingName(methodBinding.getReturnType())).append("] (");
+			if (methodBinding != null) {
+				sb.append("[").append(BindingFactory.getBindingName(methodBinding.getReturnType())).append("] (");
 
-			List<VariableDeclaration> parameters = lambda.parameters();
-			for (VariableDeclaration variableDeclaration : parameters) {
-				sb.append(createParameterName(variableDeclaration)).append(", ");
+				List<VariableDeclaration> parameters = lambda.parameters();
+				for (VariableDeclaration variableDeclaration : parameters) {
+					sb.append(createParameterName(variableDeclaration)).append(", ");
+				}
+
+				if (!parameters.isEmpty()) {
+					sb.setLength(sb.length() - 2);
+				}
+
+				sb.append(")");
 			}
-
-			if (!parameters.isEmpty()) {
-				sb.setLength(sb.length() - 2);
-			}
-
-			sb.append(")");
 
 			return CsLambdaName.newLambdaName(sb.toString());
 
@@ -151,7 +163,9 @@ public class NodeFactory {
 			FieldDeclaration fieldNode = (FieldDeclaration) node;
 
 			Object field = fieldNode.fragments().get(0);
-			if (field instanceof VariableDeclarationFragment) {
+			// TODO: resolving problem
+			if (field instanceof VariableDeclarationFragment
+					&& ((VariableDeclarationFragment) field).resolveBinding() != null) {
 				sb.append(modifierHelper(((VariableDeclarationFragment) field).resolveBinding()));
 				sb.append("[");
 				sb.append(BindingFactory
@@ -160,10 +174,8 @@ public class NodeFactory {
 				sb.append(getDeclaringType(fieldNode));
 				sb.append("].");
 				sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
-
-				return CsFieldName.newFieldName(sb.toString());
 			}
-			break;
+			return CsFieldName.newFieldName(sb.toString());
 
 		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
 			VariableDeclarationStatement variableStatementNode = (VariableDeclarationStatement) node;
@@ -175,9 +187,8 @@ public class NodeFactory {
 						.getBindingName(((VariableDeclarationFragment) variableStatement).resolveBinding().getType()));
 				sb.append("] ");
 				sb.append(((VariableDeclarationFragment) variableStatement).getName().getIdentifier());
-				return CsLocalVariableName.newLocalVariableName(sb.toString());
 			}
-			break;
+			return CsLocalVariableName.newLocalVariableName(sb.toString());
 
 		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
 			VariableDeclarationExpression variableExpressionNode = (VariableDeclarationExpression) node;
@@ -189,11 +200,10 @@ public class NodeFactory {
 						.getBindingName(((VariableDeclarationFragment) variableExpression).resolveBinding().getType()));
 				sb.append("] ");
 				sb.append(((VariableDeclarationFragment) variableExpression).getName().getIdentifier());
-				return CsLocalVariableName.newLocalVariableName(sb.toString());
 			}
-			break;
+			return CsLocalVariableName.newLocalVariableName(sb.toString());
 		}
-		throw new RuntimeException("should not happen");
+		throw new RuntimeException("should not happen; Type: " + node.getClass().getName());
 	}
 
 	private static Name createSuperMethodInvName(ASTNode node) {
@@ -208,7 +218,10 @@ public class NodeFactory {
 		StringBuilder sb = new StringBuilder();
 		MethodInvocation invocation = (MethodInvocation) node;
 		IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
-		sb.append(methodNameHelper(null, methodInvBinding, true));
+
+		// TODO: check reason for null binding
+		if (methodInvBinding != null)
+			sb.append(methodNameHelper(null, methodInvBinding, true));
 		return CsMethodName.newMethodName(sb.toString());
 	}
 
@@ -250,22 +263,29 @@ public class NodeFactory {
 		return CsMethodName.newMethodName(methodNameHelper(methodNode, methodBinding, true));
 	}
 
-	private static String methodNameHelper(MethodDeclaration methodNode, IMethodBinding method, boolean override) {
-		if (override && hasOverrideAnnotation(method)) {
-			getSuperMethodNames(method);
+	private static String methodNameHelper(MethodDeclaration methodNode, IMethodBinding methodBinding,
+			boolean override) {
+
+		// TODO: not resolving, null again
+		if (methodBinding == null) {
+			return "";
+		}
+
+		if (override && hasOverrideAnnotation(methodBinding)) {
+			getSuperMethodNames(methodBinding);
 		}
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(modifierHelper(method));
+		sb.append(modifierHelper(methodBinding));
 
 		sb.append("[");
 
-		String declaringClass = BindingFactory.getBindingName(method.getDeclaringClass());
-		if (method.isConstructor()) {
+		String declaringClass = BindingFactory.getBindingName(methodBinding.getDeclaringClass());
+		if (methodBinding.isConstructor()) {
 			sb.append(CsTypeName.newTypeName(declaringClass).getIdentifier());
 		} else {
-			String returnType = BindingFactory.getBindingName(method.getReturnType());
+			String returnType = BindingFactory.getBindingName(methodBinding.getReturnType());
 			sb.append(CsTypeName.newTypeName(returnType).getIdentifier());
 		}
 
@@ -273,15 +293,15 @@ public class NodeFactory {
 		sb.append(CsTypeName.newTypeName(declaringClass).getIdentifier());
 		sb.append("].");
 
-		if (method.isConstructor()) {
+		if (methodBinding.isConstructor()) {
 			sb.append(".ctor");
 		} else {
-			sb.append(method.getName());
+			sb.append(methodBinding.getName());
 		}
 
 		sb.append("(");
 
-		String[] parameterNames = createParameterNames(methodNode, method);
+		String[] parameterNames = createParameterNames(methodNode, methodBinding);
 
 		for (int i = 0; i < parameterNames.length; i++) {
 			sb.append(parameterNames[i]);
@@ -384,7 +404,8 @@ public class NodeFactory {
 			}
 		}
 
-		methodNames[0] = CsMethodName.newMethodName(methodNameHelper(null, firstMethod, false));
+		// methodNames[0] = CsMethodName.newMethodName(methodNameHelper(null,
+		// firstMethod, false));
 
 		if (topLevelMethod != null) {
 			methodNames[1] = CsMethodName.newMethodName(methodNameHelper(null, topLevelMethod, false));
@@ -436,6 +457,11 @@ public class NodeFactory {
 
 		public static String getBindingName(IBinding binding) {
 			StringBuilder sb = new StringBuilder();
+
+			// TODO: check null problem
+			if (binding == null) {
+				return "";
+			}
 
 			switch (binding.getKind()) {
 

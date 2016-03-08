@@ -15,12 +15,8 @@
  */
 package eclipse.commons.analysis.sstanalysistestsuite;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -40,7 +36,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.eclipse.commons.analysis.transformer.DeclarationVisitor;
 
-public class PluginAstParser {
+public class AstParser {
 
 	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private CompilationUnit parsed;
@@ -58,7 +54,7 @@ public class PluginAstParser {
 	 *            The name of the compilationunit which get parsed, for example
 	 *            "Test.java"
 	 */
-	public PluginAstParser(String projectName, String qualifiedName) {
+	public AstParser(String projectName, String qualifiedName) {
 		javaProjects = getJavaProjects();
 		initializeAst(projectName, qualifiedName);
 	}

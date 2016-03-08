@@ -1,6 +1,5 @@
 package eclipse.commons.analysis.sstanalysistestsuite.expressions;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.MethodName;
@@ -30,17 +29,5 @@ public class ObjectCreationExpressionAnalysisTest extends BaseSSTAnalysisTest {
 		assertMethod(newVariableDeclaration("$0", SSTAnalysisFixture.STRING),
 				newAssignment("$0", newInvokeConstructor(SSTAnalysisFixture.STRING_CTOR)), expressionToStatement(
 						newInvokeConstructor(stringCtor, newReferenceExpression(newVariableReference("$0")))));
-	}
-
-	// TODO: can not create parameterized names
-	@Ignore
-	@Test
-	public void parameterizedObjectCreation() {
-	}
-
-	@Ignore
-	@Test
-	public void parameterizedObjectCreationWithQualifiedName() {
-		assertMethod();
 	}
 }

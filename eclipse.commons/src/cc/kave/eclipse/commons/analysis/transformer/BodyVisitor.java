@@ -179,7 +179,7 @@ public class BodyVisitor extends ASTVisitor {
 			BodyVisitor visitor = new BodyVisitor(nameGen, ifElseBlock.getElse());
 			stmt.getElseStatement().accept(visitor);
 		}
-
+		
 		body.add(ifElseBlock);
 		return false;
 	}
@@ -267,13 +267,14 @@ public class BodyVisitor extends ASTVisitor {
 			body.add(variableDeclaration);
 
 			if (fragment.getInitializer() != null) {
-				if(isArrayCreation(fragment.getInitializer())){
+				if (isArrayCreation(fragment.getInitializer())) {
 					exprVisitor.setLastArrayAccess(variableReference);
 				}
-			
+
 				fragment.getInitializer().accept(exprVisitor);
 
-				if (!isSelfAssign(exprVisitor.getAssignableExpression(), variableReference) && !isArrayCreation(fragment.getInitializer())) {
+				if (!isSelfAssign(exprVisitor.getAssignableExpression(), variableReference)
+						&& !isArrayCreation(fragment.getInitializer())) {
 					cc.kave.commons.model.ssts.impl.statements.Assignment assignment = new cc.kave.commons.model.ssts.impl.statements.Assignment();
 					assignment.setReference(variableReference);
 					assignment.setExpression(exprVisitor.getAssignableExpression());

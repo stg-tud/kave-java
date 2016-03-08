@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -163,6 +164,7 @@ public class ExpressionVisitor extends ASTVisitor {
 
 		node.getExpression().accept(this);
 		ifElseExpression.setCondition(getSimpleExpression());
+
 		node.getThenExpression().accept(this);
 		ifElseExpression.setThenExpression(getSimpleExpression());
 		node.getElseExpression().accept(this);
@@ -192,6 +194,7 @@ public class ExpressionVisitor extends ASTVisitor {
 
 		variableReference = fieldVarRef;
 		assignableExpression = refExpr;
+		assignableReference = fieldReference;
 
 		if (!isParentStatement(node) || node.getParent() instanceof MethodInvocation) {
 			VariableReference genVar = new VariableReference();
@@ -482,9 +485,20 @@ public class ExpressionVisitor extends ASTVisitor {
 			break;
 		}
 
-		if (isPreOrPostfixExpression(node.getOperator().toString()) && !isParentAssignment(node)) {
+		if (node.getParent() instanceof IfStatement || node.getParent() instanceof ConditionalExpression) {
+			VariableReference genVar = new VariableReference();
+			genVar.setIdentifier(nameGen.getNextVariableName());
+
+			ReferenceExpression refExpr = new ReferenceExpression();
+			refExpr.setReference(genVar);
+
+			createAndAssign(node.getOperand().resolveTypeBinding(), genVar, unaryExpression);
+
+			simpleExpression = refExpr;
+		} else if (isPreOrPostfixExpression(node.getOperator().toString()) && !isParentAssignment(node)) {
 			assignment.setExpression(unaryExpression);
 			assignment.setReference(visitor.getAssignableReference());
+
 			body.add(assignment);
 		}
 		return false;
@@ -507,6 +521,7 @@ public class ExpressionVisitor extends ASTVisitor {
 		refExpr.setReference(fieldRef);
 
 		assignableExpression = refExpr;
+		assignableReference = fieldRef;
 
 		if (!isParentStatement(node)) {
 			VariableReference genVar = new VariableReference();
@@ -589,7 +604,10 @@ public class ExpressionVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(ArrayCreation node) {
-		node.getInitializer().accept(this);
+		if (node.getInitializer() != null) {
+			node.getInitializer().accept(this);
+		}
+
 		return false;
 	}
 
@@ -720,11 +738,13 @@ public class ExpressionVisitor extends ASTVisitor {
 
 			binaryExpression.setLeftOperand(leftOperand);
 
+			simpleExpression = leftOperand;
+
 			extendedOperands.get(i).accept(this);
 			binaryExpression.setRightOperand(getSimpleExpression());
 		}
 
-		if (isParentInfixExpression(node) && extendedOperands.isEmpty()) {
+		if ((isParentInfixExpression(node) && extendedOperands.isEmpty()) || node.getParent() instanceof IfStatement) {
 			VariableReference varRef = new VariableReference();
 			varRef.setIdentifier(nameGen.getNextVariableName());
 
@@ -752,13 +772,17 @@ public class ExpressionVisitor extends ASTVisitor {
 			ExpressionVisitor exprVisitor = new ExpressionVisitor(nameGen, lambdaExpression.getBody());
 			node.getBody().accept(exprVisitor);
 
-			if (!BindingFactory.getBindingName(node.resolveMethodBinding().getReturnType())
-					.equals("%void, rt.jar, 1.8")) {
+			// TODO: remove first null check
+			if (node.resolveMethodBinding() != null && !BindingFactory
+					.getBindingName(node.resolveMethodBinding().getReturnType()).equals("%void, rt.jar, 1.8")) {
 				int size = lambdaExpression.getBody().size();
-				lambdaExpression.getBody().remove(size - 1);
 
 				ReturnStatement returnStatement = new ReturnStatement();
 				returnStatement.setExpression(exprVisitor.getSimpleExpression());
+
+				if (size > 0) {
+					lambdaExpression.getBody().remove(size - 1);
+				}
 
 				lambdaExpression.getBody().add(returnStatement);
 			}
