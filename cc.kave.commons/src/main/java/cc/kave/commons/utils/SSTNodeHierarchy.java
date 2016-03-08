@@ -336,8 +336,10 @@ public class SSTNodeHierarchy {
 
 		@Override
 		public Void visit(ICompletionExpression entity, SSTNodeHierarchy context) {
-			context.addChildren(entity, Lists.newArrayList(entity.getVariableReference()));
-			entity.getVariableReference().accept(this, context);
+			if (entity.getVariableReference() != null) {
+				context.addChildren(entity, Lists.newArrayList(entity.getVariableReference()));
+				entity.getVariableReference().accept(this, context);
+			}
 			return null;
 		}
 
