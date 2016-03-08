@@ -68,21 +68,12 @@ public class QueryGeneratorByPercentage {
 
 	private Map<Double, Integer> calcPercNumbers(int size) {
 		Map<Double, Integer> removals = new HashMap<Double, Integer>();
-		int[] nums = new int[9];
 		
-		int p10 = size - (int) Math.ceil(0.10 * (double) size);
-		int first = size - (int) Math.ceil(0.25 * (double) size);
-		int second = size - (int) Math.ceil(0.5 * (double) size);
-		int third = size - (int) Math.ceil(0.75 * (double) size);
-		
-		if (first > 0) {
-			removals.put(0.25, first);
-		}
-		if (!removals.values().contains(second) && (second > 0 && second < size)) {
-			removals.put(0.5, second);
-		}
-		if (!removals.values().contains(third) && (third > 0 && third < size)) {
-			removals.put(0.75, third);
+		for (double perc = 0.10; perc < 1.0; perc += 0.10) {
+			int p = size - (int) Math.ceil(perc * (double) size);
+			if (!removals.values().contains(p) && (p > 0.0 && p < size)) {
+				removals.put(perc, p);
+			}
 		}
 		return removals;
 	}

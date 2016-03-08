@@ -17,7 +17,7 @@ package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +46,8 @@ public class QueryGeneratorByPercentageTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		
-		expected = new HashMap<Double, Set<Episode>>();
+		expected = new LinkedHashMap<Double, Set<Episode>>();
+		actuals = new LinkedHashMap<Double, Set<Episode>>();
 		
 		sut = new QueryGeneratorByPercentage();
 	}
@@ -62,7 +63,7 @@ public class QueryGeneratorByPercentageTest {
 	public void twoMethodInv() {
 		Episode target = createEpisode("11", "12", "13", "11>12", "11>13", "12>13");
 
-		expected.put(0.25, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13")));
+		expected.put(0.10, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13")));
 
 		actuals = sut.generateQueries(target);
 
@@ -74,24 +75,36 @@ public class QueryGeneratorByPercentageTest {
 		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
 				"12>14");
 		
-		expected.put(0.25, Sets.newHashSet(createEpisode("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13", "12>14"), 
+		expected.put(0.10, Sets.newHashSet(createEpisode("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13", "12>14"), 
 											createEpisode("11", "12", "13", "15", "11>12", "11>13", "11>15", "12>13"), 
 											createEpisode("11", "12", "14", "15", "11>12", "11>14", "11>15", "12>14"),
 											createEpisode("11", "13", "14", "15", "11>13", "11>14", "11>15")));
 		
-		expected.put(0.5, Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"), 
+		expected.put(0.30, Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"), 
 											createEpisode("11", "12", "14", "11>12", "11>14", "12>14"), 
 											createEpisode("11", "12", "15", "11>12", "11>15"), 
 											createEpisode("11", "13", "14", "11>13", "11>14"),
 											createEpisode("11", "13", "15", "11>13", "11>15"), 
 											createEpisode("11", "14", "15", "11>14", "11>15")));
 		
-		expected.put(0.75, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"), 
+		expected.put(0.60, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"), 
 											createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15")));
 
 		actuals = sut.generateQueries(target);
 
 		assertEquals(expected, actuals);
+	}
+	
+	private boolean equalityCheck(Map<Double, Set<Episode>> expected, Map<Double, Set<Episode>> actuals) {
+		if (expected.size() != actuals.size()) {
+			return false;
+		}
+		for (Map.Entry<Double, Set<Episode>> entry : expected.entrySet()) {
+			if (entry.getValue().size() != actuals.get(entry.getKey()).size()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private Episode createEpisode(String... strings) {
