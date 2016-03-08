@@ -200,11 +200,11 @@ public class EvaluationTest {
 	}
 	
 	@Test
-	public void Inv3() throws ZipException, IOException {
-		Set<Episode> target = Sets.newHashSet(createQuery("11", "12", "20", "21", 
+	public void twoCategoriesLogger() throws ZipException, IOException {
+		validationData.add(createQuery("11", "12", "20", "21", 
 								"11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
 		
-		when(validationParser.parse(events)).thenReturn(target);
+		when(validationParser.parse(events)).thenReturn(validationData);
 		
 		Logger.clearLog();
 		sut.evaluate();
@@ -221,12 +221,64 @@ public class EvaluationTest {
 		assertLogContains(8, "% - Proposal strategy = 5\n");
 		assertLogContains(9, "% - Similarity metric = F1-value\n\n");
 		
-		assertLogContains(10, "Generating queries for episodes with 3 number of invocations\n");
-		assertLogContains(11, "\nNumber of targets with no proposals = 0\n\n");
-		
+		assertLogContains(10, "Generating queries for episodes with 2 number of invocations\n");
+		assertLogContains(11, "\nNumber of targets with no proposals = 1\n\n");
+
 		assertLogContains(12, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(18, "Removed 0.25\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(25, "Removed 0.50\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(18, "Removed 0.25\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(25, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(32, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		
+		assertLogContains(39, "Generating queries for episodes with 3 number of invocations\n");
+		assertLogContains(40, "\nNumber of targets with no proposals = 0\n\n");
+		
+		assertLogContains(41, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
+		assertLogContains(47, "Removed 0.25\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(54, "Removed 0.50\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(61, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+	}
+	
+	@Test
+	public void twoCategoriesWriter() throws ZipException, IOException {
+		validationData.add(createQuery("11", "12", "20", "21", 
+				"11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
+
+		when(validationParser.parse(events)).thenReturn(validationData);
+
+		sut.evaluate();
+		
+		File fileName1 = new File(rootFolder.getRoot().getAbsolutePath() + "/2.txt");
+		assertTrue(fileName1.exists());
+		assertFalse(fileName1.isDirectory());
+		
+		File fileName2 = new File(rootFolder.getRoot().getAbsolutePath() + "/3.txt");
+		assertTrue(fileName2.exists());
+		assertFalse(fileName2.isDirectory());
+		
+		List<String> actuals1 = new LinkedList<String>(); 
+		try {
+			actuals1 = FileUtils.readLines(fileName1);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		List<String> expected1 = new LinkedList<String>();
+		expected1.add("Target query 1\t0.25: [ <0.29, 0.22>; ]\t2");
+		expected1.add("Target query 2\t0.25: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
+		
+		assertEquals(expected1, actuals1);
+		
+		List<String> actuals2 = new LinkedList<String>(); 
+		try {
+			actuals2 = FileUtils.readLines(fileName2);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		List<String> expected2 = new LinkedList<String>();
+		expected2.add("Target query 1\t0.25: [ <0.33, 0.22>; ]\t0.50: [ <0.50, 0.22>; ]\t3");
+		
+		assertEquals(expected2, actuals2);
 	}
 
 	private Episode createQuery(String... strings) {

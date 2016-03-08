@@ -70,7 +70,7 @@ public class Evaluation {
 	private Map<Double, List<Tuple<Double, Double>>> categoryResults = new HashMap<Double, List<Tuple<Double, Double>>>();
 	
 	private DecimalFormat df = new DecimalFormat("0.00"); 
-	private StringBuilder sb = new StringBuilder();
+	private StringBuilder sb;
 
 	@Inject
 	public Evaluation(@Named("evaluation") File directory, ValidationContextsParser parser, 
@@ -105,10 +105,12 @@ public class Evaluation {
 			if (categoryEntry.getValue().isEmpty()) {
 				continue;
 			}
+			sb = new StringBuilder();
 			int targetID = 0;
 			int targetsWithoutProposals = 0;
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
+//				Logger.log("Target %d with %d number of invocations\n", targetID);
 				boolean hasProposals = false;
 				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
 				
@@ -151,6 +153,8 @@ public class Evaluation {
 			append("\nNumber of targets with no proposals = %d\n\n", targetsWithoutProposals);
 			synthesizeResults();
 			logSynthesized();
+			categoryResults.clear();
+			results.clear();
 		}
 	}
 	
