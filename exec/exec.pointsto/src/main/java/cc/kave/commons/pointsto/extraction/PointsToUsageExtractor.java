@@ -15,18 +15,17 @@ package cc.kave.commons.pointsto.extraction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
-import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
@@ -34,9 +33,13 @@ import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
+import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
+import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.IMethodName;
 import cc.recommenders.names.ITypeName;
@@ -102,22 +105,28 @@ public class PointsToUsageExtractor {
 		return contextUsages;
 	}
 
-	public List<Usage> extractQueries(ICompletionExpression completionExpression, PointsToContext context) {
-		if (completionExpression.getTypeReference() == null && completionExpression.getVariableReference() == null) {
-			LOGGER.error("Cannot extract queries if neither type nor variable information is available");
+	public List<Usage> extractQueries(ICompletionExpression completionExpression, PointsToContext context,
+			PointsToQueryBuilder queryBuilder, SSTNodeHierarchy nodeHierarchy) {
+		if (completionExpression.getTypeReference() != null) {
+			LOGGER.error("Queries for type references are not supported");
 			return Collections.emptyList();
 		}
 
-		// find enclosing method and statement
-		Map<Class<? extends ISSTNode>, ISSTNode> completionContext = new HashMap<>();
-		completionContext.put(ICompletionExpression.class, completionExpression);
-		context.getSST().accept(new CompletionExpressionContextVisitor(), completionContext);
-		IMethodDeclaration enclosingMethod = (IMethodDeclaration) completionContext.get(IMethodDeclaration.class);
-		if (enclosingMethod == null) {
-			LOGGER.error("Failed to find enclosing method of completion expression");
+		IVariableReference receiverVarRef = completionExpression.getVariableReference();
+		if (receiverVarRef == null) {
+			LOGGER.debug("Treating missing variable reference as 'this'");
+			receiverVarRef = SSTBuilder.variableReference(LanguageOptions.getInstance().getThisName());
+		}
+
+		// find enclosing statement and method
+		EnclosingNodeHelper nodeHelper = new EnclosingNodeHelper(nodeHierarchy);
+		IStatement enclosingStatement = nodeHelper.getEnclosingStatement(completionExpression);
+		IMemberDeclaration enclosingDecl = nodeHelper.getEnclosingDeclaration(enclosingStatement);
+		if (!(enclosingDecl instanceof IMethodDeclaration)) {
+			LOGGER.error("Completion expression must be within a method declaration");
 			return Collections.emptyList();
 		}
-		IStatement enclosingStatement = (IStatement) completionContext.get(IStatement.class);
+		IMethodDeclaration enclosingMethod = (IMethodDeclaration) enclosingDecl;
 
 		UsageExtractionVisitor visitor = new UsageExtractionVisitor();
 		UsageExtractionVisitorContext visitorContext = new UsageExtractionVisitorContext(context, descentStrategy);
@@ -126,8 +135,15 @@ public class PointsToUsageExtractor {
 			// treat the enclosing method as entry point although it might not be one
 			visitor.visitEntryPoint(enclosingMethod, visitorContext);
 
-			PointsToQuery ptQuery = new PointsToQuery(completionExpression.getVariableReference(), enclosingStatement,
-					completionExpression.getTypeReference(), new Callpath(enclosingMethod.getName()));
+			PointsToQuery ptQuery;
+			Callpath callpath = new Callpath(enclosingMethod.getName());
+			if (completionExpression.getVariableReference() == null) {
+				// the query builder cannot infer the type of references that are not part of the original SST
+				cc.kave.commons.model.names.ITypeName type = context.getTypeShape().getTypeHierarchy().getElement();
+				ptQuery = new PointsToQuery(receiverVarRef, enclosingStatement, type, callpath);
+			} else {
+				ptQuery = queryBuilder.newQuery(receiverVarRef, enclosingStatement, callpath);
+			}
 			Set<AbstractLocation> locations = context.getPointerAnalysis().query(ptQuery);
 			List<Query> usages = new ArrayList<>();
 			for (AbstractLocation location : locations) {
@@ -139,6 +155,7 @@ public class PointsToUsageExtractor {
 
 			// just rewrite, do not prune
 			rewriteUsages(usages, context.getTypeShape());
+			collector.onEntryPointUsagesExtracted(enclosingMethod, usages);
 
 			return new ArrayList<Usage>(usages);
 		} catch (AssertionException | UnexpectedSSTNodeException ex) {
