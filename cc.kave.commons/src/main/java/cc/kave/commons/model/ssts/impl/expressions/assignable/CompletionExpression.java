@@ -26,7 +26,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 public class CompletionExpression implements ICompletionExpression {
 
 	private ITypeName typeReference;
-	private IVariableReference objectReference;
+	private IVariableReference variableReference;
 	private String token;
 
 	public CompletionExpression() {
@@ -45,7 +45,7 @@ public class CompletionExpression implements ICompletionExpression {
 
 	@Override
 	public IVariableReference getVariableReference() {
-		return this.objectReference;
+		return this.variableReference;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class CompletionExpression implements ICompletionExpression {
 	}
 
 	public void setObjectReference(IVariableReference objectReference) {
-		this.objectReference = objectReference;
+		this.variableReference = objectReference;
 	}
 
 	public void setToken(String token) {
@@ -68,7 +68,7 @@ public class CompletionExpression implements ICompletionExpression {
 	@Override
 	public int hashCode() {
 		int hcTypeRef = this.typeReference != null ? this.typeReference.hashCode() : 0;
-		int hcObjRef = this.objectReference != null ? this.objectReference.hashCode() : 0;
+		int hcObjRef = this.variableReference != null ? this.variableReference.hashCode() : 0;
 		int hcToken = this.token.hashCode();
 		return (3 + hcToken * 397 + hcTypeRef * 23846 + hcObjRef);
 	}
@@ -82,10 +82,10 @@ public class CompletionExpression implements ICompletionExpression {
 		if (getClass() != obj.getClass())
 			return false;
 		CompletionExpression other = (CompletionExpression) obj;
-		if (objectReference == null) {
-			if (other.objectReference != null)
+		if (variableReference == null) {
+			if (other.variableReference != null)
 				return false;
-		} else if (!objectReference.equals(other.objectReference))
+		} else if (!variableReference.equals(other.variableReference))
 			return false;
 		if (token == null) {
 			if (other.token != null)
