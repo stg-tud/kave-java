@@ -93,7 +93,7 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.utils.SSTCloneUtil;
 
-public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<InliningContext, Void> {
+public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext, Void> {
 
 	@Override
 	public Void visit(ISST sst, InliningContext context) {
@@ -121,6 +121,7 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 				context.addMethod(method);
 			}
 		}
+		context.setMethods();
 	}
 
 	private void visitMethods(InliningContext context, ISST clone) {
@@ -217,7 +218,6 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	@Override
 	public Void visit(IForLoop block, InliningContext context) {
 		block.getCondition().accept(this, context);
-		// TODO: remove List
 		context.visitBlock(block.getInit());
 		context.visitBlock(block.getStep());
 		context.visitBlock(block.getBody());
@@ -252,7 +252,8 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(IForEachLoop block, InliningContext context) {
-		((ForEachLoop) block).setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
+		ForEachLoop forEachLoop = (ForEachLoop) block;
+		forEachLoop.setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
 		block.getLoopedReference().accept(this, context);
 		context.visitBlock(block.getBody());
 		context.addStatement(block);
@@ -330,7 +331,8 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 
 	@Override
 	public Void visit(ILabelledStatement stmt, InliningContext context) {
-		((LabelledStatement) stmt).setStatement(context.visit(stmt.getStatement(), context));
+		LabelledStatement labelledStatement = (LabelledStatement) stmt;
+		labelledStatement.setStatement(context.visit(stmt.getStatement(), context));
 		context.addStatement(stmt);
 		return null;
 	}
@@ -374,28 +376,12 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 			List<IStatement> body = new ArrayList<>();
 			Map<IVariableReference, IVariableReference> preChangedNames = new HashMap<>();
 
-			if (method.getName().hasParameters()) {
-				createParameterVariables(body, method.getName().getParameters(), expr.getParameters(), preChangedNames);
-			}
-			// Checking if guards statements are needed and setting them up if
-			// so
-			CountReturnContext countReturnContext = new CountReturnContext();
-			method.accept(new CountReturnsVisitor(), countReturnContext);
-			int returnStatementCount = countReturnContext.returnCount;
-			context.setVoid(countReturnContext.isVoid);
-			boolean guardsNeeded = returnStatementCount > 1 ? true : false;
-			if (returnStatementCount == 1 && method.getBody().size() > 0) {
-				guardsNeeded = !(method.getBody().get(method.getBody().size() - 1) instanceof IReturnStatement);
-			}
-			if (guardsNeeded) {
-				setupGuardVariables(method.getName(), body, context);
-			}
+			boolean guardsNeeded = setupMethodInlining(expr, context, method, body, preChangedNames);
 			// Add all Statements from the method body
 			body.addAll(method.getBody());
-			// enter a new Scope
+
 			context.enterScope(body, preChangedNames);
 			context.setInline(true);
-			context.setGuardVariableNames(method.getName().getIdentifier());
 			if (!guardsNeeded) {
 				for (IStatement statement : body) {
 					if (statement instanceof IReturnStatement) {
@@ -407,7 +393,10 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 					}
 					statement.accept(this, context);
 				}
+				context.leaveScope();
+				context.setInline(false);
 			} else {
+				context.setGuardVariableNames(method.getName().getIdentifier());
 				context.visitBlock(body);
 				context.leaveScope();
 				context.setInline(false);
@@ -416,19 +405,34 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 				}
 				if (!context.isVoid()) {
 					context.setReturnExpression(SSTUtil.referenceExprToVariable(context.getResultName()));
-					return null;
-				} else {
-					return null;
 				}
 			}
-			context.leaveScope();
-			context.setInline(false);
-			return null;
 		} else {
 			expr.getReference().accept(this, context);
 			context.setReturnExpression(expr);
-			return null;
 		}
+		return null;
+	}
+
+	private boolean setupMethodInlining(IInvocationExpression expr, InliningContext context, IMethodDeclaration method,
+			List<IStatement> body, Map<IVariableReference, IVariableReference> preChangedNames) {
+		if (method.getName().hasParameters()) {
+			createParameterVariables(body, method.getName().getParameters(), expr.getParameters(), preChangedNames);
+		}
+		// Checking if guards statements are needed and setting them up if
+		// so
+		CountReturnContext countReturnContext = new CountReturnContext();
+		method.accept(new CountReturnsVisitor(), countReturnContext);
+		int returnStatementCount = countReturnContext.returnCount;
+		context.setVoid(countReturnContext.isVoid);
+		boolean guardsNeeded = returnStatementCount > 1 ? true : false;
+		if (returnStatementCount == 1 && method.getBody().size() > 0) {
+			guardsNeeded = !(method.getBody().get(method.getBody().size() - 1) instanceof IReturnStatement);
+		}
+		if (guardsNeeded) {
+			setupGuardVariables(method.getName(), body, context);
+		}
+		return guardsNeeded;
 	}
 
 	private void setupGuardVariables(IMethodName methodName, List<IStatement> body, InliningContext context) {
@@ -551,7 +555,6 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 			entity.getVariableReference().accept(this, context);
 		}
 		return null;
-		// TODO tests
 	}
 
 	@Override
@@ -588,7 +591,7 @@ public class InliningIStatementVisitor extends AbstractThrowingNodeVisitor<Inlin
 	}
 
 	public Void visit(IVariableReference ref, InliningContext context) {
-		((VariableReference) ref).setIdentifier(((IVariableReference) context.resolve(ref)).getIdentifier());
+		context.resolve(ref);
 		return null;
 	}
 

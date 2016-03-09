@@ -29,7 +29,6 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -56,10 +55,11 @@ public class InliningContext {
 	private boolean inline = false;
 	private boolean guardNeeded = false;
 	private boolean globalGuardNeed = false;
-	private final InliningIStatementVisitor statementVisitor;
+	private final InliningVisitor inliningVisitor;
 	private IAssignableExpression returnExpression = null;
 
 	private Set<IMethodDeclaration> inlinedMethods;
+	private Set<IMethodDeclaration> methods;
 	private boolean isVoid;
 
 	public InliningContext() {
@@ -69,8 +69,9 @@ public class InliningContext {
 		this.scope = null;
 		this.visitor = new NameScopeVisitor();
 		this.counter = 0;
-		this.statementVisitor = new InliningIStatementVisitor();
+		this.inliningVisitor = new InliningVisitor();
 		this.inlinedMethods = new HashSet<>();
+		this.methods = new HashSet<>();
 	}
 
 	public void addInlinedMethod(IMethodDeclaration method) {
@@ -78,7 +79,7 @@ public class InliningContext {
 	}
 
 	public void addMethod(IMethodDeclaration method) {
-		sst.getMethods().add(method);
+		methods.add(method);
 	}
 
 	public void addStatement(IStatement stmt) {
@@ -230,14 +231,9 @@ public class InliningContext {
 		enterBlock();
 		int index = 0;
 		for (IStatement statement : body) {
-			statement.accept(getStatementVisitor(), this);
+			statement.accept(getVisitor(), this);
 			if ((isGuardNeeded()) && index < body.size() - 1 && body.subList(index + 1, body.size()).size() > 0) {
-				IfElseBlock block = new IfElseBlock();
-				block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
-				setGuardNeeded(false);
-				block.setThen(body.subList(index + 1, body.size()));
-				visitBlock(block.getThen());
-				addStatement(block);
+				addGuardStatement(body, index, false);
 				break;
 			}
 			index++;
@@ -247,28 +243,28 @@ public class InliningContext {
 	}
 
 	public void visitScope(List<IStatement> body) {
-		visitScope(body, null);
-	}
-
-	public void visitScope(List<IStatement> body, Map<IVariableReference, IVariableReference> preChangedNames) {
-		enterScope(body, preChangedNames);
+		enterScope(body, null);
 		int index = 0;
 		for (IStatement statement : body) {
-			statement.accept(getStatementVisitor(), this);
+			statement.accept(getVisitor(), this);
 			if ((isGuardNeeded() || isGlobalGuardNeeded()) && body.subList(index + 1, body.size()).size() > 0) {
-				IfElseBlock block = new IfElseBlock();
-				block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
-				setGuardNeeded(false);
-				setGlobalGuardNeeded(false);
-				block.setThen(body.subList(index + 1, body.size()));
-				visitBlock(block.getThen());
-				addStatement(block);
+				addGuardStatement(body, index, true);
 				break;
 			}
 			index++;
 		}
-		// newBody.addAll(context.getBody());
 		leaveScope();
+	}
+
+	private void addGuardStatement(List<IStatement> body, int index, boolean globalGuard) {
+		IfElseBlock block = new IfElseBlock();
+		block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
+		setGuardNeeded(false);
+		if (globalGuard)
+			setGlobalGuardNeeded(false);
+		block.getThen().addAll(body.subList(index + 1, body.size()));
+		visitBlock(block.getThen());
+		addStatement(block);
 	}
 
 	public void setGlobalGuardNeeded(boolean guardNeeded) {
@@ -335,8 +331,8 @@ public class InliningContext {
 		return sst;
 	}
 
-	public InliningIStatementVisitor getStatementVisitor() {
-		return statementVisitor;
+	public InliningVisitor getVisitor() {
+		return inliningVisitor;
 	}
 
 	public boolean isGlobalGuardNeeded() {
@@ -355,8 +351,8 @@ public class InliningContext {
 		return isVoid;
 	}
 
-	public IReference resolve(IVariableReference ref) {
-		return scope.resolve(ref);
+	public void resolve(IVariableReference ref) {
+		scope.resolve(ref);
 	}
 
 	public IAssignableExpression getReturnExpression() {
@@ -365,6 +361,10 @@ public class InliningContext {
 
 	public void setReturnExpression(IAssignableExpression returnExpression) {
 		this.returnExpression = returnExpression;
+	}
+
+	public void setMethods() {
+		sst.setMethods(methods);
 	}
 
 }

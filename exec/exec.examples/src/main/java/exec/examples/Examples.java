@@ -135,7 +135,7 @@ public class Examples {
 		// initialize the inlining
 		InliningContext context = new InliningContext();
 		// start the transformation by accepting the visitor
-		originalSst.accept(context.getStatementVisitor(), context);
+		originalSst.accept(context.getVisitor(), context);
 		// and access the inlined version
 		ISST inlinedSst = context.getSST();
 	}

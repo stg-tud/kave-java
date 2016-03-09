@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class Scope {
@@ -42,10 +43,10 @@ public class Scope {
 		this.gotResultName = "";
 	}
 
-	public IVariableReference resolve(IVariableReference ref) {
+	public void resolve(IVariableReference ref) {
 		if (changedNames.containsKey(ref)) {
-			return changedNames.get(ref);
-		} else
-			return ref;
+			VariableReference variableReference = (VariableReference) ref;
+			variableReference.setIdentifier(changedNames.get(ref).getIdentifier());
+		}
 	}
 }

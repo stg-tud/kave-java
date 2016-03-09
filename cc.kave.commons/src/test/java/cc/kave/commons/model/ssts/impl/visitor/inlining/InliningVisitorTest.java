@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -35,7 +36,6 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpress
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -1028,10 +1028,22 @@ public class InliningVisitorTest extends InliningBaseTest {
 		assertSSTs(sst, inlinedSST);
 	}
 
+	@Test
+	@Ignore
+	public void sstIntegrationTest() {
+		// TODO: build sst with every statement, expression and reference
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("ep2")),
+				declareNonEntryPoint("ep2", //
+						declareVar("a"), assign(ref("a"), constant("0")) //
+		));
+	}
+
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
-		sst.accept(new InliningIStatementVisitor(), context);
-		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		sst.accept(new InliningVisitor(), context);
+		// System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }
