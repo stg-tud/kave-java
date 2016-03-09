@@ -16,7 +16,9 @@
 package cc.kave.episodes.evaluation.queries;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -92,19 +94,20 @@ public class QueryGeneratorByPercentageTest {
 
 		actuals = sut.generateQueries(target);
 
-		assertEquals(expected, actuals);
+		assertQueries(expected, actuals);
 	}
 	
-	private boolean equalityCheck(Map<Double, Set<Episode>> expected, Map<Double, Set<Episode>> actuals) {
-		if (expected.size() != actuals.size()) {
-			return false;
-		}
+	private void assertQueries(Map<Double, Set<Episode>> expected, Map<Double, Set<Episode>> actuals) {
+		assertTrue(expected.size() == actuals.size());
 		for (Map.Entry<Double, Set<Episode>> entry : expected.entrySet()) {
-			if (entry.getValue().size() != actuals.get(entry.getKey()).size()) {
-				return false;
+			assertTrue(entry.getValue().size() == actuals.get(entry.getKey()).size());
+			
+			Iterator<Episode> itE = entry.getValue().iterator();
+			Iterator<Episode> itA = actuals.get(entry.getKey()).iterator();
+			while (itE.hasNext()) {
+				assertEquals(itE.next(), itA.next());
 			}
 		}
-		return true;
 	}
 
 	private Episode createEpisode(String... strings) {

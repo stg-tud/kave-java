@@ -18,11 +18,9 @@ package cc.kave.episodes.evaluation.queries;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -31,19 +29,15 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetsGenerator {
 	
-	public Map<Integer, Set<Set<Fact>>> generateSubsets(Set<Fact> originalSet, Set<Integer> lengths) {
+	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length) {
 		assertTrue((originalSet.size() > 1), "Cannot subselect from less then one method invocation!");
-		for (int num : lengths) {
-			assertTrue(num < originalSet.size(), "Please subselect less than the total number of Facts!");
-		}
+		assertTrue(length < originalSet.size(), "Please subselect less than the total number of Facts!");
+		
 		List<Fact> superSet = setToListConverter(originalSet);
-		Map<Integer, Set<Set<Fact>>> results = new HashMap<Integer, Set<Set<Fact>>>();
-		for (int length : lengths) {
-			List<Set<Fact>> queryList = getSubsets(superSet, length);
-			Set<Set<Fact>> querySet = listofsetsToSetofsets(queryList);
-			results.put(length, querySet);
-		}
-		return results;
+		List<Set<Fact>> queryList = getSubsets(superSet, length);
+		Set<Set<Fact>> querySet = listofsetsToSetofsets(queryList);
+
+		return querySet;
 	}
 	
 	private Set<Set<Fact>> listofsetsToSetofsets(List<Set<Fact>> queryList) {
@@ -84,38 +78,4 @@ public class SubsetsGenerator {
 	    //"guess" x is not in the subset
 	    getSubsets(superSet, k, idx+1, current, solution);
 	}
-
-//	private Set<Set<Fact>> powerSet(Set<Fact> originalSet) {
-//		Set<Set<Fact>> sets = new HashSet<Set<Fact>>(); 
-//		if (originalSet.isEmpty()) { 
-//			sets.add(new HashSet<Fact>()); 
-//			return sets; 
-//		} 
-//		List<Fact> list = new ArrayList<Fact>(originalSet); 
-//		Fact head = list.get(0); 
-//		Set<Fact> rest = new HashSet<Fact>(list.subList(1, list.size())); 
-//		for (Set<Fact> set : powerSet(rest)) { 
-//			Set<Fact> newSet = new HashSet<Fact>(); 
-//			newSet.add(head); 
-//			newSet.addAll(set); 
-//			sets.add(newSet); 
-//			sets.add(set); 
-//		} 
-//		return sets; 
-//	}
-//	
-//	private Map<Integer, Set<Set<Fact>>> subsets(Set<Set<Fact>> allSets, Set<Integer> lengths) {
-//		Map<Integer, Set<Set<Fact>>> results = Maps.newHashMap();
-//		
-//		for (int num : lengths) {
-//			results.put(num, Sets.newHashSet());
-//		}
-//		
-//		for (Set<Fact> set : allSets) {
-//			if (results.containsKey(set.size())) {
-//				results.get(set.size()).add(set);
-//			}
-//		}
-//		return results;
-//	}
 }

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.util.MathUtils;
+
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
@@ -25,12 +27,11 @@ public class QueryGeneratorByPercentage {
 		
 		int numInvs = declInv.getSecond().size();
 		Map<Double, Integer> removals = calcPercNumbers(numInvs);
-		Map<Integer, Set<Set<Fact>>> subsets = generator.generateSubsets(declInv.getSecond(), 
-															wrap(removals));
 		
 		for (Map.Entry<Double, Integer> entry : removals.entrySet()) {
-			Set<Set<Fact>> querySubsets = subsets.get(entry.getValue());
-			for (Set<Fact> subset : querySubsets) {
+			int selectionLength = numInvs - entry.getValue();
+			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength);
+			for (Set<Fact> subset : currentSubsets) {
 				Episode query = createQuery(target, declInv.getFirst(), subset);
 				if (queries.containsKey(entry.getKey())) {
 					queries.get(entry.getKey()).add(query);
@@ -40,11 +41,6 @@ public class QueryGeneratorByPercentage {
 			}
 		}
 		return queries;
-	}
-
-	private Set<Integer> wrap(Map<Double, Integer> removals) {
-		Set<Integer> set = Sets.newHashSet(removals.values());
-		return set;
 	}
 
 	private Episode createQuery(Episode target, Fact methodDecl, Set<Fact> subset) {
@@ -70,9 +66,9 @@ public class QueryGeneratorByPercentage {
 		Map<Double, Integer> removals = new HashMap<Double, Integer>();
 		
 		for (double perc = 0.10; perc < 1.0; perc += 0.10) {
-			int p = size - (int) Math.ceil(perc * (double) size);
+			int p = (int) Math.ceil(perc * (double) size);
 			if (!removals.values().contains(p) && (p > 0.0 && p < size)) {
-				removals.put(perc, p);
+				removals.put(MathUtils.round(perc, 2), p);
 			}
 		}
 		return removals;
