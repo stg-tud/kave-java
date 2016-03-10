@@ -1116,7 +1116,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (ref instanceof IUnknownReference) {
 			LOGGER.error("Ignoring returning of an unknown reference");
 		} else {
-			ReferenceLocation returnLocation = getOrCreateReturnLocation(currentMember);
+			ReferenceLocation returnLocation;
+			if (lambdaStack.isEmpty()) {
+				returnLocation = getOrCreateReturnLocation(currentMember);
+			} else {
+				returnLocation = lambdaStack.getFirst().getValue();
+			}
 			ReferenceLocation srcLocation = ref.accept(srcLocationVisitor, this);
 
 			alias(returnLocation, srcLocation);
