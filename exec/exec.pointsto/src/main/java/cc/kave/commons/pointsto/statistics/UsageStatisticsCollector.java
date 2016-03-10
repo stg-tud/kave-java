@@ -39,6 +39,8 @@ public interface UsageStatisticsCollector {
 
 	void process(List<? extends Usage> usages);
 
+	void onUsagesPruned(int numPrunedUsages);
+
 	void output(Path file) throws IOException;
 
 }

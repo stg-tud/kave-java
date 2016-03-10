@@ -72,6 +72,12 @@ public class TypeHistogramUsageStatisticsCollector implements UsageStatisticsCol
 	}
 
 	@Override
+	public void onUsagesPruned(int numPrunedUsages) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void output(Path file) throws IOException {
 		List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.entrySet());
 		// List<Map.Entry<ITypeName, Integer>> entries = new ArrayList<>(histrogram.size());

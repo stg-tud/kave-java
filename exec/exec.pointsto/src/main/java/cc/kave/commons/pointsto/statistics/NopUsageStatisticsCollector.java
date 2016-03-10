@@ -51,6 +51,12 @@ public class NopUsageStatisticsCollector implements UsageStatisticsCollector {
 	}
 
 	@Override
+	public void onUsagesPruned(int numPrunedUsages) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void output(Path file) throws IOException {
 
 	}

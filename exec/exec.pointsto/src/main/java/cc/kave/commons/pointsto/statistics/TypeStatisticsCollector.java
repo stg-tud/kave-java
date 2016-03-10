@@ -12,12 +12,15 @@
  */
 package cc.kave.commons.pointsto.statistics;
 
+import static com.google.common.io.Files.getNameWithoutExtension;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +40,10 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 
 	private static final char SEPARATOR = ' ';
 
-	private Predicate<Usage> usageFilter;
+	private final Predicate<Usage> usageFilter;
 
 	private Map<ITypeName, Statistics> typeStatistics = new HashMap<>();
+	private long numPrunedUsages = 0;
 
 	public TypeStatisticsCollector(Predicate<Usage> usageFilter) {
 		this.usageFilter = usageFilter;
@@ -68,6 +72,8 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 				myStats.sumCallsites += otherStats.sumCallsites;
 				myStats.sumFilteredCallsites += otherStats.sumFilteredCallsites;
 			}
+
+			numPrunedUsages += otherTypeCollector.numPrunedUsages;
 		}
 	}
 
@@ -98,6 +104,11 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 				stats.sumFilteredCallsites += usage.getAllCallsites().size();
 			}
 		}
+	}
+
+	@Override
+	public void onUsagesPruned(int numPrunedUsages) {
+		this.numPrunedUsages += numPrunedUsages;
 	}
 
 	@Override
@@ -136,6 +147,8 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 			}
 		}
 
+		Path miscFile = file.getParent().resolve(getNameWithoutExtension(file.getFileName().toString()) + ".misc");
+		Files.write(miscFile, Arrays.asList("pruned Usages: " + numPrunedUsages));
 	}
 
 	private double calcAverage(long value, int size) {

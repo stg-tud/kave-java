@@ -175,15 +175,19 @@ public class PointsToUsageExtractor {
 
 	private List<Query> pruneUsages(List<Query> usages) {
 		List<Query> retainedUsages = new ArrayList<>(usages.size());
+		int numPruned = 0;
 
 		for (Query usage : usages) {
 			// prune usages that have no call sites or have an unknown type
 			ITypeName usageType = usage.getType();
-			if (!usage.getAllCallsites().isEmpty() && !CoReNameConverter.isUnknown(usageType)) {
+			if (usage.getReceiverCallsites().isEmpty() || CoReNameConverter.isUnknown(usageType)) {
+				++numPruned;
+			} else {
 				retainedUsages.add(usage);
 			}
 		}
 
+		collector.onUsagesPruned(numPruned);
 		return retainedUsages;
 	}
 
