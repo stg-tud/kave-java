@@ -38,7 +38,6 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
@@ -71,6 +70,7 @@ import cc.kave.commons.pointsto.analysis.unification.locations.Location;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
 import cc.kave.commons.pointsto.analysis.unification.locations.SimpleReferenceLocation;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.PropertyAsFieldPredicate;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 import cc.recommenders.assertions.Asserts;
@@ -93,20 +93,20 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private IMemberName currentMember;
 	private Deque<Pair<ILambdaExpression, ReferenceLocation>> lambdaStack = new ArrayDeque<>();
 
-	private DeclarationMapper declarationMapper;
+	private final PropertyAsFieldPredicate treatPropertyAsField;
 
 	private Map<IMemberName, ReferenceLocation> returnLocations = new HashMap<>();
 
 	private DestinationLocationVisitor destLocationVisitor = new DestinationLocationVisitor();
 	private SourceLocationVisitor srcLocationVisitor = new SourceLocationVisitor();
 
-	private LocationIdentifierFactory identifierFactory;
+	private final LocationIdentifierFactory identifierFactory;
 
 	private Multimap<ReferenceLocation, ReferenceLocation> pendingUnifications = HashMultimap.create();
 
 	public UnificationAnalysisVisitorContext(Context context, LocationIdentifierFactory identifierFactory) {
 		super(context);
-		declarationMapper = new DeclarationMapper(context);
+		this.treatPropertyAsField = new PropertyAsFieldPredicate(new DeclarationMapper(context));
 		this.identifierFactory = identifierFactory;
 
 		createImplicitLocations(context);
@@ -1047,9 +1047,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	public boolean treatPropertyAsField(IPropertyReference propertyRef) {
-		// treat properties of other classes and auto-implemented properties as field accesses
-		IPropertyDeclaration propertyDecl = declarationMapper.get(propertyRef.getPropertyName());
-		return propertyDecl == null || languageOptions.isAutoImplementedProperty(propertyDecl);
+		return treatPropertyAsField.test(propertyRef.getPropertyName());
 	}
 
 	public void readArray(IVariableReference destRef, IIndexAccessReference srcRef) {

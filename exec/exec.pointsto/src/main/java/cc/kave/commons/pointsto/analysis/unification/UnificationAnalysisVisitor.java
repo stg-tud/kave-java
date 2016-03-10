@@ -45,8 +45,6 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
-import cc.kave.commons.model.ssts.visitor.ISSTNode;
-import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
 import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
