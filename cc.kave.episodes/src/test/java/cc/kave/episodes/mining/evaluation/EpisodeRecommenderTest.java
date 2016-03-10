@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,8 +34,6 @@ public class EpisodeRecommenderTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
-	private DecimalFormat df = new DecimalFormat("#.###");
 
 	private Set<Tuple<Episode, Double>> expectedProposals;
 	private Set<Tuple<Episode, Double>> actualProposals;

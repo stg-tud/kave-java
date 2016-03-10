@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math.util.MathUtils;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -62,12 +63,14 @@ public class Evaluation {
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	
+	private Set<Double> percentages = Sets.newLinkedHashSet();
+	
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 	
 	private List<ProposalResults> results = new LinkedList<ProposalResults>();
 	
-	private Map<Double, List<Tuple<Double, Double>>> categoryResults = new HashMap<Double, List<Tuple<Double, Double>>>();
+	private Map<Double, List<Tuple<Double, Double>>> categoryResults = new LinkedHashMap<Double, List<Tuple<Double, Double>>>();
 	
 	private DecimalFormat df = new DecimalFormat("0.00"); 
 	private StringBuilder sb;
@@ -97,6 +100,9 @@ public class Evaluation {
 		Set<Episode> validationData = readValidationData(eventMapping);
 		Map<String, Set<Episode>> targets = categorizeTargets(validationData);
 		configurations();
+		for (double p = 0.10; p < 0.95; p += 0.10) {
+			percentages.add(p);
+		}
 		
 		for (Map.Entry<String, Set<Episode>> categoryEntry : targets.entrySet()) {
 			if (categoryEntry.getKey().equalsIgnoreCase("0-1")) {
@@ -110,7 +116,7 @@ public class Evaluation {
 			int targetsWithoutProposals = 0;
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
-//				Logger.log("Target %d with %d number of invocations\n", targetID);
+//				append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
 				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
 				
@@ -148,6 +154,7 @@ public class Evaluation {
 					targetsWithoutProposals++;
 				}
 			}
+//			Logger.log("\n");
 			writeCategoryResults(categoryEntry.getKey());
 			
 			append("\nNumber of targets with no proposals = %d\n\n", targetsWithoutProposals);
@@ -230,25 +237,24 @@ public class Evaluation {
 		}
 		append("\n");
 		for (Map.Entry<Double, List<Tuple<Double, Double>>> entry : categoryResults.entrySet()) {
-			append("Removed %s\t", df.format(entry.getKey()));
+			append("Removed %.00f\t", (entry.getKey()));
 			for (Tuple<Double, Double> pairs : entry.getValue()) {
-				append("<%s, %s>\t", df.format(pairs.getFirst()), df.format(pairs.getSecond()));
+				append("<%.00f,%.00f>\t", pairs.getFirst(), pairs.getSecond());
 			}
 			append("\n");
 		}
 	}
 
 	private void synthesizeResults() {
-		Map<Double, List<Tuple<Averager, Averager>>> categoryAverager = new HashMap<Double, List<Tuple<Averager, Averager>>>();
+		Map<Double, List<Tuple<Averager, Averager>>> categoryAverager = new LinkedHashMap<Double, List<Tuple<Averager, Averager>>>();
 		
 		//initialize
-		for (double p = 0.25; p < 0.8; p += 0.25) {
+		for (double p = 0.10; p < 0.95; p += 0.10) {
 			List<Tuple<Averager, Averager>> queryTarget = new LinkedList<Tuple<Averager, Averager>>();
-			
 			for (int ind = 0; ind < PROPOSALS; ind++) {
 				queryTarget.add(Tuple.newTuple(new Averager(), new Averager()));
 			}
-			categoryAverager.put(p, queryTarget);
+			categoryAverager.put(MathUtils.round(p, 2), queryTarget);
 		}
 		
 		//synthesize

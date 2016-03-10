@@ -172,9 +172,15 @@ public class EvaluationTest {
 		assertLogContains(11, "\nNumber of targets with no proposals = 1\n\n");
 
 		assertLogContains(12, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(18, "Removed 0.25\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(25, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(32, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(18, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(25, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(32, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(39, "Removed 0.40\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(46, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(53, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(60, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(67, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(74, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
 	}
 	
 	@Test
@@ -193,8 +199,8 @@ public class EvaluationTest {
 		}
 		
 		List<String> expected = new LinkedList<String>();
-		expected.add("Target query 1\t0.25: [ <0.29, 0.22>; ]\t2");
-		expected.add("Target query 2\t0.25: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
+		expected.add("Target query 1\t0.10: [ <0.29, 0.22>; ]\t2");
+		expected.add("Target query 2\t0.10: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
 		
 		assertEquals(expected, actuals);
 	}
@@ -225,17 +231,30 @@ public class EvaluationTest {
 		assertLogContains(11, "\nNumber of targets with no proposals = 1\n\n");
 
 		assertLogContains(12, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(18, "Removed 0.25\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(25, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(32, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(18, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(25, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(32, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(39, "Removed 0.40\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(46, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(53, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(60, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(67, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(74, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
 		
-		assertLogContains(39, "Generating queries for episodes with 3 number of invocations\n");
-		assertLogContains(40, "\nNumber of targets with no proposals = 0\n\n");
 		
-		assertLogContains(41, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(47, "Removed 0.25\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(54, "Removed 0.50\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(61, "Removed 0.75\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(81, "Generating queries for episodes with 3 number of invocations\n");
+		assertLogContains(82, "\nNumber of targets with no proposals = 0\n\n");
+		
+		assertLogContains(83, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
+		assertLogContains(89, "Removed 0.10\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(96, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(103, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(110, "Removed 0.40\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(117, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(124, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(131, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(138, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(145, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
 	}
 	
 	@Test
@@ -263,8 +282,8 @@ public class EvaluationTest {
 		}
 		
 		List<String> expected1 = new LinkedList<String>();
-		expected1.add("Target query 1\t0.25: [ <0.29, 0.22>; ]\t2");
-		expected1.add("Target query 2\t0.25: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
+		expected1.add("Target query 1\t0.10: [ <0.29, 0.22>; ]\t2");
+		expected1.add("Target query 2\t0.10: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
 		
 		assertEquals(expected1, actuals1);
 		
@@ -276,7 +295,7 @@ public class EvaluationTest {
 		}
 		
 		List<String> expected2 = new LinkedList<String>();
-		expected2.add("Target query 1\t0.25: [ <0.33, 0.22>; ]\t0.50: [ <0.50, 0.22>; ]\t3");
+		expected2.add("Target query 1\t0.10: [ <0.33, 0.22>; ]\t0.40: [ <0.50, 0.22>; ]\t3");
 		
 		assertEquals(expected2, actuals2);
 	}
