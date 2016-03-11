@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.analyzer;
 
 import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
 import static org.mockito.Mockito.verify;
@@ -32,12 +32,13 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.episodes.analyzer.ValidationSetAnalyzer;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
 
-public class TargetsCategorizationTest {
+public class ValidationSetAnalyzerTest {
 
 	@Mock
 	private EventMappingParser mappingParser;
@@ -46,7 +47,7 @@ public class TargetsCategorizationTest {
 	
 	private LinkedList<Event> events;
 	
-	private TargetsCategorization sut;
+	private ValidationSetAnalyzer sut;
 	
 	@Before
 	public void setup() throws ZipException, IOException {
@@ -57,7 +58,7 @@ public class TargetsCategorizationTest {
 		
 		events = new LinkedList<Event>();
 		
-		sut = new TargetsCategorization(mappingParser, validationParser);
+		sut = new ValidationSetAnalyzer(mappingParser, validationParser);
 		
 		when(mappingParser.parse()).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(Sets.newHashSet(createTarget("11"),

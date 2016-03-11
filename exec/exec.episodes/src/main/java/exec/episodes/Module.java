@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import cc.kave.episodes.analyzer.outputs.TrainingDataGraphGenerator;
-import cc.kave.episodes.analyzer.outputs.ValidationDataGraphGenerator;
+import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
+import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;

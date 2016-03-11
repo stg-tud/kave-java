@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.io.Logger.append;
 import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math.util.MathUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +54,7 @@ import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.TargetsCategorization;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
@@ -61,7 +65,7 @@ public class EvaluationTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Mock
 	private ValidationContextsParser validationParser;
 	@Mock
@@ -70,10 +74,12 @@ public class EvaluationTest {
 	private EpisodeParser episodeParser;
 	@Mock
 	private MaximalEpisodes maxEpisodeTracker;
+	@Mock
+	private TargetsCategorization categorizer;
 
 	private static final int FREQUENCY = 5;
 	private static final double BIDIRECTIONAL = 0.01;
-	
+
 	private QueryGeneratorByPercentage queryGenerator;
 	private EpisodeRecommender recommender;
 
@@ -81,15 +87,14 @@ public class EvaluationTest {
 	private List<Event> events = new LinkedList<Event>();
 	private Map<Integer, Set<Episode>> patterns = new HashMap<Integer, Set<Episode>>();
 	private Map<Integer, Set<Episode>> maxPatterns = new HashMap<Integer, Set<Episode>>();
-	
-	private Episode categoryQuery = createQuery("11", "20", "21", "11>20", "11>21", "20>21");
+	private Map<String, Set<Episode>> categories = new LinkedHashMap<String, Set<Episode>>();
 
 	private Evaluation sut;
 
 	@Before
 	public void setup() throws ZipException, IOException {
 		LocaleUtils.setDefaultLocale();
-		
+
 		Logger.reset();
 		Logger.setCapturing(true);
 
@@ -97,26 +102,33 @@ public class EvaluationTest {
 		recommender = new EpisodeRecommender();
 
 		MockitoAnnotations.initMocks(this);
-		sut = new Evaluation(rootFolder.getRoot(), validationParser, mappingParser, queryGenerator, recommender, episodeParser,
-				maxEpisodeTracker);
+		sut = new Evaluation(rootFolder.getRoot(), validationParser, mappingParser, queryGenerator, recommender,
+				episodeParser, maxEpisodeTracker, categorizer);
 
 		validationData.add(createQuery("11"));
 		validationData.add(createQuery("11", "12", "13", "11>12", "11>13", "12>13"));
 		validationData.add(createQuery("11", "15", "16", "11>15", "11>16", "15>16"));
 		validationData.add(createQuery("11", "20", "11>20"));
-		validationData.add(categoryQuery);
-		
+		validationData.add(createQuery("11", "20", "21", "11>20", "11>21", "20>21"));
+
+		categories.put("0-1", Sets.newHashSet(createQuery("11"), createQuery("11", "20", "11>20")));
+		categories.put("2",
+				Sets.newHashSet(createQuery("11", "12", "13", "11>12", "11>13", "12>13"),
+						createQuery("11", "15", "16", "11>15", "11>16", "15>16"),
+						createQuery("11", "20", "21", "11>20", "11>21", "20>21")));
+
+		when(categorizer.categorize(validationData)).thenReturn(categories);
+
 		events.add(new Event());
 
 		patterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14")));
 		patterns.put(3, Sets.newHashSet(createPattern(3, "11", "15", "13", "11>15", "11>13", "15>13"),
 				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
 
-		maxPatterns.put(2,
-				Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14"), 
-								createPattern(3, "11", "13", "11>13")));
+		maxPatterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14"),
+				createPattern(3, "11", "13", "11>13")));
 		maxPatterns.put(3, Sets.newLinkedHashSet());
-				maxPatterns.get(3).add(createPattern(3, "11", "15", "13", "11>15", "11>13", "15>13"));
+		maxPatterns.get(3).add(createPattern(3, "11", "15", "13", "11>15", "11>13", "15>13"));
 
 		when(episodeParser.parse(eq(FREQUENCY), eq(BIDIRECTIONAL))).thenReturn(patterns);
 		when(mappingParser.parse()).thenReturn(events);
@@ -133,8 +145,8 @@ public class EvaluationTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder does not exist");
-		sut = new Evaluation(new File("does not exist"), validationParser, mappingParser, 
-							queryGenerator, recommender, episodeParser, maxEpisodeTracker);
+		sut = new Evaluation(new File("does not exist"), validationParser, mappingParser, queryGenerator, recommender,
+				episodeParser, maxEpisodeTracker, categorizer);
 	}
 
 	@Test
@@ -142,10 +154,10 @@ public class EvaluationTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder is not a folder, but a file");
-		sut = new Evaluation(file, validationParser, mappingParser, queryGenerator, 
-								recommender, episodeParser, maxEpisodeTracker);
+		sut = new Evaluation(file, validationParser, mappingParser, queryGenerator, recommender, episodeParser,
+				maxEpisodeTracker, categorizer);
 	}
-	
+
 	@Test
 	public void logger() throws ZipException, IOException {
 		Logger.clearLog();
@@ -161,142 +173,128 @@ public class EvaluationTest {
 		assertLogContains(2, "Readng the validation data\n");
 
 		assertLogContains(3, "\n");
-		assertLogContains(4, "% - Patterns configuration:\n");
+		assertLogContains(4, "% - Evaluations configuration:\n");
 		assertLogContains(5, "% - Frequency = 5\n");
 		assertLogContains(6, "% - Bidirectional measure = 0.01\n");
-		assertLogContains(7, "% - Querying strategy = [25%, 50%, 75%]\n");
+		assertLogContains(7, "% - Querying strategy = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]\n");
 		assertLogContains(8, "% - Proposal strategy = 5\n");
-		assertLogContains(9, "% - Similarity metric = F1-value\n\n");
+		assertLogContains(9, "% - Similarity metric = F1-value\n");
+		assertLogContains(10, "% - Number of maximal queries = all combinations\n\n");
 
-		assertLogContains(10, "Generating queries for episodes with 2 number of invocations\n");
-		assertLogContains(11, "\nNumber of targets with no proposals = 1\n\n");
+		assertLogContains(11, "Generating queries for episodes with 2 number of invocations\n");
+		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
 
-		assertLogContains(12, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(18, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(25, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(32, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(39, "Removed 0.40\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(46, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(53, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(60, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(67, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(74, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
+		assertLogContains(19, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
+				"<0.00, 0.00>\t", "\n");
 	}
-	
+
 	@Test
 	public void Inv2() throws ZipException, IOException {
 		sut.evaluate();
-		
+
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/2.txt");
 		assertTrue(fileName.exists());
 		assertFalse(fileName.isDirectory());
-		
-		List<String> actuals = new LinkedList<String>(); 
+
+		List<String> actuals = new LinkedList<String>();
 		try {
 			actuals = FileUtils.readLines(fileName);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		List<String> expected = new LinkedList<String>();
-		expected.add("Target query 1\t0.10: [ <0.29, 0.22>; ]\t2");
-		expected.add("Target query 2\t0.10: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
-		
+		expected.add("Target query 1\t0.1: [ <0.29, 0.22>; ]\t2");
+		expected.add("Target query 2\t0.1: [ <0.5, 0.33>; <0.29, 0.33>; ]\t2");
+
 		assertEquals(expected, actuals);
 	}
-	
+
 	@Test
 	public void twoCategoriesLogger() throws ZipException, IOException {
-		validationData.add(createQuery("11", "12", "20", "21", 
-								"11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
-		
+		validationData.add(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
 		when(validationParser.parse(events)).thenReturn(validationData);
-		
+
+		categories.put("3", Sets
+				.newHashSet(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21")));
+		when(categorizer.categorize(validationData)).thenReturn(categories);
+
 		Logger.clearLog();
 		sut.evaluate();
-		
+
 		assertLogContains(0, "Reading the learned patterns");
 		assertLogContains(1, "Reading the mapping file");
 		assertLogContains(2, "Readng the validation data\n");
-		
+
 		assertLogContains(3, "\n");
-		assertLogContains(4, "% - Patterns configuration:\n");
+		assertLogContains(4, "% - Evaluations configuration:\n");
 		assertLogContains(5, "% - Frequency = 5\n");
 		assertLogContains(6, "% - Bidirectional measure = 0.01\n");
-		assertLogContains(7, "% - Querying strategy = [25%, 50%, 75%]\n");
+		assertLogContains(7, "% - Querying strategy = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]\n");
 		assertLogContains(8, "% - Proposal strategy = 5\n");
-		assertLogContains(9, "% - Similarity metric = F1-value\n\n");
-		
-		assertLogContains(10, "Generating queries for episodes with 2 number of invocations\n");
-		assertLogContains(11, "\nNumber of targets with no proposals = 1\n\n");
+		assertLogContains(9, "% - Similarity metric = F1-value\n");
+		assertLogContains(10, "% - Number of maximal queries = all combinations\n\n");
 
-		assertLogContains(12, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(18, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(25, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(32, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(39, "Removed 0.40\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(46, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(53, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(60, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(67, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(74, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		
-		
-		assertLogContains(81, "Generating queries for episodes with 3 number of invocations\n");
-		assertLogContains(82, "\nNumber of targets with no proposals = 0\n\n");
-		
-		assertLogContains(83, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(89, "Removed 0.10\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(96, "Removed 0.20\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(103, "Removed 0.30\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(110, "Removed 0.40\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(117, "Removed 0.50\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(124, "Removed 0.60\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(131, "Removed 0.70\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(138, "Removed 0.80\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
-		assertLogContains(145, "Removed 0.90\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "\n");
+		assertLogContains(11, "Generating queries for episodes with 2 number of invocations\n");
+		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
+
+		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
+		assertLogContains(19, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
+				"<0.00, 0.00>\t", "\n");
+
+		assertLogContains(26, "Generating queries for episodes with 3 number of invocations\n");
+		assertLogContains(27, "\nNumber of targets with no proposals = 0\n\n");
+
+		assertLogContains(28, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
+		assertLogContains(34, "Removed 0.10\t", "<0.33, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
+				"<0.00, 0.00>\t", "\n");
+		assertLogContains(41, "Removed 0.40\t", "<0.50, 0.22>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
+				"<0.00, 0.00>\t", "\n");
 	}
-	
+
 	@Test
 	public void twoCategoriesWriter() throws ZipException, IOException {
-		validationData.add(createQuery("11", "12", "20", "21", 
-				"11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
-
+		validationData.add(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
 		when(validationParser.parse(events)).thenReturn(validationData);
+		
+		categories.put("3", Sets
+				.newHashSet(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21")));
+		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		sut.evaluate();
-		
+
 		File fileName1 = new File(rootFolder.getRoot().getAbsolutePath() + "/2.txt");
 		assertTrue(fileName1.exists());
 		assertFalse(fileName1.isDirectory());
-		
+
 		File fileName2 = new File(rootFolder.getRoot().getAbsolutePath() + "/3.txt");
 		assertTrue(fileName2.exists());
 		assertFalse(fileName2.isDirectory());
-		
-		List<String> actuals1 = new LinkedList<String>(); 
+
+		List<String> actuals1 = new LinkedList<String>();
 		try {
 			actuals1 = FileUtils.readLines(fileName1);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		List<String> expected1 = new LinkedList<String>();
-		expected1.add("Target query 1\t0.10: [ <0.29, 0.22>; ]\t2");
-		expected1.add("Target query 2\t0.10: [ <0.50, 0.33>; <0.29, 0.33>; ]\t2");
-		
+		expected1.add("Target query 1\t0.1: [ <0.29, 0.22>; ]\t2");
+		expected1.add("Target query 2\t0.1: [ <0.5, 0.33>; <0.29, 0.33>; ]\t2");
+
 		assertEquals(expected1, actuals1);
-		
-		List<String> actuals2 = new LinkedList<String>(); 
+
+		List<String> actuals2 = new LinkedList<String>();
 		try {
 			actuals2 = FileUtils.readLines(fileName2);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		List<String> expected2 = new LinkedList<String>();
-		expected2.add("Target query 1\t0.10: [ <0.33, 0.22>; ]\t0.40: [ <0.50, 0.22>; ]\t3");
-		
+		expected2.add("Target query 1\t0.1: [ <0.33, 0.22>; ]\t0.4: [ <0.5, 0.22>; ]\t3");
+
 		assertEquals(expected2, actuals2);
 	}
 

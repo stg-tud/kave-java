@@ -2,7 +2,7 @@ package cc.kave.episodes.evaluation.queries;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public class QueryGeneratorByPercentage {
 	public Map<Double, Set<Episode>> generateQueries(Episode target) {
 		assertTrue(target.getNumEvents() > 2, "Not valid episode for query generation!");
 		
-		Map<Double, Set<Episode>> queries = new HashMap<Double, Set<Episode>>();
+		Map<Double, Set<Episode>> queries = new LinkedHashMap<Double, Set<Episode>>();
 		Tuple<Fact, Set<Fact>> declInv = separator.separateFacts(target);
 		
 		int numInvs = declInv.getSecond().size();
@@ -63,7 +63,7 @@ public class QueryGeneratorByPercentage {
 	}
 
 	private Map<Double, Integer> calcPercNumbers(int size) {
-		Map<Double, Integer> removals = new HashMap<Double, Integer>();
+		Map<Double, Integer> removals = new LinkedHashMap<Double, Integer>();
 		
 		for (double perc = 0.10; perc < 1.0; perc += 0.10) {
 			int p = (int) Math.ceil(perc * (double) size);

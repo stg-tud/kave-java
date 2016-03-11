@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.analyzer;
 
 import static cc.recommenders.io.Logger.append;
 
@@ -32,7 +32,7 @@ import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
 
-public class TargetsCategorization {
+public class ValidationSetAnalyzer {
 
 	private EventMappingParser mappingParser;
 	private ValidationContextsParser validationParser;
@@ -40,7 +40,7 @@ public class TargetsCategorization {
 	private Map<Integer, Integer> structure = new HashMap<Integer, Integer>();
 	
 	@Inject
-	public TargetsCategorization(EventMappingParser mParser, ValidationContextsParser vParser) {
+	public ValidationSetAnalyzer(EventMappingParser mParser, ValidationContextsParser vParser) {
 		this.mappingParser = mParser;
 		this.validationParser = vParser;
 	}
