@@ -18,14 +18,12 @@ public class QueryGeneratorByPercentage {
 
 	private SubsetsGenerator generator = new SubsetsGenerator();
 	private Separator separator = new Separator();
+	private Tuple<Fact, Set<Fact>> declInv = Tuple.newTuple(new Fact(), Sets.newHashSet());
+	private int numInvs = 0;
 	
 	public Map<Double, Set<Episode>> generateQueries(Episode target) {
-		assertTrue(target.getNumEvents() > 2, "Not valid episode for query generation!");
-		
+		preprocessing(target);
 		Map<Double, Set<Episode>> queries = new LinkedHashMap<Double, Set<Episode>>();
-		Tuple<Fact, Set<Fact>> declInv = separator.separateFacts(target);
-		
-		int numInvs = declInv.getSecond().size();
 		Map<Double, Integer> removals = calcPercNumbers(numInvs);
 		
 		for (Map.Entry<Double, Integer> entry : removals.entrySet()) {
@@ -41,6 +39,12 @@ public class QueryGeneratorByPercentage {
 			}
 		}
 		return queries;
+	}
+	
+	private void preprocessing(Episode target) {
+		assertTrue(target.getNumEvents() > 2, "Not valid episode for query generation!");
+		declInv = separator.separateFacts(target);
+		numInvs = declInv.getSecond().size();
 	}
 
 	private Episode createQuery(Episode target, Fact methodDecl, Set<Fact> subset) {

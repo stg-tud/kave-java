@@ -36,6 +36,7 @@ import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.EventStreamReader;
 import cc.kave.episodes.mining.reader.FileReader;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
+import cc.kave.episodes.model.TargetsCategorization;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -101,7 +102,8 @@ public class Module extends AbstractModule {
 
 		File evaluationRoot = evaluationFile;
 		QueryGeneratorByPercentage queryGenerator = new QueryGeneratorByPercentage();
-		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser, queryGenerator, recommender, episodeParser, episodeLearned));
+		TargetsCategorization categorizer = new TargetsCategorization();
+		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser, queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {
