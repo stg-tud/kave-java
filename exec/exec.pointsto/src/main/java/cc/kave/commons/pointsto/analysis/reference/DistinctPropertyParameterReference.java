@@ -12,31 +12,46 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+
+import com.google.common.base.MoreObjects;
+
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
-import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 
 public class DistinctPropertyParameterReference implements DistinctReference {
 
-	private IVariableReference varRef;
-	private IPropertyName property;
+	private final IVariableReference reference;
+	private final ITypeName type;
+	private final IPropertyName property;
 
 	public DistinctPropertyParameterReference(LanguageOptions languageOptions, IPropertyName property) {
-		this.varRef = SSTBuilder.variableReference(languageOptions.getPropertyParameterName());
+		this.reference = variableReference(languageOptions.getPropertyParameterName());
+		this.type = property.getValueType();
+		this.property = property;
+	}
+
+	public DistinctPropertyParameterReference(IParameterName parameter, IPropertyName property) {
+		this(parameter.getName(), parameter.getValueType(), property);
+	}
+
+	public DistinctPropertyParameterReference(String name, ITypeName type, IPropertyName property) {
+		this.reference = variableReference(name);
+		this.type = type;
 		this.property = property;
 	}
 
 	@Override
-	public IReference getReference() {
-		return varRef;
+	public IVariableReference getReference() {
+		return reference;
 	}
 
 	@Override
 	public ITypeName getType() {
-		return property.getValueType();
+		return type;
 	}
 
 	public IPropertyName getProperty() {
@@ -53,7 +68,8 @@ public class DistinctPropertyParameterReference implements DistinctReference {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((property == null) ? 0 : property.hashCode());
-		result = prime * result + ((varRef == null) ? 0 : varRef.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -71,12 +87,23 @@ public class DistinctPropertyParameterReference implements DistinctReference {
 				return false;
 		} else if (!property.equals(other.property))
 			return false;
-		if (varRef == null) {
-			if (other.varRef != null)
+		if (reference == null) {
+			if (other.reference != null)
 				return false;
-		} else if (!varRef.equals(other.varRef))
+		} else if (!reference.equals(other.reference))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctPropertyParameterReference.class)
+				.add("name", reference.getIdentifier()).add("type", type).add("property", property).toString();
 	}
 
 }

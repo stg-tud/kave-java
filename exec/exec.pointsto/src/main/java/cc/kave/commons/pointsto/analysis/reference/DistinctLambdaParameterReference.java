@@ -12,18 +12,19 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
-import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;;
 
 public class DistinctLambdaParameterReference implements DistinctReference {
 
-	private IParameterName parameter;
-	private ILambdaExpression lambda;
+	private final IParameterName parameter;
+	private final ILambdaExpression lambda;
 
 	public DistinctLambdaParameterReference(IParameterName parameter, ILambdaExpression lambda) {
 		this.parameter = parameter;
@@ -32,7 +33,7 @@ public class DistinctLambdaParameterReference implements DistinctReference {
 
 	@Override
 	public IReference getReference() {
-		return SSTBuilder.variableReference(parameter.getName());
+		return variableReference(parameter.getName());
 	}
 
 	@Override

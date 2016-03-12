@@ -12,16 +12,17 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
+import cc.kave.commons.model.ssts.references.IVariableReference;;
 
 public class DistinctKeywordReference implements DistinctReference {
 
-	private String keyword;
-	private ITypeName type;
+	private final String keyword;
+	private final ITypeName type;
 
 	public DistinctKeywordReference(String keyword, ITypeName type) {
 		this.keyword = keyword;
@@ -29,8 +30,8 @@ public class DistinctKeywordReference implements DistinctReference {
 	}
 
 	@Override
-	public IReference getReference() {
-		return SSTBuilder.variableReference(keyword);
+	public IVariableReference getReference() {
+		return variableReference(keyword);
 	}
 
 	@Override

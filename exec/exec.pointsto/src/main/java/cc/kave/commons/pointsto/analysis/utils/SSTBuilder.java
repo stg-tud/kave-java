@@ -15,7 +15,10 @@ package cc.kave.commons.pointsto.analysis.utils;
 import java.util.Arrays;
 
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
@@ -78,5 +81,9 @@ public class SSTBuilder {
 		indexAccessExpr.setReference(varRef);
 		indexAccessExpr.setIndices(Arrays.asList(constantValue()));
 		return indexAccessReference(indexAccessExpr);
+	}
+
+	public static IParameterName parameter(String name, ITypeName type) {
+		return ParameterName.newParameterName("[" + type.getIdentifier() + "] " + name);
 	}
 }

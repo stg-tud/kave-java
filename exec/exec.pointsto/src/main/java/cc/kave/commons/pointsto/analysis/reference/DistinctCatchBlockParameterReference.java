@@ -12,14 +12,15 @@
  */
 package cc.kave.commons.pointsto.analysis.reference;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;
-import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;;
 
 public class DistinctCatchBlockParameterReference implements DistinctReference {
 
-	private ICatchBlock catchBlock;
+	private final ICatchBlock catchBlock;
 
 	public DistinctCatchBlockParameterReference(ICatchBlock catchBlock) {
 		this.catchBlock = catchBlock;
@@ -27,7 +28,7 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 
 	@Override
 	public IReference getReference() {
-		return SSTBuilder.variableReference(catchBlock.getParameter().getName());
+		return variableReference(catchBlock.getParameter().getName());
 	}
 
 	@Override

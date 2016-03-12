@@ -20,7 +20,7 @@ import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class DistinctVariableReference implements DistinctReference {
 
-	private IVariableDeclaration varDecl;
+	private final IVariableDeclaration varDecl;
 
 	public DistinctVariableReference(IVariableDeclaration varDecl) {
 		this.varDecl = varDecl;

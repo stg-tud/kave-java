@@ -17,8 +17,8 @@ import cc.recommenders.assertions.Asserts;
 
 public abstract class DistinctMemberReference implements DistinctReference {
 
-	protected IMemberReference memberReference;
-	private DistinctReference baseReference;
+	protected final IMemberReference memberReference;
+	private final DistinctReference baseReference;
 
 	public DistinctMemberReference(IMemberReference memberReference, DistinctReference baseReference) {
 		this.memberReference = memberReference;

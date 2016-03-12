@@ -19,8 +19,8 @@ import cc.recommenders.assertions.Asserts;
 
 public class DistinctIndexAccessReference implements DistinctReference {
 
-	private IIndexAccessReference reference;
-	private DistinctReference baseReference;
+	private final IIndexAccessReference reference;
+	private final DistinctReference baseReference;
 
 	public DistinctIndexAccessReference(IIndexAccessReference reference, DistinctReference baseReference) {
 		this.reference = reference;
