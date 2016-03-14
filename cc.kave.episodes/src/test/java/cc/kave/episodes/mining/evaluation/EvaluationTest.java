@@ -48,7 +48,7 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
@@ -80,7 +80,7 @@ public class EvaluationTest {
 	private static final int FREQUENCY = 5;
 	private static final double BIDIRECTIONAL = 0.01;
 
-	private QueryGeneratorByPercentage queryGenerator;
+	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
 
 	private Set<Episode> validationData = Sets.newLinkedHashSet();
@@ -98,7 +98,7 @@ public class EvaluationTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 
-		queryGenerator = new QueryGeneratorByPercentage();
+		queryGenerator = new QueryStrategy();
 		recommender = new EpisodeRecommender();
 
 		MockitoAnnotations.initMocks(this);

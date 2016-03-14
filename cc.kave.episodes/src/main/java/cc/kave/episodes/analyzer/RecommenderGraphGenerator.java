@@ -32,7 +32,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -54,7 +54,7 @@ public class RecommenderGraphGenerator {
 	private EpisodeToGraphConverter graphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
-	private QueryGeneratorByPercentage queryGenerator;
+	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
@@ -65,7 +65,7 @@ public class RecommenderGraphGenerator {
 	public RecommenderGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
 			EventMappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
-			QueryGeneratorByPercentage queryGenerator, EpisodeRecommender recommender, 
+			QueryStrategy queryGenerator, EpisodeRecommender recommender, 
 			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
@@ -108,7 +108,7 @@ public class RecommenderGraphGenerator {
 			if (e.getNumEvents() > 2) {
 				int queryID = 0;
 				
-				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
+				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 				
 				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
 				Episode targetQuery = wrap(simpEpisode);

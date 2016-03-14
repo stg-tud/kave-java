@@ -31,7 +31,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -47,7 +47,7 @@ public class QueriesGraphGenerator {
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
-	private QueryGeneratorByPercentage queryGenerator;
+	private QueryStrategy queryGenerator;
 
 	private File rootFolder;
 
@@ -55,7 +55,7 @@ public class QueriesGraphGenerator {
 	public QueriesGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
 			EventMappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
-			QueryGeneratorByPercentage queryGenerator) {
+			QueryStrategy queryGenerator) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
 		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");
@@ -89,7 +89,7 @@ public class QueriesGraphGenerator {
 			if (e.getNumEvents() > 1) {
 				int queryID = 0;
 				
-				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
+				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 				
 				Logger.log("Removing transitivity closures");
 				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));

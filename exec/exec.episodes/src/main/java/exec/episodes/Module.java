@@ -24,7 +24,7 @@ import com.google.inject.name.Names;
 
 import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
-import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -101,7 +101,7 @@ public class Module extends AbstractModule {
 		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 
 		File evaluationRoot = evaluationFile;
-		QueryGeneratorByPercentage queryGenerator = new QueryGeneratorByPercentage();
+		QueryStrategy queryGenerator = new QueryStrategy();
 		TargetsCategorization categorizer = new TargetsCategorization();
 		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser, queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
 	}

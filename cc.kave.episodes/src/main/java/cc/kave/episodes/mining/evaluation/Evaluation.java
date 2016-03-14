@@ -36,7 +36,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.episodes.evaluation.queries.QueryGeneratorByPercentage;
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
@@ -58,7 +58,7 @@ public class Evaluation {
 
 	private ValidationContextsParser validationParser;
 	private EventMappingParser mappingParser;
-	private QueryGeneratorByPercentage queryGenerator;
+	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
@@ -76,7 +76,7 @@ public class Evaluation {
 
 	@Inject
 	public Evaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
-			EventMappingParser mappingParser, QueryGeneratorByPercentage queryGenerator, EpisodeRecommender recommender,
+			EventMappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
 			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
 		assertTrue(directory.exists(), "Evaluations folder does not exist");
@@ -111,7 +111,7 @@ public class Evaluation {
 			for (Episode e : categoryEntry.getValue()) {
 				// append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
-				Map<Double, Set<Episode>> queries = queryGenerator.generateQueries(e);
+				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 
 				for (Map.Entry<Double, Set<Episode>> queryEntry : queries.entrySet()) {
 					initQueryAverager(queryEntry.getKey());
