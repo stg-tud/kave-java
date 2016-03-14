@@ -64,7 +64,7 @@ public class Evaluation {
 	private MaximalEpisodes maxEpisodeTracker;
 	private TargetsCategorization categorizer;
 
-	private static final double[] percentages = new double[] { 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90 };
+	private static final double[] percentages = new double[] { 0.10, 0.30, 0.50, 0.70, 0.90 };
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 
