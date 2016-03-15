@@ -49,6 +49,8 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -75,6 +77,7 @@ import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
@@ -123,6 +126,14 @@ public class InliningBaseTest {
 	protected IStatement invocationStatement(String name, IVariableReference reference,
 			ISimpleExpression... parameters) {
 		return expr(invocationExpr(name, reference, parameters));
+	}
+
+	protected IBinaryExpression binary(BinaryOperator operator, ISimpleExpression left, ISimpleExpression right) {
+		BinaryExpression expr = new BinaryExpression();
+		expr.setLeftOperand(left);
+		expr.setOperator(operator);
+		expr.setRightOperand(right);
+		return expr;
 	}
 
 	protected IInvocationExpression invocationExpr(String name, IVariableReference reference,

@@ -139,7 +139,6 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 
 	@Override
 	public Void visit(IDoLoop block, CountReturnContext context) {
-		block.getCondition().accept(this, context);
 		visit(block.getBody(), context);
 		return null;
 	}
@@ -154,7 +153,6 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 
 	@Override
 	public Void visit(IForLoop block, CountReturnContext context) {
-		block.getCondition().accept(this, context);
 		visit(block.getInit(), context);
 		visit(block.getBody(), context);
 		visit(block.getStep(), context);
@@ -214,7 +212,6 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 	@Override
 	public Void visit(IWhileLoop block, CountReturnContext context) {
 		visit(block.getBody(), context);
-		block.getCondition().accept(this, context);
 		return null;
 	}
 
@@ -246,7 +243,6 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 
 	@Override
 	public Void visit(ILoopHeaderBlockExpression expr, CountReturnContext context) {
-		visit(expr.getBody(), context);
 		return null;
 	}
 
@@ -309,7 +305,7 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IBinaryExpression expr, CountReturnContext context) {
 		expr.getLeftOperand().accept(this, context);
@@ -322,7 +318,7 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 		expr.getOperand().accept(this, context);
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(ICastExpression expr, CountReturnContext context) {
 		return null;
@@ -330,7 +326,7 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 
 	@Override
 	public Void visit(IIndexAccessExpression expr, CountReturnContext context) {
-		for(ISimpleExpression e : expr.getIndices()){
+		for (ISimpleExpression e : expr.getIndices()) {
 			e.accept(this, context);
 		}
 		return null;
@@ -340,17 +336,17 @@ public class CountReturnsVisitor extends AbstractThrowingNodeVisitor<CountReturn
 	public Void visit(ITypeCheckExpression expr, CountReturnContext context) {
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IIndexAccessReference indexAccessRef, CountReturnContext context) {
 		indexAccessRef.getExpression().accept(this, context);
 		return null;
 	}
-	
+
 	public void visit(List<IStatement> body, CountReturnContext context) {
 		for (IStatement statement : body) {
 			statement.accept(this, context);
 		}
 	}
-	
+
 }

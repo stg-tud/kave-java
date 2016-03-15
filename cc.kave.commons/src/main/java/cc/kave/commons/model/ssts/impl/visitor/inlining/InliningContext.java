@@ -46,6 +46,7 @@ public class InliningContext {
 	public static final ITypeName GOT_RESULT_TYPE = TypeName.newTypeName("Boolean");
 	public static final String RESULT_NAME = "$result_";
 	public static final String RESULT_FLAG = "$gotNoResult_";
+	public static final String CONDITION_VAR = "$returnCondition_";
 
 	private int counter;
 	private SST sst;
@@ -55,12 +56,14 @@ public class InliningContext {
 	private boolean inline = false;
 	private boolean guardNeeded = false;
 	private boolean globalGuardNeed = false;
+	private boolean hasPreparedGuards = false;
 	private final InliningVisitor inliningVisitor;
 	private IAssignableExpression returnExpression = null;
 
 	private Set<IMethodDeclaration> inlinedMethods;
 	private Set<IMethodDeclaration> methods;
 	private boolean isVoid;
+	private boolean isInCondition = false;
 
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
@@ -121,6 +124,7 @@ public class InliningContext {
 			newScope.changedNames = scope.changedNames;
 			newScope.resultName = scope.resultName;
 			newScope.gotResultName = scope.gotResultName;
+			newScope.isInCondition = scope.isInCondition;
 		}
 		scope = newScope;
 	}
@@ -279,9 +283,9 @@ public class InliningContext {
 		this.guardNeeded = guardNeeded;
 	}
 
-	public void setGuardVariableNames(String name) {
-		scope.resultName = RESULT_NAME + name;
-		scope.gotResultName = RESULT_FLAG + name;
+	public void setGuardVariableNames(IMethodName methodName) {
+		scope.resultName = RESULT_NAME + methodName.getName();
+		scope.gotResultName = RESULT_FLAG + methodName.getName();
 	}
 
 	public void setInline(boolean inline) {
@@ -365,6 +369,28 @@ public class InliningContext {
 
 	public void setMethods() {
 		sst.setMethods(methods);
+	}
+
+	public boolean hasPreparedGuards() {
+		return hasPreparedGuards;
+	}
+
+	public void setPreparedGuards(boolean hasPreparedGuards) {
+		this.hasPreparedGuards = hasPreparedGuards;
+	}
+
+	public void enterCondition() {
+		this.enterBlock();
+		this.scope.isInCondition = true;
+	}
+
+	public void leaveCondition() {
+		this.scope.isInCondition = false;
+		this.leaveScope();
+	}
+
+	public boolean isInCondition() {
+		return this.scope.isInCondition;
 	}
 
 }

@@ -33,6 +33,7 @@ public class Scope {
 	public List<IStatement> body;
 	public String resultName;
 	public String gotResultName;
+	public boolean isInCondition;
 
 	public Scope() {
 		this.parent = null;
@@ -41,6 +42,7 @@ public class Scope {
 		this.body = new ArrayList<>();
 		this.resultName = "";
 		this.gotResultName = "";
+		this.isInCondition = false;
 	}
 
 	public void resolve(IVariableReference ref) {

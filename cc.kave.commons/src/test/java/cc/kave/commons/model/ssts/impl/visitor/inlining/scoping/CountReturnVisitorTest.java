@@ -38,8 +38,19 @@ public class CountReturnVisitorTest extends InliningBaseTest {
 								returnStatement(constant("5"), false))),
 				simpleIf(Lists.newArrayList(returnStatement(constant("6"), false)), constant("true"),
 						returnStatement(constant("7"), true)));
+		assertReturns(method, 4);
+	}
+
+	@Test
+	public void testLoopConditionReturn() {
+		IMethodDeclaration method = declareEntryPoint("m1", //
+				forLoop("i", loopHeader(returnStatement(refExpr("a"), false))));
+		assertReturns(method, 0);
+	}
+
+	private void assertReturns(IMethodDeclaration method, int count) {
 		CountReturnContext context = new CountReturnContext();
 		method.accept(new CountReturnsVisitor(), context);
-		assertThat(4, equalTo(context.returnCount));
+		assertThat(count, equalTo(context.returnCount));
 	}
 }

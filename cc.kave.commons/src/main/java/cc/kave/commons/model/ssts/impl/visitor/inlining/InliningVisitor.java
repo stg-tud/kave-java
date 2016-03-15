@@ -189,7 +189,7 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 	}
 
 	public Void visit(IReturnStatement stmt, InliningContext context) {
-		if (context.isInline()) {
+		if (context.isInline() && !context.isInCondition()) {
 			inlineReturnStatement(stmt, context);
 		} else {
 			stmt.getExpression().accept(this, context);
@@ -396,7 +396,7 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 				context.leaveScope();
 				context.setInline(false);
 			} else {
-				context.setGuardVariableNames(method.getName().getIdentifier());
+				context.setGuardVariableNames(method.getName());
 				context.visitBlock(body);
 				context.leaveScope();
 				context.setInline(false);
@@ -406,6 +406,7 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 				if (!context.isVoid()) {
 					context.setReturnExpression(SSTUtil.referenceExprToVariable(context.getResultName()));
 				}
+				context.setPreparedGuards(false);
 			}
 		} else {
 			expr.getReference().accept(this, context);
@@ -436,12 +437,13 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 	}
 
 	private void setupGuardVariables(IMethodName methodName, List<IStatement> body, InliningContext context) {
-		context.setGuardVariableNames(methodName.getIdentifier());
+		context.setGuardVariableNames(methodName);
+		context.setPreparedGuards(true);
 		if (!context.isVoid()) {
 			IVariableDeclaration variable = SSTUtil.declare(context.getResultName(), methodName.getReturnType());
 			body.add(variable);
 		}
-		body.add(SSTUtil.declare(context.getGotResultName(), context.GOT_RESULT_TYPE));
+		body.add(SSTUtil.declare(context.getGotResultName(), InliningContext.GOT_RESULT_TYPE));
 		ConstantValueExpression constant = new ConstantValueExpression();
 		constant.setValue("true");
 		body.add(SSTUtil.assignmentToLocal(context.getGotResultName(), constant));
@@ -521,7 +523,9 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 
 	@Override
 	public Void visit(ILoopHeaderBlockExpression expr, InliningContext context) {
+		context.enterCondition();
 		context.visitBlock(expr.getBody());
+		context.leaveCondition();
 		return null;
 	}
 
