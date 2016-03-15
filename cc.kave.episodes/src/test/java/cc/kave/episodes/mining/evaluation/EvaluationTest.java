@@ -15,7 +15,6 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.recommenders.io.Logger.append;
 import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,7 +34,6 @@ import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.math.util.MathUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

@@ -52,7 +52,7 @@ public class Evaluation {
 
 	private File rootFolder;
 
-	private static final int PROPOSALS = 5;
+	private static final int PROPOSALS = 10;
 	private static final int FREQUENCY = 5;
 	private static final double BIDIRECTIONAL = 0.01;
 
@@ -64,7 +64,7 @@ public class Evaluation {
 	private MaximalEpisodes maxEpisodeTracker;
 	private TargetsCategorization categorizer;
 
-	private static final double[] percentages = new double[] { 0.10, 0.30, 0.50, 0.70, 0.90 };
+	private static final double[] percentages = new double[] { 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90 };
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 
@@ -109,9 +109,12 @@ public class Evaluation {
 			int noProposals = 0;
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
-				// append("%d - %d; ", targetID, e.getNumEvents() - 1);
+				append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
 				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
+				if (e.getNumEvents() > 11) {
+					queries.putAll(queryGenerator.byNumber(e));
+				}
 
 				for (Map.Entry<Double, Set<Episode>> queryEntry : queries.entrySet()) {
 					initQueryAverager(queryEntry.getKey());
@@ -149,7 +152,7 @@ public class Evaluation {
 					noProposals++;
 				}
 			}
-			// Logger.log("\n");
+			Logger.log("\n");
 			writeCategoryResults(categoryEntry.getKey());
 
 			append("\nNumber of targets with no proposals = %d\n\n", noProposals);
