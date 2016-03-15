@@ -43,9 +43,9 @@ public class QueryStrategy {
 		return queries;
 	}
 	
-	public Map<Integer, Set<Episode>> byNumber(Episode target) {
+	public Map<Double, Set<Episode>> byNumber(Episode target) {
 		preprocessing(target);
-		Map<Integer, Set<Episode>> queries = new LinkedHashMap<Integer, Set<Episode>>();
+		Map<Double, Set<Episode>> queries = new LinkedHashMap<Double, Set<Episode>>();
 		List<Integer> removals = numberRemoved(numInvs);
 		
 		for (Integer number : removals) {
@@ -53,10 +53,11 @@ public class QueryStrategy {
 			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength);
 			for (Set<Fact> subset : currentSubsets) {
 				Episode query = createQuery(target, declInv.getFirst(), subset);
-				if (queries.containsKey(number)) {
-					queries.get(number).add(query);
+				double key = number * 1.0;
+				if (queries.containsKey(key)) {
+					queries.get(key).add(query);
 				} else {
-					queries.put(number, Sets.newHashSet(query));
+					queries.put(key, Sets.newHashSet(query));
 				}
 			}
 		}

@@ -42,8 +42,8 @@ public class QueryStrategyTest {
 	private Map<Double, Set<Episode>> expectedByPercent;
 	private Map<Double, Set<Episode>> actualsByPercent;
 
-	private Map<Integer, Set<Episode>> expectedByNumber;
-	private Map<Integer, Set<Episode>> actualsByNumber;
+	private Map<Double, Set<Episode>> expectedByNumber;
+	private Map<Double, Set<Episode>> actualsByNumber;
 
 	private QueryStrategy sut;
 
@@ -54,8 +54,8 @@ public class QueryStrategyTest {
 		expectedByPercent = new LinkedHashMap<Double, Set<Episode>>();
 		actualsByPercent = new LinkedHashMap<Double, Set<Episode>>();
 
-		expectedByNumber = new LinkedHashMap<Integer, Set<Episode>>();
-		actualsByNumber = new LinkedHashMap<Integer, Set<Episode>>();
+		expectedByNumber = new LinkedHashMap<Double, Set<Episode>>();
+		actualsByNumber = new LinkedHashMap<Double, Set<Episode>>();
 
 		sut = new QueryStrategy();
 	}
@@ -109,18 +109,18 @@ public class QueryStrategyTest {
 		Episode target = createEpisode("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15", "12>13",
 				"12>14");
 
-		expectedByNumber.put(1,
+		expectedByNumber.put(1.0,
 				Sets.newHashSet(createEpisode("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13", "12>14"),
 						createEpisode("11", "12", "13", "15", "11>12", "11>13", "11>15", "12>13"),
 						createEpisode("11", "12", "14", "15", "11>12", "11>14", "11>15", "12>14"),
 						createEpisode("11", "13", "14", "15", "11>13", "11>14", "11>15")));
 
-		expectedByNumber.put(2, Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"),
+		expectedByNumber.put(2.0, Sets.newHashSet(createEpisode("11", "12", "13", "11>12", "11>13", "12>13"),
 				createEpisode("11", "12", "14", "11>12", "11>14", "12>14"),
 				createEpisode("11", "12", "15", "11>12", "11>15"), createEpisode("11", "13", "14", "11>13", "11>14"),
 				createEpisode("11", "13", "15", "11>13", "11>15"), createEpisode("11", "14", "15", "11>14", "11>15")));
 
-		expectedByNumber.put(3, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"),
+		expectedByNumber.put(3.0, Sets.newHashSet(createEpisode("11", "12", "11>12"), createEpisode("11", "13", "11>13"),
 				createEpisode("11", "14", "11>14"), createEpisode("11", "15", "11>15")));
 
 		actualsByNumber = sut.byNumber(target);
@@ -128,9 +128,9 @@ public class QueryStrategyTest {
 		assertByNumber(expectedByNumber, actualsByNumber);
 	}
 
-	private void assertByNumber(Map<Integer, Set<Episode>> expected, Map<Integer, Set<Episode>> actuals) {
+	private void assertByNumber(Map<Double, Set<Episode>> expected, Map<Double, Set<Episode>> actuals) {
 		assertTrue(expected.size() == actuals.size());
-		for (Map.Entry<Integer, Set<Episode>> entry : expected.entrySet()) {
+		for (Map.Entry<Double, Set<Episode>> entry : expected.entrySet()) {
 			assertTrue(entry.getValue().size() == actuals.get(entry.getKey()).size());
 			
 			Iterator<Episode> itE = entry.getValue().iterator();
