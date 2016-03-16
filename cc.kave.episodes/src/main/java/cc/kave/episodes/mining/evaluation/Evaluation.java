@@ -109,13 +109,12 @@ public class Evaluation {
 			int noProposals = 0;
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
-				append("%d - %d; ", targetID, e.getNumEvents() - 1);
+//				append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
 				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 				if (e.getNumEvents() > 11) {
 					queries.putAll(queryGenerator.byNumber(e));
 				}
-
 				for (Map.Entry<Double, Set<Episode>> queryEntry : queries.entrySet()) {
 					initQueryAverager(queryEntry.getKey());
 
@@ -128,10 +127,8 @@ public class Evaluation {
 						}
 						hasProposals = true;
 						double maxEval = 0.0;
-
 						for (Tuple<Episode, Double> tuple : proposals) {
 							avgQueryProposal.get(queryEntry.getKey()).get(propCount).addValue(tuple.getSecond());
-
 							double eval = recommender.calcF1(e, tuple.getFirst());
 							if (eval > maxEval) {
 								avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(eval);
@@ -152,7 +149,7 @@ public class Evaluation {
 					noProposals++;
 				}
 			}
-			Logger.log("\n");
+//			Logger.log("\n");
 			writeCategoryResults(categoryEntry.getKey());
 
 			append("\nNumber of targets with no proposals = %d\n\n", noProposals);

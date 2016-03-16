@@ -106,6 +106,10 @@ public class EvaluationTest {
 		validationData.add(createQuery("11"));
 		validationData.add(createQuery("11", "12", "13", "11>12", "11>13", "12>13"));
 		validationData.add(createQuery("11", "15", "16", "11>15", "11>16", "15>16"));
+		validationData.add(createQuery("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13"));
+		validationData.add(createQuery("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15"));
+		validationData.add(createQuery("11", "12", "13", "14", "16", "11>12", "11>13", "11>14", "11>16"));
+		validationData.add(createQuery("11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"));
 		validationData.add(createQuery("11", "20", "11>20"));
 		validationData.add(createQuery("11", "20", "21", "11>20", "11>21", "20>21"));
 
@@ -113,20 +117,25 @@ public class EvaluationTest {
 		categories.put("2",
 				Sets.newHashSet(createQuery("11", "12", "13", "11>12", "11>13", "12>13"),
 						createQuery("11", "15", "16", "11>15", "11>16", "15>16"),
+						createQuery("11", "12", "14", "11>12", "11>14", "12>14"),
 						createQuery("11", "20", "21", "11>20", "11>21", "20>21")));
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		events.add(new Event());
 
-		patterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14")));
+		patterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(4, "11", "13", "11>13"),
+				createPattern(3, "11", "14", "11>14"), createPattern(5, "11", "15", "11>15")));
 		patterns.put(3, Sets.newHashSet(createPattern(3, "11", "15", "13", "11>15", "11>13", "15>13"),
 				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
+		patterns.put(4, Sets.newHashSet(createPattern(3, "11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13")));
 
 		maxPatterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14"),
-				createPattern(3, "11", "13", "11>13")));
-		maxPatterns.put(3, Sets.newLinkedHashSet());
-		maxPatterns.get(3).add(createPattern(3, "11", "15", "13", "11>15", "11>13", "15>13"));
+				createPattern(3, "11", "13", "11>13"), createPattern(5, "11", "15", "11>15")));
+		maxPatterns.put(3, Sets.newHashSet(createPattern(4, "11", "15", "13", "11>15", "11>13", "15>13"),
+				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
+		maxPatterns.put(4,
+				Sets.newHashSet(createPattern(3, "11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13")));
 
 		when(episodeParser.parse(eq(FREQUENCY), eq(BIDIRECTIONAL))).thenReturn(patterns);
 		when(mappingParser.parse()).thenReturn(events);
@@ -175,15 +184,17 @@ public class EvaluationTest {
 		assertLogContains(5, "% - Frequency = 5\n");
 		assertLogContains(6, "% - Bidirectional measure = 0.01\n");
 		assertLogContains(7, "% - Querying strategy = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]\n");
-		assertLogContains(8, "% - Proposal strategy = 5\n");
+		assertLogContains(8, "% - Proposal strategy = 10\n");
 		assertLogContains(9, "% - Similarity metric = F1-value\n");
 		assertLogContains(10, "% - Number of maximal queries = all combinations\n\n");
 
 		assertLogContains(11, "Generating queries for episodes with 2 number of invocations\n");
 		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
 
-		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\n");
-		assertLogContains(19, "Removed 0.10\t", "<0.39, 0.28>\t", "<0.29, 0.33>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
+		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
+				"\tTop10", "\n");
+		assertLogContains(24, "Removed 0.10\t", "<0.46, 0.31>\t", "<0.25, 0.38>\t", "<0.29, 0.33>\t", "<0.22, 0.55>\t",
+				"<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
 				"<0.00, 0.00>\t", "\n");
 	}
 
@@ -255,7 +266,7 @@ public class EvaluationTest {
 	public void twoCategoriesWriter() throws ZipException, IOException {
 		validationData.add(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21"));
 		when(validationParser.parse(events)).thenReturn(validationData);
-		
+
 		categories.put("3", Sets
 				.newHashSet(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21")));
 		when(categorizer.categorize(validationData)).thenReturn(categories);
