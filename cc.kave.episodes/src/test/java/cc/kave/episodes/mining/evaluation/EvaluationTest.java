@@ -130,8 +130,6 @@ public class EvaluationTest {
 				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
 		patterns.put(4, Sets.newHashSet(createPattern(3, "11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13")));
 
-		maxPatterns.put(2, Sets.newHashSet(createPattern(3, "11", "12", "11>12"), createPattern(3, "11", "14", "11>14"),
-				createPattern(3, "11", "13", "11>13"), createPattern(5, "11", "15", "11>15")));
 		maxPatterns.put(3, Sets.newHashSet(createPattern(4, "11", "15", "13", "11>15", "11>13", "15>13"),
 				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
 		maxPatterns.put(4,
@@ -190,12 +188,17 @@ public class EvaluationTest {
 
 		assertLogContains(11, "Generating queries for episodes with 2 number of invocations\n");
 		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
-
 		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
 				"\tTop10", "\n");
-		assertLogContains(24, "Removed 0.10\t", "<0.46, 0.31>\t", "<0.25, 0.38>\t", "<0.29, 0.33>\t", "<0.22, 0.55>\t",
+		assertLogContains(24, "Removed 0.10\t", "<0.26, 0.34>\t", "<0.29, 0.22>\t", "<0.22, 0.55>\t", "<0.00, 0.00>\t",
 				"<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
-				"<0.00, 0.00>\t", "\n");
+				"<0.00, 0.00>\t", "\n", "\n");
+		
+		assertLogContains(37, "Generating queries for episodes with 3 number of invocations\n");
+		assertLogContains(38, "\nNumber of targets with no proposals = 0\n\n");
+		assertLogContains(39, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
+				"\tTop10", "\n");
+		assertLogContains(50, "Removed 0.10\t", "<>");
 	}
 
 	@Test
