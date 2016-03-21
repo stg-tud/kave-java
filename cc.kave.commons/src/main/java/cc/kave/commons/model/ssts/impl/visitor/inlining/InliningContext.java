@@ -37,6 +37,8 @@ import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.InvocationMethodNameVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.NameScopeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -63,7 +65,7 @@ public class InliningContext {
 	private Set<IMethodDeclaration> inlinedMethods;
 	private Set<IMethodDeclaration> methods;
 	private boolean isVoid;
-	private boolean isInCondition = false;
+	private boolean hasReturnInLoop = false;
 
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
@@ -391,6 +393,21 @@ public class InliningContext {
 
 	public boolean isInCondition() {
 		return this.scope.isInCondition;
+	}
+
+	public boolean checkForReturn(IStatement statement) {
+		CountReturnContext countContext = new CountReturnContext();
+		CountReturnsVisitor countVisitor = new CountReturnsVisitor();
+		statement.accept(countVisitor, countContext);
+		return countContext.returnCount > 0;
+	}
+
+	public void sethasReturnInLoop(boolean b) {
+		this.hasReturnInLoop = b;
+	}
+
+	public boolean hasReturnInLoop() {
+		return this.hasReturnInLoop;
 	}
 
 }

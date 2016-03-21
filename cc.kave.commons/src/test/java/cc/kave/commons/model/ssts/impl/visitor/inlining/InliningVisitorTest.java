@@ -20,7 +20,6 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -1026,7 +1025,6 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
-	@Ignore
 	public void whileLoopReturn() {
 		ISST sst = buildSST(//
 				declareEntryPoint("ep1", //
@@ -1043,7 +1041,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 								declareVar("t"), //
 								assign(ref("t"), constant("1")))));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
-		String condition = InliningContext.CONDITION_VAR + "$0";
+		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
@@ -1053,6 +1051,77 @@ public class InliningVisitorTest extends InliningBaseTest {
 										declareVar(condition, InliningContext.GOT_RESULT_TYPE),
 										assign(ref(condition),
 												binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
+								returnStatement(refExpr(condition), false)), //
+								declareVar("b"), //
+								assign(ref("b"), constant("true")), //
+								simpleIf(Lists.newArrayList(), refExpr("b"),
+										assign(ref(resultFlag), constant("false"))), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), declareVar("t"), //
+										assign(ref("t"), constant("1"))))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void forLoopReturn() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						declareVar("a"), //
+						forLoop("i",
+								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
+										returnStatement(refExpr("$0"), false)), //
+								declareVar("b"), //
+								assign(ref("b"), constant("true")), //
+								simpleIf(Lists.newArrayList(), refExpr("b"),
+										returnStatement(new NullExpression(), true)), //
+								declareVar("t"), //
+								assign(ref("t"), constant("1")))));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		String condition = InliningContext.CONDITION_VAR;
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), declareVar("a"), //
+						forLoop("i",
+								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
+										declareVar(condition, InliningContext.GOT_RESULT_TYPE),
+										assign(ref(condition),
+												binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
+								returnStatement(refExpr(condition), false)), //
+								declareVar("b"), //
+								assign(ref("b"), constant("true")), //
+								simpleIf(Lists.newArrayList(), refExpr("b"),
+										assign(ref(resultFlag), constant("false"))), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), declareVar("t"), //
+										assign(ref("t"), constant("1"))))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void doLoopReturn() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						declareVar("a"), //
+						doLoop(loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
+								returnStatement(refExpr("$0"), false)), //
+								declareVar("b"), //
+								assign(ref("b"), constant("true")), //
+								simpleIf(Lists.newArrayList(), refExpr("b"),
+										returnStatement(new NullExpression(), true)), //
+								declareVar("t"), //
+								assign(ref("t"), constant("1")))));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		String condition = InliningContext.CONDITION_VAR;
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), declareVar("a"), //
+						doLoop(loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
+								declareVar(condition, InliningContext.GOT_RESULT_TYPE),
+								assign(ref(condition), binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
 								returnStatement(refExpr(condition), false)), //
 								declareVar("b"), //
 								assign(ref("b"), constant("true")), //
