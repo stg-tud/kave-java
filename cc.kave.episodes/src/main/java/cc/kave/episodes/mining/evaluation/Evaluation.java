@@ -65,6 +65,8 @@ public class Evaluation {
 	private TargetsCategorization categorizer;
 
 	private static final double[] percentages = new double[] { 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90 };
+	Map<Double, Set<Episode>> queries = new LinkedHashMap<Double, Set<Episode>>();
+	
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 
@@ -111,7 +113,7 @@ public class Evaluation {
 			for (Episode e : categoryEntry.getValue()) {
 //				append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
-				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
+				queries = queryGenerator.byPercentage(e);
 				if (e.getNumEvents() > 11) {
 					queries.putAll(queryGenerator.byNumber(e));
 				}
@@ -153,7 +155,7 @@ public class Evaluation {
 			writeCategoryResults(categoryEntry.getKey());
 
 			append("\nNumber of targets with no proposals = %d\n\n", noProposals);
-			synthesizeResults();
+			synthesizeResults(categoryEntry.getKey());
 			logSynthesized();
 			categoryResults.clear();
 			results.clear();
@@ -188,16 +190,28 @@ public class Evaluation {
 		}
 	}
 
-	private void synthesizeResults() {
+	private void synthesizeResults(String category) {
 		Map<Double, List<Tuple<Averager, Averager>>> categoryAverager = new LinkedHashMap<Double, List<Tuple<Averager, Averager>>>();
 
 		// initialize
-		for (int percId = 0; percId < percentages.length; percId++) {
+		for (double percent : percentages) {
 			List<Tuple<Averager, Averager>> percAvg = new LinkedList<Tuple<Averager, Averager>>();
 			for (int propId = 0; propId < PROPOSALS; propId++) {
 				percAvg.add(Tuple.newTuple(new Averager(), new Averager()));
 			}
-			categoryAverager.put(MathUtils.round(percentages[percId], 2), percAvg);
+			categoryAverager.put(MathUtils.round(percent, 2), percAvg);
+		}
+		if (category.length() == 5) {
+			int range = Integer.parseInt(category.substring(3));
+			if (range > 10) {
+				for (double p = 1.0; p < range; p += 1.0) {
+					List<Tuple<Averager, Averager>> percAvg = new LinkedList<Tuple<Averager, Averager>>();
+					for (int propId = 0; propId < PROPOSALS; propId++) {
+						percAvg.add(Tuple.newTuple(new Averager(), new Averager()));
+					}
+					categoryAverager.put(MathUtils.round(p, 2), percAvg);
+				}
+			}
 		}
 
 		// synthesize

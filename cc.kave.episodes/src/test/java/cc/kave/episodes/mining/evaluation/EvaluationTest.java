@@ -105,6 +105,7 @@ public class EvaluationTest {
 
 		validationData.add(createQuery("11"));
 		validationData.add(createQuery("11", "12", "13", "11>12", "11>13", "12>13"));
+		validationData.add(createQuery("11", "12", "14", "11>12", "11>14", "12>14"));
 		validationData.add(createQuery("11", "15", "16", "11>15", "11>16", "15>16"));
 		validationData.add(createQuery("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13"));
 		validationData.add(createQuery("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15"));
@@ -112,15 +113,6 @@ public class EvaluationTest {
 		validationData.add(createQuery("11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"));
 		validationData.add(createQuery("11", "20", "11>20"));
 		validationData.add(createQuery("11", "20", "21", "11>20", "11>21", "20>21"));
-
-		categories.put("0-1", Sets.newHashSet(createQuery("11"), createQuery("11", "20", "11>20")));
-		categories.put("2",
-				Sets.newHashSet(createQuery("11", "12", "13", "11>12", "11>13", "12>13"),
-						createQuery("11", "15", "16", "11>15", "11>16", "15>16"),
-						createQuery("11", "12", "14", "11>12", "11>14", "12>14"),
-						createQuery("11", "20", "21", "11>20", "11>21", "20>21")));
-
-		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		events.add(new Event());
 
@@ -134,6 +126,23 @@ public class EvaluationTest {
 				createPattern(3, "11", "13", "16", "11>13", "11>16", "13>16")));
 		maxPatterns.put(4,
 				Sets.newHashSet(createPattern(3, "11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13")));
+
+		categories.put("0-1", Sets.newHashSet(createQuery("11"), createQuery("11", "20", "11>20")));
+		categories.put("2",
+				Sets.newHashSet(createQuery("11", "12", "13", "11>12", "11>13", "12>13"),
+						createQuery("11", "15", "16", "11>15", "11>16", "15>16"),
+						createQuery("11", "12", "14", "11>12", "11>14", "12>14"),
+						createQuery("11", "20", "21", "11>20", "11>21", "20>21")));
+		categories.put("3", Sets.newHashSet(createQuery("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13")));
+		categories.put("4",
+				Sets.newHashSet(createQuery("11", "12", "13", "14", "15", "11>12", "11>13", "11>14", "11>15"),
+						createQuery("11", "12", "13", "14", "16", "11>12", "11>13", "11>14", "11>16")));
+		categories.put("10-19",
+				Sets.newHashSet(createQuery("11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
+						"11>12", "11>13", "11>14", "11>15", "11>16", "11>17", "11>18", "11>19", "11>20", "11>21",
+						"11>22")));
+
+		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		when(episodeParser.parse(eq(FREQUENCY), eq(BIDIRECTIONAL))).thenReturn(patterns);
 		when(mappingParser.parse()).thenReturn(events);
@@ -190,10 +199,10 @@ public class EvaluationTest {
 		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
 		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
 				"\tTop10", "\n");
-		assertLogContains(24, "Removed 0.10\t", "<0.26, 0.34>\t", "<0.29, 0.22>\t", "<0.22, 0.55>\t", "<0.00, 0.00>\t",
+		assertLogContains(24, "Removed 0.10\t", "<0.25, 0.32>\t", "<0.29, 0.22>\t", "<0.22, 0.55>\t", "<0.00, 0.00>\t",
 				"<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t", "<0.00, 0.00>\t",
 				"<0.00, 0.00>\t", "\n", "\n");
-		
+
 		assertLogContains(37, "Generating queries for episodes with 3 number of invocations\n");
 		assertLogContains(38, "\nNumber of targets with no proposals = 0\n\n");
 		assertLogContains(39, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
