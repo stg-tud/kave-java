@@ -60,21 +60,21 @@ public class EpisodeRecommenderTest {
 	public void emptyQuery() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Input a valid query!");
-		sut.calculateProposals(new Episode(), learnedPatterns, 2);
+		sut.getProposals(new Episode(), learnedPatterns, 2);
 	}
 
 	@Test
 	public void emptyPatterns() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
-		sut.calculateProposals(newQuery("11", "12", "11>12"), emptyEpisodes, 2);
+		sut.getProposals(newQuery("11", "12", "11>12"), emptyEpisodes, 2);
 	}
 
 	@Test
 	public void proposalsNumber() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Request a positive number of proposals to show!");
-		sut.calculateProposals(newQuery("11", "12", "11>12"), learnedPatterns, 0);
+		sut.getProposals(newQuery("11", "12", "11>12"), learnedPatterns, 0);
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class EpisodeRecommenderTest {
 	}
 
 	private void queryWith(String... facts) {
-		actualProposals = sut.calculateProposals(newQuery(facts), learnedPatterns, 3);
+		actualProposals = sut.getProposals(newQuery(facts), learnedPatterns, 3);
 	}
 
 	private void addProposal(Episode e, double probability) {

@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.datastructures.Tuple;
 
-public class ProposalResults {
+public class TargetResults {
 
 	private Episode target = new Episode();
 	Map<Double, List<Tuple<Double, Double>>> results = new HashMap<Double, List<Tuple<Double, Double>>>();
@@ -71,7 +71,7 @@ public class ProposalResults {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 	
-	public boolean equals(ProposalResults ps) {
+	public boolean equals(TargetResults ps) {
 		if (!this.target.equals(ps.target)) {
 			return false;
 		}

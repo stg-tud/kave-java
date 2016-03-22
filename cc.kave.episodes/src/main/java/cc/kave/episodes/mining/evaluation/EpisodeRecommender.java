@@ -27,7 +27,7 @@ public class EpisodeRecommender {
 	
 	private Separator separator = new Separator();
 
-	public Set<Tuple<Episode, Double>> calculateProposals(Episode query, Map<Integer, Set<Episode>> patterns, 
+	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, Set<Episode>> patterns, 
 															int numberOfProposals) {
 		assertTrue(query.getNumEvents() > 0, "Input a valid query!");
 		assertTrue(!patterns.isEmpty(), "The list of learned episodes is empty!");

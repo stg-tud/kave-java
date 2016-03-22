@@ -124,7 +124,7 @@ public class RecommenderGraphGenerator {
 					
 						int proposalID = 0;
 					
-						Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns, PROPOSALS);
+						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns, PROPOSALS);
 						Set<Double> probProposals = Sets.newLinkedHashSet();
 						for (Tuple<Episode, Double> tuple : proposals) {
 							probProposals.add(tuple.getSecond());

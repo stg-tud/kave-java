@@ -36,14 +36,14 @@ public class ProposalResultsTest {
 	private Map<Double, List<Tuple<Double, Double>>> expected;
 	List<Tuple<Double, Double>> list;
 
-	private ProposalResults sut;
+	private TargetResults sut;
 	
 	@Before
 	public void setup() {
 		expected = new HashMap<Double, List<Tuple<Double, Double>>>();
 		list = new LinkedList<Tuple<Double, Double>>();
 		
-		sut = new ProposalResults();
+		sut = new TargetResults();
 	}
 	
 	@Test
@@ -77,11 +77,11 @@ public class ProposalResultsTest {
 	
 	@Test
 	public void equality_default() {
-		ProposalResults a = new ProposalResults();
+		TargetResults a = new TargetResults();
 		a.setTarget(new Episode());
 		a.addResult(0.0, 0.0, 0.0);
 		
-		ProposalResults b = new ProposalResults();
+		TargetResults b = new TargetResults();
 		b.setTarget(new Episode());
 		b.addResult(0.0, 0.0, 0.0);
 		
@@ -92,13 +92,13 @@ public class ProposalResultsTest {
 	
 	@Test
 	public void equality_reallyTheSame() {
-		ProposalResults a = new ProposalResults();
+		TargetResults a = new TargetResults();
 		a.setTarget(createEpisode(2, "11", "12", "11>12"));
 		a.addResult(0.25, 0.9, 0.7);
 		a.addResult(0.25, 0.6, 0.4);
 		a.addResult(0.75, 0.4, 0.2);
 		
-		ProposalResults b = new ProposalResults();
+		TargetResults b = new TargetResults();
 		b.setTarget(createEpisode(2, "11", "12", "11>12"));
 		b.addResult(0.25, 0.9, 0.7);
 		b.addResult(0.25, 0.6, 0.4);
@@ -109,13 +109,13 @@ public class ProposalResultsTest {
 	
 	@Test
 	public void diffResults() {
-		ProposalResults a = new ProposalResults();
+		TargetResults a = new TargetResults();
 		a.setTarget(createEpisode(2, "11", "12", "11>12"));
 		a.addResult(0.25, 0.9, 0.7);
 		a.addResult(0.5, 0.6, 0.4);
 		a.addResult(0.5, 0.4, 0.2);
 		
-		ProposalResults b = new ProposalResults();
+		TargetResults b = new TargetResults();
 		b.setTarget(createEpisode(2, "11", "12", "11>12"));
 		b.addResult(0.25, 0.9, 0.5);
 		b.addResult(0.5, 0.5, 0.4);
@@ -127,13 +127,13 @@ public class ProposalResultsTest {
 	
 	@Test
 	public void diffTargets() {
-		ProposalResults a = new ProposalResults();
+		TargetResults a = new TargetResults();
 		a.setTarget(createEpisode(2, "11", "12", "11>12"));
 		a.addResult(0.25, 0.9, 0.7);
 		a.addResult(0.25, 0.6, 0.4);
 		a.addResult(0.25, 0.4, 0.2);
 		
-		ProposalResults b = new ProposalResults();
+		TargetResults b = new TargetResults();
 		b.setTarget(createEpisode(2, "11", "13", "11>13"));
 		b.addResult(0.25, 0.9, 0.7);
 		b.addResult(0.25, 0.6, 0.4);

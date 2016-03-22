@@ -43,7 +43,7 @@ import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.ProposalResults;
+import cc.kave.episodes.model.TargetResults;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
@@ -70,7 +70,7 @@ public class Evaluation {
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 
-	private List<ProposalResults> results = new LinkedList<ProposalResults>();
+	private List<TargetResults> results = new LinkedList<TargetResults>();
 
 	private Map<Double, List<Tuple<Double, Double>>> categoryResults = new LinkedHashMap<Double, List<Tuple<Double, Double>>>();
 
@@ -122,7 +122,7 @@ public class Evaluation {
 
 					for (Episode query : queryEntry.getValue()) {
 						int propCount = 0;
-						Set<Tuple<Episode, Double>> proposals = recommender.calculateProposals(query, maxPatterns,
+						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns,
 								PROPOSALS);
 						if (proposals.size() == 0) {
 							continue;
@@ -249,7 +249,7 @@ public class Evaluation {
 	}
 
 	private void getTargetResults(int targetID, Episode target) {
-		ProposalResults episodeResults = new ProposalResults();
+		TargetResults episodeResults = new TargetResults();
 		episodeResults.setTarget(target);
 
 		sb.append("Target query " + targetID + "\t");
