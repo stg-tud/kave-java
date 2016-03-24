@@ -26,6 +26,11 @@ import cc.recommenders.usages.Usage;
 public class NopUsageStore implements UsageStore {
 
 	@Override
+	public String getName() {
+		return this.toString();
+	}
+
+	@Override
 	public void store(Collection<Usage> usages, Path relativeInput) throws IOException {
 
 	}

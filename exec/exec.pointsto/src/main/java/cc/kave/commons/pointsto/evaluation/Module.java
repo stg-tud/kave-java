@@ -12,6 +12,13 @@
  */
 package cc.kave.commons.pointsto.evaluation;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
@@ -28,6 +35,8 @@ import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
 import cc.kave.commons.pointsto.evaluation.cv.CrossValidationFoldBuilder;
 import cc.kave.commons.pointsto.evaluation.cv.ProjectCVFoldBuilder;
+import cc.kave.commons.pointsto.stores.ProjectUsageStore;
+import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;
 import cc.recommenders.mining.calls.MiningOptions.DistanceMeasure;
@@ -44,6 +53,9 @@ import cc.recommenders.usages.features.UsageFeature;
 
 public class Module extends AbstractModule {
 
+	private final Path BASE_DIR = Paths.get("E:\\Coding\\MT");
+	private final Path USAGES_DIR = BASE_DIR.resolve("Usages");
+
 	@Override
 	protected void configure() {
 		configCrossValidation();
@@ -56,6 +68,8 @@ public class Module extends AbstractModule {
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		// ExecutorService executorService = Executors.newSingleThreadExecutor();
 		bind(ExecutorService.class).toInstance(executorService);
+
+		configStores();
 	}
 
 	private void configCrossValidation() {
@@ -82,6 +96,22 @@ public class Module extends AbstractModule {
 
 		mOpts.setFeatureDropping(true);
 		bind(MiningOptions.class).toInstance(mOpts);
+	}
+
+	private void configStores() {
+		List<UsageStore> stores = new ArrayList<>();
+		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(USAGES_DIR)) {
+			for (Path dir : dirStream) {
+				if (Files.isDirectory(dir)) {
+					stores.add(new ProjectUsageStore(dir));
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		bind(new TypeLiteral<List<UsageStore>>() {
+		}).toInstance(stores);
 	}
 
 	@Provides

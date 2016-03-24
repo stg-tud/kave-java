@@ -25,6 +25,8 @@ import cc.recommenders.usages.Usage;
 
 public interface UsageStore extends Closeable {
 
+	String getName();
+
 	void store(Collection<Usage> usages, Path relativeInput) throws IOException;
 
 	Set<ITypeName> getAllTypes();

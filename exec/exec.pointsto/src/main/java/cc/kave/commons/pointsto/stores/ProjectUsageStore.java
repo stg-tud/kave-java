@@ -132,6 +132,7 @@ public class ProjectUsageStore implements UsageStore {
 		return store;
 	}
 
+	@Override
 	public String getName() {
 		return baseDir.getFileName().toString();
 	}
@@ -401,6 +402,11 @@ public class ProjectUsageStore implements UsageStore {
 			}
 
 			return zipFile;
+		}
+
+		@Override
+		public String getName() {
+			return projectDir.getFileName().toString();
 		}
 
 		@Override
