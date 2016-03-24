@@ -17,11 +17,15 @@ import java.util.Map;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.ssts.IMemberDeclaration;
+import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 
 public class DeclarationMapper {
 
@@ -30,18 +34,22 @@ public class DeclarationMapper {
 	private Map<IPropertyName, IPropertyDeclaration> properties;
 
 	public DeclarationMapper(Context context) {
-		methods = new HashMap<>(context.getSST().getMethods().size());
-		for (IMethodDeclaration methodDecl : context.getSST().getMethods()) {
+		this(context.getSST());
+	}
+
+	public DeclarationMapper(ISST sst) {
+		methods = new HashMap<>(sst.getMethods().size());
+		for (IMethodDeclaration methodDecl : sst.getMethods()) {
 			methods.put(methodDecl.getName(), methodDecl);
 		}
 
-		fields = new HashMap<>(context.getSST().getFields().size());
-		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
+		fields = new HashMap<>(sst.getFields().size());
+		for (IFieldDeclaration fieldDecl : sst.getFields()) {
 			fields.put(fieldDecl.getName(), fieldDecl);
 		}
 
-		properties = new HashMap<>(context.getSST().getProperties().size());
-		for (IPropertyDeclaration propertyDecl : context.getSST().getProperties()) {
+		properties = new HashMap<>(sst.getProperties().size());
+		for (IPropertyDeclaration propertyDecl : sst.getProperties()) {
 			properties.put(propertyDecl.getName(), propertyDecl);
 		}
 	}
@@ -56,5 +64,14 @@ public class DeclarationMapper {
 
 	public IPropertyDeclaration get(IPropertyName property) {
 		return properties.get(property);
+	}
+
+	public IMemberDeclaration get(IMemberName member) {
+		if (member instanceof IFieldName) {
+			return get((IFieldName) member);
+		} else if (member instanceof IPropertyName) {
+			return get((IPropertyName) member);
+		}
+		throw new UnexpectedNameException(member);
 	}
 }

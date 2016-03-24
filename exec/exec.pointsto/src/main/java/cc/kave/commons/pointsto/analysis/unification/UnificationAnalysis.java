@@ -12,28 +12,15 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.AbstractPointsToAnalysis;
-import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
-import cc.kave.commons.pointsto.analysis.QueryStrategy;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.MemberLocationIdentifierFactory;
@@ -41,8 +28,6 @@ import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLoca
 import cc.kave.commons.pointsto.analysis.unification.identifiers.TypeLocationIdentifierFactory;
 
 public class UnificationAnalysis extends AbstractPointsToAnalysis {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UnificationAnalysis.class);
 
 	private final FieldSensitivity fieldSensitivity;
 
@@ -88,69 +73,6 @@ public class UnificationAnalysis extends AbstractPointsToAnalysis {
 		}
 
 		return new PointsToContext(context, this);
-	}
-
-	@Override
-	public Set<AbstractLocation> query(PointsToQuery query) {
-		IReference reference = normalizeReference(query.getReference());
-		ITypeName type = normalizeType(query.getType());
-		// use the current method for the query
-		Callpath methodPath = null;
-		if (query.getCallpath() != null) {
-			IMethodName method = normalizeMethod(query.getCallpath().getLast());
-			methodPath = (method != null) ? new Callpath(method) : null;
-		}
-
-		Collection<AbstractLocation> locations = contextToLocations
-				.get(new PointsToQuery(reference, query.getStmt(), type, methodPath));
-		if (locations.isEmpty()) {
-			// drop method
-			locations = contextToLocations.get(new PointsToQuery(reference, query.getStmt(), type, null));
-			if (!locations.isEmpty()) {
-				return new HashSet<>(locations);
-			}
-
-			// drop statements
-			locations = contextToLocations.get(new PointsToQuery(reference, null, type, methodPath));
-			if (!locations.isEmpty()) {
-				return new HashSet<>(locations);
-			}
-
-			// drop statements & method
-			locations = contextToLocations.get(new PointsToQuery(reference, null, type, null));
-			if (locations.isEmpty()) {
-				if (query.getStmt() != null && reference != null) {
-					// statement + reference are unique enough for a last effort exhaustive search
-					locations = query(reference, query.getStmt());
-					if (!locations.isEmpty()) {
-						return new HashSet<>(locations);
-					}
-				}
-
-				LOGGER.warn("Failed to find a location after dropping both statement and method");
-			}
-		}
-
-		if (locations.isEmpty() && queryStrategy == QueryStrategy.EXHAUSTIVE) {
-			locations = contextToLocations.values();
-		}
-
-		return new HashSet<>(locations);
-	}
-
-	private Collection<AbstractLocation> query(IReference reference, IStatement stmt) {
-		Set<AbstractLocation> locations = new HashSet<>();
-		for (PointsToQuery queryKey : contextToLocations.keySet()) {
-			if (queryKey.getStmt() == stmt && reference.equals(queryKey.getReference())) {
-				locations.addAll(contextToLocations.get(queryKey));
-			}
-		}
-
-		if (locations.size() > 1 && queryStrategy == QueryStrategy.MINIMIZE_USAGE_DEFECTS) {
-			return Collections.emptySet();
-		} else {
-			return locations;
-		}
 	}
 
 }
