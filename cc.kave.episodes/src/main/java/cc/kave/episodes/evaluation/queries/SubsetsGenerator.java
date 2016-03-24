@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -29,17 +30,29 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class SubsetsGenerator {
 	
-	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length) {
+	public Set<Set<Fact>> generateSubsets(Set<Fact> originalSet, int length, int limit) {
 		assertTrue((originalSet.size() > 1), "Cannot subselect from less then one method invocation!");
 		assertTrue(length < originalSet.size(), "Please subselect less than the total number of Facts!");
 		
 		List<Fact> superSet = setToListConverter(originalSet);
 		List<Set<Fact>> queryList = getSubsets(superSet, length);
-		Set<Set<Fact>> querySet = listofsetsToSetofsets(queryList);
-
+		Set<Set<Fact>> querySet = limitQueries(queryList, limit);
 		return querySet;
 	}
 	
+	private Set<Set<Fact>> limitQueries(List<Set<Fact>> queryList, int limit) {
+		if (queryList.size() <= limit) {
+			return listofsetsToSetofsets(queryList);
+		}
+		Set<Set<Fact>> result = Sets.newHashSet();
+		Random random = new Random();
+		while(result.size() < limit) {
+			int number = random.nextInt(queryList.size());
+			result.add(queryList.get(number));
+		}
+ 		return result;
+	}
+
 	private Set<Set<Fact>> listofsetsToSetofsets(List<Set<Fact>> queryList) {
 		Set<Set<Fact>> result = Sets.newHashSet();
 		for (Set<Fact> set : queryList) {
