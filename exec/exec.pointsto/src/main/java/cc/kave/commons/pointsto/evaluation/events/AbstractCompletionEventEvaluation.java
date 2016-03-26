@@ -60,21 +60,28 @@ public abstract class AbstractCompletionEventEvaluation {
 	protected abstract void evaluate(List<ICompletionEvent> completionEvents, List<PointsToAnalysisFactory> ptFactories)
 			throws IOException;
 
-	private static final Injector INJECTOR = Guice.createInjector(new Module());
-
 	public static void main(String[] args) throws IOException {
 		Path baseDir = Paths.get("E:\\Coding\\MT");
 		Path completionEventsArchive = baseDir.resolve("CompletionEvents.zip");
 		List<PointsToAnalysisFactory> ptFactories = Arrays.asList(
 				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
 				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
-				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class));
-		MRREvaluation evaluation = INJECTOR.getInstance(MRREvaluation.class);
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)/*,
+				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)*/);
+		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
+
+		Injector injector;
+		injector = Guice.createInjector(new StoreModule());
+		MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
 		evaluation.run(completionEventsArchive, ptFactories);
-		evaluation.exportResults(
-				baseDir.resolve("EvaluationResults").resolve(evaluation.getClass().getSimpleName() + ".txt"),
-				INJECTOR.getInstance(ResultExporter.class));
+		evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
+				injector.getInstance(ResultExporter.class));
 		evaluation.close();
+
+		// injector = Guice.createInjector(new Module());
+		// TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
+		// evaluation.run(completionEventsArchive, ptFactories);
+		// evaluation.exportResults(evaluationResultsDir,
+		// injector.getInstance(ResultExporter.class));
 	}
 }
