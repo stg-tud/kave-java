@@ -193,7 +193,7 @@ public class TestSSTBuilder {
 										invocationExpression("input", fsReadName,
 												Iterators.forArray(refExpr("buffer"), constant("0"),
 														refExpr(buildPropertyRef("buffer", intArrLengthName))))),
-						unknownStatement()),
+								unknownStatement()),
 						invocationStatement("output", fsWriteName,
 								Iterators.forArray(refExpr("buffer"), constant("0"), refExpr("read")))),
 				invocationStatement("input", fsCloseName), invocationStatement("output", fsCloseName));
@@ -263,11 +263,11 @@ public class TestSSTBuilder {
 								getVoidType().getIdentifier(), bType.getIdentifier()))),
 				invocationStatement("this", entry3Name));
 		IMethodDeclaration entry3Decl = declareMethod(entry3Name, true, declareVar("d", dType),
-				assignmentToLocal("d",
-						invocationExpr(dConstructor)),
-				buildTryBlock(invocationStatement("d",
-						MethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m4()",
-								getVoidType().getIdentifier(), dType.getIdentifier()))),
+				assignmentToLocal("d", invocationExpr(dConstructor)),
+				buildTryBlock(
+						invocationStatement("d",
+								MethodName.newMethodName(String.format(Locale.US, "[%s] [%s].m4()",
+										getVoidType().getIdentifier(), dType.getIdentifier()))),
 						buildCatchBlock(invocationStatement("d", MethodName.newMethodName(String.format(Locale.US,
 								"[%s] [%s].m5()", getVoidType().getIdentifier(), dType.getIdentifier()))))));
 		sst.setMethods(Sets.newHashSet(entry2Decl, entry3Decl));
@@ -283,6 +283,11 @@ public class TestSSTBuilder {
 
 	public Context createParameterArrayTest() {
 		InputStream resource = getClass().getResourceAsStream("./ParameterArrayTest.json");
+		return JsonUtils.fromJson(resource, Context.class);
+	}
+
+	public Context createRecursionTest() {
+		InputStream resource = getClass().getResourceAsStream("./RecursionTest.json");
 		return JsonUtils.fromJson(resource, Context.class);
 	}
 
