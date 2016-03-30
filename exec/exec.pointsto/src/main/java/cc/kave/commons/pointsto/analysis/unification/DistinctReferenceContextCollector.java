@@ -31,6 +31,7 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctMemberReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
+import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 
 public class DistinctReferenceContextCollector extends DistinctReferenceVisitorContext {
 
@@ -46,8 +47,8 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 	private Multimap<DistinctReference, IMethodName> referenceToMethods = HashMultimap.create();
 	private Multimap<DistinctReference, IStatement> referenceToStmts = HashMultimap.create();
 
-	public DistinctReferenceContextCollector(Context context) {
-		super(context);
+	public DistinctReferenceContextCollector(Context context, ThisReferenceOption thisReferenceOption) {
+		super(context, thisReferenceOption);
 	}
 
 	public Collection<IMethodName> getMethods(DistinctReference ref) {

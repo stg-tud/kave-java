@@ -72,6 +72,7 @@ import cc.kave.commons.pointsto.analysis.unification.locations.SimpleReferenceLo
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.utils.PropertyAsFieldPredicate;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
+import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 import cc.recommenders.assertions.Asserts;
 
@@ -105,7 +106,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private Multimap<ReferenceLocation, ReferenceLocation> pendingUnifications = HashMultimap.create();
 
 	public UnificationAnalysisVisitorContext(Context context, LocationIdentifierFactory identifierFactory) {
-		super(context);
+		super(context, ThisReferenceOption.PER_CONTEXT);
 		this.treatPropertyAsField = new PropertyAsFieldPredicate(new DeclarationMapper(context));
 		this.identifierFactory = identifierFactory;
 
@@ -481,7 +482,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		return getOrCreateLocation(distRef);
 	}
 
-	public void setCurrentMember(IMemberName member) {
+	@Override
+	public void enterMember(IMemberName member) {
+		super.enterMember(member);
 		this.currentMember = member;
 	}
 

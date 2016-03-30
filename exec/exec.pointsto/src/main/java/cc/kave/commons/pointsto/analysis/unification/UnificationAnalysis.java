@@ -26,6 +26,7 @@ import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentif
 import cc.kave.commons.pointsto.analysis.unification.identifiers.MemberLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.TypeLocationIdentifierFactory;
+import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 
 public class UnificationAnalysis extends AbstractPointsToAnalysis {
 
@@ -60,7 +61,8 @@ public class UnificationAnalysis extends AbstractPointsToAnalysis {
 		Map<DistinctReference, AbstractLocation> referenceToLocation = visitorContext.getReferenceLocations();
 
 		// collect information needed to create the query keys
-		DistinctReferenceContextCollector contextCollector = new DistinctReferenceContextCollector(context);
+		DistinctReferenceContextCollector contextCollector = new DistinctReferenceContextCollector(context,
+				ThisReferenceOption.PER_CONTEXT);
 		new DistinctReferenceContextCollectorVisitor().visit(context.getSST(), contextCollector);
 
 		QueryKeyTransformer transformer = new QueryKeyTransformer(true);

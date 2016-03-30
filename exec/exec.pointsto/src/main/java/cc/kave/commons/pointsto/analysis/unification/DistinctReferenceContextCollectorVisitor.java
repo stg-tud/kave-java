@@ -12,6 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -23,6 +24,7 @@ import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IUsingBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -40,9 +42,27 @@ public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<Dis
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, DistinctReferenceContextCollector context) {
-		context.setCurrentMethod(stmt.getName());
-		super.visit(stmt, context);
+		IMethodName method = stmt.getName();
+		context.setCurrentMethod(method);
+		context.enterMember(method);
+		try {
+			super.visit(stmt, context);
+		} finally {
+			context.leaveMember();
+		}
 		context.setCurrentMethod(null);
+		return null;
+	}
+
+	@Override
+	public Void visit(IPropertyDeclaration stmt, DistinctReferenceContextCollector context) {
+		context.setCurrentMethod(null);
+		context.enterMember(stmt.getName());
+		try {
+			super.visit(stmt, context);
+		} finally {
+			context.leaveMember();
+		}
 		return null;
 	}
 

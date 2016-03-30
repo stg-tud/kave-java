@@ -83,7 +83,8 @@ public class DistinctMethodParameterReference implements DistinctReference {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DistinctMethodParameterReference.class).add("method", method.getName())
+		return MoreObjects.toStringHelper(DistinctMethodParameterReference.class)
+				.add("method", method.getDeclaringType().getName() + "." + method.getName())
 				.add("name", parameter.getName()).toString();
 	}
 

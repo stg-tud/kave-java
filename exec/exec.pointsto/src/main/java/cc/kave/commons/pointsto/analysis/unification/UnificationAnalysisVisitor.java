@@ -71,14 +71,24 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 	@Override
 	public Void visit(IPropertyDeclaration decl, UnificationAnalysisVisitorContext context) {
-		context.setCurrentMember(decl.getName());
-		return super.visit(decl, context);
+		context.enterMember(decl.getName());
+		try {
+			super.visit(decl, context);
+		} finally {
+			context.leaveMember();
+		}
+		return null;
 	}
 
 	@Override
 	public Void visit(IMethodDeclaration decl, UnificationAnalysisVisitorContext context) {
-		context.setCurrentMember(decl.getName());
-		return super.visit(decl, context);
+		context.enterMember(decl.getName());
+		try {
+			super.visit(decl, context);
+		} finally {
+			context.leaveMember();
+		}
+		return null;
 	}
 
 	@Override
@@ -191,7 +201,7 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 		List<ISimpleExpression> parameters = entity.getParameters();
 		int numberOfFormalParameters = method.getParameters().size();
-		if (numberOfFormalParameters == 0 && parameters.size() > 0) {
+		if (numberOfFormalParameters == 0 && !parameters.isEmpty()) {
 			LOGGER.error("Attempted to invoke method {}.{} which expects zero parameters with {} actual parameters",
 					method.getDeclaringType().getName(), method.getName(), parameters.size());
 		} else {
@@ -305,8 +315,12 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 	public Void visit(IReturnStatement stmt, UnificationAnalysisVisitorContext context) {
 		ISimpleExpression expr = stmt.getExpression();
 		if (expr instanceof IReferenceExpression) {
-			IReference ref = ((IReferenceExpression) expr).getReference();
-			context.registerReturnedReference(ref);
+			try {
+				IReference ref = ((IReferenceExpression) expr).getReference();
+				context.registerReturnedReference(ref);
+			} catch (MissingVariableException | UndeclaredVariableException ex) {
+				LOGGER.error("Failed to process an assignment: {}", ex.getMessage());
+			}
 		}
 
 		return null;

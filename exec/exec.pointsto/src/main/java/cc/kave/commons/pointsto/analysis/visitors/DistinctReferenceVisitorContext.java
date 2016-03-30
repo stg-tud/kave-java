@@ -13,13 +13,17 @@
 package cc.kave.commons.pointsto.analysis.visitors;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctLambdaParameterReference;
@@ -28,27 +32,67 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterRefe
 import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.analysis.utils.ScopedMap;
 
 public abstract class DistinctReferenceVisitorContext implements ScopingVisitorContext {
 
 	private LanguageOptions languageOptions = LanguageOptions.getInstance();
 
+	private final ThisReferenceOption thisReferenceOption;
+	private final ITypeName thisType;
+	private final ITypeName superType;
+
 	protected ScopedMap<String, DistinctReference> namesToReferences = new ScopedMap<>();
 
-	public DistinctReferenceVisitorContext(Context context) {
+	public DistinctReferenceVisitorContext(Context context, ThisReferenceOption thisReferenceOption) {
+		this.thisReferenceOption = thisReferenceOption;
+
+		ITypeHierarchy typeHierarchy = context.getTypeShape().getTypeHierarchy();
+		this.thisType = typeHierarchy.getElement();
+		this.superType = languageOptions.getSuperType(typeHierarchy);
+
 		namesToReferences.enter();
 		createImplicitReferences(context);
 	}
 
 	private void createImplicitReferences(Context context) {
-		ITypeHierarchy typeHierarchy = context.getTypeShape().getTypeHierarchy();
-		DistinctReference thisRef = new DistinctKeywordReference(languageOptions.getThisName(),
-				typeHierarchy.getElement());
-		namesToReferences.create(languageOptions.getThisName(), thisRef);
-		DistinctReference superRef = new DistinctKeywordReference(languageOptions.getSuperName(),
-				languageOptions.getSuperType(typeHierarchy));
-		namesToReferences.create(languageOptions.getSuperName(), superRef);
+		if (thisReferenceOption == ThisReferenceOption.PER_CONTEXT) {
+			DistinctReference thisRef = new DistinctKeywordReference(languageOptions.getThisName(), thisType);
+			namesToReferences.create(languageOptions.getThisName(), thisRef);
+			DistinctReference superRef = new DistinctKeywordReference(languageOptions.getSuperName(), superType);
+			namesToReferences.create(languageOptions.getSuperName(), superRef);
+		}
+	}
+
+	public void enterMember(IMemberName member) {
+		if (thisReferenceOption == ThisReferenceOption.PER_MEMBER) {
+			enterScope();
+			DistinctReference thisDistRef;
+			DistinctReference superDistRef;
+			if (member instanceof IMethodName) {
+				IMethodName method = (IMethodName) member;
+				thisDistRef = new DistinctMethodParameterReference(
+						SSTBuilder.parameter(languageOptions.getThisName(), thisType), method);
+				superDistRef = new DistinctMethodParameterReference(
+						SSTBuilder.parameter(languageOptions.getSuperName(), superType), method);
+			} else if (member instanceof IPropertyName) {
+				IPropertyName property = (IPropertyName) member;
+				thisDistRef = new DistinctPropertyParameterReference(languageOptions.getThisName(), thisType, property);
+				superDistRef = new DistinctPropertyParameterReference(languageOptions.getSuperName(), superType,
+						property);
+			} else {
+				throw new UnexpectedNameException(member);
+			}
+			namesToReferences.create(languageOptions.getThisName(), thisDistRef);
+			namesToReferences.create(languageOptions.getSuperName(), superDistRef);
+		}
+	}
+
+	public void leaveMember() {
+		if (thisReferenceOption == ThisReferenceOption.PER_MEMBER) {
+			leaveScope();
+		}
 	}
 
 	@Override
