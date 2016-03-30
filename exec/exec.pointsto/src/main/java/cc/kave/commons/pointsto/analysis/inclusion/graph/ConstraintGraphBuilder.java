@@ -353,6 +353,9 @@ public class ConstraintGraphBuilder {
 			if (normalizedActualParameters.isEmpty()) {
 				LOGGER.error("Ignoring an extension method call without any parameters");
 				return;
+			} else if (normalizedActualParameters.get(0) == null) {
+				LOGGER.error("Ignoring an extension method call without a valid receiver");
+				return;
 			}
 			recvNode = getNode(normalizedActualParameters.get(0));
 			inclusionAnnotation = new InvocationAnnotation(method, false);
@@ -511,9 +514,7 @@ public class ConstraintGraphBuilder {
 
 			if (formalParameter.isParameterArray()) {
 				if (parameterArrayTemporary == null) {
-					parameterArrayTemporary = createTemporaryVariable();
-					allocate(parameterArrayTemporary,
-							new UniqueAllocationSite(formalParameter.getValueType().getArrayBaseType()));
+					parameterArrayTemporary = initializeParameterArray(formalParameter);
 					variables.add(parameterArrayTemporary);
 				}
 
@@ -526,14 +527,13 @@ public class ConstraintGraphBuilder {
 			}
 		}
 
-		// in rare cases there are less actual parameters than formal ones
-		if (variables.size() <= formalParameters.size()) {
-			int missingParameterVars = 1 + formalParameters.size() - variables.size();
-			if (hasExtensionMethodParameter(formalParameters)) {
-				--missingParameterVars;
-			}
-
-			for (int i = 0; i < missingParameterVars; ++i) {
+		// handle unset optional parameters
+		for (int i = actualParameters.size(); i < formalParameters.size(); ++i) {
+			IParameterName parameter = formalParameters.get(i);
+			if (parameter.isParameterArray()) {
+				parameterArrayTemporary = initializeParameterArray(parameter);
+				variables.add(parameterArrayTemporary);
+			} else {
 				variables.add(ConstructedTerm.BOTTOM);
 			}
 		}
@@ -549,13 +549,10 @@ public class ConstraintGraphBuilder {
 		return LambdaTerm.newMethodLambda(variables, formalParameters, returnType);
 	}
 
-	private boolean hasExtensionMethodParameter(List<IParameterName> formalParameters) {
-		for (IParameterName parameter : formalParameters) {
-			if (parameter.isExtensionMethodParameter()) {
-				return true;
-			}
-		}
-		return false;
+	private SetVariable initializeParameterArray(IParameterName parameter) {
+		SetVariable array = createTemporaryVariable();
+		allocate(array, new UniqueAllocationSite(parameter.getValueType().getArrayBaseType()));
+		return array;
 	}
 
 }

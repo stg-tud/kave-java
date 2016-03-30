@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableSet;
 
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
@@ -26,6 +29,8 @@ import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintNode;
 import cc.recommenders.assertions.Asserts;
 
 public class ConstraintResolver {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConstraintResolver.class);
 
 	private Function<SetExpression, ConstraintNode> nodeResolver;
 
@@ -144,7 +149,9 @@ public class ConstraintResolver {
 	public Set<ConstraintNode> resolve(ConstructedTerm constTerm, Projection projection,
 			InclusionAnnotation inclusionAnnotation, ContextAnnotation contextAnnotation) {
 		if (projection.getConstructor() != constTerm.getClass()) {
-			throw new IllegalArgumentException("Constructed term does not match projection");
+			LOGGER.warn("Constructed term does not match projection: {} != {}", constTerm.getClass().getSimpleName(),
+					projection.getConstructor().getSimpleName());
+			return Collections.emptySet();
 		}
 
 		int index = projection.getArgIndex();

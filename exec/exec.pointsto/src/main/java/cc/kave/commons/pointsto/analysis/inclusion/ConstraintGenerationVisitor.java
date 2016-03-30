@@ -53,9 +53,6 @@ public class ConstraintGenerationVisitor extends ScopingVisitor<ConstraintGenera
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, ConstraintGenerationVisitorContext context) {
-		// if (stmt.getName().getName().equals("entry2")) {
-		// return null;
-		// }
 		context.enterMember(stmt.getName());
 		try {
 			return super.visit(stmt, context);

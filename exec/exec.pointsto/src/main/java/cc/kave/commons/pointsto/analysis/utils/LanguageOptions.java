@@ -12,10 +12,13 @@
  */
 package cc.kave.commons.pointsto.analysis.utils;
 
+import java.util.List;
+
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -59,4 +62,13 @@ public abstract class LanguageOptions {
 
 	public abstract <T extends IMemberName> T resolveVirtual(T staticMethod, ITypeName dynamicType);
 
+	public int countOptionalParameters(List<IParameterName> parameters) {
+		int count = 0;
+		for (IParameterName parameter : parameters) {
+			if (parameter.isOptional() || parameter.isParameterArray()) {
+				++count;
+			}
+		}
+		return count;
+	}
 }

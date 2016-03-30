@@ -16,12 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -32,6 +34,7 @@ public class DeclarationMapper {
 	private Map<IMethodName, IMethodDeclaration> methods;
 	private Map<IFieldName, IFieldDeclaration> fields;
 	private Map<IPropertyName, IPropertyDeclaration> properties;
+	private Map<IEventName, IEventDeclaration> events;
 
 	public DeclarationMapper(Context context) {
 		this(context.getSST());
@@ -52,6 +55,11 @@ public class DeclarationMapper {
 		for (IPropertyDeclaration propertyDecl : sst.getProperties()) {
 			properties.put(propertyDecl.getName(), propertyDecl);
 		}
+
+		events = new HashMap<>(sst.getEvents().size());
+		for (IEventDeclaration eventDecl : sst.getEvents()) {
+			events.put(eventDecl.getName(), eventDecl);
+		}
 	}
 
 	public IMethodDeclaration get(IMethodName method) {
@@ -66,11 +74,17 @@ public class DeclarationMapper {
 		return properties.get(property);
 	}
 
+	public IEventDeclaration get(IEventName event) {
+		return events.get(event);
+	}
+
 	public IMemberDeclaration get(IMemberName member) {
 		if (member instanceof IFieldName) {
 			return get((IFieldName) member);
 		} else if (member instanceof IPropertyName) {
 			return get((IPropertyName) member);
+		} else if (member instanceof IEventName) {
+			return get((IEventName) member);
 		}
 		throw new UnexpectedNameException(member);
 	}

@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMemberName;
@@ -54,6 +56,8 @@ import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 
 public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitorContext {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConstraintGenerationVisitorContext.class);
 
 	private final LanguageOptions languageOptions = LanguageOptions.getInstance();
 
@@ -211,11 +215,22 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 			builder.allocate(tempDest, new StmtAllocationSite(lastAssignment));
 		}
 
-		List<SetVariable> actualParameters = simpleExpressionReader.read(invocation.getParameters());
-		if (languageOptions.isDelegateInvocation(method)) {
-			builder.invokeDelegate(tempDest, invocation.getReference(), actualParameters, method);
+		// sometimes the context analysis screws up and a method is called with less arguments than it has formal
+		// parameters
+		// unfortunately, we cannot assume that the positions of available arguments match the intended formal
+		// parameters as arguments might be missing at any position
+		List<IParameterName> formalParameters = method.getParameters();
+		int parameterDiff = invocation.getParameters().size() - formalParameters.size()
+				+ languageOptions.countOptionalParameters(formalParameters);
+		if (parameterDiff < 0) {
+			LOGGER.error("Skipping a method invocation which has less arguments than formal parameters");
 		} else {
-			builder.invoke(tempDest, invocation.getReference(), actualParameters, method);
+			List<SetVariable> actualParameters = simpleExpressionReader.read(invocation.getParameters());
+			if (languageOptions.isDelegateInvocation(method)) {
+				builder.invokeDelegate(tempDest, invocation.getReference(), actualParameters, method);
+			} else {
+				builder.invoke(tempDest, invocation.getReference(), actualParameters, method);
+			}
 		}
 
 		if (destRef != null) {
