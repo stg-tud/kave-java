@@ -13,13 +13,16 @@
 package cc.kave.commons.pointsto.analysis.utils;
 
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 
 public class CSharpLanguageOptions extends LanguageOptions {
 
@@ -87,4 +90,26 @@ public class CSharpLanguageOptions extends LanguageOptions {
 		return invokedMethod.getName().equals("Invoke") && invokedMethod.getDeclaringType().isDelegateType();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends IMemberName> T resolveVirtual(T staticMethod, ITypeName dynamicType) {
+		String methodName = staticMethod.getName();
+		ITypeName staticType = staticMethod.getDeclaringType();
+		if (staticType.equals(dynamicType)) {
+			return staticMethod;
+		}
+
+		String target = "[" + staticType.getIdentifier() + "]." + methodName + "(";
+		String replacement = "[" + dynamicType.getIdentifier() + "]." + methodName + "(";
+		String oldIdentifier = staticMethod.getIdentifier();
+		String newIdentifier = oldIdentifier.replace(target, replacement);
+
+		if (staticMethod.getClass() == MethodName.class) {
+			return (T) MethodName.newMethodName(newIdentifier);
+		} else if (staticMethod.getClass() == PropertyName.class) {
+			return (T) PropertyName.newPropertyName(newIdentifier);
+		} else {
+			throw new UnexpectedSSTNodeException();
+		}
+	}
 }

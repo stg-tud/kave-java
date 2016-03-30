@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.utils;
 
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IName;
 import cc.kave.commons.model.names.IPropertyName;
@@ -55,5 +56,7 @@ public abstract class LanguageOptions {
 	}
 
 	public abstract boolean isDelegateInvocation(IMethodName invokedMethod);
+
+	public abstract <T extends IMemberName> T resolveVirtual(T staticMethod, ITypeName dynamicType);
 
 }
