@@ -5,10 +5,6 @@
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<modules>
-		<module>commons</module>
-		<module>namefactory</module>
-	</modules>
 	<repositories>
 		<repository>
 			<id>eclipse-luna</id>
@@ -58,4 +54,15 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	<modules>
+		
+		
+		
+		
+		
+		<module>commons</module>
+		<module>eclipse.commons</module>
+		<module>namefactory</module>
+		<module>sst.testing</module>
+	</modules>
 </project>

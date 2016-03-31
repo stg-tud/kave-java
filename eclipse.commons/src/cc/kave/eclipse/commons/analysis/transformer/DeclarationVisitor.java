@@ -19,6 +19,8 @@ package cc.kave.eclipse.commons.analysis.transformer;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -30,6 +32,7 @@ import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.eclipse.commons.analysis.util.UniqueVariableNameGenerator;
 import cc.kave.eclipse.namefactory.NodeFactory;
+import cc.kave.eclipse.namefactory.NodeFactory.BindingFactory;
 
 public class DeclarationVisitor extends ASTVisitor {
 
@@ -46,6 +49,30 @@ public class DeclarationVisitor extends ASTVisitor {
 		if (node.getParent() instanceof TypeDeclaration) {
 			return false;
 		} else {
+			context.setEnclosingType(BindingFactory.getTypeName(node.resolveBinding()));
+			context.setPartialClassIdentifier(node.getName().getIdentifier());
+			return super.visit(node);
+		}
+	}
+	
+	@Override
+	public boolean visit(AnnotationTypeDeclaration node) {
+		if (node.getParent() instanceof AnnotationTypeDeclaration) {
+			return false;
+		} else {
+			context.setEnclosingType(BindingFactory.getTypeName(node.resolveBinding()));
+			context.setPartialClassIdentifier(node.getName().getIdentifier());
+			return super.visit(node);
+		}
+	}
+	
+	@Override
+	public boolean visit(EnumDeclaration node) {
+		if (node.getParent() instanceof EnumDeclaration) {
+			return false;
+		} else {
+			context.setEnclosingType(BindingFactory.getTypeName(node.resolveBinding()));
+			context.setPartialClassIdentifier(node.getName().getIdentifier());
 			return super.visit(node);
 		}
 	}

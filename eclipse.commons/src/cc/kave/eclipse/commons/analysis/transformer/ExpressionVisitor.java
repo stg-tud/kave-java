@@ -829,7 +829,7 @@ public class ExpressionVisitor extends ASTVisitor {
 	private boolean isParentLoop(ASTNode node) {
 		ASTNode parent = node.getParent();
 
-		while (!(parent instanceof TypeDeclaration)) {
+		while (!(parent instanceof TypeDeclaration) && parent != null) {
 			if (parent instanceof DoStatement || parent instanceof ForStatement || parent instanceof WhileStatement) {
 				return true;
 			}
@@ -871,7 +871,7 @@ public class ExpressionVisitor extends ASTVisitor {
 	}
 
 	private boolean isSelfAssign(IAssignableExpression assign, IAssignableReference varRef) {
-		if (assign instanceof ReferenceExpression && varRef.equals(((ReferenceExpression) assign).getReference())) {
+		if (varRef != null && assign instanceof ReferenceExpression && varRef.equals(((ReferenceExpression) assign).getReference())) {
 			return true;
 		}
 		return false;

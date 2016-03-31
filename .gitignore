@@ -112,3 +112,4 @@ buildNumber.properties
 
 ### Specific ###
 test-site/
+sst.testing/dependencies/

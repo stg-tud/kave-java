@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -57,6 +58,8 @@ import cc.kave.commons.model.names.csharp.CsParameterName;
 import cc.kave.commons.model.names.csharp.CsTypeName;
 
 public class NodeFactory {
+
+	public static ClassLoader loader;
 
 	public static Name createNodeName(ASTNode node) {
 
@@ -101,9 +104,10 @@ public class NodeFactory {
 
 			// TODO: Bindings are sometimes null
 			IMethodBinding ctorBinding = ((ClassInstanceCreation) node).resolveConstructorBinding();
-			
-			if(ctorBinding == null){
-				System.out.println("BINDING NULL");
+
+			if (ctorBinding == null) {
+
+				System.out.println("BINDING NULL: " + ((ClassInstanceCreation) node).toString());
 			}
 			String newName = "";
 
@@ -146,6 +150,13 @@ public class NodeFactory {
 	private static Name createFieldAccessName(ASTNode node) {
 		StringBuilder sb = new StringBuilder();
 		FieldAccess fieldAccess = (FieldAccess) node;
+		IVariableBinding resolveFieldBinding = fieldAccess.resolveFieldBinding();
+
+		if (resolveFieldBinding == null) {
+			System.out.println("BINDING NULL: " + fieldAccess.toString());
+			return CsFieldName.UNKNOWN_NAME;
+		}
+
 		sb.append(modifierHelper(fieldAccess.resolveFieldBinding()));
 		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getType())).append("] ");
 		sb.append("[").append(getBindingName(fieldAccess.resolveFieldBinding().getDeclaringClass())).append("].");
@@ -404,9 +415,6 @@ public class NodeFactory {
 			}
 		}
 
-		// methodNames[0] = CsMethodName.newMethodName(methodNameHelper(null,
-		// firstMethod, false));
-
 		if (topLevelMethod != null) {
 			methodNames[1] = CsMethodName.newMethodName(methodNameHelper(null, topLevelMethod, false));
 		}
@@ -435,8 +443,8 @@ public class NodeFactory {
 	}
 
 	private static String getDeclaringType(ASTNode node) {
-		return BindingFactory
-				.getBindingName(((TypeDeclaration) ((CompilationUnit) node.getRoot()).types().get(0)).resolveBinding());
+		return BindingFactory.getBindingName(
+				((AbstractTypeDeclaration) ((CompilationUnit) node.getRoot()).types().get(0)).resolveBinding());
 	}
 
 	private static String modifierHelper(IBinding binding) {
@@ -451,6 +459,10 @@ public class NodeFactory {
 
 	public static TypeName getBindingName(ITypeBinding binding) {
 		return CsTypeName.newTypeName(BindingFactory.getBindingName(binding));
+	}
+
+	public static void setCustomClassLoader(ClassLoader loader) {
+		NodeFactory.loader = loader;
 	}
 
 	public static class BindingFactory {
@@ -498,7 +510,14 @@ public class NodeFactory {
 				}
 
 				sb.append(", ");
-				sb.append(getAssemblyName(qualifiedName));
+
+				try {
+					sb.append(getAssemblyName(qualifiedName));
+				}
+				// somehow Class.forname throws this exception sometimes
+				catch (IllegalAccessError e) {
+					sb.append("?");
+				}
 				break;
 
 			// IVariableBinding
@@ -549,7 +568,7 @@ public class NodeFactory {
 			return "";
 		}
 
-		private static String getAssemblyName(String qualifiedName) {
+		private static String getAssemblyName(String qualifiedName) throws IllegalAccessError {
 			Class<?> c = null;
 
 			if (isPrimitivType(qualifiedName)) {
@@ -559,7 +578,16 @@ public class NodeFactory {
 			try {
 				c = Class.forName(qualifiedName);
 			} catch (ClassNotFoundException e) {
-				return "?";
+				if (loader != null) {
+					try {
+						c = Class.forName(qualifiedName, false, loader);
+					} catch (ClassNotFoundException e1) {
+					}
+				}
+
+				if (c == null) {
+					return "?";
+				}
 			}
 
 			if (c.getProtectionDomain().getCodeSource() == null) {
@@ -576,8 +604,6 @@ public class NodeFactory {
 			}
 
 			// TODO: version has to be implemented
-			CsAssemblyName.newAssemblyName(path);
-
 			return path;
 		}
 	}

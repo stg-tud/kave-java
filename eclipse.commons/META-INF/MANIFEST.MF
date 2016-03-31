@@ -7,6 +7,6 @@ Export-Package:
  cc.kave.eclipse.commons.analysis.transformer,
  cc.kave.eclipse.commons.analysis.util
 Require-Bundle: org.eclipse.jdt.core,
- namefactory,
- commons,
- org.eclipse.jdt.annotation
+ org.eclipse.jdt.annotation,
+ commons;bundle-version="1.0.0",
+ namefactory
