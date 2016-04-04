@@ -37,7 +37,7 @@ public class TypeBasedAnalysis extends AbstractPointsToAnalysis {
 
 		TypeCollector typeCollector = new TypeCollector(context);
 		for (ITypeName type : typeCollector.getTypes()) {
-			PointsToQuery key = new PointsToQuery(null, null, type, null);
+			PointsToQuery key = new PointsToQuery(null, type, null, null);
 			contextToLocations.put(key, new AbstractLocation());
 		}
 
@@ -66,7 +66,7 @@ public class TypeBasedAnalysis extends AbstractPointsToAnalysis {
 		}
 
 		// lower query to used format
-		return super.query(new PointsToQuery(null, null, query.getType(), null));
+		return super.query(new PointsToQuery(null, query.getType(), null, null));
 	}
 
 }

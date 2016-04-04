@@ -17,12 +17,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
@@ -35,7 +33,6 @@ import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterRefe
 import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceVisitor;
 import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
-import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 import cc.recommenders.assertions.Asserts;
 
 public class QueryKeyTransformer
@@ -43,80 +40,64 @@ public class QueryKeyTransformer
 
 	private boolean enableStmtsForVariables = false;
 
-	private ReferenceNormalizationVisitor normalizationVisitor = new ReferenceNormalizationVisitor();
-
 	public QueryKeyTransformer(boolean enableStmtsForVariables) {
 		this.enableStmtsForVariables = enableStmtsForVariables;
 	}
 
-	private Callpath normalizeMethod(IMethodName method) {
-		// TODO replace with isUnknown once it is overridden
-		if (method == null || method.equals(MethodName.UNKNOWN_NAME)) {
-			return null;
-		} else {
-			return new Callpath(method);
-		}
-	}
-
-	private ITypeName normalizeType(ITypeName type) {
-		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
-			return null;
-		} else {
-			return type;
-		}
-	}
-
 	@Override
 	public List<PointsToQuery> visit(DistinctKeywordReference keywordRef, DistinctReferenceContextCollector context) {
-		return Arrays
-				.asList(new PointsToQuery(keywordRef.getReference(), null, normalizeType(keywordRef.getType()), null));
+		PointsToQuery query = new PointsToQuery(keywordRef.getReference(), keywordRef.getType(), null, null);
+		return Arrays.asList(query);
 	}
 
 	@Override
 	public List<PointsToQuery> visit(DistinctFieldReference fieldRef, DistinctReferenceContextCollector context) {
-		return Arrays.asList(new PointsToQuery(fieldRef.getReference().accept(normalizationVisitor, null), null,
-				normalizeType(fieldRef.getType()), null));
+		PointsToQuery query = new PointsToQuery(fieldRef.getReference(), fieldRef.getType(), null, null);
+		return Arrays.asList(query);
 	}
 
 	@Override
 	public List<PointsToQuery> visit(DistinctVariableReference varRef, DistinctReferenceContextCollector context) {
-		Collection<IMethodName> methods = context.getMethods(varRef);
-		// if a declared variable is not used in a method, there will be no associated methods or statements
-		Asserts.assertLessOrEqual(methods.size(), 1);
-		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
-		ITypeName type = normalizeType(varRef.getType());
-		IReference reference = varRef.getReference().accept(normalizationVisitor, null);
+		Collection<IMemberName> members = context.getMembers(varRef);
+		// if a declared variable is not used in a member, there will be no associated members or statements
+		Asserts.assertLessOrEqual(members.size(), 1);
+		IMemberName member = members.isEmpty() ? null : members.iterator().next();
 
 		if (enableStmtsForVariables) {
 			Collection<IStatement> statements = context.getStatements(varRef);
 			List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 			for (IStatement stmt : statements) {
-				queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
+				PointsToQuery query = new PointsToQuery(varRef.getReference(), varRef.getType(), stmt, member);
+				queryKeys.add(query);
 			}
 
 			return queryKeys;
+		} else {
+			PointsToQuery query = new PointsToQuery(varRef.getReference(), varRef.getType(), null, member);
+			return Arrays.asList(query);
 		}
-
-		return Arrays.asList(new PointsToQuery(reference, null, type, methodPath));
 	}
 
 	@Override
 	public List<PointsToQuery> visit(DistinctPropertyReference propertyRef, DistinctReferenceContextCollector context) {
-		return Arrays.asList(new PointsToQuery(propertyRef.getReference().accept(normalizationVisitor, null), null,
-				normalizeType(propertyRef.getType()), null));
+		PointsToQuery query = new PointsToQuery(propertyRef.getReference(), propertyRef.getType(), null, null);
+		return Arrays.asList(query);
 	}
 
 	@Override
 	public List<PointsToQuery> visit(DistinctPropertyParameterReference propertyParameterRef,
 			DistinctReferenceContextCollector context) {
+		IReference reference = propertyParameterRef.getReference();
+		ITypeName type = propertyParameterRef.getType();
 		Collection<IStatement> statements = context.getStatements(propertyParameterRef);
-		ITypeName type = normalizeType(propertyParameterRef.getType());
-		IReference reference = propertyParameterRef.getReference().accept(normalizationVisitor, null);
+		Collection<IMemberName> members = context.getMembers(propertyParameterRef);
+		IMemberName member = members.isEmpty() ? null : members.iterator().next();
 		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new PointsToQuery(reference, stmt, type, null));
+			PointsToQuery query = new PointsToQuery(reference, type, stmt, member);
+			queryKeys.add(query);
 		}
 
 		return queryKeys;
@@ -126,15 +107,16 @@ public class QueryKeyTransformer
 	public List<PointsToQuery> visit(DistinctCatchBlockParameterReference catchBlockParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(catchBlockParameterRef);
-		Collection<IMethodName> methods = context.getMethods(catchBlockParameterRef);
-		Asserts.assertEquals(1, methods.size());
-		Callpath methodPath = normalizeMethod(methods.iterator().next());
-		ITypeName type = normalizeType(catchBlockParameterRef.getType());
-		IReference reference = catchBlockParameterRef.getReference().accept(normalizationVisitor, null);
+		Collection<IMemberName> members = context.getMembers(catchBlockParameterRef);
+		Asserts.assertEquals(1, members.size());
+		IMemberName member = members.isEmpty() ? null : members.iterator().next();
+		IReference reference = catchBlockParameterRef.getReference();
+		ITypeName type = catchBlockParameterRef.getType();
 		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
+			PointsToQuery query = new PointsToQuery(reference, type, stmt, member);
+			queryKeys.add(query);
 		}
 
 		return queryKeys;
@@ -144,16 +126,17 @@ public class QueryKeyTransformer
 	public List<PointsToQuery> visit(DistinctLambdaParameterReference lambdaParameterRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(lambdaParameterRef);
-		Collection<IMethodName> methods = context.getMethods(lambdaParameterRef);
+		Collection<IMemberName> members = context.getMembers(lambdaParameterRef);
 		// the user is free to write lambdas which do not use a parameter
-		Asserts.assertLessOrEqual(methods.size(), 1);
-		Callpath methodPath = methods.isEmpty() ? null : normalizeMethod(methods.iterator().next());
-		ITypeName type = normalizeType(lambdaParameterRef.getType());
-		IReference reference = lambdaParameterRef.getReference().accept(normalizationVisitor, null);
+		Asserts.assertLessOrEqual(members.size(), 1);
+		IMemberName member = members.isEmpty() ? null : members.iterator().next();
+		ITypeName type = lambdaParameterRef.getType();
+		IReference reference = lambdaParameterRef.getReference();
 		List<PointsToQuery> queryKeys = new ArrayList<>(statements.size());
 
 		for (IStatement stmt : statements) {
-			queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
+			PointsToQuery query = new PointsToQuery(reference, type, stmt, member);
+			queryKeys.add(query);
 		}
 
 		return queryKeys;
@@ -162,9 +145,9 @@ public class QueryKeyTransformer
 	@Override
 	public List<PointsToQuery> visit(DistinctMethodParameterReference methodParameterRef,
 			DistinctReferenceContextCollector context) {
-		Callpath methodPath = normalizeMethod(methodParameterRef.getMethod());
-		ITypeName type = normalizeType(methodParameterRef.getType());
-		IReference reference = methodParameterRef.getReference().accept(normalizationVisitor, null);
+		IMemberName member = methodParameterRef.getMethod();
+		ITypeName type = methodParameterRef.getType();
+		IReference reference = methodParameterRef.getReference();
 		ArrayList<PointsToQuery> queryKeys = new ArrayList<>();
 
 		if (enableStmtsForVariables) {
@@ -172,13 +155,14 @@ public class QueryKeyTransformer
 			queryKeys.ensureCapacity(statements.size());
 
 			for (IStatement stmt : statements) {
-				queryKeys.add(new PointsToQuery(reference, stmt, type, methodPath));
+				PointsToQuery query = new PointsToQuery(reference, type, stmt, member);
+				queryKeys.add(query);
 			}
 		}
 
 		// parameters are available regardless of statements that use them so that they can be queried by only looking
 		// at the declaring method
-		queryKeys.add(new PointsToQuery(reference, null, type, methodPath));
+		queryKeys.add(new PointsToQuery(reference, type, null, member));
 
 		return queryKeys;
 	}
@@ -191,8 +175,8 @@ public class QueryKeyTransformer
 
 	@Override
 	public List<PointsToQuery> visit(DistinctEventReference eventRef, DistinctReferenceContextCollector context) {
-		return Arrays.asList(new PointsToQuery(eventRef.getReference().accept(normalizationVisitor, null), null,
-				normalizeType(eventRef.getType()), null));
+		PointsToQuery query = new PointsToQuery(eventRef.getReference(), eventRef.getType(), null, null);
+		return Arrays.asList(query);
 	}
 
 }

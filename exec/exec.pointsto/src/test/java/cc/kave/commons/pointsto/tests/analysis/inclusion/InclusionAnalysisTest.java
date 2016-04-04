@@ -40,7 +40,6 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
-import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
@@ -157,9 +156,8 @@ public class InclusionAnalysisTest {
 		assertThat(namesLocations, Matchers.not(name1Locations));
 		assertThat(namesLocations, Matchers.not(name2Locations));
 
-		Set<AbstractLocation> nameLocations = ptAnalysis
-				.query(new PointsToQuery(variableReference("name"), consumeLoop.getBody().get(0),
-						consumeLoop.getDeclaration().getType(), new Callpath(consumeDecl.getName())));
+		Set<AbstractLocation> nameLocations = ptAnalysis.query(new PointsToQuery(variableReference("name"),
+				consumeLoop.getDeclaration().getType(), consumeLoop.getBody().get(0), consumeDecl.getName()));
 		assertEquals(2, nameLocations.size());
 		assertThat(nameLocations,
 				Matchers.containsInAnyOrder(name1Locations.iterator().next(), name2Locations.iterator().next()));

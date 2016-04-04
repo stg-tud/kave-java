@@ -29,7 +29,7 @@ import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 public class TypeBasedAnalysisTest {
 
 	private PointsToQuery createQuery(ITypeName type) {
-		return new PointsToQuery(null, null, type, null);
+		return new PointsToQuery(null, type, null, null);
 	}
 
 	@Test

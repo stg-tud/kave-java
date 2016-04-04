@@ -23,20 +23,16 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 
 public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 
 	protected Multimap<PointsToQuery, AbstractLocation> contextToLocations = HashMultimap.create();
 
 	protected QueryStrategy queryStrategy;
-
-	private ReferenceNormalizationVisitor referenceNormalizationVisitor = new ReferenceNormalizationVisitor();
 
 	public AbstractPointsToAnalysis() {
 		this.queryStrategy = QueryStrategy.MINIMIZE_USAGE_DEFECTS;
@@ -64,32 +60,27 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(PointsToQuery query) {
-		IReference reference = normalizeReference(query.getReference());
-		ITypeName type = normalizeType(query.getType());
-		// use the current method for the query
-		Callpath methodPath = null;
-		if (query.getCallpath() != null) {
-			IMethodName method = normalizeMethod(query.getCallpath().getLast());
-			methodPath = (method != null) ? new Callpath(method) : null;
-		}
+		IReference reference = query.getReference();
+		ITypeName type = query.getType();
+		IMemberName member = query.getMember();
 
 		Collection<AbstractLocation> locations = contextToLocations
-				.get(new PointsToQuery(reference, query.getStmt(), type, methodPath));
+				.get(new PointsToQuery(reference, type, query.getStmt(), member));
 		if (locations.isEmpty()) {
 			// drop method
-			locations = contextToLocations.get(new PointsToQuery(reference, query.getStmt(), type, null));
+			locations = contextToLocations.get(new PointsToQuery(reference, type, query.getStmt(), null));
 			if (!locations.isEmpty()) {
 				return new HashSet<>(locations);
 			}
 
 			// drop statements
-			locations = contextToLocations.get(new PointsToQuery(reference, null, type, methodPath));
+			locations = contextToLocations.get(new PointsToQuery(reference, type, null, member));
 			if (!locations.isEmpty()) {
 				return new HashSet<>(locations);
 			}
 
 			// drop statements & method
-			locations = contextToLocations.get(new PointsToQuery(reference, null, type, null));
+			locations = contextToLocations.get(new PointsToQuery(reference, type, null, null));
 			if (locations.isEmpty()) {
 				if (query.getStmt() != null && reference != null) {
 					// statement + reference are unique enough for a last effort exhaustive search
@@ -123,27 +114,6 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 			return Collections.emptySet();
 		} else {
 			return locations;
-		}
-	}
-
-	protected ITypeName normalizeType(ITypeName type) {
-		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
-			return null;
-		} else {
-			return type;
-		}
-	}
-
-	protected IMethodName normalizeMethod(IMethodName method) {
-		// TODO replace with isUnknown once it is overridden
-		return method.equals(MethodName.UNKNOWN_NAME) ? null : method;
-	}
-
-	protected IReference normalizeReference(IReference reference) {
-		if (reference == null) {
-			return null;
-		} else {
-			return reference.accept(referenceNormalizationVisitor, null);
 		}
 	}
 

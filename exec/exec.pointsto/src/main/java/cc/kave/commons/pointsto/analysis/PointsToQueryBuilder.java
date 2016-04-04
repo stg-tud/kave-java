@@ -13,13 +13,14 @@
 package cc.kave.commons.pointsto.analysis;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.pointsto.analysis.methods.EnclosingMethodCollector;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
+import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
+import cc.kave.commons.utils.SSTNodeHierarchy;
 
 /**
  * A convenience class for building {@link PointsToQuery} objects for a {@link PointsToAnalysis}.
@@ -29,48 +30,50 @@ import cc.kave.commons.pointsto.analysis.types.TypeCollector;
  */
 public class PointsToQueryBuilder {
 
-	private TypeCollector typeCollector;
-	private EnclosingMethodCollector methodCollector;
+	private final TypeCollector typeCollector;
+	private final EnclosingNodeHelper enclosingNodes;
 
 	/**
 	 * Constructs a new {@link PointsToQueryBuilder} using existing collector instances.
 	 */
-	public PointsToQueryBuilder(TypeCollector typeCollector, EnclosingMethodCollector methodCollector) {
+	public PointsToQueryBuilder(TypeCollector typeCollector, EnclosingNodeHelper enclosingNodes) {
 		this.typeCollector = typeCollector;
-		this.methodCollector = methodCollector;
+		this.enclosingNodes = enclosingNodes;
+	}
+
+	/**
+	 * Constructs a new {@link PointsToQueryBuilder} using existing collector instances.
+	 */
+	public PointsToQueryBuilder(TypeCollector typeCollector, SSTNodeHierarchy nodeHierarchy) {
+		this.typeCollector = typeCollector;
+		this.enclosingNodes = new EnclosingNodeHelper(nodeHierarchy);
 	}
 
 	public PointsToQueryBuilder(Context context) {
-		typeCollector = new TypeCollector(context);
-		methodCollector = new EnclosingMethodCollector(context.getSST());
+		this.typeCollector = new TypeCollector(context);
+		this.enclosingNodes = new EnclosingNodeHelper(new SSTNodeHierarchy(context.getSST()));
 	}
 
 	/**
 	 * Creates a new {@link PointsToQuery} for a {@link PointsToAnalysis} using the supplied {@link IReference} and
 	 * {@link IStatement}. The {@link ITypeName} and the potentially surrounding method is inferred using stored
-	 * information about the {@link ISST}. If the statement has an enclosing method, a {@link Callpath} is created from
-	 * it.
+	 * information about the {@link ISST}. The enclosing {@link IMemberName} (method or property) will be inferred.
 	 */
 	public PointsToQuery newQuery(IReference reference, IStatement stmt) {
 		ITypeName type = typeCollector.getType(reference);
+		IMemberName member = enclosingNodes.getEnclosingMember(stmt);
 
-		IMethodName method = methodCollector.getMethod(stmt);
-		Callpath callpath = null;
-		if (method != null) {
-			callpath = new Callpath(method);
-		}
-
-		return new PointsToQuery(reference, stmt, type, callpath);
+		return new PointsToQuery(reference, type, stmt, member);
 	}
 
 	/**
 	 * Creates a new {@link PointsToQuery} for a {@link PointsToAnalysis} using the supplied {@link IReference},
-	 * {@link IStatement} and {@link Callpath}. The {@link ITypeName} is inferred using stored information about the
+	 * {@link IStatement} and {@link IMemberName}. The {@link ITypeName} is inferred using stored information about the
 	 * {@link ISST}.
 	 */
-	public PointsToQuery newQuery(IReference reference, IStatement stmt, Callpath callpath) {
+	public PointsToQuery newQuery(IReference reference, IStatement stmt, IMemberName member) {
 		ITypeName type = typeCollector.getType(reference);
-		return new PointsToQuery(reference, stmt, type, callpath);
+		return new PointsToQuery(reference, type, stmt, member);
 	}
 
 }

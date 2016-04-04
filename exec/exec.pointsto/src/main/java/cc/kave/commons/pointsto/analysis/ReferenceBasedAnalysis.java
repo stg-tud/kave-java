@@ -47,7 +47,7 @@ public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 				languageOptions.getSuperType(typeHierarchy));
 
 		for (Map.Entry<IReference, ITypeName> entry : referenceTypes.entries()) {
-			PointsToQuery query = new PointsToQuery(entry.getKey(), null, entry.getValue(), null);
+			PointsToQuery query = new PointsToQuery(entry.getKey(), entry.getValue(), null, null);
 			if (!contextToLocations.containsKey(query)) {
 				contextToLocations.put(query, new AbstractLocation());
 			}
@@ -58,8 +58,8 @@ public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 
 	@Override
 	public Set<AbstractLocation> query(PointsToQuery query) {
-		IReference reference = normalizeReference(query.getReference());
-		ITypeName type = normalizeType(query.getType());
+		IReference reference = query.getReference();
+		ITypeName type = query.getType();
 
 		if (reference == null) {
 			if (type != null) {
@@ -75,7 +75,7 @@ public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 		} else {
 			if (type != null) {
 				Collection<AbstractLocation> locations = contextToLocations
-						.get(new PointsToQuery(reference, null, type, null));
+						.get(new PointsToQuery(reference, type, null, null));
 				if (locations.isEmpty()) {
 					LoggerFactory.getLogger(ReferenceBasedAnalysis.class)
 							.warn("Failed to find any matching entries for {}", query);

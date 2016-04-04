@@ -13,6 +13,7 @@
 package cc.kave.commons.pointsto.analysis.unification;
 
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -43,21 +44,22 @@ public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<Dis
 	@Override
 	public Void visit(IMethodDeclaration stmt, DistinctReferenceContextCollector context) {
 		IMethodName method = stmt.getName();
-		context.setCurrentMethod(method);
+		context.setCurrentMember(method);
 		context.enterMember(method);
 		try {
 			super.visit(stmt, context);
 		} finally {
 			context.leaveMember();
 		}
-		context.setCurrentMethod(null);
+		context.setCurrentMember(null);
 		return null;
 	}
 
 	@Override
 	public Void visit(IPropertyDeclaration stmt, DistinctReferenceContextCollector context) {
-		context.setCurrentMethod(null);
-		context.enterMember(stmt.getName());
+		IPropertyName property = stmt.getName();
+		context.setCurrentMember(property);
+		context.enterMember(property);
 		try {
 			super.visit(stmt, context);
 		} finally {

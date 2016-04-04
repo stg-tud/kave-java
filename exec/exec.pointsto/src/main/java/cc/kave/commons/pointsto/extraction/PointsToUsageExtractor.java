@@ -30,11 +30,11 @@ import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
-import cc.kave.commons.pointsto.analysis.Callpath;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
@@ -137,14 +137,13 @@ public class PointsToUsageExtractor {
 			visitor.visitEntryPoint(enclosingMethod, visitorContext);
 
 			PointsToQuery ptQuery;
-			Callpath callpath = new Callpath(enclosingMethod.getName());
 			if (completionExpression.getVariableReference() == null) {
 				// the query builder cannot infer the type of references that
 				// are not part of the original SST
 				cc.kave.commons.model.names.ITypeName type = context.getTypeShape().getTypeHierarchy().getElement();
-				ptQuery = new PointsToQuery(receiverVarRef, enclosingStatement, type, callpath);
+				ptQuery = new PointsToQuery(receiverVarRef, type, enclosingStatement, enclosingMethod.getName());
 			} else {
-				ptQuery = queryBuilder.newQuery(receiverVarRef, enclosingStatement, callpath);
+				ptQuery = queryBuilder.newQuery(receiverVarRef, enclosingStatement, enclosingMethod.getName());
 			}
 			Set<AbstractLocation> locations = context.getPointerAnalysis().query(ptQuery);
 			List<Query> usages = new ArrayList<>();

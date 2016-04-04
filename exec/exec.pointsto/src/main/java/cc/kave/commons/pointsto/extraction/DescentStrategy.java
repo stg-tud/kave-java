@@ -15,7 +15,6 @@ package cc.kave.commons.pointsto.extraction;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.pointsto.analysis.Callpath;
 
 /**
  * Controls whether the {@link PointsToUsageExtractor} descends into a specific method or property call of the same

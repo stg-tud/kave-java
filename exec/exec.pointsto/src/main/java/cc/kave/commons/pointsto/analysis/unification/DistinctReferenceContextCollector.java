@@ -21,7 +21,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.references.IMemberReference;
@@ -41,26 +41,26 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 
 	private DistinctReferenceCreationVisitor distRefCreationVisitor = new DistinctReferenceCreationVisitor();
 
-	private IMethodName currentMethod;
+	private IMemberName currentMember;
 	private IStatement currentStatement;
 
-	private Multimap<DistinctReference, IMethodName> referenceToMethods = HashMultimap.create();
+	private Multimap<DistinctReference, IMemberName> referenceToMembers = HashMultimap.create();
 	private Multimap<DistinctReference, IStatement> referenceToStmts = HashMultimap.create();
 
 	public DistinctReferenceContextCollector(Context context, ThisReferenceOption thisReferenceOption) {
 		super(context, thisReferenceOption);
 	}
 
-	public Collection<IMethodName> getMethods(DistinctReference ref) {
-		return referenceToMethods.get(ref);
+	public Collection<IMemberName> getMembers(DistinctReference ref) {
+		return referenceToMembers.get(ref);
 	}
 
 	public Collection<IStatement> getStatements(DistinctReference ref) {
 		return referenceToStmts.get(ref);
 	}
 
-	public void setCurrentMethod(IMethodName method) {
-		this.currentMethod = method;
+	public void setCurrentMember(IMemberName member) {
+		this.currentMember = member;
 	}
 
 	public void setCurrentStatement(IStatement stmt) {
@@ -72,7 +72,7 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 	}
 
 	private void registerReference(DistinctReference distRef) {
-		referenceToMethods.put(distRef, currentMethod);
+		referenceToMembers.put(distRef, currentMember);
 		referenceToStmts.put(distRef, currentStatement);
 	}
 

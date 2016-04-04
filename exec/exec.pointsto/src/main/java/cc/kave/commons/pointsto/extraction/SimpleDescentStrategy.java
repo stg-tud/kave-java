@@ -14,7 +14,6 @@ package cc.kave.commons.pointsto.extraction;
 
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.pointsto.analysis.Callpath;
 
 /**
  * A {@link DescentStrategy} that descends only into non-entry point methods that are not yet contained in the current

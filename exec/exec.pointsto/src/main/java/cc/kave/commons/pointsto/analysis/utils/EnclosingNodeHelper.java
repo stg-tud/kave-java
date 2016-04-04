@@ -10,12 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.extraction;
+package cc.kave.commons.pointsto.analysis.utils;
 
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 
 public class EnclosingNodeHelper {
@@ -42,6 +46,17 @@ public class EnclosingNodeHelper {
 		}
 
 		return (IMemberDeclaration) currentNode;
+	}
+
+	public IMemberName getEnclosingMember(IStatement stmt) {
+		IMemberDeclaration memberDecl = getEnclosingDeclaration(stmt);
+		if (memberDecl instanceof IMethodDeclaration) {
+			return ((IMethodDeclaration) memberDecl).getName();
+		} else if (memberDecl instanceof IPropertyDeclaration) {
+			return ((IPropertyDeclaration) memberDecl).getName();
+		} else {
+			throw new UnexpectedSSTNodeException(memberDecl);
+		}
 	}
 
 }

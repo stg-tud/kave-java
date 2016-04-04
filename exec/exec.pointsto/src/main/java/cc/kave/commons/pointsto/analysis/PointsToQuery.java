@@ -13,67 +13,80 @@
 package cc.kave.commons.pointsto.analysis;
 
 import com.google.common.base.MoreObjects;
+
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
 
 public class PointsToQuery {
 
-	private IReference reference;
-	private IStatement stmt;
-	private ITypeName type;
-	private Callpath callpath;
+	private static final ReferenceNormalizationVisitor REFERENCE_NORMALIZATION_VISITOR = new ReferenceNormalizationVisitor();
 
-	public PointsToQuery(IReference reference, IStatement stmt, ITypeName type, Callpath callpath) {
-		this.reference = reference;
+	private final IReference reference;
+	private final ITypeName type;
+	private final IStatement stmt;
+	private final IMemberName member;
+
+	public PointsToQuery(IReference reference, ITypeName type, IStatement stmt, IMemberName member) {
+		this.reference = normalizeReference(reference);
+		this.type = normalizeType(type);
 		this.stmt = stmt;
-		this.type = type;
-		this.callpath = callpath;
+		this.member = normalizeMember(member);
 	}
 
 	public IReference getReference() {
 		return reference;
 	}
 
-	public void setReference(IReference reference) {
-		this.reference = reference;
-	}
-
 	public IStatement getStmt() {
 		return stmt;
-	}
-
-	public void setStmt(IStatement stmt) {
-		this.stmt = stmt;
 	}
 
 	public ITypeName getType() {
 		return type;
 	}
 
-	public void setType(ITypeName type) {
-		this.type = type;
+	public IMemberName getMember() {
+		return member;
 	}
 
-	public Callpath getCallpath() {
-		return callpath;
+	protected IReference normalizeReference(IReference reference) {
+		return (reference != null) ? reference.accept(REFERENCE_NORMALIZATION_VISITOR, null) : null;
 	}
 
-	public void setCallpath(Callpath callpath) {
-		this.callpath = callpath;
+	protected ITypeName normalizeType(ITypeName type) {
+		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
+			return null;
+		} else {
+			return type;
+		}
+	}
+
+	protected IMemberName normalizeMember(IMemberName member) {
+		if (member == null || member.isUnknown()) {
+			return null;
+		} else if (member.equals(MethodName.UNKNOWN_NAME)) {
+			// TODO remove once isUnknown is overridden in MethodName
+			return null;
+		} else {
+			return member;
+		}
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(PointsToQuery.class).add("reference", reference).add("stmt", stmt)
-				.add("type", type).add("callpath", callpath).toString();
+		return MoreObjects.toStringHelper(PointsToQuery.class).add("reference", reference).add("type", type)
+				.add("stmt", stmt).add("member", member).toString();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((callpath == null) ? 0 : callpath.hashCode());
+		result = prime * result + ((member == null) ? 0 : member.hashCode());
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		result = prime * result + ((stmt == null) ? 0 : stmt.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -89,10 +102,10 @@ public class PointsToQuery {
 		if (getClass() != obj.getClass())
 			return false;
 		PointsToQuery other = (PointsToQuery) obj;
-		if (callpath == null) {
-			if (other.callpath != null)
+		if (member == null) {
+			if (other.member != null)
 				return false;
-		} else if (!callpath.equals(other.callpath))
+		} else if (!member.equals(other.member))
 			return false;
 		if (reference == null) {
 			if (other.reference != null)
