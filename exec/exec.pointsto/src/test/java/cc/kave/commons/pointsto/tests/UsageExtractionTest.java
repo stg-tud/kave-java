@@ -31,6 +31,7 @@ import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
+import cc.kave.commons.pointsto.extraction.CallsitePruning;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
@@ -202,6 +203,8 @@ public class UsageExtractionTest {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		PointsToAnalysis pointsToAnalysis = new ReferenceBasedAnalysis();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
+		// do not prune usages that only have parameter call sites
+		usageExtractor.setCallsitePruningBehavior(CallsitePruning.EMPTY_CALLSITES);
 		Context context = builder.createStreamTest();
 
 		List<Usage> usages = usageExtractor.extract(pointsToAnalysis.compute(context));

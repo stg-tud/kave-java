@@ -52,6 +52,7 @@ public class PointsToUsageExtractor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageExtractor.class);
 
 	private final DescentStrategy descentStrategy;
+	private CallsitePruning callsitePruningBehavior = CallsitePruning.EMPTY_RECV_CALLSITES;
 
 	private UsageStatisticsCollector collector;
 
@@ -66,6 +67,14 @@ public class PointsToUsageExtractor {
 	public PointsToUsageExtractor(DescentStrategy descentStrategy, UsageStatisticsCollector collector) {
 		this.descentStrategy = descentStrategy;
 		this.collector = collector;
+	}
+
+	public CallsitePruning getCallsitePruningBehavior() {
+		return callsitePruningBehavior;
+	}
+
+	public void setCallsitePruningBehavior(CallsitePruning callsitePruningBehavior) {
+		this.callsitePruningBehavior = callsitePruningBehavior;
 	}
 
 	public void setStatisticsCollector(UsageStatisticsCollector collector) {
@@ -180,8 +189,7 @@ public class PointsToUsageExtractor {
 
 		for (Query usage : usages) {
 			// prune usages that have no call sites or have an unknown type
-			ICoReTypeName usageType = usage.getType();
-			if (usage.getReceiverCallsites().isEmpty() || CoReNameConverter.isUnknown(usageType)) {
+			if (pruneUsage(usage)) {
 				++numPruned;
 			} else {
 				retainedUsages.add(usage);
@@ -190,6 +198,17 @@ public class PointsToUsageExtractor {
 
 		collector.onUsagesPruned(numPruned);
 		return retainedUsages;
+	}
+
+	private boolean pruneUsage(Usage usage) {
+		switch (callsitePruningBehavior) {
+		case EMPTY_CALLSITES:
+			return usage.getAllCallsites().isEmpty() || CoReNameConverter.isUnknown(usage.getType());
+		case EMPTY_RECV_CALLSITES:
+			return usage.getReceiverCallsites().isEmpty() || CoReNameConverter.isUnknown(usage.getType());
+		default:
+			throw new IllegalStateException("Unknown call site pruning behavior");
+		}
 	}
 
 	private void rewriteUsages(List<Query> usages, ITypeShape typeShape) {
