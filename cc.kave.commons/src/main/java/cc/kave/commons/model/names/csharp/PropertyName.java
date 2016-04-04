@@ -35,6 +35,7 @@ public class PropertyName extends MemberName implements IPropertyName {
 		return nameRegistry.get(identifier);
 	}
 
+	@Override
 	public boolean isUnknown() {
 		return this.equals(UNKNOWN_NAME);
 	}
