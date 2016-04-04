@@ -15,23 +15,29 @@
  */
 package exec.validate_evaluation.streaks;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.google.common.collect.Lists;
+
 public class EditStreak {
 
-	
-	
-	public void add(Snapshot se) {
-		// TODO Auto-generated method stub
+	private List<Snapshot> snapshots = Lists.newLinkedList();
 
+	public List<Snapshot> getSnapshots() {
+		return snapshots;
 	}
 
-	public boolean isSingleEdit() {
-		// TODO Auto-generated method stub
-		return false;
+	public void add(Snapshot s) {
+		snapshots.add(s);
+	}
+
+	public boolean isEmptyOrSingleEdit() {
+		return snapshots.size() < 2;
 	}
 
 	@Override

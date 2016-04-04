@@ -99,7 +99,7 @@ public class EditStreakGenerationRunner {
 		Iterator<Entry<ITypeName, EditStreak>> entries = editStreaks.entrySet().iterator();
 		while (entries.hasNext()) {
 			Entry<ITypeName, EditStreak> entry = entries.next();
-			if (entry.getValue().isSingleEdit()) {
+			if (entry.getValue().isEmptyOrSingleEdit()) {
 				entries.remove();
 				log.removeSingleEdit();
 			}

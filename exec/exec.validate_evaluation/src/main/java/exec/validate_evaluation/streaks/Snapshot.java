@@ -35,7 +35,7 @@ public class Snapshot {
 	private IMethodName selection;
 
 	private Snapshot() {
-		// for de-/serialization
+		// for de-/serialization only; use "create()" instead.
 	}
 
 	public LocalDateTime getDate() {
@@ -57,7 +57,6 @@ public class Snapshot {
 	public static Snapshot create(Date date, Context context, IMethodName selection) {
 		Asserts.assertNotNull(date);
 		Asserts.assertNotNull(context);
-		Asserts.assertNotNull(selection);
 
 		Snapshot e = new Snapshot();
 		e.date = toLocalDate(date);

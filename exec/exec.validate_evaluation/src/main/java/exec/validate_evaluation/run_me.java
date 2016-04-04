@@ -41,7 +41,7 @@ public class run_me {
 
 		EditStreakGenerationIo io = new EditStreakGenerationIo(dirEventsCompletion, dirEditStreaks);
 		EditStreakGenerationLogger logger = new EditStreakGenerationLogger();
-		
+
 		new EditStreakGenerationRunner(io, logger).run();
 	}
 

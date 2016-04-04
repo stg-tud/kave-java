@@ -64,8 +64,8 @@ public class SnapshotTest {
 		Snapshot.create(d, q, m);
 	}
 
-	@Test(expected = AssertionException.class)
-	public void customInit_nullSelection() {
+	@Test
+	public void customInit_nullSelectionIsOk() {
 		m = null;
 		Snapshot.create(d, q, m);
 	}

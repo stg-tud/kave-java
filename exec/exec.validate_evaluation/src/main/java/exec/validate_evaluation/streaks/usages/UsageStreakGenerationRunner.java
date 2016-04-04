@@ -76,7 +76,7 @@ public class UsageStreakGenerationRunner {
 		Iterator<Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak>> entries = editStreaks.entrySet().iterator();
 		while (entries.hasNext()) {
 			Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> entry = entries.next();
-			if (entry.getValue().isSingleEdit()) {
+			if (entry.getValue().isEmptyOrSingleEdit()) {
 				entries.remove();
 				log.removeSingleEdit();
 			}
