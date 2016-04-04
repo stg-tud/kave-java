@@ -13,48 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.streaks.usages;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import exec.validate_evaluation.streaks.EditStreak;
 
-public class StreakIo {
-
-	private String dirIn;
-	private String dirOut;
-
-	public StreakIo(String dirIn, String dirOut) {
-		this.dirIn = dirIn;
-		this.dirOut = dirOut;
-	}
+public class UsageStreakGenerationIo {
 
 	public Set<String> findZips() {
-		Directory dir = new Directory(dirIn);
-		return dir.findFiles(s -> s.endsWith(".zip"));
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public Set<ICompletionEvent> read(String zip) {
-		Set<ICompletionEvent> es = Sets.newLinkedHashSet();
-		Directory dir = new Directory(dirIn);
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
-			while (ra.hasNext()) {
-				es.add(ra.getNext(ICompletionEvent.class));
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		return es;
-	}
-
-	public void store(Iterable<EditStreak> collection, String zip) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
+
+	public void store(Collection<EditStreak> values, String zip) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

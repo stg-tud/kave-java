@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.utils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +28,7 @@ import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReFieldName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
+import exec.validate_evaluation.utils.CoReNameUtils;
 
 public class CoReNameUtilsTest {
 

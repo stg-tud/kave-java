@@ -15,9 +15,6 @@
  */
 package exec.validate_evaluation.streaks;
 
-import cc.kave.commons.model.events.completionevents.Context;
+public class EditStreakTest {
 
-public interface IUsageExtractor {
-
-	IAnalysisResult analyse(Context ctx);
 }

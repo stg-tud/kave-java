@@ -13,15 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.utils;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
-import cc.recommenders.usages.Usage;
+public class DateUtils {
+	public static LocalDateTime toLDT(Date d) {
+		return LocalDateTime.ofInstant(d.toInstant(), ZoneId.systemDefault());
+	}
 
-public interface IAnalysisResult {
-
-	List<Usage> getUsages();
-
-	Usage getFirstQuery();
+	public static Date fromLDT(LocalDateTime ldt) {
+		return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+	}
 }

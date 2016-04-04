@@ -13,44 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.streaks.usages;
 
-import java.util.Date;
+import java.util.List;
 
-import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Usage;
 
-public class Edit {
+public interface IAnalysisResult {
 
-	private Date date;
-	private Usage usage;
-	private ICoReMethodName selection;
+	List<Usage> getUsages();
 
-	private Edit() {
-		// for de-/serialization
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public Usage getUsage() {
-		return usage;
-	}
-
-	public ICoReMethodName getSelection() {
-		return selection;
-	}
-
-	public boolean isQuery() {
-		return false;
-	}
-
-	public static Edit create(Date date, Usage usage, ICoReMethodName selection) {
-		Edit e = new Edit();
-		e.date = date;
-		e.usage = usage;
-		e.selection = selection;
-		return e;
-	}
+	Usage getFirstQuery();
 }

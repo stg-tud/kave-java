@@ -20,9 +20,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -30,22 +32,24 @@ import org.junit.rules.TemporaryFolder;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
-public class StreakIoTest {
+public class EditStreakGenerationIoTest {
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
 	private File dirIn;
 	private File dirOut;
-	private StreakIo sut;
+	private EditStreakGenerationIo sut;
 
 	@Before
 	public void setup() throws IOException {
 		dirIn = tmp.newFolder("in");
 		dirOut = tmp.newFolder("out");
-		sut = new StreakIo(dirIn.getAbsolutePath(), dirOut.getAbsolutePath());
+		sut = new EditStreakGenerationIo(dirIn.getAbsolutePath(), dirOut.getAbsolutePath());
 	}
 
 	@Test
@@ -79,7 +83,40 @@ public class StreakIoTest {
 		assertEquals(expecteds, actuals);
 	}
 
-	private ICompletionEvent completionEvent(int i) {
+	@Test
+	@Ignore
+	public void editStreaksAreStored() throws IOException {
+
+		Set<EditStreak> actuals = Sets.newLinkedHashSet();
+		Set<EditStreak> expecteds = Sets.newLinkedHashSet();
+		expecteds.add(editStreak(1));
+		expecteds.add(editStreak(2));
+		expecteds.add(editStreak(3));
+
+		sut.store(expecteds, "a.zip");
+
+		Directory dir = new Directory(dirOut.getAbsolutePath());
+		try (ReadingArchive ra = dir.getReadingArchive("a.zip");) {
+
+			while (ra.hasNext()) {
+				EditStreak es = ra.getNext(EditStreak.class);
+				actuals.add(es);
+			}
+		}
+
+		assertEquals(expecteds, actuals);
+	}
+
+	private static EditStreak editStreak(int num) {
+		EditStreak es = new EditStreak();
+		for (int i = 0; i < num; i++) {
+			Snapshot e = Snapshot.create(new Date(), new Context(), null);
+			es.add(e);
+		}
+		return es;
+	}
+
+	private static ICompletionEvent completionEvent(int i) {
 		CompletionEvent ce = new CompletionEvent();
 		ce.IDESessionUUID = "sid:" + i;
 		return ce;

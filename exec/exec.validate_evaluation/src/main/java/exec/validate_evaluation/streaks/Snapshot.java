@@ -15,23 +15,60 @@
  */
 package exec.validate_evaluation.streaks;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class EditStreak {
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IMethodName;
+import cc.recommenders.assertions.Asserts;
 
-	
-	
-	public void add(Snapshot se) {
-		// TODO Auto-generated method stub
+public class Snapshot {
 
+	private LocalDateTime date;
+	private Context context;
+	private IMethodName selection;
+
+	private Snapshot() {
+		// for de-/serialization
 	}
 
-	public boolean isSingleEdit() {
-		// TODO Auto-generated method stub
+	public LocalDateTime getDate() {
+		return date;
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
+	public IMethodName getSelection() {
+		return selection;
+	}
+
+	public boolean isQuery() {
 		return false;
+	}
+
+	public static Snapshot create(Date date, Context context, IMethodName selection) {
+		Asserts.assertNotNull(date);
+		Asserts.assertNotNull(context);
+		Asserts.assertNotNull(selection);
+
+		Snapshot e = new Snapshot();
+		e.date = toLocalDate(date);
+		e.context = context;
+		e.selection = selection;
+		return e;
+	}
+
+	private static LocalDateTime toLocalDate(Date date) {
+		LocalDateTime ldt = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		return ldt;
 	}
 
 	@Override

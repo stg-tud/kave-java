@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.streaks.usages;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -31,19 +31,20 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.streaks.EditStreak;
+import exec.validate_evaluation.utils.CoReNameUtils;
 
-public class StreakGeneration {
+public class UsageStreakGenerationRunner {
 
-	private final StreakIo io;
-	private final StreakLogger log;
+	private final UsageStreakGenerationIo io;
+	private final UsageStreakGenerationLogger log;
 
 	private Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks;
 	private IUsageExtractor usageExtractor;
 
-	public StreakGeneration(StreakIo io, StreakLogger log, IUsageExtractor usageExtractor) {
+	public UsageStreakGenerationRunner(UsageStreakGenerationIo io, UsageStreakGenerationLogger log) {
 		this.io = io;
 		this.log = log;
-		this.usageExtractor = usageExtractor;
 	}
 
 	public void run() {
@@ -101,8 +102,8 @@ public class StreakGeneration {
 	}
 
 	private void register(Date d, Usage u, ICoReMethodName selection) {
-		Edit se = Edit.create(d, u, selection);
-		getEdits(u).add(se);
+		// Snapshot se = Snapshot.create(d, u, selection);
+		// getEdits(u).add(se);
 	}
 
 	private ICoReMethodName getSelection(IProposal p) {

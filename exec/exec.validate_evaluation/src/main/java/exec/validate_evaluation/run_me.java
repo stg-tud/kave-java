@@ -19,11 +19,9 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-import exec.validate_evaluation.streaks.IUsageExtractor;
-import exec.validate_evaluation.streaks.StreakGeneration;
-import exec.validate_evaluation.streaks.StreakIo;
-import exec.validate_evaluation.streaks.StreakLogger;
-import exec.validate_evaluation.streaks.UsageExtractor;
+import exec.validate_evaluation.streaks.EditStreakGenerationIo;
+import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
 
 public class run_me {
 
@@ -41,11 +39,10 @@ public class run_me {
 	private static void generateStreaks() {
 		cleanDirs(dirEditStreaks);
 
-		StreakIo io = new StreakIo(dirEventsCompletion, dirEditStreaks);
-		IUsageExtractor ue = new UsageExtractor();
-		StreakLogger logger = new StreakLogger();
+		EditStreakGenerationIo io = new EditStreakGenerationIo(dirEventsCompletion, dirEditStreaks);
+		EditStreakGenerationLogger logger = new EditStreakGenerationLogger();
 		
-		new StreakGeneration(io, logger, ue).run();
+		new EditStreakGenerationRunner(io, logger).run();
 	}
 
 	private static void cleanDirs(String... dirs) {

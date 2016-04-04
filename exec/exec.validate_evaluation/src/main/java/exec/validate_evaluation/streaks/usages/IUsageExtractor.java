@@ -13,8 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks;
+package exec.validate_evaluation.streaks.usages;
 
-public class Streak {
+import cc.kave.commons.model.events.completionevents.Context;
 
+public interface IUsageExtractor {
+
+	IAnalysisResult analyse(Context ctx);
 }

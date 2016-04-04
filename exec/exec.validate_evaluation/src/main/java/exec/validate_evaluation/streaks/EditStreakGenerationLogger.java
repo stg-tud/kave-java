@@ -19,11 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.ICoReMethodName;
-import cc.recommenders.names.ICoReTypeName;
+import cc.kave.commons.model.names.ITypeName;
 
-public class StreakLogger {
+public class EditStreakGenerationLogger {
 
 	public void foundZips(Set<String> zips) {
 		// TODO Auto-generated method stub
@@ -50,7 +48,7 @@ public class StreakLogger {
 
 	}
 
-	public void endZip(Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks) {
+	public void endZip(Map<ITypeName, EditStreak> editStreaks) {
 		// TODO Auto-generated method stub
 
 	}

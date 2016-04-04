@@ -25,6 +25,7 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.pbn.BatchPBNSmileMiner;
 import cc.recommenders.names.ICoReTypeName;
+import exec.csharp.evaluation.impl.AnalysisOfNoise;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
 
@@ -49,7 +50,7 @@ public class run {
 		init();
 
 		/* data preparation */
-		runBatchPBNSmileMiner();
+		// runBatchPBNSmileMiner();
 		// storageHelper.setModifier("inlined");
 		// runBatchPBNSmileMiner();
 		// storageHelper.clearModifier();
@@ -66,7 +67,7 @@ public class run {
 		// load(F1ByQueryType.class).run();
 		// load(F1ByCategory.class).run();
 		// load(F1Details.class).run();
-		// load(AnalysisOfNoise.class).run();
+		load(AnalysisOfNoise.class).run();
 	}
 
 	private static void runBatchPBNSmileMiner() {
