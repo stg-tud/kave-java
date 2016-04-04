@@ -27,6 +27,8 @@ import cc.kave.commons.model.names.IName;
  * their corresponding {@link IName}s respectively) to source strings.
  * 
  */
+@Deprecated // should no longer be used. No "primitive types" exist in the new
+			// naming scheme.
 public class Names {
 	public static enum PrimitiveType {
 		BOOLEAN('Z', "boolean"), VOID('V', "void"), CHAR('C', "char"), BYTE('B', "byte"), SHORT('S', "short"), INT('I',
