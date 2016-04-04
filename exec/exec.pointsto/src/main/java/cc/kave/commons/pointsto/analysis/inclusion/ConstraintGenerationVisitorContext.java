@@ -97,6 +97,14 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		AllocationSite thisAllocationSite = new ContextAllocationSite(context);
 		builder.allocate(thisDistRef.getReference(), thisAllocationSite);
 		contextThisVariable = builder.getVariable(thisDistRef.getReference());
+		
+		// generate a super-entry for querying, should not be used by the analysis itself
+		DistinctKeywordReference superDistRef = new DistinctKeywordReference(languageOptions.getSuperName(),
+				languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy()));
+		namesToReferences.enter();
+		namesToReferences.create(languageOptions.getSuperName(), superDistRef);
+		builder.alias(superDistRef.getReference(), thisDistRef.getReference());
+		namesToReferences.leave();
 
 		// call entry points
 		for (IMethodDeclaration entryPointDecl : context.getSST().getEntryPoints()) {

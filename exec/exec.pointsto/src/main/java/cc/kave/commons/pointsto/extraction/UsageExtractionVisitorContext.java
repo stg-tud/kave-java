@@ -31,6 +31,7 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -175,7 +176,9 @@ public class UsageExtractionVisitorContext {
 		IReference superReference = SSTBuilder.variableReference(languageOptions.getSuperName());
 		ITypeName superType = languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy());
 		for (AbstractLocation location : queryPointerAnalysis(superReference, superType)) {
-			implicitDefinitions.put(location, superDefinition);
+			if (!implicitDefinitions.containsKey(location)) {
+				implicitDefinitions.put(location, superDefinition);
+			}
 		}
 
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
@@ -225,6 +228,10 @@ public class UsageExtractionVisitorContext {
 	}
 
 	private Query getOrCreateUsage(AbstractLocation location, ITypeName type) {
+		if (type == null) {
+			type = TypeName.UNKNOWN_NAME;
+		}
+
 		Query usage = locationUsages.get(location);
 		if (usage == null) {
 			usage = initializeUsage(type, location);
