@@ -27,9 +27,9 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
-import cc.kave.commons.pointsto.analysis.reference.DistinctMemberReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
+import cc.kave.commons.pointsto.analysis.references.DistinctMemberReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReferenceCreationVisitor;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
 import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 

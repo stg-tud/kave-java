@@ -30,9 +30,9 @@ import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
-import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctPropertyParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 

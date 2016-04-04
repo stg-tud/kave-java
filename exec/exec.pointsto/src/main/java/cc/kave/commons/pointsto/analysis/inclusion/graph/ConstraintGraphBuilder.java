@@ -56,9 +56,9 @@ import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotati
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InvocationAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.StorageAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
-import cc.kave.commons.pointsto.analysis.reference.DistinctLambdaParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctLambdaParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 

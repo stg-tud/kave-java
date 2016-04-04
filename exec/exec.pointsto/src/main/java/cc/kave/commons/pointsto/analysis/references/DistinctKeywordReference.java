@@ -10,34 +10,33 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.reference;
+package cc.kave.commons.pointsto.analysis.references;
+
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.model.ssts.references.IVariableReference;;
 
-public class DistinctVariableReference implements DistinctReference {
+public class DistinctKeywordReference implements DistinctReference {
 
-	private final IVariableDeclaration varDecl;
+	private final String keyword;
+	private final ITypeName type;
 
-	public DistinctVariableReference(IVariableDeclaration varDecl) {
-		this.varDecl = varDecl;
+	public DistinctKeywordReference(String keyword, ITypeName type) {
+		this.keyword = keyword;
+		this.type = type;
 	}
 
 	@Override
 	public IVariableReference getReference() {
-		return varDecl.getReference();
+		return variableReference(keyword);
 	}
 
 	@Override
 	public ITypeName getType() {
-		return varDecl.getType();
-	}
-
-	public IVariableDeclaration getDeclaration() {
-		return varDecl;
+		return type;
 	}
 
 	@Override
@@ -49,7 +48,8 @@ public class DistinctVariableReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((varDecl == null) ? 0 : varDecl.hashCode());
+		result = prime * result + ((keyword == null) ? 0 : keyword.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -61,19 +61,24 @@ public class DistinctVariableReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctVariableReference other = (DistinctVariableReference) obj;
-		if (varDecl == null) {
-			if (other.varDecl != null)
+		DistinctKeywordReference other = (DistinctKeywordReference) obj;
+		if (keyword == null) {
+			if (other.keyword != null)
 				return false;
-		} else if (varDecl != other.varDecl) // reference equality
+		} else if (!keyword.equals(other.keyword))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DistinctVariableReference.class)
-				.add("name", varDecl.getReference().getIdentifier()).add("type", varDecl.getType()).toString();
+		return MoreObjects.toStringHelper(DistinctKeywordReference.class).add("keyword", keyword)
+				.add("type", type.getName()).toString();
 	}
 
 }

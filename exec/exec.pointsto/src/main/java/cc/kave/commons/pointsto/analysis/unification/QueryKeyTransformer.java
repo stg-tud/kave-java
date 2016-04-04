@@ -22,17 +22,17 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
-import cc.kave.commons.pointsto.analysis.reference.DistinctCatchBlockParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctLambdaParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctMethodParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyParameterReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceVisitor;
-import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctCatchBlockParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctEventReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctFieldReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctIndexAccessReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctKeywordReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctLambdaParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctPropertyParameterReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctPropertyReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReferenceVisitor;
+import cc.kave.commons.pointsto.analysis.references.DistinctVariableReference;
 import cc.recommenders.assertions.Asserts;
 
 public class QueryKeyTransformer

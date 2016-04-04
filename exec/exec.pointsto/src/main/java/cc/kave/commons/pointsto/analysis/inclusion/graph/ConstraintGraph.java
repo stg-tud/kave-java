@@ -43,7 +43,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.annotations.InvocationAnnotat
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.Context;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 
 public class ConstraintGraph {

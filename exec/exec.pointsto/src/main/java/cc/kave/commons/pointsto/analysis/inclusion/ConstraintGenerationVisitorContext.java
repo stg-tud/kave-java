@@ -46,9 +46,9 @@ import cc.kave.commons.pointsto.analysis.inclusion.allocations.StmtAllocationSit
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraphBuilder;
-import cc.kave.commons.pointsto.analysis.reference.DistinctKeywordReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
+import cc.kave.commons.pointsto.analysis.references.DistinctKeywordReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReferenceCreationVisitor;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.utils.PropertyAsFieldPredicate;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;

@@ -10,33 +10,39 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.reference;
+package cc.kave.commons.pointsto.analysis.references;
 
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
 import com.google.common.base.MoreObjects;
 
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IVariableReference;;
 
-public class DistinctKeywordReference implements DistinctReference {
+public class DistinctMethodParameterReference implements DistinctReference {
 
-	private final String keyword;
-	private final ITypeName type;
+	private final IParameterName parameter;
+	private final IMethodName method;
 
-	public DistinctKeywordReference(String keyword, ITypeName type) {
-		this.keyword = keyword;
-		this.type = type;
+	public DistinctMethodParameterReference(IParameterName parameter, IMethodName method) {
+		this.parameter = parameter;
+		this.method = method;
 	}
 
 	@Override
 	public IVariableReference getReference() {
-		return variableReference(keyword);
+		return variableReference(parameter.getName());
 	}
 
 	@Override
 	public ITypeName getType() {
-		return type;
+		return parameter.getValueType();
+	}
+
+	public IMethodName getMethod() {
+		return method;
 	}
 
 	@Override
@@ -48,8 +54,8 @@ public class DistinctKeywordReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((keyword == null) ? 0 : keyword.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((method == null) ? 0 : method.hashCode());
+		result = prime * result + ((parameter == null) ? 0 : parameter.hashCode());
 		return result;
 	}
 
@@ -61,24 +67,25 @@ public class DistinctKeywordReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctKeywordReference other = (DistinctKeywordReference) obj;
-		if (keyword == null) {
-			if (other.keyword != null)
+		DistinctMethodParameterReference other = (DistinctMethodParameterReference) obj;
+		if (method == null) {
+			if (other.method != null)
 				return false;
-		} else if (!keyword.equals(other.keyword))
+		} else if (!method.equals(other.method))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (parameter == null) {
+			if (other.parameter != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!parameter.equals(other.parameter))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DistinctKeywordReference.class).add("keyword", keyword)
-				.add("type", type.getName()).toString();
+		return MoreObjects.toStringHelper(DistinctMethodParameterReference.class)
+				.add("method", method.getDeclaringType().getName() + "." + method.getName())
+				.add("name", parameter.getName()).toString();
 	}
 
 }

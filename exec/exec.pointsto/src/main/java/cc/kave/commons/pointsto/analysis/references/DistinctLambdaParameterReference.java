@@ -10,29 +10,29 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.reference;
+package cc.kave.commons.pointsto.analysis.references;
 
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.references.IVariableReference;;
+import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;;
 
-public class DistinctMethodParameterReference implements DistinctReference {
+public class DistinctLambdaParameterReference implements DistinctReference {
 
 	private final IParameterName parameter;
-	private final IMethodName method;
+	private final ILambdaExpression lambda;
 
-	public DistinctMethodParameterReference(IParameterName parameter, IMethodName method) {
+	public DistinctLambdaParameterReference(IParameterName parameter, ILambdaExpression lambda) {
 		this.parameter = parameter;
-		this.method = method;
+		this.lambda = lambda;
 	}
 
 	@Override
-	public IVariableReference getReference() {
+	public IReference getReference() {
 		return variableReference(parameter.getName());
 	}
 
@@ -41,8 +41,8 @@ public class DistinctMethodParameterReference implements DistinctReference {
 		return parameter.getValueType();
 	}
 
-	public IMethodName getMethod() {
-		return method;
+	public ILambdaExpression getLambda() {
+		return lambda;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class DistinctMethodParameterReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((method == null) ? 0 : method.hashCode());
+		result = prime * result + ((lambda == null) ? 0 : lambda.hashCode());
 		result = prime * result + ((parameter == null) ? 0 : parameter.hashCode());
 		return result;
 	}
@@ -67,11 +67,11 @@ public class DistinctMethodParameterReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctMethodParameterReference other = (DistinctMethodParameterReference) obj;
-		if (method == null) {
-			if (other.method != null)
+		DistinctLambdaParameterReference other = (DistinctLambdaParameterReference) obj;
+		if (lambda == null) {
+			if (other.lambda != null)
 				return false;
-		} else if (!method.equals(other.method))
+		} else if (lambda != other.lambda) // reference equality
 			return false;
 		if (parameter == null) {
 			if (other.parameter != null)
@@ -83,9 +83,8 @@ public class DistinctMethodParameterReference implements DistinctReference {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DistinctMethodParameterReference.class)
-				.add("method", method.getDeclaringType().getName() + "." + method.getName())
-				.add("name", parameter.getName()).toString();
+		return MoreObjects.toStringHelper(DistinctLambdaParameterReference.class).add("name", parameter.getName())
+				.add("type", parameter.getValueType().getName()).toString();
 	}
 
 }

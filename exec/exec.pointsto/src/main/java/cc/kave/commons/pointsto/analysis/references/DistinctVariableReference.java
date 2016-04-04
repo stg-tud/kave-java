@@ -10,34 +10,34 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.reference;
+package cc.kave.commons.pointsto.analysis.references;
 
-import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;;
+import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class DistinctCatchBlockParameterReference implements DistinctReference {
+public class DistinctVariableReference implements DistinctReference {
 
-	private final ICatchBlock catchBlock;
+	private final IVariableDeclaration varDecl;
 
-	public DistinctCatchBlockParameterReference(ICatchBlock catchBlock) {
-		this.catchBlock = catchBlock;
+	public DistinctVariableReference(IVariableDeclaration varDecl) {
+		this.varDecl = varDecl;
 	}
 
 	@Override
-	public IReference getReference() {
-		return variableReference(catchBlock.getParameter().getName());
+	public IVariableReference getReference() {
+		return varDecl.getReference();
 	}
 
 	@Override
 	public ITypeName getType() {
-		return catchBlock.getParameter().getValueType();
+		return varDecl.getType();
 	}
 
-	public ICatchBlock getCatchBlock() {
-		return catchBlock;
+	public IVariableDeclaration getDeclaration() {
+		return varDecl;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((catchBlock == null) ? 0 : catchBlock.hashCode());
+		result = prime * result + ((varDecl == null) ? 0 : varDecl.hashCode());
 		return result;
 	}
 
@@ -61,14 +61,19 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DistinctCatchBlockParameterReference other = (DistinctCatchBlockParameterReference) obj;
-		if (catchBlock == null) {
-			if (other.catchBlock != null)
+		DistinctVariableReference other = (DistinctVariableReference) obj;
+		if (varDecl == null) {
+			if (other.varDecl != null)
 				return false;
-		} else if (catchBlock != other.catchBlock) // reference equality
+		} else if (varDecl != other.varDecl) // reference equality
 			return false;
-
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctVariableReference.class)
+				.add("name", varDecl.getReference().getIdentifier()).add("type", varDecl.getType()).toString();
 	}
 
 }

@@ -21,7 +21,7 @@ import cc.kave.commons.pointsto.analysis.AbstractPointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.LocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.MemberLocationIdentifierFactory;
 import cc.kave.commons.pointsto.analysis.unification.identifiers.SteensgaardLocationIdentifierFactory;

@@ -10,32 +10,32 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.analysis.reference;
+package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IEventReference;
 
-public class DistinctFieldReference extends DistinctMemberReference {
+public class DistinctEventReference extends DistinctMemberReference {
 
-	public DistinctFieldReference(IFieldReference fieldRef, DistinctReference baseReference) {
-		super(fieldRef, baseReference);
+	public DistinctEventReference(IEventReference eventRef, DistinctReference baseReference) {
+		super(eventRef, baseReference);
 	}
 
 	@Override
-	public boolean isStaticMember() {
-		return getReference().getFieldName().isStatic();
-	}
-
-	@Override
-	public IFieldReference getReference() {
-		return (IFieldReference) super.getReference();
+	public IEventReference getReference() {
+		return (IEventReference) super.getReference();
 	}
 
 	@Override
 	public ITypeName getType() {
-		return ((IFieldReference) memberReference).getFieldName().getValueType();
+		return getReference().getEventName().getHandlerType();
+	}
+
+	@Override
+	public boolean isStaticMember() {
+		return getReference().getEventName().isStatic();
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class DistinctFieldReference extends DistinctMemberReference {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(DistinctFieldReference.class).add("base", getBaseReference())
-				.add("name", getReference().getFieldName().getName()).toString();
+		return MoreObjects.toStringHelper(DistinctEventReference.class).add("base", getBaseReference())
+				.add("name", getReference().getEventName().getName()).toString();
 	}
 
 }

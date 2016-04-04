@@ -19,10 +19,10 @@ import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctEventReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctIndexAccessReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctPropertyReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctEventReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctFieldReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctIndexAccessReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctPropertyReference;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
 import cc.kave.commons.pointsto.analysis.visitors.FailSafeNodeVisitor;
 

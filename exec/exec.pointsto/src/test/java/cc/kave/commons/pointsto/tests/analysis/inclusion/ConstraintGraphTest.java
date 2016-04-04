@@ -46,10 +46,10 @@ import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintEdge;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraphBuilder;
-import cc.kave.commons.pointsto.analysis.reference.DistinctFieldReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReference;
-import cc.kave.commons.pointsto.analysis.reference.DistinctReferenceCreationVisitor;
-import cc.kave.commons.pointsto.analysis.reference.DistinctVariableReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctFieldReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctReferenceCreationVisitor;
+import cc.kave.commons.pointsto.analysis.references.DistinctVariableReference;
 import cc.kave.commons.pointsto.analysis.utils.ScopedMap;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 
