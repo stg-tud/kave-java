@@ -68,7 +68,8 @@ public class UsageExtractor implements IUsageExtractor {
 		@Override
 		public Usage getFirstQuery() {
 			PointsToUsageExtractor p2ue = new PointsToUsageExtractor();
-			List<Usage> queries = p2ue.extractQueries(firstCompletionExpr, p2ctx);
+			List<Usage> queries = null;
+			// TODO: was before... p2ue.extractQueries(firstCompletionExpr, p2ctx);
 			if (queries.isEmpty()) {
 				return null;
 			}

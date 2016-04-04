@@ -66,7 +66,7 @@ public class SSTComparison {
 
 	private ISST inline(ISST sst) {
 		InliningContext context = new InliningContext();
-		sst.accept(context.getStatementVisitor(), context);
+		sst.accept(context.getVisitor(), context);
 		return context.getSST();
 	}
 }
