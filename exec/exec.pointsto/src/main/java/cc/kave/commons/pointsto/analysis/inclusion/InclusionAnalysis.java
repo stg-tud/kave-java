@@ -27,9 +27,9 @@ import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintEdge;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
-import cc.kave.commons.pointsto.analysis.unification.DistinctReferenceContextCollector;
-import cc.kave.commons.pointsto.analysis.unification.DistinctReferenceContextCollectorVisitor;
-import cc.kave.commons.pointsto.analysis.unification.QueryKeyTransformer;
+import cc.kave.commons.pointsto.analysis.references.conversion.DistinctReferenceContextCollector;
+import cc.kave.commons.pointsto.analysis.references.conversion.DistinctReferenceContextCollectorVisitor;
+import cc.kave.commons.pointsto.analysis.references.conversion.QueryKeyTransformer;
 import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 
 /**
