@@ -184,6 +184,15 @@ public class ConstraintGraphBuilder {
 		}
 	}
 
+	private void ensureInvokablePropertyHasVariable(IPropertyReference propertyRef) {
+		DistinctReference distRef = referenceResolver.apply(propertyRef);
+		if (!referenceVariables.containsKey(distRef)) {
+			SetVariable temp = createTemporaryVariable();
+			referenceVariables.put(distRef, temp);
+			invokeGetProperty(temp, propertyRef);
+		}
+	}
+
 	private void initializeStaticMembers() {
 		for (Map.Entry<IMemberName, SetVariable> memberEntry : staticMembers.entrySet()) {
 			if (declMapper.get(memberEntry.getKey()) != null) {
@@ -430,6 +439,8 @@ public class ConstraintGraphBuilder {
 	}
 
 	public void invokeSetProperty(IPropertyReference propertyRef, SetVariable valueSetVar) {
+		ensureInvokablePropertyHasVariable(propertyRef);
+
 		LambdaTerm invocationLambda = LambdaTerm
 				.newPropertyLambda(Arrays.asList(ConstructedTerm.BOTTOM, valueSetVar, ConstructedTerm.BOTTOM));
 		ConstraintNode recvNode;
@@ -452,6 +463,8 @@ public class ConstraintGraphBuilder {
 	}
 
 	public void invokeGetProperty(SetVariable destSetVar, IPropertyReference propertyRef) {
+		ensureInvokablePropertyHasVariable(propertyRef);
+
 		LambdaTerm invocationLambda = LambdaTerm
 				.newPropertyLambda(Arrays.asList(ConstructedTerm.BOTTOM, ConstructedTerm.BOTTOM, destSetVar));
 		ConstraintNode recvNode;
