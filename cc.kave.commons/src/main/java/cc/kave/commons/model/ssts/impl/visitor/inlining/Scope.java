@@ -34,6 +34,7 @@ public class Scope {
 	public String resultName;
 	public String gotResultName;
 	public boolean isInCondition;
+	public boolean hasReturnInLoop;
 
 	public Scope() {
 		this.parent = null;
@@ -43,6 +44,7 @@ public class Scope {
 		this.resultName = "";
 		this.gotResultName = "";
 		this.isInCondition = false;
+		this.hasReturnInLoop = false;
 	}
 
 	public void resolve(IVariableReference ref) {

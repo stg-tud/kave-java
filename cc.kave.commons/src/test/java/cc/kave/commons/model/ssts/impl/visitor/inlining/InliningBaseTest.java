@@ -55,6 +55,8 @@ import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -83,6 +85,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
@@ -116,6 +119,18 @@ public class InliningBaseTest {
 	public static final ITypeName BOOLEAN = TypeName.newTypeName("Boolean");
 	public static final String SIGNATURE = "[Integer] [?].";
 
+	protected IStatement returnVoid() {
+		return returnStatement(new NullExpression(), true);
+	}
+
+	protected IStatement returnTrue() {
+		return returnStatement(constant("true"), false);
+	}
+
+	protected IStatement returnFalse() {
+		return returnStatement(constant("false"), false);
+	}
+
 	protected IStatement label(String label, IStatement statement) {
 		LabelledStatement labelled = new LabelledStatement();
 		labelled.setLabel(label);
@@ -133,6 +148,13 @@ public class InliningBaseTest {
 		expr.setLeftOperand(left);
 		expr.setOperator(operator);
 		expr.setRightOperand(right);
+		return expr;
+	}
+
+	protected IUnaryExpression unary(UnaryOperator operator, ISimpleExpression operand) {
+		UnaryExpression expr = new UnaryExpression();
+		expr.setOperator(operator);
+		expr.setOperand(operand);
 		return expr;
 	}
 
@@ -365,12 +387,12 @@ public class InliningBaseTest {
 		return ref;
 	}
 
-	protected IStatement breakStatement() {
+	protected IStatement breakStmt() {
 		BreakStatement breakStatement = new BreakStatement();
 		return breakStatement;
 	}
 
-	protected IStatement continueStatement() {
+	protected IStatement continueStmt() {
 		ContinueStatement continueStatement = new ContinueStatement();
 		return continueStatement;
 	}

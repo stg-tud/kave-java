@@ -28,15 +28,16 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
+import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
@@ -462,8 +463,8 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareNonEntryPoint("m2", //
 						unsafeBlock(), //
 						forLoop("i", loopHeader(expr(constant("true"))), //
-								continueStatement(), //
-								breakStatement(), //
+								continueStmt(), //
+								breakStmt(), //
 								unknownStatement()),
 						label("a", declareVar("b")), //
 						gotoStatement("a"), //
@@ -479,8 +480,8 @@ public class InliningVisitorTest extends InliningBaseTest {
 						forLoop("i", loopHeader(expr(constant("true"))), //
 								unsafeBlock(), //
 								forLoop("$0_i", loopHeader(expr(constant("true"))), //
-										continueStatement(), //
-										breakStatement(), //
+										continueStmt(), //
+										breakStmt(), //
 										unknownStatement()),
 								label("a", declareVar("$1_b")), //
 								gotoStatement("a"), //
@@ -1030,34 +1031,19 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
-						whileLoop(
-								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										returnStatement(new NullExpression(), true)), //
-								declareVar("t"), //
-								assign(ref("t"), constant("1")))));
+						whileLoop(loopHeader(returnTrue()), //
+								returnVoid(), //
+								continueStmt())));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
-		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
-						assign(ref(resultFlag), constant("true")), declareVar("a"), //
+						assign(ref(resultFlag), constant("true")), //
 						whileLoop(
-								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-										declareVar(condition, InliningContext.GOT_RESULT_TYPE),
-										assign(ref(condition),
-												binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
-								returnStatement(refExpr(condition), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										assign(ref(resultFlag), constant("false"))), //
-								simpleIf(Lists.newArrayList(), refExpr(resultFlag), declareVar("t"), //
-										assign(ref("t"), constant("1"))))));
+								loopHeader(
+										simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt()))));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -1067,34 +1053,20 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
-						forLoop("i",
-								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										returnStatement(new NullExpression(), true)), //
-								declareVar("t"), //
-								assign(ref("t"), constant("1")))));
+						forLoop("i", loopHeader(returnTrue()), //
+								returnVoid(), //
+								continueStmt())));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
 		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
-						assign(ref(resultFlag), constant("true")), declareVar("a"), //
+						assign(ref(resultFlag), constant("true")), //
 						forLoop("i",
-								loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-										declareVar(condition, InliningContext.GOT_RESULT_TYPE),
-										assign(ref(condition),
-												binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
-								returnStatement(refExpr(condition), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										assign(ref(resultFlag), constant("false"))), //
-								simpleIf(Lists.newArrayList(), refExpr(resultFlag), declareVar("t"), //
-										assign(ref("t"), constant("1"))))));
+								loopHeader(
+										simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt()))));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -1104,31 +1076,93 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
-						doLoop(loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-								returnStatement(refExpr("$0"), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										returnStatement(new NullExpression(), true)), //
-								declareVar("t"), //
-								assign(ref("t"), constant("1")))));
+						doLoop(loopHeader(returnTrue()), //
+								returnVoid(), //
+								continueStmt() //
+		)));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
-		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
-						assign(ref(resultFlag), constant("true")), declareVar("a"), //
-						doLoop(loopHeader(declareVar("$0"), assign(ref("$0"), constant("true")),
-								declareVar(condition, InliningContext.GOT_RESULT_TYPE),
-								assign(ref(condition), binary(BinaryOperator.And, refExpr("$0"), refExpr(resultFlag))),
-								returnStatement(refExpr(condition), false)), //
-								declareVar("b"), //
-								assign(ref("b"), constant("true")), //
-								simpleIf(Lists.newArrayList(), refExpr("b"),
-										assign(ref(resultFlag), constant("false"))), //
-								simpleIf(Lists.newArrayList(), refExpr(resultFlag), declareVar("t"), //
-										assign(ref("t"), constant("1"))))));
+						assign(ref(resultFlag), constant("true")), //
+						doLoop(loopHeader(
+								simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), //
+										continueStmt()))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void forEachReturn() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						forEachLoop("i", "a", //
+								returnVoid(), //
+								continueStmt())));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						forEachLoop("i", "a", //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(new BreakStatement()), refExpr(resultFlag),
+										continueStmt()))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void forEachReturnNested() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						forEachLoop("i", "a", //
+								forEachLoop("j", "b", returnVoid(), continueStmt()), continueStmt()), //
+						continueStmt()));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						forEachLoop("i", "a", //
+								forEachLoop("j", "b", //
+										assign(ref(resultFlag), constant("false")), //
+										simpleIf(Lists.newArrayList(breakStmt()), refExpr(resultFlag), continueStmt())),
+								simpleIf(Lists.newArrayList(breakStmt()), refExpr(resultFlag), continueStmt())),
+						simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt())));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void whileLoopReturnNested() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						whileLoop(loopHeader(returnTrue()), //
+								whileLoop(loopHeader(returnTrue()), //
+										returnVoid(), continueStmt()), //
+								continueStmt()),
+						continueStmt()));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						whileLoop(
+								loopHeader(
+										simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								whileLoop(
+										loopHeader(simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag),
+												returnTrue())), //
+										assign(ref(resultFlag), constant("false")), //
+										simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt())),
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt())),
+						simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt())));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -1138,21 +1172,15 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
 						whileLoop(
 								loopHeader(//
-										declareVar("$0"), //
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
+										returnTrue()), //
 								declareVar("b"))));
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
-						declareVar("a"), //
 						whileLoop(
 								loopHeader(//
-										declareVar("$0"), //
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
+										returnTrue()), //
 								declareVar("b"))));
 		assertSSTs(sst, inlinedSST);
 	}
@@ -1163,34 +1191,24 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
 						whileLoop(
 								loopHeader(//
-										declareVar("$0"), //
 										whileLoop(
 												loopHeader(//
-														declareVar("$0"), //
-														assign(ref("$0"), constant("true")), //
-														returnStatement(refExpr("$0"), false)), //
-												declareVar("b")), //
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+														returnTrue()), //
+												continueStmt()), //
+										returnTrue()), //
+								continueStmt())));
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
-						declareVar("a"), //
 						whileLoop(
 								loopHeader(//
-										declareVar("$0"), //
 										whileLoop(
 												loopHeader(//
-														declareVar("$0"), //
-														assign(ref("$0"), constant("true")), //
-														returnStatement(refExpr("$0"), false)), //
-												declareVar("b")),
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+														returnTrue()), //
+												continueStmt()),
+										returnTrue()), //
+								continueStmt())));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -1200,22 +1218,16 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
 						forLoop("a",
 								loopHeader(//
-										declareVar("$0"), //
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+										returnTrue()), //
+								continueStmt())));
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
-						declareVar("a"), //
 						forLoop("a",
 								loopHeader(//
-										declareVar("$0"), //
-										assign(ref("$0"), constant("true")), //
-										returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+										returnTrue()), //
+								continueStmt())));
 		assertSSTs(sst, inlinedSST);
 	}
 
@@ -1225,26 +1237,32 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("ep1", //
 						invocationStatement("h1")), //
 				declareNonEntryPoint("h1", //
-						declareVar("a"), //
 						doLoop(loopHeader(//
-								declareVar("$0"), //
-								assign(ref("$0"), constant("true")), //
-								returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+								returnTrue()), //
+								continueStmt())));
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
-						declareVar("a"), //
 						doLoop(loopHeader(//
-								declareVar("$0"), //
-								assign(ref("$0"), constant("true")), //
-								returnStatement(refExpr("$0"), false)), //
-								declareVar("b"))));
+								returnTrue()), //
+								continueStmt())));
 		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void test() {
+		IStatement stmt = forEachLoop("i", "a", //
+				forEachLoop("j", "b", returnStatement(new UnknownExpression(), true), continueStmt()), continueStmt());
+		CountReturnContext countContext = new CountReturnContext();
+		CountReturnsVisitor countVisitor = new CountReturnsVisitor();
+		stmt.accept(countVisitor, countContext);
+		System.out.println(countContext.returnCount);
 	}
 
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningVisitor(), context);
+		System.out.println(SSTPrintingUtils.printSST(sst));
+		System.out.println("##########");
 		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}

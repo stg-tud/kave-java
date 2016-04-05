@@ -37,6 +37,7 @@ import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.InvocationMethodNameVisitor;
@@ -65,7 +66,6 @@ public class InliningContext {
 	private Set<IMethodDeclaration> inlinedMethods;
 	private Set<IMethodDeclaration> methods;
 	private boolean isVoid;
-	private boolean hasReturnInLoop = false;
 
 	public InliningContext() {
 		this.nonEntryPoints = new HashSet<>();
@@ -127,6 +127,7 @@ public class InliningContext {
 			newScope.resultName = scope.resultName;
 			newScope.gotResultName = scope.gotResultName;
 			newScope.isInCondition = scope.isInCondition;
+			newScope.hasReturnInLoop = scope.hasReturnInLoop;
 		}
 		scope = newScope;
 	}
@@ -264,6 +265,9 @@ public class InliningContext {
 
 	private void addGuardStatement(List<IStatement> body, int index, boolean globalGuard) {
 		IfElseBlock block = new IfElseBlock();
+		if (this.scope.hasReturnInLoop) {
+			block.getElse().add(new BreakStatement());
+		}
 		block.setCondition(SSTUtil.referenceExprToVariable(getGotResultName()));
 		setGuardNeeded(false);
 		if (globalGuard)
@@ -403,11 +407,11 @@ public class InliningContext {
 	}
 
 	public void sethasReturnInLoop(boolean b) {
-		this.hasReturnInLoop = b;
+		this.scope.hasReturnInLoop = b;
 	}
 
 	public boolean hasReturnInLoop() {
-		return this.hasReturnInLoop;
+		return this.scope.hasReturnInLoop;
 	}
 
 }

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.ssts.ISST;
@@ -42,7 +44,6 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -60,8 +61,8 @@ import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
+import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
@@ -70,7 +71,6 @@ import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.EventSubscriptionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.LabelledStatement;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
@@ -266,7 +266,11 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 		ForEachLoop forEachLoop = (ForEachLoop) block;
 		forEachLoop.setDeclaration((IVariableDeclaration) context.visit(block.getDeclaration(), context));
 		block.getLoopedReference().accept(this, context);
+		context.enterBlock();
+		checkForReturn(block, context);
 		context.visitBlock(block.getBody());
+		context.sethasReturnInLoop(false);
+		context.leaveBlock(Lists.newArrayList());
 		context.addStatement(block);
 		return null;
 	}
@@ -538,19 +542,12 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 		context.visitBlock(expr.getBody());
 		context.leaveCondition();
 		if (context.hasReturnInLoop()) {
-			IStatement stmt = expr.getBody().get(expr.getBody().size() - 1);
-			if (stmt instanceof IReturnStatement) {
-				ReturnStatement returnStatement = (ReturnStatement) stmt;
-				ISimpleExpression simpleExpr = returnStatement.getExpression();
-				expr.getBody().remove(expr.getBody().size() - 1);
-				expr.getBody().add(SSTUtil.declare(InliningContext.CONDITION_VAR, InliningContext.GOT_RESULT_TYPE));
-				BinaryExpression binary = new BinaryExpression();
-				binary.setRightOperand(SSTUtil.refExpr(context.getGotResultName()));
-				binary.setLeftOperand(simpleExpr);
-				binary.setOperator(BinaryOperator.And);
-				expr.getBody().add(SSTUtil.assign(SSTUtil.variableReference(InliningContext.CONDITION_VAR), binary));
-				expr.getBody().add(SSTUtil.returnStatement(SSTUtil.refExpr(InliningContext.CONDITION_VAR)));
-			}
+			IfElseBlock stmt = new IfElseBlock();
+			stmt.setCondition(SSTUtil.refExpr(context.getGotResultName()));
+			stmt.setThen(Lists.newArrayList(expr.getBody()));
+			stmt.setElse(Lists.newArrayList(SSTUtil.returnStatement(SSTUtil.constant("false"))));
+			expr.getBody().clear();
+			expr.getBody().add(stmt);
 			context.sethasReturnInLoop(false);
 		}
 		return null;
