@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
+import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 
@@ -36,6 +37,11 @@ public class DistinctEventReference extends DistinctMemberReference {
 	@Override
 	public boolean isStaticMember() {
 		return getReference().getEventName().isStatic();
+	}
+
+	@Override
+	public IEventName getMemberName() {
+		return getReference().getEventName();
 	}
 
 	@Override

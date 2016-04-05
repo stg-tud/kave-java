@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 
@@ -26,6 +27,11 @@ public class DistinctPropertyReference extends DistinctMemberReference {
 	@Override
 	public boolean isStaticMember() {
 		return getReference().getPropertyName().isStatic();
+	}
+
+	@Override
+	public IPropertyName getMemberName() {
+		return getReference().getPropertyName();
 	}
 
 	@Override

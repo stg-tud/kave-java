@@ -13,7 +13,9 @@
 package cc.kave.commons.pointsto.extraction;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IEventName;
@@ -87,5 +89,13 @@ public class DeclarationMapper {
 			return get((IEventName) member);
 		}
 		throw new UnexpectedNameException(member);
+	}
+
+	public Set<IMemberName> getAssignableMembers() {
+		Set<IMemberName> members = new HashSet<>(fields.size() + properties.size() + events.size());
+		members.addAll(fields.keySet());
+		members.addAll(properties.keySet());
+		members.addAll(events.keySet());
+		return members;
 	}
 }

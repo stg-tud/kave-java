@@ -12,12 +12,17 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.eventReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.fieldReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.parameter;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.propertyReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -26,9 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IEventName;
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -36,13 +44,16 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ContextAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ExprAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.StmtAllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraphBuilder;
@@ -67,6 +78,9 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 	private final SimpleExpressionReader simpleExpressionReader;
 	private final AssignableReferenceWriter destinationReferenceWriter;
 
+	private final DeclarationMapper declMapper;
+	private final PropertyAsFieldPredicate treatPropertyAsField;
+
 	private final ConstraintGraphBuilder builder;
 
 	private IMemberName currentMember;
@@ -80,10 +94,10 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		super(context, ThisReferenceOption.PER_MEMBER);
 		thisParameter = parameter(languageOptions.getThisName(),
 				context.getTypeShape().getTypeHierarchy().getElement());
-		DeclarationMapper declMapper = new DeclarationMapper(context);
+		declMapper = new DeclarationMapper(context);
 		builder = new ConstraintGraphBuilder(this::getDistinctReference, declMapper, contextFactory);
 
-		PropertyAsFieldPredicate treatPropertyAsField = new PropertyAsFieldPredicate(declMapper);
+		treatPropertyAsField = new PropertyAsFieldPredicate(declMapper);
 		simpleExpressionReader = new SimpleExpressionReader(builder, treatPropertyAsField);
 		destinationReferenceWriter = new AssignableReferenceWriter(builder, treatPropertyAsField);
 
@@ -97,7 +111,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		AllocationSite thisAllocationSite = new ContextAllocationSite(context);
 		builder.allocate(thisDistRef.getReference(), thisAllocationSite);
 		contextThisVariable = builder.getVariable(thisDistRef.getReference());
-		
+
 		// generate a super-entry for querying, should not be used by the analysis itself
 		DistinctKeywordReference superDistRef = new DistinctKeywordReference(languageOptions.getSuperName(),
 				languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy()));
@@ -105,6 +119,10 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		namesToReferences.create(languageOptions.getSuperName(), superDistRef);
 		builder.alias(superDistRef.getReference(), thisDistRef.getReference());
 		namesToReferences.leave();
+
+		ConstructorMemberInitializationVisitor memberInitializationVisitor = new ConstructorMemberInitializationVisitor(
+				treatPropertyAsField);
+		Set<IMemberName> constructorInitializedMembers = new HashSet<>();
 
 		// call entry points
 		for (IMethodDeclaration entryPointDecl : context.getSST().getEntryPoints()) {
@@ -121,9 +139,41 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 				// constructor invocations require an allocated destination
 				dest = builder.createTemporaryVariable();
 				builder.allocate(dest, thisAllocationSite);
+
+				// collect initialized members
+				entryPointDecl.accept(memberInitializationVisitor, constructorInitializedMembers);
 			}
 
 			builder.invoke(dest, thisDistRef.getReference(), actualParameters, method);
+		}
+
+		initializeMissingMembers(constructorInitializedMembers);
+	}
+
+	private void initializeMissingMembers(Set<IMemberName> constructorInitializedMembers) {
+		// approximate the members which are directly initialized and initialize them
+		Set<IMemberName> uninitializedMembers = new HashSet<>(declMapper.getAssignableMembers());
+		uninitializedMembers.removeAll(constructorInitializedMembers);
+		for (IMemberName member : uninitializedMembers) {
+			IMemberReference memberRef = null;
+			if (member instanceof IFieldName) {
+				memberRef = fieldReference((IFieldName) member);
+			} else if (member instanceof IPropertyName) {
+				IPropertyName property = (IPropertyName) member;
+				if (treatPropertyAsField.test(property)) {
+					memberRef = propertyReference(property);
+				}
+			} else if (member instanceof IEventName) {
+				memberRef = eventReference((IEventName) member);
+			} else {
+				throw new UnexpectedNameException(member);
+			}
+
+			if (memberRef != null) {
+				SetVariable temp = builder.createTemporaryVariable();
+				builder.allocate(temp, new UndefinedMemberAllocationSite(member, member.getValueType()));
+				builder.writeMember(memberRef, temp, member);
+			}
 		}
 	}
 

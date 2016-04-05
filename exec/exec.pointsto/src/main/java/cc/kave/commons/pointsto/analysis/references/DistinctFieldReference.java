@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
@@ -26,6 +27,11 @@ public class DistinctFieldReference extends DistinctMemberReference {
 	@Override
 	public boolean isStaticMember() {
 		return getReference().getFieldName().isStatic();
+	}
+
+	@Override
+	public IFieldName getMemberName() {
+		return getReference().getFieldName();
 	}
 
 	@Override
