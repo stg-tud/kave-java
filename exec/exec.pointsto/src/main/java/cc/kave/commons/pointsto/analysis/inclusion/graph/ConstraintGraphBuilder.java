@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -83,6 +85,7 @@ public class ConstraintGraphBuilder {
 
 	private final RefTerm staticObject;
 	private final Map<IMemberName, SetVariable> staticMembers = new HashMap<>();
+	private final Map<IMemberName, Set<SetVariable>> undefinedStorageMembers = new HashMap<>();
 
 	public ConstraintGraphBuilder(Function<IReference, DistinctReference> referenceResolver,
 			DeclarationMapper declMapper, ContextFactory contextFactory) {
@@ -101,6 +104,7 @@ public class ConstraintGraphBuilder {
 
 	public ConstraintGraph createConstraintGraph() {
 		initializeStaticMembers();
+		initializeNonStaticMembers();
 		return new ConstraintGraph(referenceVariables, declLambdaStore, constraintNodes, contextFactory);
 	}
 
@@ -168,6 +172,16 @@ public class ConstraintGraphBuilder {
 			referenceVariables.put(distRef, temp);
 			readMember(temp, memberRef, member);
 		}
+
+		// collect non-static members without a definition
+		if (declMapper.get(member) == null && !member.isStatic()) {
+			Set<SetVariable> recvVars = undefinedStorageMembers.get(member);
+			if (recvVars == null) {
+				recvVars = new HashSet<>();
+				undefinedStorageMembers.put(member, recvVars);
+			}
+			recvVars.add(getVariable(memberRef.getReference()));
+		}
 	}
 
 	private void initializeStaticMembers() {
@@ -184,6 +198,17 @@ public class ConstraintGraphBuilder {
 						createTemporaryVariable());
 				memberNode.addPredecessor(
 						new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+			}
+		}
+	}
+
+	private void initializeNonStaticMembers() {
+		for (Map.Entry<IMemberName, Set<SetVariable>> memberEntry : undefinedStorageMembers.entrySet()) {
+			IMemberName member = memberEntry.getKey();
+			for (SetVariable recv : memberEntry.getValue()) {
+				AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, member.getValueType());
+				RefTerm obj = new RefTerm(allocationSite, createTemporaryVariable());
+				writeMemberRaw(recv, obj, member);
 			}
 		}
 	}
@@ -296,6 +321,19 @@ public class ConstraintGraphBuilder {
 			tempNode.addPredecessor(
 					new ConstraintEdge(getNode(srcSetVar), new StorageAnnotation(member), ContextAnnotation.EMPTY));
 		}
+	}
+
+	private void writeMemberRaw(SetVariable recv, SetExpression src, IMemberName member) {
+		SetVariable temp = createTemporaryVariable();
+		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
+
+		// recv ⊆ proj
+		ConstraintNode recvNode = getNode(recv);
+		recvNode.addSuccessor(
+				new ConstraintEdge(getNode(projection), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+
+		// src ⊆_m temp
+		constraintResolver.addConstraint(src, temp, new StorageAnnotation(member), ContextAnnotation.EMPTY);
 	}
 
 	private void writeStaticMember(SetVariable srcVar, IMemberName member) {
