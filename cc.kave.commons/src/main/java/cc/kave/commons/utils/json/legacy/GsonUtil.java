@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,12 +37,12 @@ import com.google.gson.reflect.TypeToken;
 
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import cc.recommenders.assertions.Throws;
-import cc.recommenders.names.ICoReFieldName;
-import cc.recommenders.names.ICoReMethodName;
-import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReFieldName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.CallFeature;
@@ -89,6 +90,10 @@ public class GsonUtil {
 		// builder.setPrettyPrinting();
 		// builder.setDateFormat("dd.MM.yyyy HH:mm:ss");
 		builder.registerTypeAdapter(Date.class, new ISO8601DateParser());
+
+		// add support for new Java 8 date/time framework
+		Converters.registerAll(builder);
+
 		builder.registerTypeAdapter(Multimap.class, new MultimapTypeAdapter());
 		//
 		builder.registerTypeAdapter(Usage.class, new UsageTypeAdapter());
