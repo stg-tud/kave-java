@@ -54,7 +54,7 @@ public class EditStreakGenerationIo {
 		return es;
 	}
 
-	public void storeStreaks(Iterable<EditStreak> streaks, String zip) {
+	public void storeStreaks(Set<EditStreak> streaks, String zip) {
 		Directory dir = new Directory(dirOut);
 		try (WritingArchive wa = dir.getWritingArchive(zip)) {
 			for (EditStreak es : streaks) {

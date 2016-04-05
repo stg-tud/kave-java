@@ -15,7 +15,6 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -61,7 +61,8 @@ public class EditStreakGenerationRunner {
 
 			removeSingleEdits();
 
-			Collection<EditStreak> streaks = editStreaks.values();
+			Set<EditStreak> streaks = Sets.newLinkedHashSet();
+			streaks.addAll(editStreaks.values());
 			log.endZip(streaks);
 			io.storeStreaks(streaks, zip);
 		}

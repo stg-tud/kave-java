@@ -25,7 +25,6 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.io.Logger;
 
 public class EditStreakGenerationLoggerTest {
 
@@ -33,7 +32,6 @@ public class EditStreakGenerationLoggerTest {
 
 	@Before
 	public void setup() {
-		Logger.setPrinting(true);
 		sut = new EditStreakGenerationLogger();
 	}
 
@@ -67,7 +65,7 @@ public class EditStreakGenerationLoggerTest {
 		streaks.add(mock(EditStreak.class));
 		streaks.add(mock(EditStreak.class));
 		streaks.add(mock(EditStreak.class));
-		
+
 		sut.endZip(streaks);
 	}
 

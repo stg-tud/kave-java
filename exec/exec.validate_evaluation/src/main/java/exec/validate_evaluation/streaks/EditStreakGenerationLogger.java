@@ -69,6 +69,6 @@ public class EditStreakGenerationLogger {
 
 	public void finish() {
 		Logger.log("");
-		Logger.log("done");
+		Logger.log("### done (%d/%d - 100.0%%) ###", totalZips, totalZips);
 	}
 }
