@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -84,16 +83,16 @@ public class EditStreakGenerationIoTest {
 	}
 
 	@Test
-	@Ignore
 	public void editStreaksAreStored() throws IOException {
 
-		Set<EditStreak> actuals = Sets.newLinkedHashSet();
 		Set<EditStreak> expecteds = Sets.newLinkedHashSet();
 		expecteds.add(editStreak(1));
 		expecteds.add(editStreak(2));
 		expecteds.add(editStreak(3));
 
-		sut.store(expecteds, "a.zip");
+		sut.storeStreaks(expecteds, "a.zip");
+
+		Set<EditStreak> actuals = sut.readStreaks("a.zip");
 
 		Directory dir = new Directory(dirOut.getAbsolutePath());
 		try (ReadingArchive ra = dir.getReadingArchive("a.zip");) {

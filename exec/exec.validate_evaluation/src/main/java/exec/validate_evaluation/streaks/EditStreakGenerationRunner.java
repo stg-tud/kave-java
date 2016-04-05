@@ -15,6 +15,7 @@
  */
 package exec.validate_evaluation.streaks;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class EditStreakGenerationRunner {
 		log.foundZips(zips);
 
 		for (String zip : zips) {
+			log.startingZip(zip);
 			editStreaks = Maps.newLinkedHashMap();
 
 			Set<ICompletionEvent> events = io.read(zip);
@@ -59,8 +61,9 @@ public class EditStreakGenerationRunner {
 
 			removeSingleEdits();
 
-			log.endZip(editStreaks);
-			io.store(editStreaks.values(), zip);
+			Collection<EditStreak> streaks = editStreaks.values();
+			log.endZip(streaks);
+			io.storeStreaks(streaks, zip);
 		}
 
 		log.finish();

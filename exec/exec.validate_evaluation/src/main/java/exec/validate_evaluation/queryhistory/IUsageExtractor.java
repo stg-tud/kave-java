@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks.usages;
+package exec.validate_evaluation.queryhistory;
 
 import cc.kave.commons.model.events.completionevents.Context;
 

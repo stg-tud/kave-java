@@ -59,13 +59,13 @@ public class Snapshot {
 		Asserts.assertNotNull(context);
 
 		Snapshot e = new Snapshot();
-		e.date = toLocalDate(date);
+		e.date = toLocalDateTime(date);
 		e.context = context;
 		e.selection = selection;
 		return e;
 	}
 
-	private static LocalDateTime toLocalDate(Date date) {
+	private static LocalDateTime toLocalDateTime(Date date) {
 		LocalDateTime ldt = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 		return ldt;
 	}

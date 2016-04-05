@@ -54,7 +54,7 @@ public class EditStreakGenerationIo {
 		return es;
 	}
 
-	public void store(Iterable<EditStreak> streaks, String zip) {
+	public void storeStreaks(Iterable<EditStreak> streaks, String zip) {
 		Directory dir = new Directory(dirOut);
 		try (WritingArchive wa = dir.getWritingArchive(zip)) {
 			for (EditStreak es : streaks) {
@@ -63,5 +63,20 @@ public class EditStreakGenerationIo {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public Set<EditStreak> readStreaks(String zip) {
+		Set<EditStreak> streaks = Sets.newLinkedHashSet();
+		Directory dir = new Directory(dirOut);
+		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+			while (ra.hasNext()) {
+				EditStreak es = ra.getNext(EditStreak.class);
+				streaks.add(es);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return streaks;
 	}
 }

@@ -15,6 +15,60 @@
  */
 package exec.validate_evaluation.streaks;
 
+import static org.mockito.Mockito.mock;
+
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.recommenders.io.Logger;
+
 public class EditStreakGenerationLoggerTest {
+
+	private EditStreakGenerationLogger sut;
+
+	@Before
+	public void setup() {
+		Logger.setPrinting(true);
+		sut = new EditStreakGenerationLogger();
+	}
+
+	@Test
+	public void integration() {
+
+		sut.foundZips(Sets.newHashSet("a.zip", "b/c.zip"));
+
+		processZip();
+		processZip();
+
+		sut.finish();
+	}
+
+	private void processZip() {
+		sut.startingZip("x.zip");
+
+		Set<ICompletionEvent> events = Sets.newHashSet(mock(ICompletionEvent.class), mock(ICompletionEvent.class),
+				mock(ICompletionEvent.class));
+		sut.foundEvents(events);
+
+		sut.processingEvent(mock(ICompletionEvent.class));
+		sut.processingEvent(mock(ICompletionEvent.class));
+
+		sut.startRemoveSingleEdits();
+		sut.removeSingleEdit();
+		sut.removeSingleEdit();
+		sut.removeSingleEdit();
+
+		Set<EditStreak> streaks = Sets.newLinkedHashSet();
+		streaks.add(mock(EditStreak.class));
+		streaks.add(mock(EditStreak.class));
+		streaks.add(mock(EditStreak.class));
+		
+		sut.endZip(streaks);
+	}
 
 }

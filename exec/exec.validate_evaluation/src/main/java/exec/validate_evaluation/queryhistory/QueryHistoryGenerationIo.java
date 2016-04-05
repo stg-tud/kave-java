@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks.usages;
+package exec.validate_evaluation.queryhistory;
 
 import java.util.Collection;
 import java.util.Set;
@@ -21,7 +21,7 @@ import java.util.Set;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import exec.validate_evaluation.streaks.EditStreak;
 
-public class UsageStreakGenerationIo {
+public class QueryHistoryGenerationIo {
 
 	public Set<String> findZips() {
 		// TODO Auto-generated method stub

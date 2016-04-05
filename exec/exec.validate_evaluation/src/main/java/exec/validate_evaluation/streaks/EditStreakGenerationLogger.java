@@ -15,47 +15,60 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.kave.commons.model.names.ITypeName;
+import cc.recommenders.io.Logger;
 
 public class EditStreakGenerationLogger {
 
+	private int totalZips = 0;
+	private int currentZip = 0;
+
 	public void foundZips(Set<String> zips) {
-		// TODO Auto-generated method stub
+		totalZips = zips.size();
+		Logger.log("found %d zips", totalZips);
+		for (String zip : zips) {
+			Logger.log("\t- %s", zip);
+		}
+	}
+
+	public void startingZip(String zip) {
+		currentZip++;
+		Logger.log("");
+		Logger.log("### processing %s (%d/%d - %.1f%%) ###", zip, currentZip, totalZips,
+				100 * (currentZip - 1) / (double) totalZips);
 
 	}
 
 	public void foundEvents(Set<ICompletionEvent> events) {
-		// TODO Auto-generated method stub
-
+		Logger.log("");
+		Logger.log("found %d events:", events.size());
+		Logger.log("");
 	}
 
 	public void processingEvent(ICompletionEvent e) {
-		// TODO Auto-generated method stub
-
+		Logger.append(".");
 	}
 
 	public void startRemoveSingleEdits() {
-		// TODO Auto-generated method stub
-
+		Logger.log("");
+		Logger.log("starting to remove single edits: ");
+		Logger.log("");
 	}
 
 	public void removeSingleEdit() {
-		// TODO Auto-generated method stub
-
+		Logger.append(".");
 	}
 
-	public void endZip(Map<ITypeName, EditStreak> editStreaks) {
-		// TODO Auto-generated method stub
-
+	public void endZip(Collection<EditStreak> streaks) {
+		Logger.log("");
+		Logger.log("found streaks for %d files for this user", streaks.size());
 	}
 
 	public void finish() {
-		// TODO Auto-generated method stub
-
+		Logger.log("");
+		Logger.log("done");
 	}
-
 }

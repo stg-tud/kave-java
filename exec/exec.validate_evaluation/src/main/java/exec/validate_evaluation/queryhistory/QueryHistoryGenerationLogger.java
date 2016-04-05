@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks.usages;
+package exec.validate_evaluation.queryhistory;
 
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +24,7 @@ import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import exec.validate_evaluation.streaks.EditStreak;
 
-public class UsageStreakGenerationLogger {
+public class QueryHistoryGenerationLogger {
 
 	public void foundZips(Set<String> zips) {
 		// TODO Auto-generated method stub

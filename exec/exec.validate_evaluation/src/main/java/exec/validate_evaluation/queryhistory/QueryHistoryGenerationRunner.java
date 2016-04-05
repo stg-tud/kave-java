@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.streaks.usages;
+package exec.validate_evaluation.queryhistory;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -34,15 +34,15 @@ import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.streaks.EditStreak;
 import exec.validate_evaluation.utils.CoReNameUtils;
 
-public class UsageStreakGenerationRunner {
+public class QueryHistoryGenerationRunner {
 
-	private final UsageStreakGenerationIo io;
-	private final UsageStreakGenerationLogger log;
+	private final QueryHistoryGenerationIo io;
+	private final QueryHistoryGenerationLogger log;
 
 	private Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks;
 	private IUsageExtractor usageExtractor;
 
-	public UsageStreakGenerationRunner(UsageStreakGenerationIo io, UsageStreakGenerationLogger log) {
+	public QueryHistoryGenerationRunner(QueryHistoryGenerationIo io, QueryHistoryGenerationLogger log) {
 		this.io = io;
 		this.log = log;
 	}
