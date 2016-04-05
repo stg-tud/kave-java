@@ -113,7 +113,7 @@ public class ConstraintGraphBuilder {
 
 		SetVariable variable = referenceVariables.get(distRef);
 		if (variable == null) {
-			variable = variableFactory.create();
+			variable = variableFactory.createReferenceVariable();
 			referenceVariables.put(distRef, variable);
 		}
 
@@ -133,7 +133,7 @@ public class ConstraintGraphBuilder {
 
 		SetVariable variable = objectVariables.get(allocationSite);
 		if (variable == null) {
-			variable = variableFactory.create();
+			variable = variableFactory.createObjectVariable();
 			objectVariables.put(allocationSite, variable);
 		}
 
@@ -193,9 +193,9 @@ public class ConstraintGraphBuilder {
 
 			ConstraintNode memberNode = getNode(memberEntry.getValue());
 			if (memberNode.getPredecessors().isEmpty()) {
-				RefTerm obj = new RefTerm(
-						new UndefinedMemberAllocationSite(memberEntry.getKey(), memberEntry.getKey().getValueType()),
-						createTemporaryVariable());
+				AllocationSite allocationSite = new UndefinedMemberAllocationSite(memberEntry.getKey(),
+						memberEntry.getKey().getValueType());
+				RefTerm obj = new RefTerm(allocationSite, getVariable(allocationSite));
 				memberNode.addPredecessor(
 						new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
 			}
@@ -207,14 +207,14 @@ public class ConstraintGraphBuilder {
 			IMemberName member = memberEntry.getKey();
 			for (SetVariable recv : memberEntry.getValue()) {
 				AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, member.getValueType());
-				RefTerm obj = new RefTerm(allocationSite, createTemporaryVariable());
+				RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 				writeMemberRaw(recv, obj, member);
 			}
 		}
 	}
 
 	public SetVariable createTemporaryVariable() {
-		return variableFactory.create();
+		return variableFactory.createReferenceVariable();
 	}
 
 	public void allocate(IVariableReference dest, AllocationSite allocationSite) {
@@ -254,7 +254,7 @@ public class ConstraintGraphBuilder {
 			readStaticMember(destSetVar, member);
 		} else {
 			SetVariable recvSetVar = getVariable(src.getReference());
-			SetVariable temp = createTemporaryVariable();
+			SetVariable temp = variableFactory.createProjectionVariable();
 
 			Projection projection = new Projection(RefTerm.class, RefTerm.READ_INDEX, temp);
 			// recv ⊆ proj
@@ -281,7 +281,7 @@ public class ConstraintGraphBuilder {
 
 	public void readArray(SetVariable destSetVar, IIndexAccessReference src) {
 		SetVariable arraySetVar = getVariable(src.getExpression().getReference());
-		SetVariable temp = createTemporaryVariable();
+		SetVariable temp = variableFactory.createProjectionVariable();
 
 		Projection projection = new Projection(RefTerm.class, RefTerm.READ_INDEX, temp);
 		// array ⊆ proj
@@ -307,7 +307,7 @@ public class ConstraintGraphBuilder {
 			writeStaticMember(srcSetVar, member);
 		} else {
 			SetVariable recvSetVar = getVariable(dest.getReference());
-			SetVariable temp = createTemporaryVariable();
+			SetVariable temp = variableFactory.createProjectionVariable();
 
 			Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
 
@@ -324,7 +324,7 @@ public class ConstraintGraphBuilder {
 	}
 
 	private void writeMemberRaw(SetVariable recv, SetExpression src, IMemberName member) {
-		SetVariable temp = createTemporaryVariable();
+		SetVariable temp = variableFactory.createProjectionVariable();
 		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
 
 		// recv ⊆ proj
@@ -352,8 +352,7 @@ public class ConstraintGraphBuilder {
 	}
 
 	private void writeArray(SetVariable arraySetVar, SetVariable srcSetVar) {
-		SetVariable temp = createTemporaryVariable();
-
+		SetVariable temp = variableFactory.createProjectionVariable();
 		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
 
 		// array ⊆ proj

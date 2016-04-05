@@ -12,27 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion;
 
-public class SetVariableFactory {
+public enum VariableKind {
 
-	private int nextVariableOrder = 0;
-
-	protected SetVariable create(VariableKind kind) {
-		if (nextVariableOrder == Integer.MAX_VALUE) {
-			throw new RuntimeException("Reached maximal number of set variables");
-		}
-
-		return new SetVariable(kind, nextVariableOrder++);
-	}
-
-	public SetVariable createReferenceVariable() {
-		return create(VariableKind.REFERENCE_VARIABLE);
-	}
-
-	public SetVariable createObjectVariable() {
-		return create(VariableKind.OBJECT_VARIABLE);
-	}
-
-	public SetVariable createProjectionVariable() {
-		return create(VariableKind.PROJECTION_VARIABLE);
-	}
+	REFERENCE_VARIABLE, OBJECT_VARIABLE, PROJECTION_VARIABLE
 }

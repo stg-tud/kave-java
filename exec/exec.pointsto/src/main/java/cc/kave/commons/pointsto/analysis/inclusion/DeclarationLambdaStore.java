@@ -102,7 +102,7 @@ public final class DeclarationLambdaStore {
 
 		ITypeName returnType = method.getReturnType();
 		if (!returnType.isVoidType()) {
-			SetVariable returnVar = variableFactory.create();
+			SetVariable returnVar = variableFactory.createReferenceVariable();
 			// methods without a definition require an object to return
 			if (declMapper.get(method) == null) {
 				allocateReturnObject(method, returnVar, returnType);
@@ -118,7 +118,7 @@ public final class DeclarationLambdaStore {
 				languageOptions.getThisName(), property.getDeclaringType(), property));
 		SetVariable setParameterVar = variableResolver
 				.apply(new DistinctPropertyParameterReference(languageOptions, property));
-		SetVariable returnVar = variableFactory.create();
+		SetVariable returnVar = variableFactory.createReferenceVariable();
 		// properties without a definition require an object to return
 		if (declMapper.get(property) == null) {
 			allocateReturnObject(property, returnVar, property.getValueType());
@@ -129,7 +129,8 @@ public final class DeclarationLambdaStore {
 	}
 
 	private void allocateReturnObject(IMemberName member, SetVariable returnVar, ITypeName type) {
-		RefTerm returnObject = new RefTerm(new UndefinedMemberAllocationSite(member, type), variableFactory.create());
+		RefTerm returnObject = new RefTerm(new UndefinedMemberAllocationSite(member, type),
+				variableFactory.createObjectVariable());
 		constraintResolver.addConstraint(returnObject, returnVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 	}
 }

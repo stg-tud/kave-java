@@ -72,7 +72,7 @@ public class ConstraintGraph {
 
 		SetVariable variable = referenceVariables.get(distRef);
 		if (variable == null) {
-			variable = declLambdaStore.getVariableFactory().create();
+			variable = declLambdaStore.getVariableFactory().createReferenceVariable();
 			referenceVariables.put(distRef, variable);
 		}
 

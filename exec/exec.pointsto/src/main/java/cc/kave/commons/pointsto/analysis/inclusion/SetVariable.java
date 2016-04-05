@@ -16,19 +16,42 @@ import com.google.common.base.MoreObjects;
 
 public class SetVariable implements SetExpression, Comparable<SetVariable> {
 
-	private int order;
+	private final VariableKind kind;
+	private final int order;
 
-	public SetVariable(int order) {
+	public SetVariable(VariableKind kind, int order) {
+		this.kind = kind;
 		this.order = order;
 	}
 
 	@Override
 	public int compareTo(SetVariable other) {
-		return this.order - other.order;
+		VariableKind otherKind = other.kind;
+		if (kind == otherKind) {
+			return this.order - other.order;
+		} else if (kind == VariableKind.REFERENCE_VARIABLE) {
+			// ref < obj < proj
+			return -1;
+		} else if (kind == VariableKind.OBJECT_VARIABLE) {
+			if (otherKind == VariableKind.REFERENCE_VARIABLE) {
+				// obj > ref
+				return 1;
+			} else if (otherKind == VariableKind.PROJECTION_VARIABLE) {
+				// obj < proj
+				return -1;
+			} else {
+				throw new IllegalArgumentException("Unknown VariableKind values");
+			}
+		} else if (kind == VariableKind.PROJECTION_VARIABLE) {
+			// proj > obj > ref
+			return 1;
+		} else {
+			throw new IllegalArgumentException("Unknown VariableKind values");
+		}
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(SetVariable.class).add("order", order).toString();
+		return MoreObjects.toStringHelper(SetVariable.class).add("kind", kind).add("order", order).toString();
 	}
 }

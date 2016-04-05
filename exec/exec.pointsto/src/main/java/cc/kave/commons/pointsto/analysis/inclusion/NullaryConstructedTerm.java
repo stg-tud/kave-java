@@ -15,7 +15,7 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 final class NullaryConstructedTerm extends SetVariable implements ConstructedTerm {
 
 	public NullaryConstructedTerm(int order) {
-		super(order);
+		super(VariableKind.REFERENCE_VARIABLE, order);
 	}
 
 	@Override

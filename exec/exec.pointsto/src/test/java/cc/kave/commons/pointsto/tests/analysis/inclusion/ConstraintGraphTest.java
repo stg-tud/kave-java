@@ -12,10 +12,12 @@
  */
 package cc.kave.commons.pointsto.tests.analysis.inclusion;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareFields;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.fieldReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.parameter;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -34,19 +36,21 @@ import org.junit.Test;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.StmtAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintEdge;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraphBuilder;
 import cc.kave.commons.pointsto.analysis.references.DistinctFieldReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctReferenceCreationVisitor;
 import cc.kave.commons.pointsto.analysis.references.DistinctVariableReference;
@@ -59,12 +63,24 @@ public class ConstraintGraphTest {
 
 	@Test
 	public void testFieldExample() {
-		ISST sst = mock(ISST.class);
+		// p = new ?()
+		// q = new ?()
+		// p.f = q
+		// r = p.f
+		// r.m()
+
+		final IFieldName field = FieldName
+				.newFieldName("[" + TypeName.UNKNOWN_NAME.getIdentifier() + "] [" + TEST_TYPE_IDENTIFIER + "].f");
+		final IMethodName method = MethodName.newMethodName("[System.Void, System] [" + TEST_TYPE_IDENTIFIER + "].m()");
+
+		DeclarationMapper declMapper = mock(DeclarationMapper.class);
+		when(declMapper.get((IMemberName) field)).thenReturn(declareFields(field.getIdentifier()).iterator().next());
+
 		ScopedMap<String, DistinctReference> scopes = new ScopedMap<>();
 		scopes.enter();
 		DistinctReferenceCreationVisitor distRefCreationVisitor = new DistinctReferenceCreationVisitor();
 		ConstraintGraphBuilder builder = new ConstraintGraphBuilder(ref -> ref.accept(distRefCreationVisitor, scopes),
-				new DeclarationMapper(sst), new EmptyContextFactory());
+				declMapper, new EmptyContextFactory());
 
 		IVariableDeclaration pDecl = declareVar("p");
 		DistinctReference pDistRef = new DistinctVariableReference(pDecl);
@@ -79,10 +95,10 @@ public class ConstraintGraphTest {
 		builder.allocate(variableReference("p"), new StmtAllocationSite(pDecl));
 		builder.allocate(variableReference("q"), new StmtAllocationSite(qDecl));
 
-		IFieldName field = FieldName
-				.newFieldName("[" + TypeName.UNKNOWN_NAME.getIdentifier() + "] [" + TEST_TYPE_IDENTIFIER + "].f");
 		builder.writeMember(fieldReference(variableReference("p"), field), variableReference("q"), field);
 		builder.readMember(variableReference("r"), fieldReference(variableReference("p"), field), field);
+
+		builder.invoke(ConstructedTerm.BOTTOM, variableReference("r"), Collections.emptyList(), method);
 
 		ConstraintGraph graph = builder.createConstraintGraph();
 		graph.computeClosure();
@@ -94,6 +110,10 @@ public class ConstraintGraphTest {
 				Matchers.is(ls.get(rDistRef)));
 		assertThat(ls.get(new DistinctVariableReference(pDecl)),
 				Matchers.not(ls.get(new DistinctVariableReference(qDecl))));
+		assertThat(
+				ls.get(new DistinctMethodParameterReference(
+						parameter("this", TypeName.newTypeName(TEST_TYPE_IDENTIFIER)), method)),
+				Matchers.is(ls.get(new DistinctVariableReference(rDecl))));
 	}
 
 	@Test
