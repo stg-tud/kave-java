@@ -36,8 +36,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpressio
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnContext;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.util.CountReturnsVisitor;
+import cc.kave.commons.testutils.model.ssts.SSTFixture;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
@@ -1249,13 +1248,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
-	public void test() {
-		IStatement stmt = forEachLoop("i", "a", //
-				forEachLoop("j", "b", returnStatement(new UnknownExpression(), true), continueStmt()), continueStmt());
-		CountReturnContext countContext = new CountReturnContext();
-		CountReturnsVisitor countVisitor = new CountReturnsVisitor();
-		stmt.accept(countVisitor, countContext);
-		System.out.println(countContext.returnCount);
+	public void fullModelSupport() {
+		ISST sst = new SSTFixture().getSST();
+		sst.accept(new InliningVisitor(), new InliningContext());
 	}
 
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
