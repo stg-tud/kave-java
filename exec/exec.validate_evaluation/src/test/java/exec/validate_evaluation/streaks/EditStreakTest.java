@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ public class EditStreakTest {
 	@Test
 	public void snapshotsCanBeAdded() {
 		EditStreak sut = new EditStreak();
-		Snapshot s = Snapshot.create(new Date(), new Context(), null);
+		Snapshot s = Snapshot.create(LocalDateTime.now(), new Context(), null);
 		sut.add(s);
 
 		assertTrue(sut.isEmptyOrSingleEdit());
@@ -51,8 +51,8 @@ public class EditStreakTest {
 	@Test
 	public void multipleSnapshotsCanBeAdded() {
 		EditStreak sut = new EditStreak();
-		sut.add(Snapshot.create(new Date(), new Context(), null));
-		sut.add(Snapshot.create(new Date(), new Context(), null));
+		sut.add(Snapshot.create(LocalDateTime.now(), new Context(), null));
+		sut.add(Snapshot.create(LocalDateTime.now(), new Context(), null));
 
 		assertFalse(sut.isEmptyOrSingleEdit());
 	}
@@ -67,7 +67,7 @@ public class EditStreakTest {
 
 	@Test
 	public void equality_reallyTheSame() {
-		Snapshot s = Snapshot.create(new Date(), new Context(), null);
+		Snapshot s = Snapshot.create(LocalDateTime.now(), new Context(), null);
 
 		EditStreak a = new EditStreak();
 		a.add(s);
@@ -81,7 +81,7 @@ public class EditStreakTest {
 	@Test
 	public void equality_different() {
 		EditStreak a = new EditStreak();
-		a.add(Snapshot.create(new Date(), new Context(), null));
+		a.add(Snapshot.create(LocalDateTime.now(), new Context(), null));
 		EditStreak b = new EditStreak();
 
 		assertNotEquals(a, b);

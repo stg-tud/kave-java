@@ -15,9 +15,10 @@
  */
 package exec.validate_evaluation.streaks;
 
-import static exec.validate_evaluation.utils.DateUtils.toLDT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
@@ -33,13 +34,13 @@ import exec.validate_evaluation.utils.DateUtils;
 
 public class SnapshotTest {
 
-	private Date d;
+	private LocalDateTime d;
 	private Context q;
 	private IMethodName m;
 
 	@Before
 	public void setup() {
-		d = date(1);
+		d = LocalDateTime.now();
 		q = mock(Context.class);
 		m = mock(IMethodName.class);
 	}
@@ -47,7 +48,7 @@ public class SnapshotTest {
 	@Test
 	public void customInit() {
 		Snapshot sut = Snapshot.create(d, q, m);
-		assertEquals(toLDT(d), sut.getDate());
+		assertEquals(d, sut.getDate());
 		assertEquals(q, sut.getContext());
 		assertEquals(m, sut.getSelection());
 	}
@@ -62,6 +63,18 @@ public class SnapshotTest {
 	public void customInit_nullQuery() {
 		q = null;
 		Snapshot.create(d, q, m);
+	}
+
+	@Test
+	public void hasSelection() {
+		Snapshot sut = Snapshot.create(d, q, m);
+		assertTrue(sut.hasSelection());
+	}
+
+	@Test
+	public void hasNoSelection() {
+		Snapshot sut = Snapshot.create(d, q, null);
+		assertFalse(sut.hasSelection());
 	}
 
 	@Test
@@ -81,7 +94,7 @@ public class SnapshotTest {
 
 	@Test
 	public void equality_diffDate() {
-		Date d2 = date(2);
+		LocalDateTime d2 = d.plusSeconds(1);
 
 		Snapshot a = Snapshot.create(d, q, m);
 		Snapshot b = Snapshot.create(d2, q, m);

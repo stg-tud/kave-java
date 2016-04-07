@@ -16,8 +16,10 @@
 
 package cc.kave.commons.utils.json;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -37,7 +39,6 @@ import cc.kave.commons.model.ssts.impl.SST;
 public class CompletionEventSerializationTest {
 
 	@Test
-	@Ignore
 	public void verifyToJson() {
 		CompletionEvent getExample = GetExample();
 		String actual = JsonUtils.toJson(getExample, ICompletionEvent.class);
@@ -67,7 +68,7 @@ public class CompletionEventSerializationTest {
 
 		e.IDESessionUUID = "0xDEADBEEF";
 		e.KaVEVersion = "1.0";
-		e.TriggeredAt = "2012-02-23T18:54:59.549";
+		e.TriggeredAt = getDate("2012-02-23T18:54:59.549");
 		e.TriggeredBy = Trigger.Unknown;
 		e.Duration = "00:00:02";
 		e.ActiveWindow = "VisualStudio.WindowName:vsWindowTypeDocument File.cs";
@@ -95,6 +96,11 @@ public class CompletionEventSerializationTest {
 		return e;
 	}
 
+	private static LocalDateTime getDate(String str) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		return LocalDateTime.parse(str, formatter);
+	}
+
 	private static ProposalSelection createProposalSelection(String methodName, String selectedAfter) {
 		IProposal p = createProposal(methodName);
 		ProposalSelection ps = new ProposalSelection(p);
@@ -111,7 +117,7 @@ public class CompletionEventSerializationTest {
 
 	private static String GetExampleJson_Current() {
 		// should reflect current serialization format!
-		return "{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.CompletionEvent, KaVE.Commons\",\"Context2\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\",\"TypeShape\":{\"$type\":\"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons\",\"TypeHierarchy\":{\"$type\":\"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons\",\"Element\":\"CSharp.UnknownTypeName:?\",\"Implements\":[]},\"MethodHierarchies\":[]},\"SST\":{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.TypeName:T,P\",\"PartialClassIdentifier\":\"\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[]}},\"ProposalCollection\":[{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M2()\",\"Relevance\":42}],\"Selections\":[{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.6720000\"},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M2()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.7830000\"},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.8940000\"}],\"TerminatedBy\":3,\"TerminatedState\":0,\"IDESessionUUID\":\"0xDEADBEEF\",\"KaVEVersion\":\"1.0\",\"TriggeredAt\":\"2012-02-23T18:54:59.549\",\"TriggeredBy\":0,\"Duration\":\"00:00:02\",\"ActiveWindow\":\"VisualStudio.WindowName:vsWindowTypeDocument File.cs\",\"ActiveDocument\":\"VisualStudio.DocumentName:\\\\Path\\\\To\\\\File.cs\"}";
+		return "{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.CompletionEvent, KaVE.Commons\",\"Context2\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\",\"TypeShape\":{\"$type\":\"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons\",\"TypeHierarchy\":{\"$type\":\"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons\",\"Element\":\"CSharp.UnknownTypeName:?\",\"Implements\":[]},\"MethodHierarchies\":[]},\"SST\":{\"$type\":\"[SST:SST]\",\"EnclosingType\":\"CSharp.TypeName:T,P\",\"PartialClassIdentifier\":\"\",\"Fields\":[],\"Properties\":[],\"Methods\":[],\"Events\":[],\"Delegates\":[]}},\"ProposalCollection\":[{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M2()\",\"Relevance\":42}],\"Selections\":[{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.6720000\",\"Index\":-1},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M2()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.7830000\",\"Index\":-1},{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\"Proposal\":{\"$type\":\"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\",\"Name\":\"CSharp.MethodName:[T1,P1] [T1,P2].M1()\",\"Relevance\":42},\"SelectedAfter\":\"18:54:59.8940000\",\"Index\":-1}],\"TerminatedBy\":3,\"TerminatedState\":0,\"ProposalCount\":0,\"IDESessionUUID\":\"0xDEADBEEF\",\"KaVEVersion\":\"1.0\",\"TriggeredAt\":\"2012-02-23T18:54:59.549\",\"TriggeredBy\":0,\"Duration\":\"00:00:02\",\"ActiveWindow\":\"VisualStudio.WindowName:vsWindowTypeDocument File.cs\",\"ActiveDocument\":\"VisualStudio.DocumentName:\\\\Path\\\\To\\\\File.cs\"}";
 	}
 
 	private static String GetExampleJson_Old() {

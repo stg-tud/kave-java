@@ -15,7 +15,7 @@
  */
 package exec.validate_evaluation.queryhistory;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class QueryHistoryGenerationRunner {
 	}
 
 	private void extractEdits(ICompletionEvent e) {
-		Date date = e.getTriggeredAt();
+		LocalDateTime date = e.getTriggeredAt();
 
 		IAnalysisResult result = usageExtractor.analyse(e.getContext());
 		List<Usage> usages = result.getUsages();
@@ -101,7 +101,7 @@ public class QueryHistoryGenerationRunner {
 		}
 	}
 
-	private void register(Date d, Usage u, ICoReMethodName selection) {
+	private void register(LocalDateTime d, Usage u, ICoReMethodName selection) {
 		// Snapshot se = Snapshot.create(d, u, selection);
 		// getEdits(u).add(se);
 	}

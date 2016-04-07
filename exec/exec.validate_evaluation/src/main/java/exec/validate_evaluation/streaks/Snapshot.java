@@ -16,8 +16,6 @@
 package exec.validate_evaluation.streaks;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -50,24 +48,19 @@ public class Snapshot {
 		return selection;
 	}
 
-	public boolean isQuery() {
-		return false;
+	public boolean hasSelection() {
+		return selection != null;
 	}
 
-	public static Snapshot create(Date date, Context context, IMethodName selection) {
+	public static Snapshot create(LocalDateTime date, Context context, IMethodName selection) {
 		Asserts.assertNotNull(date);
 		Asserts.assertNotNull(context);
 
 		Snapshot e = new Snapshot();
-		e.date = toLocalDateTime(date);
+		e.date = date;
 		e.context = context;
 		e.selection = selection;
 		return e;
-	}
-
-	private static LocalDateTime toLocalDateTime(Date date) {
-		LocalDateTime ldt = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-		return ldt;
 	}
 
 	@Override

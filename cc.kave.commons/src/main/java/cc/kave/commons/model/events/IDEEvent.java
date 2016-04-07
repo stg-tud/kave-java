@@ -16,7 +16,7 @@
 
 package cc.kave.commons.model.events;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.annotation.Nullable;
 
@@ -35,10 +35,10 @@ public abstract class IDEEvent implements IIDEEvent {
 	public String KaVEVersion;
 
 	@Nullable
-	public String TriggeredAt;
-	
-	public Date getTriggeredAt() {
-		return null;
+	public LocalDateTime TriggeredAt;
+
+	public LocalDateTime getTriggeredAt() {
+		return TriggeredAt;
 	}
 
 	public Trigger TriggeredBy;

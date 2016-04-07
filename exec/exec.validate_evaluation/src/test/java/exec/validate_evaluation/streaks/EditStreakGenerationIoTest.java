@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.junit.Before;
@@ -109,7 +109,7 @@ public class EditStreakGenerationIoTest {
 	private static EditStreak editStreak(int num) {
 		EditStreak es = new EditStreak();
 		for (int i = 0; i < num; i++) {
-			Snapshot e = Snapshot.create(new Date(), new Context(), null);
+			Snapshot e = Snapshot.create(LocalDateTime.now(), new Context(), null);
 			es.add(e);
 		}
 		return es;
