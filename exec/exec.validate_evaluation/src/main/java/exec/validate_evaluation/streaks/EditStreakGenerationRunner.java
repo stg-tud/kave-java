@@ -15,10 +15,8 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.util.Date;
-import java.util.Iterator;
+import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
@@ -35,15 +33,23 @@ public class EditStreakGenerationRunner {
 
 	private final EditStreakGenerationLogger log;
 	private final EditStreakGenerationIo io;
+	private final Set<IRemovalFilter> filters;
 
 	private Map<ITypeName, EditStreak> editStreaks;
 
 	public EditStreakGenerationRunner(EditStreakGenerationIo io, EditStreakGenerationLogger log) {
 		this.io = io;
 		this.log = log;
+		filters = Sets.newLinkedHashSet();
+	}
+
+	public void add(IRemovalFilter filter) {
+		filters.add(filter);
 	}
 
 	public void run() {
+		log.starting(filters);
+
 		Set<String> zips = io.findZips();
 		log.foundZips(zips);
 
@@ -59,7 +65,7 @@ public class EditStreakGenerationRunner {
 				extractEdits(e);
 			}
 
-			removeSingleEdits();
+			// filterRemovals();
 
 			Set<EditStreak> streaks = Sets.newLinkedHashSet();
 			streaks.addAll(editStreaks.values());
@@ -71,7 +77,7 @@ public class EditStreakGenerationRunner {
 	}
 
 	private void extractEdits(ICompletionEvent e) {
-		Date date = e.getTriggeredAt();
+		LocalDateTime date = e.getTriggeredAt();
 		Context ctx = e.getContext();
 
 		IMethodName selection = null;
@@ -79,14 +85,6 @@ public class EditStreakGenerationRunner {
 			selection = getSelection(e);
 		}
 		register(date, ctx, selection);
-	}
-
-	private void register(Date d, Context ctx, IMethodName selection) {
-		ITypeName encType = ctx.getSST().getEnclosingType();
-		if (!encType.isUnknown()) {
-			Snapshot se = Snapshot.create(d, ctx, selection);
-			getEdits(encType).add(se);
-		}
 	}
 
 	private IMethodName getSelection(ICompletionEvent e) {
@@ -98,17 +96,26 @@ public class EditStreakGenerationRunner {
 		return null;
 	}
 
-	private void removeSingleEdits() {
-		log.startRemoveSingleEdits();
-		Iterator<Entry<ITypeName, EditStreak>> entries = editStreaks.entrySet().iterator();
-		while (entries.hasNext()) {
-			Entry<ITypeName, EditStreak> entry = entries.next();
-			if (entry.getValue().isEmptyOrSingleEdit()) {
-				entries.remove();
-				log.removeSingleEdit();
-			}
+	private void register(LocalDateTime date, Context ctx, IMethodName selection) {
+		ITypeName encType = ctx.getSST().getEnclosingType();
+		if (!encType.isUnknown()) {
+			Snapshot se = Snapshot.create(date, ctx, selection);
+			getEdits(encType).add(se);
 		}
 	}
+
+	// private void filterRemovals() {
+	// log.startingRemovalFiltering();
+	// Iterator<Entry<ITypeName, EditStreak>> entries =
+	// editStreaks.entrySet().iterator();
+	// while (entries.hasNext()) {
+	// Entry<ITypeName, EditStreak> entry = entries.next();
+	// if (entry.getValue().isEmptyOrSingleEdit()) {
+	// entries.remove();
+	// log.removedEditStreak();
+	// }
+	// }
+	// }
 
 	private EditStreak getEdits(ITypeName type) {
 		EditStreak streak = editStreaks.get(type);
@@ -117,5 +124,16 @@ public class EditStreakGenerationRunner {
 			editStreaks.put(type, streak);
 		}
 		return streak;
+	}
+
+	public interface IRemovalFilter {
+		public boolean shouldRemove(EditStreak e);
+	}
+
+	public class SingleEditStreakRemovalFilter implements IRemovalFilter {
+		@Override
+		public boolean shouldRemove(EditStreak e) {
+			return e.isEmptyOrSingleEdit();
+		}
 	}
 }

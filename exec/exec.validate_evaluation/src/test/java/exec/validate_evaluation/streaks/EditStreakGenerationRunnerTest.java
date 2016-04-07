@@ -21,6 +21,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,10 +34,23 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.events.completionevents.Proposal;
+import cc.kave.commons.model.events.completionevents.ProposalSelection;
+import cc.kave.commons.model.events.completionevents.TerminationState;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.Name;
+import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.impl.SST;
 import cc.recommenders.io.Logger;
 
 public class EditStreakGenerationRunnerTest {
+
+	private static final IName anyName = Name.newName("abc");
 
 	private EditStreakGenerationIo io;
 	private EditStreakGenerationLogger log;
@@ -100,12 +114,33 @@ public class EditStreakGenerationRunnerTest {
 	}
 
 	@Test
-	public void asd() {
-		addInput("a.zip", new CompletionEvent());
-		addInput("b/c.zip", new CompletionEvent(), new CompletionEvent());
+	public void happyPath() {
+		Context ctx1 = context(TypeName.newTypeName("T,P"));
+		Context ctx2 = context(TypeName.newTypeName("T,P"));
+		addInput("a.zip", apply(anyMethod(1), ctx1), apply(anyMethod(2), ctx2));
 
 		sut.run();
 
+	}
+
+	@Test
+	public void noMethodSelected() {
+		addInput("a.zip", apply(anyName, new Context()));
+
+		sut.run();
+
+	}
+
+	private static IMethodName anyMethod(int i) {
+		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+	}
+
+	private Context context(ITypeName encType) {
+		SST sst = new SST();
+		sst.setEnclosingType(encType);
+		Context ctx = new Context();
+		ctx.setSST(sst);
+		return ctx;
 	}
 
 	private void addInput(String string, ICompletionEvent... eventArr) {
@@ -114,5 +149,39 @@ public class EditStreakGenerationRunnerTest {
 			events.add(event);
 		}
 		input.put(string, events);
+	}
+
+	private static ICompletionEvent apply(IName name, Context context) {
+		return completionEventWithSelection(TerminationState.Applied, name, context);
+	}
+
+	private static ICompletionEvent abort(IName name, Context context) {
+		return completionEventWithSelection(TerminationState.Cancelled, name, context);
+	}
+
+	private static ICompletionEvent completionEventWithSelection(TerminationState state, IName name, Context context) {
+		CompletionEvent e = completionEvent(context);
+
+		e.terminatedState = state;
+
+		Proposal p = new Proposal();
+		p.Name = name;
+		e.proposalCollection.add(p);
+
+		ProposalSelection ps = new ProposalSelection();
+		ps.Proposal = p;
+		e.selections.add(ps);
+
+		return e;
+	}
+
+	private static CompletionEvent completionEvent(Context context) {
+		CompletionEvent e = new CompletionEvent();
+		e.TriggeredAt = LocalDateTime.now();
+
+		e.terminatedState = TerminationState.Unknown;
+		e.context = context;
+
+		return e;
 	}
 }
