@@ -25,6 +25,7 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner.IRemovalFilter;
 
 public class EditStreakGenerationLoggerTest {
 
@@ -37,6 +38,10 @@ public class EditStreakGenerationLoggerTest {
 
 	@Test
 	public void integration() {
+		Set<IRemovalFilter> filters = Sets.newHashSet();
+		filters.add(mock(IRemovalFilter.class));
+		filters.add(mock(IRemovalFilter.class));
+		sut.starting(filters);
 
 		sut.foundZips(Sets.newHashSet("a.zip", "b/c.zip"));
 
@@ -56,10 +61,10 @@ public class EditStreakGenerationLoggerTest {
 		sut.processingEvent(mock(ICompletionEvent.class));
 		sut.processingEvent(mock(ICompletionEvent.class));
 
-		sut.startRemoveSingleEdits();
-		sut.removeSingleEdit();
-		sut.removeSingleEdit();
-		sut.removeSingleEdit();
+		sut.startingRemovalFiltering();
+		sut.removedEditStreak();
+		sut.removedEditStreak();
+		sut.removedEditStreak();
 
 		Set<EditStreak> streaks = Sets.newLinkedHashSet();
 		streaks.add(mock(EditStreak.class));

@@ -20,11 +20,22 @@ import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.recommenders.io.Logger;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner.IRemovalFilter;
 
 public class EditStreakGenerationLogger {
 
 	private int totalZips = 0;
 	private int currentZip = 0;
+
+	public void starting(Set<IRemovalFilter> filters) {
+		Logger.log("### starting ###");
+		Logger.log("");
+		Logger.log("registered filters:");
+		for (IRemovalFilter f : filters) {
+			Logger.log("- %s", f.getClass());
+		}
+		Logger.log("");
+	}
 
 	public void foundZips(Set<String> zips) {
 		totalZips = zips.size();
@@ -52,13 +63,13 @@ public class EditStreakGenerationLogger {
 		Logger.append(".");
 	}
 
-	public void startRemoveSingleEdits() {
+	public void startingRemovalFiltering() {
 		Logger.log("");
-		Logger.log("starting to remove single edits: ");
+		Logger.log("starting to filter for removals: ");
 		Logger.log("");
 	}
 
-	public void removeSingleEdit() {
+	public void removedEditStreak() {
 		Logger.append(".");
 	}
 
