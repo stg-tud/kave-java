@@ -16,6 +16,7 @@
 package exec.validate_evaluation.streaks;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +105,15 @@ public class EditStreakGenerationIoTest {
 		}
 
 		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void emptyEditStreaksAreNotStored() throws IOException {
+
+		sut.storeStreaks(Sets.newLinkedHashSet(), "a.zip");
+
+		Directory dir = new Directory(dirOut.getAbsolutePath());
+		assertFalse(dir.exists("a.zip"));
 	}
 
 	private static EditStreak editStreak(int num) {

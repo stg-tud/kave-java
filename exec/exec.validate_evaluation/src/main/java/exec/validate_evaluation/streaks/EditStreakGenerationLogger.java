@@ -32,7 +32,7 @@ public class EditStreakGenerationLogger {
 		Logger.log("");
 		Logger.log("registered filters:");
 		for (IRemovalFilter f : filters) {
-			Logger.log("- %s", f.getClass());
+			Logger.log("- %s", f.toString());
 		}
 		Logger.log("");
 	}

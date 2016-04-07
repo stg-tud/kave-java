@@ -15,10 +15,18 @@
  */
 package exec.validate_evaluation.streaks;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -46,7 +54,8 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.Name;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.recommenders.io.Logger;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner.EmptyOrSingleEditStreakRemovalFilter;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner.IRemovalFilter;
 
 public class EditStreakGenerationRunnerTest {
 
@@ -61,14 +70,12 @@ public class EditStreakGenerationRunnerTest {
 
 	@Before
 	public void setup() {
-		Logger.setPrinting(true);
-
 		input = Maps.newLinkedHashMap();
 		output = Maps.newLinkedHashMap();
 
 		io = mockIo();
 
-		log = new EditStreakGenerationLogger();// (EditStreakGenerationLogger.class);
+		log = mock(EditStreakGenerationLogger.class);
 
 		sut = new EditStreakGenerationRunner(io, log);
 	}
@@ -114,21 +121,178 @@ public class EditStreakGenerationRunnerTest {
 	}
 
 	@Test
-	public void happyPath() {
-		Context ctx1 = context(TypeName.newTypeName("T,P"));
-		Context ctx2 = context(TypeName.newTypeName("T,P"));
-		addInput("a.zip", apply(anyMethod(1), ctx1), apply(anyMethod(2), ctx2));
+	public void logging_happyPath() {
+		Context ctx1a = context(type(1));
+		Context ctx1b = context(type(1));
+
+		ICompletionEvent e1 = apply(date(1), ctx1a, anyMethod(1));
+		ICompletionEvent e2 = apply(date(2), ctx1b, anyMethod(2));
+		addInput("a.zip", e1, e2);
 
 		sut.run();
 
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1a, anyMethod(1)));
+		es.add(Snapshot.create(date(2), ctx1b, anyMethod(2)));
+
+		Set<EditStreak> expectedStreaks = Sets.newHashSet();
+		expectedStreaks.add(es);
+
+		verify(log).starting(anySetOf(IRemovalFilter.class));
+		verify(log).foundZips(Sets.newHashSet("a.zip"));
+		verify(log).startingZip("a.zip");
+		verify(log).foundEvents(Sets.newHashSet(e1, e2));
+		verify(log, times(2)).processingEvent(any(ICompletionEvent.class));
+		verify(log).startingRemovalFiltering();
+		verify(log).endZip(eq(expectedStreaks));
+		verify(log).finish();
+
+		verifyNoMoreInteractions(log);
 	}
 
 	@Test
-	public void noMethodSelected() {
-		addInput("a.zip", apply(anyName, new Context()));
+	public void logging_filters() {
+		IRemovalFilter f1 = mock(IRemovalFilter.class);
+		IRemovalFilter f2 = mock(IRemovalFilter.class);
+		sut.add(f1);
+		sut.add(f2);
 
 		sut.run();
 
+		verify(log).starting(Sets.newHashSet(f1, f2));
+	}
+
+	@Test
+	public void logging_snapshotIsFiltered() {
+		Context ctx1 = context(type(1));
+		ICompletionEvent e1 = apply(date(1), ctx1, anyMethod(1));
+		addInput("a.zip", e1);
+
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1, anyMethod(1)));
+
+		sut.add(e -> e.equals(es));
+		sut.run();
+
+		verify(log).starting(anySetOf(IRemovalFilter.class));
+		verify(log).foundZips(Sets.newHashSet("a.zip"));
+		verify(log).startingZip("a.zip");
+		verify(log).foundEvents(Sets.newHashSet(e1));
+		verify(log).processingEvent(any(ICompletionEvent.class));
+		verify(log).startingRemovalFiltering();
+		verify(log).removedEditStreak();
+		verify(log).endZip(eq(Sets.newHashSet()));
+		verify(log).finish();
+
+		verifyNoMoreInteractions(log);
+	}
+
+	@Test
+	public void happyPath() {
+		Context ctx1a = context(type(1));
+		Context ctx1b = context(type(1));
+
+		ICompletionEvent e1 = apply(date(1), ctx1a, anyMethod(1));
+		ICompletionEvent e2 = apply(date(2), ctx1b, anyMethod(2));
+		addInput("a.zip", e1, e2);
+
+		sut.run();
+
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1a, anyMethod(1)));
+		es.add(Snapshot.create(date(2), ctx1b, anyMethod(2)));
+
+		assertNumFiles(1);
+		assertFile("a.zip", es);
+	}
+
+	@Test
+	public void filteringEditStreak() {
+		Context ctx1a = context(type(1));
+		Context ctx1b = context(type(1));
+
+		ICompletionEvent e1 = apply(date(1), ctx1a, anyMethod(1));
+		ICompletionEvent e2 = apply(date(2), ctx1b, anyMethod(2));
+		addInput("a.zip", e1, e2);
+
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1a, anyMethod(1)));
+		es.add(Snapshot.create(date(2), ctx1b, anyMethod(2)));
+
+		sut.add(e -> false); // filter that never hits
+		sut.add(e -> e.equals(es));
+		sut.run();
+
+		assertNumFiles(1);
+		assertFile("a.zip");
+	}
+
+	@Test
+	public void applicationOfNonMethod() {
+
+		Context ctx1 = context(type(1));
+		ICompletionEvent e1 = apply(date(1), ctx1, anyName);
+		addInput("a.zip", e1);
+
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1, null));
+
+		sut.run();
+
+		assertNumFiles(1);
+		assertFile("a.zip", es);
+	}
+
+	@Test
+	public void abortedCompletion() {
+
+		Context ctx1 = context(type(1));
+		ICompletionEvent e1 = abort(date(1), ctx1, anyName);
+		addInput("a.zip", e1);
+
+		EditStreak es = new EditStreak();
+		es.add(Snapshot.create(date(1), ctx1, null));
+
+		sut.run();
+
+		assertNumFiles(1);
+		assertFile("a.zip", es);
+	}
+
+	@Test
+	public void noSnapshotsInUnknownType() {
+
+		Context ctx1 = context(TypeName.UNKNOWN_NAME);
+		ICompletionEvent e1 = abort(date(1), ctx1, anyName);
+		addInput("a.zip", e1);
+
+		sut.run();
+
+		assertNumFiles(1);
+		assertFile("a.zip");
+	}
+
+	@Test
+	public void defaultFilterWorks() {
+		EmptyOrSingleEditStreakRemovalFilter sut = new EmptyOrSingleEditStreakRemovalFilter();
+
+		EditStreak es = mock(EditStreak.class);
+
+		when(es.isEmptyOrSingleEdit()).thenReturn(false);
+		assertFalse(sut.apply(es));
+
+		when(es.isEmptyOrSingleEdit()).thenReturn(true);
+		assertTrue(sut.apply(es));
+	}
+
+	private void assertFile(String zip, EditStreak... es) {
+		Set<EditStreak> actuals = output.get(zip);
+		Set<EditStreak> expecteds = Sets.newHashSet(es);
+		assertEquals(expecteds, actuals);
+	}
+
+	private void assertNumFiles(int numFiles) {
+		assertEquals(numFiles, output.keySet().size());
 	}
 
 	private static IMethodName anyMethod(int i) {
@@ -151,17 +315,19 @@ public class EditStreakGenerationRunnerTest {
 		input.put(string, events);
 	}
 
-	private static ICompletionEvent apply(IName name, Context context) {
-		return completionEventWithSelection(TerminationState.Applied, name, context);
+	private static ICompletionEvent apply(LocalDateTime triggeredAt, Context context, IName name) {
+		return completionEventWithSelection(triggeredAt, TerminationState.Applied, name, context);
 	}
 
-	private static ICompletionEvent abort(IName name, Context context) {
-		return completionEventWithSelection(TerminationState.Cancelled, name, context);
+	private static ICompletionEvent abort(LocalDateTime triggeredAt, Context context, IName name) {
+		return completionEventWithSelection(triggeredAt, TerminationState.Cancelled, name, context);
 	}
 
-	private static ICompletionEvent completionEventWithSelection(TerminationState state, IName name, Context context) {
+	private static ICompletionEvent completionEventWithSelection(LocalDateTime triggeredAt, TerminationState state,
+			IName name, Context context) {
 		CompletionEvent e = completionEvent(context);
 
+		e.TriggeredAt = triggeredAt;
 		e.terminatedState = state;
 
 		Proposal p = new Proposal();
@@ -183,5 +349,13 @@ public class EditStreakGenerationRunnerTest {
 		e.context = context;
 
 		return e;
+	}
+
+	private ITypeName type(int i) {
+		return TypeName.newTypeName("T" + i + ",P");
+	}
+
+	private static LocalDateTime date(int deltaSecs) {
+		return LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0).plusSeconds(deltaSecs);
 	}
 }

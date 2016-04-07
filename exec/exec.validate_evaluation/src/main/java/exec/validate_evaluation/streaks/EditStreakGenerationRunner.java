@@ -16,8 +16,11 @@
 package exec.validate_evaluation.streaks;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -65,7 +68,7 @@ public class EditStreakGenerationRunner {
 				extractEdits(e);
 			}
 
-			// filterRemovals();
+			filterRemovals();
 
 			Set<EditStreak> streaks = Sets.newLinkedHashSet();
 			streaks.addAll(editStreaks.values());
@@ -104,18 +107,20 @@ public class EditStreakGenerationRunner {
 		}
 	}
 
-	// private void filterRemovals() {
-	// log.startingRemovalFiltering();
-	// Iterator<Entry<ITypeName, EditStreak>> entries =
-	// editStreaks.entrySet().iterator();
-	// while (entries.hasNext()) {
-	// Entry<ITypeName, EditStreak> entry = entries.next();
-	// if (entry.getValue().isEmptyOrSingleEdit()) {
-	// entries.remove();
-	// log.removedEditStreak();
-	// }
-	// }
-	// }
+	private void filterRemovals() {
+		log.startingRemovalFiltering();
+		Iterator<Entry<ITypeName, EditStreak>> entries = editStreaks.entrySet().iterator();
+		while (entries.hasNext()) {
+			EditStreak streak = entries.next().getValue();
+			for (IRemovalFilter filter : filters) {
+				if (filter.apply(streak)) {
+					entries.remove();
+					log.removedEditStreak();
+					break;
+				}
+			}
+		}
+	}
 
 	private EditStreak getEdits(ITypeName type) {
 		EditStreak streak = editStreaks.get(type);
@@ -126,13 +131,13 @@ public class EditStreakGenerationRunner {
 		return streak;
 	}
 
-	public interface IRemovalFilter {
-		public boolean shouldRemove(EditStreak e);
+	public static interface IRemovalFilter extends Function<EditStreak, Boolean> {
+		public Boolean apply(EditStreak e);
 	}
 
-	public class SingleEditStreakRemovalFilter implements IRemovalFilter {
+	public static class EmptyOrSingleEditStreakRemovalFilter implements IRemovalFilter {
 		@Override
-		public boolean shouldRemove(EditStreak e) {
+		public Boolean apply(EditStreak e) {
 			return e.isEmptyOrSingleEdit();
 		}
 	}
