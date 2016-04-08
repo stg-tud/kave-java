@@ -37,7 +37,6 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.testutils.model.ssts.SSTFixture;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -1382,9 +1381,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningVisitor(), context);
-		System.out.println(SSTPrintingUtils.printSST(sst));
-		System.out.println("##########");
-		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		// System.out.println(SSTPrintingUtils.printSST(sst));
+		// System.out.println("##########");
+		// System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }
