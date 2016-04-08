@@ -37,6 +37,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.testutils.model.ssts.SSTFixture;
+import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -1305,6 +1306,74 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
+	public void whileLoopReturnSimpleExpr() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						whileLoop(constant("true"), //
+								returnVoid(), //
+								continueStmt())));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						whileLoop(
+								loopHeader(
+										simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt()))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void forLoopReturnSimpleExpr() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						forLoop("i", constant("true"), //
+								returnVoid(), //
+								continueStmt())));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		String condition = InliningContext.CONDITION_VAR;
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						forLoop("i",
+								loopHeader(
+										simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), continueStmt()))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void doLoopReturnSimpleExpr() {
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						doLoop(constant("true"), //
+								returnVoid(), //
+								continueStmt() //
+		)));
+		String resultFlag = InliningContext.RESULT_FLAG + "h1";
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
+						assign(ref(resultFlag), constant("true")), //
+						doLoop(loopHeader(
+								simpleIf(Lists.newArrayList(returnFalse()), refExpr(resultFlag), returnTrue())), //
+								assign(ref(resultFlag), constant("false")), //
+								simpleIf(Lists.newArrayList(), refExpr(resultFlag), //
+										continueStmt()))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
 	public void fullModelSupport() {
 		ISST sst = new SSTFixture().getSST();
 		sst.accept(new InliningVisitor(), new InliningContext());
@@ -1313,9 +1382,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningVisitor(), context);
-		// System.out.println(SSTPrintingUtils.printSST(sst));
-		// System.out.println("##########");
-		// System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+		System.out.println(SSTPrintingUtils.printSST(sst));
+		System.out.println("##########");
+		System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

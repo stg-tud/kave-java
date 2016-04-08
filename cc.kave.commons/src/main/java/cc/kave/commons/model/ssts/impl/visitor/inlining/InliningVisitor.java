@@ -60,9 +60,13 @@ import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
+import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
@@ -221,6 +225,12 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 	@Override
 	public Void visit(IForLoop block, InliningContext context) {
 		checkForReturn(block, context);
+		if (context.hasReturnInLoop() && block.getCondition() instanceof ISimpleExpression) {
+			LoopHeaderBlockExpression loopheader = new LoopHeaderBlockExpression();
+			loopheader.getBody().add(SSTUtil.returnStatement((ISimpleExpression) block.getCondition()));
+			ForLoop newBlock = (ForLoop) block;
+			newBlock.setCondition(loopheader);
+		}
 		block.getCondition().accept(this, context);
 		context.visitBlock(block.getInit());
 		context.visitBlock(block.getStep());
@@ -232,6 +242,12 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 	@Override
 	public Void visit(IWhileLoop block, InliningContext context) {
 		checkForReturn(block, context);
+		if (context.hasReturnInLoop() && block.getCondition() instanceof ISimpleExpression) {
+			LoopHeaderBlockExpression loopheader = new LoopHeaderBlockExpression();
+			loopheader.getBody().add(SSTUtil.returnStatement((ISimpleExpression) block.getCondition()));
+			WhileLoop newBlock = (WhileLoop) block;
+			newBlock.setCondition(loopheader);
+		}
 		block.getCondition().accept(this, context);
 		context.visitBlock(block.getBody());
 		context.addStatement(block);
@@ -255,6 +271,12 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 	@Override
 	public Void visit(IDoLoop block, InliningContext context) {
 		checkForReturn(block, context);
+		if (context.hasReturnInLoop() && block.getCondition() instanceof ISimpleExpression) {
+			LoopHeaderBlockExpression loopheader = new LoopHeaderBlockExpression();
+			loopheader.getBody().add(SSTUtil.returnStatement((ISimpleExpression) block.getCondition()));
+			DoLoop newBlock = (DoLoop) block;
+			newBlock.setCondition(loopheader);
+		}
 		block.getCondition().accept(this, context);
 		context.visitBlock(block.getBody());
 		context.addStatement(block);

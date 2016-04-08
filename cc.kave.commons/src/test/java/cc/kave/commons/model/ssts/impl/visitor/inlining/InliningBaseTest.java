@@ -48,6 +48,7 @@ import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -228,7 +229,7 @@ public class InliningBaseTest {
 		return composedExpr;
 	}
 
-	protected IForLoop forLoop(String var, ILoopHeaderBlockExpression condition, IStatement... body) {
+	protected IForLoop forLoop(String var, ILoopHeaderExpression condition, IStatement... body) {
 		ForLoop forLoop = new ForLoop();
 		forLoop.setInit(Lists.newArrayList(declareVar(var), assign(ref(var), constant("0"))));
 		forLoop.setStep(Lists.newArrayList(assign(ref(var), constant("2"))));
@@ -245,7 +246,7 @@ public class InliningBaseTest {
 		return ifElse;
 	}
 
-	protected IDoLoop doLoop(ILoopHeaderBlockExpression condition, IStatement... body) {
+	protected IDoLoop doLoop(ILoopHeaderExpression condition, IStatement... body) {
 		DoLoop doLoop = new DoLoop();
 		doLoop.setBody(Lists.newArrayList(body));
 		doLoop.setCondition(condition);
@@ -327,7 +328,7 @@ public class InliningBaseTest {
 		return expr;
 	}
 
-	protected IWhileLoop whileLoop(ILoopHeaderBlockExpression condition, IStatement... body) {
+	protected IWhileLoop whileLoop(ILoopHeaderExpression condition, IStatement... body) {
 		WhileLoop whileLoop = new WhileLoop();
 		whileLoop.setBody(Lists.newArrayList(body));
 		whileLoop.setCondition(condition);

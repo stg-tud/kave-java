@@ -83,8 +83,9 @@ import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 
 /*
- * TODO: visitor tests with this sst only fail for unimplemented expressions and references 
- * 		 when the visitor traverses ExpressionStatements expression, DoLoop´s condition and ReferenceExpressions reference.
+ *  visitor tests with this sst only fail for unimplemented expressions and references 
+ * 	when the visitor traverses ExpressionStatements expression, DoLoop´s condition and ReferenceExpressions reference.
+ * 	TODO: extend test to include all possible combinations
  */
 
 public class SSTFixture {
@@ -155,7 +156,7 @@ public class SSTFixture {
 				new UsingBlock(), //
 				new LockBlock(),
 
-				// assignable expressions
+		// assignable expressions
 				assExpr(new BinaryExpression()), //
 				assExpr(new UnaryExpression()), //
 				assExpr(new CastExpression()), //
@@ -167,16 +168,16 @@ public class SSTFixture {
 				assExpr(new InvocationExpression()), //
 				assExpr(new LambdaExpression()), //
 
-				// simple expressions
+		// simple expressions
 				assExpr(new ConstantValueExpression()), //
 				assExpr(new NullExpression()), //
 				assExpr(new ReferenceExpression()), //
 				assExpr(new UnknownExpression()), //
 
-				// loopheaderblock expression
+		// loopheaderblock expression
 				loopheaderExpr(new LoopHeaderBlockExpression()),
 
-				// references
+		// references
 				ref(new EventReference()), //
 				ref(new FieldReference()), //
 				ref(new IndexAccessReference()), //
