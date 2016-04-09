@@ -15,50 +15,98 @@
  */
 package exec.validate_evaluation.queryhistory;
 
-import java.util.Map;
+import static cc.recommenders.io.Logger.append;
+import static cc.recommenders.io.Logger.log;
+
 import java.util.Set;
 
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.ICoReMethodName;
-import cc.recommenders.names.ICoReTypeName;
 import exec.validate_evaluation.streaks.EditStreak;
 
 public class QueryHistoryGenerationLogger {
 
+	private int currentFile = 0;
+	private int totalFiles;
+
 	public void foundZips(Set<String> zips) {
-		// TODO Auto-generated method stub
-		
+		totalFiles = zips.size();
+		log("found %d files:", totalFiles);
+		for (String zip : zips) {
+			log("- %s", zip);
+		}
 	}
 
-	public void foundEvents(Set<ICompletionEvent> events) {
-		// TODO Auto-generated method stub
-		
+	public void processingFile(String zip) {
+		currentFile++;
+		double progress = 100 * (currentFile - 1) / (double) totalFiles;
+		log("");
+		log("### %s (%d/%d - %.1f%%) ###", zip, currentFile, totalFiles, progress);
 	}
 
-	public void processingEvent(ICompletionEvent e) {
-		// TODO Auto-generated method stub
-		
+	private int currentStreak;
+
+	public void foundEditStreaks(int size) {
+		currentStreak = 0;
+		log("");
+		log("found %d edit streaks", size);
 	}
 
-	public void endZip(Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks) {
-		// TODO Auto-generated method stub
-		
+	private int currentSnapshot;
+
+	public void processingEditStreak(EditStreak e) {
+		currentStreak++;
+		log("");
+		log("-- edit streak %d ---------------", currentStreak);
+		currentSnapshot = 0;
+	}
+
+	public void processingSnapshot(boolean hasSelection) {
+		log("s%d%s: ", currentSnapshot++, hasSelection ? "+" : "-");
+	}
+
+	public void usage() {
+		append(".");
+	}
+
+	public void artificialUsage() {
+		append("o");
+	}
+
+	private boolean isFirstFix;
+
+	public void startFixingHistories() {
+		log("");
+		log("fixing histories:");
+		log("");
+		isFirstFix = true;
+	}
+
+	public void fixedQueryHistory(int diff) {
+		if (isFirstFix) {
+			isFirstFix = false;
+			append("" + diff);
+		} else {
+			append(", " + diff);
+		}
+	}
+
+	public void startingRemoveEmptyHistories() {
+		log("");
+		log("removing empty or single histories:");
+		log("");
+	}
+
+	public void removedEmptyHistory() {
+		append(".");
+	}
+
+	public void finishStreak() {
+	}
+
+	public void finishFile() {
 	}
 
 	public void finish() {
-		// TODO Auto-generated method stub
-		
+		log("");
+		log("### done (100.0%%) ###", totalFiles, totalFiles);
 	}
-
-	public void startRemoveSingleEdits() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void removeSingleEdit() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
