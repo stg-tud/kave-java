@@ -53,12 +53,12 @@ public class QueryHistoryIoTest {
 	@Test
 	public void filesAreFound() throws IOException {
 		create(file(dir, "a.txt"));
-		create(file(dir, "a.zip"));
 		create(file(dir, "a.json"));
-		create(file(dir, "a", "b", "c.json"));
+		create(file(dir, "a.zip"));
+		create(file(dir, "a", "b", "c.zip"));
 
 		Set<String> actuals = sut.findQueryHistoryZips();
-		Set<String> expecteds = Sets.newHashSet("a.json", Paths.get("a", "b", "c.json").toString());
+		Set<String> expecteds = Sets.newHashSet("a.zip", Paths.get("a", "b", "c.zip").toString());
 		assertEquals(expecteds, actuals);
 	}
 
@@ -68,27 +68,15 @@ public class QueryHistoryIoTest {
 		Collection<List<Usage>> qhs = Lists.newLinkedList();
 		qhs.add(history(query(1)));
 
-		sut.storeQueryHistories(qhs, Paths.get("a", "b.json").toString());
-
-		File expectedFile = Paths.get(dir.getAbsolutePath(), "a", "b.json").toFile();
-		assertTrue(expectedFile.exists());
-	}
-
-	@Test
-	public void correctFileIsCreated_zipIsRenamed() {
-
-		Collection<List<Usage>> qhs = Lists.newLinkedList();
-		qhs.add(history(query(1)));
-
 		sut.storeQueryHistories(qhs, Paths.get("a", "b.zip").toString());
 
-		File expectedFile = Paths.get(dir.getAbsolutePath(), "a", "b.json").toFile();
+		File expectedFile = Paths.get(dir.getAbsolutePath(), "a", "b.zip").toFile();
 		assertTrue(expectedFile.exists());
 	}
 
 	@Test
 	public void storeAndReadHistories() {
-		String zip = Paths.get("a", "b.json").toString();
+		String zip = Paths.get("a", "b.zip").toString();
 
 		Collection<List<Usage>> expecteds = Lists.newLinkedList();
 		expecteds.add(history(query(1)));

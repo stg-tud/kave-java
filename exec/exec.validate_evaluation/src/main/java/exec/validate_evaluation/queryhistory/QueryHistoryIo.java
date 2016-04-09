@@ -21,9 +21,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.WritingArchive;
 import cc.recommenders.usages.Usage;
 
 public class QueryHistoryIo {
@@ -36,18 +39,16 @@ public class QueryHistoryIo {
 
 	public Set<String> findQueryHistoryZips() {
 		Directory dir = new Directory(this.dir);
-		return dir.findFiles(s -> s.endsWith(".json"));
+		return dir.findFiles(s -> s.endsWith(".zip"));
 	}
 
 	public void storeQueryHistories(Collection<List<Usage>> collection, String zip) {
 
-		if (zip.endsWith(".zip")) {
-			zip = zip.substring(0, zip.length() - 3) + "json";
-		}
-
-		try {
-			Directory dir = new Directory(this.dir);
-			dir.write(collection, zip);
+		Directory dir = new Directory(this.dir);
+		try (WritingArchive wa = dir.getWritingArchive(zip)) {
+			for (List<Usage> us : collection) {
+				wa.add(us);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -55,13 +56,17 @@ public class QueryHistoryIo {
 
 	public Collection<List<Usage>> readQueryHistories(String zip) {
 
-		Type type = new TypeToken<Collection<List<Usage>>>() {
-		}.getType();
+		Directory dir = new Directory(this.dir);
+		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
 
-		try {
-			Directory dir = new Directory(this.dir);
-			Collection<List<Usage>> out = dir.read(zip, type);
-			return out;
+			Type type = new TypeToken<List<Usage>>() {
+			}.getType();
+
+			List<List<Usage>> us = Lists.newLinkedList();
+			while (ra.hasNext()) {
+				us.add(ra.getNext(type));
+			}
+			return us;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
