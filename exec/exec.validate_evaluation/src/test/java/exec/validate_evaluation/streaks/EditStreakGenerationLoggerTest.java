@@ -73,5 +73,4 @@ public class EditStreakGenerationLoggerTest {
 
 		sut.endZip(streaks);
 	}
-
 }

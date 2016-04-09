@@ -53,13 +53,25 @@ public class EditStreakGenerationIoTest {
 	}
 
 	@Test
-	public void zipsAreFound() throws IOException {
+	public void completionEventZipsAreFound() throws IOException {
 		create(file(dirIn, "a.txt"));
 		create(file(dirIn, "a.zip"));
 		create(file(dirIn, "a", "b", "c.zip"));
 		create(file(dirOut, "x.zip"));
 
-		Set<String> actuals = sut.findZips();
+		Set<String> actuals = sut.findCompletionEventZips();
+		Set<String> expecteds = Sets.newHashSet("a.zip", Paths.get("a", "b", "c.zip").toString());
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void editStreakZipsAreFound() throws IOException {
+		create(file(dirOut, "a.txt"));
+		create(file(dirOut, "a.zip"));
+		create(file(dirOut, "a", "b", "c.zip"));
+		create(file(dirIn, "x.zip"));
+
+		Set<String> actuals = sut.findEditStreakZips();
 		Set<String> expecteds = Sets.newHashSet("a.zip", Paths.get("a", "b", "c.zip").toString());
 		assertEquals(expecteds, actuals);
 	}
@@ -79,7 +91,7 @@ public class EditStreakGenerationIoTest {
 			}
 		}
 
-		Set<ICompletionEvent> actuals = sut.read("a.zip");
+		Set<ICompletionEvent> actuals = sut.readCompletionEvents("a.zip");
 		assertEquals(expecteds, actuals);
 	}
 
@@ -91,9 +103,9 @@ public class EditStreakGenerationIoTest {
 		expecteds.add(editStreak(2));
 		expecteds.add(editStreak(3));
 
-		sut.storeStreaks(expecteds, "a.zip");
+		sut.storeEditStreaks(expecteds, "a.zip");
 
-		Set<EditStreak> actuals = sut.readStreaks("a.zip");
+		Set<EditStreak> actuals = sut.readEditStreaks("a.zip");
 
 		Directory dir = new Directory(dirOut.getAbsolutePath());
 		try (ReadingArchive ra = dir.getReadingArchive("a.zip");) {
@@ -110,7 +122,7 @@ public class EditStreakGenerationIoTest {
 	@Test
 	public void emptyEditStreaksAreNotStored() throws IOException {
 
-		sut.storeStreaks(Sets.newLinkedHashSet(), "a.zip");
+		sut.storeEditStreaks(Sets.newLinkedHashSet(), "a.zip");
 
 		Directory dir = new Directory(dirOut.getAbsolutePath());
 		assertFalse(dir.exists("a.zip"));

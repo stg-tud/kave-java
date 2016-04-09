@@ -53,14 +53,14 @@ public class EditStreakGenerationRunner {
 	public void run() {
 		log.starting(filters);
 
-		Set<String> zips = io.findZips();
+		Set<String> zips = io.findCompletionEventZips();
 		log.foundZips(zips);
 
 		for (String zip : zips) {
 			log.startingZip(zip);
 			editStreaks = Maps.newLinkedHashMap();
 
-			Set<ICompletionEvent> events = io.read(zip);
+			Set<ICompletionEvent> events = io.readCompletionEvents(zip);
 			log.foundEvents(events);
 
 			for (ICompletionEvent e : events) {
@@ -73,7 +73,7 @@ public class EditStreakGenerationRunner {
 			Set<EditStreak> streaks = Sets.newLinkedHashSet();
 			streaks.addAll(editStreaks.values());
 			log.endZip(streaks);
-			io.storeStreaks(streaks, zip);
+			io.storeEditStreaks(streaks, zip);
 		}
 
 		log.finish();

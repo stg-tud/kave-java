@@ -83,14 +83,14 @@ public class EditStreakGenerationRunnerTest {
 	private EditStreakGenerationIo mockIo() {
 		EditStreakGenerationIo io = mock(EditStreakGenerationIo.class);
 
-		when(io.findZips()).then(new Answer<Set<String>>() {
+		when(io.findCompletionEventZips()).then(new Answer<Set<String>>() {
 			@Override
 			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
 				return Sets.newLinkedHashSet(input.keySet());
 			}
 		});
 
-		when(io.read(anyString())).then(new Answer<Set<ICompletionEvent>>() {
+		when(io.readCompletionEvents(anyString())).then(new Answer<Set<ICompletionEvent>>() {
 			@Override
 			public Set<ICompletionEvent> answer(InvocationOnMock invocation) throws Throwable {
 				String zip = (String) invocation.getArguments()[0];
@@ -107,9 +107,9 @@ public class EditStreakGenerationRunnerTest {
 				output.put(zip, streaks);
 				return null;
 			}
-		}).when(io).storeStreaks(anySetOf(EditStreak.class), anyString());
+		}).when(io).storeEditStreaks(anySetOf(EditStreak.class), anyString());
 
-		when(io.readStreaks(anyString())).then(new Answer<Set<EditStreak>>() {
+		when(io.readEditStreaks(anyString())).then(new Answer<Set<EditStreak>>() {
 			@Override
 			public Set<EditStreak> answer(InvocationOnMock invocation) throws Throwable {
 				String zip = (String) invocation.getArguments()[0];

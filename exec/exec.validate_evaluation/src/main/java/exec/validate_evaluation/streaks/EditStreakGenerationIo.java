@@ -35,12 +35,12 @@ public class EditStreakGenerationIo {
 		this.dirOut = dirOut;
 	}
 
-	public Set<String> findZips() {
+	public Set<String> findCompletionEventZips() {
 		Directory dir = new Directory(dirIn);
 		return dir.findFiles(s -> s.endsWith(".zip"));
 	}
 
-	public Set<ICompletionEvent> read(String zip) {
+	public Set<ICompletionEvent> readCompletionEvents(String zip) {
 		Set<ICompletionEvent> es = Sets.newLinkedHashSet();
 		Directory dir = new Directory(dirIn);
 		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
@@ -54,7 +54,7 @@ public class EditStreakGenerationIo {
 		return es;
 	}
 
-	public void storeStreaks(Set<EditStreak> streaks, String zip) {
+	public void storeEditStreaks(Set<EditStreak> streaks, String zip) {
 		if (streaks.isEmpty()) {
 			return;
 		}
@@ -68,7 +68,12 @@ public class EditStreakGenerationIo {
 		}
 	}
 
-	public Set<EditStreak> readStreaks(String zip) {
+	public Set<String> findEditStreakZips() {
+		Directory dir = new Directory(dirOut);
+		return dir.findFiles(s -> s.endsWith(".zip"));
+	}
+
+	public Set<EditStreak> readEditStreaks(String zip) {
 		Set<EditStreak> streaks = Sets.newLinkedHashSet();
 		Directory dir = new Directory(dirOut);
 		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
