@@ -58,8 +58,6 @@ public class QueryHistoryGenerationLoggerTest {
 		sut.startingRemoveEmptyHistories();
 		sut.removedEmptyHistory();
 		sut.removedEmptyHistory();
-
-		sut.finishFile();
 	}
 
 	private void streak() {
@@ -76,7 +74,5 @@ public class QueryHistoryGenerationLoggerTest {
 			sut.artificialUsage();
 			sut.usage();
 		}
-
-		sut.finishStreak();
 	}
 }

@@ -99,12 +99,6 @@ public class QueryHistoryGenerationLogger {
 		append(".");
 	}
 
-	public void finishStreak() {
-	}
-
-	public void finishFile() {
-	}
-
 	public void finish() {
 		log("");
 		log("### done (100.0%%) ###", totalFiles, totalFiles);
