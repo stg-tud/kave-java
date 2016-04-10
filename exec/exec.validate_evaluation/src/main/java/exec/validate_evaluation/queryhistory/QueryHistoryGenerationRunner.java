@@ -15,117 +15,121 @@
  */
 package exec.validate_evaluation.queryhistory;
 
-import java.time.LocalDateTime;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.kave.commons.model.events.completionevents.IProposal;
-import cc.kave.commons.model.events.completionevents.TerminationState;
+import cc.kave.commons.model.names.IMethodName;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.CallSite;
+import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.streaks.EditStreak;
+import exec.validate_evaluation.streaks.EditStreakGenerationIo;
+import exec.validate_evaluation.streaks.Snapshot;
 import exec.validate_evaluation.utils.CoReNameUtils;
 
 public class QueryHistoryGenerationRunner {
 
-	private final QueryHistoryGenerationIo io;
+	private final QueryHistoryIo io;
 	private final QueryHistoryGenerationLogger log;
+	private final IUsageExtractor usageExtractor;
+	private final QueryHistoryCollector histCollector;
+	private final EditStreakGenerationIo esIo;
 
-	private Map<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> editStreaks;
-	private IUsageExtractor usageExtractor;
+	private Set<EditStreak> editStreaks;
 
-	public QueryHistoryGenerationRunner(QueryHistoryGenerationIo io, QueryHistoryGenerationLogger log) {
+	public QueryHistoryGenerationRunner(EditStreakGenerationIo esIo, QueryHistoryIo io,
+			QueryHistoryGenerationLogger log, QueryHistoryCollector histCollector, IUsageExtractor usageExtractor) {
+		this.esIo = esIo;
 		this.io = io;
 		this.log = log;
+		this.histCollector = histCollector;
+		this.usageExtractor = usageExtractor;
 	}
 
 	public void run() {
-		Set<String> zips = io.findZips();
+		Set<String> zips = esIo.findEditStreakZips();
 		log.foundZips(zips);
 
 		for (String zip : zips) {
-			editStreaks = Maps.newLinkedHashMap();
+			histCollector.startUser();
+			
+			log.processingFile(zip);
+			editStreaks = esIo.readEditStreaks(zip);
+			log.foundEditStreaks(editStreaks.size());
 
-			Set<ICompletionEvent> events = io.read(zip);
-			log.foundEvents(events);
-
-			for (ICompletionEvent e : events) {
-				log.processingEvent(e);
-				extractEdits(e);
+			for (EditStreak es : editStreaks) {
+				process(es);
 			}
 
-			removeSingleEdits();
-
-			log.endZip(editStreaks);
-			io.store(editStreaks.values(), zip);
+			Collection<List<Usage>> us = histCollector.getHistories();
+			io.storeQueryHistories(us, zip);
 		}
 
 		log.finish();
 	}
 
-	private void removeSingleEdits() {
-		log.startRemoveSingleEdits();
-		Iterator<Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak>> entries = editStreaks.entrySet().iterator();
-		while (entries.hasNext()) {
-			Entry<Tuple<ICoReMethodName, ICoReTypeName>, EditStreak> entry = entries.next();
-			if (entry.getValue().isEmptyOrSingleEdit()) {
-				entries.remove();
-				log.removeSingleEdit();
+	private void process(EditStreak e) {
+
+		log.processingEditStreak(e);
+
+		Map<Snapshot, List<Usage>> allUsages = Maps.newHashMap();
+		Map<Snapshot, Usage> allQueries = Maps.newHashMap();
+
+		for (Snapshot s : e.getSnapshots()) {
+			IAnalysisResult result = usageExtractor.analyse(s.getContext());
+			allUsages.put(s, result.getUsages());
+			allQueries.put(s, result.getFirstQuery());
+		}
+
+		int numSnapshots = e.getSnapshots().size();
+		histCollector.startEditStreak(numSnapshots, getKeys(allUsages));
+
+		for (Snapshot s : e.getSnapshots()) {
+			histCollector.startSnapshot();
+			List<Usage> usages = allUsages.get(s);
+			Usage query = allQueries.get(s);
+			for (Usage u : usages) {
+				histCollector.register(u);
+				log.usage();
+
+				boolean isQuery = u.equals(query);
+				if (isQuery && s.hasSelection()) {
+					Usage u2 = merge(u, s.getSelection());
+					histCollector.registerSelectionResult(u2);
+				}
+			}
+			histCollector.endSnapshot();
+		}
+	}
+
+	private Usage merge(Usage u, IMethodName m) {
+		CallSite call = CallSites.createReceiverCallSite(CoReNameUtils.toCoReName(m));
+		Query q = Query.createAsCopyFrom(u);
+		q.addCallSite(call);
+		return q;
+
+	}
+
+	private static Set<Tuple<ICoReTypeName, ICoReMethodName>> getKeys(Map<Snapshot, List<Usage>> allUsages) {
+
+		Set<Tuple<ICoReTypeName, ICoReMethodName>> keys = Sets.newHashSet();
+
+		for (List<Usage> us : allUsages.values()) {
+			for (Usage u : us) {
+				Tuple<ICoReTypeName, ICoReMethodName> key = Tuple.newTuple(u.getType(), u.getMethodContext());
+				keys.add(key);
 			}
 		}
-	}
 
-	private void extractEdits(ICompletionEvent e) {
-		LocalDateTime date = e.getTriggeredAt();
-
-		IAnalysisResult result = usageExtractor.analyse(e.getContext());
-		List<Usage> usages = result.getUsages();
-		Usage query = result.getFirstQuery();
-
-		if (e.getTerminatedState() == TerminationState.Applied) {
-			usages.remove(query);
-			ICoReMethodName selection = getSelection(e.getLastSelectedProposal());
-			register(date, query, selection);
-		}
-
-		for (Usage u : usages) {
-			register(date, u, null);
-		}
-	}
-
-	private void register(LocalDateTime d, Usage u, ICoReMethodName selection) {
-		// Snapshot se = Snapshot.create(d, u, selection);
-		// getEdits(u).add(se);
-	}
-
-	private ICoReMethodName getSelection(IProposal p) {
-		boolean isMethodName = p.getName() instanceof cc.kave.commons.model.names.IMethodName;
-		if (!isMethodName) {
-			return null;
-		}
-		cc.kave.commons.model.names.IMethodName m = (cc.kave.commons.model.names.IMethodName) p.getName();
-		return CoReNameUtils.toCoReName(m);
-	}
-
-	private EditStreak getEdits(Usage u) {
-		Tuple<ICoReMethodName, ICoReTypeName> key = getKey(u);
-		EditStreak streak = editStreaks.get(key);
-		if (streak == null) {
-			streak = new EditStreak();
-			editStreaks.put(key, streak);
-		}
-		return streak;
-	}
-
-	private Tuple<ICoReMethodName, ICoReTypeName> getKey(Usage u) {
-		return Tuple.newTuple(u.getMethodContext(), u.getType());
+		return keys;
 	}
 }

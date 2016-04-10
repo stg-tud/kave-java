@@ -59,16 +59,8 @@ public class QueryHistoryGenerationLogger {
 		currentSnapshot = 0;
 	}
 
-	public void processingSnapshot(boolean hasSelection) {
-		log("s%d%s: ", currentSnapshot++, hasSelection ? "+" : "-");
-	}
-
 	public void usage() {
 		append(".");
-	}
-
-	public void artificialUsage() {
-		append("o");
 	}
 
 	private boolean isFirstFix;
@@ -102,5 +94,14 @@ public class QueryHistoryGenerationLogger {
 	public void finish() {
 		log("");
 		log("### done (100.0%%) ###", totalFiles, totalFiles);
+	}
+
+	public void foundContextKeys(int size) {
+		log("found %d context keys", size);
+	}
+
+	public void startSnapshot() {
+		// TODO Auto-generated method stub
+		
 	}
 }

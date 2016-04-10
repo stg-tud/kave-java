@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.io.Logger;
 import exec.validate_evaluation.streaks.EditStreak;
 
 public class QueryHistoryGenerationLoggerTest {
@@ -29,7 +28,6 @@ public class QueryHistoryGenerationLoggerTest {
 
 	@Before
 	public void setup() {
-		Logger.setPrinting(true);
 		sut = new QueryHistoryGenerationLogger();
 	}
 
@@ -64,14 +62,11 @@ public class QueryHistoryGenerationLoggerTest {
 		sut.processingEditStreak(new EditStreak());
 
 		for (int i = 0; i < 3; i++) {
-			sut.processingSnapshot(i % 2 == 0);
-			sut.usage();
-			sut.usage();
-			sut.artificialUsage();
 			sut.usage();
 			sut.usage();
 			sut.usage();
-			sut.artificialUsage();
+			sut.usage();
+			sut.usage();
 			sut.usage();
 		}
 	}

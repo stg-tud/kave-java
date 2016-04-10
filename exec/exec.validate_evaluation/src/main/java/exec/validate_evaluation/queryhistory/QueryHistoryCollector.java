@@ -42,8 +42,12 @@ public class QueryHistoryCollector {
 		this.log = log;
 	}
 
-	public void registerKeys(int numSnapshots, Set<Tuple<ICoReTypeName, ICoReMethodName>> keys) {
+	public void startUser() {
+		// TODO Auto-generated method stub
 		// queryHistories = Maps.newLinkedHashMap();
+	}
+
+	public void startEditStreak(int numSnapshots, Set<Tuple<ICoReTypeName, ICoReMethodName>> keys) {
 
 	}
 
