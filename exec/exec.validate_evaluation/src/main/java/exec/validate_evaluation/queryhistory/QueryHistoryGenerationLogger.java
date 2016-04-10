@@ -59,8 +59,27 @@ public class QueryHistoryGenerationLogger {
 		currentSnapshot = 0;
 	}
 
+	public void startSnapshot() {
+		log("s%d: ", currentSnapshot++);
+	}
+
 	public void usage() {
 		append(".");
+	}
+
+	public void usageMerged() {
+		append("o");
+	}
+
+	public void finish() {
+		log("");
+		log("### done (100.0%%) ###", totalFiles, totalFiles);
+	}
+
+	/* everything from here on is printed in QueryHistoryCollector */
+
+	public void registeredContextKeys(int size) {
+		log("registered %d context keys", size);
 	}
 
 	private boolean isFirstFix;
@@ -89,19 +108,5 @@ public class QueryHistoryGenerationLogger {
 
 	public void removedEmptyHistory() {
 		append(".");
-	}
-
-	public void finish() {
-		log("");
-		log("### done (100.0%%) ###", totalFiles, totalFiles);
-	}
-
-	public void foundContextKeys(int size) {
-		log("found %d context keys", size);
-	}
-
-	public void startSnapshot() {
-		// TODO Auto-generated method stub
-		
 	}
 }

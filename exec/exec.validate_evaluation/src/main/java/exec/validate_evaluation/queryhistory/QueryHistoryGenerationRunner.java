@@ -61,7 +61,7 @@ public class QueryHistoryGenerationRunner {
 
 		for (String zip : zips) {
 			histCollector.startUser();
-			
+
 			log.processingFile(zip);
 			editStreaks = esIo.readEditStreaks(zip);
 			log.foundEditStreaks(editStreaks.size());
@@ -94,6 +94,7 @@ public class QueryHistoryGenerationRunner {
 		histCollector.startEditStreak(numSnapshots, getKeys(allUsages));
 
 		for (Snapshot s : e.getSnapshots()) {
+			log.startSnapshot();
 			histCollector.startSnapshot();
 			List<Usage> usages = allUsages.get(s);
 			Usage query = allQueries.get(s);
@@ -105,6 +106,7 @@ public class QueryHistoryGenerationRunner {
 				if (isQuery && s.hasSelection()) {
 					Usage u2 = merge(u, s.getSelection());
 					histCollector.registerSelectionResult(u2);
+					log.usageMerged();
 				}
 			}
 			histCollector.endSnapshot();

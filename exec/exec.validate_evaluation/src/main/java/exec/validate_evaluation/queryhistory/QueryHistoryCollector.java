@@ -52,7 +52,6 @@ public class QueryHistoryCollector {
 	}
 
 	public void startSnapshot() {
-		log.startSnapshot();
 		// TODO Auto-generated method stub
 
 	}
