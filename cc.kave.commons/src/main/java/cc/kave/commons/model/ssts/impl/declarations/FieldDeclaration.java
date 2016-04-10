@@ -30,7 +30,7 @@ public class FieldDeclaration implements IFieldDeclaration {
 	public FieldDeclaration() {
 		this.name = FieldName.UNKNOWN_NAME;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return Lists.newArrayList();
@@ -62,4 +62,9 @@ public class FieldDeclaration implements IFieldDeclaration {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		// TODO proper handling
+		return String.format("FieldDecl@%d{%s}", hashCode(), name);
+	}
 }
