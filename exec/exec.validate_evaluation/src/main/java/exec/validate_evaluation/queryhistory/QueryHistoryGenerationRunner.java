@@ -90,8 +90,7 @@ public class QueryHistoryGenerationRunner {
 			allQueries.put(s, result.getFirstQuery());
 		}
 
-		int numSnapshots = e.getSnapshots().size();
-		histCollector.startEditStreak(numSnapshots, getKeys(allUsages));
+		histCollector.startEditStreak(getKeys(allUsages));
 
 		for (Snapshot s : e.getSnapshots()) {
 			log.startSnapshot();

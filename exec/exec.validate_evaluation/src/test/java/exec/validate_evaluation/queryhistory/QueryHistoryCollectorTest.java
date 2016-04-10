@@ -15,6 +15,270 @@
  */
 package exec.validate_evaluation.queryhistory;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.names.CoReMethodName;
+import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
+
 public class QueryHistoryCollectorTest {
 
+	private QueryHistoryCollector sut;
+	private QueryHistoryGenerationLogger log;
+
+	@Before
+	public void setup() {
+		log = mock(QueryHistoryGenerationLogger.class);
+		sut = new QueryHistoryCollector(log);
+		sut.startUser();
+	}
+
+	@Test(expected = AssertionException.class)
+	public void cannotRegisterUsagesForUnknownKeys() {
+		startStreak();
+		sut.startSnapshot();
+		sut.register(u(1, 2));
+	}
+
+	@Test
+	public void canRegisterUsages() {
+		startStreak(k(1, 1));
+
+		snapshot(() -> {
+			sut.register(u(1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+
+		List<Usage> actuals = assertSingleHistory();
+		List<Usage> expecteds = Lists.newArrayList(u(1, 1), u(1, 1, 1));
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void cannotRegisterTheSameKeyTwicePerSnapshot() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+			sut.register(u(1, 1, 2));
+		});
+	}
+
+	@Test
+	public void missingUsagesAreAdded() {
+		startStreak(k(1, 1), k(2, 2));
+		snapshot(() -> {
+			sut.register(u(1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+			sut.register(u(2, 2, 1));
+		});
+
+		Set<List<Usage>> actuals = sut.getHistories();
+		Set<List<Usage>> expecteds = Sets.newLinkedHashSet();
+		expecteds.add(Lists.newArrayList(u(1, 1), u(1, 1, 1)));
+		expecteds.add(Lists.newArrayList(none(), u(2, 2, 1)));
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void directRepetitionsAreFiltered() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 3));
+		});
+
+		List<Usage> actuals = assertSingleHistory();
+		List<Usage> expecteds = Lists.newArrayList(u(1, 1, 1), u(1, 1, 2), u(1, 1, 3));
+		assertEquals(expecteds, actuals);
+
+		verify(log).startFixingHistories();
+		verify(log).fixedQueryHistory(-1);
+	}
+
+	@Test
+	public void directRepetitionsAreFiltered_multiple() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 3));
+		});
+
+		List<Usage> actuals = assertSingleHistory();
+		List<Usage> expecteds = Lists.newArrayList(u(1, 1, 1), u(1, 1, 2), u(1, 1, 3));
+		assertEquals(expecteds, actuals);
+
+		verify(log).startFixingHistories();
+		verify(log).fixedQueryHistory(-2);
+	}
+
+	@Test
+	public void indirectRepetitionsAreNotFiltered() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 3));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 2));
+		});
+
+		List<Usage> actuals = assertSingleHistory();
+		List<Usage> expecteds = Lists.newArrayList(u(1, 1, 1), u(1, 1, 2), u(1, 1, 3), u(1, 1, 2));
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void singleHistoryIsCompletelyRemoved() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+
+		Set<List<Usage>> actuals = sut.getHistories();
+		Set<List<Usage>> expecteds = Sets.newHashSet();
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void bothFiltersCombined() {
+		startStreak(k(1, 1));
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+		});
+
+		Set<List<Usage>> actuals = sut.getHistories();
+		Set<List<Usage>> expecteds = Sets.newHashSet();
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void selectionIsAdded() {
+		startStreak(k(1, 1));
+
+		snapshot(() -> {
+			sut.register(u(1, 1, 1));
+			sut.registerSelectionResult(u(1, 1, 1, 2));
+		});
+
+		snapshot(() -> {
+			sut.register(u(1, 1, 3));
+		});
+
+		List<Usage> actuals = assertSingleHistory();
+		List<Usage> expecteds = Lists.newArrayList(u(1, 1, 1), u(1, 1, 1, 2), u(1, 1, 3));
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void cannotRegisterTwoSelections() {
+		startStreak(k(1, 1));
+
+		sut.startSnapshot();
+		sut.registerSelectionResult(u(1, 1, 1));
+		sut.registerSelectionResult(u(1, 1, 1));
+	}
+
+	private void snapshot(InSnapshotAction fun) {
+		sut.startSnapshot();
+		fun.action();
+		sut.endSnapshot();
+	}
+
+	private Usage none() {
+		return new NoUsage();
+	}
+
+	private List<Usage> assertSingleHistory() {
+		Collection<List<Usage>> res = sut.getHistories();
+		assertEquals(1, res.size());
+		return res.iterator().next();
+	}
+
+	@SafeVarargs
+	private final void startStreak(Tuple<ICoReTypeName, ICoReMethodName>... ks) {
+		Set<Tuple<ICoReTypeName, ICoReMethodName>> keys = Sets.newHashSet();
+		for (Tuple<ICoReTypeName, ICoReMethodName> k : ks) {
+			keys.add(k);
+		}
+		sut.startEditStreak(keys);
+	}
+
+	private Tuple<ICoReTypeName, ICoReMethodName> k(int typeNum, int methodNum) {
+		return Tuple.newTuple(type(typeNum), ctx(methodNum));
+	}
+
+	private ICoReTypeName type(int typeNum) {
+		return CoReTypeName.get("LT" + typeNum);
+	}
+
+	private Usage u(int typeNum, int methodNum, int... callNums) {
+		Query q = new Query();
+		q.setType(type(typeNum));
+		q.setMethodContext(ctx(methodNum));
+		for (int callNum : callNums) {
+			q.addCallSite(CallSites.createReceiverCallSite(m(callNum)));
+		}
+		return q;
+	}
+
+	private ICoReMethodName ctx(int methodNum) {
+		return m(100 + methodNum);
+	}
+
+	private ICoReMethodName m(int methodNum) {
+		return CoReMethodName.get("LT.m" + methodNum + "()V");
+	}
+
+	private interface InSnapshotAction {
+		public void action();
+	}
 }

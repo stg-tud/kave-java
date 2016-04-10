@@ -62,15 +62,15 @@ import exec.validate_evaluation.streaks.Snapshot;
 public class QueryHistoryGenerationRunnerTest {
 
 	@Captor
-	private ArgumentCaptor<Collection<List<Usage>>> usageCaptor;
+	private ArgumentCaptor<Set<List<Usage>>> usageCaptor;
 
 	private Map<String, Set<EditStreak>> in;
-	private Map<String, Collection<List<Usage>>> out;
+	private Map<String, Set<List<Usage>>> out;
 
 	private QueryHistoryGenerationRunner sut;
 
 	private QueryHistoryCollector histCollector;
-	private Collection<List<Usage>> collectedUsages;
+	private Set<List<Usage>> collectedUsages;
 
 	private IUsageExtractor usageExtractor;
 
@@ -179,7 +179,7 @@ public class QueryHistoryGenerationRunnerTest {
 	}
 
 	private void startUser() {
-		collectedUsages = Lists.newLinkedList();
+		collectedUsages = Sets.newLinkedHashSet();
 	}
 
 	private void startSnapshot() {
@@ -236,17 +236,17 @@ public class QueryHistoryGenerationRunnerTest {
 
 		sut.run();
 
-		Collection<List<Usage>> expectedA = Lists.newLinkedList();
+		Set<List<Usage>> expectedA = Sets.newLinkedHashSet();
 		expectedA.add(usages(1, 0));
 		expectedA.add(usages(2, 0));
 		expectedA.add(usages(2, 1));
 
-		Collection<List<Usage>> expectedB = Lists.newLinkedList();
+		Set<List<Usage>> expectedB = Sets.newLinkedHashSet();
 		expectedB.add(usages(3, 0));
 		expectedB.add(usages(3, 1));
 		expectedB.add(usages(3, 2));
 
-		Collection<List<Usage>> actualA = out.get("a.zip");
+		Set<List<Usage>> actualA = out.get("a.zip");
 		assertEquals(expectedA, actualA);
 		Collection<List<Usage>> actualB = out.get("b.zip");
 		assertEquals(expectedB, actualB);
@@ -281,21 +281,22 @@ public class QueryHistoryGenerationRunnerTest {
 		Collection<List<Usage>> actuals = out.get("a.zip");
 
 		List<Usage> usages = Lists.newArrayList(usage, usageMerged);
-		Collection<List<Usage>> expecteds = Lists.newArrayList();
+		Set<List<Usage>> expecteds = Sets.newLinkedHashSet();
 		expecteds.add(usages);
 
 		assertEquals(expecteds, actuals);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void keysAreCorrectlyGeneratedAndPassed() {
 		in.put("a.zip", streaks(streak(1), streak(2)));
 
 		sut.run();
 
-		verify(histCollector).startEditStreak(1, Sets.newHashSet(key("LT-1-0", "LT.num1i0()V")));
-		verify(histCollector).startEditStreak(2,
-				Sets.newHashSet(key("LT-2-0", "LT.num2i0()V"), key("LT-2-1", "LT.num2i1()V")));
+		verify(histCollector).startEditStreak(Sets.newHashSet(key("LT-1-0", "LT.num1i0()V")));
+		verify(histCollector)
+				.startEditStreak(Sets.newHashSet(key("LT-2-0", "LT.num2i0()V"), key("LT-2-1", "LT.num2i1()V")));
 	}
 
 	@Test
