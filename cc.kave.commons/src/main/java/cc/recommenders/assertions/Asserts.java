@@ -11,6 +11,7 @@
 package cc.recommenders.assertions;
 
 import static java.lang.String.format;
+
 import cc.recommenders.exceptions.AssertionException;
 
 public class Asserts {
@@ -71,7 +72,7 @@ public class Asserts {
 			throw new AssertionException(format("parameter %f must be less or equal to %f", a, b));
 		}
 	}
-	
+
 	public static void assertLessOrEqual(int a, int b) {
 		if (a > b) {
 			throw new AssertionException(format("parameter %d must be less or equal to %d", a, b));
@@ -116,6 +117,12 @@ public class Asserts {
 	public static void assertFalse(boolean condition, String message) {
 		if (condition) {
 			throw new AssertionException(message);
+		}
+	}
+
+	public static void assertNull(Object o) {
+		if (o != null) {
+			throw new AssertionException("expected null");
 		}
 	}
 }

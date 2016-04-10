@@ -10,11 +10,16 @@
  */
 package cc.recommenders.assertions;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import cc.recommenders.exceptions.AssertionException;
 
 public class AssertsTest {
+
+	@Rule
+	public ExpectedException expectedEx = ExpectedException.none();
 
 	@Test(expected = AssertionException.class)
 	public void nullThrowsException() {
@@ -92,6 +97,19 @@ public class AssertsTest {
 	@Test(expected = AssertionException.class)
 	public void assertLessOrEqualCanFail() {
 		Asserts.assertLessOrEqual(4.0, 3.0);
+	}
+
+	@Test
+	public void assertNull() {
+		Asserts.assertNull(null);
+	}
+
+	@Test
+	public void assertNullCanFail() {
+		expectedEx.expect(AssertionException.class);
+		expectedEx.expectMessage("expected null");
+
+		Asserts.assertNull(new Object());
 	}
 
 	@Test
