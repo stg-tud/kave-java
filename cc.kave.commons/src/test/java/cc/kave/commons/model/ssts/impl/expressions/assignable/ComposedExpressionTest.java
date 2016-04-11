@@ -25,8 +25,8 @@ import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class ComposedExpressionTest extends SSTBaseTest {
 
@@ -89,5 +89,10 @@ public class ComposedExpressionTest extends SSTBaseTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new ComposedExpression());
 	}
 }

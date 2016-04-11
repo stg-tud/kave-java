@@ -24,6 +24,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class LambdaExpression implements ILambdaExpression {
 	private ILambdaName name;
@@ -38,7 +39,7 @@ public class LambdaExpression implements ILambdaExpression {
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
-	
+
 	@Override
 	public List<IStatement> getBody() {
 		return this.body;
@@ -93,4 +94,8 @@ public class LambdaExpression implements ILambdaExpression {
 		return this.name;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

@@ -22,8 +22,8 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.ITypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class TypeCheckExpressionTest extends SSTBaseTest {
 
@@ -101,4 +101,8 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 		SSTTestHelper.accept(sut, 23).verify(sut);
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new TypeCheckExpression());
+	}
 }

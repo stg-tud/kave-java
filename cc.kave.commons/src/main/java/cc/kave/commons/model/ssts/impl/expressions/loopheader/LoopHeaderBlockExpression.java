@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class LoopHeaderBlockExpression implements ILoopHeaderBlockExpression {
 
@@ -30,7 +31,7 @@ public class LoopHeaderBlockExpression implements ILoopHeaderBlockExpression {
 	public LoopHeaderBlockExpression() {
 		this.body = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -70,5 +71,10 @@ public class LoopHeaderBlockExpression implements ILoopHeaderBlockExpression {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

@@ -22,8 +22,8 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class CastExpressionTest extends SSTBaseTest {
 	@Test
@@ -119,5 +119,10 @@ public class CastExpressionTest extends SSTBaseTest {
 		Assert.assertEquals(0, (int) CastOperator.Unknown.ordinal());
 		Assert.assertEquals(1, (int) CastOperator.Cast.ordinal());
 		Assert.assertEquals(2, (int) CastOperator.SafeCast.ordinal());
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new CastExpression());
 	}
 }

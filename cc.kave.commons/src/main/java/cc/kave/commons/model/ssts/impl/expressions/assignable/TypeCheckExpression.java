@@ -24,6 +24,7 @@ import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class TypeCheckExpression implements ITypeCheckExpression {
 
@@ -93,4 +94,8 @@ public class TypeCheckExpression implements ITypeCheckExpression {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

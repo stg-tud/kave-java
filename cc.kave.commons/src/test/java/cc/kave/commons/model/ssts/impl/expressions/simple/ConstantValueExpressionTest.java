@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class ConstantValueExpressionTest extends SSTBaseTest {
 
@@ -84,4 +84,8 @@ public class ConstantValueExpressionTest extends SSTBaseTest {
 		// TODO : Visitor Test
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new ConstantValueExpression());
+	}
 }

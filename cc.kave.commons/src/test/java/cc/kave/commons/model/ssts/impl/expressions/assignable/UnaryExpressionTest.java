@@ -20,9 +20,9 @@ import org.junit.Test;
 
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class UnaryExpressionTest {
 
@@ -112,5 +112,10 @@ public class UnaryExpressionTest {
 
 		// Bitwise
 		Assert.assertEquals(8, (int) UnaryOperator.Complement.ordinal());
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new UnaryExpression());
 	}
 }

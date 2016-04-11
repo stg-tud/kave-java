@@ -25,9 +25,9 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class IndexAccessExpressionTest extends SSTBaseTest {
 	@Test
@@ -107,5 +107,10 @@ public class IndexAccessExpressionTest extends SSTBaseTest {
 	public void testVisitorIsImplemented() {
 		IndexAccessExpression sut = new IndexAccessExpression();
 		SSTTestHelper.accept(sut, 23).verify(sut);
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new IndexAccessExpression());
 	}
 }

@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ReferenceExpression implements IReferenceExpression {
 
@@ -30,7 +31,7 @@ public class ReferenceExpression implements IReferenceExpression {
 	public ReferenceExpression() {
 		this.reference = new UnknownReference();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -72,4 +73,8 @@ public class ReferenceExpression implements IReferenceExpression {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

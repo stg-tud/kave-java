@@ -20,10 +20,10 @@ import org.junit.Test;
 
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class BinaryExpressionTest {
 	@Test
@@ -142,4 +142,8 @@ public class BinaryExpressionTest {
 		Assert.assertEquals(18, (int) BinaryOperator.ShiftRight.ordinal());
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new BinaryExpression());
+	}
 }
