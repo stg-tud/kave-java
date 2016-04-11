@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
+import static cc.kave.commons.pointsto.analysis.utils.GenericNameUtils.eraseGenericInstantiations;
+
 import com.google.common.base.MoreObjects;
 
 import cc.kave.commons.model.names.IMemberName;
@@ -72,7 +74,7 @@ public class PointsToQuery {
 			// TODO remove once isUnknown is overridden in MethodName
 			return null;
 		} else {
-			return member;
+			return eraseGenericInstantiations(member);
 		}
 	}
 

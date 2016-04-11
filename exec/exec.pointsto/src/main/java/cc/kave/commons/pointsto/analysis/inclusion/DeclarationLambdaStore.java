@@ -30,6 +30,8 @@ import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
+import cc.kave.commons.pointsto.analysis.names.DistinctMemberName;
+import cc.kave.commons.pointsto.analysis.names.DistinctMemberNameFactory;
 import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctPropertyParameterReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
@@ -39,6 +41,7 @@ import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 public final class DeclarationLambdaStore {
 
 	private final LanguageOptions languageOptions = LanguageOptions.getInstance();
+	private final DistinctMemberNameFactory nameFactory = new DistinctMemberNameFactory();
 
 	private final Function<DistinctReference, SetVariable> variableResolver;
 	private final SetVariableFactory variableFactory;
@@ -46,7 +49,7 @@ public final class DeclarationLambdaStore {
 	private final ConstraintResolver constraintResolver;
 	private final DeclarationMapper declMapper;
 
-	private final Map<IMemberName, LambdaTerm> declarationLambdas = new HashMap<>();
+	private final Map<DistinctMemberName, LambdaTerm> declarationLambdas = new HashMap<>();
 
 	public DeclarationLambdaStore(Function<DistinctReference, SetVariable> variableResolver,
 			SetVariableFactory variableFactory, ConstraintResolver constraintResolver, DeclarationMapper declMapper) {
@@ -67,7 +70,8 @@ public final class DeclarationLambdaStore {
 	}
 
 	public LambdaTerm getDeclarationLambda(IMemberName member) {
-		LambdaTerm lambda = declarationLambdas.get(member);
+		DistinctMemberName name = nameFactory.create(member);
+		LambdaTerm lambda = declarationLambdas.get(name);
 		if (lambda == null) {
 			if (member instanceof IMethodName) {
 				lambda = createDeclarationLambda((IMethodName) member);
@@ -76,7 +80,7 @@ public final class DeclarationLambdaStore {
 			} else {
 				throw new UnexpectedNameException(member);
 			}
-			declarationLambdas.put(member, lambda);
+			declarationLambdas.put(name, lambda);
 		}
 
 		return lambda;
