@@ -54,6 +54,10 @@ public class CoReNameUtils {
 
 	public static ICoReTypeName toCoReName(ITypeName t) {
 
+		if (t.isUnknownType()) {
+			return CoReTypeName.get("LUnknown");
+		}
+
 		if (t.isArrayType()) {
 			return CoReTypeName.get("[" + toCoReName(t.getArrayBaseType()));
 		}

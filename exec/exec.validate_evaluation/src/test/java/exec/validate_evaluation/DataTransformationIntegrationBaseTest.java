@@ -60,6 +60,7 @@ import cc.recommenders.io.WritingArchive;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 import exec.validate_evaluation.microcommits.MicroCommit;
 import exec.validate_evaluation.microcommits.MicroCommitGenerationLogger;
@@ -202,7 +203,9 @@ public abstract class DataTransformationIntegrationBaseTest {
 	protected Query _q(ICoReMethodName ctx, ICoReTypeName type, ICoReMethodName... calls) {
 		Query q = new Query();
 		q.setType(type);
+		q.setClassContext(CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME));
 		q.setMethodContext(ctx);
+		q.setDefinition(DefinitionSites.createUnknownDefinitionSite());
 		for (ICoReMethodName i : calls) {
 			q.addCallSite(CallSites.createReceiverCallSite(i));
 		}
@@ -264,6 +267,7 @@ public abstract class DataTransformationIntegrationBaseTest {
 	protected static IInvocationExpression inv(String id, IMethodName m) {
 		InvocationExpression expr = new InvocationExpression();
 		expr.setReference(ref(id));
+		expr.setMethodName(m);
 		return expr;
 	}
 
