@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class UnknownStatement implements IUnknownStatement {
 
@@ -27,7 +28,7 @@ public class UnknownStatement implements IUnknownStatement {
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
-	
+
 	public boolean equals(Object obj) {
 		return obj instanceof UnknownStatement ? true : false;
 	}
@@ -41,4 +42,8 @@ public class UnknownStatement implements IUnknownStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

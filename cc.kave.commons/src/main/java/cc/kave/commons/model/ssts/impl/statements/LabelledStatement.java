@@ -21,6 +21,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.statements.ILabelledStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class LabelledStatement implements ILabelledStatement {
 
@@ -31,7 +32,7 @@ public class LabelledStatement implements ILabelledStatement {
 		this.label = "";
 		this.statement = new UnknownStatement();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -87,4 +88,8 @@ public class LabelledStatement implements ILabelledStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

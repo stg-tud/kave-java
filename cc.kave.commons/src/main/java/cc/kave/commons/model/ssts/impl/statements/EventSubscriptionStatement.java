@@ -25,6 +25,7 @@ import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 	private IAssignableReference reference;
@@ -36,12 +37,12 @@ public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 		expression = new UnknownExpression();
 		operation = EventSubscriptionOperation.Add;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
-	
+
 	public IAssignableReference getReference() {
 		return reference;
 	}
@@ -103,5 +104,10 @@ public class EventSubscriptionStatement implements IEventSubscriptionStatement {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

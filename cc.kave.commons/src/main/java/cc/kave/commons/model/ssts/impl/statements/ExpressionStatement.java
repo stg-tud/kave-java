@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ExpressionStatement implements IExpressionStatement {
 
@@ -74,6 +75,6 @@ public class ExpressionStatement implements IExpressionStatement {
 
 	@Override
 	public String toString() {
-		return String.format("ExpressionStatement@%d{\n\t%s\n}", hashCode(), expression.toString());
+		return ToStringUtils.toString(this);
 	}
 }

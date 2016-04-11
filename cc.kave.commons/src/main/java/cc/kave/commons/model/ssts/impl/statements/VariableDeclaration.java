@@ -17,9 +17,6 @@ package cc.kave.commons.model.ssts.impl.statements;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -27,6 +24,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class VariableDeclaration implements IVariableDeclaration {
 
@@ -37,7 +35,7 @@ public class VariableDeclaration implements IVariableDeclaration {
 		this.reference = new VariableReference();
 		this.type = TypeName.UNKNOWN_NAME;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -104,7 +102,6 @@ public class VariableDeclaration implements IVariableDeclaration {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
-
 }

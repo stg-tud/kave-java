@@ -25,7 +25,7 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class VariableDeclarationTest {
 
@@ -102,5 +102,10 @@ public class VariableDeclarationTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new VariableDeclaration());
 	}
 }

@@ -17,9 +17,6 @@ package cc.kave.commons.model.ssts.impl.statements;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
@@ -27,6 +24,7 @@ import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class Assignment implements IAssignment {
 
@@ -103,6 +101,6 @@ public class Assignment implements IAssignment {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
 }

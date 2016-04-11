@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import cc.kave.commons.model.ssts.statements.IContinueStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ContinueStatement implements IContinueStatement {
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -41,4 +42,8 @@ public class ContinueStatement implements IContinueStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

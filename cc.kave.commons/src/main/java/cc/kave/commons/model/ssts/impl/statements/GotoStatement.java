@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class GotoStatement implements IGotoStatement {
 
@@ -33,7 +34,7 @@ public class GotoStatement implements IGotoStatement {
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
-	
+
 	@Override
 	public String getLabel() {
 		return this.label;
@@ -70,4 +71,8 @@ public class GotoStatement implements IGotoStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

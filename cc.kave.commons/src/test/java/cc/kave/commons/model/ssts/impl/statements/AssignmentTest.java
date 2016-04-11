@@ -28,7 +28,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
-import cc.kave.commons.model.ssts.impl.statements.Assignment;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class AssignmentTest {
 
@@ -101,4 +101,8 @@ public class AssignmentTest {
 		// TODO : Visitor Test
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new Assignment());
+	}
 }

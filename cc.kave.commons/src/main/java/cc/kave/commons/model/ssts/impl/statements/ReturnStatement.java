@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ReturnStatement implements IReturnStatement {
 
@@ -32,7 +33,7 @@ public class ReturnStatement implements IReturnStatement {
 		this.expression = new UnknownExpression();
 		this.isVoid = false;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -89,4 +90,8 @@ public class ReturnStatement implements IReturnStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

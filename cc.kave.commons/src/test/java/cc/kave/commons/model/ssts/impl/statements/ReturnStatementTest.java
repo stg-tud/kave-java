@@ -25,7 +25,7 @@ import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class ReturnStatementTest {
 
@@ -86,5 +86,10 @@ public class ReturnStatementTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new ReturnStatement());
 	}
 }

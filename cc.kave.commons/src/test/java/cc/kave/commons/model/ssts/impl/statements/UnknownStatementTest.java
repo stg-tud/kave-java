@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class UnknownStatementTest {
 
@@ -51,5 +51,10 @@ public class UnknownStatementTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new UnknownStatement());
 	}
 }

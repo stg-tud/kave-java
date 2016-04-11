@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ThrowStatement implements IThrowStatement {
 
@@ -30,7 +31,7 @@ public class ThrowStatement implements IThrowStatement {
 	public ThrowStatement() {
 		this.reference = new VariableReference();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -78,5 +79,10 @@ public class ThrowStatement implements IThrowStatement {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }
