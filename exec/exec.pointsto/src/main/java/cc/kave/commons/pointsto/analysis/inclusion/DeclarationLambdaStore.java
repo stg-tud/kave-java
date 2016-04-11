@@ -132,5 +132,19 @@ public final class DeclarationLambdaStore {
 		RefTerm returnObject = new RefTerm(new UndefinedMemberAllocationSite(member, type),
 				variableFactory.createObjectVariable());
 		constraintResolver.addConstraint(returnObject, returnVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+
+		if (type.isArrayType()) {
+			// provide one initialized array entry
+			ITypeName baseType = type.getArrayBaseType();
+			RefTerm arrayEntry = new RefTerm(new UndefinedMemberAllocationSite(member, baseType),
+					variableFactory.createObjectVariable());
+			SetVariable temp = variableFactory.createProjectionVariable();
+			Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
+
+			// array ⊆ proj
+			constraintResolver.addConstraint(returnVar, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+			// src ⊆ temp
+			constraintResolver.addConstraint(arrayEntry, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+		}
 	}
 }
