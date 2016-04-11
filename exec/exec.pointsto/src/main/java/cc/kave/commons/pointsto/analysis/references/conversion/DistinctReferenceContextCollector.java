@@ -13,12 +13,15 @@
 package cc.kave.commons.pointsto.analysis.references.conversion;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMemberName;
@@ -45,7 +48,8 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 	private IStatement currentStatement;
 
 	private Multimap<DistinctReference, IMemberName> referenceToMembers = HashMultimap.create();
-	private Multimap<DistinctReference, IStatement> referenceToStmts = HashMultimap.create();
+	private Multimap<DistinctReference, IStatement> referenceToStmts = Multimaps.newSetMultimap(new HashMap<>(),
+			Sets::newIdentityHashSet);
 
 	public DistinctReferenceContextCollector(Context context, ThisReferenceOption thisReferenceOption) {
 		super(context, thisReferenceOption);
