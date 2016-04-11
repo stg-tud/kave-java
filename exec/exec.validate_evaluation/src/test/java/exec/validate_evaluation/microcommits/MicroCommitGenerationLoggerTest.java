@@ -15,13 +15,38 @@
  */
 package exec.validate_evaluation.microcommits;
 
-import static org.junit.Assert.fail;
+import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 public class MicroCommitGenerationLoggerTest {
+
+	private MicroCommitGenerationLogger sut;
+
+	@Before
+	public void setup() {
+		sut = new MicroCommitGenerationLogger();
+	}
+
 	@Test
-	public void todo() {
-		fail();
+	public void integration() {
+		Set<String> zips = Sets.newHashSet("a", "b");
+		sut.foundZips(zips);
+		for (String zip : zips) {
+			file(zip);
+		}
+		sut.done();
+	}
+
+	private void file(String zip) {
+		sut.processingZip(zip);
+		sut.foundHistories(3);
+
+		for (int i = 0; i < 3; i++) {
+			sut.convertedToCommits(i);
+		}
 	}
 }

@@ -15,7 +15,9 @@
  */
 package exec.validate_evaluation.microcommits;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
@@ -35,18 +37,34 @@ public class MicroCommitGenerationRunner {
 	}
 
 	public void run() {
-		for (String zip : qhIo.findQueryHistoryZips()) {
-			for (List<Usage> qh : qhIo.readQueryHistories(zip)) {
-				List<MicroCommit> mc = createCommits(qh);
+		Set<String> zips = qhIo.findQueryHistoryZips();
+		log.foundZips(zips);
+		for (String zip : zips) {
+			log.processingZip(zip);
+			List<MicroCommit> mcForUser = Lists.newLinkedList();
+
+			Collection<List<Usage>> histories = qhIo.readQueryHistories(zip);
+			log.foundHistories(histories.size());
+
+			for (List<Usage> qh : histories) {
+				List<MicroCommit> mcs = createCommits(qh);
+				log.convertedToCommits(mcs.size());
+				mcForUser.addAll(mcs);
 			}
+			mcIo.store(mcForUser, zip);
 		}
+		
+		log.done();
 	}
 
 	private List<MicroCommit> createCommits(List<Usage> qh) {
 		List<MicroCommit> commits = Lists.newLinkedList();
 		for (int i = 1; i < qh.size(); i++) {
 			for (int j = 0; j < i; j++) {
+				Usage end = qh.get(i);
+				Usage start = qh.get(j);
 
+				commits.add(MicroCommit.create(start, end));
 			}
 		}
 		return commits;

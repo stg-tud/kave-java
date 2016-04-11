@@ -15,6 +15,51 @@
  */
 package exec.validate_evaluation.microcommits;
 
+import static cc.recommenders.io.Logger.append;
+import static cc.recommenders.io.Logger.log;
+
+import java.util.Set;
+
 public class MicroCommitGenerationLogger {
 
+	private int totalZips;
+	private int currentZip;
+
+	public void foundZips(Set<String> zips) {
+		totalZips = zips.size();
+		currentZip = 0;
+
+		log("found %d zips", totalZips);
+		for (String zip : zips) {
+			log("- %s", zip);
+		}
+	}
+
+	public void processingZip(String zip) {
+		double perc = 100 * currentZip++ / (double) totalZips;
+		log("");
+		log("### %s (%d/%d - %.1f%%) ###", zip, currentZip, totalZips, perc);
+	}
+
+	private boolean isFirstCommit;
+
+	public void foundHistories(int size) {
+		log("");
+		log("found %d histories, will convert them to micro commits:", size);
+		log("");
+		isFirstCommit = true;
+	}
+
+	public void convertedToCommits(int num) {
+		if (!isFirstCommit) {
+			append(", ");
+		}
+		append("%d", num);
+		isFirstCommit = false;
+	}
+
+	public void done() {
+		log("");
+		log("### done (100%%) ###");
+	}
 }
