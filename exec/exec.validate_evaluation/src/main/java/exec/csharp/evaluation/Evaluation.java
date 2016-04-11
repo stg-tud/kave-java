@@ -94,8 +94,8 @@ public class Evaluation implements IEvaluation {
 
 				for (MicroCommit t : histories) {
 
-					Query start = t.getStart();
-					Query end = t.getEnd();
+					Usage start = t.getStart();
+					Usage end = t.getEnd();
 
 					if (shouldSkip(start, end, shouldLog, mode)) {
 						continue;
@@ -110,7 +110,7 @@ public class Evaluation implements IEvaluation {
 		consumer.finish();
 	}
 
-	private boolean shouldSkip(Query start, Query end, boolean shouldLog, QueryMode mode) {
+	private boolean shouldSkip(Usage start, Usage end, boolean shouldLog, QueryMode mode) {
 		int numAdditions = QueryUtils.countAdditions(start, end);
 		int numRemovals = QueryUtils.countRemovals(start, end);
 		if (0 == numAdditions) {
@@ -126,7 +126,7 @@ public class Evaluation implements IEvaluation {
 		return false;
 	}
 
-	private double measurePredictionQuality(Query start, Query end) {
+	private double measurePredictionQuality(Usage start, Usage end) {
 		List<Query> queries = queryBuilder.createQueries(start, end);
 		BoxplotData res = new BoxplotData();
 		for (Query q : queries) {
@@ -138,7 +138,7 @@ public class Evaluation implements IEvaluation {
 		return res.getMean();
 	}
 
-	private Set<ICoReMethodName> getExpectation(Query q, Query end) {
+	private Set<ICoReMethodName> getExpectation(Usage q, Usage end) {
 
 		Set<ICoReMethodName> expectation = Sets.newLinkedHashSet();
 		for (CallSite cs : end.getReceiverCallsites()) {

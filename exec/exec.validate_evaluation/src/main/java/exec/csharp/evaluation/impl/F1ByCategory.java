@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.io.Logger;
-import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;
 import exec.csharp.queries.QueryMode;
@@ -63,7 +63,7 @@ public class F1ByCategory extends AbstractEvaluationConsumer {
 	}
 
 	@Override
-	public void addResult(Query start, Query end, QueryMode queryMode, double f1) {
+	public void addResult(Usage start, Usage end, QueryMode queryMode, double f1) {
 		Logger.append(".");
 		QueryContent qc = categorize(start, end);
 
@@ -73,7 +73,7 @@ public class F1ByCategory extends AbstractEvaluationConsumer {
 		}
 	}
 
-	private QueryContent categorize(Query start, Query end) {
+	private QueryContent categorize(Usage start, Usage end) {
 		int numStart = start.getReceiverCallsites().size();
 		int numAdded = QueryUtils.countAdditions(start, end);
 		int numRemoved = QueryUtils.countRemovals(start, end);

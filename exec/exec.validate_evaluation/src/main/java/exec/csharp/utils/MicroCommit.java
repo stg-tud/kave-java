@@ -20,17 +20,17 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 public class MicroCommit {
-	public Query Item1;
-	public Query Item2;
+	public Usage Item1;
+	public Usage Item2;
 
-	public Query getStart() {
+	public Usage getStart() {
 		return Item1;
 	}
 
-	public Query getEnd() {
+	public Usage getEnd() {
 		return Item2;
 	}
 

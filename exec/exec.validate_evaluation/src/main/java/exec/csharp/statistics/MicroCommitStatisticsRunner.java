@@ -64,8 +64,8 @@ public class MicroCommitStatisticsRunner {
 				numTotal++;
 				MicroCommit t = ra.getNext(MicroCommit.class);
 
-				Query a = t.Item1;
-				Query b = t.Item2;
+				Usage a = t.Item1;
+				Usage b = t.Item2;
 
 				ICoReTypeName type = a.getType();
 
@@ -160,7 +160,7 @@ public class MicroCommitStatisticsRunner {
 		return false;
 	}
 
-	private String getDiff(Query a, Query b) {
+	private String getDiff(Usage a, Usage b) {
 
 		int removed = 0;
 		int added = 0;

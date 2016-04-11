@@ -19,7 +19,6 @@ import java.util.List;
 
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
-import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.csharp.queries.QueryMode;
 import exec.csharp.utils.MicroCommit;
@@ -40,7 +39,7 @@ public interface IEvaluationConsumer {
 
 	void registerQuery(DefinitionSiteKind def, int before, int add, int after);
 
-	void addResult(Query start, Query end, QueryMode queryMode, double f1);
+	void addResult(Usage start, Usage end, QueryMode queryMode, double f1);
 
 	void finish();
 

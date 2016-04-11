@@ -25,7 +25,6 @@ import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
-import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;
@@ -118,7 +117,7 @@ public class F1ByQueryMode extends AbstractEvaluationConsumer {
 	}
 
 	@Override
-	public void addResult(Query start, Query end, QueryMode queryMode, double f1) {
+	public void addResult(Usage start, Usage end, QueryMode queryMode, double f1) {
 		results.get(queryMode).add(f1);
 
 		String diffString = QueryUtils.toDiffString(start, end);

@@ -15,18 +15,18 @@
  */
 package exec.csharp.utils;
 
-import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 public class QueryJudge {
 
-	private final Query start;
-	private final Query end;
+	private final Usage start;
+	private final Usage end;
 
 	private NoiseMode noiseMode;
 	private int numAdditions;
 	private int numRemovals;
 
-	public QueryJudge(Query start, Query end) {
+	public QueryJudge(Usage start, Usage end) {
 		this.start = start;
 		this.end = end;
 

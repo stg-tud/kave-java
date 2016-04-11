@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import cc.recommenders.evaluation.data.BoxplotData;
-import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;
 import exec.csharp.queries.QueryMode;
@@ -53,7 +53,7 @@ public class AnalysisOfNoise extends AbstractEvaluationConsumer {
 	}
 
 	@Override
-	public void addResult(Query start, Query end, QueryMode queryMode, double f1) {
+	public void addResult(Usage start, Usage end, QueryMode queryMode, double f1) {
 		NoiseMode noiseMode = new QueryJudge(start, end).getNoiseMode();
 		results.get(queryMode).get(noiseMode).add(f1);
 	}
