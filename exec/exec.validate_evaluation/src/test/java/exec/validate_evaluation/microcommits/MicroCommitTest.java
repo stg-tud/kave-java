@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 public class MicroCommitTest {
 	@Test
@@ -33,6 +34,15 @@ public class MicroCommitTest {
 		assertNull(sut.Item2);
 		assertNull(sut.getStart());
 		assertNull(sut.getEnd());
+	}
+
+	@Test
+	public void customInit() {
+		Usage u1 = mock(Usage.class);
+		Usage u2 = mock(Usage.class);
+		MicroCommit sut = MicroCommit.create(u1, u2);
+		assertSame(u1, sut.Item1);
+		assertSame(u2, sut.Item2);
 	}
 
 	@Test

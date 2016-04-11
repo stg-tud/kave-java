@@ -48,4 +48,11 @@ public class MicroCommit {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
+	public static MicroCommit create(Usage start, Usage end) {
+		MicroCommit mc = new MicroCommit();
+		mc.Item1 = start;
+		mc.Item2 = end;
+		return mc;
+	}
 }
