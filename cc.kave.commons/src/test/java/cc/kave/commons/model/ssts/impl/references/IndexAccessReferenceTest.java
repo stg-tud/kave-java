@@ -25,7 +25,7 @@ import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class IndexAccessReferenceTest {
 
@@ -84,4 +84,8 @@ public class IndexAccessReferenceTest {
 		SSTTestHelper.accept(sut, 23).verify(sut);
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new IndexAccessReference());
+	}
 }

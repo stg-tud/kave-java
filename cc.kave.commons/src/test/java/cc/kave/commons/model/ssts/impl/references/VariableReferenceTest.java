@@ -17,12 +17,12 @@ package cc.kave.commons.model.ssts.impl.references;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.references.VariableReference;
 
 public class VariableReferenceTest {
 
@@ -86,4 +86,10 @@ public class VariableReferenceTest {
 		// TODO : Visitor Test
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		VariableReference ref = new VariableReference();
+		ref.setIdentifier("x");
+		assertEquals("VarRef(x)", ref.toString());
+	}
 }

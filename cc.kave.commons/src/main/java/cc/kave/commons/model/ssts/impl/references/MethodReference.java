@@ -23,6 +23,7 @@ import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class MethodReference implements IMethodReference {
 
@@ -33,7 +34,7 @@ public class MethodReference implements IMethodReference {
 		this.reference = new VariableReference();
 		this.methodName = MethodName.UNKNOWN_NAME;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -93,4 +94,8 @@ public class MethodReference implements IMethodReference {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

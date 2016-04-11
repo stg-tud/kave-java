@@ -25,6 +25,7 @@ import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class PropertyReferenceTest extends SSTBaseTest {
 
@@ -98,5 +99,10 @@ public class PropertyReferenceTest extends SSTBaseTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new PropertyReference());
 	}
 }

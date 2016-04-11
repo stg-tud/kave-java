@@ -23,6 +23,7 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class PropertyReference implements IPropertyReference {
 
@@ -33,7 +34,7 @@ public class PropertyReference implements IPropertyReference {
 		this.reference = new VariableReference();
 		this.propertyName = PropertyName.UNKNOWN_NAME;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -93,4 +94,8 @@ public class PropertyReference implements IPropertyReference {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpress
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class IndexAccessReference implements IIndexAccessReference {
 
@@ -75,4 +76,8 @@ public class IndexAccessReference implements IIndexAccessReference {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

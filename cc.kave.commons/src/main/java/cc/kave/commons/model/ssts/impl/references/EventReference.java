@@ -23,6 +23,7 @@ import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class EventReference implements IEventReference {
 
@@ -33,7 +34,7 @@ public class EventReference implements IEventReference {
 		this.reference = new VariableReference();
 		this.eventName = EventName.UNKNOWN_NAME;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -93,4 +94,8 @@ public class EventReference implements IEventReference {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

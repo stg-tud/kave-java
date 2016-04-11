@@ -23,6 +23,7 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class FieldReference implements IFieldReference {
 
@@ -38,7 +39,7 @@ public class FieldReference implements IFieldReference {
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
 	}
-	
+
 	@Override
 	public IVariableReference getReference() {
 		return this.reference;
@@ -93,4 +94,8 @@ public class FieldReference implements IFieldReference {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }
