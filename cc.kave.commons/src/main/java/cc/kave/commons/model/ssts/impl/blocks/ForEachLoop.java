@@ -28,6 +28,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ForEachLoop implements IForEachLoop {
 
@@ -40,7 +41,7 @@ public class ForEachLoop implements IForEachLoop {
 		this.loopedReference = new VariableReference();
 		this.body = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = Lists.newArrayList(declaration, loopedReference);
@@ -117,4 +118,8 @@ public class ForEachLoop implements IForEachLoop {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

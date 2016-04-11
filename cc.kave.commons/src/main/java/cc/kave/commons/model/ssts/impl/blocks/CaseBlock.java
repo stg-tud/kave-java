@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class CaseBlock implements ICaseBlock {
 
@@ -82,4 +83,8 @@ public class CaseBlock implements ICaseBlock {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

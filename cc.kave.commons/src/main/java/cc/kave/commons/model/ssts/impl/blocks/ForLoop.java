@@ -18,14 +18,13 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ForLoop implements IForLoop {
 
@@ -40,7 +39,7 @@ public class ForLoop implements IForLoop {
 		this.body = new ArrayList<>();
 		this.condition = new UnknownExpression();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = new ArrayList<>(init);
@@ -131,4 +130,8 @@ public class ForLoop implements IForLoop {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

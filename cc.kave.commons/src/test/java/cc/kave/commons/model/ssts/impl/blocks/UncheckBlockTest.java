@@ -17,19 +17,19 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class UncheckBlockTest extends SSTBaseTest {
 
@@ -57,7 +57,7 @@ public class UncheckBlockTest extends SSTBaseTest {
 
 		assertChildren(sut, sut.getBody().get(0));
 	}
-	
+
 	@Test
 	public void testEqualityDefault() {
 		UncheckedBlock a = new UncheckedBlock();
@@ -96,5 +96,10 @@ public class UncheckBlockTest extends SSTBaseTest {
 	@Test
 	public void testVisitorWithReturnIsImplemented() {
 		// TODO: Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new UncheckedBlock());
 	}
 }

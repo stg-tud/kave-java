@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class DoLoop implements IDoLoop {
 
@@ -36,7 +37,7 @@ public class DoLoop implements IDoLoop {
 		this.condition = new UnknownExpression();
 		this.body = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = Lists.newArrayList(condition);
@@ -98,4 +99,8 @@ public class DoLoop implements IDoLoop {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

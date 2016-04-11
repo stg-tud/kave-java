@@ -23,6 +23,7 @@ import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class CatchBlock implements ICatchBlock {
 	private CatchBlockKind kind;
@@ -95,4 +96,8 @@ public class CatchBlock implements ICatchBlock {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

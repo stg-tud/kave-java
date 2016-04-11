@@ -18,14 +18,14 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
-
-import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class TryBlock implements ITryBlock {
 
@@ -39,7 +39,7 @@ public class TryBlock implements ITryBlock {
 		this.catchBlocks = new ArrayList<>();
 		this._finally = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = new ArrayList<>(body);
@@ -116,4 +116,8 @@ public class TryBlock implements ITryBlock {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

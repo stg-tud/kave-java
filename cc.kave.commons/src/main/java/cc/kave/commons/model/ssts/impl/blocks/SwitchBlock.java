@@ -27,6 +27,7 @@ import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class SwitchBlock implements ISwitchBlock {
 
@@ -39,7 +40,7 @@ public class SwitchBlock implements ISwitchBlock {
 		this.sections = new ArrayList<>();
 		this.defaultSection = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = Lists.newArrayList(reference);
@@ -116,4 +117,8 @@ public class SwitchBlock implements ISwitchBlock {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

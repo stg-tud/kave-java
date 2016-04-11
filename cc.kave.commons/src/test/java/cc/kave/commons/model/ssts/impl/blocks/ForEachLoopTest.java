@@ -17,18 +17,18 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class ForEachLoopTest extends SSTBaseTest {
 	@Test
@@ -53,14 +53,14 @@ public class ForEachLoopTest extends SSTBaseTest {
 		assertThat(this.someVarRef("a"), equalTo(sut.getLoopedReference()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getBody()));
 	}
-	
+
 	@Test
 	public void testChildrenIdentity() {
 		ForEachLoop sut = new ForEachLoop();
 		sut.setDeclaration(someDeclaration());
 		sut.setLoopedReference(this.someVarRef("a"));
 		sut.getBody().add(new ReturnStatement());
-		
+
 		assertChildren(sut, sut.getDeclaration(), sut.getLoopedReference(), sut.getBody().get(0));
 	}
 
@@ -127,5 +127,10 @@ public class ForEachLoopTest extends SSTBaseTest {
 	@Test
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new ForEachLoop());
 	}
 }

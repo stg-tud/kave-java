@@ -17,22 +17,22 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class UsingBlockTest extends SSTBaseTest {
 
@@ -54,13 +54,13 @@ public class UsingBlockTest extends SSTBaseTest {
 		assertThat(this.someVarRef("a"), equalTo(sut.getReference()));
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getBody()));
 	}
-	
+
 	@Test
 	public void testChildrenIdentity() {
 		UsingBlock sut = new UsingBlock();
 		sut.setReference(this.someVarRef("a"));
 		sut.getBody().add(new ReturnStatement());
-		
+
 		assertChildren(sut, sut.getReference(), sut.getBody().get(0));
 	}
 
@@ -117,5 +117,10 @@ public class UsingBlockTest extends SSTBaseTest {
 	@Test
 	public void testVisitorWithReturnIsImplemented() {
 		// TODO: Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new UsingBlock());
 	}
 }

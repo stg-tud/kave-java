@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class LockBlock implements ILockBlock {
 
@@ -36,7 +37,7 @@ public class LockBlock implements ILockBlock {
 		this.reference = new VariableReference();
 		this.body = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = Lists.newArrayList(reference);
@@ -96,5 +97,10 @@ public class LockBlock implements ILockBlock {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

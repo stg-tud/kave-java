@@ -18,9 +18,6 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
@@ -30,6 +27,7 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class IfElseBlock implements IIfElseBlock {
 
@@ -43,7 +41,7 @@ public class IfElseBlock implements IIfElseBlock {
 		this._else = new ArrayList<>();
 		this.then = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		List<ISSTNode> children = Lists.newArrayList(condition);
@@ -123,6 +121,6 @@ public class IfElseBlock implements IIfElseBlock {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
 }

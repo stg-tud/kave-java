@@ -17,17 +17,17 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
-import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class CatchBlockTest extends SSTBaseTest {
 	@Test
@@ -113,4 +113,8 @@ public class CatchBlockTest extends SSTBaseTest {
 		assertThat(2, equalTo(CatchBlockKind.General.ordinal()));
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new CatchBlock());
+	}
 }

@@ -17,20 +17,20 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class LockBlockTest extends SSTBaseTest {
 
@@ -53,7 +53,7 @@ public class LockBlockTest extends SSTBaseTest {
 		assertThat(this.someVarRef("x"), equalTo(sut.getReference()));
 		assertThat(Lists.newArrayList(new BreakStatement()), equalTo(sut.getBody()));
 	}
-	
+
 	@Test
 	public void testChildrenIdentity() {
 		LockBlock sut = new LockBlock();
@@ -117,4 +117,8 @@ public class LockBlockTest extends SSTBaseTest {
 		// TODO: Visitor Test
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new LockBlock());
+	}
 }

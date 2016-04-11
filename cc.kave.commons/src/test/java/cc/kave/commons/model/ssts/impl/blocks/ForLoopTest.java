@@ -23,17 +23,17 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class ForLoopTest extends SSTBaseTest {
 
@@ -61,16 +61,16 @@ public class ForLoopTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new BreakStatement()), equalTo(sut.getStep()));
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getBody()));
 	}
-	
+
 	@Test
-	public void testChildrenIdentity(){
+	public void testChildrenIdentity() {
 		ForLoop sut = new ForLoop();
 		sut.setCondition(new ConstantValueExpression());
 		sut.getInit().add(new GotoStatement());
 		sut.getStep().add(new BreakStatement());
 		sut.getBody().add(new ContinueStatement());
-		
-		assertChildren(sut, sut.getInit().get(0), sut.getCondition(), sut.getStep().get(0), sut.getBody().get(0)); 
+
+		assertChildren(sut, sut.getInit().get(0), sut.getCondition(), sut.getStep().get(0), sut.getBody().get(0));
 	}
 
 	@Test
@@ -148,5 +148,10 @@ public class ForLoopTest extends SSTBaseTest {
 	@Test
 	public void VisitorWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new ForLoop());
 	}
 }

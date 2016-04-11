@@ -17,22 +17,22 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class IfElseBlockTest extends SSTBaseTest {
 	@Test
@@ -57,7 +57,7 @@ public class IfElseBlockTest extends SSTBaseTest {
 		assertThat(Lists.newArrayList(new ReturnStatement()), equalTo(sut.getThen()));
 		assertThat(Lists.newArrayList(new ContinueStatement()), equalTo(sut.getElse()));
 	}
-	
+
 	@Test
 	public void testChildrenIdentity() {
 		IfElseBlock sut = new IfElseBlock();
@@ -131,5 +131,10 @@ public class IfElseBlockTest extends SSTBaseTest {
 	@Test
 	public void testVisitorWithReturnIsImplemented() {
 		// TODO : Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new IfElseBlock());
 	}
 }

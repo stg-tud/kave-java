@@ -17,21 +17,20 @@ package cc.kave.commons.model.ssts.impl.blocks;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
-import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class SwitchBlockTest extends SSTBaseTest {
 
@@ -67,7 +66,7 @@ public class SwitchBlockTest extends SSTBaseTest {
 
 		assertChildren(sut, sut.getReference(), sut.getDefaultSection().get(0));
 	}
-	
+
 	@Test
 	public void testEqualityDefault() {
 		SwitchBlock a = new SwitchBlock();
@@ -131,5 +130,10 @@ public class SwitchBlockTest extends SSTBaseTest {
 	@Test
 	public void testVisitorWithReturnIsImplemented() {
 		// TODO: Visitor Test
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new SwitchBlock());
 	}
 }
