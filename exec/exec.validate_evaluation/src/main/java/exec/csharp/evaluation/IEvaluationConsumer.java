@@ -21,7 +21,7 @@ import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Usage;
 import exec.csharp.queries.QueryMode;
-import exec.csharp.utils.MicroCommit;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public interface IEvaluationConsumer {
 

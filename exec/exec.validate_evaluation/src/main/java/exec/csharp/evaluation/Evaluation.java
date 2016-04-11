@@ -37,11 +37,11 @@ import cc.recommenders.usages.Usage;
 import exec.csharp.queries.IQueryBuilder;
 import exec.csharp.queries.QueryBuilderFactory;
 import exec.csharp.queries.QueryMode;
-import exec.csharp.utils.MicroCommit;
 import exec.csharp.utils.ModelHelper;
 import exec.csharp.utils.QueryUtils;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class Evaluation implements IEvaluation {
 

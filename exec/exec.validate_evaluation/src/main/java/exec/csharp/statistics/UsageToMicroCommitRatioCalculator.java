@@ -29,9 +29,9 @@ import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import exec.csharp.utils.MapSorter;
-import exec.csharp.utils.MicroCommit;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class UsageToMicroCommitRatioCalculator {
 

@@ -30,8 +30,8 @@ import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;
 import exec.csharp.queries.QueryMode;
 import exec.csharp.utils.MapSorter;
-import exec.csharp.utils.MicroCommit;
 import exec.csharp.utils.QueryUtils;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class F1ByQueryMode extends AbstractEvaluationConsumer {
 

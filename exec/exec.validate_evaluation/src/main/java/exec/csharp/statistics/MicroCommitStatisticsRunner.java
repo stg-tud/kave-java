@@ -27,9 +27,9 @@ import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.csharp.utils.MapSorter;
-import exec.csharp.utils.MicroCommit;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class MicroCommitStatisticsRunner {
 
