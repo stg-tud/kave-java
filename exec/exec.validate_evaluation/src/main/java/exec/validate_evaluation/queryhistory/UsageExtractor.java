@@ -21,8 +21,10 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
+import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.Usage;
 
 public class UsageExtractor implements IUsageExtractor {
@@ -34,8 +36,12 @@ public class UsageExtractor implements IUsageExtractor {
 
 	private class AnalysisResult extends AbstractTraversingNodeVisitor<Void, Void> implements IAnalysisResult {
 
+		private SSTNodeHierarchy nodeHierarchy;
 		private PointsToContext p2ctx;
 		private ICompletionExpression firstCompletionExpr;
+		private PointsToQueryBuilder queryBuilder;
+		private PointsToUsageExtractor p2ue;
+		private Context ctx;
 
 		public AnalysisResult(Context ctx) {
 			findCompletion(ctx);
@@ -55,22 +61,23 @@ public class UsageExtractor implements IUsageExtractor {
 		}
 
 		private void createCompletionContext(Context ctx) {
+			this.ctx = ctx;
+			nodeHierarchy = new SSTNodeHierarchy(ctx.getSST());
 			TypeBasedAnalysis analysis = new TypeBasedAnalysis();
+			queryBuilder = new PointsToQueryBuilder(ctx);
 			p2ctx = analysis.compute(ctx);
+			p2ue = new PointsToUsageExtractor();
 		}
 
 		@Override
 		public List<Usage> getUsages() {
-			PointsToUsageExtractor p2ue = new PointsToUsageExtractor();
-			return p2ue.extract(p2ctx);
+			List<Usage> usages = p2ue.extract(p2ctx);
+			return usages;
 		}
 
 		@Override
 		public Usage getFirstQuery() {
-			PointsToUsageExtractor p2ue = new PointsToUsageExtractor();
-			List<Usage> queries = null;
-			// TODO: was before... p2ue.extractQueries(firstCompletionExpr,
-			// p2ctx);
+			List<Usage> queries = p2ue.extractQueries(firstCompletionExpr, p2ctx, queryBuilder, nodeHierarchy);
 			if (queries.isEmpty()) {
 				return null;
 			}
