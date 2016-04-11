@@ -16,7 +16,9 @@
 package cc.kave.commons.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.AbstractCollection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -48,7 +50,7 @@ public class ToStringUtils {
 	}
 
 	public static String toString(String s) {
-		return String.format("\"%s\"", s);
+		return String.format("\"%s\"", s.replaceAll("\\\"", "\\\\\""));
 	}
 
 	public static String toString(Object o) {
@@ -97,9 +99,7 @@ public class ToStringUtils {
 				sb.append(" = ");
 
 				Object val = getValue(o, f);
-
 				appendRefOrStepDown(depth, val, sb, visited);
-
 				sb.append(",\n");
 			}
 			c = c.getSuperclass();
@@ -125,6 +125,28 @@ public class ToStringUtils {
 			val = f.get(o);
 		}
 		return val;
+	}
+
+	private static boolean hasCustomToString(Class<? extends Object> c) throws SecurityException {
+
+		if (isBuiltInClass(c)) {
+			return false;
+		}
+
+		Method m;
+		try {
+			m = c.getMethod("toString");
+		} catch (NoSuchMethodException e) {
+			m = null;
+		}
+
+		return !isBuiltInClass(m.getDeclaringClass());
+	}
+
+	private static boolean isBuiltInClass(Class<? extends Object> c) {
+		return Object.class.equals(c) || Boolean.class.equals(c) || Integer.class.equals(c) || Long.class.equals(c)
+				|| Float.class.equals(c) || Double.class.equals(c) || Character.class.equals(c)
+				|| String.class.equals(c) || AbstractCollection.class.equals(c);
 	}
 
 	private static boolean handlePrimitives(Object o, StringBuilder sb) {
@@ -209,12 +231,26 @@ public class ToStringUtils {
 			return;
 		}
 
+		boolean hasCustomToString = hasCustomToString(o.getClass());
+		if (hasCustomToString) {
+			sb.append(indent(depth + 1, o.toString()));
+			return;
+		}
+
 		if (visited.contains(o)) {
 			sb.append(String.format("{--> %s@%d}", o.getClass().getSimpleName(), o.hashCode()));
 		} else {
 			visited.add(o);
 			toString(depth + 1, sb, o, visited);
 		}
+	}
+
+	private static String indent(int depth, String string) {
+		StringBuilder sb = new StringBuilder();
+		indent(depth, sb);
+		String indent = sb.toString();
+		String out = string.replaceAll("\n", "\n" + indent);
+		return out;
 	}
 
 	private static void indent(int depth, StringBuilder sb) {

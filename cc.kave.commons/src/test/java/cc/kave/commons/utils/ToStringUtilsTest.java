@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class ToStringUtilsTest {
 
 	@Test
@@ -62,7 +63,7 @@ public class ToStringUtilsTest {
 
 	@Test
 	public void primitiveStringWithQuotes() {
-		assertEquals("\"a\"", ToStringUtils.toString("a\"b"));
+		assertEquals("\"a\\\"b\"", ToStringUtils.toString("a\"b"));
 	}
 
 	@Test
@@ -138,9 +139,17 @@ public class ToStringUtilsTest {
 		assertObj("H@123 {\n   f = 1,\n   H2.f = 2,\n   g = 3,\n}", s);
 	}
 
+	@Test
+	public void objStopsAtCustomToStringMethods() {
+		N n = new N();
+		n.hc = 12;
+		n.o = new T();
+
+		assertObj("N@12 {\n   hc = 12,\n   o = [\n   --my custom to string\n   ],\n}", n);
+	}
+
 	private static void assertObj(String expected, Object o) {
 		String actual = ToStringUtils.toString(o);
-		System.out.println(actual);
 		assertEquals(expected, actual);
 	}
 
@@ -200,15 +209,22 @@ public class ToStringUtilsTest {
 		public int g = 3;
 	}
 
-	private static class MySet<T> extends HashSet<T> {
+	private static class T {
+		@Override
+		public String toString() {
+			return "[\n--my custom to string\n]";
+		}
+	}
+
+	private static class MySet<U> extends HashSet<U> {
 		private static final long serialVersionUID = 1L;
 		private int hc;
 
 		@SafeVarargs
-		public MySet(int hc, T... ts) {
+		public MySet(int hc, U... us) {
 			this.hc = hc;
-			for (T t : ts) {
-				add(t);
+			for (U u : us) {
+				add(u);
 			}
 		}
 
@@ -218,15 +234,15 @@ public class ToStringUtilsTest {
 		}
 	}
 
-	private static class MyList<T> extends LinkedList<T> {
+	private static class MyList<U> extends LinkedList<U> {
 		private static final long serialVersionUID = 1L;
 		private int hc;
 
 		@SafeVarargs
-		public MyList(int hc, T... ts) {
+		public MyList(int hc, U... us) {
 			this.hc = hc;
-			for (T t : ts) {
-				add(t);
+			for (U u : us) {
+				add(u);
 			}
 		}
 
