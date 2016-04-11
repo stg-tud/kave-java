@@ -15,17 +15,50 @@
  */
 package exec.validate_evaluation.microcommits;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Lists;
+
+import cc.recommenders.io.Directory;
+import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.WritingArchive;
 
 public class MicroCommitIo {
-	public List<String> findZips() {
-		return null;
+	private String root;
+
+	public MicroCommitIo(String dir) {
+		this.root = dir;
+	}
+
+	public Set<String> findZips() {
+		Directory dir = new Directory(this.root);
+		return dir.findFiles(s -> s.endsWith(".zip"));
 	}
 
 	public void store(List<MicroCommit> commits, String zip) {
+		Directory dir = new Directory(this.root);
+		try (WritingArchive wa = dir.getWritingArchive(zip)) {
+			for (MicroCommit mc : commits) {
+				wa.add(mc);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public List<MicroCommit> read(String zip) {
-		return null;
+		List<MicroCommit> commits = Lists.newLinkedList();
+		Directory dir = new Directory(this.root);
+
+		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+			while (ra.hasNext()) {
+				commits.add(ra.getNext(MicroCommit.class));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return commits;
 	}
 }
