@@ -37,7 +37,7 @@ public class Assignment implements IAssignment {
 		this.reference = new UnknownReference();
 		this.expression = new UnknownExpression();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -105,5 +105,4 @@ public class Assignment implements IAssignment {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
-
 }

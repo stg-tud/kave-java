@@ -30,7 +30,7 @@ public class VariableReference implements IVariableReference {
 	public VariableReference() {
 		this.identifier = this.defaultIdentifier;
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -80,4 +80,8 @@ public class VariableReference implements IVariableReference {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("VarRef(%s)", identifier);
+	}
 }

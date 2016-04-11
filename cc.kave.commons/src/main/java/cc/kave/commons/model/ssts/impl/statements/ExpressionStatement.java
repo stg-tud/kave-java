@@ -30,7 +30,7 @@ public class ExpressionStatement implements IExpressionStatement {
 	public ExpressionStatement() {
 		this.expression = new UnknownExpression();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -72,4 +72,8 @@ public class ExpressionStatement implements IExpressionStatement {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("ExpressionStatement@%d{\n\t%s\n}", hashCode(), expression.toString());
+	}
 }
