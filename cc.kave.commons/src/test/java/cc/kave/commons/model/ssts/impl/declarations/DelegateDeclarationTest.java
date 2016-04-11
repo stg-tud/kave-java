@@ -24,6 +24,7 @@ import org.junit.Test;
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class DelegateDeclarationTest {
 
@@ -83,8 +84,13 @@ public class DelegateDeclarationTest {
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
 	}
-	
-	private static IDelegateTypeName someDelegateType(){
+
+	private static IDelegateTypeName someDelegateType() {
 		return DelegateTypeName.newDelegateTypeName("d:[R,P] [SomeDelegateType,P].()");
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new DelegateDeclaration());
 	}
 }

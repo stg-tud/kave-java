@@ -21,10 +21,10 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.commons.model.ssts.impl.SSTTestHelper;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class FieldDeclarationTest {
 
@@ -87,5 +87,10 @@ public class FieldDeclarationTest {
 
 	private IFieldName someField() {
 		return FieldName.newFieldName("[T1,P1] [T2,P2].Field");
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new FieldDeclaration());
 	}
 }

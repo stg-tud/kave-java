@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class PropertyDeclaration implements IPropertyDeclaration {
 
@@ -38,7 +39,7 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 		this.get = new ArrayList<>();
 		this.set = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return Lists.newArrayList();
@@ -111,4 +112,8 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

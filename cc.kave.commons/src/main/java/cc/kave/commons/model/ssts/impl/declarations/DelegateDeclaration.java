@@ -22,6 +22,7 @@ import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class DelegateDeclaration implements IDelegateDeclaration {
 
@@ -62,4 +63,8 @@ public class DelegateDeclaration implements IDelegateDeclaration {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

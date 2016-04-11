@@ -20,9 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.ITypeName;
@@ -35,6 +32,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class SST implements ISST {
 
@@ -55,7 +53,7 @@ public class SST implements ISST {
 		this.events = new HashSet<IEventDeclaration>();
 		this.delegates = new HashSet<IDelegateDeclaration>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -207,7 +205,6 @@ public class SST implements ISST {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
-
 }

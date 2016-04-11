@@ -18,9 +18,6 @@ package cc.kave.commons.model.ssts.impl.declarations;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.IMethodName;
@@ -29,6 +26,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class MethodDeclaration implements IMethodDeclaration {
 
@@ -40,7 +38,7 @@ public class MethodDeclaration implements IMethodDeclaration {
 		name = MethodName.UNKNOWN_NAME;
 		body = new ArrayList<>();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return Lists.newArrayList();
@@ -112,6 +110,6 @@ public class MethodDeclaration implements IMethodDeclaration {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
 }

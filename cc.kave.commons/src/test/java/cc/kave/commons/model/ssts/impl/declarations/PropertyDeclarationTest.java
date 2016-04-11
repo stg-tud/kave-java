@@ -23,15 +23,15 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class PropertyDeclarationTest {
 
@@ -121,5 +121,10 @@ public class PropertyDeclarationTest {
 
 	private IPropertyName someProperty() {
 		return PropertyName.newPropertyName("[T1,P1] [T2,P2].Property");
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new PropertyDeclaration());
 	}
 }

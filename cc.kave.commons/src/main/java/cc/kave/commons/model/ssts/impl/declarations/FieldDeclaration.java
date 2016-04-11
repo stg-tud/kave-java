@@ -22,6 +22,7 @@ import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class FieldDeclaration implements IFieldDeclaration {
 
@@ -64,7 +65,6 @@ public class FieldDeclaration implements IFieldDeclaration {
 
 	@Override
 	public String toString() {
-		// TODO proper handling
-		return String.format("FieldDecl@%d{%s}", hashCode(), name);
+		return ToStringUtils.toString(this);
 	}
 }

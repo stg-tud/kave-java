@@ -23,15 +23,15 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-
-import com.google.common.collect.Lists;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class MethodDeclarationTest {
 
@@ -127,4 +127,8 @@ public class MethodDeclarationTest {
 		// TODO : Visitor Test
 	}
 
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new MethodDeclaration());
+	}
 }

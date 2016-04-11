@@ -24,6 +24,7 @@ import org.junit.Test;
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
+import cc.kave.commons.utils.ToStringAssert;
 
 public class EventDeclarationTest {
 
@@ -84,8 +85,13 @@ public class EventDeclarationTest {
 	public void testWithReturnIsImplemented() {
 		// TODO : Visitor Test
 	}
-	
+
 	private IEventName someEvent() {
 		return EventName.newEventName("[T1,P1] [T2,P2].Event");
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new EventDeclaration());
 	}
 }
