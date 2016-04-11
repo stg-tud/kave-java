@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class IfElseExpression implements IIfElseExpression {
 
@@ -34,7 +35,7 @@ public class IfElseExpression implements IIfElseExpression {
 		this.thenExpression = new UnknownExpression();
 		this.elseExpression = new UnknownExpression();
 	}
-	
+
 	@Override
 	public Iterable<ISSTNode> getChildren() {
 		return new ArrayList<ISSTNode>();
@@ -105,5 +106,10 @@ public class IfElseExpression implements IIfElseExpression {
 	@Override
 	public <TContext, TReturn> TReturn accept(ISSTNodeVisitor<TContext, TReturn> visitor, TContext context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

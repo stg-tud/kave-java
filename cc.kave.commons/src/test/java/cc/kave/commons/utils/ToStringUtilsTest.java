@@ -61,6 +61,11 @@ public class ToStringUtilsTest {
 	}
 
 	@Test
+	public void primitiveStringWithQuotes() {
+		assertEquals("\"a\"", ToStringUtils.toString("a\"b"));
+	}
+
+	@Test
 	public void objNull() {
 		assertObj("null", null);
 	}
