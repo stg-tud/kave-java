@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +29,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -54,7 +56,6 @@ import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
@@ -144,16 +145,14 @@ public abstract class BaseIntegrationTest {
 	protected abstract List<ICompletionEvent> getEvents();
 
 	private void validate() {
-		List<MicroCommit> actuals = readCommits();
-		List<MicroCommit> expecteds = getExpectedMicroCommits();
+		Set<MicroCommit> actuals = readCommits();
+		Set<MicroCommit> expecteds = getExpectedMicroCommits();
 
-		String act = ToStringUtils.toString(actuals);
-		String exp = ToStringUtils.toString(expecteds);
 		assertEquals(expecteds, actuals);
 	}
 
-	private List<MicroCommit> readCommits() {
-		List<MicroCommit> commits = Lists.newLinkedList();
+	private Set<MicroCommit> readCommits() {
+		Set<MicroCommit> commits = Sets.newHashSet();
 		Directory dir = new Directory(path(dirCommits));
 		try (ReadingArchive ra = dir.getReadingArchive("a.zip")) {
 			while (ra.hasNext()) {
@@ -165,7 +164,7 @@ public abstract class BaseIntegrationTest {
 		return commits;
 	}
 
-	protected abstract List<MicroCommit> getExpectedMicroCommits();
+	protected abstract Set<MicroCommit> getExpectedMicroCommits();
 
 	/* utils for completion events */
 

@@ -16,8 +16,10 @@
 package exec.validate_evaluation.integrationtests;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -27,6 +29,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.microcommits.MicroCommit;
 
@@ -81,10 +84,19 @@ public class HandlingOfNonExistingKeys extends BaseIntegrationTest {
 	}
 
 	@Override
-	protected List<MicroCommit> getExpectedMicroCommits() {
+	protected Set<MicroCommit> getExpectedMicroCommits() {
 		ICoReMethodName ctx = _m(10, 1);
-		Usage a = _q(ctx, _t(1), _m(1, 1));
-		Usage b = _q(ctx, _t(1), _m(1, 1), _m(1, 2));
-		return Lists.newArrayList(MicroCommit.create(a, b));
+		Usage a1 = _q(ctx, _t(1), _m(1, 1), _m(1, 2));
+		Usage a2 = _q(ctx, _t(1), _m(1, 1));
+		Usage a3 = new NoUsage();
+		Usage b1 = new NoUsage();
+		Usage b2 = _q(ctx, _t(1), _m(1, 1));
+		Usage b3 = _q(ctx, _t(1), _m(1, 1), _m(1, 2));
+
+		return Sets.newHashSet(com(a1, a2), com(a1, a3), com(a2, a3), com(b1, b2), com(b1, b3), com(b2, b3));
+	}
+
+	private MicroCommit com(Usage a1, Usage a2) {
+		return MicroCommit.create(a1, a2);
 	}
 }

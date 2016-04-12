@@ -28,6 +28,7 @@ import cc.recommenders.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 
 public class QueryHistoryCollector {

@@ -36,6 +36,7 @@ import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 

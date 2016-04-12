@@ -16,8 +16,10 @@
 package exec.validate_evaluation.integrationtests;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -54,10 +56,10 @@ public class BasicSelectionOfCodeCompletion extends BaseIntegrationTest {
 	}
 
 	@Override
-	protected List<MicroCommit> getExpectedMicroCommits() {
+	protected Set<MicroCommit> getExpectedMicroCommits() {
 		ICoReMethodName ctx = _m(10, 1);
 		Usage a = _q(ctx, _t(1), _m(1, 1));
 		Usage b = _q(ctx, _t(1), _m(1, 1), _m(1, 2));
-		return Lists.newArrayList(MicroCommit.create(a, b));
+		return Sets.newHashSet(MicroCommit.create(a, b));
 	}
 }
