@@ -24,7 +24,7 @@ import org.junit.Test;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
-import cc.kave.commons.utils.ToStringAssert;
+import cc.kave.commons.testutils.ToStringAssert;
 
 public class ReferenceExpressionTest extends SSTBaseTest {
 

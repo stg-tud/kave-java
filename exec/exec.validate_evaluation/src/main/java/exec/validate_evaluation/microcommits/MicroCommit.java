@@ -18,8 +18,8 @@ package exec.validate_evaluation.microcommits;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.usages.Usage;
 
 public class MicroCommit {
@@ -46,7 +46,7 @@ public class MicroCommit {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return ToStringUtils.toString(this);
 	}
 
 	public static MicroCommit create(Usage start, Usage end) {

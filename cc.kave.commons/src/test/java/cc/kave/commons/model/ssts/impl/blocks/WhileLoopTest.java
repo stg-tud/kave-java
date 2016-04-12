@@ -34,7 +34,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.utils.ToStringAssert;
+import cc.kave.commons.testutils.ToStringAssert;
 
 public class WhileLoopTest extends SSTBaseTest {
 

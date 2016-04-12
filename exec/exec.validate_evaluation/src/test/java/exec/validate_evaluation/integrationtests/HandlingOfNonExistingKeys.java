@@ -13,11 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation;
+package exec.validate_evaluation.integrationtests;
 
 import java.util.List;
-
-import org.junit.Before;
 
 import com.google.common.collect.Lists;
 
@@ -32,37 +30,47 @@ import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.microcommits.MicroCommit;
 
-public class BasicSelectionOfCodeCompletion extends DataTransformationIntegrationBaseTest {
-
-	@Before
-	public void setup() {
-	}
+public class HandlingOfNonExistingKeys extends BaseIntegrationTest {
 
 	@Override
 	protected List<ICompletionEvent> getEvents() {
+		return Lists.newArrayList(first(), second(), third());
+	}
+
+	private CompletionEvent first() {
 
 		MethodDeclaration md = newMethodDeclaration(10, 1, //
-				varDecl(t(1), "o"), //
-				assign("o", new ConstantValueExpression()), //
-				invStmt("o", m(1, 1)), //
-				complStmt("o"));
-		
-		/*
-		 * Der resultierende SST sollte folgendem Code entsprechen:
-		 * 
-		 * class T10 {
-		 *   void m1() { // T10.m1()
-		 *      T1 o;    
-		 *      o = -constant-
-		 *      o.m1(); // T1.m1()
-		 *      o.$
-		 *   }
-		 * }
-		 */
+				varDecl(t(1), "o1"), //
+				assign("o1", new ConstantValueExpression()), //
+				invStmt("o1", m(1, 1)), //
+				invStmt("o1", m(1, 2)));
 
-		CompletionEvent ce = completionEvent(10, md, m(1, 2));
+		return completionEvent(10, md);
+	}
 
-		return Lists.newArrayList(ce);
+	private CompletionEvent second() {
+
+		MethodDeclaration md = newMethodDeclaration(10, 1, //
+				varDecl(t(1), "o1"), //
+				assign("o1", new ConstantValueExpression()), //
+				invStmt("o1", m(1, 1)), //
+				//
+				varDecl(t(2), "o2"), //
+				assign("o2", new ConstantValueExpression()), //
+				invStmt("o2", m(2, 1)));
+
+		return completionEvent(10, md);
+	}
+
+	private CompletionEvent third() {
+
+		MethodDeclaration md = newMethodDeclaration(10, 1, //
+				varDecl(t(2), "o2"), //
+				assign("o2", new ConstantValueExpression()), //
+				invStmt("o2", m(2, 1)), //
+				invStmt("o2", m(2, 2)));
+
+		return completionEvent(10, md);
 	}
 
 	private IAssignment assign(String id, IAssignableExpression expr) {

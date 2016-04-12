@@ -27,7 +27,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
-import cc.kave.commons.utils.ToStringAssert;
+import cc.kave.commons.testutils.ToStringAssert;
 
 public class IfElseExpressionTest extends SSTBaseTest {
 

@@ -65,4 +65,9 @@ public class NoUsage extends AbstractUsage {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("{NoUsage@%d}", hashCode());
+	}
 }

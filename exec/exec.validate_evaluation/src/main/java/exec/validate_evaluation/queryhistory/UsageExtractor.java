@@ -77,6 +77,9 @@ public class UsageExtractor implements IUsageExtractor {
 
 		@Override
 		public Usage getFirstQuery() {
+			if (firstCompletionExpr == null) {
+				return null;
+			}
 			List<Usage> queries = p2ue.extractQueries(firstCompletionExpr, p2ctx, queryBuilder, nodeHierarchy);
 			if (queries.isEmpty()) {
 				return null;

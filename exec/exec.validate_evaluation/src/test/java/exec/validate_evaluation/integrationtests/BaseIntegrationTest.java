@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation;
+package exec.validate_evaluation.integrationtests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -54,6 +54,7 @@ import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
@@ -77,7 +78,7 @@ import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
 import exec.validate_evaluation.utils.CoReNameUtils;
 
-public abstract class DataTransformationIntegrationBaseTest {
+public abstract class BaseIntegrationTest {
 
 	@Rule
 	public TemporaryFolder dirTmp = new TemporaryFolder();
@@ -145,6 +146,9 @@ public abstract class DataTransformationIntegrationBaseTest {
 	private void validate() {
 		List<MicroCommit> actuals = readCommits();
 		List<MicroCommit> expecteds = getExpectedMicroCommits();
+
+		String act = ToStringUtils.toString(actuals);
+		String exp = ToStringUtils.toString(expecteds);
 		assertEquals(expecteds, actuals);
 	}
 
@@ -260,7 +264,7 @@ public abstract class DataTransformationIntegrationBaseTest {
 
 	protected static IExpressionStatement invStmt(String id, IMethodName m) {
 		ExpressionStatement exprStmt = new ExpressionStatement();
-		exprStmt.setExpression(inv("id", m));
+		exprStmt.setExpression(inv(id, m));
 		return exprStmt;
 	}
 

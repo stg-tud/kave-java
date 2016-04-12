@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
+import cc.kave.commons.testutils.ToStringAssert;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -96,5 +97,10 @@ public class MicroCommitTest {
 		MicroCommit b = new MicroCommit();
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new MicroCommit());
 	}
 }

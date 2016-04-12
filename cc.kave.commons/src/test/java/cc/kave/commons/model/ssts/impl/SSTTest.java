@@ -37,7 +37,7 @@ import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
-import cc.kave.commons.utils.ToStringAssert;
+import cc.kave.commons.testutils.ToStringAssert;
 
 public class SSTTest {
 
