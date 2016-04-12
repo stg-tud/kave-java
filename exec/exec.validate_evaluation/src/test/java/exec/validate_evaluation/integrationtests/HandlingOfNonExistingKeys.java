@@ -90,8 +90,8 @@ public class HandlingOfNonExistingKeys extends BaseIntegrationTest {
 		Usage a2 = _q(ctx, _t(1), _m(1, 1));
 		Usage a3 = new NoUsage();
 		Usage b1 = new NoUsage();
-		Usage b2 = _q(ctx, _t(1), _m(1, 1));
-		Usage b3 = _q(ctx, _t(1), _m(1, 1), _m(1, 2));
+		Usage b2 = _q(ctx, _t(2), _m(2, 1));
+		Usage b3 = _q(ctx, _t(2), _m(2, 1), _m(2, 2));
 
 		return Sets.newHashSet(com(a1, a2), com(a1, a3), com(a2, a3), com(b1, b2), com(b1, b3), com(b2, b3));
 	}

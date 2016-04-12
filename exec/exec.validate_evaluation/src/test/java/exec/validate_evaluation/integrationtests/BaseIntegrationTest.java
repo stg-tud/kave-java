@@ -147,7 +147,6 @@ public abstract class BaseIntegrationTest {
 	private void validate() {
 		Set<MicroCommit> actuals = readCommits();
 		Set<MicroCommit> expecteds = getExpectedMicroCommits();
-
 		assertEquals(expecteds, actuals);
 	}
 
