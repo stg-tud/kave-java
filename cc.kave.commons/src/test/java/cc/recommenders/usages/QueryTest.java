@@ -12,6 +12,7 @@ package cc.recommenders.usages;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -21,11 +22,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.names.CoReMethodName;
-
-import com.google.common.collect.Sets;
 
 public class QueryTest {
 
@@ -184,6 +185,16 @@ public class QueryTest {
 		assertEquals(expected.getMethodContext(), actual.getMethodContext());
 		assertEquals(expected.getDefinitionSite(), actual.getDefinitionSite());
 		assertEquals(expected.getAllCallsites(), actual.getAllCallsites());
+	}
+
+	@Test
+	public void equality_default() {
+		assertEquals(new Query(), new Query());
+	}
+
+	@Test
+	public void equality_notEqualToNoUsage() {
+		assertNotEquals(new Query(), new NoUsage());
 	}
 
 	private static CallSite createReceiverCallSite() {

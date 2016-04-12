@@ -13,6 +13,13 @@ package cc.kave.commons.utils.json.legacy;
 import java.io.IOException;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
+import cc.recommenders.assertions.Asserts;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
@@ -22,13 +29,9 @@ import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.DefinitionSites;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
-
-import com.google.common.collect.Sets;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
 public class UsageTypeAdapter extends TypeAdapter<Usage> {
 
@@ -52,6 +55,14 @@ public class UsageTypeAdapter extends TypeAdapter<Usage> {
 
 	@Override
 	public void write(JsonWriter out, Usage usage) throws IOException {
+		if (usage instanceof NoUsage) {
+			out.value("NoUsage");
+		} else {
+			writeQuery(out, usage);
+		}
+	}
+
+	private void writeQuery(JsonWriter out, Usage usage) throws IOException {
 		out.beginObject();
 
 		if (usage.getType() != null) {
@@ -82,6 +93,13 @@ public class UsageTypeAdapter extends TypeAdapter<Usage> {
 
 	@Override
 	public Usage read(JsonReader in) throws IOException {
+
+		if (in.peek() == JsonToken.STRING) {
+			String val = in.nextString();
+			Asserts.assertEquals("NoUsage", val, "Invalid JSON. Expected 'NoUsage', but found '" + val + "'.");
+			return new NoUsage();
+		}
+
 		Query q = new Query();
 		q.setAllCallsites(null);
 

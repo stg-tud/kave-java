@@ -43,6 +43,7 @@ import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReFieldName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.CallFeature;
@@ -98,6 +99,7 @@ public class GsonUtil {
 		//
 		builder.registerTypeAdapter(Usage.class, new UsageTypeAdapter());
 		builder.registerTypeAdapter(Query.class, new UsageTypeAdapter());
+		builder.registerTypeAdapter(NoUsage.class, new UsageTypeAdapter());
 
 		RuntimeTypeAdapterFactory<UsageFeature> rtaf = RuntimeTypeAdapterFactory.of(UsageFeature.class, "$type")
 				.registerSubtype(CallFeature.class).registerSubtype(ClassFeature.class)

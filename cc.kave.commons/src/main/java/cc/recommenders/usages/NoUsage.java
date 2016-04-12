@@ -13,61 +13,70 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package exec.validate_evaluation.queryhistory;
+package cc.recommenders.usages;
 
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.google.common.collect.Sets;
-
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.usages.AbstractUsage;
-import cc.recommenders.usages.CallSite;
-import cc.recommenders.usages.DefinitionSite;
-import cc.recommenders.usages.DefinitionSites;
 
-public class NoUsage extends AbstractUsage {
+/**
+ * This class represents the special case of "no usage existed" in a history of
+ * usages. Should not be used in a context different to this question.
+ */
+public class NoUsage implements Usage {
+
+	private RuntimeException ex() {
+		return new RuntimeException("not implemented");
+	}
 
 	@Override
 	public ICoReTypeName getType() {
-		return null;
+		throw ex();
 	}
 
 	@Override
 	public ICoReTypeName getClassContext() {
-		return null;
+		throw ex();
 	}
 
 	@Override
 	public ICoReMethodName getMethodContext() {
-		return null;
+		throw ex();
 	}
 
 	@Override
 	public DefinitionSite getDefinitionSite() {
-		return DefinitionSites.createUnknownDefinitionSite();
+		throw ex();
 	}
 
 	@Override
 	public Set<CallSite> getAllCallsites() {
-		return Sets.newHashSet();
+		throw ex();
+	}
+
+	@Override
+	public Set<CallSite> getReceiverCallsites() {
+		throw ex();
+	}
+
+	@Override
+	public Set<CallSite> getParameterCallsites() {
+		throw ex();
 	}
 
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return 42;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		return obj instanceof NoUsage;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("{NoUsage@%d}", hashCode());
+		return "{NoUsage}";
 	}
 }
