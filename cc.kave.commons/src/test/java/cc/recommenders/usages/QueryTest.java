@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.testutils.ToStringAssert;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
@@ -195,6 +196,11 @@ public class QueryTest {
 	@Test
 	public void equality_notEqualToNoUsage() {
 		assertNotEquals(new Query(), new NoUsage());
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new Query());
 	}
 
 	private static CallSite createReceiverCallSite() {
