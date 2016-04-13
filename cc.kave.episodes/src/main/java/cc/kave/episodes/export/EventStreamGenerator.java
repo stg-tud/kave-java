@@ -34,7 +34,15 @@ import cc.recommenders.assertions.Asserts;
 
 public class EventStreamGenerator {
 
+	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+
 	private List<Event> events = Lists.newLinkedList();
+
+	public EventStreamGenerator() {
+		events.add(DUMMY_EVENT);
+	}
 
 	public void add(Context ctx) {
 		ctx.getSST().accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());

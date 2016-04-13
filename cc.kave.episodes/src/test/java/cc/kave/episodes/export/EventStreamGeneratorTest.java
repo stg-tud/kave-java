@@ -53,6 +53,11 @@ public class EventStreamGeneratorTest {
 	}
 
 	@Test
+	public void dummyEventIsAlwaysCreated() {
+		assertStream(dummy());
+	}
+
+	@Test
 	public void notOverwritingAnything() {
 		Context ctx = new Context();
 
@@ -64,6 +69,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(//
+				dummy(), //
 				Events.newContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 
@@ -81,6 +87,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(//
+				dummy(), //
 				Events.newContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
 
@@ -98,6 +105,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(//
+				dummy(), //
 				Events.newContext(m(4, 1)), //
 				Events.newInvocation(m(2, 3)));
 
@@ -111,7 +119,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream();
+		assertStream(dummy());
 
 	}
 
@@ -128,8 +136,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(//
-				Events.newContext(unknown()), //
+		assertStream(dummy(), Events.newContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 	}
 
@@ -144,7 +151,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream();
+		assertStream(dummy());
 	}
 
 	@Test
@@ -163,6 +170,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(//
+				dummy(), //
 				Events.newContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newContext(m(12, 2)), //
@@ -188,6 +196,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx2);
 
 		assertStream(//
+				dummy(), //
 				Events.newContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newContext(m(12, 1)), //
@@ -246,5 +255,9 @@ public class EventStreamGeneratorTest {
 
 	private ITypeName t(int typeNum) {
 		return TypeName.newTypeName(String.format("T%d,P", typeNum));
+	}
+
+	private Event dummy() {
+		return Events.newContext(MethodName.newMethodName("[You, Can] [Safely, Ignore].ThisDummyValue()"));
 	}
 }
