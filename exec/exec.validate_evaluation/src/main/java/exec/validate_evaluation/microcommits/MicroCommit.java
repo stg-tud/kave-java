@@ -20,6 +20,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import cc.kave.commons.utils.ToStringUtils;
+import cc.recommenders.assertions.Asserts;
+import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 
 public class MicroCommit {
@@ -32,6 +36,16 @@ public class MicroCommit {
 
 	public Usage getEnd() {
 		return Item2;
+	}
+
+	public ICoReTypeName getType() {
+		if (!(Item1 instanceof NoUsage)) {
+			return Item1.getType();
+		}
+		if (!(Item2 instanceof NoUsage)) {
+			return Item2.getType();
+		}
+		throw new AssertionException("should not happen!");
 	}
 
 	@Override
@@ -50,6 +64,8 @@ public class MicroCommit {
 	}
 
 	public static MicroCommit create(Usage start, Usage end) {
+		Asserts.assertFalse(start instanceof NoUsage && end instanceof NoUsage);
+
 		MicroCommit mc = new MicroCommit();
 		mc.Item1 = start;
 		mc.Item2 = end;

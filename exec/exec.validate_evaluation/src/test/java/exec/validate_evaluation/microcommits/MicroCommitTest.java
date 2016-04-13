@@ -24,6 +24,10 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -97,6 +101,45 @@ public class MicroCommitTest {
 		MicroCommit b = new MicroCommit();
 		assertNotEquals(a, b);
 		assertNotEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test(expected = AssertionException.class)
+	public void getType_nn() {
+		MicroCommit.create(new NoUsage(), new NoUsage());
+	}
+
+	@Test
+	public void getType_nq() {
+		MicroCommit sut = MicroCommit.create(new NoUsage(), q(1));
+		ICoReTypeName actual = sut.getType();
+		ICoReTypeName expected = t(1);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void getType_qn() {
+		MicroCommit sut = MicroCommit.create(q(1), new NoUsage());
+		ICoReTypeName actual = sut.getType();
+		ICoReTypeName expected = t(1);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void getType_qq() {
+		MicroCommit sut = MicroCommit.create(q(1), q(2));
+		ICoReTypeName actual = sut.getType();
+		ICoReTypeName expected = t(1);
+		assertEquals(expected, actual);
+	}
+
+	private Query q(int i) {
+		Query query = new Query();
+		query.setType(t(i));
+		return query;
+	}
+
+	private ICoReTypeName t(int i) {
+		return CoReTypeName.get("LT" + i);
 	}
 
 	@Test
