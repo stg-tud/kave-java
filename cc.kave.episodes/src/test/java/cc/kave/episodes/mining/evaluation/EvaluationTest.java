@@ -197,7 +197,7 @@ public class EvaluationTest {
 		assertLogContains(10, "% - Number of maximal queries = all combinations\n\n");
 
 		assertLogContains(11, "Generating queries for episodes with 2 number of invocations\n");
-		assertLogContains(12, "\nNumber of targets with no proposals = 1\n\n");
+		assertLogContains(12, "Number of targets with no proposals = 1\n\n");
 		assertLogContains(13, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
 				"\tTop10", "\n");
 		assertLogContains(24, "Removed 0.10\t", "<0.25, 0.32>\t", "<0.29, 0.22>\t", "<0.22, 0.55>\t", "<0.00, 0.00>\t",
@@ -205,7 +205,7 @@ public class EvaluationTest {
 				"<0.00, 0.00>\t", "\n");
 
 		assertLogContains(36, "Generating queries for episodes with 3 number of invocations\n");
-		assertLogContains(37, "\nNumber of targets with no proposals = 0\n\n");
+		assertLogContains(37, "Number of targets with no proposals = 0\n\n");
 		assertLogContains(38, "\tTop1", "\tTop2", "\tTop3", "\tTop4", "\tTop5", "\tTop6", "\tTop7", "\tTop8", "\tTop9",
 				"\tTop10", "\n");
 		assertLogContains(49, "Removed 0.10\t", "<0.45, 0.67>", "<0.24, 0.67>", "<0.24, 0.67>", "<0.00, 0.00>\t",

@@ -78,4 +78,12 @@ public class EpisodeRecommender {
 		double f1 = m.getF1();
 		return f1;
 	}
+	
+	public double calcPrecision(Episode query, Episode episode) {
+		Set<Fact> factsQuery = separator.getEpisodeBody(query);
+		
+		Measure m = Measure.newMeasure(factsQuery, episode.getFacts());
+		double precision = m.getPrecision();
+		return precision;
+	}
 }

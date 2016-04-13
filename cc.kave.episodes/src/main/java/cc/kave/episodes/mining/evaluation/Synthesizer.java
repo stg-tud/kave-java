@@ -42,6 +42,7 @@ public class Synthesizer {
 
 	public TargetResults getTargetResults(Episode target, Map<Integer, Set<Episode>> episodes, int numberOfProposals) {
 		TargetResults targetResults = new TargetResults();
+		targetResults.setTarget(target);
 
 		Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 		Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
@@ -59,24 +60,46 @@ public class Synthesizer {
 
 			for (Episode query : queryEntry.getValue()) {
 				Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, episodes, numberOfProposals);
-				
+
 				if (proposals.size() == 0) {
 					continue;
 				}
 				if (avgQueryProposal.get(queryEntry.getKey()).size() < proposals.size()) {
 					for (int p = 0; p < proposals.size(); p++) {
-						
+						avgQueryProposal.get(queryEntry.getKey()).add(new Averager());
+						avgTargetProposal.get(queryEntry.getKey()).add(new Averager());
 					}
 				}
-				
 				int propCount = 0;
 				double maxEval = 0.0;
 				for (Tuple<Episode, Double> tuple : proposals) {
-					
+					avgQueryProposal.get(queryEntry.getKey()).get(propCount).addValue(tuple.getSecond());
+					double eval = recommender.calcPrecision(target, tuple.getFirst());
+					if (eval > maxEval) {
+						avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(eval);
+						maxEval = eval;
+					} else {
+						avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(maxEval);
+					}
+					propCount++;
 				}
 			}
 		}
+		return avgTargetResults(target, avgQueryProposal, avgTargetProposal);
+	}
 
+	private TargetResults avgTargetResults(Episode target, Map<Double, List<Averager>> avgQueryProposal,
+			Map<Double, List<Averager>> avgTargetProposal) {
+		TargetResults targetResults = new TargetResults();
+		targetResults.setTarget(target);
+
+		for (Map.Entry<Double, List<Averager>> entry : avgQueryProposal.entrySet()) {
+			for (int p = 0; p < entry.getValue().size(); p++) {
+				double qp = entry.getValue().get(p).average();
+				double tp = avgTargetProposal.get(entry.getKey()).get(p).average();
+				targetResults.addResult(entry.getKey(), qp, tp);
+			}
+		}
 		return targetResults;
 	}
 }

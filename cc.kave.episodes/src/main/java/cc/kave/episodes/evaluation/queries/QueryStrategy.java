@@ -30,7 +30,7 @@ public class QueryStrategy {
 		
 		for (Map.Entry<Double, Integer> entry : removals.entrySet()) {
 			int selectionLength = numInvs - entry.getValue();
-			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength);
+			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength, 10);
 			for (Set<Fact> subset : currentSubsets) {
 				Episode query = createQuery(target, declInv.getFirst(), subset);
 				if (queries.containsKey(entry.getKey())) {
@@ -50,7 +50,7 @@ public class QueryStrategy {
 		
 		for (Integer number : removals) {
 			int selectionLength = numInvs - number;
-			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength);
+			Set<Set<Fact>> currentSubsets = generator.generateSubsets(declInv.getSecond(), selectionLength, 10);
 			for (Set<Fact> subset : currentSubsets) {
 				Episode query = createQuery(target, declInv.getFirst(), subset);
 				double key = number * 1.0;

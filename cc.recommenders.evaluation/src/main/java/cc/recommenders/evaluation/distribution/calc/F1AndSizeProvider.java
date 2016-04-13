@@ -16,11 +16,13 @@ import static cc.recommenders.evaluation.OutputUtils.humanReadableByteCount;
 import static cc.recommenders.io.Logger.append;
 import static cc.recommenders.io.Logger.log;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
@@ -30,11 +32,6 @@ import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
-
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 
 public class F1AndSizeProvider extends AbstractTaskProvider<F1AndSizeTask> {
 

@@ -66,7 +66,7 @@ public class Evaluation {
 
 	private static final double[] percentages = new double[] { 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90 };
 	Map<Double, Set<Episode>> queries = new LinkedHashMap<Double, Set<Episode>>();
-	
+
 	private Map<Double, List<Averager>> avgQueryProposal = new HashMap<Double, List<Averager>>();
 	private Map<Double, List<Averager>> avgTargetProposal = new HashMap<Double, List<Averager>>();
 
@@ -111,19 +111,23 @@ public class Evaluation {
 			int noProposals = 0;
 			Logger.log("Generating queries for episodes with %s number of invocations\n", categoryEntry.getKey());
 			for (Episode e : categoryEntry.getValue()) {
-//				append("%d - %d; ", targetID, e.getNumEvents() - 1);
+				// append("%d - %d; ", targetID, e.getNumEvents() - 1);
 				boolean hasProposals = false;
+				// Logger.log("Start query generations 1");
 				queries = queryGenerator.byPercentage(e);
+				// Logger.log("End query generator 1");
 				if (e.getNumEvents() > 11) {
+					// Logger.log("Start query generations 2");
 					queries.putAll(queryGenerator.byNumber(e));
+					// Logger.log("End query generator 2");
 				}
+				// Logger.log("Start recommender");
 				for (Map.Entry<Double, Set<Episode>> queryEntry : queries.entrySet()) {
 					initQueryAverager(queryEntry.getKey());
 
 					for (Episode query : queryEntry.getValue()) {
 						int propCount = 0;
-						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns,
-								PROPOSALS);
+						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns, PROPOSALS);
 						if (proposals.size() == 0) {
 							continue;
 						}
@@ -131,7 +135,7 @@ public class Evaluation {
 						double maxEval = 0.0;
 						for (Tuple<Episode, Double> tuple : proposals) {
 							avgQueryProposal.get(queryEntry.getKey()).get(propCount).addValue(tuple.getSecond());
-							double eval = recommender.calcF1(e, tuple.getFirst());
+							double eval = recommender.calcPrecision(e, tuple.getFirst());
 							if (eval > maxEval) {
 								avgTargetProposal.get(queryEntry.getKey()).get(propCount).addValue(eval);
 								maxEval = eval;
@@ -142,6 +146,7 @@ public class Evaluation {
 						}
 					}
 				}
+				// Logger.log("End recommender");
 				if (hasProposals) {
 					targetID++;
 					getTargetResults(targetID, e);
@@ -151,10 +156,10 @@ public class Evaluation {
 					noProposals++;
 				}
 			}
-//			Logger.log("\n");
+			// Logger.log("\n");
 			writeCategoryResults(categoryEntry.getKey());
 
-			append("\nNumber of targets with no proposals = %d\n\n", noProposals);
+			append("Number of targets with no proposals = %d\n\n", noProposals);
 			synthesizeResults(categoryEntry.getKey());
 			logSynthesized();
 			categoryResults.clear();
