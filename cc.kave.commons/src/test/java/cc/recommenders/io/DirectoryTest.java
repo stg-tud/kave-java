@@ -48,18 +48,18 @@ public class DirectoryTest {
 	@Before
 	public void setup() {
 		tempFileName = tempFolder.getRoot().getAbsolutePath();
-		uut = new Directory(tempFileName + "/");
+		uut = new Directory(tempFileName);
 	}
 
 	@Test
-	public void InitAddsTrialingSlash() throws IOException {
-		String withSlash = tempFileName + "/with/";
+	public void InitAddsTrailingSeparator() throws IOException {
+		String withSlash = p(tempFileName, "with") + File.separator;
 		URL a = new Directory(withSlash).getUrl();
-		assertTrue(a.toString().endsWith("/"));
+		assertTrue(a.toString().endsWith(File.separator));
 
-		String withoutSlash = tempFileName + "/without";
+		String withoutSlash = p(tempFileName, File.separator) + "without";
 		URL b = new Directory(withoutSlash).getUrl();
-		assertTrue(b.toString().endsWith("/"));
+		assertTrue(b.toString().endsWith(File.separator));
 	}
 
 	@Test
@@ -117,12 +117,16 @@ public class DirectoryTest {
 	public void ifAFolderExistsItIsCountedWithoutChilds() throws IOException {
 		setup();
 		tempFolder.newFolder("afolder");
-		tempFolder.newFile("afolder/file");
-		tempFolder.newFile("afolder/file2");
+		tempFolder.newFile(p("afolder", "file"));
+		tempFolder.newFile(p("afolder", "file2"));
 
 		int count = uut.count();
 		int expected = 1;
 		assertEquals(expected, count);
+	}
+
+	private String p(String... parts) {
+		return String.join(File.separator, parts);
 	}
 
 	@Test
@@ -130,8 +134,8 @@ public class DirectoryTest {
 		setup();
 		tempFolder.newFile("someFile");
 		tempFolder.newFolder("afolder");
-		tempFolder.newFile("afolder/file");
-		tempFolder.newFile("afolder/file2");
+		tempFolder.newFile(p("afolder", "file"));
+		tempFolder.newFile(p("afolder", "file2"));
 
 		uut.clear();
 
@@ -189,7 +193,7 @@ public class DirectoryTest {
 	public void foldersCanBeCreated() {
 		setup();
 		uut.createDirectory("subdir");
-		File folder = new File(tempFileName + "/subdir");
+		File folder = new File(tempFileName, "subdir");
 
 		assertTrue(folder.exists());
 		assertTrue(folder.isDirectory());
@@ -198,8 +202,8 @@ public class DirectoryTest {
 	@Test
 	public void foldersWithSubfoldersCanBeCreated() {
 		setup();
-		uut.createDirectory("subdir/subsubdir");
-		File folder = new File(tempFileName + "/subdir/subsubdir");
+		uut.createDirectory(p("subdir", "subsubdir"));
+		File folder = new File(tempFileName, p("subdir", "subsubdir"));
 
 		assertTrue(folder.exists());
 		assertTrue(folder.isDirectory());
@@ -289,8 +293,8 @@ public class DirectoryTest {
 
 	@Test
 	public void getWritingArchiveCreateParentFolder() throws IOException {
-		uut.getWritingArchive("a/b.zip");
-		File expected = new File(tempFileName, "a/b.zip");
+		uut.getWritingArchive(p("a", "b.zip"));
+		File expected = new File(tempFileName, p("a", "b.zip"));
 		assertTrue(expected.exists());
 	}
 
@@ -351,7 +355,7 @@ public class DirectoryTest {
 	@Test
 	public void directoriesAreCreatedOnInit() {
 		setup();
-		String newFolderName = tempFolder.getRoot().getAbsolutePath() + "/test";
+		String newFolderName = p(tempFolder.getRoot().getAbsolutePath(), "test");
 		new Directory(newFolderName);
 
 		File newFolder = new File(newFolderName);
@@ -363,13 +367,7 @@ public class DirectoryTest {
 	public void creatingFolderOnExistingFile() throws IOException {
 		setup();
 		tempFolder.newFile("a.txt");
-		new Directory(tempFileName + "/a.txt");
-	}
-
-	@Test(expected = AssertionException.class)
-	public void openingInvalidFolder() {
-		File nonExisting = new File("/path/to/!nv4lid:folder?");
-		new Directory(nonExisting.getAbsolutePath());
+		new Directory(p(tempFileName, "a.txt"));
 	}
 
 	@Test
@@ -402,21 +400,21 @@ public class DirectoryTest {
 	@Test(expected = AssertionException.class)
 	public void getParent_nonExisting() {
 		Directory sut = new Directory(tempFileName);
-		sut.getParentDirectory("a/b/c/etc");
+		sut.getParentDirectory(p("a", "b", "c", "etc"));
 	}
 
 	@Test(expected = AssertionException.class)
 	public void getParent_tryingToEscape() {
 		Directory sut = new Directory(tempFileName);
-		sut.getParentDirectory("../");
+		sut.getParentDirectory(".." + File.separator);
 	}
 
 	@Test
 	public void getParent_realCase() throws IOException {
 		Directory sut = new Directory(tempFileName);
-		sut.createDirectory("a/b/").writeContent("...", "c.txt");
+		sut.createDirectory(p("a", "b")).writeContent("...", "c.txt");
 
-		Directory d = sut.getParentDirectory("a/b/c.txt");
+		Directory d = sut.getParentDirectory(p("a", "b", "c.txt"));
 
 		URL actual = d.getUrl();
 		URL expected = new Directory(tempFileName + "/a/b").getUrl();

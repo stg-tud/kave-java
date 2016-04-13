@@ -39,13 +39,11 @@ public class Directory {
 	private final String rootDir;
 
 	public Directory(String rootDir) {
-
-		// TODO handle windows paths
-
-		if (rootDir.endsWith("/")) {
+		String pathSep = Character.toString(File.separatorChar);
+		if (rootDir.endsWith(pathSep)) {
 			this.rootDir = rootDir;
 		} else {
-			this.rootDir = rootDir + "/";
+			this.rootDir = rootDir + pathSep;
 		}
 
 		File rootFile = new File(rootDir);
@@ -60,7 +58,7 @@ public class Directory {
 
 	public <T> T read(String relativePath, Type classOfT) throws IOException {
 
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		T obj = JsonUtils.fromJson(file, classOfT);
 
 		return obj;
@@ -68,22 +66,22 @@ public class Directory {
 
 	public <T> void write(T obj, String relativePath) throws IOException {
 
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		JsonUtils.toJson(obj, file);
 	}
 
 	public String readContent(String relativePath) throws IOException {
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		return FileUtils.readFileToString(file);
 	}
 
 	public void writeContent(String content, String relativePath) throws IOException {
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		FileUtils.writeStringToFile(file, content);
 	}
 
 	public boolean exists(String relativePath) {
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		return file.exists();
 	}
 
@@ -120,7 +118,7 @@ public class Directory {
 	}
 
 	public WritingArchive getWritingArchive(String relativePath) throws IOException {
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		File parent = file.getParentFile();
 		if (parent != null && !parent.exists()) {
 			parent.mkdirs();
@@ -138,8 +136,8 @@ public class Directory {
 			throw Throws.throwIllegalArgumentException("file does not exists or name collision of tmpfile");
 		}
 
-		File old = new File(rootDir + "/" + fileName);
-		File tmp = new File(rootDir + "/" + tmpFileName);
+		File old = new File(rootDir, fileName);
+		File tmp = new File(rootDir, tmpFileName);
 		old.renameTo(tmp);
 
 		ReadingArchive oldArchive = getReadingArchive(tmpFileName);
@@ -161,13 +159,13 @@ public class Directory {
 
 	public ReadingArchive getReadingArchive(String relativePath) throws IOException {
 
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		ReadingArchive archive = new ReadingArchive(file);
 		return archive;
 	}
 
 	public void delete(String relativePath) {
-		File file = new File(rootDir + "/" + relativePath);
+		File file = new File(rootDir, relativePath);
 		file.delete();
 	}
 
@@ -213,7 +211,7 @@ public class Directory {
 		while (it.hasNext()) {
 			String absPath = it.next().getAbsolutePath();
 			String relPath = absPath.substring(rootDir.length()); // TODO -1?
-			if (relPath.startsWith("/")) {
+			if (relPath.startsWith(File.separator)) {
 				relPath = relPath.substring(1);
 			}
 			files.add(relPath);
@@ -223,7 +221,7 @@ public class Directory {
 	}
 
 	public Directory getParentDirectory(String relativeFileName) {
-		File f = new File(rootDir + "/" + relativeFileName);
+		File f = new File(rootDir, relativeFileName);
 		Asserts.assertTrue(f.exists());
 		Asserts.assertFalse(f.getAbsolutePath().contains(".."));
 		return new Directory(f.getParent());
