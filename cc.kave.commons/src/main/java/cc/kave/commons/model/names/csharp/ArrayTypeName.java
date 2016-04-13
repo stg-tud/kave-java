@@ -19,7 +19,7 @@ package cc.kave.commons.model.names.csharp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.ITypeName;
 
 public class ArrayTypeName extends TypeName {
@@ -133,7 +133,7 @@ public class ArrayTypeName extends TypeName {
 	}
 
 	@Override
-	public IBundleName getAssembly() {
+	public IAssemblyName getAssembly() {
 		return getArrayBaseType().getAssembly();
 	}
 

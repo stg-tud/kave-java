@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.names.csharp;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 
@@ -44,7 +44,7 @@ public class UnknownTypeName extends TypeName {
 	}
 
 	@Override
-	public IBundleName getAssembly() {
+	public IAssemblyName getAssembly() {
 		return AssemblyName.getUnknownName();
 	}
 

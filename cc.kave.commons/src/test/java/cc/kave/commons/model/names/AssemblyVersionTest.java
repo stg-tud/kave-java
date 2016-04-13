@@ -20,12 +20,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IBundleVersion;
+import cc.kave.commons.model.names.IAssemblyVersion;
 import cc.kave.commons.model.names.csharp.AssemblyVersion;
 
 public class AssemblyVersionTest {
 
-	IBundleVersion version = AssemblyVersion.newAssemblyVersion("12.30.17.42");
+	IAssemblyVersion version = AssemblyVersion.newAssemblyVersion("12.30.17.42");
 
 	@Test
 	public void getMajor() {

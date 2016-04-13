@@ -17,20 +17,20 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.Map;
 
-import cc.kave.commons.model.names.IBundleVersion;
+import cc.kave.commons.model.names.IAssemblyVersion;
 
 import com.google.common.collect.MapMaker;
 
-public class AssemblyVersion extends Name implements IBundleVersion {
+public class AssemblyVersion extends Name implements IAssemblyVersion {
 	private static final Map<String, AssemblyVersion> nameRegistry = new MapMaker().weakValues().makeMap();
 
-	public static final IBundleVersion UNKNOWN_NAME = newAssemblyVersion(UNKNOWN_NAME_IDENTIFIER);
+	public static final IAssemblyVersion UNKNOWN_NAME = newAssemblyVersion(UNKNOWN_NAME_IDENTIFIER);
 
 	/**
 	 * Alias names are valid C# identifiers that are not keywords, plus the
 	 * special alias 'global'.
 	 */
-	public static IBundleVersion newAssemblyVersion(String identifier) {
+	public static IAssemblyVersion newAssemblyVersion(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new AssemblyVersion(identifier));
 		}

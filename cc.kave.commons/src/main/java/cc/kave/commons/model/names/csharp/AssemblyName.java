@@ -19,15 +19,15 @@ import java.util.Map;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.commons.model.names.IBundleName;
-import cc.kave.commons.model.names.IBundleVersion;
+import cc.kave.commons.model.names.IAssemblyName;
+import cc.kave.commons.model.names.IAssemblyVersion;
 
-public class AssemblyName extends Name implements IBundleName {
+public class AssemblyName extends Name implements IAssemblyName {
 	private static final Map<String, AssemblyName> nameRegistry = new MapMaker().weakValues().makeMap();
 
-	public static final IBundleName UNKNOWN_NAME = newAssemblyName(UNKNOWN_NAME_IDENTIFIER);
+	public static final IAssemblyName UNKNOWN_NAME = newAssemblyName(UNKNOWN_NAME_IDENTIFIER);
 
-	public static IBundleName newAssemblyName(String identifier) {
+	public static IAssemblyName newAssemblyName(String identifier) {
 		if (!nameRegistry.containsKey(identifier)) {
 			nameRegistry.put(identifier, new AssemblyName(identifier));
 		}
@@ -39,7 +39,7 @@ public class AssemblyName extends Name implements IBundleName {
 	}
 
 	@Override
-	public IBundleVersion getVersion() {
+	public IAssemblyVersion getVersion() {
 		if (isUnknown()) {
 			return AssemblyVersion.UNKNOWN_NAME;
 		} else if (!identifier.contains(",")) {
@@ -62,7 +62,7 @@ public class AssemblyName extends Name implements IBundleName {
 		}
 	}
 
-	public static IBundleName getUnknownName() {
+	public static IAssemblyName getUnknownName() {
 		return AssemblyName.newAssemblyName(UNKNOWN_NAME_IDENTIFIER);
 	}
 

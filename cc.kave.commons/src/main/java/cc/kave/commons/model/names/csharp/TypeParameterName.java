@@ -18,7 +18,7 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 
@@ -92,7 +92,7 @@ public class TypeParameterName extends Name implements ITypeName {
 	}
 
 	@Override
-	public IBundleName getAssembly() {
+	public IAssemblyName getAssembly() {
 		return getTypeParameterType().getAssembly();
 	}
 

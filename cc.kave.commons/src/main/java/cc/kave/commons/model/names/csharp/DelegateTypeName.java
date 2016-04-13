@@ -17,7 +17,7 @@ package cc.kave.commons.model.names.csharp;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.INamespaceName;
@@ -126,7 +126,7 @@ public class DelegateTypeName extends TypeName implements IDelegateTypeName {
 	}
 
 	@Override
-	public IBundleName getAssembly() {
+	public IAssemblyName getAssembly() {
 		return getDelegateType().getAssembly();
 	}
 

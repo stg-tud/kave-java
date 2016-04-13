@@ -39,7 +39,7 @@ import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.IAliasName;
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.IFieldName;
@@ -167,7 +167,7 @@ public abstract class JsonUtils {
 
 		// name interface types
 		registerName(gb, IAliasName.class);
-		registerName(gb, IBundleName.class);
+		registerName(gb, IAssemblyName.class);
 		registerName(gb, IEventName.class);
 		registerName(gb, IFieldName.class);
 		registerName(gb, ILambdaName.class);

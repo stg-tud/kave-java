@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.IAliasName;
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.IFieldName;
@@ -62,7 +62,7 @@ public class CSharpNameDeserializationTest {
 	@Test
 	public void DeserializesToAssemblyName() {
 		assertDeserialize("\"CSharp.AssemblyName:A, 1.2.3.4\"", AssemblyName.newAssemblyName("A, 1.2.3.4"),
-				IBundleName.class);
+				IAssemblyName.class);
 	}
 
 	@Test

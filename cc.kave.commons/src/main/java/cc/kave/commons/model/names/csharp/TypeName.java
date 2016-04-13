@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 
@@ -97,7 +97,7 @@ public class TypeName extends Name implements ITypeName {
 	}
 
 	@Override
-	public IBundleName getAssembly() {
+	public IAssemblyName getAssembly() {
 		int endOfTypeName = getLengthOfTypeName(identifier);
 		String assemblyIdentifier = identifier.substring(endOfTypeName).trim();
 		assemblyIdentifier = assemblyIdentifier.replaceFirst(",", "").trim();

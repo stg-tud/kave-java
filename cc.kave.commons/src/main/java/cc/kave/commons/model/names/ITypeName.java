@@ -19,7 +19,7 @@ public interface ITypeName extends IGenericName {
 	/**
 	 * The name of the bundle (e.g., assembly) this type is declared in.
 	 */
-	IBundleName getAssembly();
+	IAssemblyName getAssembly();
 
 	/**
 	 * A full-qualified identifier of the namespace containing the type.

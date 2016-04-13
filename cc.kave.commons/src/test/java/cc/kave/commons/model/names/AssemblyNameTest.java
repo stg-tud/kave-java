@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.csharp.AssemblyName;
 import cc.kave.commons.model.names.csharp.AssemblyVersion;
 
@@ -35,7 +35,7 @@ public class AssemblyNameTest {
 	@Test
 	public void shouldBeMSCorLibAssembly() {
 		final String identifier = "mscorlib, 4.0.0.0";
-		IBundleName mscoreAssembly = AssemblyName.newAssemblyName(identifier);
+		IAssemblyName mscoreAssembly = AssemblyName.newAssemblyName(identifier);
 
 		assertEquals("mscorlib", mscoreAssembly.getName());
 		assertEquals("4.0.0.0", mscoreAssembly.getVersion().getIdentifier());
@@ -45,7 +45,7 @@ public class AssemblyNameTest {
 	@Test
 	public void shouldBeVersionlessAssembly() {
 		final String identifier = "assembly";
-		IBundleName assemblyName = AssemblyName.newAssemblyName(identifier);
+		IAssemblyName assemblyName = AssemblyName.newAssemblyName(identifier);
 
 		assertEquals("assembly", assemblyName.getName());
 		assertEquals(AssemblyVersion.UNKNOWN_NAME, assemblyName.getVersion());
@@ -54,7 +54,7 @@ public class AssemblyNameTest {
 
 	@Test
 	public void shouldHaveUnknownVersionIfUnknown() {
-		IBundleName uut = AssemblyName.UNKNOWN_NAME;
+		IAssemblyName uut = AssemblyName.UNKNOWN_NAME;
 
 		assertEquals("???", uut.getName());
 		assertEquals(AssemblyVersion.UNKNOWN_NAME, uut.getVersion());

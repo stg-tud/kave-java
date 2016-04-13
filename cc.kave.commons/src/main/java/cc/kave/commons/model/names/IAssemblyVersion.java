@@ -15,8 +15,12 @@
  */
 package cc.kave.commons.model.names;
 
-public interface IBundleName extends IName {
-	IBundleVersion getVersion();
+public interface IAssemblyVersion extends IName {
+	int getMajor();
 
-	String getName();
+	int getMinor();
+
+	int getBuild();
+
+	int getRevision();
 }
