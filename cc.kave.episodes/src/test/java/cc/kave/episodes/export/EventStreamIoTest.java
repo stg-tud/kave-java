@@ -64,6 +64,29 @@ public class EventStreamIoTest {
 		assertEquals(expectedTxt, actualTxt);
 	}
 
+	@Test
+	public void mappingContainsUniqueEvents() throws IOException {
+
+		File a = file();
+		File b = file();
+
+		List<Event> stream = Lists.newArrayList(inv(1), inv(1), inv(1));
+		List<Event> expected = Lists.newArrayList(inv(1));
+		String expectedTxt = "0,0.000\n" + //
+				"0,0.001\n" + //
+				"0,0.002\n";
+
+		EventStreamIo.write(stream, a.getAbsolutePath(), b.getAbsolutePath());
+
+		assertTrue(a.exists());
+		assertTrue(b.exists());
+
+		List<Event> actuals = EventStreamIo.readMapping(b.getAbsolutePath());
+		String actualTxt = FileUtils.readFileToString(a);
+		assertEquals(expected, actuals);
+		assertEquals(expectedTxt, actualTxt);
+	}
+
 	private File file() throws IOException {
 		File file = tmp.newFile();
 		file.delete();

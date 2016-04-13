@@ -28,6 +28,7 @@ import com.google.common.reflect.TypeToken;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.recommenders.assertions.Asserts;
 
 public class EventStreamIo {
 
@@ -36,30 +37,34 @@ public class EventStreamIo {
 
 	public static void write(List<Event> stream, String fileStream, String fileMapping) {
 		try {
-			String streamTxt = toString(stream);
+			List<Event> mapping = createMapping(stream);
+			String streamTxt = toString(stream, mapping);
 			FileUtils.writeStringToFile(new File(fileStream), streamTxt);
-			JsonUtils.toJson(stream, new File(fileMapping));
+			JsonUtils.toJson(mapping, new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private static String toString(List<Event> stream) {
-		StringBuilder sb = new StringBuilder();
+	private static List<Event> createMapping(List<Event> stream) {
+		List<Event> mapping = Lists.newLinkedList();
+		for (Event e : stream) {
+			if (mapping.indexOf(e) == -1) {
+				mapping.add(e);
+			}
+		}
+		return mapping;
+	}
 
-		List<Event> uniqueEvents = Lists.newLinkedList();
+	private static String toString(List<Event> stream, List<Event> mapping) {
+		StringBuilder sb = new StringBuilder();
 
 		boolean isFirstMethod = true;
 		double time = 0.000;
 
 		for (Event e : stream) {
-			uniqueEvents.add(e);
-
-			int idx = uniqueEvents.indexOf(e);
-			if (idx == -1) {
-				idx = uniqueEvents.size();
-				uniqueEvents.add(e);
-			}
+			int idx = mapping.indexOf(e);
+			Asserts.assertNotNegative(idx);
 
 			if (e.getKind() == EventKind.METHOD_DECLARATION && !isFirstMethod) {
 				time += TIMEOUT;
