@@ -18,9 +18,11 @@ package exec.validate_evaluation.queryhistory;
 import static cc.recommenders.io.Logger.append;
 import static cc.recommenders.io.Logger.log;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import exec.validate_evaluation.streaks.EditStreak;
+import exec.validate_evaluation.streaks.Snapshot;
 
 public class QueryHistoryGenerationLogger {
 
@@ -55,8 +57,16 @@ public class QueryHistoryGenerationLogger {
 	public void processingEditStreak(EditStreak e) {
 		currentStreak++;
 		log("");
-		log("-- edit streak %d ---------------", currentStreak);
+		log("-- edit streak %d: %s ---------------", currentStreak, getEncType(e));
 		currentSnapshot = 0;
+	}
+
+	private String getEncType(EditStreak e) {
+		Iterator<Snapshot> it = e.getSnapshots().iterator();
+		if (it.hasNext()) {
+			return it.next().getContext().getSST().getEnclosingType().getIdentifier();
+		}
+		return "--";
 	}
 
 	public void startSnapshot() {

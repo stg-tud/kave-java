@@ -26,7 +26,6 @@ import com.google.common.collect.Sets;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
@@ -83,9 +82,8 @@ public class QueryHistoryCollector {
 			Tuple<ICoReTypeName, ICoReMethodName> key = getKey(u);
 
 			if (keysInThisSnapshot.contains(key)) {
-				Logger.err("ignoring second registration of the key '%s'", key);
 				// generics currently blow our concept... as do instance-aware
-				// points2 analyses
+				// points-to analyses
 				return;
 			}
 
