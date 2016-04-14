@@ -83,6 +83,12 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
 	@Override
 	public TerminationState getTerminatedState() {
+		boolean wasApplied = terminatedState == TerminationState.Applied;
+		boolean hasSelections = !selections.isEmpty();
+		boolean hasProposals = !proposalCollection.isEmpty();
+		if (wasApplied && !(hasProposals || hasSelections)) {
+			return TerminationState.Unknown;
+		}
 		return terminatedState;
 	}
 

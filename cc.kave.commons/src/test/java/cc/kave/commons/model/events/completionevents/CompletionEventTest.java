@@ -64,6 +64,16 @@ public class CompletionEventTest {
 		assertEquals(p2, sut.getLastSelectedProposal());
 	}
 
+	@Test
+	public void terminationStateIsReWrittenIfInvalid() {
+		CompletionEvent sut = new CompletionEvent();
+		sut.terminatedState = TerminationState.Applied;
+
+		TerminationState actual = sut.getTerminatedState();
+		TerminationState expected = TerminationState.Unknown;
+		assertEquals(expected, actual);
+	}
+
 	private static IProposal p(IName n) {
 		Proposal p = new Proposal();
 		p.Name = n;
