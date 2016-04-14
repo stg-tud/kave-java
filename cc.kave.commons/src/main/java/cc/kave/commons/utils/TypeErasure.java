@@ -43,7 +43,7 @@ public class TypeErasure {
 			return id;
 		}
 
-		Map<String, String> replacements = Maps.newHashMap();
+		Map<String, String> replacements = Maps.newLinkedHashMap();
 		int tick = FindNext(id, 0, '`');
 
 		while (tick != -1) {

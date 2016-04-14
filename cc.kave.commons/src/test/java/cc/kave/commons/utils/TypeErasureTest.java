@@ -63,6 +63,13 @@ public class TypeErasureTest {
 	}
 
 	@Test
+	public void nestedGenercis() {
+		String inp = "T`1[[G1 -> T`1[[G2-> T2]],P]],P";
+		String out = "T`1[[G1]],P";
+		assertRepl(inp, out);
+	}
+
+	@Test
 	public void strangeNestingSyntax_unbound() {
 		String inp = "T`1+U`1[[G1],[G2],P";
 		String out = "T`1+U`1[[G1],[G2],P";
