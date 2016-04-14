@@ -215,7 +215,7 @@ public abstract class JsonUtils {
 		registerHierarchy(gb, IVariableDeclaration.class, VariableDeclaration.class);
 		// References
 		registerHierarchy(gb, IReference.class, UnknownReference.class, EventReference.class, FieldReference.class,
-				PropertyReference.class, MethodReference.class, VariableReference.class);
+				IndexAccessReference.class, PropertyReference.class, MethodReference.class, VariableReference.class);
 		registerHierarchy(gb, IAssignableReference.class, EventReference.class, FieldReference.class,
 				IndexAccessReference.class, PropertyReference.class, UnknownReference.class, VariableReference.class);
 		registerHierarchy(gb, IVariableReference.class, VariableReference.class);
