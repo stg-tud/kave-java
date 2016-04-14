@@ -20,7 +20,9 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.ssts.impl.visitor.TypeErasureVisitor;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
@@ -45,7 +47,9 @@ public class EditStreakGenerationIo {
 		Directory dir = new Directory(dirIn);
 		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
 			while (ra.hasNext()) {
-				es.add(ra.getNext(ICompletionEvent.class));
+				CompletionEvent ce = ra.getNext(CompletionEvent.class);
+				ce.context = TypeErasureVisitor.erase(ce.context);
+				es.add(ce);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

@@ -34,6 +34,8 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.impl.SST;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
@@ -126,6 +128,39 @@ public class EditStreakGenerationIoTest {
 
 		Directory dir = new Directory(dirOut.getAbsolutePath());
 		assertFalse(dir.exists("a.zip"));
+	}
+
+	@Test
+	public void readEventsAreTypeErased() throws IOException {
+
+		SST inSST = new SST();
+		inSST.setEnclosingType(TypeName.newTypeName("T`1[[G1->T,P]],P"));
+		Context inCtx = new Context();
+		inCtx.setSST(inSST);
+		CompletionEvent in = new CompletionEvent();
+		in.context = inCtx;
+
+		SST outSST = new SST();
+		outSST.setEnclosingType(TypeName.newTypeName("T`1[[G1]],P"));
+		Context outCtx = new Context();
+		outCtx.setSST(outSST);
+		CompletionEvent out = new CompletionEvent();
+		out.context = outCtx;
+
+		Set<ICompletionEvent> ins = Sets.newLinkedHashSet();
+		ins.add(in);
+
+		Directory dir = new Directory(dirIn.getAbsolutePath());
+		try (WritingArchive wa = dir.getWritingArchive("a.zip");) {
+			for (ICompletionEvent e : ins) {
+				wa.add(e);
+			}
+		}
+
+		Set<ICompletionEvent> outs = Sets.newLinkedHashSet();
+		outs.add(out);
+		Set<ICompletionEvent> actuals = sut.readCompletionEvents("a.zip");
+		assertEquals(outs, actuals);
 	}
 
 	private static EditStreak editStreak(int num) {
