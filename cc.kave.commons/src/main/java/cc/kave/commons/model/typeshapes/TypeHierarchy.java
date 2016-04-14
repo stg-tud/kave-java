@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName;
 
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class TypeHierarchy implements ITypeHierarchy {
 
@@ -119,4 +120,8 @@ public class TypeHierarchy implements ITypeHierarchy {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
+	}
 }

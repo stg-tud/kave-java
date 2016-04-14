@@ -23,9 +23,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
-import java.util.HashSet;
 
-import org.junit.Test;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -33,6 +31,7 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
+import cc.kave.commons.testutils.ToStringAssert;
 
 public class TypeHierarchyTest {
 
@@ -116,6 +115,11 @@ public class TypeHierarchyTest {
 		TypeHierarchy b = new TypeHierarchy();
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));
+	}
+
+	@Test
+	public void toStringIsImplemented() {
+		ToStringAssert.AssertToStringUtils(new TypeHierarchy());
 	}
 
 	private static TypeHierarchy someHierarchy(String string) {
