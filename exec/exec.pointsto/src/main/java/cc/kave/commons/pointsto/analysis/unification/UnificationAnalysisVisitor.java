@@ -246,6 +246,12 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 			}
 		}
 
+		if (!method.isStatic() && !entity.getReference().isMissing()) {
+			// ensure a location is created for the receiver: we might end up without one if the variable is not used
+			// anywhere else
+			context.getLocation(entity.getReference());
+		}
+
 		if (destRef != null && !method.getReturnType().isVoidType()) {
 			context.storeReturn(destRef, returnLocation);
 		}
