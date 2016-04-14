@@ -20,11 +20,17 @@ import java.util.regex.Pattern;
 
 public class TypeUtil {
 
+	private static Pattern regex1 = Pattern.compile("cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)");
+	private static Pattern regex2 = Pattern.compile("cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)");
+	private static Pattern regex3 = Pattern.compile("\"KaVE.Model.([.a-zA-Z0-9_]+), KaVE.Model\"");
+	private static Pattern regex4 = Pattern
+			.compile("cc\\.kave\\.commons\\.model\\.events\\.completionevent\\.([.a-zA-Z0-9_]+)");
+	private static Pattern regex5 = Pattern.compile("\"KaVE([.a-zA-Z0-9_]+), KaVE.Commons\"");
+	private static Pattern regex6 = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
+
 	public static String toCSharpTypeNames(String json) {
-		return replacePattern(
-				replacePattern(json, "cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)", "[SST:", "]",
-						false),
-				"cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)", "KaVE.Commons.Model.", ", KaVE.Commons", false);
+		return replacePattern(replacePattern(json, regex1, "[SST:", "]", false), regex2, "KaVE.Commons.Model.",
+				", KaVE.Commons", false);
 	}
 
 	public static String toJavaTypeNames(String json) {
@@ -34,26 +40,23 @@ public class TypeUtil {
 	}
 
 	private static String legacySupport_PackageNames(String json) {
-		return replacePattern(json, "\"KaVE.Model.([.a-zA-Z0-9_]+), KaVE.Model\"", "\"KaVE.Commons.Model.",
-				", KaVE.Commons\"", false);
+		return replacePattern(json, regex3, "\"KaVE.Commons.Model.", ", KaVE.Commons\"", false);
 	}
 
 	private static String legacySupport_CompletionEvents(String json) {
-		return replacePattern(json, "cc\\.kave\\.commons\\.model\\.events\\.completionevent\\.([.a-zA-Z0-9_]+)",
-				"cc\\.kave\\.commons\\.model\\.events\\.completionevents\\.", "", true);
+		return replacePattern(json, regex4, "cc\\.kave\\.commons\\.model\\.events\\.completionevents\\.", "", true);
 	}
 
 	private static String completionEvent_formatting(String json) {
-		return replacePattern(json, "\"KaVE([.a-zA-Z0-9_]+), KaVE.Commons\"", "\"cc.kave", "\"", true);
+		return replacePattern(json, regex5, "\"cc.kave", "\"", true);
 	}
 
 	private static String toJavaPackages(String json) {
-		return replacePattern(json, "\\[SST:([.a-zA-Z0-9_]+)\\]", "cc.kave.commons.model.ssts.impl.", "", true);
+		return replacePattern(json, regex6, "cc.kave.commons.model.ssts.impl.", "", true);
 	}
 
-	private static String replacePattern(String type, String pattern, String prefix, String suffix, boolean lower) {
+	private static String replacePattern(String type, Pattern regex, String prefix, String suffix, boolean lower) {
 		StringBuffer resultString = new StringBuffer();
-		Pattern regex = Pattern.compile(pattern);
 		Matcher regexMatcher = regex.matcher(type);
 		while (regexMatcher.find()) {
 			String replacement = prefix + (lower ? allToLowerCaseNamespace(regexMatcher.group(1))
