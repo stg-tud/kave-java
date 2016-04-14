@@ -29,7 +29,9 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IBreakStatement;
@@ -127,7 +129,21 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 	}
 
 	@Override
+	public Void visit(IConstantValueExpression expr, UsageExtractionVisitorContext context) {
+		context.registerConstant(expr);
+		return null;
+	}
+
+	@Override
+	public Void visit(IFieldReference fieldRef, UsageExtractionVisitorContext context) {
+		context.registerFieldAccess(fieldRef);
+		return null;
+	}
+
+	@Override
 	public Void visit(IPropertyReference propertyRef, UsageExtractionVisitorContext context) {
+		context.registerPropertyAccess(propertyRef);
+
 		// descend into property if applicable
 		context.processDescent(propertyRef.getPropertyName());
 

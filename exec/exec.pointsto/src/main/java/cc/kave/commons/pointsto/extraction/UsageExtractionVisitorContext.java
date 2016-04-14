@@ -38,6 +38,10 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.references.IAssignableReference;
+import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
@@ -112,6 +116,23 @@ public class UsageExtractionVisitorContext {
 
 	public void setCurrentStatement(IStatement stmt) {
 		this.currentStatement = stmt;
+	}
+
+	private IReference getAssignmentSource() {
+		if (currentStatement instanceof IAssignment) {
+			IAssignment assignment = (IAssignment) currentStatement;
+			if (assignment.getExpression() instanceof IReferenceExpression) {
+				return ((IReferenceExpression) assignment.getExpression()).getReference();
+			}
+		}
+		return null;
+	}
+
+	private IAssignableReference getAssignmentDestination() {
+		if (currentStatement instanceof IAssignment) {
+			return ((IAssignment) currentStatement).getReference();
+		}
+		return null;
 	}
 
 	public void enterNonEntryPoint(IMethodName method) {
@@ -326,17 +347,46 @@ public class UsageExtractionVisitorContext {
 	}
 
 	public void registerConstant(IConstantValueExpression constExpr) {
-		if (!(currentStatement instanceof IAssignment)) {
-			LOGGER.error("Cannot register constant definition site: target is no assignment");
+		IReference assignmentDest = getAssignmentDestination();
+		if (assignmentDest == null) {
+			// constant not used in an assignment
 			return;
 		}
 
-		IAssignment assignStmt = (IAssignment) currentStatement;
-		ITypeName type = typeCollector.getType(assignStmt.getReference());
-		PointsToQuery query = new PointsToQuery(assignStmt.getReference(), type, currentStatement,
-				getMemberForPointsToQuery());
+		ITypeName type = typeCollector.getType(assignmentDest);
+		PointsToQuery query = new PointsToQuery(assignmentDest, type, currentStatement, getMemberForPointsToQuery());
 		DefinitionSite newDefinition = DefinitionSites.createDefinitionByConstant();
 
+		updateDefinitions(query, newDefinition);
+	}
+
+	public void registerFieldAccess(IFieldReference fieldRef) {
+		IReference assignmentSrc = getAssignmentSource();
+		if (assignmentSrc == null || assignmentSrc != fieldRef) {
+			// field not accessed in assignment or not read
+			return;
+		}
+
+		IReference assignmentDest = getAssignmentDestination();
+		ITypeName type = typeCollector.getType(assignmentDest);
+		PointsToQuery query = new PointsToQuery(assignmentDest, type, currentStatement, getMemberForPointsToQuery());
+		DefinitionSite newDefinition = DefinitionSites
+				.createDefinitionByField(CoReNameConverter.convert(fieldRef.getFieldName()));
+		updateDefinitions(query, newDefinition);
+	}
+
+	public void registerPropertyAccess(IPropertyReference propertyRef) {
+		IReference assignmentSrc = getAssignmentSource();
+		if (assignmentSrc == null || assignmentSrc != propertyRef) {
+			// property not accessed in assignment or not read
+			return;
+		}
+
+		IReference assignmentDest = getAssignmentDestination();
+		ITypeName type = typeCollector.getType(assignmentDest);
+		PointsToQuery query = new PointsToQuery(assignmentDest, type, currentStatement, getMemberForPointsToQuery());
+		DefinitionSite newDefinition = DefinitionSites
+				.createDefinitionByField(CoReNameConverter.convert(propertyRef.getPropertyName()));
 		updateDefinitions(query, newDefinition);
 	}
 
