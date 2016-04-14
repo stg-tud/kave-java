@@ -17,8 +17,6 @@ package cc.kave.commons.model.events.completionevents;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -26,6 +24,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.TypeShape;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class Context {
 	private ITypeShape typeShape;
@@ -65,6 +64,6 @@ public class Context {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringUtils.toString(this);
 	}
 }
