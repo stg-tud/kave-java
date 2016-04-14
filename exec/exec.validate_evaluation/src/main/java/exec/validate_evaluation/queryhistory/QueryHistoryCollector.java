@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
@@ -33,150 +34,128 @@ import cc.recommenders.usages.Usage;
 
 public class QueryHistoryCollector {
 
-	private enum State {
-		UNDEFINED, PROCESSING_USER, PROCESSING_STREAK, PROCESSING_SNAPSHOT
-	}
-
-	private State currentState = State.UNDEFINED;
-
 	private final QueryHistoryGenerationLogger log;
-
-	private Set<Tuple<ICoReTypeName, ICoReMethodName>> keys;
-	private Map<Tuple<ICoReTypeName, ICoReMethodName>, List<Usage>> queryHistories;
-
-	private Set<Tuple<ICoReTypeName, ICoReMethodName>> keysInThisSnapshot = Sets.newHashSet();
-
-	private Usage selectionResult;
 
 	public QueryHistoryCollector(QueryHistoryGenerationLogger log) {
 		this.log = log;
 	}
 
-	private void transition(State from, State to) {
-		Asserts.assertEquals(from, currentState,
-				String.format("invalid state! expected %s, but was %s", from, currentState));
-		currentState = to;
+	public QueryHistoryForStreak startEditStreak(Set<Tuple<ICoReTypeName, ICoReMethodName>> keys) {
+		return new QueryHistoryForStreak(keys);
 	}
 
-	private void require(State s) {
-		Asserts.assertEquals(s, currentState, String.format("invalid state! expected %s, but was %s", s, currentState));
-	}
+	public class QueryHistoryForStreak {
 
-	public void startUser() {
-		transition(State.UNDEFINED, State.PROCESSING_USER);
-		queryHistories = Maps.newLinkedHashMap();
-	}
+		private Set<Tuple<ICoReTypeName, ICoReMethodName>> keysInEditStreak;
+		private Set<Tuple<ICoReTypeName, ICoReMethodName>> keysInThisSnapshot = Sets.newHashSet();
 
-	public void startEditStreak(Set<Tuple<ICoReTypeName, ICoReMethodName>> keys) {
-		transition(State.PROCESSING_USER, State.PROCESSING_STREAK);
-		this.keys = keys;
-	}
+		private Map<Tuple<ICoReTypeName, ICoReMethodName>, List<Usage>> queryHistories = Maps.newLinkedHashMap();
 
-	public void startSnapshot() {
-		transition(State.PROCESSING_STREAK, State.PROCESSING_SNAPSHOT);
-	}
+		private Usage selectionResult;
 
-	public void register(Usage u) {
-		require(State.PROCESSING_SNAPSHOT);
-		Tuple<ICoReTypeName, ICoReMethodName> key = getKey(u);
-		// TODO reanable and write tests (generics?)
-//		Asserts.assertFalse(keysInThisSnapshot.contains(key),
-//				"you are trying to register the same key again for this snapshot");
-		registerByKey(u, key);
-	}
-
-	public void registerSelectionResult(Usage u2) {
-		require(State.PROCESSING_SNAPSHOT);
-		Asserts.assertNull(selectionResult);
-		selectionResult = u2;
-	}
-
-	private void registerByKey(Usage u, Tuple<ICoReTypeName, ICoReMethodName> key) {
-		Asserts.assertTrue(keys.contains(key));
-
-		keysInThisSnapshot.add(key);
-
-		List<Usage> qh = queryHistories.get(key);
-		if (qh == null) {
-			qh = Lists.newLinkedList();
-			queryHistories.put(key, qh);
-		}
-		qh.add(u);
-	}
-
-	private Tuple<ICoReTypeName, ICoReMethodName> getKey(Usage u) {
-		return Tuple.newTuple(u.getType(), u.getMethodContext());
-	}
-
-	public void noSnapshots() {
-		transition(State.PROCESSING_SNAPSHOT, State.PROCESSING_STREAK);
-	}
-
-	public void endSnapshot() {
-		transition(State.PROCESSING_SNAPSHOT, State.PROCESSING_STREAK);
-
-		if (selectionResult != null) {
-			registerByKey(selectionResult, getKey(selectionResult));
-			selectionResult = null;
+		public QueryHistoryForStreak(Set<Tuple<ICoReTypeName, ICoReMethodName>> keys) {
+			this.keysInEditStreak = keys;
 		}
 
-		for (Tuple<ICoReTypeName, ICoReMethodName> key : keys) {
-			if (!keysInThisSnapshot.contains(key)) {
-				registerByKey(new NoUsage(), key);
+		public void startSnapshot() {
+		}
+
+		public void noSnapshots() {
+		}
+
+		public void endSnapshot() {
+
+			if (selectionResult != null) {
+				registerByKey(selectionResult, getKey(selectionResult));
+				selectionResult = null;
+			}
+
+			for (Tuple<ICoReTypeName, ICoReMethodName> key : keysInEditStreak) {
+				if (!keysInThisSnapshot.contains(key)) {
+					registerByKey(new NoUsage(), key);
+				}
+			}
+
+			keysInThisSnapshot.clear();
+		}
+
+		public void register(Usage u) {
+			Tuple<ICoReTypeName, ICoReMethodName> key = getKey(u);
+
+			if (keysInThisSnapshot.contains(key)) {
+				Logger.err("ignoring second registration of the key '%s'", key);
+				// generics currently blow our concept... as do instance-aware
+				// points2 analyses
+				return;
+			}
+
+			registerByKey(u, key);
+		}
+
+		public void registerSelectionResult(Usage u2) {
+			Asserts.assertNull(selectionResult);
+			selectionResult = u2;
+		}
+
+		private void registerByKey(Usage u, Tuple<ICoReTypeName, ICoReMethodName> key) {
+			Asserts.assertTrue(keysInEditStreak.contains(key));
+
+			keysInThisSnapshot.add(key);
+
+			List<Usage> qh = queryHistories.get(key);
+			if (qh == null) {
+				qh = Lists.newLinkedList();
+				queryHistories.put(key, qh);
+			}
+			qh.add(u);
+		}
+
+		private Tuple<ICoReTypeName, ICoReMethodName> getKey(Usage u) {
+			return Tuple.newTuple(u.getType(), u.getMethodContext());
+		}
+
+		public Set<List<Usage>> getHistories() {
+			removeRepeatingUsages();
+			removeSingleHistories();
+			return Sets.newLinkedHashSet(queryHistories.values());
+		}
+
+		private void removeRepeatingUsages() {
+			log.startFixingHistories();
+			for (List<Usage> qh : queryHistories.values()) {
+				removeRepeatingUsages(qh);
 			}
 		}
 
-		keysInThisSnapshot.clear();
-	}
+		private void removeRepeatingUsages(List<Usage> qh) {
+			Usage last = null;
+			int diff = 0;
 
-	public void endEditStreak() {
-		// TODO write tests!!
-		transition(State.PROCESSING_STREAK, State.PROCESSING_USER);
-	}
+			for (Iterator<Usage> it = qh.iterator(); it.hasNext();) {
+				Usage u = it.next();
 
-	public Set<List<Usage>> getHistories() {
-		// TODO tests for updated states...
-		transition(State.PROCESSING_USER, State.UNDEFINED);
-		removeRepeatingUsages();
-		removeSingleHistories();
-		return Sets.newLinkedHashSet(queryHistories.values());
-	}
+				if (u.equals(last)) {
+					it.remove();
+					diff++;
+				}
 
-	private void removeRepeatingUsages() {
-		log.startFixingHistories();
-		for (List<Usage> qh : queryHistories.values()) {
-			removeRepeatingUsages(qh);
-		}
-	}
-
-	private void removeRepeatingUsages(List<Usage> qh) {
-		Usage last = null;
-		int diff = 0;
-
-		for (Iterator<Usage> it = qh.iterator(); it.hasNext();) {
-			Usage u = it.next();
-
-			if (u.equals(last)) {
-				it.remove();
-				diff++;
+				last = u;
 			}
 
-			last = u;
-		}
-
-		if (diff > 0) {
-			log.fixedQueryHistory(-diff);
-		}
-	}
-
-	private void removeSingleHistories() {
-		log.startingRemoveEmptyHistories();
-		queryHistories.entrySet().removeIf(e -> {
-			if (e.getValue().size() < 2) {
-				log.removedEmptyHistory();
-				return true;
+			if (diff > 0) {
+				log.fixedQueryHistory(-diff);
 			}
-			return false;
-		});
+		}
+
+		private void removeSingleHistories() {
+			log.startingRemoveEmptyHistories();
+			queryHistories.entrySet().removeIf(e -> {
+				if (e.getValue().size() < 2) {
+					log.removedEmptyHistory();
+					return true;
+				}
+				return false;
+			});
+		}
 	}
 }

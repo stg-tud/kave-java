@@ -39,17 +39,18 @@ import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.queryhistory.QueryHistoryCollector.QueryHistoryForStreak;
 
 public class QueryHistoryCollectorTest {
 
-	private QueryHistoryCollector sut;
+	private QueryHistoryCollector qhc;
+	private QueryHistoryForStreak sut;
 	private QueryHistoryGenerationLogger log;
 
 	@Before
 	public void setup() {
 		log = mock(QueryHistoryGenerationLogger.class);
-		sut = new QueryHistoryCollector(log);
-		sut.startUser();
+		qhc = new QueryHistoryCollector(log);
 	}
 
 	@Test(expected = AssertionException.class)
@@ -75,13 +76,23 @@ public class QueryHistoryCollectorTest {
 		assertEquals(expecteds, actuals);
 	}
 
-	@Test(expected = AssertionException.class)
-	public void cannotRegisterTheSameKeyTwicePerSnapshot() {
-		startStreak(k(1, 1));
+	@Test
+	public void secondRegistrationOfTheSameKeyPerSnapshotIsIgnored() {
+		startStreak(k(1, 1), k(1, 2));
 		snapshot(() -> {
 			sut.register(u(1, 1, 1));
 			sut.register(u(1, 1, 2));
+			sut.register(u(1, 2, 1));
 		});
+		snapshot(() -> {
+			sut.register(u(1, 1, 1, 2));
+			sut.register(u(1, 2, 1, 2));
+		});
+		Set<List<Usage>> actual = sut.getHistories();
+		Set<List<Usage>> expected = Sets.newHashSet();
+		expected.add(Lists.newArrayList(u(1, 1, 1), u(1, 1, 1, 2)));
+		expected.add(Lists.newArrayList(u(1, 2, 1), u(1, 2, 1, 2)));
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -250,7 +261,7 @@ public class QueryHistoryCollectorTest {
 		for (Tuple<ICoReTypeName, ICoReMethodName> k : ks) {
 			keys.add(k);
 		}
-		sut.startEditStreak(keys);
+		sut = qhc.startEditStreak(keys);
 	}
 
 	private Tuple<ICoReTypeName, ICoReMethodName> k(int typeNum, int methodNum) {

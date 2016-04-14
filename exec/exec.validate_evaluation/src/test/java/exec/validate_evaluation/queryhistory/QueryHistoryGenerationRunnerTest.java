@@ -16,11 +16,9 @@
 package exec.validate_evaluation.queryhistory;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -30,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -53,8 +50,10 @@ import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.queryhistory.QueryHistoryCollector.QueryHistoryForStreak;
 import exec.validate_evaluation.streaks.EditStreak;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.Snapshot;
@@ -76,6 +75,8 @@ public class QueryHistoryGenerationRunnerTest {
 
 	private List<Usage> curUsages;
 
+	private QueryHistoryForStreak qhfs;
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -86,7 +87,8 @@ public class QueryHistoryGenerationRunnerTest {
 		QueryHistoryIo io = mockQueryHistoryIo();
 
 		QueryHistoryGenerationLogger log = mock(QueryHistoryGenerationLogger.class);
-		mockQueryHistoryCollector();
+		// mockQueryHistoryCollector();
+		histCollector = new QueryHistoryCollector(log);
 		mockUsageExtractor();
 		sut = new QueryHistoryGenerationRunner(esIo, io, log, histCollector, usageExtractor);
 	}
@@ -123,68 +125,19 @@ public class QueryHistoryGenerationRunnerTest {
 	}
 
 	private List<Usage> usages(int num, int i) {
-		List<Usage> usages = Lists.newLinkedList();
+		return Lists.newArrayList(usage(num, i));
+	}
 
+	private Query usage(int num, int i) {
 		Query u = new Query();
 		u.setType(CoReTypeName.get("LT-" + num + "-" + i));
 		u.setMethodContext(methodContext(num, i));
 		u.addCallSite(CallSites.createReceiverCallSite("LT.m()V"));
-		usages.add(u);
-		return usages;
+		return u;
 	}
 
 	private CoReMethodName methodContext(int num, int i) {
 		return CoReMethodName.get(String.format("LT.num%di%d()V", num, i));
-	}
-
-	private void mockQueryHistoryCollector() {
-		histCollector = mock(QueryHistoryCollector.class);
-
-		// be aware that this mocking does not reflect the real implementation,
-		// but that it simply uses values that are easy to test for!
-
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				startUser();
-				return null;
-			}
-		}).when(histCollector).startUser();
-
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				startSnapshot();
-				Usage u = (Usage) invocation.getArguments()[0];
-				curUsages.add(u);
-				return null;
-			}
-		}).when(histCollector).register(any(Usage.class));
-
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Usage u = (Usage) invocation.getArguments()[0];
-				curUsages.add(u);
-				return null;
-			}
-		}).when(histCollector).registerSelectionResult(any(Usage.class));
-
-		when(histCollector.getHistories()).then(new Answer<Collection<List<Usage>>>() {
-			@Override
-			public Collection<List<Usage>> answer(InvocationOnMock invocation) throws Throwable {
-				return collectedUsages;
-			}
-		});
-	}
-
-	private void startUser() {
-		collectedUsages = Sets.newLinkedHashSet();
-	}
-
-	private void startSnapshot() {
-		curUsages = Lists.newLinkedList();
-		collectedUsages.add(curUsages);
 	}
 
 	private EditStreakGenerationIo mockEditStreakIo() {
@@ -225,8 +178,8 @@ public class QueryHistoryGenerationRunnerTest {
 
 		sut.run();
 
-		assertEquals(collectedUsages, out.get("a.zip"));
-		assertEquals(collectedUsages, out.get("b.zip"));
+		assertEquals(Sets.newHashSet(), out.get("a.zip"));
+		assertEquals(Sets.newHashSet(), out.get("b.zip"));
 	}
 
 	@Test
@@ -237,14 +190,14 @@ public class QueryHistoryGenerationRunnerTest {
 		sut.run();
 
 		Set<List<Usage>> expectedA = Sets.newLinkedHashSet();
-		expectedA.add(usages(1, 0));
-		expectedA.add(usages(2, 0));
-		expectedA.add(usages(2, 1));
+		// streak(1) is filtered -- single item
+		expectedA.add(Lists.newArrayList(usage(2, 0), new NoUsage()));
+		expectedA.add(Lists.newArrayList(new NoUsage(), usage(2, 1)));
 
 		Set<List<Usage>> expectedB = Sets.newLinkedHashSet();
-		expectedB.add(usages(3, 0));
-		expectedB.add(usages(3, 1));
-		expectedB.add(usages(3, 2));
+		expectedB.add(Lists.newArrayList(usage(3, 0), new NoUsage()));
+		expectedB.add(Lists.newArrayList(new NoUsage(), usage(3, 1), new NoUsage()));
+		expectedB.add(Lists.newArrayList(new NoUsage(), usage(3, 2)));
 
 		Set<List<Usage>> actualA = out.get("a.zip");
 		assertEquals(expectedA, actualA);
@@ -285,25 +238,6 @@ public class QueryHistoryGenerationRunnerTest {
 		expecteds.add(usages);
 
 		assertEquals(expecteds, actuals);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void keysAreCorrectlyGeneratedAndPassed() {
-		in.put("a.zip", streaks(streak(1), streak(2)));
-
-		sut.run();
-
-		verify(histCollector).startEditStreak(Sets.newHashSet(key("LT-1-0", "LT.num1i0()V")));
-		verify(histCollector)
-				.startEditStreak(Sets.newHashSet(key("LT-2-0", "LT.num2i0()V"), key("LT-2-1", "LT.num2i1()V")));
-	}
-
-	@Test
-	@Ignore
-	public void integrationTest() {
-		// drei EditStreaks für zwei User erzeugen, in dem alle Fälle abgedeckt
-		// sind (inkl. Selection).
 	}
 
 	private Tuple<ICoReTypeName, ICoReMethodName> key(String t, String m) {

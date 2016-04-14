@@ -15,7 +15,6 @@
  */
 package exec.validate_evaluation.queryhistory;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +30,7 @@ import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.queryhistory.QueryHistoryCollector.QueryHistoryForStreak;
 import exec.validate_evaluation.streaks.EditStreak;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.Snapshot;
@@ -60,39 +60,30 @@ public class QueryHistoryGenerationRunner {
 		log.foundZips(zips);
 
 		for (String zip : zips) {
-			histCollector.startUser();
-
 			log.processingFile(zip);
+
+			Set<List<Usage>> us = Sets.newHashSet();
 			editStreaks = esIo.readEditStreaks(zip);
+
 			log.foundEditStreaks(editStreaks.size());
 
 			for (EditStreak es : editStreaks) {
 				try {
-					process(es);
+					Set<List<Usage>> process = process(es);
+					us.addAll(process);
 				} catch (Exception e) {
-					backToProcessingUser();
+					// TODO fix causing issue
+					e.printStackTrace();
 				}
 			}
 
-			Collection<List<Usage>> us = histCollector.getHistories();
 			io.storeQueryHistories(us, zip);
 		}
 
 		log.finish();
 	}
 
-	private void backToProcessingUser() {
-		try {
-			histCollector.endSnapshot();
-		} catch (Exception e) {
-		}
-		try {
-			histCollector.endEditStreak();
-		} catch (Exception e) {
-		}
-	}
-
-	private void process(EditStreak e) {
+	private Set<List<Usage>> process(EditStreak e) {
 
 		log.processingEditStreak(e);
 
@@ -105,28 +96,31 @@ public class QueryHistoryGenerationRunner {
 			allQueries.put(s, result.getFirstQuery());
 		}
 
-		histCollector.startEditStreak(getKeys(allUsages));
+		QueryHistoryForStreak qhc = histCollector.startEditStreak(getKeys(allUsages));
 
 		for (Snapshot s : e.getSnapshots()) {
-			log.startSnapshot();
-			histCollector.startSnapshot();
 			List<Usage> usages = allUsages.get(s);
 			Usage query = allQueries.get(s);
+
+			log.startSnapshot();
+			qhc.startSnapshot();
+
 			for (Usage u : usages) {
-				histCollector.register(u);
+				qhc.register(u);
 				log.usage();
 
 				boolean isQuery = u.equals(query);
 				if (isQuery && s.hasSelection()) {
 					Usage u2 = merge(u, s.getSelection());
-					histCollector.registerSelectionResult(u2);
+					qhc.registerSelectionResult(u2);
 					log.usageMerged();
 				}
 			}
-			histCollector.endSnapshot();
+
+			qhc.endSnapshot();
 		}
 
-		histCollector.endEditStreak();
+		return qhc.getHistories();
 	}
 
 	private Usage merge(Usage u, IMethodName m) {
@@ -134,20 +128,16 @@ public class QueryHistoryGenerationRunner {
 		Query q = Query.createAsCopyFrom(u);
 		q.addCallSite(call);
 		return q;
-
 	}
 
 	private static Set<Tuple<ICoReTypeName, ICoReMethodName>> getKeys(Map<Snapshot, List<Usage>> allUsages) {
-
 		Set<Tuple<ICoReTypeName, ICoReMethodName>> keys = Sets.newHashSet();
-
 		for (List<Usage> us : allUsages.values()) {
 			for (Usage u : us) {
 				Tuple<ICoReTypeName, ICoReMethodName> key = Tuple.newTuple(u.getType(), u.getMethodContext());
 				keys.add(key);
 			}
 		}
-
 		return keys;
 	}
 }
