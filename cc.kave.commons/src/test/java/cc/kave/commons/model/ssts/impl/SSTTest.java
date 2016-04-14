@@ -208,6 +208,6 @@ public class SSTTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new SST());
+		ToStringAssert.assertToStringUtils(new SST());
 	}
 }

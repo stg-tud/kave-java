@@ -144,6 +144,6 @@ public class MicroCommitTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new MicroCommit());
+		ToStringAssert.assertToStringUtils(new MicroCommit());
 	}
 }

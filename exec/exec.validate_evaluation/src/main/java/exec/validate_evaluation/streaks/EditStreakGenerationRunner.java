@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IName;
@@ -91,10 +92,13 @@ public class EditStreakGenerationRunner {
 	}
 
 	private IMethodName getSelection(ICompletionEvent e) {
-		IName proposalName = e.getLastSelectedProposal().getName();
-		boolean isMethodName = proposalName instanceof IMethodName;
-		if (isMethodName) {
-			return (IMethodName) proposalName;
+		IProposal lsp = e.getLastSelectedProposal();
+		if (lsp != null) {
+			IName proposalName = lsp.getName();
+			boolean isMethodName = proposalName instanceof IMethodName;
+			if (isMethodName) {
+				return (IMethodName) proposalName;
+			}
 		}
 		return null;
 	}

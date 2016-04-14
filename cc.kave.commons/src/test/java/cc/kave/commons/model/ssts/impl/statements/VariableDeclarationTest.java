@@ -106,6 +106,6 @@ public class VariableDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new VariableDeclaration());
+		ToStringAssert.assertToStringUtils(new VariableDeclaration());
 	}
 }

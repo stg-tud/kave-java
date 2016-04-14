@@ -17,8 +17,13 @@ package exec.csharp.utils;
 
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class QueryUtils {
+
+	public static String toDiffString(MicroCommit mc) {
+		return toDiffString(mc.Item1, mc.Item2);
+	}
 
 	public static String toDiffString(Usage a, Usage b) {
 		StringBuilder sb = new StringBuilder();

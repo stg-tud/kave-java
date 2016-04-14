@@ -152,6 +152,6 @@ public class ForLoopTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ForLoop());
+		ToStringAssert.assertToStringUtils(new ForLoop());
 	}
 }

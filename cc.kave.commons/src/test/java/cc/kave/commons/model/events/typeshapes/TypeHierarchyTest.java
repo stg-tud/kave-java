@@ -119,7 +119,7 @@ public class TypeHierarchyTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new TypeHierarchy());
+		ToStringAssert.assertToStringUtils(new TypeHierarchy());
 	}
 
 	private static TypeHierarchy someHierarchy(String string) {

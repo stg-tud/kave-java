@@ -103,6 +103,6 @@ public class LabelledStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new LabelledStatement());
+		ToStringAssert.assertToStringUtils(new LabelledStatement());
 	}
 }

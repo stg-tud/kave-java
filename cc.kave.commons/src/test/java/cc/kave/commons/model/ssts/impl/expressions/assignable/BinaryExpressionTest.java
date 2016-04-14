@@ -144,6 +144,6 @@ public class BinaryExpressionTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new BinaryExpression());
+		ToStringAssert.assertToStringUtils(new BinaryExpression());
 	}
 }

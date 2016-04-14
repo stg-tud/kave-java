@@ -55,6 +55,6 @@ public class UnknownStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UnknownStatement());
+		ToStringAssert.assertToStringUtils(new UnknownStatement());
 	}
 }

@@ -49,6 +49,6 @@ public class BreakStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new BreakStatement());
+		ToStringAssert.assertToStringUtils(new BreakStatement());
 	}
 }

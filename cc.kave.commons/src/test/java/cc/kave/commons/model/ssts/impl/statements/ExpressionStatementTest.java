@@ -88,6 +88,6 @@ public class ExpressionStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ExpressionStatement());
+		ToStringAssert.assertToStringUtils(new ExpressionStatement());
 	}
 }

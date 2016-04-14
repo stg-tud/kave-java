@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 
@@ -48,23 +49,29 @@ public class MicroCommitGenerationRunner {
 
 			for (List<Usage> qh : histories) {
 				List<MicroCommit> mcs = createCommits(qh);
-				log.convertedToCommits(mcs.size());
+				log.convertedToCommits(qh.size(), mcs.size());
 				mcForUser.addAll(mcs);
 			}
 			mcIo.store(mcForUser, zip);
 		}
-		
+
 		log.done();
 	}
 
 	private List<MicroCommit> createCommits(List<Usage> qh) {
+
 		List<MicroCommit> commits = Lists.newLinkedList();
-		for (int i = 1; i < qh.size(); i++) {
+		// TODO fix/test
+		for (int i = 1; i < Math.min(40, qh.size()); i++) {
 			for (int j = 0; j < i; j++) {
 				Usage end = qh.get(i);
 				Usage start = qh.get(j);
 
-				commits.add(MicroCommit.create(start, end));
+				// TODO write test for this check
+				boolean atLeastOneIsRealUsage = !(start instanceof NoUsage) || !(end instanceof NoUsage);
+				if (atLeastOneIsRealUsage) {
+					commits.add(MicroCommit.create(start, end));
+				}
 			}
 		}
 		return commits;

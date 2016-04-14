@@ -86,6 +86,6 @@ public class IndexAccessReferenceTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new IndexAccessReference());
+		ToStringAssert.assertToStringUtils(new IndexAccessReference());
 	}
 }

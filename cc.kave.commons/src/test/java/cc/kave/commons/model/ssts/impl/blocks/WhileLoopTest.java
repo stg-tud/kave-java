@@ -124,6 +124,6 @@ public class WhileLoopTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new WhileLoop());
+		ToStringAssert.assertToStringUtils(new WhileLoop());
 	}
 }

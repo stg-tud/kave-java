@@ -94,6 +94,6 @@ public class ThrowStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ThrowStatement());
+		ToStringAssert.assertToStringUtils(new ThrowStatement());
 	}
 }

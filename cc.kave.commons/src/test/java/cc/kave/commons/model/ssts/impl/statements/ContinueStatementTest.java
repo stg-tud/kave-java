@@ -50,6 +50,6 @@ public class ContinueStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ContinueStatement());
+		ToStringAssert.assertToStringUtils(new ContinueStatement());
 	}
 }

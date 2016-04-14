@@ -103,6 +103,6 @@ public class FieldReferenceTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new FieldReference());
+		ToStringAssert.assertToStringUtils(new FieldReference());
 	}
 }

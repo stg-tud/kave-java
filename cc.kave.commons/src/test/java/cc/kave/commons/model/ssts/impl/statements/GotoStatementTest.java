@@ -87,6 +87,6 @@ public class GotoStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new GotoStatement());
+		ToStringAssert.assertToStringUtils(new GotoStatement());
 	}
 }

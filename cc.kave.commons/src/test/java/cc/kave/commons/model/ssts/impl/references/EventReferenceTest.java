@@ -103,6 +103,6 @@ public class EventReferenceTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new EventReference());
+		ToStringAssert.assertToStringUtils(new EventReference());
 	}
 }

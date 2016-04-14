@@ -125,6 +125,6 @@ public class PropertyDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new PropertyDeclaration());
+		ToStringAssert.assertToStringUtils(new PropertyDeclaration());
 	}
 }

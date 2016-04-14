@@ -91,6 +91,6 @@ public class FieldDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new FieldDeclaration());
+		ToStringAssert.assertToStringUtils(new FieldDeclaration());
 	}
 }

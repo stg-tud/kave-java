@@ -100,6 +100,6 @@ public class UncheckBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UncheckedBlock());
+		ToStringAssert.assertToStringUtils(new UncheckedBlock());
 	}
 }

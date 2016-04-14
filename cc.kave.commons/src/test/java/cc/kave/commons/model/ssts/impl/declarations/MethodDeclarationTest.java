@@ -129,6 +129,6 @@ public class MethodDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new MethodDeclaration());
+		ToStringAssert.assertToStringUtils(new MethodDeclaration());
 	}
 }

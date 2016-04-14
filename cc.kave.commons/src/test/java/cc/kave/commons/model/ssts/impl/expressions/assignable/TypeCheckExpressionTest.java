@@ -103,6 +103,6 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new TypeCheckExpression());
+		ToStringAssert.assertToStringUtils(new TypeCheckExpression());
 	}
 }

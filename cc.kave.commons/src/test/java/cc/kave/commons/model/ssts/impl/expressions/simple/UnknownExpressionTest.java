@@ -56,6 +56,6 @@ public class UnknownExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UnknownExpression());
+		ToStringAssert.assertToStringUtils(new UnknownExpression());
 	}
 }

@@ -114,6 +114,6 @@ public class EventSubscriptionStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new EventSubscriptionStatement());
+		ToStringAssert.assertToStringUtils(new EventSubscriptionStatement());
 	}
 }

@@ -11,14 +11,14 @@ package exec.csharp;
 import static cc.recommenders.mining.calls.MiningOptions.newMiningOptions;
 import static cc.recommenders.mining.calls.QueryOptions.newQueryOptions;
 
+import java.nio.file.Paths;
+
 import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
 import cc.recommenders.evaluation.OptionsUtils;
-import cc.recommenders.evaluation.queries.QueryBuilder;
-import cc.recommenders.evaluation.queries.ZeroCallQueryBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.QueryOptions;
@@ -27,13 +27,13 @@ import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
 import cc.recommenders.mining.features.FeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
-import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
 import exec.csharp.evaluation.Evaluation;
 import exec.csharp.evaluation.IEvaluation;
 import exec.csharp.queries.RandomQueryBuilder;
 import exec.csharp.utils.StorageHelper;
+import exec.validate_evaluation.microcommits.MicroCommitIo;
 
 public class Module extends AbstractModule {
 
@@ -75,10 +75,11 @@ public class Module extends AbstractModule {
 	}
 
 	@Provides
-	public QueryBuilder<Usage, Query> provideQueryBuilder() {
-		return new ZeroCallQueryBuilder();
-		// PartialUsageQueryBuilder qb = new PartialUsageQueryBuilder();
-		// qb.setNumOfQueries(3);
-		// return qb;
+	public MicroCommitIo provideMicroCommitIo() {
+		return new MicroCommitIo(path("MicroCommits"));
+	}
+
+	private String path(String... relSubFolders) {
+		return Paths.get(ROOT_PATH, relSubFolders).toString();
 	}
 }

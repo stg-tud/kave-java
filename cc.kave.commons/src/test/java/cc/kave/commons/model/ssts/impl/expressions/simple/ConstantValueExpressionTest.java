@@ -86,6 +86,6 @@ public class ConstantValueExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ConstantValueExpression());
+		ToStringAssert.assertToStringUtils(new ConstantValueExpression());
 	}
 }

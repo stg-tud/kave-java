@@ -46,7 +46,7 @@ public class MicroCommitGenerationLoggerTest {
 		sut.foundHistories(3);
 
 		for (int i = 0; i < 3; i++) {
-			sut.convertedToCommits(i);
+			sut.convertedToCommits(i, 2 * i);
 		}
 	}
 }

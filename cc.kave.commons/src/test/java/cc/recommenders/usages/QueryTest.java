@@ -200,7 +200,7 @@ public class QueryTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new Query());
+		ToStringAssert.assertToStringUtils(new Query());
 	}
 
 	private static CallSite createReceiverCallSite() {

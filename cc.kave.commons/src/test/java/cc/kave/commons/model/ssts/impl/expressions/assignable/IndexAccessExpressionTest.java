@@ -111,6 +111,6 @@ public class IndexAccessExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new IndexAccessExpression());
+		ToStringAssert.assertToStringUtils(new IndexAccessExpression());
 	}
 }

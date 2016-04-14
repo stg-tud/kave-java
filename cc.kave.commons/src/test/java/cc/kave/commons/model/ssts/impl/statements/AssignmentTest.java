@@ -103,6 +103,6 @@ public class AssignmentTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new Assignment());
+		ToStringAssert.assertToStringUtils(new Assignment());
 	}
 }

@@ -56,6 +56,6 @@ public class UnknownReferenceTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UnknownReference());
+		ToStringAssert.assertToStringUtils(new UnknownReference());
 	}
 }

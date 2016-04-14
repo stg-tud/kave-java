@@ -57,6 +57,6 @@ public class NullExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new NullExpression());
+		ToStringAssert.assertToStringUtils(new NullExpression());
 	}
 }

@@ -121,6 +121,6 @@ public class IfElseExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new IfElseExpression());
+		ToStringAssert.assertToStringUtils(new IfElseExpression());
 	}
 }

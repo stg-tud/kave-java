@@ -90,6 +90,6 @@ public class ReturnStatementTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ReturnStatement());
+		ToStringAssert.assertToStringUtils(new ReturnStatement());
 	}
 }

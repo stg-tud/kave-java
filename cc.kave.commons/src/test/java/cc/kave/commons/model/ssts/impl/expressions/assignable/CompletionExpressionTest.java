@@ -121,6 +121,6 @@ public class CompletionExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new CompletionExpression());
+		ToStringAssert.assertToStringUtils(new CompletionExpression());
 	}
 }

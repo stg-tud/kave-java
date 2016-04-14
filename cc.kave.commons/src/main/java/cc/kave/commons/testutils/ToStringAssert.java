@@ -18,7 +18,7 @@ package cc.kave.commons.testutils;
 import static org.junit.Assert.fail;
 
 public class ToStringAssert {
-	public static void AssertToStringUtils(Object obj) {
+	public static void assertToStringUtils(Object obj) {
 		String openingBrace = obj instanceof Iterable ? "[" : "{";
 		String typeName = obj.getClass().getSimpleName();
 		int hashCode = obj.hashCode();

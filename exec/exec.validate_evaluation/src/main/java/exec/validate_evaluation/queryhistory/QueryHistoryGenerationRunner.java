@@ -67,7 +67,11 @@ public class QueryHistoryGenerationRunner {
 			log.foundEditStreaks(editStreaks.size());
 
 			for (EditStreak es : editStreaks) {
-				process(es);
+				try {
+					process(es);
+				} catch (Exception e) {
+					backToProcessingUser();
+				}
 			}
 
 			Collection<List<Usage>> us = histCollector.getHistories();
@@ -75,6 +79,17 @@ public class QueryHistoryGenerationRunner {
 		}
 
 		log.finish();
+	}
+
+	private void backToProcessingUser() {
+		try {
+			histCollector.endSnapshot();
+		} catch (Exception e) {
+		}
+		try {
+			histCollector.endEditStreak();
+		} catch (Exception e) {
+		}
 	}
 
 	private void process(EditStreak e) {
@@ -110,6 +125,8 @@ public class QueryHistoryGenerationRunner {
 			}
 			histCollector.endSnapshot();
 		}
+
+		histCollector.endEditStreak();
 	}
 
 	private Usage merge(Usage u, IMethodName m) {

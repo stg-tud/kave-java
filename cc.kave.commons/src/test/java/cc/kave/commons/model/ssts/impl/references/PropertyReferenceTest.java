@@ -103,6 +103,6 @@ public class PropertyReferenceTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new PropertyReference());
+		ToStringAssert.assertToStringUtils(new PropertyReference());
 	}
 }

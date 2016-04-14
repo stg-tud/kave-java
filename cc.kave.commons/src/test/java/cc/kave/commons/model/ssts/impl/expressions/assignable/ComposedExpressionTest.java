@@ -93,6 +93,6 @@ public class ComposedExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ComposedExpression());
+		ToStringAssert.assertToStringUtils(new ComposedExpression());
 	}
 }

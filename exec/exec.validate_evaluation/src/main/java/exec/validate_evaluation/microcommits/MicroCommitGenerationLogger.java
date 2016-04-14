@@ -50,11 +50,13 @@ public class MicroCommitGenerationLogger {
 		isFirstCommit = true;
 	}
 
-	public void convertedToCommits(int num) {
+	public void convertedToCommits(int qhLen, int numMCs) {
 		if (!isFirstCommit) {
 			append(", ");
 		}
-		append("%d", num);
+		append("%d", qhLen);
+		append(">");
+		append("%d", numMCs);
 		isFirstCommit = false;
 	}
 

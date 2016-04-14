@@ -92,6 +92,6 @@ public class EventDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new EventDeclaration());
+		ToStringAssert.assertToStringUtils(new EventDeclaration());
 	}
 }

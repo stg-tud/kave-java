@@ -135,6 +135,6 @@ public class IfElseBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new IfElseBlock());
+		ToStringAssert.assertToStringUtils(new IfElseBlock());
 	}
 }

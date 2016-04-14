@@ -109,6 +109,6 @@ public class LambdaExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new LambdaExpression());
+		ToStringAssert.assertToStringUtils(new LambdaExpression());
 	}
 }

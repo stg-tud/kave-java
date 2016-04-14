@@ -97,6 +97,6 @@ public class CaseBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new CaseBlock());
+		ToStringAssert.assertToStringUtils(new CaseBlock());
 	}
 }

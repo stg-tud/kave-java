@@ -116,6 +116,6 @@ public class UnaryExpressionTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UnaryExpression());
+		ToStringAssert.assertToStringUtils(new UnaryExpression());
 	}
 }

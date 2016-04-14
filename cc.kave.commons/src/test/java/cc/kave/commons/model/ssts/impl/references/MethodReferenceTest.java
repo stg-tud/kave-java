@@ -103,6 +103,6 @@ public class MethodReferenceTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new MethodReference());
+		ToStringAssert.assertToStringUtils(new MethodReference());
 	}
 }

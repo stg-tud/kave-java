@@ -119,6 +119,6 @@ public class LockBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new LockBlock());
+		ToStringAssert.assertToStringUtils(new LockBlock());
 	}
 }

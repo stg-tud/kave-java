@@ -79,8 +79,9 @@ public class QueryHistoryCollector {
 	public void register(Usage u) {
 		require(State.PROCESSING_SNAPSHOT);
 		Tuple<ICoReTypeName, ICoReMethodName> key = getKey(u);
-		Asserts.assertFalse(keysInThisSnapshot.contains(key),
-				"you are trying to register the same key again for this snapshot");
+		// TODO reanable and write tests (generics?)
+//		Asserts.assertFalse(keysInThisSnapshot.contains(key),
+//				"you are trying to register the same key again for this snapshot");
 		registerByKey(u, key);
 	}
 
@@ -107,6 +108,10 @@ public class QueryHistoryCollector {
 		return Tuple.newTuple(u.getType(), u.getMethodContext());
 	}
 
+	public void noSnapshots() {
+		transition(State.PROCESSING_SNAPSHOT, State.PROCESSING_STREAK);
+	}
+
 	public void endSnapshot() {
 		transition(State.PROCESSING_SNAPSHOT, State.PROCESSING_STREAK);
 
@@ -124,8 +129,14 @@ public class QueryHistoryCollector {
 		keysInThisSnapshot.clear();
 	}
 
+	public void endEditStreak() {
+		// TODO write tests!!
+		transition(State.PROCESSING_STREAK, State.PROCESSING_USER);
+	}
+
 	public Set<List<Usage>> getHistories() {
-		transition(State.PROCESSING_STREAK, State.UNDEFINED);
+		// TODO tests for updated states...
+		transition(State.PROCESSING_USER, State.UNDEFINED);
 		removeRepeatingUsages();
 		removeSingleHistories();
 		return Sets.newLinkedHashSet(queryHistories.values());

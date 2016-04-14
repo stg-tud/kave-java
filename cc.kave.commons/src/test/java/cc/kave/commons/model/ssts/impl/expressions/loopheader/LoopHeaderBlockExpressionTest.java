@@ -94,6 +94,6 @@ public class LoopHeaderBlockExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new LoopHeaderBlockExpression());
+		ToStringAssert.assertToStringUtils(new LoopHeaderBlockExpression());
 	}
 }

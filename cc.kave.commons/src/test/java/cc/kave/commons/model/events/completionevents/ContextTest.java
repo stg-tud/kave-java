@@ -23,6 +23,6 @@ public class ContextTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new Context());
+		ToStringAssert.assertToStringUtils(new Context());
 	}
 }

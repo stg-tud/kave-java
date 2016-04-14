@@ -140,7 +140,7 @@ public class MicroCommitGenerationRunnerTest {
 
 		verify(log).processingZip("a.zip");
 		verify(log).foundHistories(1);
-		verify(log, times(3)).convertedToCommits(1);
+		verify(log, times(3)).convertedToCommits(2, 1);
 
 		verify(log).processingZip("b.zip");
 		verify(log).foundHistories(2);
@@ -154,7 +154,7 @@ public class MicroCommitGenerationRunnerTest {
 	@Test
 	public void largeConversionsCreateAppropriateLog() {
 		correctCreationOfIntermediateHistories();
-		verify(log).convertedToCommits(3);
+		verify(log).convertedToCommits(3, 3);
 	}
 
 	private void assertNumFiles(int expected) {

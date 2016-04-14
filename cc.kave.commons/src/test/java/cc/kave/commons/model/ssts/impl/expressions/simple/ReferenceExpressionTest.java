@@ -89,6 +89,6 @@ public class ReferenceExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new ReferenceExpression());
+		ToStringAssert.assertToStringUtils(new ReferenceExpression());
 	}
 }

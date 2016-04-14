@@ -123,6 +123,6 @@ public class CastExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new CastExpression());
+		ToStringAssert.assertToStringUtils(new CastExpression());
 	}
 }

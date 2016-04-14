@@ -129,6 +129,6 @@ public class InvocationExpressionTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new InvocationExpression());
+		ToStringAssert.assertToStringUtils(new InvocationExpression());
 	}
 }

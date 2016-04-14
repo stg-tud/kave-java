@@ -115,6 +115,6 @@ public class CatchBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new CatchBlock());
+		ToStringAssert.assertToStringUtils(new CatchBlock());
 	}
 }

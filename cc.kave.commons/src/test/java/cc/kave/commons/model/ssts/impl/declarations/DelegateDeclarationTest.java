@@ -91,6 +91,6 @@ public class DelegateDeclarationTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new DelegateDeclaration());
+		ToStringAssert.assertToStringUtils(new DelegateDeclaration());
 	}
 }

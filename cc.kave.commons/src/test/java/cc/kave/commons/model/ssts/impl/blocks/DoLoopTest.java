@@ -114,6 +114,6 @@ public class DoLoopTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new DoLoop());
+		ToStringAssert.assertToStringUtils(new DoLoop());
 	}
 }

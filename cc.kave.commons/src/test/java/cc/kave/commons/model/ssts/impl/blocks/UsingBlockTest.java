@@ -121,6 +121,6 @@ public class UsingBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UsingBlock());
+		ToStringAssert.assertToStringUtils(new UsingBlock());
 	}
 }

@@ -134,6 +134,6 @@ public class TryBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new TryBlock());
+		ToStringAssert.assertToStringUtils(new TryBlock());
 	}
 }

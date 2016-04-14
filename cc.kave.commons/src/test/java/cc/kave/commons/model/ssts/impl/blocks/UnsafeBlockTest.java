@@ -57,6 +57,6 @@ public class UnsafeBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new UnsafeBlock());
+		ToStringAssert.assertToStringUtils(new UnsafeBlock());
 	}
 }

@@ -134,6 +134,6 @@ public class SwitchBlockTest extends SSTBaseTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.AssertToStringUtils(new SwitchBlock());
+		ToStringAssert.assertToStringUtils(new SwitchBlock());
 	}
 }
