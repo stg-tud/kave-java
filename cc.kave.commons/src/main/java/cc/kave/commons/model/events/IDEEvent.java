@@ -37,18 +37,20 @@ public abstract class IDEEvent implements IIDEEvent {
 	@Nullable
 	public LocalDateTime TriggeredAt;
 
+	@Nullable
+	public LocalDateTime TerminatedAt;
+
+	@Override
 	public LocalDateTime getTriggeredAt() {
 		return TriggeredAt;
 	}
 
-	public Trigger TriggeredBy;
-
-	@Nullable
-	public String getTerminatedAt() {
-		// get { return TriggeredAt + Duration; }
-		// set { Duration = value - TriggeredAt; }
-		return null;
+	@Override
+	public LocalDateTime getTerminatedAt() {
+		return TerminatedAt;
 	}
+
+	public Trigger TriggeredBy;
 
 	@Nullable
 	public String Duration;

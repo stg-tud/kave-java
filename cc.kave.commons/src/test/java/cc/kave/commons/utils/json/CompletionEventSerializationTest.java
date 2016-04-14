@@ -97,8 +97,7 @@ public class CompletionEventSerializationTest {
 	}
 
 	private static LocalDateTime getDate(String str) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		return LocalDateTime.parse(str, formatter);
+		return LocalDateTime.parse(str, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 	}
 
 	private static ProposalSelection createProposalSelection(String methodName, String selectedAfter) {

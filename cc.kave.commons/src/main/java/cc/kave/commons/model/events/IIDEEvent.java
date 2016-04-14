@@ -18,5 +18,7 @@ package cc.kave.commons.model.events;
 import java.time.LocalDateTime;
 
 public interface IIDEEvent {
-	public LocalDateTime getTriggeredAt();
+	LocalDateTime getTriggeredAt();
+
+	LocalDateTime getTerminatedAt();
 }
