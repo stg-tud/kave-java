@@ -36,15 +36,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.pointsto.AdvancedPointsToAnalysisFactory;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
-import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
-import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
-import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
-import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.kave.commons.pointsto.tests.AnalysesProvider;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Usage;
@@ -54,10 +48,7 @@ public class PointsToUsageExtractorTest extends UsageExtractionTest {
 
 	@Parameters
 	public static Collection<Object[]> data() {
-		return Arrays.asList(new Object[][] { { new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class) },
-				{ new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class) },
-				{ new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL) },
-				{ new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class) } });
+		return AnalysesProvider.ANALYSES_AS_PARAMETERS;
 	}
 
 	private final PointsToAnalysisFactory analysisFactory;

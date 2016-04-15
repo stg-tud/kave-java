@@ -12,6 +12,17 @@
  */
 package cc.kave.commons.pointsto.analysis.utils;
 
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.assignment;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.indexAccessReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.invocationExpr;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.propertyReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.referenceExpr;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableDeclaration;
+
+import java.util.Arrays;
+import java.util.List;
+
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
@@ -21,6 +32,8 @@ import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
 
@@ -112,4 +125,23 @@ public class CSharpLanguageOptions extends LanguageOptions {
 			throw new UnexpectedSSTNodeException();
 		}
 	}
+
+	@Override
+	public List<IStatement> emulateForEachVariableAssignment(IVariableReference dest, IVariableReference src,
+			ITypeName srcType) {
+		if (srcType != null && srcType.isArrayType()) {
+			return Arrays.asList(assignment(dest, indexAccessReference(src)));
+		} else {
+			String tmpVar = "$foreachEnumerator";
+			ITypeName enumeratorType = TypeName.newTypeName("System.Collections.IEnumerator, mscorlib");
+			IMethodName getEnumeratorName = MethodName.newMethodName(
+					"[" + enumeratorType.getIdentifier() + "] [" + srcType.getIdentifier() + "].GetEnumerator()");
+			IPropertyName current = PropertyName.newPropertyName(
+					"get [System.Object, mscorlib] [" + enumeratorType.getIdentifier() + "].Current()");
+			return Arrays.asList(variableDeclaration(enumeratorType, variableReference(tmpVar)),
+					assignment(variableReference(tmpVar), invocationExpr(getEnumeratorName, src)),
+					assignment(dest, referenceExpr(propertyReference(variableReference(tmpVar), current))));
+		}
+	}
+
 }

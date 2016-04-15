@@ -21,7 +21,9 @@ import cc.kave.commons.model.names.IName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 
 public abstract class LanguageOptions {
@@ -71,4 +73,7 @@ public abstract class LanguageOptions {
 		}
 		return count;
 	}
+
+	public abstract List<IStatement> emulateForEachVariableAssignment(IVariableReference dest, IVariableReference src,
+			ITypeName srcType);
 }

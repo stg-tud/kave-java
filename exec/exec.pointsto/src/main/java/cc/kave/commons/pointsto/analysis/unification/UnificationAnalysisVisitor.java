@@ -22,6 +22,7 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -98,10 +99,15 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 		context.declareVariable(block.getDeclaration());
 
 		try {
-			// model as dest = src[X]
 			IVariableReference srcRef = block.getLoopedReference();
 			IVariableReference destRef = block.getDeclaration().getReference();
-			context.readArray(destRef, SSTBuilder.indexAccessReference(srcRef));
+			List<IStatement> emulationStmts = languageOptions.emulateForEachVariableAssignment(destRef, srcRef,
+					context.getDistinctReference(srcRef).getType());
+			context.enterScope();
+			for (IStatement stmt : emulationStmts) {
+				stmt.accept(this, context);
+			}
+			context.leaveScope();
 
 			visitStatements(block.getBody(), context);
 		} catch (MissingVariableException | UndeclaredVariableException ex) {

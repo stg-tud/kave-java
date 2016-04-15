@@ -360,7 +360,7 @@ public class ConstraintGraphBuilder {
 		writeArray(arraySetVar, srcSetVar);
 	}
 
-	private void writeArray(SetVariable arraySetVar, SetVariable srcSetVar) {
+	public void writeArray(SetVariable arraySetVar, SetVariable srcSetVar) {
 		SetVariable temp = variableFactory.createProjectionVariable();
 		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
 
@@ -601,7 +601,7 @@ public class ConstraintGraphBuilder {
 
 	private SetVariable initializeParameterArray(IParameterName parameter) {
 		SetVariable array = createTemporaryVariable();
-		allocate(array, new UniqueAllocationSite(parameter.getValueType().getArrayBaseType()));
+		allocate(array, new UniqueAllocationSite(parameter.getValueType()));
 		return array;
 	}
 

@@ -176,10 +176,9 @@ public class ConstraintGenerationVisitor extends ScopingVisitor<ConstraintGenera
 		context.declareVariable(block.getDeclaration());
 
 		try {
-			// model as dest = src[X]
 			IVariableReference srcRef = block.getLoopedReference();
 			IVariableReference destRef = block.getDeclaration().getReference();
-			context.assign(destRef, SSTBuilder.indexAccessReference(srcRef));
+			context.assignForEachVariable(destRef, srcRef, this);
 
 			visitStatements(block.getBody(), context);
 		} catch (MissingVariableException | UndeclaredVariableException ex) {

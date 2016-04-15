@@ -14,6 +14,7 @@ package cc.kave.commons.pointsto.tests;
 
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +31,8 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -38,6 +41,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
@@ -143,6 +147,14 @@ public abstract class TestBuilder {
 		ExpressionStatement stmt = new ExpressionStatement();
 		stmt.setExpression(expr);
 		return stmt;
+	}
+
+	public IForEachLoop forEachLoop(IVariableDeclaration loopVar, String source, IStatement... stmts) {
+		ForEachLoop loop = new ForEachLoop();
+		loop.setDeclaration(loopVar);
+		loop.setLoopedReference(variableReference(source));
+		loop.setBody(Arrays.asList(stmts));
+		return loop;
 	}
 
 	public Context context(ITypeName type, Set<IMethodDeclaration> methods, Set<IFieldDeclaration> fields,

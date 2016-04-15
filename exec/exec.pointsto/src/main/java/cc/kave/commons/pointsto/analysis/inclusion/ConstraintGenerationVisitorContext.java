@@ -39,6 +39,7 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -46,9 +47,11 @@ import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IUnknownReference;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ContextAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ExprAllocationSite;
@@ -130,7 +133,16 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 			List<IParameterName> formalParameters = method.getParameters();
 			List<SetVariable> actualParameters = formalParameters.stream().map(parameter -> {
 				SetVariable parameterVar = builder.createTemporaryVariable();
-				builder.allocate(parameterVar, new EntryPointAllocationSite(method, parameter));
+				AllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
+				builder.allocate(parameterVar, parameterAllocationSite);
+
+				if (parameter.getValueType().isArrayType()) {
+					// provide an array with content
+					SetVariable tmp = builder.createTemporaryVariable();
+					builder.allocate(tmp, new ArrayEntryAllocationSite(parameterAllocationSite));
+					builder.writeArray(parameterVar, tmp);
+				}
+
 				return parameterVar;
 			}).collect(Collectors.toList());
 
@@ -231,6 +243,17 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 
 	public ConstraintGraphBuilder getBuilder() {
 		return builder;
+	}
+
+	public void assignForEachVariable(IVariableReference destRef, IVariableReference srcRef,
+			ConstraintGenerationVisitor visitor) {
+		List<IStatement> emulationStmts = languageOptions.emulateForEachVariableAssignment(destRef, srcRef,
+				getDistinctReference(srcRef).getType());
+		enterScope();
+		for (IStatement stmt : emulationStmts) {
+			stmt.accept(visitor, this);
+		}
+		leaveScope();
 	}
 
 	public void assign(IAssignableReference dest, IReference src) {
