@@ -144,12 +144,22 @@ public class QueryUtilsTest {
 
 	@Test
 	public void toDiffString_completeRemoval() {
-		assertDiffToString(q(1), new NoUsage(), "[-]");
+		assertDiffToString(q(1), new NoUsage(), "~[-1]");
+	}
+
+	@Test
+	public void toDiffString_completeRemoval2() {
+		assertDiffToString(q(1, 2), new NoUsage(), "~[-2]");
 	}
 
 	@Test
 	public void toDiffString_fromScratch() {
-		assertDiffToString(new NoUsage(), q(1), "[+]");
+		assertDiffToString(new NoUsage(), q(1), "~[+1]");
+	}
+
+	@Test
+	public void toDiffString_fromScratch2() {
+		assertDiffToString(new NoUsage(), q(1, 2), "~[+2]");
 	}
 
 	@Test

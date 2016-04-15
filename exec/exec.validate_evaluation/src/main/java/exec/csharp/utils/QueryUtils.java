@@ -32,10 +32,10 @@ public class QueryUtils {
 			return "[- -> -]";
 		}
 		if (a instanceof NoUsage) {
-			return "[+]";
+			return String.format("~[+%d]", b.getReceiverCallsites().size());
 		}
 		if (b instanceof NoUsage) {
-			return "[-]";
+			return String.format("~[-%d]", a.getReceiverCallsites().size());
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -70,6 +70,11 @@ public class QueryUtils {
 		}
 
 		return sb.toString();
+	}
+
+	private static Usage empty(Usage a) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public static int countAdditions(Usage a, Usage b) {
