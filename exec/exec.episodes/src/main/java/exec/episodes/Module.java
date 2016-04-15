@@ -51,10 +51,10 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "configurations/");
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File eventStreamData = new File(rootFolder + "EpisodeMining/EventStreamForEpisodeMining/");
+		File eventStreamData = new File(rootFolder + "EpisodeMining/dataSet/SST/");
 		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
-		File validationContexts = new File(rootFolder + "EpisodeMining/Contexts-Validation/");
-		Directory validationCtxtDir = new Directory(validationContexts.getAbsolutePath());
+		File contexts = new File(rootFolder + "EpisodeMining/Contexts/");
+		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File graphFile = new File(rootFolder);
 		Directory graphDir = new Directory(graphFile.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
@@ -63,14 +63,14 @@ public class Module extends AbstractModule {
 		Map<String, Directory> dirs = Maps.newHashMap();
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
-		dirs.put("contexts", validationCtxtDir);
+		dirs.put("contexts", ctxtDir);
 		dirs.put("graph", graphDir);
 		dirs.put("evaluation", evaluationDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
-		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(validationContexts);
+		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
 		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		
@@ -86,7 +86,7 @@ public class Module extends AbstractModule {
 		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
 		File graphRoot = graphFile;
 
-		Directory vcr = new Directory(validationContexts.getAbsolutePath());
+		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
 
 		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);

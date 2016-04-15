@@ -36,6 +36,8 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.export.EventStreamGenerator;
+import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.ReadingArchive;
 
@@ -47,15 +49,21 @@ public class DoSomething {
 	}
 
 	private void readAllContexts(String dirContexts) throws ZipException, IOException {
-		for (File zip : findAllZips(dirContexts)) {
+		List<File> zips = findAllZips(dirContexts);
+		for (File zip : zips) {
 			ReadingArchive ra = new ReadingArchive(zip);
 
 			int i = 0;
 
+			EventStreamGenerator gen = new EventStreamGenerator();
 			System.out.println("found contexts for the following classes:");
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 
+				gen.add(ctx);
+				
+				
+				
 				List<Event> events = Lists.newLinkedList(); // get from
 															// somewhere
 															// ("eventMapping.txt")
@@ -81,6 +89,10 @@ public class DoSomething {
 				}
 			}
 			ra.close();
+			
+			List<Event> es = gen.getEventStream();
+			
+			EventStreamIo.write(es, null, null);
 		}
 	}
 

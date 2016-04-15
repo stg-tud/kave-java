@@ -71,7 +71,10 @@ public class EventStreamIo {
 			}
 			isFirstMethod = false;
 
-			sb.append(String.format("%d,%.3f\n", idx, time));
+			sb.append(idx);
+			sb.append(',');
+			sb.append(String.format("%.3f",time));
+			sb.append('\n');
 
 			time += DELTA;
 		}
