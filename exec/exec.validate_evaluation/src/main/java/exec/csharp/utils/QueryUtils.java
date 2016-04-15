@@ -16,16 +16,28 @@
 package exec.csharp.utils;
 
 import cc.recommenders.usages.CallSite;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class QueryUtils {
 
 	public static String toDiffString(MicroCommit mc) {
-		return toDiffString(mc.Item1, mc.Item2);
+		return toDiffString(mc.getStart(), mc.getEnd());
 	}
 
 	public static String toDiffString(Usage a, Usage b) {
+
+		if (a instanceof NoUsage && b instanceof NoUsage) {
+			return "[- -> -]";
+		}
+		if (a instanceof NoUsage) {
+			return "[+]";
+		}
+		if (b instanceof NoUsage) {
+			return "[-]";
+		}
+
 		StringBuilder sb = new StringBuilder();
 		sb.append(a.getReceiverCallsites().size());
 		int numRemovals = countRemovals(a, b);

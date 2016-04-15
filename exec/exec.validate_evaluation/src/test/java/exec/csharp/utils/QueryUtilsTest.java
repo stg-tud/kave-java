@@ -26,7 +26,9 @@ import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 public class QueryUtilsTest {
 
@@ -140,7 +142,22 @@ public class QueryUtilsTest {
 		assertDiffToString(a, b, "2-1+2~TCMD");
 	}
 
-	private void assertDiffToString(Query a, Query b, String expected) {
+	@Test
+	public void toDiffString_completeRemoval() {
+		assertDiffToString(q(1), new NoUsage(), "[-]");
+	}
+
+	@Test
+	public void toDiffString_fromScratch() {
+		assertDiffToString(new NoUsage(), q(1), "[+]");
+	}
+
+	@Test
+	public void toDiffString_NoUsageToNoUsage() {
+		assertDiffToString(new NoUsage(), new NoUsage(), "[- -> -]");
+	}
+
+	private void assertDiffToString(Usage a, Usage b, String expected) {
 		String actual = QueryUtils.toDiffString(a, b);
 		assertEquals(expected, actual);
 	}
