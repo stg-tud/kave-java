@@ -94,10 +94,25 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 	private void evaluateType(String validationAnalysisName, ICoReTypeName type,
 			Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries) throws IOException {
+		log("\t%s:\n", Names.vm2srcQualifiedType(type));
 		for (UsageStore store : usageStores) {
-			ICallsRecommender<Query> recommender = trainRecommender(store.load(type, usageFilter));
-			store.flush();
-			double score = calcMRR(recommender, queries.get(type));
+
+			ICallsRecommender<Query> recommender = null;
+			{
+				List<Usage> usages = store.load(type, usageFilter);
+				if (!usages.isEmpty()) {
+					recommender = trainRecommender(usages);
+				}
+				store.flush();
+			}
+
+			double score = 0;
+			if (recommender == null) {
+				log("\t\t%s: no usages\n", store.getName());
+			} else {
+				score = calcMRR(recommender, queries.get(type));
+				log("\t\t%s: %.3f\n", store.getName(), score);
+			}
 			results.put(ImmutableTriple.of(type, store.getName(), validationAnalysisName), score);
 		}
 	}
