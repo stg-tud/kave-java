@@ -16,6 +16,7 @@
 package exec.validate_evaluation.queryhistory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -75,6 +76,17 @@ public class QueryHistoryIoTest {
 	}
 
 	@Test
+	public void correctFileIsNotCreatedWhenNoHistoriesAreProvided() {
+
+		Collection<List<Usage>> qhs = Lists.newLinkedList();
+
+		sut.storeQueryHistories(qhs, Paths.get("a", "b.zip").toString());
+
+		File expectedFile = Paths.get(dir.getAbsolutePath(), "a", "b.zip").toFile();
+		assertFalse(expectedFile.exists());
+	}
+
+	@Test
 	public void storeAndReadHistories() {
 		String zip = Paths.get("a", "b.zip").toString();
 
@@ -84,6 +96,25 @@ public class QueryHistoryIoTest {
 		expecteds.add(history(query(4), query(5), query(6)));
 
 		sut.storeQueryHistories(expecteds, zip);
+		Collection<List<Usage>> actuals = sut.readQueryHistories(zip);
+
+		assertEquals(expecteds, actuals);
+	}
+
+	@Test
+	public void storeAndReadHistories_emptiesAreRemoved() {
+		String zip = Paths.get("a", "b.zip").toString();
+
+		Collection<List<Usage>> expecteds = Lists.newLinkedList();
+		expecteds.add(history(query(1)));
+		expecteds.add(history(query(2), query(3)));
+		expecteds.add(history(query(4), query(5), query(6)));
+
+		Collection<List<Usage>> input = Lists.newLinkedList();
+		input.add(history());
+		input.addAll(expecteds);
+
+		sut.storeQueryHistories(input, zip);
 		Collection<List<Usage>> actuals = sut.readQueryHistories(zip);
 
 		assertEquals(expecteds, actuals);

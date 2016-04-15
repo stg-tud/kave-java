@@ -44,10 +44,16 @@ public class QueryHistoryIo {
 
 	public void storeQueryHistories(Collection<List<Usage>> collection, String zip) {
 
+		if (collection.isEmpty()) {
+			return;
+		}
+
 		Directory dir = new Directory(this.dir);
 		try (WritingArchive wa = dir.getWritingArchive(zip)) {
 			for (List<Usage> us : collection) {
-				wa.add(us);
+				if (!us.isEmpty()) {
+					wa.add(us);
+				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
