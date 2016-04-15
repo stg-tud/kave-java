@@ -38,8 +38,23 @@ public class QueryUtilsTest {
 	}
 
 	@Test
-	public void countAdditions_addition() {
+	public void countAdditions_addition_qq() {
 		assertEquals(1, countAdditions(q(1), q(1, 2)));
+	}
+
+	@Test
+	public void countAdditions_addition_nq() {
+		assertEquals(1, countAdditions(new NoUsage(), q(1)));
+	}
+
+	@Test
+	public void countAdditions_addition_qn() {
+		assertEquals(0, countAdditions(q(1), new NoUsage()));
+	}
+
+	@Test
+	public void countAdditions_addition_nn() {
+		assertEquals(0, countAdditions(new NoUsage(), new NoUsage()));
 	}
 
 	@Test
@@ -58,8 +73,23 @@ public class QueryUtilsTest {
 	}
 
 	@Test
-	public void countRemovals_removal() {
+	public void countRemovals_removal_qq() {
 		assertEquals(1, countRemovals(q(1, 2), q(1)));
+	}
+
+	@Test
+	public void countRemovals_removal_nq() {
+		assertEquals(0, countRemovals(new NoUsage(), q(1)));
+	}
+
+	@Test
+	public void countRemovals_removal_qn() {
+		assertEquals(2, countRemovals(q(1, 2), new NoUsage()));
+	}
+
+	@Test
+	public void countRemovals_removal_nn() {
+		assertEquals(0, countRemovals(new NoUsage(), new NoUsage()));
 	}
 
 	@Test

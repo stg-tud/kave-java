@@ -72,12 +72,18 @@ public class QueryUtils {
 		return sb.toString();
 	}
 
-	private static Usage empty(Usage a) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public static int countAdditions(Usage a, Usage b) {
+
+		if (a instanceof NoUsage && b instanceof NoUsage) {
+			return 0;
+		}
+		if (a instanceof NoUsage) {
+			return b.getReceiverCallsites().size();
+		}
+		if (b instanceof NoUsage) {
+			return 0;
+		}
+
 		int additions = 0;
 		for (CallSite cs : b.getReceiverCallsites()) {
 			if (!a.getReceiverCallsites().contains(cs)) {
@@ -88,6 +94,16 @@ public class QueryUtils {
 	}
 
 	public static int countRemovals(Usage a, Usage b) {
+		if (a instanceof NoUsage && b instanceof NoUsage) {
+			return 0;
+		}
+		if (a instanceof NoUsage) {
+			return 0;
+		}
+		if (b instanceof NoUsage) {
+			return a.getReceiverCallsites().size();
+		}
+
 		int removals = 0;
 		for (CallSite cs : a.getReceiverCallsites()) {
 			if (!b.getReceiverCallsites().contains(cs)) {
