@@ -48,7 +48,7 @@ public class TypeCollectorVisitorContext {
 	public TypeCollectorVisitorContext(Context context) {
 		initializeSymbolTable(context);
 	}
-	
+
 	public IdentityHashMap<IReference, ITypeName> getReferenceTypes() {
 		return referenceTypes;
 	}
@@ -131,7 +131,8 @@ public class TypeCollectorVisitorContext {
 		if (parameter.isUnknown()) {
 			LOGGER.error("Cannot declare an unknown parameter");
 		} else {
-			declare(parameter.getName(), parameter.getValueType());
+			// allow a method parameter to be declared multiple times in order to guard against faulty user input
+			declare(parameter.getName(), parameter.getValueType(), true);
 		}
 	}
 
@@ -149,7 +150,7 @@ public class TypeCollectorVisitorContext {
 
 		ITypeName type = symbolTable.get(reference.getIdentifier());
 		if (type == null) {
-			LOGGER.error("Skipping a reference to an unknown variable");
+			LOGGER.error("Skipping a reference to an undeclared variable");
 		} else {
 			referenceTypes.put(reference, type);
 		}

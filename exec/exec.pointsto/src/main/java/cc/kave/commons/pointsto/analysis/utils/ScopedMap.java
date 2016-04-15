@@ -66,9 +66,13 @@ public class ScopedMap<K, V> {
 		return values.getFirst();
 	}
 
+	/**
+	 * @throws DuplicateKeyException
+	 *             If the key already exists in the current scope
+	 */
 	public void create(K key, V value) {
 		if (keyStack.getFirst().contains(key)) {
-			throw new IllegalArgumentException("Key does already exist in the current scope");
+			throw new DuplicateKeyException(key);
 		}
 
 		keyStack.getFirst().add(key);
@@ -102,5 +106,14 @@ public class ScopedMap<K, V> {
 		}
 
 		return update;
+	}
+
+	public static class DuplicateKeyException extends IllegalArgumentException {
+
+		private static final long serialVersionUID = 8432691707057053261L;
+
+		public DuplicateKeyException(Object key) {
+			super("Key '" + key.toString() + "' already exists in the current scope");
+		}
 	}
 }
