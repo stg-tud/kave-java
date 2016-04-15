@@ -27,10 +27,6 @@ public class CompletionEventFilter implements Predicate<ICompletionEvent> {
 			return false;
 		}
 
-		if (event.getSelections().isEmpty()) {
-			return false;
-		}
-
 		IProposal proposal = event.getLastSelectedProposal();
 		if (proposal == null) {
 			return false;
