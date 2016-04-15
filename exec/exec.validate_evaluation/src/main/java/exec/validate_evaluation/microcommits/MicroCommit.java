@@ -21,14 +21,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.assertions.Asserts;
-import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 
 public class MicroCommit {
-	public Usage Item1;
-	public Usage Item2;
+	private Usage Item1;
+	private Usage Item2;
 
 	public Usage getStart() {
 		return Item1;
@@ -39,13 +39,18 @@ public class MicroCommit {
 	}
 
 	public ICoReTypeName getType() {
+		return getFirstNoUsage().getType();
+	}
+
+	public ICoReMethodName getMethodContext() {
+		return getFirstNoUsage().getMethodContext();
+	}
+
+	private Usage getFirstNoUsage() {
 		if (!(Item1 instanceof NoUsage)) {
-			return Item1.getType();
+			return Item1;
 		}
-		if (!(Item2 instanceof NoUsage)) {
-			return Item2.getType();
-		}
-		throw new AssertionException("should not happen!");
+		return Item2;
 	}
 
 	@Override

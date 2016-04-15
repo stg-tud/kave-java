@@ -64,8 +64,8 @@ public class MicroCommitStatisticsRunner {
 				numTotal++;
 				MicroCommit t = ra.getNext(MicroCommit.class);
 
-				Usage a = t.Item1;
-				Usage b = t.Item2;
+				Usage a = t.getStart();
+				Usage b = t.getEnd();
 
 				ICoReTypeName type = a.getType();
 
@@ -94,7 +94,7 @@ public class MicroCommitStatisticsRunner {
 		int numSanity = numTotal - numAdditions - numRemovals - numNeither - numBoth;
 
 		System.out.printf(
-				"totals:\n-------\n%d tuples - additions: %d (+both: %d), removals: %d (both: %d, neither: %d, sanity: %d)\n",
+				"totals:\n-------\n%d MicroCommits - additions: %d (+both: %d), removals: %d (both: %d, neither: %d, sanity: %d)\n",
 				numTotal, numAdditions, (numAdditions + numBoth), numRemovals, numBoth, numNeither, numSanity);
 
 		Map<ICoReTypeName, Integer> sortedCounts = MapSorter.sortByCount(counts);

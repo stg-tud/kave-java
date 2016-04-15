@@ -86,9 +86,7 @@ public class MicroCommitIoTest {
 
 	private MicroCommit commit(int i) {
 		int j = 2 * i;
-		MicroCommit mc = new MicroCommit();
-		mc.Item1 = usage(j);
-		mc.Item2 = usage(j + 1);
+		MicroCommit mc = MicroCommit.create(usage(j), usage(j + 1));
 		return mc;
 	}
 
