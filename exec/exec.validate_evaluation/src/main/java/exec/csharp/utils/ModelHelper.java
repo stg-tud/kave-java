@@ -31,7 +31,7 @@ import cc.recommenders.usages.Usage;
 
 public class ModelHelper {
 
-	public static final int MAX_NUM_USAGES = 40000;
+	public static final int MAX_NUM_USAGES = 30000;
 
 	private PBNMiner miner;
 	private NestedZipFolders<ICoReTypeName> zipsUsages;

@@ -49,14 +49,16 @@ public class Module extends AbstractModule {
 	}
 
 	private void bindMiningAndQueryOptions() {
-		String opts = OptionsUtils.pbn(10).c(false).d(true).p(false).useFloat().ignore(false).min(30).get();
+		@SuppressWarnings("deprecation")
+		String opts = OptionsUtils.pbn(10).c(false).d(true).p(false).useFloat().ignore(false).dropRareFeatures(false)
+				.min(30).get();
 		bind(QueryOptions.class).toInstance(newQueryOptions(opts));
 		bind(MiningOptions.class).toInstance(newMiningOptions(opts));
 	}
 
 	@Provides
 	public RandomQueryBuilder provideRandomQueryBuilder() {
-		return new RandomQueryBuilder(10);
+		return new RandomQueryBuilder(6);
 	}
 
 	@Provides
