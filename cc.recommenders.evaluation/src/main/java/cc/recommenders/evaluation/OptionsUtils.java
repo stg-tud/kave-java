@@ -20,7 +20,8 @@ public class OptionsUtils {
 		return ob.get();
 	}
 
-	public static String getOptionsWithInit(String algo, boolean useClass, boolean useDefinition, boolean useParameters) {
+	public static String getOptionsWithInit(String algo, boolean useClass, boolean useDefinition,
+			boolean useParameters) {
 		OptionsBuilder ob = new OptionsBuilder(algo);
 		ob.useClass = useClass;
 		ob.useDefinition = useDefinition;
@@ -55,7 +56,8 @@ public class OptionsUtils {
 		private boolean useClass = false;
 		private boolean useDefinition = false;
 		private boolean useParameters = false;
-		private boolean ignore = true;
+		private boolean ignore = false;
+		private boolean dropRare = false;
 		private int min = 0;
 
 		public OptionsBuilder(String algo) {
@@ -63,13 +65,13 @@ public class OptionsUtils {
 		}
 
 		public String get() {
-			String mOpts = "+W[0.00; 0.00; 0.00; 0.00]%sINIT-DROP";
+			String mOpts = "+W[0.00; 0.00; 0.00; 0.00]%sINIT%sDROP";
 			String end = "%sIGNORE%sDOUBLE%s";
 			String opts = algo + mOpts + "+Q[%s]%sCLASS+METHOD%sDEF%sPARAMS" + end;
 			String queryType = useNmQueries ? "NM" : "ZERO";
-			String minStr = min != 0 ? "+MIN"+min : "";
-			return String.format(opts, has(useInit), queryType, has(useClass), has(useDefinition), has(useParameters),
-					has(ignore), has(useDouble), minStr);
+			String minStr = min != 0 ? "+MIN" + min : "";
+			return String.format(opts, has(useInit), has(dropRare), queryType, has(useClass), has(useDefinition),
+					has(useParameters), has(ignore), has(useDouble), minStr);
 		}
 
 		private char has(boolean opt) {
@@ -116,8 +118,17 @@ public class OptionsUtils {
 			return this;
 		}
 
+		/**
+		 * You should really not use this option, it invalidates an evaluation!
+		 */
+		@Deprecated
 		public OptionsBuilder ignore(boolean ignore) {
 			this.ignore = ignore;
+			return this;
+		}
+
+		public OptionsBuilder dropRareFeatures(boolean dropRare) {
+			this.dropRare = dropRare;
 			return this;
 		}
 
