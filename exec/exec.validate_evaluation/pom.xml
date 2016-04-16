@@ -22,12 +22,14 @@
 			<version>0.0.1-SNAPSHOT</version>
 
 			<exclusions>
+<!--
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-nop</artifactId>
 				</exclusion>
+		  -->
 			</exclusions>
-		</dependency>
+		  </dependency>
 		<dependency>
 			<groupId>cc.kave</groupId>
 			<artifactId>cc.recommenders.testutils</artifactId>

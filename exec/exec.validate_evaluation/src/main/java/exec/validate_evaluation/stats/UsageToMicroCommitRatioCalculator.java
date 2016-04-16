@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.csharp.statistics;
+package exec.validate_evaluation.stats;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
@@ -32,85 +32,98 @@ import exec.csharp.utils.MapSorter;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
 import exec.validate_evaluation.microcommits.MicroCommit;
+import exec.validate_evaluation.microcommits.MicroCommitIo;
 
 public class UsageToMicroCommitRatioCalculator {
 
-	private final NestedZipFolders<ICoReTypeName> dirMicroCommits;
+	private final Map<ICoReTypeName, List<MicroCommit>> allMicroCommits;
 	private final NestedZipFolders<ICoReTypeName> dirUsages;
+	private MicroCommitIo io;
 
 	@Inject
-	public UsageToMicroCommitRatioCalculator(StorageHelper storageHelper) {
-		dirMicroCommits = storageHelper.getNestedZipFolder(StorageCase.MICRO_COMMITS);
+	public UsageToMicroCommitRatioCalculator(StorageHelper storageHelper, MicroCommitIo io) {
+		this.io = io;
+		allMicroCommits = Maps.newHashMap();
 		dirUsages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
 	}
 
 	public void run() throws IOException {
 
+		System.out.println("\nreading all available MicroCommits...");
+		for (String zip : io.findZips()) {
+			for (MicroCommit mc : io.read(zip)) {
+				List<MicroCommit> mcs = allMicroCommits.get(mc.getType());
+				if (mcs == null) {
+					mcs = Lists.newLinkedList();
+					allMicroCommits.put(mc.getType(), mcs);
+				}
+				mcs.add(mc);
+			}
+		}
+
 		Map<String, Double> usageToHistoryRatio = Maps.newLinkedHashMap();
 
 		int numTypesTotal = 0;
-		int numTuplesTotal = 0;
+		int numCommitsTotal = 0;
 		int numUsagesTotal = 0;
 
 		int numTypesDATEV = 0;
-		int numTuplesDATEV = 0;
+		int numCommitsDATEV = 0;
 		int numUsagesDATEV = 0;
 
 		int numTypesWith = 0;
-		int numTuplesWith = 0;
+		int numCommitsWith = 0;
 		int numUsagesWith = 0;
 		int numTypesWithout = 0;
-		int numTuplesWithout = 0;
+		int numCommitsWithout = 0;
 		int numUsagesWithout = 0;
 
-		Set<ICoReTypeName> keys = dirMicroCommits.findKeys();
-		for (ICoReTypeName t : keys) {
-			System.out.printf("reading %s... ", t);
+		for (ICoReTypeName t : allMicroCommits.keySet()) {
 
-			List<MicroCommit> histories = dirMicroCommits.readAllZips(t, MicroCommit.class);
+			List<MicroCommit> commits = allMicroCommits.get(t);
 			List<Usage> usages = dirUsages.readAllZips(t, Usage.class);
 
-			int numTuples = histories.size();
+			int numCommits = commits.size();
 			int numUsages = usages.size();
-			System.out.printf("%d tuples, %d usages\n", numTuples, numUsages);
+			System.out.printf("%s: %d commits, %d usages\n", t, numCommits, numUsages);
 
 			// if (numUsages > 0 && !isDatev(t)) {
 			if (!isDatev(t)) {
-				double ratio = (0.000001 + numUsages) / (1.0 * numTuples);
-				String key = String.format("%s (%d/%d)", t, numUsages, numTuples);
+				double ratio = (0.000001 + numUsages) / (1.0 * numCommits);
+				String key = String.format("%s (%d/%d)", t, numUsages, numCommits);
 				usageToHistoryRatio.put(key, ratio);
 			}
 
 			numTypesTotal++;
-			numTuplesTotal += numTuples;
+			numCommitsTotal += numCommits;
 			numUsagesTotal += numUsages;
 
-			if (numTuples > 0 && numUsages > 0) {
+			if (numCommits > 0 && numUsages > 0) {
 				numTypesWith++;
-				numTuplesWith += numTuples;
+				numCommitsWith += numCommits;
 				numUsagesWith += numUsages;
 			} else {
 				numTypesWithout++;
-				numTuplesWithout += numTuples;
+				numCommitsWithout += numCommits;
 				numUsagesWithout += numUsages;
 
 				if (isDatev(t)) {
 					numTypesDATEV++;
-					numTuplesDATEV += numTuples;
+					numCommitsDATEV += numCommits;
 					numUsagesDATEV += numUsages;
 				}
 			}
 		}
 
 		System.out.printf("\n\nsummary:\n");
-		System.out.printf("we have a total of %d start/end tuples and %d usages for %d different types\n",
-				numTuplesTotal, numUsagesTotal, numTypesTotal);
-		System.out.printf("currently, we have both tuples and usages for %d types (%d queries, %d usages)\n",
-				numTypesWith, numTuplesWith, numUsagesWith);
-		System.out.printf("we have tuples, but no usages for %d types (%d queries, %d usages)\n", numTypesWithout,
-				numTuplesWithout, numUsagesWithout);
-		System.out.printf("out of these, %d types (%d queries, %d usages) are related to DATEV\n", numTypesDATEV,
-				numTuplesDATEV, numUsagesDATEV);
+		System.out.printf("we have a total of %d commits and %d usages for %d different types\n", numCommitsTotal,
+				numUsagesTotal, numTypesTotal);
+		System.out.printf("currently, we have both commits and usages for %d types (%d commits, %d usages)\n",
+				numTypesWith, numCommitsWith, numUsagesWith);
+		System.out.printf("we have commits, but no usages for %d types (%d commits, %d usages)\n", numTypesWithout,
+				numCommitsWithout, numUsagesWithout);
+		System.out.printf("out of these, %d types (%d commits, %d usages) are related to DATEV\n", numTypesDATEV,
+				numCommitsDATEV, numUsagesDATEV);
 
 		System.out.printf("\n\nratios (usages/histories):\n");
 		Map<String, Double> sortedRatios = MapSorter.sort(usageToHistoryRatio);
