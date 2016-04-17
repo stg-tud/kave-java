@@ -97,7 +97,8 @@ public class BasicExcelEvaluation {
 					continue;
 				}
 
-				System.out.printf("\n### found %d commits ###\nfor %s\nin %s\n\n", readCommits.size(), type, zip);
+				System.out.printf("\n### found %d commits ###\nfor %s (%d usages)\nin %s\n\n", readCommits.size(), type,
+						us.size(), zip);
 
 				for (QueryMode mode : QueryMode.values()) {
 					System.out.println(mode);
@@ -170,15 +171,18 @@ public class BasicExcelEvaluation {
 		System.out.println();
 		System.out.println();
 		System.out.println("### RES3 -- grouped by type ###");
-		System.out.println("type\tnumUsages\tcount\tf1\tbp");
+		System.out.println("mode\ttype\tnumUsages\tcount\tf1\tbp");
 		for (Tuple<QueryMode, ICoReTypeName> modeAndType : res3.keySet()) {
-			Boxplot bp = res3.get(modeAndType).getBoxplot();
+			BoxplotData bpd = res3.get(modeAndType);
+			if (bpd.hasData()) {
+				Boxplot bp = res3.get(modeAndType).getBoxplot();
 
-			QueryMode mode = modeAndType.getFirst();
-			ICoReTypeName type = modeAndType.getSecond();
+				QueryMode mode = modeAndType.getFirst();
+				ICoReTypeName type = modeAndType.getSecond();
 
-			System.out.printf("%s\t%s\t%d\t%d\t%.3f\t%s\n", mode, type, typeUsageCounts.get(type), bp.getNumValues(),
-					bp.getMean(), bp);
+				System.out.printf("%s\t%s\t%d\t%d\t%.3f\t%s\n", mode, type, typeUsageCounts.get(type),
+						bp.getNumValues(), bp.getMean(), bp);
+			}
 		}
 	}
 
