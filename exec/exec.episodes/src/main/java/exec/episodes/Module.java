@@ -53,7 +53,7 @@ public class Module extends AbstractModule {
 		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
 		File eventStreamData = new File(rootFolder + "EpisodeMining/dataSet/SST/");
 		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
-		File contexts = new File(rootFolder + "EpisodeMining/Contexts/");
+		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File graphFile = new File(rootFolder);
 		Directory graphDir = new Directory(graphFile.getAbsolutePath());
