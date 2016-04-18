@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.AssemblyName;
 import cc.kave.commons.model.names.csharp.NamespaceName;
 import cc.kave.commons.model.names.csharp.TypeName;
@@ -31,6 +30,13 @@ import cc.kave.commons.model.names.csharp.TypeName;
 public class TypeNameTest {
 
 	private final String TestAssemblyIdentifier = "a, 1.0.0.0";
+
+	@Test
+	public void customInit() {
+		ITypeName actual = TypeName.newTypeName("T%s,P", 1);
+		ITypeName expected = TypeName.newTypeName("T1,P");
+		assertEquals(expected, actual);
+	}
 
 	@Test
 	public void shouldImplementIsUnknown() {

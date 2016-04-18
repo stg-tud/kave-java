@@ -25,12 +25,17 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 
 public class MethodNameTest {
+
+	@Test
+	public void customInit() {
+		IMethodName actual = MethodName.newMethodName("[T%d,P] [T%d,P].M()", 1, 2);
+		IMethodName expected = MethodName.newMethodName("[T1,P] [T2,P].M()");
+		assertEquals(expected, actual);
+	}
 
 	@Test
 	public void shouldImplementIsUnknown() {

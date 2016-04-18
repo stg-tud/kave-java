@@ -311,4 +311,7 @@ public class TypeName extends Name implements ITypeName {
 		return this.equals(UNKNOWN_NAME);
 	}
 
+	public static ITypeName newTypeName(String string, Object... args) {
+		return newTypeName(String.format(string, args));
+	}
 }
