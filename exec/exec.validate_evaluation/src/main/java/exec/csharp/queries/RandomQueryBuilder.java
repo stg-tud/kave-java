@@ -64,7 +64,7 @@ public class RandomQueryBuilder extends AbstractQueryBuilder {
 	// }
 
 	private List<Query> createRandomQueries(Usage end, int numToRemove) {
-		Set<CallSite> allSites = end.getAllCallsites();
+		Set<CallSite> allSites = end.getReceiverCallsites();
 		Set<Set<CallSite>> randomSelections = Sets.newLinkedHashSet();
 
 		int iterations = 0;

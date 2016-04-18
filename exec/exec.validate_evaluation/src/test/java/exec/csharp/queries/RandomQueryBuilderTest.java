@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -32,14 +31,16 @@ import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
-public class RandomQueryBuilderTest {
+public class RandomQueryBuilderTest extends AbstractQueryBuilderTest {
 
 	private RandomQueryBuilder sut;
 
-	@Before
-	public void setup() {
+	@Override
+	protected IQueryBuilder<Usage, Query> createQueryBuilder() {
 		sut = new RandomQueryBuilder(3);
+		return sut;
 	}
 
 	@Test

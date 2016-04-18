@@ -24,27 +24,28 @@ import static org.mockito.Mockito.mock;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
-public class RealWithNoiseQueryBuilderTest {
+public class RealWithNoiseQueryBuilderTest extends AbstractQueryBuilderTest {
 
-	private RealWithNoiseQueryBuilder sut;
+	private IQueryBuilder<Usage, Query> sut;
 
 	private Query start;
 	private Query end;
 
-	@Before
-	public void setup() {
+	@Override
+	protected IQueryBuilder<Usage, Query> createQueryBuilder() {
 		sut = new RealWithNoiseQueryBuilder();
+		return sut;
 	}
 
 	@Test

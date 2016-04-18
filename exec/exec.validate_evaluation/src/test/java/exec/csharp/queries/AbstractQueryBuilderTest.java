@@ -16,6 +16,7 @@
 package exec.csharp.queries;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -25,10 +26,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.recommenders.names.ICoReMethodName;
-import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -41,7 +42,7 @@ public abstract class AbstractQueryBuilderTest {
 	private IQueryBuilder<Usage, Query> sut;
 
 	@Before
-	public void setup() {
+	public void baseSetup() {
 		sut = createQueryBuilder();
 	}
 
@@ -54,6 +55,22 @@ public abstract class AbstractQueryBuilderTest {
 		assertEquals(end.getClassContext(), q.getClassContext());
 		assertEquals(end.getMethodContext(), q.getMethodContext());
 		assertEquals(end.getDefinitionSite(), q.getDefinitionSite());
+	}
+
+	@Test
+	public void onlyReceiverCallSitesAreCopied() {
+		Usage start = createUsage();
+		Usage end = createUsage();
+		end.getAllCallsites().add(param("p1"));
+		end.getAllCallsites().add(call("m1"));
+		end.getAllCallsites().add(param("p2"));
+		end.getAllCallsites().add(call("m2"));
+		end.getAllCallsites().add(param("p3"));
+
+		List<Query> actuals = sut.createQueries(start, end);
+		for (Query actual : actuals) {
+			assertTrue(actual.getParameterCallsites().isEmpty());
+		}
 	}
 
 	protected abstract IQueryBuilder<Usage, Query> createQueryBuilder();
@@ -81,6 +98,11 @@ public abstract class AbstractQueryBuilderTest {
 	private CallSite call(String method) {
 		String m = String.format("LT.%s()V", method);
 		return CallSites.createReceiverCallSite(m);
+	}
+
+	private CallSite param(String method) {
+		String m = String.format("LT.%s()V", method);
+		return CallSites.createParameterCallSite(m, 1);
 	}
 
 	protected Query createUsage(String... methodNames) {
