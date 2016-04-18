@@ -70,7 +70,6 @@ public class EventStreamGenerator {
 					}
 				}
 			}
-
 			return super.visit(decl, context);
 		}
 

@@ -55,8 +55,8 @@ public class Module extends AbstractModule {
 		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
-		File graphFile = new File(rootFolder);
-		Directory graphDir = new Directory(graphFile.getAbsolutePath());
+		File episodeRootFile = new File(rootFolder);
+		Directory episodeRootDir = new Directory(episodeRootFile.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
 
@@ -64,14 +64,14 @@ public class Module extends AbstractModule {
 		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
 		dirs.put("contexts", ctxtDir);
-		dirs.put("graph", graphDir);
+		dirs.put("rootDir", episodeRootDir);
 		dirs.put("evaluation", evaluationDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
-		bind(File.class).annotatedWith(Names.named("graph")).toInstance(graphFile);
+		bind(File.class).annotatedWith(Names.named("rootDir")).toInstance(episodeRootFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		
 
@@ -84,7 +84,7 @@ public class Module extends AbstractModule {
 
 		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
 		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
-		File graphRoot = graphFile;
+		File graphRoot = episodeRootFile;
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
