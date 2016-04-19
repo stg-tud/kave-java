@@ -25,8 +25,12 @@ public class WritingArchive implements Closeable {
 	private int count = 0;
 	private ZipOutputStream out;
 
-	public WritingArchive(File file) throws FileNotFoundException {
-		out = new ZipOutputStream(new FileOutputStream(file));
+	public WritingArchive(File file) {
+		try {
+			out = new ZipOutputStream(new FileOutputStream(file));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public <T> void add(T obj) throws IOException {

@@ -18,11 +18,14 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.json.JsonUtils;
 
@@ -60,6 +63,18 @@ public class ReadingArchive implements Closeable {
 		in.close();
 
 		return str;
+	}
+
+	public <T> List<T> getAll(Class<T> c) {
+		try {
+			List<T> out = Lists.newLinkedList();
+			while (hasNext()) {
+				out.add(getNext(c));
+			}
+			return out;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public int numberOfEntries() {
