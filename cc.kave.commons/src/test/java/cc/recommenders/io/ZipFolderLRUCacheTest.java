@@ -18,7 +18,6 @@ package cc.recommenders.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,73 +39,73 @@ public class ZipFolderLRUCacheTest {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
-	private File _root;
-	private ZipFolderLRUCache<String> _sut;
+	private File root;
+	private ZipFolderLRUCache<String> sut;
 
 	@Before
 	public void setUp() throws IOException {
-		_root = tmp.newFolder("data");
-		_sut = new ZipFolderLRUCache<String>(_root.getAbsolutePath(), 2);
+		root = tmp.newFolder("data");
+		sut = new ZipFolderLRUCache<String>(root, 2);
 	}
 
 	@Test
 	public void sizeAndCache() {
-		assertEquals(0, _sut.size());
-		assertFalse(_sut.isCached("a"));
+		assertEquals(0, sut.size());
+		assertFalse(sut.isCached("a"));
 
-		_sut.getArchive("a");
+		sut.getArchive("a");
 
-		assertEquals(1, _sut.size());
-		assertTrue(_sut.isCached("a"));
+		assertEquals(1, sut.size());
+		assertTrue(sut.isCached("a"));
 	}
 
 	@Test
 	public void filesAreCreatedInCorrectSubfolders() throws IOException {
-		_sut.getArchive(relFile("a"));
-		_sut.getArchive(relFile("b", "b"));
-		_sut.getArchive(relFile("c", "c", "c"));
-		_sut.getArchive(relFile("d", "d", "d", "d"));
+		sut.getArchive(relFile("a"));
+		sut.getArchive(relFile("b", "b"));
+		sut.getArchive(relFile("c", "c", "c"));
+		sut.getArchive(relFile("d", "d", "d", "d"));
 
-		_sut.close();
+		sut.close();
 
-		assertTrue(_root.exists());
-		assertTrue(file(_root, "a", ".zipfolder").exists());
-		assertTrue(file(_root, "b", "b", ".zipfolder").exists());
-		assertTrue(file(_root, "c", "c", "c", ".zipfolder").exists());
-		assertTrue(file(_root, "d", "d", "d", "d", ".zipfolder").exists());
+		assertTrue(root.exists());
+		assertTrue(file(root, "a", ".zipfolder").exists());
+		assertTrue(file(root, "b", "b", ".zipfolder").exists());
+		assertTrue(file(root, "c", "c", "c", ".zipfolder").exists());
+		assertTrue(file(root, "d", "d", "d", "d", ".zipfolder").exists());
 	}
 
 	@Test
 	public void doubleSlashIsNotAnIssue() throws IOException {
-		_sut.getArchive("La//a");
+		sut.getArchive("La//a");
 
-		_sut.close();
+		sut.close();
 
-		assertTrue(_root.exists());
-		assertTrue(file(_root, "La", "a", ".zipfolder").exists());
+		assertTrue(root.exists());
+		assertTrue(file(root, "La", "a", ".zipfolder").exists());
 	}
 
 	@Test
 	public void keyIsPassedAsMetaDataWithoutReplacement() throws IOException {
 		String key = "La/A.1/_!";
 
-		_sut.getArchive(key);
-		_sut.close();
+		sut.getArchive(key);
+		sut.close();
 
-		File metaFile = file(_root, "La", "A", "1", "__", ".zipfolder");
+		File metaFile = file(root, "La", "A", "1", "__", ".zipfolder");
 		String actual = FileUtils.readFileToString(metaFile);
 		assertEquals(JsonUtils.toJson(key), actual);
 	}
 
 	@Test
 	public void complexKeysArePossibleThoughNotRecommended() throws IOException {
-		ZipFolderLRUCache<List<String>> sut = new ZipFolderLRUCache<List<String>>(_root.getAbsolutePath(), 2);
+		ZipFolderLRUCache<List<String>> sut = new ZipFolderLRUCache<List<String>>(root, 2);
 		List<String> key = Lists.newArrayList("a", "b");
 
 		sut.getArchive(key);
 		sut.close();
 
-		File metaFile = file(_root, "[a,b]", ".zipfolder");
+		File metaFile = file(root, "[a,b]", ".zipfolder");
 		String actual = FileUtils.readFileToString(metaFile);
 		String expected = JsonUtils.toJson(key);
 		assertEquals(expected, actual);
@@ -114,32 +113,32 @@ public class ZipFolderLRUCacheTest {
 
 	@Test
 	public void replacementInKeysWorks() {
-		String a = "a,.+-\\_$()[]{}:*?\"<>|";
-		String e = "a,\\+-\\_$()[]{}______\\0.zip";
-		try (IWritingArchive wa = _sut.getArchive(a)) {
+		String a = "a,.+-/\\_$()[]{}:*?\"|";
+		String e = "a,/+-/_$()[]{}____";
+		try (IWritingArchive wa = sut.getArchive(a)) {
 			wa.add("something");
 		}
 
-		assertTrue(_root.exists());
-		assertTrue(file(_root, e).exists());
+		assertTrue(root.exists());
+		assertTrue(file(root, e, "0.zip").exists());
 	}
 
 	@Test
 	public void cacheDoesNotGrowLargerThanCapacity() {
-		_sut.getArchive("a");
-		_sut.getArchive("b");
-		_sut.getArchive("c");
+		sut.getArchive("a");
+		sut.getArchive("b");
+		sut.getArchive("c");
 
-		assertEquals(2, _sut.size());
+		assertEquals(2, sut.size());
 	}
 
 	@Test
 	public void existingFilesAreNotOverwritten() throws IOException {
-		_sut.close();
+		sut.close();
 
-		File metaFile = file(_root, "a", ".zipfolder");
-		File zip0 = file(_root, "a", "0.zip");
-		File zip1 = file(_root, "a", "1.zip");
+		File metaFile = file(root, "a", ".zipfolder");
+		File zip0 = file(root, "a", "0.zip");
+		File zip1 = file(root, "a", "1.zip");
 
 		// setup fake data from previous run
 		FileUtils.writeStringToFile(metaFile, "test");
@@ -148,10 +147,10 @@ public class ZipFolderLRUCacheTest {
 		}
 
 		// new initialization
-		_sut = new ZipFolderLRUCache<String>(_root.getAbsolutePath(), 2);
-		IWritingArchive a = _sut.getArchive("a");
+		sut = new ZipFolderLRUCache<String>(root, 2);
+		IWritingArchive a = sut.getArchive("a");
 		a.add("x");
-		_sut.close();
+		sut.close();
 
 		assertTrue(metaFile.exists());
 		assertTrue(zip0.exists());
@@ -171,8 +170,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	private void assertZipContent(File file, String... expectedsArr) {
-		try {
-			IReadingArchive ra = new ReadingArchive(file);
+		try (IReadingArchive ra = new ReadingArchive(file)) {
 			List<String> expecteds = Lists.newArrayList(expectedsArr);
 			List<String> actuals = Lists.newArrayList();
 			while (ra.hasNext()) {
@@ -186,68 +184,69 @@ public class ZipFolderLRUCacheTest {
 
 	@Test
 	public void leastRecentlyUsedKeyIsRemoved() {
-		_sut.getArchive("a");
-		_sut.getArchive("b");
-		_sut.getArchive("c");
+		sut.getArchive("a");
+		sut.getArchive("b");
+		sut.getArchive("c");
 
-		assertFalse(_sut.isCached("a"));
-		assertTrue(_sut.isCached("b"));
-		assertTrue(_sut.isCached("c"));
+		assertFalse(sut.isCached("a"));
+		assertTrue(sut.isCached("b"));
+		assertTrue(sut.isCached("c"));
 	}
 
 	@Test
 	public void refreshingWorks() {
-		_sut.getArchive("a");
-		_sut.getArchive("b");
-		_sut.getArchive("a");
-		_sut.getArchive("c");
+		sut.getArchive("a");
+		sut.getArchive("b");
+		sut.getArchive("a");
+		sut.getArchive("c");
 
-		assertFalse(_sut.isCached("b"));
-		assertTrue(_sut.isCached("a"));
-		assertTrue(_sut.isCached("c"));
+		assertFalse(sut.isCached("b"));
+		assertTrue(sut.isCached("a"));
+		assertTrue(sut.isCached("c"));
 	}
 
 	@Test
 	public void cacheRemoveClosesOpenArchive() throws IOException {
-		File expectedFileName = file(_root, "a", "0.zip");
+		File expectedFileName = file(root, "a", "0.zip");
 
-		IWritingArchive wa = _sut.getArchive("a");
+		IWritingArchive wa = sut.getArchive("a");
 		wa.add("something");
-		_sut.getArchive("b");
+		sut.getArchive("b");
 
 		assertFalse(expectedFileName.exists());
-		_sut.getArchive("c");
+		sut.getArchive("c");
 		assertTrue(expectedFileName.exists());
 	}
 
 	@Test
 	public void closeClosesAllOpenArchives() throws IOException {
-		IWritingArchive wa = _sut.getArchive("a");
+		IWritingArchive wa = sut.getArchive("a");
 		wa.add("something");
 
-		_sut.close();
+		sut.close();
 
-		assertFalse(_sut.isCached("a"));
-		assertEquals(0, _sut.size());
-		assertTrue(file(_root, "a", "0.zip").exists());
+		assertFalse(sut.isCached("a"));
+		assertEquals(0, sut.size());
+		assertTrue(file(root, "a", "0.zip").exists());
 	}
 
 	@SuppressWarnings("resource")
 	@Test(expected = AssertionException.class)
 	public void directoryHasToExist() {
-		new ZipFolderLRUCache<String>("/does/not/exist/", 10);
+		new ZipFolderLRUCache<String>(file(root, "does", "not", "exist"), 10);
 	}
 
 	@SuppressWarnings("resource")
 	@Test(expected = AssertionException.class)
-	public void directoryMustNotBeAFile() {
-		fail("TODO create file first");
-		new ZipFolderLRUCache<String>("", 10);
+	public void directoryMustNotBeAFile() throws IOException {
+		File f = file(root, "x.txt");
+		f.createNewFile();
+		new ZipFolderLRUCache<String>(f, 10);
 	}
 
 	@SuppressWarnings("resource")
 	@Test(expected = AssertionException.class)
 	public void capacityMustBeLargerThanZero() {
-		new ZipFolderLRUCache<String>(_root.getAbsolutePath(), 0);
+		new ZipFolderLRUCache<String>(root, 0);
 	}
 }

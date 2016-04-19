@@ -27,15 +27,16 @@ import cc.recommenders.assertions.Asserts;
 
 public class ZipFolderLRUCache<T> implements AutoCloseable {
 
-	private final String _root;
+	private final File _root;
 	private final int _capacity;
 
 	private final List<T> _accessOrderList = Lists.newLinkedList();
 	private final Map<T, WritingArchive> _openArchives = Maps.newLinkedHashMap();
 	private final Map<T, ZipFolder> _folders = Maps.newLinkedHashMap();
 
-	public ZipFolderLRUCache(String root, int capacity) {
-		Asserts.assertTrue(new File(root).exists());
+	public ZipFolderLRUCache(File root, int capacity) {
+		Asserts.assertTrue(root.exists());
+		Asserts.assertTrue(root.isDirectory());
 		Asserts.assertTrue(capacity > 0);
 
 		_root = root;
@@ -89,17 +90,19 @@ public class ZipFolderLRUCache<T> implements AutoCloseable {
 		return folderUtil;
 	}
 
+	/**
+	 * the goal is not to create a reversible transformation, but to have an
+	 * easy to read path. The keys could be stored as metaData in the .zipfolder
+	 * marker
+	 */
 	private String GetTargetFolder(T key) {
-		// TODO regex magic
-		// var regex = new Regex(@"[^a-zA-Z0-9,\\-_/+$(){}[\\]]");
-
 		String relName = JsonUtils.toJson(key);
 		relName = relName.replace('.', '/');
 		relName = relName.replace("\\\"", "\""); // quotes inside json
 		relName = relName.replace("\"", ""); // surrounding quotes
 		relName = relName.replace('\\', '/');
-		// relName = regex.Replace(relName, "_");
-
+		relName = relName.replaceAll("[^a-zA-Z0-9,\\-_/+$(){}\\[\\]]", "_");
+		relName = relName.replaceAll("\\/+", "/"); // clean up duplicate slashes
 		return new File(_root, relName).getAbsolutePath();
 	}
 
