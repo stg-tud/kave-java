@@ -10,7 +10,6 @@
  ******************************************************************************/
 package cc.recommenders.io;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
@@ -28,61 +26,79 @@ import org.apache.commons.io.IOUtils;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.recommenders.assertions.Asserts;
 
-public class ReadingArchive implements Closeable {
+public class ReadingArchive implements IReadingArchive {
 
 	private ZipFile zipFile;
 	private Enumeration<? extends ZipEntry> entries;
 
-	public ReadingArchive(File file) throws ZipException, IOException {
-		zipFile = new ZipFile(file);
-		entries = zipFile.entries();
+	public ReadingArchive(File file) {
+		Asserts.assertTrue(file.exists());
+		Asserts.assertTrue(file.isFile());
+		try {
+			zipFile = new ZipFile(file);
+			entries = zipFile.entries();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public boolean hasNext() throws IOException {
+	@Override
+	public boolean hasNext() {
 		return entries.hasMoreElements();
 	}
 
-	public <T> T getNext(Type classOfT) throws IOException {
-
-		ZipEntry next = entries.nextElement();
-		InputStream in = zipFile.getInputStream(next);
-		T obj = JsonUtils.fromJson(in, classOfT);
-		in.close();
-
-		return obj;
-	}
-
-	public String getNextPlain() throws IOException {
-
-		ZipEntry next = entries.nextElement();
-		InputStream in = zipFile.getInputStream(next);
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(in, writer, Charset.defaultCharset().toString());
-		String str = writer.toString();
-		in.close();
-
-		return str;
-	}
-
-	public <T> List<T> getAll(Class<T> c) {
+	@Override
+	public <T> T getNext(Type classOfT) {
 		try {
-			List<T> out = Lists.newLinkedList();
-			while (hasNext()) {
-				out.add(getNext(c));
-			}
-			return out;
+			ZipEntry next = entries.nextElement();
+			InputStream in = zipFile.getInputStream(next);
+			T obj = JsonUtils.fromJson(in, classOfT);
+			in.close();
+
+			return obj;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public int numberOfEntries() {
+	@Override
+	public String getNextPlain() {
+		try {
+			ZipEntry next = entries.nextElement();
+			InputStream in = zipFile.getInputStream(next);
+			StringWriter writer = new StringWriter();
+			IOUtils.copy(in, writer, Charset.defaultCharset().toString());
+			String str = writer.toString();
+			in.close();
+
+			return str;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public <T> List<T> getAll(Class<T> c) {
+		List<T> out = Lists.newLinkedList();
+		while (hasNext()) {
+			out.add(getNext(c));
+		}
+		return out;
+	}
+
+	@Override
+	public int getNumberOfEntries() {
 		return zipFile.size();
 	}
 
 	@Override
-	public void close() throws IOException {
-		zipFile.close();
+	public void close() {
+		try {
+			zipFile.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
