@@ -28,6 +28,7 @@ import com.google.common.reflect.TypeToken;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 
 public class ReadAllContextsRunner {
@@ -41,7 +42,7 @@ public class ReadAllContextsRunner {
 		for (File zip : findAllZips(dirContexts)) {
 			System.out.printf("reading '%s':\n", zip);
 			try {
-				ReadingArchive ra = new ReadingArchive(zip);
+				IReadingArchive ra = new ReadingArchive(zip);
 
 				while (ra.hasNext()) {
 					Context ctx = ra.getNext(Context.class);

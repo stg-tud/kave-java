@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
 public class ContextIo {
@@ -42,7 +42,7 @@ public class ContextIo {
 		Set<Context> contexts = Sets.newLinkedHashSet();
 		Directory dir = new Directory(this.root);
 
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+		try (IReadingArchive ra = dir.getReadingArchive(zip)) {
 			while (ra.hasNext()) {
 				contexts.add(ra.getNext(Context.class));
 			}

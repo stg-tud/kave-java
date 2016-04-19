@@ -123,7 +123,6 @@ public class Directory {
 		if (parent != null && !parent.exists()) {
 			parent.mkdirs();
 		}
-		file.createNewFile();
 		WritingArchive archive = new WritingArchive(file);
 
 		return archive;
@@ -140,7 +139,7 @@ public class Directory {
 		File tmp = new File(rootDir, tmpFileName);
 		old.renameTo(tmp);
 
-		ReadingArchive oldArchive = getReadingArchive(tmpFileName);
+		IReadingArchive oldArchive = getReadingArchive(tmpFileName);
 		WritingArchive newArchive = getWritingArchive(fileName);
 
 		while (oldArchive.hasNext()) {

@@ -24,7 +24,7 @@ import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.ssts.impl.visitor.TypeErasureVisitor;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
 public class EditStreakGenerationIo {
@@ -45,7 +45,7 @@ public class EditStreakGenerationIo {
 	public Set<ICompletionEvent> readCompletionEvents(String zip) {
 		Set<ICompletionEvent> es = Sets.newLinkedHashSet();
 		Directory dir = new Directory(dirIn);
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+		try (IReadingArchive ra = dir.getReadingArchive(zip)) {
 			while (ra.hasNext()) {
 				CompletionEvent ce = ra.getNext(CompletionEvent.class);
 				ce.context = TypeErasureVisitor.erase(ce.context);
@@ -80,7 +80,7 @@ public class EditStreakGenerationIo {
 	public Set<EditStreak> readEditStreaks(String zip) {
 		Set<EditStreak> streaks = Sets.newLinkedHashSet();
 		Directory dir = new Directory(dirOut);
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+		try (IReadingArchive ra = dir.getReadingArchive(zip)) {
 			while (ra.hasNext()) {
 				EditStreak es = ra.getNext(EditStreak.class);
 				streaks.add(es);

@@ -17,7 +17,7 @@ import java.util.Set;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;
@@ -64,7 +64,7 @@ public class ProjectFoldedUsageStore {
 		List<ProjectFoldedUsage> usages = Lists.newLinkedList();
 
 		String fileName = type.toString().replace('/', '_') + ".zip";
-		ReadingArchive ra = in.getReadingArchive(fileName);
+		IReadingArchive ra = in.getReadingArchive(fileName);
 		while (ra.hasNext()) {
 			ProjectFoldedUsage pfu = ra.getNext(ProjectFoldedUsage.class);
 			usages.add(pfu);

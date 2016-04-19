@@ -37,7 +37,7 @@ import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
 public class EditStreakGenerationIoTest {
@@ -110,7 +110,7 @@ public class EditStreakGenerationIoTest {
 		Set<EditStreak> actuals = sut.readEditStreaks("a.zip");
 
 		Directory dir = new Directory(dirOut.getAbsolutePath());
-		try (ReadingArchive ra = dir.getReadingArchive("a.zip");) {
+		try (IReadingArchive ra = dir.getReadingArchive("a.zip");) {
 
 			while (ra.hasNext()) {
 				EditStreak es = ra.getNext(EditStreak.class);

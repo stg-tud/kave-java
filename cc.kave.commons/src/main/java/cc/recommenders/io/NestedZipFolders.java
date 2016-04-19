@@ -102,7 +102,7 @@ public class NestedZipFolders<T> {
 		Set<String> zips = findZipsIn(zipFolder);
 		for (String zip : zips) {
 			try {
-				ReadingArchive ra = zipFolder.getReadingArchive(zip);
+				IReadingArchive ra = zipFolder.getReadingArchive(zip);
 				while (ra.hasNext()) {
 					values.add(ra.getNext(classOfV));
 				}

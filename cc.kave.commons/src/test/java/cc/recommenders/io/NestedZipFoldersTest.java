@@ -101,7 +101,9 @@ public class NestedZipFoldersTest {
 	public void hasZips_happyPath() throws IOException {
 		Directory dirA = rootDir.createDirectory("a");
 		dirA.write("a", ".zipfolder");
-		dirA.getWritingArchive("0.zip").close();
+		try (WritingArchive wa = dirA.getWritingArchive("0.zip")) {
+			wa.add("x");
+		}
 
 		assertTrue(sut.hasZips("a"));
 	}

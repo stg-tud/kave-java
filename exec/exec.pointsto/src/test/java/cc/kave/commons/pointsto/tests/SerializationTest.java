@@ -25,6 +25,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
@@ -56,7 +57,7 @@ public class SerializationTest {
 			writer.close();
 
 			
-			ReadingArchive reader = new ReadingArchive(tempZip);
+			IReadingArchive reader = new ReadingArchive(tempZip);
 
 			ComposedExpression readExpr = reader.getNext(ComposedExpression.class);
 			List<IVariableReference> references = readExpr.getReferences();

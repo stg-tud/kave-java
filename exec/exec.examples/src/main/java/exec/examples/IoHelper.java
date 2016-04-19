@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 
 /**
@@ -51,7 +52,7 @@ public class IoHelper {
 	public static List<Context> read(String zipFile) {
 		LinkedList<Context> res = Lists.newLinkedList();
 		try {
-			ReadingArchive ra = new ReadingArchive(new File(zipFile));
+			IReadingArchive ra = new ReadingArchive(new File(zipFile));
 			while (ra.hasNext()) {
 				res.add(ra.getNext(Context.class));
 			}

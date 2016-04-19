@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
@@ -62,7 +62,7 @@ public class ProjectIndexer {
 			int numInvalid = 0;
 			int numFiltered = 0;
 			int numRemaining = 0;
-			ReadingArchive ra = in.getReadingArchive(fileName);
+			IReadingArchive ra = in.getReadingArchive(fileName);
 			try {
 				while (ra.hasNext()) {
 					ObjectUsage ou = ra.getNext(ObjectUsage.class);

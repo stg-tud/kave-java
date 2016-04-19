@@ -26,8 +26,8 @@ import cc.recommenders.assertions.Throws;
 import cc.recommenders.collections.SublistSelector;
 import cc.recommenders.io.DataStore;
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.names.ICoReTypeName;
 
@@ -158,7 +158,7 @@ public class ObjectUsageStore implements DataStore<ICoReTypeName, ObjectUsage> {
 
 		String fileName = createFileName(type.toString()) + ".zip";
 		try {
-			ReadingArchive archive = directory.getReadingArchive(fileName);
+			IReadingArchive archive = directory.getReadingArchive(fileName);
 			List<ObjectUsage> observations = newArrayList();
 			while (archive.hasNext()) {
 				ObjectUsage ou = archive.getNext(ObjectUsage.class);

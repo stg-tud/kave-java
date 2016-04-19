@@ -21,6 +21,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 
 public class SSTComparison {
@@ -34,7 +35,7 @@ public class SSTComparison {
 
 	public void run() {
 		try {
-			ReadingArchive ra = new ReadingArchive(new File(zipTestCases));
+			IReadingArchive ra = new ReadingArchive(new File(zipTestCases));
 			while (ra.hasNext()) {
 				printSeparator();
 				Context ctx = ra.getNext(Context.class);

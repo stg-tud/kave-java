@@ -18,7 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -42,7 +42,7 @@ public class UsagesStatisticsRunner {
 		for (String fileName : files) {
 			System.out.printf("found: %s\n", fileName);
 
-			ReadingArchive ra = dirUsages.getReadingArchive(fileName);
+			IReadingArchive ra = dirUsages.getReadingArchive(fileName);
 
 			while (ra.hasNext()) {
 				Usage u = ra.getNext(Query.class);

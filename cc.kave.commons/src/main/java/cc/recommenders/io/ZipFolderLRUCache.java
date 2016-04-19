@@ -16,7 +16,6 @@
 package cc.recommenders.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class ZipFolderLRUCache<T> implements AutoCloseable {
 		_capacity = capacity;
 	}
 
-	public WritingArchive getArchive(T key) {
+	public IWritingArchive getArchive(T key) {
 		RefreshAccess(key);
 
 		if (_openArchives.containsKey(key)) {
@@ -64,11 +63,7 @@ public class ZipFolderLRUCache<T> implements AutoCloseable {
 		if (_accessOrderList.size() > _capacity) {
 			T oldest = _accessOrderList.iterator().next();
 			_accessOrderList.remove(oldest);
-			try {
-				_openArchives.get(oldest).close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			_openArchives.get(oldest).close();
 			_openArchives.remove(oldest);
 		}
 	}
@@ -118,11 +113,7 @@ public class ZipFolderLRUCache<T> implements AutoCloseable {
 
 	public void close() {
 		for (WritingArchive wa : _openArchives.values()) {
-			try {
-				wa.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			wa.close();
 		}
 		_accessOrderList.clear();
 		_openArchives.clear();

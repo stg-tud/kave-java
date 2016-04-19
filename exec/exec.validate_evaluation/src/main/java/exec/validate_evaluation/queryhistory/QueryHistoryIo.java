@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.usages.Usage;
 
@@ -63,7 +63,7 @@ public class QueryHistoryIo {
 	public Collection<List<Usage>> readQueryHistories(String zip) {
 
 		Directory dir = new Directory(this.dir);
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+		try (IReadingArchive ra = dir.getReadingArchive(zip)) {
 
 			Type type = new TypeToken<List<Usage>>() {
 			}.getType();

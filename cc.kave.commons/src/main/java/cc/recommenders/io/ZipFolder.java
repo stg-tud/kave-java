@@ -95,11 +95,7 @@ public class ZipFolder {
 	}
 
 	public ReadingArchive open(String relPath) {
-		try {
-			File f = Paths.get(_root, relPath).toFile();
-			return new ReadingArchive(f);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		File f = Paths.get(_root, relPath).toFile();
+		return new ReadingArchive(f);
 	}
 }

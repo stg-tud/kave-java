@@ -34,7 +34,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 
 public class ValidationContextsParser {
 
@@ -48,7 +48,7 @@ public class ValidationContextsParser {
 		Set<Episode> validationData = Sets.newHashSet();
 
 		for (String zip : findZips()) {
-			ReadingArchive ra = rootDir.getReadingArchive(zip);
+			IReadingArchive ra = rootDir.getReadingArchive(zip);
 
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);

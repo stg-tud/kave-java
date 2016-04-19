@@ -22,7 +22,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 
 public class MicroCommitIo {
@@ -52,7 +52,7 @@ public class MicroCommitIo {
 		List<MicroCommit> commits = Lists.newLinkedList();
 		Directory dir = new Directory(this.root);
 
-		try (ReadingArchive ra = dir.getReadingArchive(zip)) {
+		try (IReadingArchive ra = dir.getReadingArchive(zip)) {
 			while (ra.hasNext()) {
 				commits.add(ra.getNext(MicroCommit.class));
 			}

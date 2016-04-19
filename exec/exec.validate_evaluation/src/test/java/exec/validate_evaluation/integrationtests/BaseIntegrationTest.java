@@ -57,7 +57,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.WritingArchive;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
@@ -153,7 +153,7 @@ public abstract class BaseIntegrationTest {
 	private Set<MicroCommit> readCommits() {
 		Set<MicroCommit> commits = Sets.newHashSet();
 		Directory dir = new Directory(path(dirCommits));
-		try (ReadingArchive ra = dir.getReadingArchive("a.zip")) {
+		try (IReadingArchive ra = dir.getReadingArchive("a.zip")) {
 			while (ra.hasNext()) {
 				commits.add(ra.getNext(MicroCommit.class));
 			}

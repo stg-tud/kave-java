@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -60,7 +61,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void FilesAreCreatedInCorrectSubfolders() {
+	public void filesAreCreatedInCorrectSubfolders() throws IOException {
 		_sut.getArchive(relFile("a"));
 		_sut.getArchive(relFile("b", "b"));
 		_sut.getArchive(relFile("c", "c", "c"));
@@ -76,7 +77,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void DoubleSlashIsNotAnIssue() {
+	public void doubleSlashIsNotAnIssue() throws IOException {
 		_sut.getArchive("La//a");
 
 		_sut.close();
@@ -86,7 +87,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void KeyIsPassedAsMetaDataWithoutReplacement() throws IOException {
+	public void keyIsPassedAsMetaDataWithoutReplacement() throws IOException {
 		String key = "La/A.1/_!";
 
 		_sut.getArchive(key);
@@ -98,7 +99,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void ComplexKeysArePossibleThoughNotRecommended() throws IOException {
+	public void complexKeysArePossibleThoughNotRecommended() throws IOException {
 		ZipFolderLRUCache<List<String>> sut = new ZipFolderLRUCache<List<String>>(_root.getAbsolutePath(), 2);
 		List<String> key = Lists.newArrayList("a", "b");
 
@@ -112,10 +113,10 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void ReplacementInKeysWorks() throws IOException {
+	public void replacementInKeysWorks() {
 		String a = "a,.+-\\_$()[]{}:*?\"<>|";
 		String e = "a,\\+-\\_$()[]{}______\\0.zip";
-		try (WritingArchive wa = _sut.getArchive(a)) {
+		try (IWritingArchive wa = _sut.getArchive(a)) {
 			wa.add("something");
 		}
 
@@ -124,7 +125,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void CacheDoesNotGrowLargerThanCapacity() {
+	public void cacheDoesNotGrowLargerThanCapacity() {
 		_sut.getArchive("a");
 		_sut.getArchive("b");
 		_sut.getArchive("c");
@@ -133,7 +134,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void ExistingFilesAreNotOverwritten() throws IOException {
+	public void existingFilesAreNotOverwritten() throws IOException {
 		_sut.close();
 
 		File metaFile = file(_root, "a", ".zipfolder");
@@ -148,7 +149,7 @@ public class ZipFolderLRUCacheTest {
 
 		// new initialization
 		_sut = new ZipFolderLRUCache<String>(_root.getAbsolutePath(), 2);
-		WritingArchive a = _sut.getArchive("a");
+		IWritingArchive a = _sut.getArchive("a");
 		a.add("x");
 		_sut.close();
 
@@ -157,23 +158,21 @@ public class ZipFolderLRUCacheTest {
 		assertTrue(zip1.exists());
 
 		assertEquals("test", FileUtils.readFileToString(metaFile));
-		AssertZipContent(zip0, "test");
-		AssertZipContent(zip1, "x");
+		assertZipContent(zip0, "test");
+		assertZipContent(zip1, "x");
 	}
 
 	private File file(File dir, String... parts) {
-		// TODO Auto-generated method stub
-		return null;
+		return Paths.get(dir.getAbsolutePath(), parts).toFile();
 	}
 
-	private String relFile(String... parts) {
-		// TODO Auto-generated method stub
-		return null;
+	private String relFile(String... tokens) {
+		return String.join(File.separator, tokens);
 	}
 
-	private void AssertZipContent(File file, String... expectedsArr) {
+	private void assertZipContent(File file, String... expectedsArr) {
 		try {
-			ReadingArchive ra = new ReadingArchive(file);
+			IReadingArchive ra = new ReadingArchive(file);
 			List<String> expecteds = Lists.newArrayList(expectedsArr);
 			List<String> actuals = Lists.newArrayList();
 			while (ra.hasNext()) {
@@ -186,7 +185,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void LeastRecentlyUsedKeyIsRemoved() {
+	public void leastRecentlyUsedKeyIsRemoved() {
 		_sut.getArchive("a");
 		_sut.getArchive("b");
 		_sut.getArchive("c");
@@ -197,7 +196,7 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void RefreshingWorks() {
+	public void refreshingWorks() {
 		_sut.getArchive("a");
 		_sut.getArchive("b");
 		_sut.getArchive("a");
@@ -209,10 +208,10 @@ public class ZipFolderLRUCacheTest {
 	}
 
 	@Test
-	public void CacheRemoveClosesOpenArchive() throws IOException {
+	public void cacheRemoveClosesOpenArchive() throws IOException {
 		File expectedFileName = file(_root, "a", "0.zip");
 
-		WritingArchive wa = _sut.getArchive("a");
+		IWritingArchive wa = _sut.getArchive("a");
 		wa.add("something");
 		_sut.getArchive("b");
 
@@ -223,7 +222,7 @@ public class ZipFolderLRUCacheTest {
 
 	@Test
 	public void closeClosesAllOpenArchives() throws IOException {
-		WritingArchive wa = _sut.getArchive("a");
+		IWritingArchive wa = _sut.getArchive("a");
 		wa.add("something");
 
 		_sut.close();

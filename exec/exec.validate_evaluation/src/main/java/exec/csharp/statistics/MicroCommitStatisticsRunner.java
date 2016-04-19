@@ -20,8 +20,8 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.NestedZipFolders;
-import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
@@ -57,7 +57,7 @@ public class MicroCommitStatisticsRunner {
 
 		for (String fileName : files) {
 			System.out.printf("found: %s\n", fileName);
-			ReadingArchive ra = dirHistories.getReadingArchive(fileName);
+			IReadingArchive ra = dirHistories.getReadingArchive(fileName);
 
 			int counter = 1;
 			while (ra.hasNext()) {

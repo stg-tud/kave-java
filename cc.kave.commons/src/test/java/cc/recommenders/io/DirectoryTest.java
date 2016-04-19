@@ -53,11 +53,11 @@ public class DirectoryTest {
 
 	@Test
 	public void InitAddsTrailingSeparator() throws IOException {
-		String withSlash = p(tempFileName, "with") + File.separator;
+		String withSlash = relFile(tempFileName, "with") + File.separator;
 		URL a = new Directory(withSlash).getUrl();
 		assertTrue(a.toString().endsWith(File.separator));
 
-		String withoutSlash = p(tempFileName, File.separator) + "without";
+		String withoutSlash = relFile(tempFileName, File.separator) + "without";
 		URL b = new Directory(withoutSlash).getUrl();
 		assertTrue(b.toString().endsWith(File.separator));
 	}
@@ -117,16 +117,20 @@ public class DirectoryTest {
 	public void ifAFolderExistsItIsCountedWithoutChilds() throws IOException {
 		setup();
 		tempFolder.newFolder("afolder");
-		tempFolder.newFile(p("afolder", "file"));
-		tempFolder.newFile(p("afolder", "file2"));
+		tempFolder.newFile(relFile("afolder", "file"));
+		tempFolder.newFile(relFile("afolder", "file2"));
 
 		int count = uut.count();
 		int expected = 1;
 		assertEquals(expected, count);
 	}
 
-	private String p(String... parts) {
+	private String relFile(String... parts) {
 		return String.join(File.separator, parts);
+	}
+
+	private File file(File dir, String... parts) {
+		return Paths.get(dir.getAbsolutePath(), parts).toFile();
 	}
 
 	@Test
@@ -134,8 +138,8 @@ public class DirectoryTest {
 		setup();
 		tempFolder.newFile("someFile");
 		tempFolder.newFolder("afolder");
-		tempFolder.newFile(p("afolder", "file"));
-		tempFolder.newFile(p("afolder", "file2"));
+		tempFolder.newFile(relFile("afolder", "file"));
+		tempFolder.newFile(relFile("afolder", "file2"));
 
 		uut.clear();
 
@@ -202,8 +206,8 @@ public class DirectoryTest {
 	@Test
 	public void foldersWithSubfoldersCanBeCreated() {
 		setup();
-		uut.createDirectory(p("subdir", "subsubdir"));
-		File folder = new File(tempFileName, p("subdir", "subsubdir"));
+		uut.createDirectory(relFile("subdir", "subsubdir"));
+		File folder = new File(tempFileName, relFile("subdir", "subsubdir"));
 
 		assertTrue(folder.exists());
 		assertTrue(folder.isDirectory());
@@ -246,9 +250,9 @@ public class DirectoryTest {
 		}
 		writingArchive.close();
 
-		ReadingArchive readingArchive = uut.getReadingArchive(fileName);
+		IReadingArchive readingArchive = uut.getReadingArchive(fileName);
 
-		assertEquals(3, readingArchive.numberOfEntries());
+		assertEquals(3, readingArchive.getNumberOfEntries());
 
 		while (readingArchive.hasNext()) {
 			String s = readingArchive.getNext(String.class);
@@ -278,9 +282,9 @@ public class DirectoryTest {
 		}
 		writingArchive.close();
 
-		ReadingArchive readingArchive = uut.getReadingArchive(fileName);
+		IReadingArchive readingArchive = uut.getReadingArchive(fileName);
 
-		assertEquals(4, readingArchive.numberOfEntries());
+		assertEquals(4, readingArchive.getNumberOfEntries());
 
 		while (readingArchive.hasNext()) {
 			String s = readingArchive.getNextPlain();
@@ -293,9 +297,9 @@ public class DirectoryTest {
 
 	@Test
 	public void getWritingArchiveCreateParentFolder() throws IOException {
-		uut.getWritingArchive(p("a", "b.zip"));
-		File expected = new File(tempFileName, p("a", "b.zip"));
-		assertTrue(expected.exists());
+		uut.getWritingArchive(relFile("a", "b.zip"));
+		File parent = file(new File(tempFileName), "a");
+		assertTrue(parent.exists());
 	}
 
 	@Test
@@ -311,7 +315,7 @@ public class DirectoryTest {
 		archive.close();
 
 		List<String> actual = Lists.newArrayList();
-		ReadingArchive readingArchive = uut.getReadingArchive("test.zip");
+		IReadingArchive readingArchive = uut.getReadingArchive("test.zip");
 		while (readingArchive.hasNext()) {
 			String next = readingArchive.getNext(String.class);
 			actual.add(next);
@@ -355,7 +359,7 @@ public class DirectoryTest {
 	@Test
 	public void directoriesAreCreatedOnInit() {
 		setup();
-		String newFolderName = p(tempFolder.getRoot().getAbsolutePath(), "test");
+		String newFolderName = relFile(tempFolder.getRoot().getAbsolutePath(), "test");
 		new Directory(newFolderName);
 
 		File newFolder = new File(newFolderName);
@@ -367,7 +371,7 @@ public class DirectoryTest {
 	public void creatingFolderOnExistingFile() throws IOException {
 		setup();
 		tempFolder.newFile("a.txt");
-		new Directory(p(tempFileName, "a.txt"));
+		new Directory(relFile(tempFileName, "a.txt"));
 	}
 
 	@Test
@@ -400,7 +404,7 @@ public class DirectoryTest {
 	@Test(expected = AssertionException.class)
 	public void getParent_nonExisting() {
 		Directory sut = new Directory(tempFileName);
-		sut.getParentDirectory(p("a", "b", "c", "etc"));
+		sut.getParentDirectory(relFile("a", "b", "c", "etc"));
 	}
 
 	@Test(expected = AssertionException.class)
@@ -412,9 +416,9 @@ public class DirectoryTest {
 	@Test
 	public void getParent_realCase() throws IOException {
 		Directory sut = new Directory(tempFileName);
-		sut.createDirectory(p("a", "b")).writeContent("...", "c.txt");
+		sut.createDirectory(relFile("a", "b")).writeContent("...", "c.txt");
 
-		Directory d = sut.getParentDirectory(p("a", "b", "c.txt"));
+		Directory d = sut.getParentDirectory(relFile("a", "b", "c.txt"));
 
 		URL actual = d.getUrl();
 		URL expected = new Directory(tempFileName + "/a/b").getUrl();

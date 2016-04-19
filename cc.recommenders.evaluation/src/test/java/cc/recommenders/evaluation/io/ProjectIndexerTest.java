@@ -38,6 +38,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import cc.recommenders.io.Directory;
+import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.io.WritingArchive;
@@ -209,7 +210,7 @@ public class ProjectIndexerTest {
 	@Test
 	public void doesNotCrashForBrokenUsagesAndLogsThem() throws IOException {
 		givenTheListOfFiles("a.zip");
-		ReadingArchive ra = readingArchives.get("a.zip");
+		IReadingArchive ra = readingArchives.get("a.zip");
 		when(ra.hasNext()).thenReturn(true);
 		when(ra.getNext(any(Type.class))).thenThrow(new RuntimeException());
 
@@ -226,7 +227,7 @@ public class ProjectIndexerTest {
 	@Test
 	public void invalidValuesAreIgnoredAndLogged() throws IOException {
 		givenTheListOfFiles("a.zip");
-		ReadingArchive ra = readingArchives.get("a.zip");
+		IReadingArchive ra = readingArchives.get("a.zip");
 		ObjectUsage ou = mock(ObjectUsage.class);
 		Usage u = mock(Usage.class);
 		when(u.getType()).thenReturn(TYPE);
@@ -291,7 +292,7 @@ public class ProjectIndexerTest {
 	}
 
 	private void withContents(String fileName, final int numUsages) throws IOException {
-		ReadingArchive ra = readingArchives.get(fileName);
+		IReadingArchive ra = readingArchives.get(fileName);
 		final ObjectUsage[] ous = new ObjectUsage[numUsages];
 
 		for (int i = 0; i < numUsages; i++) {
