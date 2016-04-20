@@ -14,6 +14,8 @@ import static cc.recommenders.assertions.Asserts.assertFalse;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
@@ -24,7 +26,7 @@ public class BoxplotData {
 
 	private List<Double> data = Lists.newLinkedList();
 	private double[] dataAsCachedArray;
-	
+
 	public void add(Double d) {
 		data.add(d);
 	}
@@ -93,10 +95,20 @@ public class BoxplotData {
 			add(v);
 		}
 	}
-	
+
 	public static BoxplotData from(double[] vs) {
 		BoxplotData bd = new BoxplotData();
 		bd.addAll(vs);
 		return bd;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 }

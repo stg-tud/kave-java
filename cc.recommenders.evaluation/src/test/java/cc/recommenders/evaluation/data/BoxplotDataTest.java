@@ -13,6 +13,7 @@ package cc.recommenders.evaluation.data;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.math.util.MathUtils;
@@ -164,6 +165,33 @@ public class BoxplotDataTest {
 		double[] actuals = sut.getRawValues();
 		double[] expecteds = new double[] { 0.0, 1.0, 4.0 };
 		assertArrayEquals(expecteds, actuals, TEST_PRECISION);
+	}
+
+	@Test
+	public void equality_default() {
+		BoxplotData a = new BoxplotData();
+		BoxplotData b = new BoxplotData();
+		assertEquals(a, b);
+		assertEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	public void equality_afterAddingValues() {
+		BoxplotData a = new BoxplotData();
+		a.add(0.1);
+		BoxplotData b = new BoxplotData();
+		b.add(0.1);
+		assertEquals(a, b);
+		assertEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	public void equality_differentValues() {
+		BoxplotData a = new BoxplotData();
+		a.add(0.1);
+		BoxplotData b = new BoxplotData();
+		assertNotEquals(a, b);
+		assertNotEquals(a.hashCode(), b.hashCode());
 	}
 
 	private Variance createVariance(double... values) {
