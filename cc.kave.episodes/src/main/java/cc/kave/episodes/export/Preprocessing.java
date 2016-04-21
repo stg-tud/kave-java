@@ -48,13 +48,16 @@ public class Preprocessing {
 		List<File> zips = findAllZips(getContextsPath());
 		
 		for (File zip : zips) {
-			Logger.log("Writing zip file %s\n", zip.toString());
+			Logger.log("Reading zip file %s", zip.toString());
 			ReadingArchive ra = new ReadingArchive(zip);
 			EventStreamGenerator generator = new EventStreamGenerator();
 			
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				System.out.println(ctx.toString());
+				if (ctx == null) {
+					continue;
+				}
+//				System.out.println(ctx.toString());
 				generator.add(ctx);
 			}
 			ra.close();
@@ -82,7 +85,7 @@ public class Preprocessing {
 	}
 	
 	private String getMappingPath() {
-		File mappingFile = new File(rootDir.getAbsolutePath() + "/dataSet/eventStream.txt");
+		File mappingFile = new File(rootDir.getAbsolutePath() + "/dataSet/eventMapping.txt");
 		return mappingFile.getAbsolutePath();
 	}
 }
