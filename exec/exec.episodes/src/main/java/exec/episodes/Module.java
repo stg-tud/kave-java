@@ -50,7 +50,7 @@ public class Module extends AbstractModule {
 	@Override
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "configurations/");
-		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
+//		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
 		File eventStreamData = new File(rootFolder + "EpisodeMining/dataSet/SST/");
 		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
@@ -61,7 +61,7 @@ public class Module extends AbstractModule {
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
-		dirs.put("episode", episodeDir);
+//		dirs.put("episode", episodeDir);
 		dirs.put("events", eventStreamDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("rootDir", episodeRootDir);

@@ -105,6 +105,7 @@ public class EventStreamGenerator {
 		}
 
 		private void addEnclosingMethodIfAvailable() {
+			System.out.println(currentCtx.toString());
 			Asserts.assertNotNull(currentCtx);
 			events.add(Events.newContext(currentCtx));
 			currentCtx = null;

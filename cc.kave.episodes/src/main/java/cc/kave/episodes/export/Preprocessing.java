@@ -15,6 +15,8 @@
  */
 package cc.kave.episodes.export;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
@@ -34,27 +37,29 @@ public class Preprocessing {
 
 	private File rootDir;
 
+	@Inject
 	public Preprocessing(@Named("rootDir") File directory) {
+		assertTrue(directory.exists(), "Contexts folder does not exist");
+		assertTrue(directory.isDirectory(), "Contexts is not a folder, but a file");
 		this.rootDir = directory;
 	}
 
 	public void readAllContexts() throws ZipException, IOException {
 		List<File> zips = findAllZips(getContextsPath());
-		int zipCounter = 0;
 		
 		for (File zip : zips) {
-			Logger.log("Writing zip file %d\n", zipCounter);
+			Logger.log("Writing zip file %s\n", zip.toString());
 			ReadingArchive ra = new ReadingArchive(zip);
 			EventStreamGenerator generator = new EventStreamGenerator();
 			
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
+				System.out.println(ctx.toString());
 				generator.add(ctx);
 			}
 			ra.close();
 			List<Event> es = generator.getEventStream();
 			EventStreamIo.write(es, getStreamPath(), getMappingPath());
-			zipCounter++;
 		}
 	}
 
@@ -67,7 +72,7 @@ public class Preprocessing {
 	}
 
 	private String getContextsPath() {
-		String path = rootDir.getAbsolutePath() + "/dataSet/SST/";
+		String path = rootDir.getAbsolutePath() + "/dataSet/SST/Github/";
 		return path;
 	}
 	
