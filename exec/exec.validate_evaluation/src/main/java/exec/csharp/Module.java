@@ -11,6 +11,7 @@ package exec.csharp;
 import static cc.recommenders.mining.calls.MiningOptions.newMiningOptions;
 import static cc.recommenders.mining.calls.QueryOptions.newQueryOptions;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
@@ -18,6 +19,7 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
+import cc.recommenders.assertions.Asserts;
 import cc.recommenders.evaluation.OptionsUtils;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.ModelBuilder;
@@ -43,6 +45,9 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		bindMiningAndQueryOptions();
 
+		
+		Asserts.assertTrue(new File(ROOT_PATH).exists(), "\n\n###\n### ROOT_PATH does not exist. Evaluation disc not mounted?\n###\n\n");
+		
 		// TODO read ROOT_PATH from settings file
 		bind(StorageHelper.class).toInstance(new StorageHelper(ROOT_PATH));
 		bind(IEvaluation.class).to(Evaluation.class);

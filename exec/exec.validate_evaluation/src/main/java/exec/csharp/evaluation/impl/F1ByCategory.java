@@ -20,14 +20,13 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import cc.recommenders.assertions.Asserts;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.io.Logger;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;
 import exec.csharp.queries.QueryMode;
-import exec.csharp.utils.QueryUtils;
+import exec.csharp.utils.QueryJudge;
 
 public class F1ByCategory extends AbstractEvaluationConsumer {
 
@@ -74,24 +73,7 @@ public class F1ByCategory extends AbstractEvaluationConsumer {
 	}
 
 	private QueryContent categorize(Usage start, Usage end) {
-		int numStart = start.getReceiverCallsites().size();
-		int numAdded = QueryUtils.countAdditions(start, end);
-		int numRemoved = QueryUtils.countRemovals(start, end);
-		int numStartWithoutNoise = numStart - numRemoved;
-		Asserts.assertGreaterOrEqual(numStartWithoutNoise, 0);
-		int numEnd = end.getReceiverCallsites().size();
-		Asserts.assertEquals(numStartWithoutNoise + numAdded, numEnd);
-
-		if (numStartWithoutNoise == 0) {
-			return QueryContent.ZERO;
-		}
-		if (numStartWithoutNoise == 1 && numEnd == 2) {
-			return QueryContent.NM;
-		}
-		if (numStartWithoutNoise == numEnd - 1) {
-			return QueryContent.MINUS1;
-		}
-		return QueryContent.NM;
+		return new QueryJudge(start, end).getQueryContentCategorization();
 	}
 
 	@Override

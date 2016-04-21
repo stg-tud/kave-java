@@ -15,8 +15,10 @@
  */
 package exec.csharp.utils;
 
+import cc.recommenders.assertions.Asserts;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
+import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
 
 public class QueryJudge {
 
@@ -86,5 +88,32 @@ public class QueryJudge {
 			return true;
 		}
 		return !start.getDefinitionSite().equals(end.getDefinitionSite());
+	}
+
+	public QueryContent getQueryContentCategorization() {
+		Asserts.assertFalse(end instanceof NoUsage);
+
+		if (start instanceof NoUsage) {
+			return QueryContent.ZERO;
+		}
+
+		int numStart = start.getReceiverCallsites().size();
+		int numAdded = QueryUtils.countAdditions(start, end);
+		int numRemoved = QueryUtils.countRemovals(start, end);
+		int numStartWithoutNoise = numStart - numRemoved;
+		Asserts.assertGreaterOrEqual(numStartWithoutNoise, 0);
+		int numEnd = end.getReceiverCallsites().size();
+		Asserts.assertEquals(numStartWithoutNoise + numAdded, numEnd);
+
+		if (numStartWithoutNoise == 0) {
+			return QueryContent.ZERO;
+		}
+		if (numStartWithoutNoise == 1 && numEnd == 2) {
+			return QueryContent.NM;
+		}
+		if (numStartWithoutNoise == numEnd - 1) {
+			return QueryContent.MINUS1;
+		}
+		return QueryContent.NM;
 	}
 }

@@ -80,6 +80,8 @@ public class BasicExcelEvaluation {
 
 		System.out.printf("\ninitializing nested .zip folder for types/usages... (%s)\n", new Date());
 		Set<ICoReTypeName> types = usages.findKeys();
+		// Set<ICoReTypeName> types =
+		// Sets.newHashSet(CoReTypeName.get("LSystem/IO/MemoryStream"));
 		for (ICoReTypeName type : types) {
 			List<Usage> us = usages.readAllZips(type, Usage.class);
 			if (us.size() < 1) {
@@ -100,28 +102,45 @@ public class BasicExcelEvaluation {
 				System.out.printf("\n### found %d commits ###\nfor %s (%d usages)\nin %s\n\n", readCommits.size(), type,
 						us.size(), zip);
 
-				for (QueryMode mode : QueryMode.values()) {
+				// QueryMode[] modes = QueryMode.values();
+				QueryMode[] modes = new QueryMode[] { QueryMode.REAL };
+				for (QueryMode mode : modes) {
 					System.out.println(mode);
 
-					BoxplotData boxplotByType = new BoxplotData();
 					Tuple<QueryMode, ICoReTypeName> typeKey = Tuple.newTuple(mode, type);
-					res3.put(typeKey, boxplotByType);
+					BoxplotData bpd3 = res3.get(typeKey);
+					if (bpd3 == null) {
+						bpd3 = new BoxplotData();
+						res3.put(typeKey, bpd3);
+					}
 
 					qb = qbf.get(mode);
 
 					for (MicroCommit mc : readCommits) {
+
+						// System.out.println(mc.getStart());
+						// System.out.println("---------");
+						// System.out.println(mc.getEnd());
+
 						Usage start = mc.getStart();
 						Usage end = mc.getEnd();
 
 						if (shouldSkip(start, end)) {
+//							System.out.println("skipped");
+//							System.out.println("########################");
 							continue;
 						}
 
-						double f1 = measurePredictionQuality(start, end);
 						String diff = QueryUtils.toDiffString(mc);
+						double f1 = measurePredictionQuality(start, end);
+
+						// System.out.println();
+						// System.out.printf("diff: %s\n", diff);
+						// System.out.printf("--> %.3f\n", f1);
+						// System.out.println("########################");
 
 						res.get(mode).add(f1);
-						boxplotByType.add(f1);
+						bpd3.add(f1);
 
 						String k2 = mode + "\t" + diff;
 						BoxplotData bp = res2.get(k2);
@@ -155,8 +174,11 @@ public class BasicExcelEvaluation {
 		System.out.println("### RES1 -- grouped by (mode) ###");
 		System.out.println("mode -> f1 (boxplot)");
 		for (QueryMode m : res.keySet()) {
-			Boxplot bp = res.get(m).getBoxplot();
-			System.out.printf("%s -> %.3f (%s)\n", m, bp.getMean(), bp);
+			BoxplotData bpd = res.get(m);
+			if (bpd.hasData()) {
+				Boxplot bp = bpd.getBoxplot();
+				System.out.printf("%s -> %.3f (%s)\n", m, bp.getMean(), bp);
+			}
 		}
 
 		System.out.println();
@@ -164,8 +186,11 @@ public class BasicExcelEvaluation {
 		System.out.println("### RES2 -- grouped by (mode+diff) ###");
 		System.out.println("mode\tdiff\tcount\tf1\tbp");
 		for (String k : res2.keySet()) {
-			Boxplot bp = res2.get(k).getBoxplot();
-			System.out.printf("%s\t%d\t%.3f\t%s\n", k, bp.getNumValues(), bp.getMean(), bp);
+			BoxplotData bpd = res2.get(k);
+			if (bpd.hasData()) {
+				Boxplot bp = bpd.getBoxplot();
+				System.out.printf("%s\t%d\t%.3f\t%s\n", k, bp.getNumValues(), bp.getMean(), bp);
+			}
 		}
 
 		System.out.println();
@@ -215,13 +240,15 @@ public class BasicExcelEvaluation {
 	}
 
 	private double measurePredictionQuality(Usage start, Usage end) {
-		List<Query> queries = qb.createQueries(safe(start, end), safe(end, start));
+		Usage sstart = safe(start, end);
+		Usage send = safe(end, start);
+		List<Query> queries = qb.createQueries(sstart, send);
 		BoxplotData res = new BoxplotData();
 		for (Query q : queries) {
 			Set<ICoReMethodName> proposals = getProposals(rec, q);
 			Set<ICoReMethodName> expectation = getExpectation(q, end);
-			Measure measure = Measure.newMeasure(expectation, proposals);
-			res.add(measure.getF1());
+			double f1 = Measure.newMeasure(expectation, proposals).getF1();
+			res.add(f1);
 		}
 		return res.getMean();
 	}

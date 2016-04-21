@@ -29,9 +29,13 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.pbn.BatchPBNSmileMiner;
 import cc.recommenders.names.ICoReTypeName;
+import exec.csharp.queries.QueryBuilderFactory;
+import exec.csharp.utils.ModelHelper;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
-import exec.validate_evaluation.basicexcel.BasicExcelEvaluation;
+import exec.validate_evaluation.categorized.MicroCommitIoExtension;
+import exec.validate_evaluation.categorized.NoiseCategorizedEvaluation;
+import exec.validate_evaluation.categorized.ScenarioCategorizedEvaluation;
 import exec.validate_evaluation.microcommits.MicroCommitGenerationLogger;
 import exec.validate_evaluation.microcommits.MicroCommitGenerationRunner;
 import exec.validate_evaluation.microcommits.MicroCommitIo;
@@ -40,7 +44,6 @@ import exec.validate_evaluation.queryhistory.QueryHistoryGenerationLogger;
 import exec.validate_evaluation.queryhistory.QueryHistoryGenerationRunner;
 import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 import exec.validate_evaluation.queryhistory.UsageExtractor;
-import exec.validate_evaluation.stats.UsageToMicroCommitRatioCalculator;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
@@ -92,8 +95,19 @@ public class run {
 		// load(AnalysisOfNoise.class).run();
 
 		/* new evals */
-		load(BasicExcelEvaluation.class).run();
+		// load(BasicExcelEvaluation.class).run();
+		runCategorizedEvaluation();
 		// runStats();
+	}
+
+	private static void runCategorizedEvaluation() {
+		NestedZipFolders<ICoReTypeName> usages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
+		ModelHelper mh = load(ModelHelper.class);
+		MicroCommitIo mcIo = new MicroCommitIo(dirMC);
+		MicroCommitIoExtension mcIoExt = new MicroCommitIoExtension(mcIo);
+		QueryBuilderFactory qbf = load(QueryBuilderFactory.class);
+		new NoiseCategorizedEvaluation(usages, mh, mcIoExt, qbf).run();
+		new ScenarioCategorizedEvaluation(usages, mh, mcIoExt, qbf).run();
 	}
 
 	private static void runStats() throws IOException {
@@ -103,7 +117,7 @@ public class run {
 
 		// new MicroCommitStats(mcIo).run();
 		// new QueryHistoryStats(qhIo).run();
-		new UsageToMicroCommitRatioCalculator(sh, mcIo).run();
+		// new UsageToMicroCommitRatioCalculator(sh, mcIo).run();
 	}
 
 	private static void runMicroCommitTransformation() {

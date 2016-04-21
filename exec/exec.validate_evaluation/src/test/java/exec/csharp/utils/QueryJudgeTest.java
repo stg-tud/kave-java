@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
@@ -30,6 +31,7 @@ import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
+import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
 
 public class QueryJudgeTest {
 
@@ -143,6 +145,48 @@ public class QueryJudgeTest {
 		assertEquals(2, sut.getNumRemovals());
 		assertTrue(sut.hasDefChange());
 		assertEquals(NoiseMode.PURE_REMOVAL, sut.getNoiseMode());
+	}
+
+	@Test
+	public void queryContent_0p1() {
+		Usage a = createQuery();
+		Usage b = createQuery(1);
+		assertEquals(QueryContent.ZERO, new QueryJudge(a, b).getQueryContentCategorization());
+	}
+
+	@Test
+	public void queryContent_1p1() {
+		Usage a = createQuery(1);
+		Usage b = createQuery(1, 2);
+		assertEquals(QueryContent.NM, new QueryJudge(a, b).getQueryContentCategorization());
+	}
+
+	@Test
+	public void queryContent_2p1() {
+		Usage a = createQuery(1, 2);
+		Usage b = createQuery(1, 2, 3);
+		assertEquals(QueryContent.MINUS1, new QueryJudge(a, b).getQueryContentCategorization());
+	}
+
+	@Test
+	public void queryContent_else() {
+		Usage a = createQuery(1);
+		Usage b = createQuery(1, 2, 3);
+		assertEquals(QueryContent.NM, new QueryJudge(a, b).getQueryContentCategorization());
+	}
+
+	@Test
+	public void queryContent_nq() {
+		Usage a = new NoUsage();
+		Usage b = createQuery(1);
+		assertEquals(QueryContent.ZERO, new QueryJudge(a, b).getQueryContentCategorization());
+	}
+
+	@Test(expected = AssertionException.class)
+	public void queryContent_qn() {
+		Usage a = createQuery(1, 2, 3);
+		Usage b = new NoUsage();
+		new QueryJudge(a, b).getQueryContentCategorization();
 	}
 
 	private QueryJudge judge() {
