@@ -16,16 +16,20 @@
 package exec.csharp.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
+import cc.recommenders.usages.Usage;
 
 public class QueryJudgeTest {
 
@@ -113,6 +117,32 @@ public class QueryJudgeTest {
 		b = createQuery(1);
 		b.setDefinition(DefinitionSites.createUnknownDefinitionSite());
 		assertEquals(NoiseMode.PURE_REMOVAL, judge().getNoiseMode());
+	}
+
+	@Test
+	public void judging_nq() {
+		Usage a = new NoUsage();
+		Usage b = createQuery(1, 2);
+		QueryJudge sut = new QueryJudge(a, b);
+		assertTrue(sut.hasAdditions());
+		assertEquals(2, sut.getNumAdditions());
+		assertFalse(sut.hasRemovals());
+		assertEquals(0, sut.getNumRemovals());
+		assertTrue(sut.hasDefChange());
+		assertEquals(NoiseMode.NO_NOISE, sut.getNoiseMode());
+	}
+
+	@Test
+	public void judging_qn() {
+		Usage a = createQuery(1, 2);
+		Usage b = new NoUsage();
+		QueryJudge sut = new QueryJudge(a, b);
+		assertFalse(sut.hasAdditions());
+		assertEquals(0, sut.getNumAdditions());
+		assertTrue(sut.hasRemovals());
+		assertEquals(2, sut.getNumRemovals());
+		assertTrue(sut.hasDefChange());
+		assertEquals(NoiseMode.PURE_REMOVAL, sut.getNoiseMode());
 	}
 
 	private QueryJudge judge() {

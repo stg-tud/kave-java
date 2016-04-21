@@ -15,6 +15,7 @@
  */
 package exec.csharp.utils;
 
+import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 
 public class QueryJudge {
@@ -37,6 +38,10 @@ public class QueryJudge {
 	}
 
 	private NoiseMode calcNoiseMode() {
+		if (start instanceof NoUsage) {
+			return NoiseMode.NO_NOISE;
+		}
+
 		if (hasRemovals() && hasDefChange()) {
 			if (hasAdditions()) {
 				return NoiseMode.DEF_AND_REMOVAL;
@@ -77,6 +82,9 @@ public class QueryJudge {
 	}
 
 	public boolean hasDefChange() {
+		if (start instanceof NoUsage || end instanceof NoUsage) {
+			return true;
+		}
 		return !start.getDefinitionSite().equals(end.getDefinitionSite());
 	}
 }
