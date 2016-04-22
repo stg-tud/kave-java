@@ -39,16 +39,13 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
 import cc.kave.commons.model.names.MethodName;
 import cc.kave.commons.model.names.Name;
 import cc.kave.commons.model.names.TypeName;
-import cc.kave.commons.model.names.csharp.CsAssemblyName;
 import cc.kave.commons.model.names.csharp.CsFieldName;
 import cc.kave.commons.model.names.csharp.CsLambdaName;
 import cc.kave.commons.model.names.csharp.CsLocalVariableName;
@@ -173,19 +170,19 @@ public class NodeFactory {
 		case ASTNode.FIELD_DECLARATION:
 			FieldDeclaration fieldNode = (FieldDeclaration) node;
 
-			Object field = fieldNode.fragments().get(0);
+			VariableDeclarationFragment field = (VariableDeclarationFragment) fieldNode.fragments().get(0);
+
 			// TODO: resolving problem
-			if (field instanceof VariableDeclarationFragment
-					&& ((VariableDeclarationFragment) field).resolveBinding() != null) {
-				sb.append(modifierHelper(((VariableDeclarationFragment) field).resolveBinding()));
+			if (field instanceof VariableDeclarationFragment && field.resolveBinding() != null) {
+				sb.append(modifierHelper(field.resolveBinding()));
 				sb.append("[");
-				sb.append(BindingFactory
-						.getBindingName(((VariableDeclarationFragment) field).resolveBinding().getType()));
+				sb.append(BindingFactory.getBindingName(field.resolveBinding().getType()));
 				sb.append("] [");
 				sb.append(getDeclaringType(fieldNode));
 				sb.append("].");
-				sb.append(((VariableDeclarationFragment) field).getName().getIdentifier());
+				sb.append(field.getName().getIdentifier());
 			}
+
 			return CsFieldName.newFieldName(sb.toString());
 
 		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
@@ -231,8 +228,10 @@ public class NodeFactory {
 		IMethodBinding methodInvBinding = invocation.resolveMethodBinding();
 
 		// TODO: check reason for null binding
-		if (methodInvBinding != null)
+		if (methodInvBinding != null) {
 			sb.append(methodNameHelper(null, methodInvBinding, true));
+		}
+
 		return CsMethodName.newMethodName(sb.toString());
 	}
 
@@ -366,7 +365,7 @@ public class NodeFactory {
 			if (methodDecl != null) {
 				param.append(((SingleVariableDeclaration) methodDecl.parameters().get(i)).getName().getIdentifier());
 			} else {
-				param.append("?");
+				param.append("?parameter");
 			}
 			parameters[i] = CsParameterName.newParameterName(param.toString()).getIdentifier();
 		}
@@ -483,20 +482,27 @@ public class NodeFactory {
 			// ITypeBinding
 			case 2:
 				ITypeBinding type = (ITypeBinding) binding;
-				String qualifiedName = type.getQualifiedName();
+				String qualifiedName;
+
+				if (type.isArray()) {
+					qualifiedName = type.getElementType().getQualifiedName();
+				} else if (type.isParameterizedType()) {
+					qualifiedName = type.getQualifiedName();
+					qualifiedName = qualifiedName.substring(0, qualifiedName.indexOf("<"));
+				} else {
+					qualifiedName = type.getQualifiedName();
+				}
 				sb.append(addPrefix(type));
 
 				if (type.isParameterizedType()) {
-					sb.append(qualifiedName.substring(0, qualifiedName.indexOf("<")));
+					sb.append(qualifiedName);
 					sb.append("`");
 					sb.append(type.getTypeArguments().length);
 					sb.append("[");
 
 					// TODO: generics for later work
 					for (ITypeBinding t : type.getTypeArguments()) {
-						sb.append("[T -> T");
-						// sb.append(getBindingName(t));
-						sb.append("],");
+						sb.append("[T -> " + getBindingName(t) + "],");
 					}
 
 					sb.deleteCharAt(sb.toString().length() - 1);
@@ -516,6 +522,7 @@ public class NodeFactory {
 				}
 				// somehow Class.forname throws this exception sometimes
 				catch (IllegalAccessError e) {
+					System.out.println("IllegalAccesError: " + qualifiedName);
 					sb.append("?");
 				}
 				break;
