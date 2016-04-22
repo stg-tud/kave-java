@@ -20,72 +20,72 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipException;
 
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.Lists;
+import com.google.common.base.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class Preprocessing {
 
-	private File rootDir;
+	private Directory rootDir;
+	private File rootFolder;
 
 	@Inject
-	public Preprocessing(@Named("rootDir") File directory) {
-		assertTrue(directory.exists(), "Contexts folder does not exist");
-		assertTrue(directory.isDirectory(), "Contexts is not a folder, but a file");
+	public Preprocessing(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
+		assertTrue(folder.exists(), "Contexts folder does not exist");
+		assertTrue(folder.isDirectory(), "Contexts is not a folder, but a file");
 		this.rootDir = directory;
+		this.rootFolder = folder;
 	}
 
 	public void readAllContexts() throws ZipException, IOException {
-		List<File> zips = findAllZips(getContextsPath());
+		EventStreamGenerator generator = new EventStreamGenerator();
 		
-		for (File zip : zips) {
+		for (String zip : findZips()) {
 			Logger.log("Reading zip file %s", zip.toString());
-			ReadingArchive ra = new ReadingArchive(zip);
-			EventStreamGenerator generator = new EventStreamGenerator();
+			ReadingArchive ra = rootDir.getReadingArchive(zip);
 			
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				if (ctx == null) {
 					continue;
 				}
-//				System.out.println(ctx.toString());
 				generator.add(ctx);
 			}
 			ra.close();
-			List<Event> es = generator.getEventStream();
-			EventStreamIo.write(es, getStreamPath(), getMappingPath());
 		}
+		Logger.log("Getting the event stream data!");
+		List<Event> es = generator.getEventStream();
+		Logger.log("Writing event stream and event mapping files!");
+		EventStreamIo.write(es, getStreamPath(), getMappingPath());
 	}
 
-	private List<File> findAllZips(String dir) {
-		List<File> zips = Lists.newLinkedList();
-		for (File f : FileUtils.listFiles(new File(dir), new String[] { "zip" }, true)) {
-			zips.add(f);
-		}
+	private Set<String> findZips() {
+		Set<String> zips = rootDir.findFiles(new Predicate<String>() {
+
+			@Override
+			public boolean apply(String arg0) {
+				return arg0.endsWith(".zip");
+			}
+		});
 		return zips;
-	}
-
-	private String getContextsPath() {
-		String path = rootDir.getAbsolutePath() + "/dataSet/SST/Github/";
-		return path;
 	}
 	
 	private String getStreamPath() {
-		File streamFile = new File(rootDir.getAbsolutePath() + "/dataSet/eventStream.txt");
+		File streamFile = new File(rootFolder.getAbsolutePath() + "/eventStream.txt");
 		return streamFile.getAbsolutePath();
 	}
 	
 	private String getMappingPath() {
-		File mappingFile = new File(rootDir.getAbsolutePath() + "/dataSet/eventMapping.txt");
+		File mappingFile = new File(rootFolder.getAbsolutePath() + "/eventMapping.txt");
 		return mappingFile.getAbsolutePath();
 	}
 }

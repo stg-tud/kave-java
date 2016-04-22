@@ -15,19 +15,20 @@
  */
 package cc.kave.episodes.export;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.io.Directory;
 
 public class PreprocessingTest {
 
@@ -36,23 +37,28 @@ public class PreprocessingTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
+	@Mock
 	private EventStreamGenerator generator;
+	@Mock
 	private EventStreamIo streamer;
+	@Mock
+	private FileUtils fileUtils;
+	@Mock
+	private Directory dir;
 	
 	private Preprocessing sut;
 	
 	@Before 
 	public void setup() {
-		generator = mock(EventStreamGenerator.class);
-		streamer = mock(EventStreamIo.class);
-		sut = new Preprocessing(rootFolder.getRoot());
+		MockitoAnnotations.initMocks(this);
+		sut = new Preprocessing(dir, rootFolder.getRoot());
 	}
 	
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Contexts folder does not exist");
-		sut = new Preprocessing(new File("does not exist"));
+		sut = new Preprocessing(dir, new File("does not exist"));
 	}
 
 	@Test
@@ -60,6 +66,6 @@ public class PreprocessingTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Contexts is not a folder, but a file");
-		sut = new Preprocessing(file);
+		sut = new Preprocessing(dir, file);
 	}
 }
