@@ -45,7 +45,7 @@ public class MicroCommitGenerationLogger {
 
 	public void foundHistories(int size) {
 		log("");
-		log("found %d histories, will convert them to micro commits:", size);
+		log("found %d histories, will convert them to micro commits (notation: len(uh) > #mcs):", size);
 		log("");
 		isFirstCommit = true;
 	}

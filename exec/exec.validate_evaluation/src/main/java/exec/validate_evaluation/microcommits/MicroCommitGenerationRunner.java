@@ -27,6 +27,8 @@ import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 
 public class MicroCommitGenerationRunner {
 
+	private static final int MAX_HISTORY_DEPTH = 10;
+
 	private QueryHistoryIo qhIo;
 	private MicroCommitIo mcIo;
 	private MicroCommitGenerationLogger log;
@@ -62,8 +64,11 @@ public class MicroCommitGenerationRunner {
 
 		List<MicroCommit> commits = Lists.newLinkedList();
 		// TODO fix/test
-		for (int i = 1; i < Math.min(40, qh.size()); i++) {
-			for (int j = 0; j < i; j++) {
+		for (int i = 1; i < qh.size(); i++) {
+
+			int first = Math.max(0, i - MAX_HISTORY_DEPTH);
+
+			for (int j = first; j < i; j++) {
 				Usage end = qh.get(i);
 				Usage start = qh.get(j);
 

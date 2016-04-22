@@ -154,6 +154,8 @@ public class QueryHistoryCollector {
 				}
 				return false;
 			});
+
+			// TODO: remove histories that start and end with NoUsage
 		}
 	}
 }
