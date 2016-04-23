@@ -17,7 +17,7 @@ package exec.validate_evaluation.categorized;
 
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
-import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
+import exec.csharp.evaluation.impl.QueryContent;
 import exec.csharp.queries.QueryBuilderFactory;
 import exec.csharp.utils.ModelHelper;
 import exec.csharp.utils.QueryJudge;
@@ -34,5 +34,4 @@ public class ScenarioCategorizedEvaluation extends CategorizedEvaluation<QueryCo
 	protected QueryContent getCategory(MicroCommit mc) {
 		return new QueryJudge(mc.getStart(), mc.getEnd()).getQueryContentCategorization();
 	}
-
 }

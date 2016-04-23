@@ -15,26 +15,39 @@
  */
 package exec.csharp.utils;
 
+import javax.annotation.Nonnull;
+
 import cc.recommenders.assertions.Asserts;
+import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
-import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
+import exec.csharp.evaluation.impl.QueryContent;
 import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class QueryJudge {
 
-	private final Usage start;
-	private final Usage end;
+	private Usage start;
+	private Usage end;
 
 	private NoiseMode noiseMode;
+	private QueryContent queryContent;
+
 	private int numAdditions;
 	private int numRemovals;
 
-	public QueryJudge(MicroCommit mc) {
-		this(mc.getStart(), mc.getEnd());
+	public QueryJudge(@Nonnull MicroCommit mc) {
+		Asserts.assertNotNull(mc);
+		init(mc.getStart(), mc.getEnd());
 	}
 
-	public QueryJudge(Usage start, Usage end) {
+	public QueryJudge(@Nonnull Usage start, @Nonnull Usage end) {
+		init(start, end);
+	}
+
+	private void init(Usage start, Usage end) {
+		Asserts.assertNotNull(start);
+		Asserts.assertNotNull(end);
+
 		this.start = start;
 		this.end = end;
 
@@ -42,6 +55,7 @@ public class QueryJudge {
 		numRemovals = QueryUtils.countRemovals(start, end);
 
 		noiseMode = calcNoiseMode();
+		queryContent = calcQueryContentCategorization();
 	}
 
 	private NoiseMode calcNoiseMode() {
@@ -95,14 +109,28 @@ public class QueryJudge {
 		if (start instanceof NoUsage || end instanceof NoUsage) {
 			return true;
 		}
-		return !start.getDefinitionSite().equals(end.getDefinitionSite());
+		DefinitionSite def1 = start.getDefinitionSite();
+		DefinitionSite def2 = end.getDefinitionSite();
+		return !def1.equals(def2);
 	}
 
 	public QueryContent getQueryContentCategorization() {
-		Asserts.assertFalse(end instanceof NoUsage);
+		return queryContent;
+	}
+
+	private QueryContent calcQueryContentCategorization() {
+		if (start instanceof NoUsage && end instanceof NoUsage) {
+			return QueryContent.SKIPPED;
+		}
 
 		if (start instanceof NoUsage) {
-			return QueryContent.ZERO;
+			boolean hasAdditions = !end.getReceiverCallsites().isEmpty();
+			return hasAdditions ? QueryContent.FROM_SRATCH : QueryContent.SKIPPED;
+		}
+
+		if (end instanceof NoUsage) {
+			boolean hasRemovals = !start.getReceiverCallsites().isEmpty();
+			return hasRemovals ? QueryContent.PURE_REMOVAL : QueryContent.SKIPPED;
 		}
 
 		int numStart = start.getReceiverCallsites().size();
@@ -113,15 +141,28 @@ public class QueryJudge {
 		int numEnd = end.getReceiverCallsites().size();
 		Asserts.assertEquals(numStartWithoutNoise + numAdded, numEnd);
 
+		if (numAdded == 0) {
+			return numRemoved == 0 ? QueryContent.SKIPPED : QueryContent.PURE_REMOVAL;
+		}
+
+		boolean hasNoise = hasDefChange() || getNumRemovals() > 0;
 		if (numStartWithoutNoise == 0) {
-			return QueryContent.ZERO;
+			if (getNumAdditions() == 1) {
+				return hasNoise ? QueryContent.ZERO_ONE_DEF : QueryContent.ZERO_ONE;
+			} else {
+				return hasNoise ? QueryContent.ZERO_DEF : QueryContent.ZERO;
+			}
 		}
-		if (numStartWithoutNoise == 1 && numEnd == 2) {
-			return QueryContent.NM;
+		if (numStartWithoutNoise == 1) {
+			if (getNumAdditions() == 1) {
+				return hasNoise ? QueryContent.ONE_TWO_DEF : QueryContent.ONE_TWO;
+			}
 		}
+
 		if (numStartWithoutNoise == numEnd - 1) {
-			return QueryContent.MINUS1;
+			return hasNoise ? QueryContent.MINUS1_DEF : QueryContent.MINUS1;
 		}
-		return QueryContent.NM;
+
+		return hasNoise ? QueryContent.NM_DEF : QueryContent.NM;
 	}
 }

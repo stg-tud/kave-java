@@ -102,7 +102,4 @@ public class F1ByCategory extends AbstractEvaluationConsumer {
 		System.out.println();
 	}
 
-	public enum QueryContent {
-		ZERO, NM, MINUS1
-	}
 }

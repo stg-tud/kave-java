@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.csharp.utils;
+package exec.csharp.evaluation.impl;
 
-public enum NoiseMode {
-	NO_NOISE, DEF, REMOVAL, DEF_AND_REMOVAL, PURE_REMOVAL, FROM_SCRATCH, SKIPPED
+public enum QueryContent {
+	ZERO_ONE, ZERO_ONE_DEF, // 0|1[~D]
+	ONE_TWO, ONE_TWO_DEF, // 1|2[~D]
+	ZERO, ZERO_DEF, // 0|M[~D],
+	NM, NM_DEF, // N|M[~D]
+	MINUS1, MINUS1_DEF, // M-1|M[~D]
+	FROM_SRATCH, // ~[+x]
+	PURE_REMOVAL, // N-y[~D], ~[-x]
+	SKIPPED // 0[~D], N[~D], ~[+/-0], in general "nn" queries
 }
