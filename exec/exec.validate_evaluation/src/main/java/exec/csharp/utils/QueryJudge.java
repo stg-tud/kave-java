@@ -19,6 +19,7 @@ import cc.recommenders.assertions.Asserts;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class QueryJudge {
 
@@ -28,6 +29,10 @@ public class QueryJudge {
 	private NoiseMode noiseMode;
 	private int numAdditions;
 	private int numRemovals;
+
+	public QueryJudge(MicroCommit mc) {
+		this(mc.getStart(), mc.getEnd());
+	}
 
 	public QueryJudge(Usage start, Usage end) {
 		this.start = start;

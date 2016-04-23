@@ -32,11 +32,22 @@ import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.impl.F1ByCategory.QueryContent;
+import exec.validate_evaluation.microcommits.MicroCommit;
 
 public class QueryJudgeTest {
 
 	private Query a;
 	private Query b;
+
+	@Test
+	public void bothInitsAreExchangable() {
+		a = createQuery(1);
+		b = createQuery(1, 2);
+
+		QueryJudge j1 = new QueryJudge(a, b);
+		QueryJudge j2 = new QueryJudge(MicroCommit.create(a, b));
+		assertEquals(j1.getNumAdditions(), j2.getNumAdditions());
+	}
 
 	@Test
 	public void numAdditions() {
@@ -190,7 +201,7 @@ public class QueryJudgeTest {
 	}
 
 	private QueryJudge judge() {
-		return new QueryJudge(a, b);
+		return new QueryJudge(MicroCommit.create(a, b));
 	}
 
 	private Query createQuery(int... mIds) {
