@@ -16,5 +16,5 @@
 package exec.csharp.utils;
 
 public enum NoiseMode {
-	NO_NOISE, DEF, REMOVAL, DEF_AND_REMOVAL, PURE_REMOVAL
+	NO_NOISE, DEF, REMOVAL, DEF_AND_REMOVAL, PURE_REMOVAL, FROM_SCRATCH
 }

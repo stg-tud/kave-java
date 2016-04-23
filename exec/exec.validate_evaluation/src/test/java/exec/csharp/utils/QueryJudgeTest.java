@@ -142,7 +142,7 @@ public class QueryJudgeTest {
 		assertFalse(sut.hasRemovals());
 		assertEquals(0, sut.getNumRemovals());
 		assertTrue(sut.hasDefChange());
-		assertEquals(NoiseMode.NO_NOISE, sut.getNoiseMode());
+		assertEquals(NoiseMode.FROM_SCRATCH, sut.getNoiseMode());
 	}
 
 	@Test

@@ -46,7 +46,10 @@ public class QueryJudge {
 
 	private NoiseMode calcNoiseMode() {
 		if (start instanceof NoUsage) {
-			return NoiseMode.NO_NOISE;
+			return NoiseMode.FROM_SCRATCH;
+		}
+		if (end instanceof NoUsage) {
+			return NoiseMode.PURE_REMOVAL;
 		}
 
 		if (hasRemovals() && hasDefChange()) {
