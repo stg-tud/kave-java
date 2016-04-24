@@ -26,7 +26,8 @@ import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 
 public class MicroCommitGenerationRunner {
 
-	private static final int MAX_HISTORY_LENGTH = 15;
+	// see QueryHistoryStats (9 covers 95% of data)
+	private static final int MAX_HISTORY_LENGTH = 9;
 
 	private QueryHistoryIo qhIo;
 	private MicroCommitIo mcIo;

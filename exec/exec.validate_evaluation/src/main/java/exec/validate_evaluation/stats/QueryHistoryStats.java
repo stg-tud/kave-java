@@ -43,6 +43,9 @@ public class QueryHistoryStats {
 	}
 
 	public void run() {
+
+		BoxplotData uhLen = new BoxplotData();
+
 		for (String zip : io.findQueryHistoryZips()) {
 
 			System.out.println();
@@ -57,6 +60,7 @@ public class QueryHistoryStats {
 			sortedHists = Maps.newHashMap();
 
 			for (List<Usage> hist : hists) {
+				uhLen.add((double) hist.size());
 				sort(hist);
 			}
 
@@ -67,6 +71,13 @@ public class QueryHistoryStats {
 		System.out.println();
 
 		System.out.printf("--- overall stats ---\n");
+		System.out.printf("uhLen stats: %s\n", uhLen.getBoxplot());
+		System.out.println("percentiles for len(uh):");
+		for (int percentile = 80; percentile < 101; percentile += 1) {
+			double len = uhLen.getPercentil(percentile);
+			System.out.printf("\t%d covered with a uh len of %.1f\n", percentile, len);
+		}
+		System.out.println();
 		System.out.printf("numHistories: %d (%d collisions)\n", numLocations, collisions);
 		Boxplot bp = avgHistLength.getBoxplot();
 		System.out.printf("avgLength: %.1f usages %s\n", bp.getMean(), bp);
@@ -101,7 +112,7 @@ public class QueryHistoryStats {
 			}
 		}
 	}
-	
+
 	private int collisions = 0;
 
 	private void sort(List<Usage> hist) {

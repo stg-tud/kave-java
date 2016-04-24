@@ -44,6 +44,7 @@ import exec.validate_evaluation.queryhistory.QueryHistoryGenerationLogger;
 import exec.validate_evaluation.queryhistory.QueryHistoryGenerationRunner;
 import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 import exec.validate_evaluation.queryhistory.UsageExtractor;
+import exec.validate_evaluation.stats.QueryHistoryStats;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
@@ -78,7 +79,6 @@ public class run {
 		// runBatchPBNSmileMiner();
 		// storageHelper.setModifier("inlined");
 		// runBatchPBNSmileMiner();
-		// runMicroCommitTransformation();
 		// storageHelper.clearModifier();
 
 		/* evaluations */
@@ -97,8 +97,9 @@ public class run {
 
 		/* new evals */
 		// load(BasicExcelEvaluation.class).run();
-		runCategorizedEvaluation();
-		// runStats();
+		// runMicroCommitTransformation();
+		// runCategorizedEvaluation();
+		runStats();
 	}
 
 	private static void runCategorizedEvaluation() {
@@ -118,7 +119,7 @@ public class run {
 		StorageHelper sh = new StorageHelper(dirRoot);
 
 		// new MicroCommitStats(mcIo).run();
-		// new QueryHistoryStats(qhIo).run();
+		new QueryHistoryStats(qhIo).run();
 		// new UsageToMicroCommitRatioCalculator(sh, mcIo).run();
 	}
 
