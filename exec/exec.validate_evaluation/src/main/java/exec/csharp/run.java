@@ -47,6 +47,7 @@ import exec.validate_evaluation.queryhistory.UsageExtractor;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
+import exec.validate_evaluation.streaks.EditStreakGenerationRunner.EmptyOrSingleEditStreakRemovalFilter;
 
 public class run {
 
@@ -108,6 +109,7 @@ public class run {
 		QueryBuilderFactory qbf = load(QueryBuilderFactory.class);
 		new NoiseCategorizedEvaluation(usages, mh, mcIoExt, qbf).run();
 		new ScenarioCategorizedEvaluation(usages, mh, mcIoExt, qbf).run();
+		// new DebuggingEvaluation(usages, mh, mcIoExt, qbf).run();
 	}
 
 	private static void runStats() throws IOException {
@@ -131,18 +133,19 @@ public class run {
 		MicroCommitGenerationLogger mcLog = new MicroCommitGenerationLogger();
 
 		EditStreakGenerationRunner esGen = new EditStreakGenerationRunner(esIo, esLog);
+		esGen.add(new EmptyOrSingleEditStreakRemovalFilter());
 		QueryHistoryGenerationRunner qhGen = new QueryHistoryGenerationRunner(esIo, qhIo, qhLog,
 				new QueryHistoryCollector(qhLog), new UsageExtractor());
 		MicroCommitGenerationRunner mcGen = new MicroCommitGenerationRunner(qhIo, mcIo, mcLog);
 
 		// clean(dirES);
 		// esGen.run();
-
-		clean(dirQH);
-		qhGen.run();
-
-		clean(dirMC);
-		mcGen.run();
+		//
+		// clean(dirQH);
+		// qhGen.run();
+		//
+		// clean(dirMC);
+		// mcGen.run();
 	}
 
 	private static void clean(String dir) {
