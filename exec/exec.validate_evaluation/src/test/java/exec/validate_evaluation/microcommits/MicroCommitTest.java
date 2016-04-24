@@ -23,6 +23,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.testutils.ToStringAssert;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
@@ -32,6 +34,7 @@ import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.utils.CoReNameUtils;
 
 public class MicroCommitTest {
 	@Test
@@ -104,8 +107,21 @@ public class MicroCommitTest {
 	}
 
 	@Test(expected = AssertionException.class)
-	public void cannotInitializeWithTwoNonUsages() {
-		MicroCommit.create(new NoUsage(), new NoUsage());
+	public void initWithNull_start() {
+		MicroCommit.create(null, new NoUsage());
+	}
+
+	@Test(expected = AssertionException.class)
+	public void initWithNull_end() {
+		MicroCommit.create(new NoUsage(), null);
+	}
+
+	@Test
+	public void getType_nn() {
+		MicroCommit sut = MicroCommit.create(new NoUsage(), new NoUsage());
+		ICoReTypeName actual = sut.getType();
+		ICoReTypeName expected = CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME);
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -129,6 +145,14 @@ public class MicroCommitTest {
 		MicroCommit sut = MicroCommit.create(q(1), q(2));
 		ICoReTypeName actual = sut.getType();
 		ICoReTypeName expected = t(1);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void getMethodContext_nn() {
+		MicroCommit sut = MicroCommit.create(new NoUsage(), new NoUsage());
+		ICoReMethodName actual = sut.getMethodContext();
+		ICoReMethodName expected = CoReNameUtils.toCoReName(MethodName.UNKNOWN_NAME);
 		assertEquals(expected, actual);
 	}
 

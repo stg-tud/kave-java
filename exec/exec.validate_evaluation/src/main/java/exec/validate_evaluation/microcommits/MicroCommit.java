@@ -16,15 +16,20 @@
 
 package exec.validate_evaluation.microcommits;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
+import exec.validate_evaluation.utils.CoReNameUtils;
 
 public class MicroCommit {
 	private Usage Item1;
@@ -39,10 +44,20 @@ public class MicroCommit {
 	}
 
 	public ICoReTypeName getType() {
+		if (hasOnlyNoUsages()) {
+			return CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME);
+		}
 		return getFirstNoUsage().getType();
 	}
 
+	private boolean hasOnlyNoUsages() {
+		return Item1 instanceof NoUsage && Item2 instanceof NoUsage;
+	}
+
 	public ICoReMethodName getMethodContext() {
+		if (hasOnlyNoUsages()) {
+			return CoReNameUtils.toCoReName(MethodName.UNKNOWN_NAME);
+		}
 		return getFirstNoUsage().getMethodContext();
 	}
 
@@ -68,8 +83,9 @@ public class MicroCommit {
 		return ToStringUtils.toString(this);
 	}
 
-	public static MicroCommit create(Usage start, Usage end) {
-		Asserts.assertFalse(start instanceof NoUsage && end instanceof NoUsage);
+	public static MicroCommit create(@Nonnull Usage start, @Nonnull Usage end) {
+		Asserts.assertNotNull(start);
+		Asserts.assertNotNull(end);
 
 		MicroCommit mc = new MicroCommit();
 		mc.Item1 = start;
