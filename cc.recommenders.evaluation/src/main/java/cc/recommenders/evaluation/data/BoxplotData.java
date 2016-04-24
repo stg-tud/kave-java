@@ -62,7 +62,7 @@ public class BoxplotData {
 		return new Variance(data.size(), mean, variance);
 	}
 
-	private double getPercentil(int percent) {
+	public double getPercentil(int percent) {
 		refreshCache();
 		Percentile p = new Percentile(percent);
 		// sorting is implicitly done in the evaluate method
