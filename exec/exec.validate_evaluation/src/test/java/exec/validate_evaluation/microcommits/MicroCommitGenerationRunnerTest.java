@@ -136,6 +136,7 @@ public class MicroCommitGenerationRunnerTest {
 	public void allLoggerMethodsAreCalled() {
 		noProblemWithMultipleFilesOrHistories();
 
+		verify(log).init(15);
 		verify(log).foundZips(Sets.newHashSet("a.zip", "b.zip"));
 
 		verify(log).processingZip("a.zip");

@@ -26,7 +26,7 @@ import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 
 public class MicroCommitGenerationRunner {
 
-	private static final int MAX_HISTORY_DEPTH = 15;
+	private static final int MAX_HISTORY_LENGTH = 15;
 
 	private QueryHistoryIo qhIo;
 	private MicroCommitIo mcIo;
@@ -39,6 +39,7 @@ public class MicroCommitGenerationRunner {
 	}
 
 	public void run() {
+		log.init(MAX_HISTORY_LENGTH);
 		Set<String> zips = qhIo.findQueryHistoryZips();
 		log.foundZips(zips);
 		for (String zip : zips) {
@@ -65,7 +66,7 @@ public class MicroCommitGenerationRunner {
 		for (int i = 1; i < qh.size(); i++) {
 
 			// TODO fix/test
-			int first = Math.max(0, i - MAX_HISTORY_DEPTH);
+			int first = Math.max(0, i - MAX_HISTORY_LENGTH);
 
 			for (int j = first; j < i; j++) {
 				Usage end = qh.get(i);

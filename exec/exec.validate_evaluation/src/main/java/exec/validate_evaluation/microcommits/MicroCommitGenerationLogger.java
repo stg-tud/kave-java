@@ -22,6 +22,10 @@ import java.util.Set;
 
 public class MicroCommitGenerationLogger {
 
+	public void init(int maxHistoryLength) {
+		log("starting (max history length: %d)", maxHistoryLength);
+	}
+
 	private int totalZips;
 	private int currentZip;
 
