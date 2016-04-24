@@ -207,7 +207,7 @@ public abstract class BaseIntegrationTest {
 		q.setType(type);
 		q.setClassContext(CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME));
 		q.setMethodContext(ctx);
-		q.setDefinition(DefinitionSites.createUnknownDefinitionSite());
+		q.setDefinition(DefinitionSites.createDefinitionByConstant());
 		for (ICoReMethodName i : calls) {
 			q.addCallSite(CallSites.createReceiverCallSite(i));
 		}

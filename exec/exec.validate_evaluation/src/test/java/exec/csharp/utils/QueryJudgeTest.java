@@ -75,6 +75,13 @@ public class QueryJudgeTest {
 	}
 
 	@Test
+	public void numAdditions_removal() {
+		a = createQuery(1, 9);
+		b = createQuery(1, 2);
+		assertEquals(1, judge().getNumAdditions());
+	}
+
+	@Test
 	public void hasAdditions() {
 		a = createQuery(1);
 		b = createQuery(1);
@@ -89,6 +96,13 @@ public class QueryJudgeTest {
 	public void numRemovals() {
 		a = createQuery(1, 2);
 		b = createQuery(1);
+		assertEquals(1, judge().getNumRemovals());
+	}
+
+	@Test
+	public void numRemovals_addition() {
+		a = createQuery(1, 2);
+		b = createQuery(1, 9);
 		assertEquals(1, judge().getNumRemovals());
 	}
 
@@ -110,44 +124,6 @@ public class QueryJudgeTest {
 		assertEquals(false, judge().hasDefChange());
 		b.setDefinition(DefinitionSites.createUnknownDefinitionSite());
 		assertEquals(true, judge().hasDefChange());
-	}
-
-	@Test
-	public void noise_simpleAddition() {
-		a = createQuery(1);
-		b = createQuery(1, 2);
-		assertEquals(NoiseMode.NO_NOISE, judge().getNoiseMode());
-	}
-
-	@Test
-	public void noise_defChange() {
-		a = createQuery(1);
-		b = createQuery(1);
-		b.setDefinition(DefinitionSites.createUnknownDefinitionSite());
-		assertEquals(NoiseMode.DEF, judge().getNoiseMode());
-	}
-
-	@Test
-	public void noise_methodRemoval() {
-		a = createQuery(1, 2);
-		b = createQuery(1, 3);
-		assertEquals(NoiseMode.REMOVAL, judge().getNoiseMode());
-	}
-
-	@Test
-	public void noise_defAndMethodRemoval() {
-		a = createQuery(1, 2);
-		b = createQuery(1, 3);
-		b.setDefinition(DefinitionSites.createUnknownDefinitionSite());
-		assertEquals(NoiseMode.DEF_AND_REMOVAL, judge().getNoiseMode());
-	}
-
-	@Test
-	public void noise_pureRemoval() {
-		a = createQuery(1, 2);
-		b = createQuery(1);
-		b.setDefinition(DefinitionSites.createUnknownDefinitionSite());
-		assertEquals(NoiseMode.PURE_REMOVAL, judge().getNoiseMode());
 	}
 
 	@Test

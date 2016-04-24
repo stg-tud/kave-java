@@ -59,11 +59,22 @@ public class QueryJudge {
 	}
 
 	private NoiseMode calcNoiseMode() {
-		if (start instanceof NoUsage) {
-			return NoiseMode.FROM_SCRATCH;
+		if (start instanceof NoUsage && end instanceof NoUsage) {
+			return NoiseMode.SKIPPED;
 		}
+
+		if (start instanceof NoUsage) {
+			boolean hasAdditions = !end.getReceiverCallsites().isEmpty();
+			return hasAdditions ? NoiseMode.FROM_SCRATCH : NoiseMode.SKIPPED;
+		}
+
 		if (end instanceof NoUsage) {
-			return NoiseMode.PURE_REMOVAL;
+			boolean hasRemovals = !start.getReceiverCallsites().isEmpty();
+			return hasRemovals ? NoiseMode.PURE_REMOVAL : NoiseMode.SKIPPED;
+		}
+		
+		if(!(hasAdditions() || hasRemovals())) {
+			return NoiseMode.SKIPPED;
 		}
 
 		if (hasRemovals() && hasDefChange()) {
@@ -75,11 +86,11 @@ public class QueryJudge {
 		}
 
 		if (hasRemovals()) {
-			return NoiseMode.REMOVAL;
+			return hasAdditions() ? NoiseMode.REMOVAL : NoiseMode.PURE_REMOVAL;
 		}
 
 		if (hasDefChange()) {
-			return NoiseMode.DEF;
+			return hasAdditions() ? NoiseMode.DEF : NoiseMode.SKIPPED;
 		}
 
 		return NoiseMode.NO_NOISE;
@@ -125,7 +136,7 @@ public class QueryJudge {
 
 		if (start instanceof NoUsage) {
 			boolean hasAdditions = !end.getReceiverCallsites().isEmpty();
-			return hasAdditions ? QueryContent.FROM_SRATCH : QueryContent.SKIPPED;
+			return hasAdditions ? QueryContent.FROM_SCRATCH : QueryContent.SKIPPED;
 		}
 
 		if (end instanceof NoUsage) {

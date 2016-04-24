@@ -19,49 +19,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.recommenders.names.CoReMethodName;
-import cc.recommenders.names.ICoReMethodName;
-import cc.recommenders.usages.CallSites;
-import cc.recommenders.usages.DefinitionSites;
-import cc.recommenders.usages.NoUsage;
-import cc.recommenders.usages.Query;
-import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.impl.QueryContent;
-import exec.csharp.utils.QueryJudge;
 
-public class QueryContentClassificationTest {
+public class QueryContentClassificationTest extends BaseTest {
 
-	private Usage a;
-	private Usage b;
-
-	private void setA(char def, int... callNums) {
-		a = usage(def, callNums);
-	}
-
-	private void setB(char def, int... callNums) {
-		b = usage(def, callNums);
-	}
-
-	private void nnA() {
-		a = new NoUsage();
-	}
-
-	private void nnB() {
-		b = new NoUsage();
-	}
-
-	private Usage usage(char def, int... calls) {
-		Query q = new Query();
-		ICoReMethodName m = CoReMethodName.get(String.format("LT.m%c()V", def));
-		q.setDefinition(DefinitionSites.createDefinitionByReturn(m));
-		for (int call : calls) {
-			q.addCallSite(CallSites.createReceiverCallSite("LT.m" + call + "()V"));
-		}
-		return q;
-	}
-
-	private void assertQueryContent(QueryContent expected) {
-		QueryContent actual = new QueryJudge(a, b).getQueryContentCategorization();
+	protected void assertQueryContent(QueryContent expected) {
+		QueryContent actual = judge().getQueryContentCategorization();
 		assertEquals(expected, actual);
 	}
 
@@ -231,7 +194,7 @@ public class QueryContentClassificationTest {
 	public void nq1() {
 		nnA();
 		setB('a', 1);
-		assertQueryContent(QueryContent.FROM_SRATCH);
+		assertQueryContent(QueryContent.FROM_SCRATCH);
 	}
 
 	// ~[0] -> SKIPPED

@@ -16,5 +16,11 @@
 package exec.csharp.utils;
 
 public enum NoiseMode {
-	NO_NOISE, DEF, REMOVAL, DEF_AND_REMOVAL, PURE_REMOVAL, FROM_SCRATCH, SKIPPED
+	NO_NOISE, // n+x
+	DEF, // n+x~D
+	REMOVAL, // n+x-y
+	DEF_AND_REMOVAL, // n+x-y~D
+	PURE_REMOVAL, // n-y[~D], ~[-X]
+	FROM_SCRATCH, // ~[+x]
+	SKIPPED // n[~D], ~[+/-0]
 }

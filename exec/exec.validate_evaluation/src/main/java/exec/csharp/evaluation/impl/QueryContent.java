@@ -21,7 +21,7 @@ public enum QueryContent {
 	ZERO, ZERO_DEF, // 0|M[~D],
 	NM, NM_DEF, // N|M[~D]
 	MINUS1, MINUS1_DEF, // M-1|M[~D]
-	FROM_SRATCH, // ~[+x]
+	FROM_SCRATCH, // ~[+x]
 	PURE_REMOVAL, // N-y[~D], ~[-x]
 	SKIPPED // 0[~D], N[~D], ~[+/-0], in general "nn" queries
 }
