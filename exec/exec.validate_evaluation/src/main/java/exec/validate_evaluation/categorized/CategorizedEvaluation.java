@@ -39,7 +39,6 @@ import exec.csharp.queries.IQueryBuilder;
 import exec.csharp.queries.QueryBuilderFactory;
 import exec.csharp.queries.QueryMode;
 import exec.csharp.utils.ModelHelper;
-import exec.csharp.utils.QueryUtils;
 import exec.validate_evaluation.microcommits.MicroCommit;
 
 public abstract class CategorizedEvaluation<Category> {
@@ -113,24 +112,14 @@ public abstract class CategorizedEvaluation<Category> {
 			Usage start = mc.getStart();
 			Usage end = mc.getEnd();
 
-			if (shouldSkip(start, end)) {
-				continue;
-			}
-
 			Category c = getCategory(mc);
-			double f1 = measurePredictionQuality(start, end);
+			double f1 = shouldEvaluate(c) ? measurePredictionQuality(start, end) : 0;
 			res.add(c, f1);
 		}
 		log.finishedMicroCommits();
 	}
 
-	private boolean shouldSkip(Usage start, Usage end) {
-		int numAdditions = QueryUtils.countAdditions(start, end);
-		if (0 == numAdditions) {
-			return true;
-		}
-		return false;
-	}
+	protected abstract boolean shouldEvaluate(Category c);
 
 	private double measurePredictionQuality(Usage start, Usage end) {
 		Usage sstart = safe(start, end);

@@ -34,4 +34,9 @@ public class ScenarioCategorizedEvaluation extends CategorizedEvaluation<QueryCo
 	protected QueryContent getCategory(MicroCommit mc) {
 		return new QueryJudge(mc.getStart(), mc.getEnd()).getQueryContentCategorization();
 	}
+
+	@Override
+	protected boolean shouldEvaluate(QueryContent c) {
+		return !(c == QueryContent.SKIPPED || c == QueryContent.PURE_REMOVAL);
+	}
 }

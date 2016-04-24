@@ -35,4 +35,9 @@ public class NoiseCategorizedEvaluation extends CategorizedEvaluation<NoiseMode>
 		QueryJudge judge = new QueryJudge(mc.getStart(), mc.getEnd());
 		return judge.getNoiseMode();
 	}
+
+	@Override
+	protected boolean shouldEvaluate(NoiseMode c) {
+		return !(c == NoiseMode.SKIPPED || c == NoiseMode.PURE_REMOVAL);
+	}
 }
