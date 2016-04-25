@@ -22,47 +22,54 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.episodes.Events;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
+	
+	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
-
+	
 	public static void write(List<Event> stream, String fileStream, String fileMapping) {
 		try {
-			List<Event> mapping = createMapping(stream);
-			String streamTxt = toString(stream, mapping);
+			StreamMapping sm = new StreamMapping();
+			sm = FilterEvents.filter(stream);
+			String streamTxt = toString(sm.getStreamData(), sm.getMappingData());
 			Logger.log("Writing stream data file!");
 			FileUtils.writeStringToFile(new File(fileStream), streamTxt);
 			Logger.log("Writing mapping data file!");
-			JsonUtils.toJson(mapping, new File(fileMapping));
+			JsonUtils.toJson(sm.getMappingData(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private static List<Event> createMapping(List<Event> stream) {
-		List<Event> mapping = Lists.newLinkedList();
-		int eventNumber = 0;
-		for (Event e : stream) {
-			eventNumber++;
-			if (mapping.indexOf(e) == -1) {
-				mapping.add(e);
-			}
-			if (eventNumber % 100000 == 0){
-				Logger.log("Created mapping for %d/%d", eventNumber, stream.size());
-			}
-		}
-		return mapping;
-	}
+//	private static List<Event> createMapping(List<Event> stream) {
+//		List<Event> mapping = Lists.newLinkedList();
+//		int eventNumber = 0;
+//		for (Event e : stream) {
+//			eventNumber++;
+//			if (mapping.indexOf(e) == -1) {
+//				mapping.add(e);
+//			}
+//			if (eventNumber % 100000 == 0){
+//				Logger.log("Created mapping for %d/%d", eventNumber, stream.size());
+//			}
+//		}
+//		return mapping;
+//	}
 
 	private static String toString(List<Event> stream, List<Event> mapping) {
 		StringBuilder sb = new StringBuilder();

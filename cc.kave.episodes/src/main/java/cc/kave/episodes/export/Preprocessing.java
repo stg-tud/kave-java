@@ -37,7 +37,7 @@ public class Preprocessing {
 
 	private Directory rootDir;
 	private File rootFolder;
-
+	
 	@Inject
 	public Preprocessing(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
 		assertTrue(folder.exists(), "Contexts folder does not exist");
