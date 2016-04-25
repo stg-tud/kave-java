@@ -29,6 +29,7 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.assertions.Asserts;
+import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
 
@@ -39,7 +40,9 @@ public class EventStreamIo {
 		try {
 			List<Event> mapping = createMapping(stream);
 			String streamTxt = toString(stream, mapping);
+			Logger.log("Writing stream data file!");
 			FileUtils.writeStringToFile(new File(fileStream), streamTxt);
+			Logger.log("Writing mapping data file!");
 			JsonUtils.toJson(mapping, new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -48,9 +51,14 @@ public class EventStreamIo {
 
 	private static List<Event> createMapping(List<Event> stream) {
 		List<Event> mapping = Lists.newLinkedList();
+		int eventNumber = 0;
 		for (Event e : stream) {
+			eventNumber++;
 			if (mapping.indexOf(e) == -1) {
 				mapping.add(e);
+			}
+			if (eventNumber % 100000 == 0){
+				Logger.log("Created mapping for %d/%d", eventNumber, stream.size());
 			}
 		}
 		return mapping;
@@ -61,8 +69,10 @@ public class EventStreamIo {
 
 		boolean isFirstMethod = true;
 		double time = 0.000;
+		int eventNumber = 0;
 
 		for (Event e : stream) {
+			eventNumber++;
 			int idx = mapping.indexOf(e);
 			Asserts.assertNotNegative(idx);
 
@@ -77,9 +87,12 @@ public class EventStreamIo {
 			sb.append('\n');
 
 			time += DELTA;
+			
+			if (eventNumber % 100000 == 0){
+				Logger.log("Converting to a string %d/%d", eventNumber, stream.size());
+			}
 		}
 		return sb.toString();
-
 	}
 
 	public static List<Event> readMapping(String path) {

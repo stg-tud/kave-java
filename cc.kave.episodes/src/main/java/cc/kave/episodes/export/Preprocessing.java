@@ -62,9 +62,7 @@ public class Preprocessing {
 			}
 			ra.close();
 		}
-		Logger.log("Getting the event stream data!");
 		List<Event> es = generator.getEventStream();
-		Logger.log("Writing event stream and event mapping files!");
 		EventStreamIo.write(es, getStreamPath(), getMappingPath());
 	}
 
