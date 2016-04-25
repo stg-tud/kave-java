@@ -29,6 +29,9 @@ import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;
+import exec.csharp.evaluation.impl.QueryContent;
+import exec.csharp.utils.NoiseMode;
+import exec.csharp.utils.QueryJudge;
 import exec.csharp.utils.QueryUtils;
 import exec.validate_evaluation.microcommits.MicroCommit;
 import exec.validate_evaluation.microcommits.MicroCommitIo;
@@ -69,14 +72,20 @@ public class MicroCommitStats {
 		System.out.printf("numLocations: %d\n", usedLocations.size());
 		System.out.printf("numCommits: %d\n", numCommits);
 
-		System.out.println();
+		printCounting("diffStats", diffCounts);
+		printCounting("noiseStats", noiseCounts);
+		printCounting("contentStats", contentCounts);
+	}
 
-		System.out.println("diff stats:");
+	private void printCounting(String title, Map<?, Integer> counts) {
+		System.out.println();
+		System.out.println();
+		System.out.printf("#### %s ####\n", title);
 		int numDiffs = 0;
-		for (String diff : diffCounts.keySet()) {
-			int diffCount = diffCounts.get(diff);
+		for (Object key : counts.keySet()) {
+			int diffCount = counts.get(key);
 			numDiffs += diffCount;
-			System.out.printf("%s\t%d\n", diff, diffCount);
+			System.out.printf("%s\t%d\n", key, diffCount);
 		}
 		System.out.printf("---\ntotal\t%d\n", numDiffs);
 	}
@@ -116,6 +125,8 @@ public class MicroCommitStats {
 	private Set<Tuple<ICoReTypeName, ICoReMethodName>> usedLocations = Sets.newHashSet();
 	private int numCommits = 0;
 	private Map<String, Integer> diffCounts = Maps.newHashMap();
+	private Map<NoiseMode, Integer> noiseCounts = Maps.newHashMap();
+	private Map<QueryContent, Integer> contentCounts = Maps.newHashMap();
 
 	private void print() {
 
@@ -143,6 +154,9 @@ public class MicroCommitStats {
 
 				numCommits += mcs.size();
 
+				System.out.println();
+				System.out.println();
+				System.out.println("### Diff String ###");
 				for (MicroCommit mc : mcs) {
 					String diff = QueryUtils.toDiffString(mc);
 					System.out.printf("%s, ", diff);
@@ -152,6 +166,32 @@ public class MicroCommitStats {
 						diffCounts.put(diff, 1);
 					} else {
 						diffCounts.put(diff, i + 1);
+					}
+				}
+
+				System.out.println();
+				System.out.println();
+				System.out.println("### Noise Mode / Query Content ###");
+				for (MicroCommit mc : mcs) {
+					QueryJudge judge = new QueryJudge(mc);
+
+					NoiseMode noiseMode = judge.getNoiseMode();
+					QueryContent queryContentCategorization = judge.getQueryContentCategorization();
+
+					System.out.printf("%s/%s, ", noiseMode, queryContentCategorization);
+
+					Integer i = noiseCounts.get(noiseMode);
+					if (i == null) {
+						noiseCounts.put(noiseMode, 1);
+					} else {
+						noiseCounts.put(noiseMode, i + 1);
+					}
+
+					Integer i2 = contentCounts.get(queryContentCategorization);
+					if (i2 == null) {
+						contentCounts.put(queryContentCategorization, 1);
+					} else {
+						contentCounts.put(queryContentCategorization, i2 + 1);
 					}
 				}
 
