@@ -34,7 +34,17 @@ public class CategorizedEvaluationLogger<Category> {
 
 	private boolean isFirstUser;
 
+	private int numTypes;
+	private int curType = 0;
+
+	public void foundTypes(int numTypes) {
+		System.out.printf("found %d types...\n", numTypes);
+		this.numTypes = numTypes;
+
+	}
+
 	public void type(ICoReTypeName type) {
+		curType++;
 		this.currentType = type;
 		isFirstUser = true;
 	}
@@ -44,7 +54,9 @@ public class CategorizedEvaluationLogger<Category> {
 	public void user(String user) {
 		if (isFirstUser) {
 			System.out.println();
-			System.out.printf("### %s #############################\n", currentType);
+			double perc = 100 * ((curType - 1) / (double) numTypes);
+			System.out.printf("### %s (%d/%d - %.1f%%) #############################\n", currentType, curType, numTypes,
+					perc);
 			isFirstUser = false;
 		}
 		System.out.println();
@@ -73,7 +85,7 @@ public class CategorizedEvaluationLogger<Category> {
 
 	public void done(Map<QueryMode, List<CategorizedResults<Category>>> allRes) {
 		System.out.println(new Date());
-		System.out.println();
+		System.out.println("done (all res merged by usage history)");
 
 		Set<Category> categories = collectCategories(allRes.values());
 
@@ -85,28 +97,11 @@ public class CategorizedEvaluationLogger<Category> {
 
 		Map<Category, Integer> counts = Maps.newHashMap();
 
-		boolean shouldCount = true;
 		for (QueryMode mode : allRes.keySet()) {
 			List<CategorizedResults<Category>> byMode = allRes.get(mode);
 			CategorizedResults<Category> mergedRes = CategorizedResults.merge(byMode);
 
-			System.out.printf("%s", mode);
-			for (Category c : categories) {
-				Boxplot bp = mergedRes.get(c);
-				System.out.printf("\t%.5f", bp.getMean());
-
-				if (shouldCount) {
-					int num = bp.getNumValues();
-					Integer i = counts.get(c);
-					if (i == null) {
-						counts.put(c, num);
-					} else {
-						counts.put(c, i + num);
-					}
-				}
-			}
-			System.out.println();
-			shouldCount = false;
+			counts = doneInternally(mode, categories, mergedRes);
 		}
 
 		System.out.printf("count");
@@ -114,6 +109,51 @@ public class CategorizedEvaluationLogger<Category> {
 			System.out.printf("\t%d", counts.get(c));
 		}
 		System.out.println();
+	}
+
+	public void doneAllTogether(Map<QueryMode, CategorizedResults<Category>> res) {
+		System.out.println(new Date());
+		System.out.println("done (all res unmerged)");
+		Map<Category, Integer> counts = null;
+		Set<Category> categories = res.values().iterator().next().getCategories();
+
+		System.out.printf("mode");
+		for (Category c : categories) {
+			System.out.printf("\t%s", c);
+		}
+		System.out.println();
+
+		for (QueryMode mode : res.keySet()) {
+			counts = doneInternally(mode, categories, res.get(mode));
+		}
+
+		System.out.printf("count");
+		for (Category c : categories) {
+			System.out.printf("\t%d", counts.get(c));
+		}
+		System.out.println();
+	}
+
+	private Map<Category, Integer> doneInternally(QueryMode mode, Set<Category> categories,
+			CategorizedResults<Category> res) {
+		Map<Category, Integer> counts = Maps.newHashMap();
+
+		System.out.printf("%s", mode);
+		for (Category c : categories) {
+			Boxplot bp = res.get(c);
+			System.out.printf("\t%.5f", bp.getMean());
+
+			int num = bp.getNumValues();
+			Integer i = counts.get(c);
+			if (i == null) {
+				counts.put(c, num);
+			} else {
+				counts.put(c, i + num);
+			}
+		}
+		System.out.println();
+
+		return counts;
 	}
 
 	private Set<Category> collectCategories(Collection<List<CategorizedResults<Category>>> values) {

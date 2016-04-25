@@ -62,12 +62,14 @@ public abstract class CategorizedEvaluation<Category> {
 
 	public void run() {
 
+		Map<QueryMode, CategorizedResults<Category>> allResUnmerged = Maps.newHashMap();
 		Map<QueryMode, List<CategorizedResults<Category>>> allRes = Maps.newHashMap();
 
 		Set<ICoReTypeName> keys = usages.findKeys();
 		// ICoReTypeName[] keys = new ICoReTypeName[] {
 		// CoReTypeName.get("LSystem/Enum"),
 		// CoReTypeName.get("LSystem/Text/StringBuilder") };
+		log.foundTypes(keys.size());
 		for (ICoReTypeName type : keys) {
 			log.type(type);
 			rec = mh.get(type);
@@ -82,13 +84,24 @@ public abstract class CategorizedEvaluation<Category> {
 					for (QueryMode mode : queryModes) {
 						log.queryMode(mode);
 						qb = qbf.get(mode);
-						evaluate(mcs, createNewResultsForQueryHistory(allRes, mode));
+						evaluate(mcs, createNewResultsForQueryHistory(allRes, mode), getResult(allResUnmerged, mode));
 					}
 				}
 			}
 		}
 
 		log.done(allRes);
+		log.doneAllTogether(allResUnmerged);
+	}
+
+	private CategorizedResults<Category> getResult(Map<QueryMode, CategorizedResults<Category>> allRes,
+			QueryMode mode) {
+		CategorizedResults<Category> res = allRes.get(mode);
+		if (res == null) {
+			res = CategorizedResults.create();
+			allRes.put(mode, res);
+		}
+		return res;
 	}
 
 	private CategorizedResults<Category> createNewResultsForQueryHistory(
@@ -105,7 +118,8 @@ public abstract class CategorizedEvaluation<Category> {
 		return newRes;
 	}
 
-	private void evaluate(List<MicroCommit> mcs, CategorizedResults<Category> res) {
+	private void evaluate(List<MicroCommit> mcs, CategorizedResults<Category> res,
+			CategorizedResults<Category> resUnmerged) {
 
 		for (MicroCommit mc : mcs) {
 			log.microCommit();
@@ -115,6 +129,7 @@ public abstract class CategorizedEvaluation<Category> {
 			Category c = getCategory(mc);
 			double f1 = shouldEvaluate(c) ? measurePredictionQuality(start, end) : 0;
 			res.add(c, f1);
+			resUnmerged.add(c, f1);
 		}
 		log.finishedMicroCommits();
 	}
