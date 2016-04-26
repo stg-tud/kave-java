@@ -52,15 +52,19 @@ public class EventsFilter {
 					sm.addEvent(Events.newHolder());
 				}
 			}
-			if (eventNumber % 100000 == 0){
-				Logger.log("Created mapping for %.5f", eventNumber/(stream.size()*1.0));
-			}
+			logger(eventNumber, stream.size(), "Created mapping for");
 		}
 		Logger.log("One time occured events are: %d", sigletons);
 		Logger.log("Number of unique events is: %d", occurrences.size());
 		Logger.log("Total number of events is: %d", stream.size());
 		
 		return sm;
+	}
+
+	private static void logger(int counter, int length, String string) {
+		if (counter % 100000 == 0){
+			Logger.log("%s %.5f", string, counter / (length * 1.0));
+		}
 	}
 
 	private static Map<Event, Integer> getFrequences(List<Event> stream) {
@@ -75,9 +79,7 @@ public class EventsFilter {
 			} else {
 				occurrences.put(e, 1);
 			}
-			if (eventNumber % 100000 == 0){
-				Logger.log("Counting frequency for %d/%d", eventNumber, stream.size());
-			}
+			logger(eventNumber, stream.size(), "Counting frequency for");
 		}
 		return occurrences;
 	}

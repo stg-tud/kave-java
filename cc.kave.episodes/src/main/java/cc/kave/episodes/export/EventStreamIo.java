@@ -45,7 +45,7 @@ public class EventStreamIo {
 	public static void write(List<Event> stream, String fileStream, String fileMapping) {
 		try {
 			StreamMapping sm = new StreamMapping();
-			sm = FilterEvents.filter(stream);
+			sm = EventsFilter.filter(stream);
 			String streamTxt = toString(sm.getStreamData(), sm.getMappingData());
 			Logger.log("Writing stream data file!");
 			FileUtils.writeStringToFile(new File(fileStream), streamTxt);
@@ -55,21 +55,6 @@ public class EventStreamIo {
 			throw new RuntimeException(e);
 		}
 	}
-
-//	private static List<Event> createMapping(List<Event> stream) {
-//		List<Event> mapping = Lists.newLinkedList();
-//		int eventNumber = 0;
-//		for (Event e : stream) {
-//			eventNumber++;
-//			if (mapping.indexOf(e) == -1) {
-//				mapping.add(e);
-//			}
-//			if (eventNumber % 100000 == 0){
-//				Logger.log("Created mapping for %d/%d", eventNumber, stream.size());
-//			}
-//		}
-//		return mapping;
-//	}
 
 	private static String toString(List<Event> stream, List<Event> mapping) {
 		StringBuilder sb = new StringBuilder();
@@ -81,6 +66,10 @@ public class EventStreamIo {
 		for (Event e : stream) {
 			eventNumber++;
 			int idx = mapping.indexOf(e);
+			if (e.getKind() == EventKind.CONTEXT_HOLDER) {
+				time += TIMEOUT;
+				continue;
+			}
 			Asserts.assertNotNegative(idx);
 
 			if (e.getKind() == EventKind.METHOD_DECLARATION && !isFirstMethod) {
@@ -96,7 +85,7 @@ public class EventStreamIo {
 			time += DELTA;
 			
 			if (eventNumber % 100000 == 0){
-				Logger.log("Converting to a string %d/%d", eventNumber, stream.size());
+				Logger.log("Converting to a string %.5f", eventNumber / (stream.size() * 1.0));
 			}
 		}
 		return sb.toString();

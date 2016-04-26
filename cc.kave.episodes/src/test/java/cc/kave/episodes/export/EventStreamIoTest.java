@@ -50,15 +50,15 @@ public class EventStreamIoTest {
 		File a = file();
 		File b = file();
 
-		List<Event> stream = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), ctx(4), ctx(1), inv(5));
-		List<Event> mapping = Lists.newArrayList(DUMMY_EVENT, ctx(1), ctx(4), inv(5));
+		List<Event> stream = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), ctx(6), ctx(7), inv(2), ctx(1), inv(5));
+		List<Event> mapping = Lists.newArrayList(DUMMY_EVENT, ctx(1), inv(2), inv(5));
 		String expectedTxt = "0,0.000\n" + //
 				"1,0.501\n" + //
-				"2,1.002\n" + //
+				"2,0.502\n" + //
 				"3,1.003\n" + //
-				"2,1.504\n" + //
-				"1,2.005\n" + //
-				"3,2.006\n";
+				"2,2.004\n" + //
+				"1,2.505\n" + //
+				"3,2.506\n";
 
 		EventStreamIo.write(stream, a.getAbsolutePath(), b.getAbsolutePath());
 

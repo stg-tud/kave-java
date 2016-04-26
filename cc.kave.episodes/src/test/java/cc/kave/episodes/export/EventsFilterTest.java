@@ -57,6 +57,10 @@ public class EventsFilterTest {
 		StreamMapping actuals = EventsFilter.filter(events);
 		
 		assertEquals(expected, actuals);
+		assertEquals(expected.getStreamData(), actuals.getStreamData());
+		assertEquals(expected.getMappingData(), actuals.getMappingData());
+		assertEquals(expected.getStreamLength(), actuals.getStreamLength());
+		assertEquals(expected.getNumberEvents(), actuals.getNumberEvents());
 	}
 	
 	private static Event inv(int i) {

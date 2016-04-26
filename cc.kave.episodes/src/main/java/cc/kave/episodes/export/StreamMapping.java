@@ -25,6 +25,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
 
 public class StreamMapping {
 	private List<Event> streamData = Lists.newLinkedList();
@@ -36,7 +37,7 @@ public class StreamMapping {
 	
 	public void addEvent(Event event) {
 		this.streamData.add(event);
-		if (this.mappingData.indexOf(event) == -1) {
+		if ((this.mappingData.indexOf(event) == -1) && (event.getKind() != EventKind.CONTEXT_HOLDER)) {
 			this.mappingData.add(event);
 		}
 	}

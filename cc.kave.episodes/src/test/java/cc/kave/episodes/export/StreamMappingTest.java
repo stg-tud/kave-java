@@ -28,7 +28,6 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.episodes.model.Episode;
 
 public class StreamMappingTest {
 
@@ -61,12 +60,13 @@ public class StreamMappingTest {
 		sut.addEvent(ctx(1));
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
+		sut.addEvent(hld());
 		sut.addEvent(inv(2));
 		
-		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3), inv(2)), sut.getStreamData());
+		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3), hld(), inv(2)), sut.getStreamData());
 		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3)), sut.getMappingData());
 		
-		assertEquals(4, sut.getStreamLength());
+		assertEquals(5, sut.getStreamLength());
 		assertEquals(3, sut.getNumberEvents());
 	}
 	
@@ -131,6 +131,10 @@ public class StreamMappingTest {
 
 	private static Event ctx(int i) {
 		return Events.newContext(m(i));
+	}
+	
+	private static Event hld() {
+		return Events.newHolder();
 	}
 	
 	private static IMethodName m(int i) {
