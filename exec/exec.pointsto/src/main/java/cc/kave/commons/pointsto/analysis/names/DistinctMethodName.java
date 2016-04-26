@@ -12,34 +12,28 @@
  */
 package cc.kave.commons.pointsto.analysis.names;
 
-import static cc.kave.commons.pointsto.analysis.utils.GenericNameUtils.eraseGenericInstantiations;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
 
 public class DistinctMethodName extends DistinctMemberName {
 
-	private final List<ITypeName> parameterTypes;
+	private final List<IParameterName> parameters;
 
 	public DistinctMethodName(IMethodName method) {
 		super(method.getValueType(), method.getDeclaringType(), method.getName());
 
-		List<IParameterName> parameters = method.getParameters();
-		parameterTypes = new ArrayList<>(parameters.size());
-		for (IParameterName parameter : parameters) {
-			parameterTypes.add(eraseGenericInstantiations(parameter.getValueType()));
-		}
+		// in c# both generic parameter types and parameter modifiers (in, out) serve to distinguish different method
+		// overloads
+		parameters = method.getParameters();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((parameterTypes == null) ? 0 : parameterTypes.hashCode());
+		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
 		return result;
 	}
 
@@ -52,10 +46,10 @@ public class DistinctMethodName extends DistinctMemberName {
 		if (getClass() != obj.getClass())
 			return false;
 		DistinctMethodName other = (DistinctMethodName) obj;
-		if (parameterTypes == null) {
-			if (other.parameterTypes != null)
+		if (parameters == null) {
+			if (other.parameters != null)
 				return false;
-		} else if (!parameterTypes.equals(other.parameterTypes))
+		} else if (!parameters.equals(other.parameters))
 			return false;
 		return true;
 	}
