@@ -68,7 +68,7 @@ public class TypeStatisticsCollector implements UsageStatisticsCollector {
 				}
 
 				myStats.numUsages += otherStats.numUsages;
-				myStats.numFilteredUsages = otherStats.numFilteredUsages;
+				myStats.numFilteredUsages += otherStats.numFilteredUsages;
 				myStats.sumCallsites += otherStats.sumCallsites;
 				myStats.sumFilteredCallsites += otherStats.sumFilteredCallsites;
 			}
