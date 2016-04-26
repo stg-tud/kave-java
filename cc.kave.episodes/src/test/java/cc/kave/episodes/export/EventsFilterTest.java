@@ -15,9 +15,12 @@
  */
 package cc.kave.episodes.export;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
@@ -26,17 +29,34 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
-public class FilterEventsTest {
+public class EventsFilterTest {
 
-	private List<Event> events;
+	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 	
-	private FilterEvents sut;
+	private List<Event> events;
 	
 	@Before
 	public void setup() {
 		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+	}
+	
+	@Test
+	public void filterTest() {
+		StreamMapping expected = new StreamMapping();
+		expected.addEvent(DUMMY_EVENT);
+		expected.addEvent(ctx(1));
+		expected.addEvent(inv(2));
+		expected.addEvent(inv(3));
+		expected.addEvent(hld());
+		expected.addEvent(inv(2));
+		expected.addEvent(ctx(1));
+		expected.addEvent(inv(3));
 		
-		sut = new FilterEvents();
+		StreamMapping actuals = EventsFilter.filter(events);
+		
+		assertEquals(expected, actuals);
 	}
 	
 	private static Event inv(int i) {
@@ -45,6 +65,10 @@ public class FilterEventsTest {
 
 	private static Event ctx(int i) {
 		return Events.newContext(m(i));
+	}
+	
+	private static Event hld() {
+		return Events.newHolder();
 	}
 	
 	private static IMethodName m(int i) {
