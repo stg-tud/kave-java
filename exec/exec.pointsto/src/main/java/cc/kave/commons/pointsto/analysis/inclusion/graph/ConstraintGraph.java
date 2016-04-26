@@ -166,6 +166,15 @@ public class ConstraintGraph {
 							succEdge.getInclusionAnnotation());
 					ContextAnnotation newContextAnnotation = concat(preEdge.getContextAnnotation(),
 							succEdge.getContextAnnotation());
+
+					if (bothConstructedTerms && newInclAnnotation instanceof InvocationAnnotation) {
+						// prevent adding a constraint between an invocation lambda and a lambda used to model a
+						// delegate
+						// this situation may arise if a method is called on a delegate variable (either directly or via
+						// an extension method)
+						continue;
+					}
+
 					changedNodes.addAll(constraintResolver.addConstraint(preEdgeTarget, succEdgeTarget,
 							newInclAnnotation, newContextAnnotation));
 				}
