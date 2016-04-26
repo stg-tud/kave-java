@@ -31,4 +31,10 @@ public class Events {
 		event.setMethod(m);
 		return event;
 	}
+	
+	public static Event newHolder() {
+		Event event = new Event();
+		event.setKind(EventKind.CONTEXT_HOLDER);
+		return event;
+	}
 }

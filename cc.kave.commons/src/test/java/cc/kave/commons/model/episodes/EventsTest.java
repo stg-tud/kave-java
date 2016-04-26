@@ -45,4 +45,12 @@ public class EventsTest {
 		assertSame(m, actual.getMethod());
 		assertNull(actual.getType());
 	}
+	
+	@Test
+	public void holder() {
+		Event actual = Events.newHolder();
+		
+		assertEquals(EventKind.CONTEXT_HOLDER, actual.getKind());
+		assertNull(actual.getType());
+	}
 }
