@@ -23,9 +23,7 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import cc.recommenders.exceptions.AssertionException;
 
@@ -78,8 +76,7 @@ public class TypeValidationTest {
 				// combination
 				/* arr+X */ "arr(1):d:[T,P][T,P].M()", "arr(1):T'1[[T2]],P", "arr(1):T", //
 				/* nested+X */ "n:T'1[[T]]+NT,P", //
-				"n:T+i:N,P",
-				"n:T+NT'1[[T]],P", }) {
+				"n:T+i:N,P", "n:T+NT'1[[T]],P", "n:n:n:n:abc.i:I+e:E+X+e:E2+i:I2,P" }) {
 			assertValid(t);
 		}
 	}
@@ -128,7 +125,7 @@ public class TypeValidationTest {
 		for (int arrSize : new int[] { 0, 1, 2 }) {
 			String arrPart = createArrPart(arrSize);
 			for (String t : types) {
-				typesOut.add(arrPart+t);
+				typesOut.add(arrPart + t);
 			}
 		}
 		return typesOut;

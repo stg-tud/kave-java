@@ -23,22 +23,27 @@ import cc.kave.commons.model.names.IBundleName;
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.parser.TypeNameParseUtil;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NestedTypeNameContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ResolvedTypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeNameContext;
 import cc.recommenders.exceptions.AssertionException;
 
-public class CsTypeName implements ITypeName{
-	
+public class CsTypeName implements ITypeName {
+
 	private TypeContext ctx;
-	
-	public CsTypeName(String type){
-		try{
+
+	public CsTypeName(String type) {
+		try {
 			TypeContext ctx = TypeNameParseUtil.validateTypeName(type);
 			this.ctx = ctx;
-		}catch(AssertionException e){
-			System.err.println("Invalid Type: " + e.getMessage());
+		} catch (AssertionException e) {
+			throw e;
 		}
+	}
+
+	public CsTypeName(TypeContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -79,9 +84,9 @@ public class CsTypeName implements ITypeName{
 	@Override
 	public List<ITypeName> getTypeParameters() {
 		// TODO: first typename ?
-		if(hasTypeParameters()){
+		if (hasTypeParameters()) {
 			TypeNameContext typeNameCtx = getFirstGenericTypeName();
-			if(typeNameCtx != null){
+			if (typeNameCtx != null) {
 			}
 		}
 		return Lists.newArrayList();
@@ -103,9 +108,11 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public IBundleName getAssembly() {
-		String identifier = "???";
-		if(ctx.regularType() != null){
+		String identifier = "";
+		if (ctx.regularType() != null) {
 			identifier = ctx.regularType().assembly().getText();
+		} else if (ctx.arrayType() != null) {
+			return new CsTypeName(ctx.arrayType().type()).getAssembly();
 		}
 		return AssemblyName.newAssemblyName(identifier);
 	}
@@ -113,30 +120,43 @@ public class CsTypeName implements ITypeName{
 	@Override
 	public INamespaceName getNamespace() {
 		String identifier = "";
-		if(ctx.regularType() != null && ctx.regularType().resolvedType().namespace() != null)
+		if (ctx.regularType() != null && ctx.regularType().resolvedType() != null
+				&& ctx.regularType().resolvedType().namespace() != null) {
 			identifier = ctx.regularType().resolvedType().namespace().getText();
-		if(identifier.startsWith("e:")){
-			identifier = identifier.substring(2, identifier.length());
+		} else if (ctx.regularType() != null && ctx.regularType().nestedType() != null) {
+			identifier = recursiveNested(ctx.regularType().nestedType().nestedTypeName());
 		}
-		if(identifier.endsWith(".")){
-			identifier = identifier.substring(0, identifier.length() -1);
-		}
+		System.out.println(ctx.getText() + " "
+				+ (ctx.regularType() != null && ctx.regularType().nestedType() != null
+						&& ctx.regularType().nestedType().nestedTypeName() != null
+								? ctx.regularType().nestedType().nestedTypeName().getText() : ""));
 		return NamespaceName.newNamespaceName(identifier);
+	}
+
+	private String recursiveNested(NestedTypeNameContext nestedTypeName) {
+		if (nestedTypeName.resolvedType() != null)
+			return nestedTypeName.resolvedType().namespace() != null
+					? nestedTypeName.resolvedType().namespace().getText() : "";
+		return recursiveNested(nestedTypeName.nestedType().nestedTypeName());
 	}
 
 	@Override
 	public ITypeName getDeclaringType() {
-		if(ctx.regularType() != null && this.isNestedType()){
-			String identifier = getWithoutLastTypeName(ctx.regularType().resolvedType()) + "," + (ctx.regularType().WS() != null ? ctx.regularType().WS().getText() : "") + ctx.regularType().assembly().getText();
+		if (ctx.regularType() != null && this.isNestedType()) {
+			String identifier = getWithoutLastTypeName(ctx.regularType().resolvedType()) + ","
+					+ (ctx.regularType().WS() != null ? ctx.regularType().WS().getText() : "")
+					+ ctx.regularType().assembly().getText();
 			return new CsTypeName(identifier);
 		}
 		return null;
 	}
 
 	private String getWithoutLastTypeName(ResolvedTypeContext resolvedType) {
-		String typeName = resolvedType.namespace() != null ? resolvedType.namespace().getText() + resolvedType.typeName().getText() : resolvedType.typeName().getText();
+		String typeName = resolvedType.namespace() != null
+				? resolvedType.namespace().getText() + resolvedType.typeName().getText()
+				: resolvedType.typeName().getText();
 		List<TypeNameContext> typeNames = Lists.newArrayList();
-		for(int i = 1; i < typeNames.size()-1; i++){
+		for (int i = 1; i < typeNames.size() - 1; i++) {
 			typeName += "+" + typeNames.get(i).getText();
 		}
 		return typeName;
@@ -145,23 +165,23 @@ public class CsTypeName implements ITypeName{
 	@Override
 	public String getFullName() {
 		String fullName = "";
-		if(ctx.regularType() != null){
+		if (ctx.regularType() != null) {
 			fullName = ctx.regularType().resolvedType().getText();
-		}else if(ctx.UNKNOWN() != null){
+		} else if (ctx.UNKNOWN() != null) {
 			fullName = ctx.UNKNOWN().getText();
 		}
-		
-		if(fullName.startsWith("e:") || fullName.startsWith("i:") || fullName.startsWith("s:"))
+
+		if (fullName.startsWith("e:") || fullName.startsWith("i:") || fullName.startsWith("s:"))
 			fullName = fullName.substring(2);
-		
+
 		return fullName;
 	}
 
 	@Override
 	public String getName() {
-		if(ctx.regularType() != null){
+		if (ctx.regularType() != null) {
 			return ctx.regularType().resolvedType().typeName().simpleTypeName().getText();
-		}else if(ctx.UNKNOWN() != null){
+		} else if (ctx.UNKNOWN() != null) {
 			return ctx.UNKNOWN().getText();
 		}
 		return null;
@@ -184,13 +204,12 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public boolean isSimpleType() {
-		if(ctx.regularType() != null){
+		if (ctx.regularType() != null) {
 			return isSimpleTypeIdentifier(ctx.regularType().getText());
 		}
 		return false;
 	}
 
-	
 	private static boolean isSimpleTypeIdentifier(String identifier) {
 		return isNumericTypeName(identifier) || identifier.startsWith("System.Boolean,");
 	}
@@ -230,12 +249,14 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public boolean isStructType() {
-		return isSimpleType() || isVoidType() || isNullableType() || (ctx.regularType() != null && ctx.regularType().resolvedType().getText().startsWith("s:"));
+		return isSimpleType() || isVoidType() || isNullableType()
+				|| (ctx.regularType() != null && ctx.regularType().resolvedType().getText().startsWith("s:"));
 	}
 
 	@Override
 	public boolean isNullableType() {
-		return ctx.regularType() != null && ctx.regularType().resolvedType().getText().startsWith("System.Nullable'1[[");
+		return ctx.regularType() != null
+				&& ctx.regularType().resolvedType().getText().startsWith("System.Nullable'1[[");
 	}
 
 	@Override
@@ -260,15 +281,15 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public boolean isNestedType() {
-		if(ctx.regularType() != null){
+		if (ctx.regularType() != null) {
 			return ctx.regularType().nestedType() != null;
 		}
 		return false;
 	}
-	
+
 	private boolean containsGenericParts(List<TypeNameContext> typeName) {
-		for(TypeNameContext t : typeName){
-			if(t.genericTypePart() != null)
+		for (TypeNameContext t : typeName) {
+			if (t.genericTypePart() != null)
 				return true;
 		}
 		return false;
