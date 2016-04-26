@@ -47,7 +47,7 @@ public class EventStreamIo {
 			Logger.log("Writing stream data file!");
 			FileUtils.writeStringToFile(new File(fileStream), sm.getStreamString());
 			Logger.log("Writing mapping data file!");
-			JsonUtils.toJson(sm.getMappingData(), new File(fileMapping));
+			JsonUtils.toJson(sm.getMappingData().keySet(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

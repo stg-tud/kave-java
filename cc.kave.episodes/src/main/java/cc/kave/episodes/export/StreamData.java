@@ -16,6 +16,7 @@
 package cc.kave.episodes.export;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -32,7 +34,7 @@ public class StreamData {
 	public static final double TIMEOUT = 0.5;
 
 	private List<Event> streamData = Lists.newLinkedList();
-	private List<Event> mappingData = Lists.newLinkedList();
+	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();
 	private int streamLength = 0;
 
@@ -47,7 +49,7 @@ public class StreamData {
 		return this.sb.toString();
 	}
 
-	public List<Event> getMappingData() {
+	public Map<Event, Integer> getMappingData() {
 		return this.mappingData;
 	}
 	
@@ -60,7 +62,7 @@ public class StreamData {
 	}
 
 	public void addEvent(Event event) {
-		int idx = this.mappingData.indexOf(event);
+		Integer idx = this.mappingData.get(event);
 
 		this.streamData.add(event);
 		this.streamLength++;
@@ -68,9 +70,9 @@ public class StreamData {
 		if (event.getKind() == EventKind.CONTEXT_HOLDER) {
 			this.time += TIMEOUT;
 		} else {
-			if (idx == -1) {
-				this.mappingData.add(event);
-				idx = this.mappingData.indexOf(event);
+			if (idx == null) {
+				idx = getNumberEvents();
+				this.mappingData.put(event, idx);
 			}
 		}
 
@@ -79,7 +81,7 @@ public class StreamData {
 		}
 		this.isFirstMethod = false;
 		
-		if (idx > -1) {
+		if (idx != null) {
 			this.sb.append(idx);
 			this.sb.append(',');
 			this.sb.append(String.format("%.3f", this.time));

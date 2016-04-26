@@ -19,10 +19,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
@@ -41,15 +44,18 @@ public class StreamDataTest {
 	@Test
 	public void defaultValues() {
 		assertEquals(Lists.newLinkedList(), sut.getStreamData());
-		assertEquals(Lists.newLinkedList(), sut.getMappingData());
+		assertEquals(Maps.newLinkedHashMap(), sut.getMappingData());
 	}
 	
 	@Test
 	public void valuesCanBeSet() {
 		sut.addEvent(ctx(1));
 		
+		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
+		expMap.put(ctx(1), 0);
+		
 		assertEquals(Lists.newArrayList(ctx(1)), sut.getStreamData());
-		assertEquals(Lists.newArrayList(ctx(1)), sut.getMappingData());
+		assertEquals(expMap, sut.getMappingData());
 		
 		assertEquals(1, sut.getStreamLength());
 		assertEquals(1, sut.getNumberEvents());
@@ -63,8 +69,13 @@ public class StreamDataTest {
 		sut.addEvent(hld());
 		sut.addEvent(inv(2));
 		
+		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
+		expectedMap.put(ctx(1), 0);
+		expectedMap.put(inv(2), 1);
+		expectedMap.put(inv(3), 2);
+		
 		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3), hld(), inv(2)), sut.getStreamData());
-		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3)), sut.getMappingData());
+		assertEquals(expectedMap, sut.getMappingData());
 		
 		assertEquals(5, sut.getStreamLength());
 		assertEquals(3, sut.getNumberEvents());
@@ -89,7 +100,7 @@ public class StreamDataTest {
 		b.addEvent(inv(2));
 		
 		assertTrue(a.equals(b));
-		assertEquals(a.getStreamData(), b.getMappingData());
+		assertEquals(a.getStreamData(), b.getStreamData());
 		assertEquals(a.getStreamString(), b.getStreamString());
 		assertEquals(a.getMappingData(), b.getMappingData());
 		assertEquals(a.getStreamLength(), b.getStreamLength());

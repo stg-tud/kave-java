@@ -52,19 +52,15 @@ public class EventsFilter {
 					sm.addEvent(Events.newHolder());
 				}
 			}
-			logger(eventNumber, stream.size(), "Processed episodes are");
+			if (eventNumber % 100000 == 0){
+				Logger.log("Processed episodes are %.5f", eventNumber / (stream.size() * 1.0));
+			}
 		}
 		Logger.log("One time occured events are: %d", sigletons);
 		Logger.log("Number of unique events is: %d", occurrences.size());
 		Logger.log("Total number of events is: %d", stream.size());
 		
 		return sm;
-	}
-
-	private static void logger(int counter, int length, String string) {
-		if (counter % 100000 == 0){
-			Logger.log("%s %.5f", string, counter / (length * 1.0));
-		}
 	}
 
 	private static Map<Event, Integer> getFrequences(List<Event> stream) {
