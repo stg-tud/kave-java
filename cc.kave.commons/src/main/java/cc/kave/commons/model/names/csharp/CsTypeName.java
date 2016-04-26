@@ -68,7 +68,7 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public boolean isGenericEntity() {
-		return (ctx.regularType() != null && containsGenericParts(ctx.regularType().resolvedType().typeName()));
+		return (ctx.regularType() != null);
 	}
 
 	@Override
@@ -88,10 +88,6 @@ public class CsTypeName implements ITypeName{
 	}
 
 	private TypeNameContext getFirstGenericTypeName() {
-		for(TypeNameContext t : ctx.regularType().resolvedType().typeName()){
-			if(t.genericTypePart() != null)
-				return t;
-		}
 		return null;
 	}
 
@@ -138,8 +134,8 @@ public class CsTypeName implements ITypeName{
 	}
 
 	private String getWithoutLastTypeName(ResolvedTypeContext resolvedType) {
-		String typeName = resolvedType.namespace() != null ? resolvedType.namespace().getText() + resolvedType.typeName().get(0).getText() : resolvedType.typeName().get(0).getText();
-		List<TypeNameContext> typeNames = resolvedType.typeName();
+		String typeName = resolvedType.namespace() != null ? resolvedType.namespace().getText() + resolvedType.typeName().getText() : resolvedType.typeName().getText();
+		List<TypeNameContext> typeNames = Lists.newArrayList();
 		for(int i = 1; i < typeNames.size()-1; i++){
 			typeName += "+" + typeNames.get(i).getText();
 		}
@@ -164,7 +160,7 @@ public class CsTypeName implements ITypeName{
 	@Override
 	public String getName() {
 		if(ctx.regularType() != null){
-			return ctx.regularType().resolvedType().typeName().get(0).simpleTypeName().getText();
+			return ctx.regularType().resolvedType().typeName().simpleTypeName().getText();
 		}else if(ctx.UNKNOWN() != null){
 			return ctx.UNKNOWN().getText();
 		}
@@ -265,7 +261,7 @@ public class CsTypeName implements ITypeName{
 	@Override
 	public boolean isNestedType() {
 		if(ctx.regularType() != null){
-			return ctx.regularType().resolvedType().typeName().size() > 1;
+			return ctx.regularType().nestedType() != null;
 		}
 		return false;
 	}
@@ -280,7 +276,7 @@ public class CsTypeName implements ITypeName{
 
 	@Override
 	public boolean isArrayType() {
-		return ctx.arrayPart() != null;
+		return ctx.arrayType() != null;
 	}
 
 	@Override

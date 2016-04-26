@@ -105,13 +105,37 @@ public class TypeNamingBaseListener implements TypeNamingListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArrayPart(TypeNamingParser.ArrayPartContext ctx) { }
+	@Override public void enterArrayType(TypeNamingParser.ArrayTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArrayPart(TypeNamingParser.ArrayPartContext ctx) { }
+	@Override public void exitArrayType(TypeNamingParser.ArrayTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNestedType(TypeNamingParser.NestedTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNestedType(TypeNamingParser.NestedTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNestedTypeName(TypeNamingParser.NestedTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNestedTypeName(TypeNamingParser.NestedTypeNameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -148,6 +172,42 @@ public class TypeNamingBaseListener implements TypeNamingListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTypeName(TypeNamingParser.TypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEnumTypeName(TypeNamingParser.EnumTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEnumTypeName(TypeNamingParser.EnumTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterInterfaceTypeName(TypeNamingParser.InterfaceTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInterfaceTypeName(TypeNamingParser.InterfaceTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStructTypeName(TypeNamingParser.StructTypeNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStructTypeName(TypeNamingParser.StructTypeNameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

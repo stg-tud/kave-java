@@ -85,15 +85,35 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 */
 	void exitDelegateType(TypeNamingParser.DelegateTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TypeNamingParser#arrayPart}.
+	 * Enter a parse tree produced by {@link TypeNamingParser#arrayType}.
 	 * @param ctx the parse tree
 	 */
-	void enterArrayPart(TypeNamingParser.ArrayPartContext ctx);
+	void enterArrayType(TypeNamingParser.ArrayTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TypeNamingParser#arrayPart}.
+	 * Exit a parse tree produced by {@link TypeNamingParser#arrayType}.
 	 * @param ctx the parse tree
 	 */
-	void exitArrayPart(TypeNamingParser.ArrayPartContext ctx);
+	void exitArrayType(TypeNamingParser.ArrayTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#nestedType}.
+	 * @param ctx the parse tree
+	 */
+	void enterNestedType(TypeNamingParser.NestedTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#nestedType}.
+	 * @param ctx the parse tree
+	 */
+	void exitNestedType(TypeNamingParser.NestedTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#nestedTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void enterNestedTypeName(TypeNamingParser.NestedTypeNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#nestedTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void exitNestedTypeName(TypeNamingParser.NestedTypeNameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#resolvedType}.
 	 * @param ctx the parse tree
@@ -124,6 +144,36 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTypeName(TypeNamingParser.TypeNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#enumTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnumTypeName(TypeNamingParser.EnumTypeNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#enumTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnumTypeName(TypeNamingParser.EnumTypeNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#interfaceTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void enterInterfaceTypeName(TypeNamingParser.InterfaceTypeNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#interfaceTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void exitInterfaceTypeName(TypeNamingParser.InterfaceTypeNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#structTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void enterStructTypeName(TypeNamingParser.StructTypeNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#structTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void exitStructTypeName(TypeNamingParser.StructTypeNameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#simpleTypeName}.
 	 * @param ctx the parse tree

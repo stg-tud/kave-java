@@ -43,20 +43,28 @@ package cc.kave.commons.model.names.csharp.parser;
 typeEOL : type EOL;
 methodEOL: method EOL;
 
-type: UNKNOWN | (typeParameter | regularType | delegateType) arrayPart?;
-typeParameter : id;
-regularType: resolvedType ',' WS? assembly;
+type: UNKNOWN | typeParameter | regularType | delegateType | arrayType;
+typeParameter : id (WS? '->' WS? type)?;
+regularType: ( resolvedType | nestedType ) ',' WS? assembly;
 delegateType: 'd:' method;
-arrayPart: '[' ','* ']';
+arrayType: 'arr(' POSNUM '):' type;
 
-resolvedType: namespace? typeName ('+' typeName)*;
+nestedType: 'n:' nestedTypeName '+' typeName;
+nestedTypeName: nestedType | resolvedType;
+
+
+resolvedType: namespace? typeName;
 namespace : (id '.')+;
-typeName: simpleTypeName genericTypePart?;
+typeName: (enumTypeName | interfaceTypeName | structTypeName | simpleTypeName) genericTypePart?;
 
+enumTypeName: 'e:' simpleTypeName;
+interfaceTypeName: 'i:' simpleTypeName;
+structTypeName: 's:' simpleTypeName;
 simpleTypeName: id;
 
+
 genericTypePart: '\'' POSNUM '[' genericParam (',' genericParam)* ']';
-genericParam: '[' typeParameter (WS? '->' WS? type)? ']';
+genericParam: '[' typeParameter ']';
 
 assembly: id (',' WS? assemblyVersion)? ;
 assemblyVersion: num '.' num '.' num '.' num;	

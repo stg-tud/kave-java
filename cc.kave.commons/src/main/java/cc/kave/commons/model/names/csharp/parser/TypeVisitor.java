@@ -4,21 +4,26 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ArrayPartContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ArrayTypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.AssemblyContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.AssemblyVersionContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.DelegateTypeContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.EnumTypeNameContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.FormalParamContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.GenericParamContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.GenericTypePartContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.IdContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.InterfaceTypeNameContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.MethodContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.MethodEOLContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NamespaceContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NestedTypeContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NestedTypeNameContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NumContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.RegularTypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ResolvedTypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.SimpleTypeNameContext;
+import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.StructTypeNameContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeEOLContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeNameContext;
@@ -109,18 +114,6 @@ public class TypeVisitor implements TypeNamingListener {
 
 	@Override
 	public void exitDelegateType(DelegateTypeContext ctx) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void enterArrayPart(ArrayPartContext ctx) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void exitArrayPart(ArrayPartContext ctx) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -277,6 +270,78 @@ public class TypeVisitor implements TypeNamingListener {
 
 	@Override
 	public void exitMethodEOL(MethodEOLContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterArrayType(ArrayTypeContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitArrayType(ArrayTypeContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterNestedType(NestedTypeContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitNestedType(NestedTypeContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterNestedTypeName(NestedTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitNestedTypeName(NestedTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterEnumTypeName(EnumTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitEnumTypeName(EnumTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterInterfaceTypeName(InterfaceTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitInterfaceTypeName(InterfaceTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterStructTypeName(StructTypeNameContext ctx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void exitStructTypeName(StructTypeNameContext ctx) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -64,9 +64,9 @@ public class TypeValidationTest {
 				// regular types
 				"T,P", "n.T,P", "T,A,0.0.0.0", "?",
 				// nested types
-				"T+NT,P",
+				"n:T+NT,P", "n:n:T+NT+T,P", "n:a.T+NT,P",
 				// type qualifier
-				"i:T,P", "e:T,P", "s:T,P",
+				"i:T,P", "e:T,P", "s:T,P", "n.i:T,P",
 				// delegates
 				"d:[T1,P] [T2,P].M()", "d:[?] [?].M( )", "d:[?] [?].M([?] p)", "d:[?] [?].M([?] p1,[?] p2)",
 				// unnecessary whitespaces
@@ -74,11 +74,12 @@ public class TypeValidationTest {
 				// generics
 				"T'1[[T1]],P", "T'2[[T1],[T2->?]],P",
 				// arrays
-				"T,P[]", "T,P[,]",
+				"arr(1):T,P", "arr(2):T,P",
 				// combination
-				/* arr+X */ "d:[T,P][T,P].M()[]", "T'1[[T2]],P[,]", "T[,]", //
-				/* nested+X */ "T'1[[T]]+NT,P", //
-				"T+NT'1[[T]],P", }) {
+				/* arr+X */ "arr(1):d:[T,P][T,P].M()", "arr(1):T'1[[T2]],P", "arr(1):T", //
+				/* nested+X */ "n:T'1[[T]]+NT,P", //
+				"n:T+i:N,P",
+				"n:T+NT'1[[T]],P", }) {
 			assertValid(t);
 		}
 	}
@@ -103,10 +104,10 @@ public class TypeValidationTest {
 			add(types, "n.%s,A,0.0.0.1", simpleTypeName);
 			for (String nestedSimpleTypeName : createSimpleTypeNames()) {
 				// single nesting
-				add(types, "n.%s+%s,P", simpleTypeName, nestedSimpleTypeName);
+				add(types, "n:n.%s+%s,P", simpleTypeName, nestedSimpleTypeName);
 				for (String nested2SimpleTypeName : createSimpleTypeNames()) {
 					// double nesting
-					add(types, "n.%s+%s+%s,P", simpleTypeName, nestedSimpleTypeName, nested2SimpleTypeName);
+					add(types, "n:n:n.%s+%s+%s,P", simpleTypeName, nestedSimpleTypeName, nested2SimpleTypeName);
 				}
 			}
 		}
@@ -127,10 +128,9 @@ public class TypeValidationTest {
 		for (int arrSize : new int[] { 0, 1, 2 }) {
 			String arrPart = createArrPart(arrSize);
 			for (String t : types) {
-				typesOut.add(t + arrPart);
+				typesOut.add(arrPart+t);
 			}
 		}
-
 		return typesOut;
 	}
 
@@ -149,12 +149,7 @@ public class TypeValidationTest {
 	private String createArrPart(int arrSize) {
 		if (arrSize <= 0)
 			return "";
-		int numCommas = arrSize - 1;
-		StringBuilder sb = new StringBuilder("[");
-		for (int i = 0; i < numCommas; i++) {
-			sb.append(',');
-		}
-		return sb.append("]").toString();
+		return "arr(" + arrSize + "):";
 	}
 
 	private Set<String> createGenericTypes(int maxDepth) {
