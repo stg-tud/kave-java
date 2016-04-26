@@ -29,13 +29,13 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
-public class StreamMappingTest {
+public class StreamDataTest {
 
-	private StreamMapping sut;
+	private StreamData sut;
 	
 	@Before
 	public void setup() {
-		sut = new StreamMapping();
+		sut = new StreamData();
 	}
 	
 	@Test
@@ -72,35 +72,37 @@ public class StreamMappingTest {
 	
 	@Test
 	public void equality_default() {
-		StreamMapping a = new StreamMapping();
-		StreamMapping b = new StreamMapping();
-		assertEquals(a, b);
-		assertEquals(a.hashCode(), b.hashCode());
+		StreamData a = new StreamData();
+		StreamData b = new StreamData();
+		
 		assertTrue(a.equals(b));
 	}
 	
 	@Test
 	public void equlityReallySame() {
-		StreamMapping a = new StreamMapping();
+		StreamData a = new StreamData();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamMapping b = new StreamMapping();
+		StreamData b = new StreamData();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		
-		assertEquals(a, b);
+		assertTrue(a.equals(b));
+		assertEquals(a.getStreamData(), b.getMappingData());
+		assertEquals(a.getStreamString(), b.getStreamString());
+		assertEquals(a.getMappingData(), b.getMappingData());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 	}
 	
 	@Test
 	public void notEqual1() {
-		StreamMapping a = new StreamMapping();
+		StreamData a = new StreamData();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamMapping b = new StreamMapping();
+		StreamData b = new StreamData();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(3));
 		
@@ -111,11 +113,11 @@ public class StreamMappingTest {
 	
 	@Test
 	public void notEqual2() {
-		StreamMapping a = new StreamMapping();
+		StreamData a = new StreamData();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamMapping b = new StreamMapping();
+		StreamData b = new StreamData();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		b.addEvent(inv(3));

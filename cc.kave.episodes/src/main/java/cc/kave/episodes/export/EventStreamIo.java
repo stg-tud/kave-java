@@ -25,12 +25,10 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.assertions.Asserts;
 import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
@@ -44,51 +42,15 @@ public class EventStreamIo {
 	
 	public static void write(List<Event> stream, String fileStream, String fileMapping) {
 		try {
-			StreamMapping sm = new StreamMapping();
+			StreamData sm = new StreamData();
 			sm = EventsFilter.filter(stream);
-			String streamTxt = toString(sm.getStreamData(), sm.getMappingData());
 			Logger.log("Writing stream data file!");
-			FileUtils.writeStringToFile(new File(fileStream), streamTxt);
+			FileUtils.writeStringToFile(new File(fileStream), sm.getStreamString());
 			Logger.log("Writing mapping data file!");
 			JsonUtils.toJson(sm.getMappingData(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private static String toString(List<Event> stream, List<Event> mapping) {
-		StringBuilder sb = new StringBuilder();
-
-		boolean isFirstMethod = true;
-		double time = 0.000;
-		int eventNumber = 0;
-
-		for (Event e : stream) {
-			eventNumber++;
-			int idx = mapping.indexOf(e);
-			if (e.getKind() == EventKind.CONTEXT_HOLDER) {
-				time += TIMEOUT;
-				continue;
-			}
-			Asserts.assertNotNegative(idx);
-
-			if (e.getKind() == EventKind.METHOD_DECLARATION && !isFirstMethod) {
-				time += TIMEOUT;
-			}
-			isFirstMethod = false;
-
-			sb.append(idx);
-			sb.append(',');
-			sb.append(String.format("%.3f",time));
-			sb.append('\n');
-
-			time += DELTA;
-			
-			if (eventNumber % 1000000 == 0){
-				Logger.log("Converting to a string %.5f", eventNumber / (stream.size() * 1.0));
-			}
-		}
-		return sb.toString();
 	}
 
 	public static List<Event> readMapping(String path) {

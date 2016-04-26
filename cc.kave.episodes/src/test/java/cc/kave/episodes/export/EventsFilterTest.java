@@ -16,6 +16,7 @@
 package cc.kave.episodes.export;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class EventsFilterTest {
 	
 	@Test
 	public void filterTest() {
-		StreamMapping expected = new StreamMapping();
+		StreamData expected = new StreamData();
 		expected.addEvent(DUMMY_EVENT);
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(2));
@@ -54,9 +55,9 @@ public class EventsFilterTest {
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(3));
 		
-		StreamMapping actuals = EventsFilter.filter(events);
+		StreamData actuals = EventsFilter.filter(events);
 		
-		assertEquals(expected, actuals);
+		assertTrue(expected.equals(actuals));
 		assertEquals(expected.getStreamData(), actuals.getStreamData());
 		assertEquals(expected.getMappingData(), actuals.getMappingData());
 		assertEquals(expected.getStreamLength(), actuals.getStreamLength());

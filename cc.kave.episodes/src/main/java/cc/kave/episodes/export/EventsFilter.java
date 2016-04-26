@@ -33,8 +33,8 @@ public class EventsFilter {
 	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 	
-	public static StreamMapping filter(List<Event> stream) {
-		StreamMapping sm = new StreamMapping();
+	public static StreamData filter(List<Event> stream) {
+		StreamData sm = new StreamData();
 		
 		Map<Event, Integer> occurrences = getFrequences(stream);
 		
@@ -52,7 +52,7 @@ public class EventsFilter {
 					sm.addEvent(Events.newHolder());
 				}
 			}
-			logger(eventNumber, stream.size(), "Created mapping for");
+			logger(eventNumber, stream.size(), "Processed episodes are");
 		}
 		Logger.log("One time occured events are: %d", sigletons);
 		Logger.log("Number of unique events is: %d", occurrences.size());

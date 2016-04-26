@@ -27,33 +27,68 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 
-public class StreamMapping {
+public class StreamData {
+	public static final double DELTA = 0.001;
+	public static final double TIMEOUT = 0.5;
+
 	private List<Event> streamData = Lists.newLinkedList();
 	private List<Event> mappingData = Lists.newLinkedList();
-	
+	private StringBuilder sb = new StringBuilder();
+	private int streamLength = 0;
+
+	private boolean isFirstMethod = true;
+	private double time = 0.000;
+
 	public List<Event> getStreamData() {
-		return streamData;
+		return this.streamData;
 	}
-	
-	public void addEvent(Event event) {
-		this.streamData.add(event);
-		if ((this.mappingData.indexOf(event) == -1) && (event.getKind() != EventKind.CONTEXT_HOLDER)) {
-			this.mappingData.add(event);
-		}
+
+	public String getStreamString() {
+		return this.sb.toString();
 	}
-	
+
 	public List<Event> getMappingData() {
-		return mappingData;
+		return this.mappingData;
 	}
 	
 	public int getStreamLength() {
-		return this.streamData.size();
+		return this.streamLength;
 	}
-	
+
 	public int getNumberEvents() {
 		return this.mappingData.size();
 	}
-	
+
+	public void addEvent(Event event) {
+		int idx = this.mappingData.indexOf(event);
+
+		this.streamData.add(event);
+		this.streamLength++;
+
+		if (event.getKind() == EventKind.CONTEXT_HOLDER) {
+			this.time += TIMEOUT;
+		} else {
+			if (idx == -1) {
+				this.mappingData.add(event);
+				idx = this.mappingData.indexOf(event);
+			}
+		}
+
+		if (event.getKind() == EventKind.METHOD_DECLARATION && !this.isFirstMethod) {
+			this.time += TIMEOUT;
+		}
+		this.isFirstMethod = false;
+		
+		if (idx > -1) {
+			this.sb.append(idx);
+			this.sb.append(',');
+			this.sb.append(String.format("%.3f", this.time));
+			this.sb.append('\n');
+
+			this.time += DELTA;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -67,5 +102,21 @@ public class StreamMapping {
 	@Override
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	public boolean equals(StreamData sm) {
+		if (!this.streamData.equals(sm.getStreamData())) {
+			return false;
+		}
+		if (!this.mappingData.equals(sm.getMappingData())) {
+			return false;
+		}
+		if (!this.sb.toString().equals(sm.getStreamString())) {
+			return false;
+		}
+		if (this.streamLength != sm.getStreamLength()) {
+			return false;
+		}
+		return true;
 	}
 }
