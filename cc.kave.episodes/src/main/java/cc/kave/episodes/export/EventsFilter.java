@@ -69,17 +69,14 @@ public class EventsFilter {
 
 	private static Map<Event, Integer> getFrequences(List<Event> stream) {
 		Map<Event, Integer> occurrences = Maps.newHashMap();
-		int eventNumber = 0;
 		
 		for (Event e : stream) {
-			eventNumber++;
 			if (occurrences.keySet().contains(e)) {
 				int freq = occurrences.get(e);
 				occurrences.put(e, freq + 1);
 			} else {
 				occurrences.put(e, 1);
 			}
-			logger(eventNumber, stream.size(), "Counting frequency for");
 		}
 		return occurrences;
 	}

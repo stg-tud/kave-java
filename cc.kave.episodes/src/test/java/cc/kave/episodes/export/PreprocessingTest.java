@@ -109,8 +109,9 @@ public class PreprocessingTest {
 
 		md2.getBody().add(wrap(ie1));
 		md2.getBody().add(wrap(ie2));
-
+		md2.getBody().add(wrap(ie2));
 		sst.getMethods().add(md2);
+		
 		Context context = new Context();
 		context.setSST(sst);
 		data.put("a", context);
@@ -207,21 +208,21 @@ public class PreprocessingTest {
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
 		
+		//ctx1 ctx2 inv1 inv2 inv2 ctx2 inv3 inv3
 		StringBuilder streamBuilder = new StringBuilder();
 		streamBuilder.append("0,0.000\n");
-		streamBuilder.append("1,0.501\n");
-		streamBuilder.append("2,0.502\n");
-		streamBuilder.append("3,0.503\n");
-		streamBuilder.append("1,1.004\n");
-		streamBuilder.append("4,1.005\n");
-		streamBuilder.append("4,1.006\n");
+		streamBuilder.append("1,1.001\n");
+		streamBuilder.append("2,1.002\n");
+		streamBuilder.append("2,1.003\n");
+		streamBuilder.append("1,1.504\n");
+		streamBuilder.append("3,1.505\n");
+		streamBuilder.append("3,1.506\n");
 		
 		String expectedStream = streamBuilder.toString();
 		
 		StringBuilder mappingBuilder = new StringBuilder();
 		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
 		mappingBuilder.append("{\"Kind\":0,\"Method\":\"CSharp.MethodName:[?] [?].???()\"},");
-		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()\"},");
 		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"},");
 		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()\"}]");
 		
@@ -252,18 +253,16 @@ public class PreprocessingTest {
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
 		
+		//ctx1 ctx2 inv1 inv2 inv2
 		StringBuilder streamBuilder = new StringBuilder();
 		streamBuilder.append("0,0.000\n");
-		streamBuilder.append("1,0.501\n");
-		streamBuilder.append("2,0.502\n");
-		streamBuilder.append("3,0.503\n");
+		streamBuilder.append("1,1.001\n");
+		streamBuilder.append("1,1.002\n");
 		
 		String expectedStream = streamBuilder.toString();
 		
 		StringBuilder mappingBuilder = new StringBuilder();
 		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
-		mappingBuilder.append("{\"Kind\":0,\"Method\":\"CSharp.MethodName:[?] [?].???()\"},");
-		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()\"},");
 		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"}]");
 		
 		String expectedMapping = mappingBuilder.toString();

@@ -84,7 +84,7 @@ public class EventStreamIo {
 
 			time += DELTA;
 			
-			if (eventNumber % 100000 == 0){
+			if (eventNumber % 1000000 == 0){
 				Logger.log("Converting to a string %.5f", eventNumber / (stream.size() * 1.0));
 			}
 		}
