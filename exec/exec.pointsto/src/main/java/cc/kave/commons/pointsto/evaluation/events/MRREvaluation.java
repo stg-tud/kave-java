@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -39,6 +41,7 @@ import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
+import cc.kave.commons.pointsto.evaluation.TypeNameComparator;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.stores.UsageStore;
@@ -124,27 +127,37 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 
 		for (ICompletionEvent event : completionEvents) {
-			Context context = event.getContext();
-			PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(context);
-			SSTNodeHierarchy nodeHierarchy = new SSTNodeHierarchy(context.getSST());
-			List<ICompletionExpression> completionExprs = completionExprCollector.collect(context);
+			try {
+				Context context = event.getContext();
+				PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(context);
+				SSTNodeHierarchy nodeHierarchy = new SSTNodeHierarchy(context.getSST());
+				List<ICompletionExpression> completionExprs = completionExprCollector.collect(context);
 
-			for (ICompletionExpression expr : completionExprs) {
-				List<Usage> exprQueries = usageExtractor.extractQueries(expr, ptFactory.create().compute(context),
-						queryBuilder, nodeHierarchy);
-				for (Usage query : exprQueries) {
-					Map<ICompletionEvent, List<Usage>> typeBin = queries.get(query.getType());
-					if (typeBin == null) {
-						typeBin = new HashMap<>();
-						queries.put(query.getType(), typeBin);
-					}
+				for (ICompletionExpression expr : completionExprs) {
+					List<Usage> exprQueries = usageExtractor.extractQueries(expr, ptFactory.create().compute(context),
+							queryBuilder, nodeHierarchy);
+					for (Usage query : exprQueries) {
+						Map<ICompletionEvent, List<Usage>> typeBin = queries.get(query.getType());
+						if (typeBin == null) {
+							typeBin = new HashMap<>();
+							queries.put(query.getType(), typeBin);
+						}
 
-					List<Usage> eventBin = typeBin.get(event);
-					if (eventBin == null) {
-						eventBin = new ArrayList<>();
-						typeBin.put(event, eventBin);
+						List<Usage> eventBin = typeBin.get(event);
+						if (eventBin == null) {
+							eventBin = new ArrayList<>();
+							typeBin.put(event, eventBin);
+						}
+						eventBin.add(query);
 					}
-					eventBin.add(query);
+				}
+			} catch (RuntimeException ex) {
+				if (ex.getMessage().startsWith("Invalid Signature Syntax: ")) {
+					LoggerFactory.getLogger(getClass()).error(
+							"Failed to extract queries for context due to MethodName.getSignature bug: {}",
+							ex.getMessage());
+				} else {
+					throw ex;
 				}
 			}
 		}
@@ -153,8 +166,10 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	}
 
 	private Set<ICoReTypeName> getQueryTypes(Collection<Map<ICompletionEvent, List<Usage>>> eventUsages) {
-		return eventUsages.stream().flatMap(eu -> eu.values().stream()).flatMap(u -> u.stream()).map(u -> u.getType())
-				.collect(Collectors.toSet());
+		List<ICoReTypeName> types = new ArrayList<>(eventUsages.stream().flatMap(eu -> eu.values().stream())
+				.flatMap(u -> u.stream()).map(u -> u.getType()).collect(Collectors.toSet()));
+		types.sort(new TypeNameComparator());
+		return Sets.newLinkedHashSet(types);
 	}
 
 	private Set<ICoReTypeName> getStoreTypes() {

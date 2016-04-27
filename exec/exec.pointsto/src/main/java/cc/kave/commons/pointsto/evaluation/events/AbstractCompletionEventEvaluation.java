@@ -13,10 +13,13 @@
 package cc.kave.commons.pointsto.evaluation.events;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.inject.Guice;
@@ -29,9 +32,12 @@ import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
+import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.Logger;
+import cc.kave.commons.pointsto.evaluation.Module;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
+import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.JsonUtils;
 
@@ -42,17 +48,36 @@ public abstract class AbstractCompletionEventEvaluation {
 	}
 
 	public void run(Path completionEventsArchive, List<PointsToAnalysisFactory> ptFactories) throws IOException {
-		List<ICompletionEvent> complectionEvents;
-		int totalNumberOfEvents;
-		try (ZipArchive archive = new ZipArchive(completionEventsArchive)) {
-			complectionEvents = archive.stream(ICompletionEvent.class, JsonUtils::fromJson).parallel()
-					.filter(new CompletionEventFilter()).collect(Collectors.toList());
-			totalNumberOfEvents = archive.countFiles();
+		List<Path> zipFiles;
+		if (Files.isRegularFile(completionEventsArchive)) {
+			zipFiles = Arrays.asList(completionEventsArchive);
+		} else {
+			zipFiles = IOHelper.getZipFiles(completionEventsArchive);
 		}
-		log("%d/%d (%.2f%%) events used for evaluation\n", complectionEvents.size(), totalNumberOfEvents,
-				complectionEvents.size() / (double) totalNumberOfEvents * 100);
 
-		evaluate(complectionEvents, ptFactories);
+		List<ICompletionEvent> completionEvents = new ArrayList<>();
+		int totalNumberOfEvents = loadEvents(zipFiles, completionEvents);
+
+		log("%d/%d (%.2f%%) events used for evaluation\n", completionEvents.size(), totalNumberOfEvents,
+				completionEvents.size() / (double) totalNumberOfEvents * 100);
+
+		evaluate(completionEvents, ptFactories);
+	}
+
+	protected Predicate<ICompletionEvent> createCompletionEventFilter() {
+		return new CompletionEventFilter();
+	}
+
+	private int loadEvents(List<Path> zipFiles, List<ICompletionEvent> completionEvents) throws IOException {
+		int totalNumberOfEvents = 0;
+		for (Path file : zipFiles) {
+			try (ZipArchive archive = new ZipArchive(file)) {
+				completionEvents.addAll(archive.stream(ICompletionEvent.class, JsonUtils::fromJson).parallel()
+						.filter(createCompletionEventFilter()).collect(Collectors.toList()));
+				totalNumberOfEvents += archive.countFiles();
+			}
+		}
+		return totalNumberOfEvents;
 	}
 
 	protected abstract void evaluate(List<ICompletionEvent> completionEvents, List<PointsToAnalysisFactory> ptFactories)
@@ -60,32 +85,25 @@ public abstract class AbstractCompletionEventEvaluation {
 
 	public static void main(String[] args) throws IOException {
 		Path baseDir = Paths.get("E:\\Coding\\MT");
-		Path completionEventsArchive = baseDir.resolve("CompletionEvents.zip");
-		List<PointsToAnalysisFactory> ptFactories = Arrays
-				.asList(new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
-						new SimplePointsToAnalysisFactory<>(
-								TypeBasedAnalysis.class),
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class,
-						FieldSensitivity.FULL)/*
-												 * , new
-												 * SimplePointsToAnalysisFactory
-												 * <>(InclusionAnalysis.class)
-												 */);
+		Path completionEventsArchive = baseDir.resolve("OnlyCompletion");
+		List<PointsToAnalysisFactory> ptFactories = Arrays.asList(
+				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
+				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
+				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class));
 		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;
-		injector = Guice.createInjector(new StoreModule());
-		MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
-		evaluation.run(completionEventsArchive, ptFactories);
-		evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
-				injector.getInstance(ResultExporter.class));
-		evaluation.close();
+		// injector = Guice.createInjector(new StoreModule());
+		// MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
+		// evaluation.run(completionEventsArchive, ptFactories);
+		// evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
+		// injector.getInstance(ResultExporter.class));
+		// evaluation.close();
 
 		// injector = Guice.createInjector(new Module());
-		// TimeEvaluation evaluation =
-		// injector.getInstance(TimeEvaluation.class);
+		// TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
 		// evaluation.run(completionEventsArchive, ptFactories);
-		// evaluation.exportResults(evaluationResultsDir,
-		// injector.getInstance(ResultExporter.class));
+		// evaluation.exportResults(evaluationResultsDir, injector.getInstance(ResultExporter.class));
 	}
 }
