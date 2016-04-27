@@ -16,6 +16,7 @@
 package cc.kave.episodes.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -24,14 +25,12 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.episodes.model.StreamData;
 
 public class StreamDataTest {
 
@@ -44,8 +43,11 @@ public class StreamDataTest {
 	
 	@Test
 	public void defaultValues() {
-		assertEquals(Lists.newLinkedList(), sut.getStreamData());
-		assertEquals(Maps.newLinkedHashMap(), sut.getMappingData());
+		assertEquals(Maps.newLinkedHashMap(), sut.getMapping());
+		assertEquals(0, sut.getEventNumber());
+		assertEquals(0, sut.getStreamLength());
+		
+		assertTrue(sut.getStream().equals(""));
 	}
 	
 	@Test
@@ -55,15 +57,16 @@ public class StreamDataTest {
 		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
 		expMap.put(ctx(1), 0);
 		
-		assertEquals(Lists.newArrayList(ctx(1)), sut.getStreamData());
-		assertEquals(expMap, sut.getMappingData());
+		assertEquals(expMap, sut.getMapping());
+		assertTrue(sut.getStream().equals("0,0.000\n"));
 		
 		assertEquals(1, sut.getStreamLength());
-		assertEquals(1, sut.getNumberEvents());
+		assertEquals(1, sut.getEventNumber());
 	}
 	
 	@Test
 	public void addMultipleEvents() {
+		sut.addEvent(ctx(0));
 		sut.addEvent(ctx(1));
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
@@ -71,15 +74,23 @@ public class StreamDataTest {
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(ctx(1), 0);
-		expectedMap.put(inv(2), 1);
-		expectedMap.put(inv(3), 2);
+		expectedMap.put(ctx(0), 0);
+		expectedMap.put(ctx(1), 1);
+		expectedMap.put(inv(2), 2);
+		expectedMap.put(inv(3), 3);
 		
-		assertEquals(Lists.newArrayList(ctx(1), inv(2), inv(3), hld(), inv(2)), sut.getStreamData());
-		assertEquals(expectedMap, sut.getMappingData());
+		StringBuilder expSb = new StringBuilder();
+		expSb.append("0,0.000\n");
+		expSb.append("1,0.501\n");
+		expSb.append("2,0.502\n");
+		expSb.append("3,0.503\n");
+		expSb.append("2,1.004\n");
 		
-		assertEquals(5, sut.getStreamLength());
-		assertEquals(3, sut.getNumberEvents());
+		assertEquals(expectedMap, sut.getMapping());
+		assertTrue(sut.getStream().equalsIgnoreCase(expSb.toString()));
+		
+		assertEquals(6, sut.getStreamLength());
+		assertEquals(4, sut.getEventNumber());
 	}
 	
 	@Test
@@ -101,11 +112,11 @@ public class StreamDataTest {
 		b.addEvent(inv(2));
 		
 		assertTrue(a.equals(b));
-		assertEquals(a.getStreamData(), b.getStreamData());
-		assertEquals(a.getStreamString(), b.getStreamString());
-		assertEquals(a.getMappingData(), b.getMappingData());
+		assertTrue(a.getStream().equalsIgnoreCase(b.getStream()));
+		assertEquals(a.getStream(), b.getStream());
+		assertEquals(a.getMapping(), b.getMapping());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
+		assertEquals(a.getEventNumber(), b.getEventNumber());
 	}
 	
 	@Test
@@ -118,9 +129,11 @@ public class StreamDataTest {
 		b.addEvent(ctx(1));
 		b.addEvent(inv(3));
 		
-		assertNotEquals(a, b);
-		assertEquals(a.getStreamLength(), b.getStreamLength());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
+		assertFalse(a.equals(b));
+		assertNotEquals(a.getMapping(), b.getMapping());
+		assertEquals(a.getStream(), b.getStream());
+		assertTrue(a.getStreamLength() == b.getStreamLength());
+		assertEquals(a.getEventNumber(), b.getEventNumber());
 	}
 	
 	@Test
@@ -134,9 +147,29 @@ public class StreamDataTest {
 		b.addEvent(inv(2));
 		b.addEvent(inv(3));
 		
-		assertNotEquals(a, b);
-		assertNotEquals(a.getStreamLength(), b.getStreamLength());
-		assertNotEquals(a.getNumberEvents(), b.getNumberEvents());
+		assertFalse(a.equals(b));
+		assertNotEquals(a.getMapping(), b.getMapping());
+		assertNotEquals(a.getStream(), b.getStream());
+		assertTrue(a.getStreamLength() != b.getStreamLength());
+		assertNotEquals(a.getEventNumber(), b.getEventNumber());
+	}
+	
+	@Test
+	public void notEqualStream() {
+		StreamData a = new StreamData();
+		a.addEvent(ctx(1));
+		a.addEvent(inv(2));
+		a.addEvent(inv(2));
+		
+		StreamData b = new StreamData();
+		b.addEvent(ctx(1));
+		b.addEvent(inv(2));
+		
+		assertFalse(a.equals(b));
+		assertEquals(a.getMapping(), b.getMapping());
+		assertNotEquals(a.getStream(), b.getStream());
+		assertTrue(a.getStreamLength() != b.getStreamLength());
+		assertEquals(a.getEventNumber(), b.getEventNumber());
 	}
 	
 	private static Event inv(int i) {

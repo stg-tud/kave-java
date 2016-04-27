@@ -15,7 +15,6 @@
  */
 package cc.kave.episodes.model;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -23,7 +22,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
@@ -33,23 +31,18 @@ public class StreamData {
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
 
-	private List<Event> streamData = Lists.newLinkedList();
 	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();
 	private int streamLength = 0;
 
-	private boolean isFirstMethod = true;
-	private double time = 0.000;
+	boolean isFirstMethod = true;
+	double time = 0.000;
 
-	public List<Event> getStreamData() {
-		return this.streamData;
-	}
-
-	public String getStreamString() {
+	public String getStream() {
 		return this.sb.toString();
 	}
 
-	public Map<Event, Integer> getMappingData() {
+	public Map<Event, Integer> getMapping() {
 		return this.mappingData;
 	}
 	
@@ -57,25 +50,23 @@ public class StreamData {
 		return this.streamLength;
 	}
 
-	public int getNumberEvents() {
+	public int getEventNumber() {
 		return this.mappingData.size();
 	}
 
 	public void addEvent(Event event) {
-		Integer idx = this.mappingData.get(event);
-
-		this.streamData.add(event);
 		this.streamLength++;
+		
+		Integer idx = this.mappingData.get(event);
 
 		if (event.getKind() == EventKind.CONTEXT_HOLDER) {
 			this.time += TIMEOUT;
 		} else {
 			if (idx == null) {
-				idx = getNumberEvents();
+				idx = getEventNumber();
 				this.mappingData.put(event, idx);
 			}
 		}
-
 		if (event.getKind() == EventKind.METHOD_DECLARATION && !this.isFirstMethod) {
 			this.time += TIMEOUT;
 		}
@@ -107,13 +98,10 @@ public class StreamData {
 	}
 	
 	public boolean equals(StreamData sm) {
-		if (!this.streamData.equals(sm.getStreamData())) {
+		if (!this.mappingData.equals(sm.getMapping())) {
 			return false;
 		}
-		if (!this.mappingData.equals(sm.getMappingData())) {
-			return false;
-		}
-		if (!this.sb.toString().equals(sm.getStreamString())) {
+		if (!this.sb.toString().equals(sm.getStream())) {
 			return false;
 		}
 		if (this.streamLength != sm.getStreamLength()) {

@@ -46,10 +46,10 @@ public class EventStreamIo {
 			StreamData sm = new StreamData();
 			sm = EventsFilter.filter(stream);
 			Logger.log("After filtering out one time events!");
-			Logger.log("Number of unique events is: %d",sm.getNumberEvents());
+			Logger.log("Number of unique events is: %d",sm.getEventNumber());
 			Logger.log("Length of event stream data is: %d", sm.getStreamLength());
-			FileUtils.writeStringToFile(new File(fileStream), sm.getStreamString());
-			JsonUtils.toJson(sm.getMappingData().keySet(), new File(fileMapping));
+			FileUtils.writeStringToFile(new File(fileStream), sm.getStream());
+			JsonUtils.toJson(sm.getMapping().keySet(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
