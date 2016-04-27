@@ -29,6 +29,7 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.StreamData;
 import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
