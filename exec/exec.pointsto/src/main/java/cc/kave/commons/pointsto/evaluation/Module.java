@@ -66,7 +66,7 @@ public class Module extends AbstractModule {
 	private void configOptions() {
 		QueryOptions qOpts = new QueryOptions();
 		qOpts.queryType = QueryType.NM;
-		qOpts.minProbability = 0.3;
+		qOpts.minProbability = 0.01;
 		qOpts.useClassContext = true;
 		qOpts.useMethodContext = true;
 		qOpts.useDefinition = true;
