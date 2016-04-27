@@ -38,12 +38,10 @@ public class EventsFilter {
 		
 		Map<Event, Integer> occurrences = getFrequences(stream);
 		
-		int eventNumber = 0;
 		int sigletons = 0;
 		
 		sm.addEvent(DUMMY_EVENT);
 		for (Event e : stream) {
-			eventNumber++;
 			if (occurrences.get(e) > 1) {
 				sm.addEvent(e);
 			} else {
@@ -52,13 +50,11 @@ public class EventsFilter {
 					sm.addEvent(Events.newHolder());
 				}
 			}
-			if (eventNumber % 100000 == 0){
-				Logger.log("Processed episodes are %.5f", eventNumber / (stream.size() * 1.0));
-			}
 		}
+		Logger.log("Before filtering out one time events!");
 		Logger.log("One time occured events are: %d", sigletons);
 		Logger.log("Number of unique events is: %d", occurrences.size());
-		Logger.log("Total number of events is: %d", stream.size());
+		Logger.log("Length of event stream data is: %d", stream.size());
 		
 		return sm;
 	}
