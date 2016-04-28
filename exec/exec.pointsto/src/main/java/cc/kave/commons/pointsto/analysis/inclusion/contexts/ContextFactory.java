@@ -12,12 +12,12 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.contexts;
 
-import cc.kave.commons.pointsto.analysis.inclusion.RefTerm;
+import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
 
 public interface ContextFactory {
 
-	Context create(RefTerm object, InclusionAnnotation invocationInclusionAnnotation, ContextAnnotation invocationContextAnnotation);
+	Context create(ConstructedTerm object, InclusionAnnotation invocationInclusionAnnotation, ContextAnnotation invocationContextAnnotation);
 
 }

@@ -12,14 +12,14 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.contexts;
 
-import cc.kave.commons.pointsto.analysis.inclusion.RefTerm;
+import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
 
 public class EmptyContextFactory implements ContextFactory {
 
 	@Override
-	public Context create(RefTerm object, InclusionAnnotation invocationInclusionAnnotation, ContextAnnotation invocationContextAnnotation) {
+	public Context create(ConstructedTerm object, InclusionAnnotation invocationInclusionAnnotation, ContextAnnotation invocationContextAnnotation) {
 		return Context.EMPTY;
 	}
 

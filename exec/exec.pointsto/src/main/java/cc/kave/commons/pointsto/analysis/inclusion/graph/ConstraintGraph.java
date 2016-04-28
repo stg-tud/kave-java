@@ -45,6 +45,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
+import cc.recommenders.assertions.Asserts;
 
 public class ConstraintGraph {
 
@@ -135,93 +136,77 @@ public class ConstraintGraph {
 
 	private Set<ConstraintNode> processNode(ConstraintNode node) {
 		Set<ConstraintNode> changedNodes = new HashSet<>();
-		Set<ConstraintEdge> objectEdges = new HashSet<>();
-		Set<ConstraintEdge> invocationEdges = new HashSet<>();
 
 		Collection<ConstraintEdge> predecessors = new ArrayList<>(node.getPredecessors());
 		Collection<ConstraintEdge> successors = new ArrayList<>(node.getSuccessors());
 
 		for (ConstraintEdge preEdge : predecessors) {
 			SetExpression preEdgeTarget = preEdge.getTarget().getSetExpression();
-			if (preEdgeTarget instanceof RefTerm) {
-				objectEdges.add(preEdge);
-			}
 
 			for (ConstraintEdge succEdge : successors) {
 				SetExpression succEdgeTarget = succEdge.getTarget().getSetExpression();
-				if (succEdgeTarget instanceof LambdaTerm
-						&& succEdge.getInclusionAnnotation() instanceof InvocationAnnotation) {
-					invocationEdges.add(succEdge);
-				}
 
 				if (match(preEdge, succEdge)) {
-					boolean bothConstructedTerms = preEdgeTarget instanceof ConstructedTerm
-							&& succEdgeTarget instanceof ConstructedTerm;
-					if (bothConstructedTerms && preEdgeTarget.getClass() != succEdgeTarget.getClass()) {
+					boolean bothConstructedTerms = preEdgeTarget instanceof ConstructedTerm && succEdgeTarget instanceof ConstructedTerm;
+					if (bothConstructedTerms && succEdgeTarget instanceof LambdaTerm
+							&& succEdge.getInclusionAnnotation() instanceof InvocationAnnotation) {
+						processInvocation(preEdge, succEdge, changedNodes);
+					} else if (bothConstructedTerms && preEdgeTarget.getClass() != succEdgeTarget.getClass()) {
 						// prevent adding a constraint between RefTerm and LambdaTerm
 						continue;
+					} else {
+						InclusionAnnotation newInclAnnotation = concat(preEdge.getInclusionAnnotation(),
+								succEdge.getInclusionAnnotation());
+						ContextAnnotation newContextAnnotation = concat(preEdge.getContextAnnotation(),
+								succEdge.getContextAnnotation());
+
+						changedNodes.addAll(constraintResolver.addConstraint(preEdgeTarget, succEdgeTarget,
+								newInclAnnotation, newContextAnnotation));
 					}
-
-					InclusionAnnotation newInclAnnotation = concat(preEdge.getInclusionAnnotation(),
-							succEdge.getInclusionAnnotation());
-					ContextAnnotation newContextAnnotation = concat(preEdge.getContextAnnotation(),
-							succEdge.getContextAnnotation());
-
-					if (bothConstructedTerms && newInclAnnotation instanceof InvocationAnnotation) {
-						// prevent adding a constraint between an invocation lambda and a lambda used to model a
-						// delegate
-						// this situation may arise if a method is called on a delegate variable (either directly or via
-						// an extension method)
-						continue;
-					}
-
-					changedNodes.addAll(constraintResolver.addConstraint(preEdgeTarget, succEdgeTarget,
-							newInclAnnotation, newContextAnnotation));
 				}
 			}
 		}
-
-		processInvocations(objectEdges, invocationEdges, changedNodes);
 		return changedNodes;
 	}
 
-	private void processInvocations(Set<ConstraintEdge> objectEdges, Set<ConstraintEdge> invocationEdges,
+	private void processInvocation(ConstraintEdge objectEdge, ConstraintEdge invocationEdge,
 			Set<ConstraintNode> changedNodes) {
-		for (ConstraintEdge objectEdge : objectEdges) {
-			RefTerm object = (RefTerm) objectEdge.getTarget().getSetExpression();
+		ConstructedTerm object = (ConstructedTerm) objectEdge.getTarget().getSetExpression();
+		// object can be either a RefTerm (default) or in rare cases a LambdaTerm (if a normal method is invoked on a
+		// delegate)
 
-			for (ConstraintEdge invocationEdge : invocationEdges) {
-				if (match(objectEdge, invocationEdge)) {
-					InvocationAnnotation invocationAnnotation = (InvocationAnnotation) invocationEdge
-							.getInclusionAnnotation();
-					// virtual call resolution
-					IMemberName staticMember = invocationAnnotation.getMember();
-					ITypeName dynamicType = object.getAllocationSite().getType();
-					IMemberName targetMember;
-					if (!invocationAnnotation.isDynamicallyDispatched() || dynamicType == null
-							|| dynamicType.isUnknownType()) {
-						targetMember = staticMember;
-					} else {
-						targetMember = languageOptions.resolveVirtual(staticMember, dynamicType);
-					}
-					LambdaTerm declarationLambda = getDeclarationLambda(targetMember);
-
-					ContextAnnotation contextAnnotation = concat(objectEdge.getContextAnnotation(),
-							invocationEdge.getContextAnnotation());
-					Context newContext = contextFactory.create(object, invocationAnnotation, contextAnnotation);
-					if (contextAnnotation.isEmpty() && contextFactory.getClass() != EmptyContextFactory.class) {
-						contextAnnotation = new ContextAnnotation(Context.WILDCARD, Context.WILDCARD);
-					}
-
-					changedNodes.addAll(constraintResolver.addConstraint(object, declarationLambda.getArgument(0),
-							InclusionAnnotation.EMPTY,
-							createContextAnnotation(contextAnnotation.getLeft(), newContext)));
-					changedNodes.addAll(constraintResolver.resolve(declarationLambda,
-							(LambdaTerm) invocationEdge.getTarget().getSetExpression(), InclusionAnnotation.EMPTY,
-							createContextAnnotation(newContext, contextAnnotation.getRight())));
-				}
+		InvocationAnnotation invocationAnnotation = (InvocationAnnotation) invocationEdge.getInclusionAnnotation();
+		IMemberName staticMember = invocationAnnotation.getMember();
+		IMemberName targetMember = null;
+		if (object instanceof RefTerm) {
+			// virtual call resolution
+			ITypeName dynamicType = ((RefTerm) object).getAllocationSite().getType();
+			if (!invocationAnnotation.isDynamicallyDispatched() || dynamicType == null || dynamicType.isUnknownType()) {
+				targetMember = staticMember;
+			} else {
+				targetMember = languageOptions.resolveVirtual(staticMember, dynamicType);
 			}
+		} else if (object instanceof LambdaTerm) {
+			// no virtual call resolution for delegates possible
+			targetMember = staticMember;
+		} else {
+			Asserts.fail("Invalid constructed term type");
 		}
+
+		LambdaTerm declarationLambda = getDeclarationLambda(targetMember);
+
+		ContextAnnotation contextAnnotation = concat(objectEdge.getContextAnnotation(),
+				invocationEdge.getContextAnnotation());
+		Context newContext = contextFactory.create(object, invocationAnnotation, contextAnnotation);
+		if (contextAnnotation.isEmpty() && contextFactory.getClass() != EmptyContextFactory.class) {
+			contextAnnotation = new ContextAnnotation(Context.WILDCARD, Context.WILDCARD);
+		}
+
+		changedNodes.addAll(constraintResolver.addConstraint(object, declarationLambda.getArgument(0),
+				InclusionAnnotation.EMPTY, createContextAnnotation(contextAnnotation.getLeft(), newContext)));
+		changedNodes.addAll(constraintResolver.resolve(declarationLambda,
+				(LambdaTerm) invocationEdge.getTarget().getSetExpression(), InclusionAnnotation.EMPTY,
+				createContextAnnotation(newContext, contextAnnotation.getRight())));
 	}
 
 	public Multimap<DistinctReference, ConstraintEdge> computeLeastSolution() {
