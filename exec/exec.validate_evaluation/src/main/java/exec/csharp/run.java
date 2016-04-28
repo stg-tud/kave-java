@@ -36,15 +36,16 @@ import exec.csharp.utils.StorageHelper;
 import exec.validate_evaluation.categorized.MicroCommitIoExtension;
 import exec.validate_evaluation.categorized.NoiseCategorizedEvaluation;
 import exec.validate_evaluation.categorized.ScenarioCategorizedEvaluation;
+import exec.validate_evaluation.greedy_and_endgoal.GreedyAndEndGoalEval;
+import exec.validate_evaluation.microcommits.FinalStateMicroCommitGenerationRunner;
 import exec.validate_evaluation.microcommits.MicroCommitGenerationLogger;
-import exec.validate_evaluation.microcommits.MicroCommitGenerationRunner;
 import exec.validate_evaluation.microcommits.MicroCommitIo;
 import exec.validate_evaluation.queryhistory.QueryHistoryCollector;
 import exec.validate_evaluation.queryhistory.QueryHistoryGenerationLogger;
 import exec.validate_evaluation.queryhistory.QueryHistoryGenerationRunner;
 import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 import exec.validate_evaluation.queryhistory.UsageExtractor;
-import exec.validate_evaluation.stats.QueryHistoryStats;
+import exec.validate_evaluation.stats.MicroCommitStats;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
@@ -98,8 +99,16 @@ public class run {
 		/* new evals */
 		// load(BasicExcelEvaluation.class).run();
 		// runMicroCommitTransformation();
-		// runCategorizedEvaluation();
-		runStats();
+		runCategorizedEvaluation();
+		// runStats();
+		// runGreedyVsGoalEval();
+	}
+
+	private static void runGreedyVsGoalEval() {
+		NestedZipFolders<ICoReTypeName> usages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
+		ModelHelper mh = load(ModelHelper.class);
+		QueryHistoryIo qhIo = new QueryHistoryIo(dirQH);
+		new GreedyAndEndGoalEval(usages, mh, qhIo).run();
 	}
 
 	private static void runCategorizedEvaluation() {
@@ -118,8 +127,11 @@ public class run {
 		QueryHistoryIo qhIo = new QueryHistoryIo(dirQH);
 		StorageHelper sh = new StorageHelper(dirRoot);
 
-		// new MicroCommitStats(mcIo).run();
-		new QueryHistoryStats(qhIo).run();
+		NestedZipFolders<ICoReTypeName> usages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
+		// new QueryContentStats(usages, new
+		// MicroCommitIoExtension(mcIo)).run();
+		new MicroCommitStats(mcIo, usages).run();
+		// new QueryHistoryStats(qhIo, usages).run();
 		// new UsageToMicroCommitRatioCalculator(sh, mcIo).run();
 	}
 
@@ -137,16 +149,18 @@ public class run {
 		esGen.add(new EmptyOrSingleEditStreakRemovalFilter());
 		QueryHistoryGenerationRunner qhGen = new QueryHistoryGenerationRunner(esIo, qhIo, qhLog,
 				new QueryHistoryCollector(qhLog), new UsageExtractor());
-		MicroCommitGenerationRunner mcGen = new MicroCommitGenerationRunner(qhIo, mcIo, mcLog);
+		// MicroCommitGenerationRunner mcGen = new
+		// MicroCommitGenerationRunner(qhIo, mcIo, mcLog);
+		FinalStateMicroCommitGenerationRunner mcGen = new FinalStateMicroCommitGenerationRunner(qhIo, mcIo, mcLog);
 
 		// clean(dirES);
 		// esGen.run();
 		//
 		// clean(dirQH);
 		// qhGen.run();
-		//
-		// clean(dirMC);
-		// mcGen.run();
+
+		clean(dirMC);
+		mcGen.run();
 	}
 
 	private static void clean(String dir) {

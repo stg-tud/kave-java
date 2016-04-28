@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
@@ -38,11 +39,14 @@ import exec.validate_evaluation.microcommits.MicroCommitIo;
 
 public class MicroCommitStats {
 
+	int numCommitsWithNoUsages;
 	private MicroCommitIo io;
 	private Map<ICoReTypeName, Map<ICoReMethodName, List<MicroCommit>>> allCommits = Maps.newHashMap();
+	private NestedZipFolders<ICoReTypeName> usages;
 
-	public MicroCommitStats(MicroCommitIo io) {
+	public MicroCommitStats(MicroCommitIo io, NestedZipFolders<ICoReTypeName> usages) {
 		this.io = io;
+		this.usages = usages;
 	}
 
 	public void run() {
@@ -71,6 +75,7 @@ public class MicroCommitStats {
 		System.out.printf("numTypes: %d\n", usedTypes.size());
 		System.out.printf("numLocations: %d\n", usedLocations.size());
 		System.out.printf("numCommits: %d\n", numCommits);
+		System.out.printf("numCommitsWithNoUsages: %d\n", numCommitsWithNoUsages);
 
 		printCounting("diffStats", diffCounts);
 		printCounting("noiseStats", noiseCounts);
@@ -96,6 +101,11 @@ public class MicroCommitStats {
 
 		ICoReTypeName type = mc.getType();
 		ICoReMethodName context = mc.getMethodContext();
+
+		if (!usages.hasZips(type)) {
+			numCommitsWithNoUsages++;
+			return;
+		}
 
 		Map<ICoReMethodName, List<MicroCommit>> ctxs = allCommits.get(type);
 		if (ctxs == null) {
@@ -137,17 +147,11 @@ public class MicroCommitStats {
 			System.out.println();
 			System.out.printf("#### commits of '%s' ####\n", t);
 
-			boolean isFirst = true;
 			for (ICoReMethodName m : ctxs.keySet()) {
 				List<MicroCommit> mcs = ctxs.get(m);
 
-				if (isFirst) {
-					Tuple<ICoReTypeName, ICoReMethodName> loc = Tuple.newTuple(t, m);
-					if (!usedLocations.add(loc)) {
-						System.out.println();
-					}
-					isFirst = false;
-				}
+				Tuple<ICoReTypeName, ICoReMethodName> loc = Tuple.newTuple(t, m);
+				usedLocations.add(loc);
 
 				System.out.println();
 				System.out.printf("in: %s\n", m);

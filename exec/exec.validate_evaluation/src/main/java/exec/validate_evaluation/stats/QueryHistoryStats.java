@@ -19,14 +19,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
+import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;
@@ -36,17 +38,27 @@ import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 public class QueryHistoryStats {
 
 	private QueryHistoryIo io;
-	private Map<ICoReTypeName, Multimap<ICoReMethodName, Usage>> sortedHists;
+	private Set<ICoReTypeName> usedTypes;
+	private int numUsagesForTypes = 0;
 
-	public QueryHistoryStats(QueryHistoryIo io) {
+	private Map<ICoReTypeName, Map<ICoReMethodName, List<Usage>>> uhByUser;
+	private NestedZipFolders<ICoReTypeName> usages;
+
+	public QueryHistoryStats(QueryHistoryIo io, NestedZipFolders<ICoReTypeName> usages) {
 		this.io = io;
+		this.usages = usages;
 	}
 
 	public void run() {
 
-		BoxplotData uhLen = new BoxplotData();
+		int numHistoriesWithoutReferenceData = 0;
+		BoxplotData usageHistoryLengths = new BoxplotData();
+
+		usedTypes = Sets.newHashSet();
 
 		for (String zip : io.findQueryHistoryZips()) {
+
+			uhByUser = Maps.newHashMap();
 
 			System.out.println();
 			System.out.printf("#####\n");
@@ -57,11 +69,20 @@ public class QueryHistoryStats {
 			Collection<List<Usage>> hists = io.readQueryHistories(zip);
 			System.out.printf("%d histories:\n", hists.size());
 
-			sortedHists = Maps.newHashMap();
-
 			for (List<Usage> hist : hists) {
-				uhLen.add((double) hist.size());
-				sort(hist);
+
+				ICoReTypeName type = findFirstRealUsage(hist).getType();
+				if (usages.hasZips(type)) {
+					if (!usedTypes.contains(type)) {
+						usedTypes.add(type);
+						List<Usage> us = usages.readAllZips(type, Usage.class);
+						numUsagesForTypes += us.size();
+					}
+					usageHistoryLengths.add((double) hist.size());
+					sort(hist);
+				} else {
+					numHistoriesWithoutReferenceData++;
+				}
 			}
 
 			print();
@@ -71,10 +92,13 @@ public class QueryHistoryStats {
 		System.out.println();
 
 		System.out.printf("--- overall stats ---\n");
-		System.out.printf("uhLen stats: %s\n", uhLen.getBoxplot());
+		System.out.printf("numUsedTypes: %d\n", usedTypes.size());
+		System.out.printf("numUsagesForTypes: %d\n", numUsagesForTypes);
+		System.out.printf("numUHWithoutData: %d\n", numHistoriesWithoutReferenceData);
+		System.out.printf("uhLen stats: %s\n", usageHistoryLengths.getBoxplot());
 		System.out.println("percentiles for len(uh):");
 		for (int percentile = 80; percentile < 101; percentile += 1) {
-			double len = uhLen.getPercentil(percentile);
+			double len = usageHistoryLengths.getPercentil(percentile);
 			System.out.printf("\t%d covered with a uh len of %.1f\n", percentile, len);
 		}
 		System.out.println();
@@ -88,15 +112,16 @@ public class QueryHistoryStats {
 
 	private void print() {
 
-		for (ICoReTypeName t : sortedHists.keySet()) {
+		for (ICoReTypeName t : uhByUser.keySet()) {
 			System.out.println();
 			System.out.printf("#### usages of '%s' ####\n", t);
-			Multimap<ICoReMethodName, Usage> hists = sortedHists.get(t);
+			Map<ICoReMethodName, List<Usage>> hists = uhByUser.get(t);
 			for (ICoReMethodName m : hists.keySet()) {
 				System.out.println();
 				System.out.printf("in: %s\n", m);
 
-				Collection<Usage> hist = hists.get(m);
+				List<Usage> hist = hists.get(m);
+
 				numLocations++;
 				avgHistLength.add((double) hist.size());
 
@@ -115,32 +140,42 @@ public class QueryHistoryStats {
 
 	private int collisions = 0;
 
-	private void sort(List<Usage> hist) {
+	private void sort(List<Usage> usageHistory) {
 
-		Usage first = findFirstRealUsage(hist);
+		Usage first = findFirstRealUsage(usageHistory);
 		ICoReTypeName type = first.getType();
 		ICoReMethodName context = first.getMethodContext();
 
-		Multimap<ICoReMethodName, Usage> hists = sortedHists.get(type);
-		if (hists == null) {
-			hists = LinkedHashMultimap.create();
-			sortedHists.put(type, hists);
+		List<Usage> uhByTypeAndContext = get(type, context);
+
+		for (Usage u : usageHistory) {
+			if (!(u instanceof NoUsage)) {
+				Asserts.assertTrue(type.equals(u.getType()));
+				Asserts.assertTrue(context.equals(u.getMethodContext()));
+			}
+			uhByTypeAndContext.add(u);
+		}
+	}
+
+	private List<Usage> get(ICoReTypeName type, ICoReMethodName context) {
+		Map<ICoReMethodName, List<Usage>> uhByType = uhByUser.get(type);
+		if (uhByType == null) {
+			uhByType = Maps.newLinkedHashMap();
+			uhByUser.put(type, uhByType);
 		}
 
-		if (hists.containsKey(context)) {
+		List<Usage> uhByTypeAndContext = uhByType.get(context);
+		if (uhByTypeAndContext == null) {
+			uhByTypeAndContext = Lists.newLinkedList();
+			uhByType.put(context, uhByTypeAndContext);
+		} else {
 			collisions++;
 			System.out.flush();
 			System.err.printf("collision for context '%s'\n", context);
 			System.err.flush();
 		}
 
-		for (Usage u : hist) {
-			if (!(u instanceof NoUsage)) {
-				Asserts.assertTrue(type.equals(u.getType()));
-				Asserts.assertTrue(context.equals(u.getMethodContext()));
-			}
-			hists.put(context, u);
-		}
+		return uhByTypeAndContext;
 	}
 
 	private Usage findFirstRealUsage(List<Usage> hist) {

@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.recommenders.evaluation.data.Boxplot;
+import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.names.ICoReTypeName;
 import exec.csharp.queries.QueryMode;
 
@@ -168,5 +169,13 @@ public class CategorizedEvaluationLogger<Category> {
 
 	public static <T> CategorizedEvaluationLogger<T> create() {
 		return new CategorizedEvaluationLogger<T>();
+	}
+
+	public void doneByMode(Map<QueryMode, BoxplotData> resByMode) {
+		System.out.println("averaged over all commits:");
+		for (QueryMode mode : resByMode.keySet()) {
+			Boxplot bp = resByMode.get(mode).getBoxplot();
+			System.out.printf("%s:\t%.1f\t%s\n", mode, bp.getMean(), bp);
+		}
 	}
 }
