@@ -21,6 +21,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -52,21 +55,25 @@ public class PointsToUsageExtractor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PointsToUsageExtractor.class);
 
 	private final DescentStrategy descentStrategy;
-	private CallsitePruning callsitePruningBehavior = CallsitePruning.EMPTY_RECV_CALLSITES;
+	private CallsitePruning callsitePruningBehavior;
+	private MethodContextReplacement methodContextRewritingStrategy;
 
 	private UsageStatisticsCollector collector;
 
 	public PointsToUsageExtractor() {
-		this(new SimpleDescentStrategy(), new NopUsageStatisticsCollector());
+		this.descentStrategy = new SimpleDescentStrategy();
+		this.callsitePruningBehavior = CallsitePruning.EMPTY_RECV_CALLSITES;
+		this.methodContextRewritingStrategy = MethodContextReplacement.FIRST_OR_SUPER_OR_ELEMENT;
+		this.collector = new NopUsageStatisticsCollector();
 	}
 
-	public PointsToUsageExtractor(UsageStatisticsCollector collector) {
-		this(new SimpleDescentStrategy(), collector);
-	}
-
-	public PointsToUsageExtractor(DescentStrategy descentStrategy, UsageStatisticsCollector collector) {
+	@Inject
+	public PointsToUsageExtractor(DescentStrategy descentStrategy, CallsitePruning callsitePruningBehavior,
+			MethodContextReplacement methodContextRewritingStrategy) {
 		this.descentStrategy = descentStrategy;
-		this.collector = collector;
+		this.callsitePruningBehavior = callsitePruningBehavior;
+		this.methodContextRewritingStrategy = methodContextRewritingStrategy;
+		this.collector = new NopUsageStatisticsCollector();
 	}
 
 	public CallsitePruning getCallsitePruningBehavior() {
@@ -75,6 +82,14 @@ public class PointsToUsageExtractor {
 
 	public void setCallsitePruningBehavior(CallsitePruning callsitePruningBehavior) {
 		this.callsitePruningBehavior = callsitePruningBehavior;
+	}
+
+	public MethodContextReplacement getMethodContextRewritingStrategy() {
+		return methodContextRewritingStrategy;
+	}
+
+	public void setMethodContextRewritingStrategy(MethodContextReplacement methodContextRewritingStrategy) {
+		this.methodContextRewritingStrategy = methodContextRewritingStrategy;
 	}
 
 	public void setStatisticsCollector(UsageStatisticsCollector collector) {
@@ -278,9 +293,14 @@ public class PointsToUsageExtractor {
 				ICoReMethodName newMethodContext = currentContext;
 				if (firstMethod != null) {
 					newMethodContext = firstMethod;
+				} else if (methodContextRewritingStrategy == MethodContextReplacement.FIRST_OR_UNKNOWN) {
+					return CoReNameConverter.convert(MethodName.UNKNOWN_NAME);
 				} else if (superMethod != null) {
 					newMethodContext = superMethod;
+				} else if (methodContextRewritingStrategy == MethodContextReplacement.FIRST_OR_SUPER_OR_UNKNOWN) {
+					return CoReNameConverter.convert(MethodName.UNKNOWN_NAME);
 				} else {
+					// FIRST_OR_SUPER_OR_ELEMENT
 					return currentContext;
 				}
 
