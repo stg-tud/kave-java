@@ -1,13 +1,13 @@
 package exec.demographics;
 
-import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 
 public interface IDemographicsIO {
 	Set<String> findUsers();
-	Position getPosition(String user);
+	Positions getPosition(String user);
 	int getNumQueries(String user);
-	List<CompletionEvent> readEvents(String user);
+
+	Set<ICompletionEvent> readEvents(String user);
 }

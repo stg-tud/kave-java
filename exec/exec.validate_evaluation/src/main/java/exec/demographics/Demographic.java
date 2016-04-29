@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Demographic {
 	public String user;
-	public Position position;
+	public Positions position;
 	public LocalDate firstEventDate;
 	public LocalDate lastEventDate;
 	public int numberOfCompletionEvents;

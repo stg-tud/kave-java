@@ -1,17 +1,21 @@
 package exec.demographics;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 
 public class DemographicsCollectorTest {
 
@@ -39,23 +43,23 @@ public class DemographicsCollectorTest {
 	public void collectsPosition() {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
-		when(demographicsIO.getPosition("user")).thenReturn(Position.Industry);
+		when(demographicsIO.getPosition("user")).thenReturn(Positions.SoftwareEngineer);
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
-		assertThat(getSingleDemographic(demographics).position, is(Position.Industry));
+		assertThat(getSingleDemographic(demographics).position, is(Positions.SoftwareEngineer));
 	}
 
 	@Test
 	public void collectsFirstEventDate() {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
-		CompletionEvent firstEvent = completionEventOn(1987, 6, 20);
-		when(demographicsIO.readEvents("user")).thenReturn(Arrays.asList(firstEvent));
+		ICompletionEvent firstEvent = completionEventOn(1987, 6, 20);
+		when(demographicsIO.readEvents("user")).thenReturn(Sets.newLinkedHashSet(Arrays.asList(firstEvent)));
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
-		assertThat(getSingleDemographic(demographics).firstEventDate, is(firstEvent.TriggeredAt.toLocalDate()));
+		assertThat(getSingleDemographic(demographics).firstEventDate, is(firstEvent.getTriggeredAt().toLocalDate()));
 	}
 
 	@Test
@@ -63,7 +67,7 @@ public class DemographicsCollectorTest {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
 		CompletionEvent lastEvent = completionEventOn(2016, 4, 28);
-		when(demographicsIO.readEvents("user")).thenReturn(Arrays.asList(someCompletionEvent(), lastEvent));
+		when(demographicsIO.readEvents("user")).thenReturn(events(someCompletionEvent(1), lastEvent));
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
@@ -74,8 +78,8 @@ public class DemographicsCollectorTest {
 	public void collectsNumberOfCompletionEvents() {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
-		when(demographicsIO.readEvents("user")).thenReturn(Arrays.asList(someCompletionEvent(), someCompletionEvent(),
-				someCompletionEvent(), someCompletionEvent()));
+		when(demographicsIO.readEvents("user")).thenReturn(
+				events(someCompletionEvent(1), someCompletionEvent(2), someCompletionEvent(3), someCompletionEvent(4)));
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
@@ -107,44 +111,47 @@ public class DemographicsCollectorTest {
 			assertThat(demographic.totalNumberOfGenQueries, is(70));
 		}
 	}
-	
+
 	@Test
 	public void collectsNumberOfDays() {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
-		when(demographicsIO.readEvents("user")).thenReturn(Arrays.asList(
-				completionEventOn(2014, 1, 1),
-				completionEventOn(2014, 1, 1),
-				completionEventOn(2014, 1, 2)));
+		when(demographicsIO.readEvents("user")).thenReturn(
+				events(completionEventOn(2014, 1, 1), completionEventOn(2014, 1, 1), completionEventOn(2014, 1, 2)));
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
 		assertThat(getSingleDemographic(demographics).numberOfParticipationDays, is(2));
 	}
-	
+
+	private Set<ICompletionEvent> events(ICompletionEvent... eventArr) {
+		LinkedHashSet<ICompletionEvent> events = Sets.newLinkedHashSet();
+		for (ICompletionEvent e : eventArr) {
+			events.add(e);
+		}
+		return events;
+	}
+
 	@Test
 	public void collectsNumberOfMonths() {
 		IDemographicsIO demographicsIO = mock(IDemographicsIO.class);
 		when(demographicsIO.findUsers()).thenReturn(Sets.newHashSet("user"));
-		when(demographicsIO.readEvents("user")).thenReturn(Arrays.asList(
-				completionEventOn(2014, 1, 1),
-				completionEventOn(2014, 1, 19),
-				completionEventOn(2014, 2, 1),
-				completionEventOn(2014, 5, 30)));
+		when(demographicsIO.readEvents("user")).thenReturn(events(completionEventOn(2014, 1, 1),
+				completionEventOn(2014, 1, 19), completionEventOn(2014, 2, 1), completionEventOn(2014, 5, 30)));
 
 		Demographics demographics = collectDemographics(demographicsIO);
 
 		assertThat(getSingleDemographic(demographics).numberOfParticipationMonths, is(3));
 	}
 
-	private CompletionEvent someCompletionEvent() {
+	private CompletionEvent someCompletionEvent(int num) {
 		CompletionEvent event = new CompletionEvent();
-		event.TriggeredAt = LocalDateTime.now();
+		event.TriggeredAt = LocalDateTime.MIN.plusSeconds(num);
 		return event;
 	}
 
 	private CompletionEvent completionEventOn(int year, int month, int day) {
-		CompletionEvent lastEvent = someCompletionEvent();
+		CompletionEvent lastEvent = someCompletionEvent(1);
 		lastEvent.TriggeredAt = LocalDateTime.of(year, month, day, 11, 17);
 		return lastEvent;
 	}

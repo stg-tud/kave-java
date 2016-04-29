@@ -2,10 +2,12 @@ package exec.demographics;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.function.Function;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 
 public class DemographicsCollector {
 
@@ -19,7 +21,11 @@ public class DemographicsCollector {
 		Demographics demographics = new Demographics();
 		int totalNumberOfGenQueries = 0;
 
-		for (String user : demographicsIO.findUsers()) {
+		Set<String> users = demographicsIO.findUsers();
+		System.out.printf("found %d users...\n", users.size());
+		int num = 1;
+		for (String user : users) {
+			System.out.printf("%s\t%d: %s\n", new Date(), num++, user);
 			Demographic demographic = collect(user);
 			demographics.add(demographic);
 			totalNumberOfGenQueries += demographic.numberOfGenQueries;
@@ -37,7 +43,7 @@ public class DemographicsCollector {
 		demographic.user = user;
 		demographic.position = demographicsIO.getPosition(user);
 		demographic.numberOfGenQueries = demographicsIO.getNumQueries(user);
-		List<CompletionEvent> events = demographicsIO.readEvents(user);
+		Set<ICompletionEvent> events = demographicsIO.readEvents(user);
 		demographic.numberOfCompletionEvents = events.size();
 		demographic.numberOfParticipationDays = countUnique(events, this::getDate);
 		demographic.numberOfParticipationMonths = countUnique(events, this::getMonth);
@@ -48,23 +54,28 @@ public class DemographicsCollector {
 		return demographic;
 	}
 
-	private CompletionEvent getLast(List<CompletionEvent> events) {
-		return events.get(events.size() - 1);
+	private ICompletionEvent getLast(Set<ICompletionEvent> events) {
+		ICompletionEvent ce = null;
+		Iterator<ICompletionEvent> it = events.iterator();
+		while (it.hasNext()) {
+			ce = it.next();
+		}
+		return ce;
 	}
 
-	private CompletionEvent getFirst(List<CompletionEvent> events) {
-		return events.get(0);
+	private ICompletionEvent getFirst(Set<ICompletionEvent> events) {
+		return events.iterator().next();
 	}
-	
-	private <T> int countUnique(Collection<CompletionEvent> events, Function<CompletionEvent, T> unit) {
+
+	private <T> int countUnique(Collection<ICompletionEvent> events, Function<ICompletionEvent, T> unit) {
 		return (int) events.stream().map(unit).distinct().count();
 	}
 
-	private LocalDate getMonth(CompletionEvent event) {
+	private LocalDate getMonth(ICompletionEvent event) {
 		return getDate(event).withDayOfMonth(1);
 	}
 
-	private LocalDate getDate(CompletionEvent event) {
-		return event.TriggeredAt.toLocalDate();
+	private LocalDate getDate(ICompletionEvent event) {
+		return event.getTriggeredAt().toLocalDate();
 	}
 }
