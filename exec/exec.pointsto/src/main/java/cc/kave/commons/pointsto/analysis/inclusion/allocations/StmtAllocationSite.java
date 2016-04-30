@@ -26,17 +26,18 @@ import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 public class StmtAllocationSite implements AllocationSite {
 
 	private final IStatement stmt;
+	private final ITypeName type;
 
 	public StmtAllocationSite(IStatement stmt) {
+		this(stmt, inferType(stmt));
+	}
+
+	public StmtAllocationSite(IStatement stmt, ITypeName type) {
 		this.stmt = stmt;
+		this.type = type;
 	}
 
-	public IStatement getStmt() {
-		return stmt;
-	}
-
-	@Override
-	public ITypeName getType() {
+	private static ITypeName inferType(IStatement stmt) {
 		if (stmt instanceof IAssignment) {
 			IAssignableExpression expr = ((IAssignment) stmt).getExpression();
 			if (expr instanceof IInvocationExpression) {
@@ -50,6 +51,11 @@ public class StmtAllocationSite implements AllocationSite {
 			return ((IVariableDeclaration) stmt).getType();
 		}
 		return TypeName.UNKNOWN_NAME;
+	}
+
+	@Override
+	public ITypeName getType() {
+		return type;
 	}
 
 	@Override
@@ -71,12 +77,19 @@ public class StmtAllocationSite implements AllocationSite {
 		StmtAllocationSite other = (StmtAllocationSite) obj;
 		if (stmt != other.stmt)
 			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else {
+			if (!type.equals(other.type))
+				return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(StmtAllocationSite.class).add("stmt", stmt).toString();
+		return MoreObjects.toStringHelper(StmtAllocationSite.class).add("stmt", stmt).add("type", type).toString();
 	}
 
 }

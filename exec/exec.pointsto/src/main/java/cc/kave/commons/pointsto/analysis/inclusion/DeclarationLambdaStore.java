@@ -27,6 +27,9 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.OutParameterAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
@@ -90,6 +93,8 @@ public final class DeclarationLambdaStore {
 		List<IParameterName> formalParameters = method.getParameters();
 		List<SetVariable> variables = new ArrayList<>(formalParameters.size() + 2);
 
+		boolean isMethodWithoutDefinition = declMapper.get(method) == null;
+
 		if (!method.isExtensionMethod()) {
 			if (method.isStatic()) {
 				variables.add(ConstructedTerm.BOTTOM);
@@ -101,14 +106,22 @@ public final class DeclarationLambdaStore {
 
 		for (IParameterName parameter : formalParameters) {
 			DistinctReference parameterDistRef = new DistinctMethodParameterReference(parameter, method);
-			variables.add(variableResolver.apply(parameterDistRef));
+			SetVariable parameterVar = variableResolver.apply(parameterDistRef);
+			variables.add(parameterVar);
+
+			if (parameter.isOutput() && (isMethodWithoutDefinition || parameter.getValueType().isStructType())) {
+				// methods without a definition require an object for their out-parameters; struct out-parameters are
+				// allocated even for methods which have a definition as they already have a location on method entry
+				// (although they remain uninitialized)
+				allocateOutParameter(method, parameter, parameterVar);
+			}
 		}
 
 		ITypeName returnType = method.getReturnType();
 		if (!returnType.isVoidType()) {
 			SetVariable returnVar = variableFactory.createReferenceVariable();
 			// methods without a definition require an object to return
-			if (declMapper.get(method) == null) {
+			if (isMethodWithoutDefinition) {
 				allocateReturnObject(method, returnVar, returnType);
 			}
 			variables.add(returnVar);
@@ -133,22 +146,37 @@ public final class DeclarationLambdaStore {
 	}
 
 	private void allocateReturnObject(IMemberName member, SetVariable returnVar, ITypeName type) {
-		RefTerm returnObject = new RefTerm(new UndefinedMemberAllocationSite(member, type),
-				variableFactory.createObjectVariable());
+		AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, type);
+		RefTerm returnObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 		constraintResolver.addConstraint(returnObject, returnVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 
 		if (type.isArrayType()) {
-			// provide one initialized array entry
-			ITypeName baseType = type.getArrayBaseType();
-			RefTerm arrayEntry = new RefTerm(new UndefinedMemberAllocationSite(member, baseType),
-					variableFactory.createObjectVariable());
-			SetVariable temp = variableFactory.createProjectionVariable();
-			Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
-
-			// array ⊆ proj
-			constraintResolver.addConstraint(returnVar, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
-			// src ⊆ temp
-			constraintResolver.addConstraint(arrayEntry, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+			allocateArrayEntry(allocationSite, returnVar);
 		}
 	}
+
+	private void allocateOutParameter(IMemberName member, IParameterName parameter, SetVariable parameterVar) {
+		AllocationSite allocationSite = new OutParameterAllocationSite(member, parameter);
+		RefTerm paramObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
+		constraintResolver.addConstraint(paramObject, parameterVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+
+		ITypeName type = parameter.getValueType();
+		if (type.isArrayType()) {
+			allocateArrayEntry(allocationSite, parameterVar);
+		}
+	}
+
+	private void allocateArrayEntry(AllocationSite arrayAllocationSite, SetVariable returnVar) {
+		// provide one initialized array entry
+		RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(arrayAllocationSite),
+				variableFactory.createObjectVariable());
+		SetVariable temp = variableFactory.createProjectionVariable();
+		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
+
+		// array ⊆ proj
+		constraintResolver.addConstraint(returnVar, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+		// src ⊆ temp
+		constraintResolver.addConstraint(arrayEntry, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+	}
+
 }

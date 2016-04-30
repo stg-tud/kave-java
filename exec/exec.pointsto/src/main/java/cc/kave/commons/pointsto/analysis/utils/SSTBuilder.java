@@ -70,7 +70,8 @@ public class SSTBuilder {
 	}
 
 	public static IFieldReference fieldReference(IFieldName field) {
-		IVariableReference thisReference = variableReference(LanguageOptions.getInstance().getThisName());
+		IVariableReference thisReference = field.isStatic() ? new VariableReference()
+				: variableReference(LanguageOptions.getInstance().getThisName());
 		return fieldReference(thisReference, field);
 	}
 
@@ -82,7 +83,8 @@ public class SSTBuilder {
 	}
 
 	public static IPropertyReference propertyReference(IPropertyName property) {
-		IVariableReference thisReference = variableReference(LanguageOptions.getInstance().getThisName());
+		IVariableReference thisReference = property.isStatic() ? new VariableReference()
+				: variableReference(LanguageOptions.getInstance().getThisName());
 		return propertyReference(thisReference, property);
 	}
 

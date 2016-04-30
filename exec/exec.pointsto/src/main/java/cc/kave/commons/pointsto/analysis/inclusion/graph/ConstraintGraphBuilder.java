@@ -51,6 +51,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.SetExpression;
 import cc.kave.commons.pointsto.analysis.inclusion.SetVariable;
 import cc.kave.commons.pointsto.analysis.inclusion.SetVariableFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UniqueAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
@@ -196,7 +197,7 @@ public class ConstraintGraphBuilder {
 	private void initializeStaticMembers() {
 		for (Map.Entry<IMemberName, SetVariable> memberEntry : staticMembers.entrySet()) {
 			if (declMapper.get(memberEntry.getKey()) != null) {
-				// only initialize members that are without a definition
+				// only initialize members that do not have a definition
 				continue;
 			}
 
@@ -207,6 +208,13 @@ public class ConstraintGraphBuilder {
 				RefTerm obj = new RefTerm(allocationSite, getVariable(allocationSite));
 				memberNode.addPredecessor(
 						new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+
+				if (allocationSite.getType().isArrayType()) {
+					// provide one entry for arrays
+					RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
+							variableFactory.createObjectVariable());
+					writeArrayRaw(obj, arrayEntry);
+				}
 			}
 		}
 	}
@@ -218,6 +226,13 @@ public class ConstraintGraphBuilder {
 				AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, member.getValueType());
 				RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 				writeMemberRaw(recv, obj, member);
+
+				if (allocationSite.getType().isArrayType()) {
+					// provide one entry for arrays
+					RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
+							variableFactory.createObjectVariable());
+					writeArrayRaw(obj, arrayEntry);
+				}
 			}
 		}
 	}
@@ -373,6 +388,17 @@ public class ConstraintGraphBuilder {
 		ConstraintNode tempNode = getNode(temp);
 		tempNode.addPredecessor(
 				new ConstraintEdge(getNode(srcSetVar), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+	}
+
+	private void writeArrayRaw(SetExpression arrayExpr, SetExpression srcExpr) {
+		SetVariable temp = variableFactory.createProjectionVariable();
+		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
+
+		// array ⊆ proj
+		constraintResolver.addConstraint(arrayExpr, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+
+		// src ⊆ temp
+		constraintResolver.addConstraint(srcExpr, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 	}
 
 	public void invoke(SetVariable dest, IVariableReference recv, List<SetVariable> normalizedActualParameters,

@@ -12,28 +12,31 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
+import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.recommenders.assertions.Asserts;
 
-public class ArrayEntryAllocationSite implements AllocationSite {
+public class OutParameterAllocationSite implements AllocationSite {
 
-	private final AllocationSite arrayAllocationSite;
+	private final IMemberName member;
+	private final IParameterName parameter;
 
-	public ArrayEntryAllocationSite(AllocationSite arrayAllocationSite) {
-		Asserts.assertTrue(arrayAllocationSite.getType().isArrayType());
-		this.arrayAllocationSite = arrayAllocationSite;
+	public OutParameterAllocationSite(IMemberName member, IParameterName parameter) {
+		this.member = member;
+		this.parameter = parameter;
 	}
 
 	@Override
 	public ITypeName getType() {
-		return arrayAllocationSite.getType().getArrayBaseType();
+		return parameter.getValueType();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((arrayAllocationSite == null) ? 0 : arrayAllocationSite.hashCode());
+		result = prime * result + ((member == null) ? 0 : member.hashCode());
+		result = prime * result + ((parameter == null) ? 0 : parameter.hashCode());
 		return result;
 	}
 
@@ -45,11 +48,16 @@ public class ArrayEntryAllocationSite implements AllocationSite {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ArrayEntryAllocationSite other = (ArrayEntryAllocationSite) obj;
-		if (arrayAllocationSite == null) {
-			if (other.arrayAllocationSite != null)
+		OutParameterAllocationSite other = (OutParameterAllocationSite) obj;
+		if (member == null) {
+			if (other.member != null)
 				return false;
-		} else if (!arrayAllocationSite.equals(other.arrayAllocationSite))
+		} else if (!member.equals(other.member))
+			return false;
+		if (parameter == null) {
+			if (other.parameter != null)
+				return false;
+		} else if (!parameter.equals(other.parameter))
 			return false;
 		return true;
 	}

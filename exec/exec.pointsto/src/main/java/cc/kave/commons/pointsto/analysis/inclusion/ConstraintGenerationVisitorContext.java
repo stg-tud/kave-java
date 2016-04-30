@@ -37,6 +37,7 @@ import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
@@ -183,8 +184,16 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 
 			if (memberRef != null) {
 				SetVariable temp = builder.createTemporaryVariable();
-				builder.allocate(temp, new UndefinedMemberAllocationSite(member, member.getValueType()));
+				AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, member.getValueType());
+				builder.allocate(temp, allocationSite);
 				builder.writeMember(memberRef, temp, member);
+
+				if (allocationSite.getType().isArrayType()) {
+					// provide one array entry
+					SetVariable arrayEntry = builder.createTemporaryVariable();
+					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(allocationSite));
+					builder.writeArray(temp, arrayEntry);
+				}
 			}
 		}
 	}
@@ -293,7 +302,17 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 				// constructor invocation needs an allocated destination
 				tempDest = builder.createTemporaryVariable();
 			}
-			builder.allocate(tempDest, new StmtAllocationSite(lastAssignment));
+			AllocationSite allocationSite = new StmtAllocationSite(lastAssignment);
+			builder.allocate(tempDest, allocationSite);
+			if (allocationSite.getType().isArrayType()) {
+				ITypeName baseType = allocationSite.getType().getArrayBaseType();
+				if (baseType.isStructType()) {
+					// elements in a struct array are allocated at allocation time of the array
+					SetVariable arrayEntry = builder.createTemporaryVariable();
+					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(allocationSite));
+					builder.writeArray(tempDest, arrayEntry);
+				}
+			}
 		}
 
 		// sometimes the context analysis screws up and a method is called with less arguments than it has formal

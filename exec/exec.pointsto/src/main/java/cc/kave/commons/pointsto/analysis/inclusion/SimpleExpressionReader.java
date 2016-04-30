@@ -80,7 +80,9 @@ public class SimpleExpressionReader extends FailSafeNodeVisitor<ConstraintGraphB
 
 	@Override
 	public SetVariable visit(IUnknownExpression unknownExpr, ConstraintGraphBuilder context) {
-		return null;
+		SetVariable temp = context.createTemporaryVariable();
+		context.allocate(temp, new ExprAllocationSite(unknownExpr));
+		return temp;
 	}
 
 	@Override

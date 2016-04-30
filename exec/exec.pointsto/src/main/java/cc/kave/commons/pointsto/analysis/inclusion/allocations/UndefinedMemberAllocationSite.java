@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
 
@@ -65,4 +67,9 @@ public class UndefinedMemberAllocationSite implements AllocationSite {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(UndefinedMemberAllocationSite.class).add("member", member).add("type", type)
+				.toString();
+	}
 }
