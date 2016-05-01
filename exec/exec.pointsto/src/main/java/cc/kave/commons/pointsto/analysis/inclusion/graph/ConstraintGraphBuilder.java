@@ -194,6 +194,15 @@ public class ConstraintGraphBuilder {
 		}
 	}
 
+	private void ensureArrayAccessHasVariable(IIndexAccessReference arrayRef) {
+		DistinctReference distRef = referenceResolver.apply(arrayRef);
+		if (!referenceVariables.containsKey(distRef)) {
+			SetVariable temp = createTemporaryVariable();
+			referenceVariables.put(distRef, temp);
+			readArray(temp, arrayRef);
+		}
+	}
+
 	private void initializeStaticMembers() {
 		for (Map.Entry<IMemberName, SetVariable> memberEntry : staticMembers.entrySet()) {
 			if (declMapper.get(memberEntry.getKey()) != null) {
@@ -304,6 +313,8 @@ public class ConstraintGraphBuilder {
 	}
 
 	public void readArray(SetVariable destSetVar, IIndexAccessReference src) {
+		ensureArrayAccessHasVariable(src);
+
 		SetVariable arraySetVar = getVariable(src.getExpression().getReference());
 		SetVariable temp = variableFactory.createProjectionVariable();
 
@@ -371,6 +382,8 @@ public class ConstraintGraphBuilder {
 	}
 
 	public void writeArray(IIndexAccessReference dest, SetVariable srcSetVar) {
+		ensureArrayAccessHasVariable(dest);
+
 		SetVariable arraySetVar = getVariable(dest.getExpression().getReference());
 		writeArray(arraySetVar, srcSetVar);
 	}

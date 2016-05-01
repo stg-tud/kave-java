@@ -67,7 +67,7 @@ class SimpleExpressionVisitor extends FailSafeNodeVisitor<ContextReferencePair, 
 
 	@Override
 	public Void visit(IUnknownExpression unknownExpr, ContextReferencePair context) {
-		LOGGER.error("Ignoring an unknown expression");
+		context.getAnalysisContext().allocate(context.getReference());
 		return null;
 	}
 }

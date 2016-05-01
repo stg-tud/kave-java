@@ -63,8 +63,11 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 
 	@Override
 	public IReference visit(IIndexAccessReference indexAccessRef, Void context) {
-		// map array accesses to the base variable
-		return indexAccessRef.getExpression().getReference().accept(this, context);
+		IReference baseRef = indexAccessRef.getExpression().getReference().accept(this, null);
+		if (baseRef == null) {
+			return null;
+		}
+		return indexAccessRef;
 	}
 
 	@Override

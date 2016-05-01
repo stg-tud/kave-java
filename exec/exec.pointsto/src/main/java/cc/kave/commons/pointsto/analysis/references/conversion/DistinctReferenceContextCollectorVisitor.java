@@ -28,6 +28,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -202,6 +203,12 @@ public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<Dis
 		super.visit(block, context);
 		context.setCurrentStatement(null);
 		return null;
+	}
+
+	@Override
+	public Void visit(IIndexAccessReference indexAccessRef, DistinctReferenceContextCollector context) {
+		context.useReference(indexAccessRef);
+		return super.visit(indexAccessRef, context);
 	}
 
 	@Override

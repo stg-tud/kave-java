@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -89,6 +90,7 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private Map<DistinctReference, ReferenceLocation> referenceLocations = new HashMap<>();
 	private Map<DistinctMemberReference, SetRepresentative> memberLocations = new HashMap<>();
+	private Map<DistinctIndexAccessReference, SetRepresentative> indexAccessLocations = new HashMap<>();
 
 	private IAssignment lastAssignment;
 	private IMemberName currentMember;
@@ -145,7 +147,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			result.put(reference, abstractLocation);
 		}
 
-		for (Map.Entry<DistinctMemberReference, SetRepresentative> entry : memberLocations.entrySet()) {
+		for (Map.Entry<? extends DistinctReference, SetRepresentative> entry : Iterables
+				.concat(memberLocations.entrySet(), indexAccessLocations.entrySet())) {
 			DistinctReference reference = entry.getKey();
 			SetRepresentative ecr = unionFind.find(entry.getValue());
 
@@ -353,6 +356,12 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void registerMemberLocation(DistinctMemberReference memberRef, Location location) {
 		if (!memberLocations.containsKey(memberRef)) {
 			memberLocations.put(memberRef, location.getSetRepresentative());
+		}
+	}
+
+	private void registerIndexAccessLocation(DistinctIndexAccessReference distRef, Location location) {
+		if (!indexAccessLocations.containsKey(distRef)) {
+			indexAccessLocations.put(distRef, location.getSetRepresentative());
 		}
 	}
 
@@ -1069,34 +1078,29 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation srcLocation = getOrCreateLocation(srcRef.getBaseReference());
 		LocationIdentifier destIdentifier = getIdentifierForSimpleRefLoc(srcRef.getType());
 		LocationIdentifier srcIdentifier = identifierFactory.create(srcRef.getReference(), srcRef.getType());
-		readDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
+		Location srcDerefLocation = readDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
+
+		registerIndexAccessLocation(srcRef, srcDerefLocation);
 	}
 
 	public void writeArray(IIndexAccessReference destRef, IReference srcRef) {
 		DistinctIndexAccessReference distDestRef = (DistinctIndexAccessReference) destRef
 				.accept(distinctReferenceCreationVisitor, namesToReferences);
-		ReferenceLocation destLocation = getOrCreateLocation(distDestRef.getBaseReference());
-		writeArray(destRef, destLocation, distDestRef.getType(), srcRef);
+		writeArray(distDestRef, srcRef);
+	}
+
+	void writeArray(DistinctIndexAccessReference destRef, IReference srcRef) {
+		ReferenceLocation srcLocaction = srcRef.accept(srcLocationVisitor, this);
+		writeArray(destRef, srcLocaction);
 	}
 
 	void writeArray(DistinctIndexAccessReference destRef, ReferenceLocation srcLocation) {
 		ReferenceLocation destLocation = getOrCreateLocation(destRef.getBaseReference());
 		LocationIdentifier destIdentifier = identifierFactory.create(destRef.getReference(), destRef.getType());
 		LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(destRef.getType());
-		writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
-	}
+		Location destDerefLocation = writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 
-	void writeArray(IIndexAccessReference destRef, ReferenceLocation destLocation, ITypeName baseType,
-			IReference srcRef) {
-		ReferenceLocation srcLocation = srcRef.accept(srcLocationVisitor, this);
-		writeArray(destRef, destLocation, baseType, srcLocation);
-	}
-
-	void writeArray(IIndexAccessReference destRef, ReferenceLocation destLocation, ITypeName baseType,
-			ReferenceLocation srcLocation) {
-		LocationIdentifier destIdentifier = identifierFactory.create(destRef, baseType);
-		LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(baseType);
-		writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
+		registerIndexAccessLocation(destRef, destDerefLocation);
 	}
 
 	public void registerParameterReference(ReferenceLocation parameterLocation, IVariableReference actualParameter) {

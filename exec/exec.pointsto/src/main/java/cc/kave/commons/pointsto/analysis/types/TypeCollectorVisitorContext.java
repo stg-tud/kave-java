@@ -24,11 +24,13 @@ import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -120,7 +122,8 @@ public class TypeCollectorVisitorContext {
 			LOGGER.error("Cannot declare a missing variable");
 		} else {
 			ITypeName type = varDecl.getType();
-			// SST lack a compound statement to handle scoping brackets -> allow a variable to be declared multiple times
+			// SST lack a compound statement to handle scoping brackets -> allow a variable to be declared multiple
+			// times
 			declare(varDecl.getReference().getIdentifier(), type, true);
 
 			referenceTypes.put(varDecl.getReference(), type);
@@ -175,6 +178,27 @@ public class TypeCollectorVisitorContext {
 			ITypeName type = property.getValueType();
 			referenceTypes.put(reference, type);
 			allTypes.add(type);
+		}
+	}
+
+	public void useIndexAccessReference(IIndexAccessReference reference) {
+		IVariableReference baseRef = reference.getExpression().getReference();
+		if (baseRef.isMissing()) {
+			LOGGER.error("Skipping an index access reference to a missing variable");
+			return;
+		}
+
+		ITypeName type = symbolTable.get(baseRef.getIdentifier());
+		if (type == null) {
+			LOGGER.error("Skipping an index access reference due to an undeclared base variable");
+		} else {
+			ITypeName baseType = TypeName.UNKNOWN_NAME;
+			if (type.isArrayType()) {
+				baseType = type.getArrayBaseType();
+			}
+
+			referenceTypes.put(reference, baseType);
+			allTypes.add(baseType);
 		}
 	}
 

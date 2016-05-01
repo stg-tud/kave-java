@@ -48,6 +48,8 @@ import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingVariableException;
 import cc.kave.commons.pointsto.analysis.exceptions.UndeclaredVariableException;
+import cc.kave.commons.pointsto.analysis.references.DistinctIndexAccessReference;
+import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.unification.locations.FunctionLocation;
 import cc.kave.commons.pointsto.analysis.unification.locations.ReferenceLocation;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
@@ -231,8 +233,9 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 					if (formalParameter.isParameterArray()) {
 						IIndexAccessReference indexAccessRef = SSTBuilder
 								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
-						context.writeArray(indexAccessRef, formalParameterLocation,
-								formalParameter.getValueType().getArrayBaseType(), parameterRef);
+						DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
+								new DistinctMethodParameterReference(formalParameter, method));
+						context.writeArray(distRef, parameterRef);
 					} else {
 
 						parameterRef.accept(parameterVisitor,
@@ -241,10 +244,14 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 				} else if (parameterExpr instanceof IConstantValueExpression) {
 					if (formalParameter.isParameterArray()) {
 						ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
+						context.allocate(tempLoc);
+
 						IIndexAccessReference indexAccessRef = SSTBuilder
 								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
-						context.writeArray(indexAccessRef, formalParameterLocation,
-								formalParameter.getValueType().getArrayBaseType(), tempLoc);
+						DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
+								new DistinctMethodParameterReference(formalParameter, method));
+
+						context.writeArray(distRef, tempLoc);
 					} else {
 						context.allocate(formalParameterLocation);
 					}

@@ -170,7 +170,17 @@ public class QueryKeyTransformer
 	@Override
 	public List<PointsToQuery> visit(DistinctIndexAccessReference indexAccessRef,
 			DistinctReferenceContextCollector context) {
-		return indexAccessRef.getBaseReference().accept(this, context);
+		Collection<IMemberName> members = context.getMembers(indexAccessRef);
+		Asserts.assertLessOrEqual(members.size(), 1);
+		IMemberName member = members.isEmpty() ? null : members.iterator().next();
+
+		Collection<IStatement> statements = context.getStatements(indexAccessRef);
+		List<PointsToQuery> queries = new ArrayList<>(statements.size());
+		for (IStatement stmt : statements) {
+			queries.add(new PointsToQuery(indexAccessRef.getReference(), indexAccessRef.getType(), stmt, member));
+		}
+
+		return queries;
 	}
 
 	@Override

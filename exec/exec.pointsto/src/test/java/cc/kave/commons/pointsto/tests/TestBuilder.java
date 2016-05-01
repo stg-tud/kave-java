@@ -37,6 +37,7 @@ import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -50,6 +51,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
+import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -89,6 +91,10 @@ public abstract class TestBuilder {
 		return TypeName.newTypeName("System.Void, mscorlib");
 	}
 
+	public ITypeName intType() {
+		return TypeName.newTypeName("System.Int32, mscorlib");
+	}
+
 	public IMethodName method(ITypeName declType, String name, ITypeName... parameters) {
 		return method(voidType(), declType, name, parameters);
 	}
@@ -98,6 +104,13 @@ public abstract class TestBuilder {
 				.mapToObj(i -> "[" + parameters[i].getIdentifier() + "] p" + i).collect(Collectors.joining(", "));
 		return MethodName.newMethodName("[" + retType.getIdentifier() + "] [" + declType.getIdentifier() + "]." + name
 				+ "(" + parameterIdentifiers + ")");
+	}
+
+	public IMethodName constructor(ITypeName declType, ITypeName... parameters) {
+		String parameterIdentifiers = IntStream.range(0, parameters.length)
+				.mapToObj(i -> "[" + parameters[i].getIdentifier() + "] p" + i).collect(Collectors.joining(", "));
+		return MethodName.newMethodName(
+				"[" + voidType() + "] [" + declType.getIdentifier() + "]..ctor(" + parameterIdentifiers + ")");
 	}
 
 	public IFieldName field(ITypeName type, ITypeName declType, int id) {
@@ -120,6 +133,13 @@ public abstract class TestBuilder {
 		return assignment;
 	}
 
+	public IAssignment assign(IAssignableReference dest, IAssignableExpression src) {
+		Assignment assignment = new Assignment();
+		assignment.setReference(dest);
+		assignment.setExpression(src);
+		return assignment;
+	}
+
 	public IAssignment assign(String dest, String src) {
 		ReferenceExpression refExpr = new ReferenceExpression();
 		refExpr.setReference(variableReference(src));
@@ -134,6 +154,13 @@ public abstract class TestBuilder {
 		invocation.setReference(variableReference(recv));
 		invocation.setMethodName(method);
 		invocation.setParameters(Collections.emptyList());
+		return invocation;
+	}
+
+	public IInvocationExpression invoke(IMethodName method, ISimpleExpression... arguments) {
+		InvocationExpression invocation = new InvocationExpression();
+		invocation.setMethodName(method);
+		invocation.setParameters(Arrays.asList(arguments));
 		return invocation;
 	}
 

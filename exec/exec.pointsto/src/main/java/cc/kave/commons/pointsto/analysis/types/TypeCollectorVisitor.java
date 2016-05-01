@@ -33,6 +33,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -245,4 +246,10 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 		return null;
 	}
 
+	@Override
+	public Void visit(IIndexAccessReference indexAccessRef, TypeCollectorVisitorContext context) {
+		indexAccessRef.getExpression().getReference().accept(this, context);
+		context.useIndexAccessReference(indexAccessRef);
+		return null;
+	}
 }

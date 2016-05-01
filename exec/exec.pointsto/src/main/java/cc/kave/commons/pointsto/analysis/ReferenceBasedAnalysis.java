@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -36,9 +35,10 @@ public class ReferenceBasedAnalysis extends AbstractPointsToAnalysis {
 	public PointsToContext compute(Context context) {
 		checkContextBinding();
 
-		Multimap<IReference, ITypeName> referenceTypes = HashMultimap.create();
 		ReferenceCollectionVisitor collectionVisitor = new ReferenceCollectionVisitor();
-		collectionVisitor.visit(context.getSST(), referenceTypes);
+		ReferenceCollectionContext collectionContext = new ReferenceCollectionContext();
+		collectionVisitor.visit(context.getSST(), collectionContext);
+		Multimap<IReference, ITypeName> referenceTypes = collectionContext.getReferences();
 
 		LanguageOptions languageOptions = LanguageOptions.getInstance();
 		ITypeHierarchy typeHierarchy = context.getTypeShape().getTypeHierarchy();
