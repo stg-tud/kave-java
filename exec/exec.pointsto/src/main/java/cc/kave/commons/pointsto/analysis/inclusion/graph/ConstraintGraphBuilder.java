@@ -358,7 +358,7 @@ public class ConstraintGraphBuilder {
 		}
 	}
 
-	private void writeMemberRaw(SetVariable recv, SetExpression src, IMemberName member) {
+	public void writeMemberRaw(SetVariable recv, SetExpression src, IMemberName member) {
 		SetVariable temp = variableFactory.createProjectionVariable();
 		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
 

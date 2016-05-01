@@ -14,16 +14,15 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.eventReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.fieldReference;
-import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.parameter;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.propertyReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,6 +54,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ContextAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointAllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ExprAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.StmtAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
@@ -76,7 +76,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 
 	private final LanguageOptions languageOptions = LanguageOptions.getInstance();
 
-	private final IParameterName thisParameter;
+	private final ITypeName thisType;
 
 	private final DistinctReferenceCreationVisitor distinctReferenceCreationVisitor = new DistinctReferenceCreationVisitor();
 	private final SimpleExpressionReader simpleExpressionReader;
@@ -96,8 +96,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 
 	public ConstraintGenerationVisitorContext(Context context, ContextFactory contextFactory) {
 		super(context, ThisReferenceOption.PER_MEMBER);
-		thisParameter = parameter(languageOptions.getThisName(),
-				context.getTypeShape().getTypeHierarchy().getElement());
+		thisType = context.getTypeShape().getTypeHierarchy().getElement();
 		declMapper = new DeclarationMapper(context);
 		builder = new ConstraintGraphBuilder(this::getDistinctReference, declMapper, contextFactory);
 
@@ -109,8 +108,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 	}
 
 	private void initializeContext(Context context) {
-		DistinctKeywordReference thisDistRef = new DistinctKeywordReference(languageOptions.getThisName(),
-				thisParameter.getValueType());
+		DistinctKeywordReference thisDistRef = new DistinctKeywordReference(languageOptions.getThisName(), thisType);
 		namesToReferences.create(languageOptions.getThisName(), thisDistRef);
 		AllocationSite thisAllocationSite = new ContextAllocationSite(context);
 		builder.allocate(thisDistRef.getReference(), thisAllocationSite);
@@ -132,20 +130,10 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		for (IMethodDeclaration entryPointDecl : context.getSST().getEntryPoints()) {
 			IMethodName method = entryPointDecl.getName();
 			List<IParameterName> formalParameters = method.getParameters();
-			List<SetVariable> actualParameters = formalParameters.stream().map(parameter -> {
-				SetVariable parameterVar = builder.createTemporaryVariable();
-				AllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
-				builder.allocate(parameterVar, parameterAllocationSite);
-
-				if (parameter.getValueType().isArrayType()) {
-					// provide an array with content
-					SetVariable tmp = builder.createTemporaryVariable();
-					builder.allocate(tmp, new ArrayEntryAllocationSite(parameterAllocationSite));
-					builder.writeArray(parameterVar, tmp);
-				}
-
-				return parameterVar;
-			}).collect(Collectors.toList());
+			List<SetVariable> actualParameters = new ArrayList<>(formalParameters.size());
+			for (IParameterName parameter : formalParameters) {
+				actualParameters.add(initializeMethodArgument(method, parameter));
+			}
 
 			SetVariable dest = null;
 			if (method.isConstructor()) {
@@ -161,6 +149,35 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		}
 
 		initializeMissingMembers(constructorInitializedMembers);
+	}
+
+	private SetVariable initializeMethodArgument(IMethodName method, IParameterName parameter) {
+		SetVariable parameterVar = builder.createTemporaryVariable();
+		EntryPointAllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
+		builder.allocate(parameterVar, parameterAllocationSite);
+
+		ITypeName type = parameter.getValueType();
+		if (type.isArrayType()) {
+			// provide an array with content
+			SetVariable tmp = builder.createTemporaryVariable();
+			builder.allocate(tmp, new ArrayEntryAllocationSite(parameterAllocationSite));
+			builder.writeArray(parameterVar, tmp);
+		} else if (type.equals(thisType)) {
+			for (IMemberName member : declMapper.getAssignableMembers()) {
+				AllocationSite memberAllocationSite = new EntryPointMemberAllocationSite(parameterAllocationSite,
+						member);
+				SetVariable memberVar = builder.createTemporaryVariable();
+				builder.allocate(memberVar, memberAllocationSite);
+				if (member.getValueType().isArrayType()) {
+					SetVariable arrayEntry = builder.createTemporaryVariable();
+					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(memberAllocationSite));
+					builder.writeArray(memberVar, arrayEntry);
+				}
+				builder.writeMemberRaw(parameterVar, memberVar, member);
+			}
+		}
+
+		return parameterVar;
 	}
 
 	private void initializeMissingMembers(Set<IMemberName> constructorInitializedMembers) {
