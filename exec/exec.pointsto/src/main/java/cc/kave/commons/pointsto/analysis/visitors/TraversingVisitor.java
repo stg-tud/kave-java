@@ -14,6 +14,9 @@ package cc.kave.commons.pointsto.analysis.visitors;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -72,6 +75,8 @@ import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
 public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TContext, TReturn> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TraversingVisitor.class);
 
 	protected void visitStatements(List<IStatement> statements, TContext context) {
 		for (IStatement stmt : statements) {
@@ -296,11 +301,21 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 
 		IMethodName method = entity.getMethodName();
 
-		// static methods and constructors do not have a sensible reference
-		if (!method.isStatic() && !method.isConstructor()) {
-			return entity.getReference().accept(this, context);
-		} else {
-			return null;
+		// protect against isConstructor/getSignature bug in MethodName
+		try {
+			// static methods and constructors do not have a sensible reference
+			if (!method.isStatic() && !method.isConstructor()) {
+				return entity.getReference().accept(this, context);
+			} else {
+				return null;
+			}
+		} catch (RuntimeException ex) {
+			if (ex.getMessage().startsWith("Invalid Signature Syntax")) {
+				LOGGER.error("Skipping receiver reference due to MethodName.getSignature bug");
+				return null;
+			} else {
+				throw ex;
+			}
 		}
 	}
 

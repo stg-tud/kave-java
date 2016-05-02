@@ -120,7 +120,17 @@ public class ConstraintGenerationVisitor extends ScopingVisitor<ConstraintGenera
 			return null;
 		}
 
-		context.invoke(entity);
+		// protect against isConstructor/getSignature bug in MethodName
+		try {
+			context.invoke(entity);
+		} catch (RuntimeException ex) {
+			if (ex.getMessage().startsWith("Invalid Signature Syntax")) {
+				LOGGER.error("Ignoring invocation expression due to MethodName.getSignature bug");
+				return null;
+			} else {
+				throw ex;
+			}
+		}
 
 		return null;
 	}

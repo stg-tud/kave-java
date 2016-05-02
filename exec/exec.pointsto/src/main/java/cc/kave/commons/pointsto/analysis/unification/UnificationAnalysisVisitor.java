@@ -172,104 +172,116 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 	@Override
 	public Void visit(IInvocationExpression entity, UnificationAnalysisVisitorContext context) {
-		IMethodName method = entity.getMethodName();
+		// protect against isConstructor/getSignature bug in MethodName
+		try {
+			IMethodName method = entity.getMethodName();
 
-		IAssignableReference destRef = context.getDestinationForExpr(entity);
+			IAssignableReference destRef = context.getDestinationForExpr(entity);
 
-		// TODO replace with isUnknown once fixed
-		if (method.equals(MethodName.UNKNOWN_NAME)) {
-			// assume that unknown methods return a newly allocated object
-			if (destRef != null) {
+			// TODO replace with isUnknown once fixed
+			if (method.equals(MethodName.UNKNOWN_NAME)) {
+				// assume that unknown methods return a newly allocated object
+				if (destRef != null) {
+					context.allocate(destRef);
+				}
+				return super.visit(entity, context);
+			}
+
+			List<ReferenceLocation> parameterLocations;
+			ReferenceLocation returnLocation;
+
+			if (method.isConstructor() && destRef != null) {
 				context.allocate(destRef);
 			}
-			return super.visit(entity, context);
-		}
 
-		List<ReferenceLocation> parameterLocations;
-		ReferenceLocation returnLocation;
-
-		if (method.isConstructor() && destRef != null) {
-			context.allocate(destRef);
-		}
-
-		if (languageOptions.isDelegateInvocation(method)) {
-			// TODO detect a bug where a delegate stored in a property of the class is invoked by using 'this' as the
-			// receiver
-			if (entity.getReference().getIdentifier().equals(languageOptions.getThisName())) {
-				LOGGER.error("Skipping malformed delegate invocation");
-				return null;
+			if (languageOptions.isDelegateInvocation(method)) {
+				// TODO detect a bug where a delegate stored in a property of the class is invoked by using 'this' as
+				// the
+				// receiver
+				if (entity.getReference().getIdentifier().equals(languageOptions.getThisName())) {
+					LOGGER.error("Skipping malformed delegate invocation");
+					return null;
+				}
+				FunctionLocation functionLocation = context.invokeDelegate(entity);
+				parameterLocations = functionLocation.getParameterLocations();
+				returnLocation = functionLocation.getReturnLocation();
+			} else {
+				parameterLocations = context.getMethodParameterLocations(method);
+				returnLocation = context.getMethodReturnLocation(method);
 			}
-			FunctionLocation functionLocation = context.invokeDelegate(entity);
-			parameterLocations = functionLocation.getParameterLocations();
-			returnLocation = functionLocation.getReturnLocation();
-		} else {
-			parameterLocations = context.getMethodParameterLocations(method);
-			returnLocation = context.getMethodReturnLocation(method);
-		}
 
-		List<ISimpleExpression> parameters = entity.getParameters();
-		int numberOfFormalParameters = method.getParameters().size();
-		if (numberOfFormalParameters == 0 && !parameters.isEmpty()) {
-			LOGGER.error("Attempted to invoke method {}.{} which expects zero parameters with {} actual parameters",
-					method.getDeclaringType().getName(), method.getName(), parameters.size());
-		} else {
-			for (int i = 0; i < parameters.size(); ++i) {
-				// due to parameter arrays the number of actual parameters can be greater than the number for formal
-				// parameters
-				int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
-				ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
-				IParameterName formalParameter = method.getParameters().get(formalParameterIndex);
+			List<ISimpleExpression> parameters = entity.getParameters();
+			int numberOfFormalParameters = method.getParameters().size();
+			if (numberOfFormalParameters == 0 && !parameters.isEmpty()) {
+				LOGGER.error("Attempted to invoke method {}.{} which expects zero parameters with {} actual parameters",
+						method.getDeclaringType().getName(), method.getName(), parameters.size());
+			} else {
+				for (int i = 0; i < parameters.size(); ++i) {
+					// due to parameter arrays the number of actual parameters can be greater than the number for formal
+					// parameters
+					int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
+					ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
+					IParameterName formalParameter = method.getParameters().get(formalParameterIndex);
 
-				ISimpleExpression parameterExpr = parameters.get(i);
-				if (parameterExpr instanceof IReferenceExpression) {
-					IReference parameterRef = ((IReferenceExpression) parameterExpr).getReference();
+					ISimpleExpression parameterExpr = parameters.get(i);
+					if (parameterExpr instanceof IReferenceExpression) {
+						IReference parameterRef = ((IReferenceExpression) parameterExpr).getReference();
 
-					if (parameterRef instanceof IUnknownReference) {
-						LOGGER.warn("Skipping unknown parameter reference");
-						continue;
-					}
+						if (parameterRef instanceof IUnknownReference) {
+							LOGGER.warn("Skipping unknown parameter reference");
+							continue;
+						}
 
-					// parameter arrays are treated separately: write actual parameters into the array
-					if (formalParameter.isParameterArray()) {
-						IIndexAccessReference indexAccessRef = SSTBuilder
-								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
-						DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
-								new DistinctMethodParameterReference(formalParameter, method));
-						context.writeArray(distRef, parameterRef);
-					} else {
+						// parameter arrays are treated separately: write actual parameters into the array
+						if (formalParameter.isParameterArray()) {
+							IIndexAccessReference indexAccessRef = SSTBuilder
+									.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
+							DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
+									new DistinctMethodParameterReference(formalParameter, method));
+							context.writeArray(distRef, parameterRef);
+						} else {
 
-						parameterRef.accept(parameterVisitor,
-								new ContextLocationPair(context, formalParameterLocation));
-					}
-				} else if (parameterExpr instanceof IConstantValueExpression) {
-					if (formalParameter.isParameterArray()) {
-						ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
-						context.allocate(tempLoc);
+							parameterRef.accept(parameterVisitor,
+									new ContextLocationPair(context, formalParameterLocation));
+						}
+					} else if (parameterExpr instanceof IConstantValueExpression) {
+						if (formalParameter.isParameterArray()) {
+							ReferenceLocation tempLoc = context.createSimpleReferenceLocation();
+							context.allocate(tempLoc);
 
-						IIndexAccessReference indexAccessRef = SSTBuilder
-								.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
-						DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
-								new DistinctMethodParameterReference(formalParameter, method));
+							IIndexAccessReference indexAccessRef = SSTBuilder
+									.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
+							DistinctIndexAccessReference distRef = new DistinctIndexAccessReference(indexAccessRef,
+									new DistinctMethodParameterReference(formalParameter, method));
 
-						context.writeArray(distRef, tempLoc);
-					} else {
-						context.allocate(formalParameterLocation);
+							context.writeArray(distRef, tempLoc);
+						} else {
+							context.allocate(formalParameterLocation);
+						}
 					}
 				}
 			}
-		}
 
-		if (!method.isStatic() && !entity.getReference().isMissing()) {
-			// ensure a location is created for the receiver: we might end up without one if the variable is not used
-			// anywhere else
-			context.getLocation(entity.getReference());
-		}
+			if (!method.isStatic() && !entity.getReference().isMissing()) {
+				// ensure a location is created for the receiver: we might end up without one if the variable is not
+				// used
+				// anywhere else
+				context.getLocation(entity.getReference());
+			}
 
-		if (destRef != null && !method.getReturnType().isVoidType()) {
-			context.storeReturn(destRef, returnLocation);
-		}
+			if (destRef != null && !method.getReturnType().isVoidType()) {
+				context.storeReturn(destRef, returnLocation);
+			}
 
-		return super.visit(entity, context);
+			return super.visit(entity, context);
+		} catch (RuntimeException ex) {
+			if (ex.getMessage().startsWith("Invalid Signature Syntax")) {
+				LOGGER.error("Ignoring invocation expression due to MethodName.getSignature bug");
+				return null;
+			} else {
+				throw ex;
+			}
+		}
 	}
 
 	@Override

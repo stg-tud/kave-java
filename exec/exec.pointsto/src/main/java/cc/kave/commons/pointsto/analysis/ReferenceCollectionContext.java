@@ -76,7 +76,7 @@ public class ReferenceCollectionContext implements ScopingVisitorContext {
 	public void declareParameter(IParameterName parameter, IMethodName method) {
 		String name = parameter.getName();
 		ITypeName type = parameter.getValueType();
-		types.create(name, type);
+		types.createOrUpdate(name, type);
 		references.put(variableReference(name), type);
 	}
 
@@ -84,7 +84,7 @@ public class ReferenceCollectionContext implements ScopingVisitorContext {
 	public void declareParameter(IParameterName parameter, ILambdaExpression lambdaExpr) {
 		String name = parameter.getName();
 		ITypeName type = parameter.getValueType();
-		types.create(name, type);
+		types.createOrUpdate(name, type);
 		references.put(variableReference(name), type);
 	}
 
@@ -105,7 +105,7 @@ public class ReferenceCollectionContext implements ScopingVisitorContext {
 
 	@Override
 	public void declareVariable(IVariableDeclaration varDecl) {
-		types.create(varDecl.getReference().getIdentifier(), varDecl.getType());
+		types.createOrUpdate(varDecl.getReference().getIdentifier(), varDecl.getType());
 		references.put(varDecl.getReference(), varDecl.getType());
 	}
 
