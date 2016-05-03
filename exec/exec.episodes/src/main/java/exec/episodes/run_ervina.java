@@ -25,6 +25,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import cc.kave.episodes.export.Preprocessing;
+import cc.kave.episodes.export.StreamPartition;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -44,7 +45,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		load(Preprocessing.class).readAllContexts();
+//		load(Preprocessing.class).readAllContexts();
+		load(StreamPartition.class).partition();
 		
 		// load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
 		// load(QueriesGraphGenerator.class).generateGraphs();

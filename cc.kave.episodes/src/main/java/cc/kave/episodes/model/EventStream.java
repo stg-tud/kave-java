@@ -27,7 +27,7 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 
-public class StreamData {
+public class EventStream {
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
 
@@ -97,7 +97,7 @@ public class StreamData {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 	
-	public boolean equals(StreamData sm) {
+	public boolean equals(EventStream sm) {
 		if (!this.mappingData.equals(sm.getMapping())) {
 			return false;
 		}

@@ -29,7 +29,7 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.episodes.model.StreamData;
+import cc.kave.episodes.model.EventStream;
 
 public class EventsFilterTest {
 
@@ -46,7 +46,7 @@ public class EventsFilterTest {
 	
 	@Test
 	public void filterTest() {
-		StreamData expected = new StreamData();
+		EventStream expected = new EventStream();
 		expected.addEvent(DUMMY_EVENT);
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(2));
@@ -56,7 +56,7 @@ public class EventsFilterTest {
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(3));
 		
-		StreamData actuals = EventsFilter.filter(events);
+		EventStream actuals = EventsFilter.filter(events);
 		
 		assertTrue(expected.equals(actuals));
 		assertEquals(expected.getMapping(), actuals.getMapping());

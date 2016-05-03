@@ -29,7 +29,7 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.episodes.model.StreamData;
+import cc.kave.episodes.model.EventStream;
 import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
@@ -43,7 +43,7 @@ public class EventStreamIo {
 	
 	public static void write(List<Event> stream, String fileStream, String fileMapping) {
 		try {
-			StreamData sm = new StreamData();
+			EventStream sm = new EventStream();
 			sm = EventsFilter.filter(stream);
 			Logger.log("After filtering out one time events!");
 			Logger.log("Number of unique events is: %d",sm.getEventNumber());

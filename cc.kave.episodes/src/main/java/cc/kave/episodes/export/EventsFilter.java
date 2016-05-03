@@ -21,7 +21,7 @@ import java.util.Map;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.episodes.model.StreamData;
+import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Logger;
 
@@ -29,8 +29,8 @@ public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
 	
-	public static StreamData filter(List<Event> stream) {
-		StreamData sm = new StreamData();
+	public static EventStream filter(List<Event> stream) {
+		EventStream sm = new EventStream();
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
 		Logger.log("Minimal occurrence is %d", statistics.minFreq(occurrences));

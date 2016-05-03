@@ -32,13 +32,13 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
-public class StreamDataTest {
+public class EventStreamTest {
 
-	private StreamData sut;
+	private EventStream sut;
 	
 	@Before
 	public void setup() {
-		sut = new StreamData();
+		sut = new EventStream();
 	}
 	
 	@Test
@@ -95,19 +95,19 @@ public class StreamDataTest {
 	
 	@Test
 	public void equality_default() {
-		StreamData a = new StreamData();
-		StreamData b = new StreamData();
+		EventStream a = new EventStream();
+		EventStream b = new EventStream();
 		
 		assertTrue(a.equals(b));
 	}
 	
 	@Test
 	public void equlityReallySame() {
-		StreamData a = new StreamData();
+		EventStream a = new EventStream();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamData b = new StreamData();
+		EventStream b = new EventStream();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		
@@ -121,11 +121,11 @@ public class StreamDataTest {
 	
 	@Test
 	public void notEqual1() {
-		StreamData a = new StreamData();
+		EventStream a = new EventStream();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamData b = new StreamData();
+		EventStream b = new EventStream();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(3));
 		
@@ -138,11 +138,11 @@ public class StreamDataTest {
 	
 	@Test
 	public void notEqual2() {
-		StreamData a = new StreamData();
+		EventStream a = new EventStream();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		
-		StreamData b = new StreamData();
+		EventStream b = new EventStream();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		b.addEvent(inv(3));
@@ -156,12 +156,12 @@ public class StreamDataTest {
 	
 	@Test
 	public void notEqualStream() {
-		StreamData a = new StreamData();
+		EventStream a = new EventStream();
 		a.addEvent(ctx(1));
 		a.addEvent(inv(2));
 		a.addEvent(inv(2));
 		
-		StreamData b = new StreamData();
+		EventStream b = new EventStream();
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		
