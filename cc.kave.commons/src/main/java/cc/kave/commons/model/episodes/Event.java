@@ -52,6 +52,15 @@ public class Event {
 	public void setMethod(IMethodName methodName) {
 		this.Method = methodName;
 	}
+	
+	public Event createDummyEvent() {
+		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+		
+		this.Method = DUMMY_METHOD;
+		
+		return this;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
