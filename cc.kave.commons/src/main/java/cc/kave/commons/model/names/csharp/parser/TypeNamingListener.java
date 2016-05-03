@@ -145,6 +145,16 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 */
 	void exitTypeName(TypeNamingParser.TypeNameContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#possiblyGenericTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void enterPossiblyGenericTypeName(TypeNamingParser.PossiblyGenericTypeNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#possiblyGenericTypeName}.
+	 * @param ctx the parse tree
+	 */
+	void exitPossiblyGenericTypeName(TypeNamingParser.PossiblyGenericTypeNameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#enumTypeName}.
 	 * @param ctx the parse tree
 	 */
@@ -205,6 +215,16 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 */
 	void exitGenericParam(TypeNamingParser.GenericParamContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#boundTypeParameter}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoundTypeParameter(TypeNamingParser.BoundTypeParameterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#boundTypeParameter}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoundTypeParameter(TypeNamingParser.BoundTypeParameterContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#assembly}.
 	 * @param ctx the parse tree
 	 */
@@ -235,6 +255,26 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 */
 	void exitMethod(TypeNamingParser.MethodContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#constructor}.
+	 * @param ctx the parse tree
+	 */
+	void enterConstructor(TypeNamingParser.ConstructorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#constructor}.
+	 * @param ctx the parse tree
+	 */
+	void exitConstructor(TypeNamingParser.ConstructorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#customMethod}.
+	 * @param ctx the parse tree
+	 */
+	void enterCustomMethod(TypeNamingParser.CustomMethodContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#customMethod}.
+	 * @param ctx the parse tree
+	 */
+	void exitCustomMethod(TypeNamingParser.CustomMethodContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#formalParam}.
 	 * @param ctx the parse tree
 	 */
@@ -244,6 +284,46 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFormalParam(TypeNamingParser.FormalParamContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#staticModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterStaticModifier(TypeNamingParser.StaticModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#staticModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitStaticModifier(TypeNamingParser.StaticModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#paramsModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterParamsModifier(TypeNamingParser.ParamsModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#paramsModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitParamsModifier(TypeNamingParser.ParamsModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#optsModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterOptsModifier(TypeNamingParser.OptsModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#optsModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitOptsModifier(TypeNamingParser.OptsModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#refModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterRefModifier(TypeNamingParser.RefModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#refModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitRefModifier(TypeNamingParser.RefModifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#id}.
 	 * @param ctx the parse tree

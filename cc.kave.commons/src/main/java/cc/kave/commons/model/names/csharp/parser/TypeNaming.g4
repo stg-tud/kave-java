@@ -44,7 +44,7 @@ typeEOL : type EOL;
 methodEOL: method EOL;
 
 type: UNKNOWN | typeParameter | regularType | delegateType | arrayType;
-typeParameter : id (WS? '->' WS? type)?;
+typeParameter : id;
 regularType: ( resolvedType | nestedType ) ',' WS? assembly;
 delegateType: 'd:' method;
 arrayType: 'arr(' POSNUM '):' type;
@@ -55,7 +55,8 @@ nestedTypeName: nestedType | resolvedType;
 
 resolvedType: namespace? typeName;
 namespace : (id '.')+;
-typeName: (enumTypeName | interfaceTypeName | structTypeName | simpleTypeName) genericTypePart?;
+typeName: enumTypeName | possiblyGenericTypeName;
+possiblyGenericTypeName: ( interfaceTypeName | structTypeName | simpleTypeName ) genericTypePart?;
 
 enumTypeName: 'e:' simpleTypeName;
 interfaceTypeName: 'i:' simpleTypeName;
@@ -64,13 +65,21 @@ simpleTypeName: id;
 
 
 genericTypePart: '\'' POSNUM '[' genericParam (',' genericParam)* ']';
-genericParam: '[' typeParameter ']';
+genericParam: '[' boundTypeParameter ']';
+boundTypeParameter: typeParameter (WS? '->' WS? type)?;
+
 
 assembly: id (',' WS? assemblyVersion)? ;
 assemblyVersion: num '.' num '.' num '.' num;	
 
-method: '[' type ']' WS? '[' type'].' id '(' WS? ( formalParam ( WS? ',' WS? formalParam)*)? WS? ')' ;
-formalParam: '[' type']' WS? id;
+method: (constructor | customMethod) '(' WS? ( formalParam ( WS? ',' WS? formalParam)*)? WS? ')';
+constructor: '[' type '].' ('.ctor' | '.cctor');
+customMethod: '[' type ']' WS? (staticModifier)? WS? '[' type '].' id genericTypePart?;
+formalParam: (paramsModifier | optsModifier | refModifier)? WS? '[' type ']' WS? id;
+staticModifier: 'static';
+paramsModifier: 'params';
+optsModifier: 'opts';
+refModifier: 'ref';
 
 // basic
 UNKNOWN:'?';

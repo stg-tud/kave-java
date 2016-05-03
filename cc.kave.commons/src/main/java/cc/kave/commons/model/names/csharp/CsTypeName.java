@@ -119,17 +119,13 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public INamespaceName getNamespace() {
-		String identifier = "";
+		String identifier = "???";
 		if (ctx.regularType() != null && ctx.regularType().resolvedType() != null
 				&& ctx.regularType().resolvedType().namespace() != null) {
 			identifier = ctx.regularType().resolvedType().namespace().getText();
 		} else if (ctx.regularType() != null && ctx.regularType().nestedType() != null) {
 			identifier = recursiveNested(ctx.regularType().nestedType().nestedTypeName());
 		}
-		System.out.println(ctx.getText() + " "
-				+ (ctx.regularType() != null && ctx.regularType().nestedType() != null
-						&& ctx.regularType().nestedType().nestedTypeName() != null
-								? ctx.regularType().nestedType().nestedTypeName().getText() : ""));
 		return NamespaceName.newNamespaceName(identifier);
 	}
 
@@ -179,11 +175,6 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public String getName() {
-		if (ctx.regularType() != null) {
-			return ctx.regularType().resolvedType().typeName().simpleTypeName().getText();
-		} else if (ctx.UNKNOWN() != null) {
-			return ctx.UNKNOWN().getText();
-		}
 		return null;
 	}
 
@@ -288,10 +279,6 @@ public class CsTypeName implements ITypeName {
 	}
 
 	private boolean containsGenericParts(List<TypeNameContext> typeName) {
-		for (TypeNameContext t : typeName) {
-			if (t.genericTypePart() != null)
-				return true;
-		}
 		return false;
 	}
 
