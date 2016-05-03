@@ -18,30 +18,29 @@ package cc.kave.episodes.export;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.model.StreamData;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Logger;
 
 public class EventsFilter {
 	
-	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
-	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+	private static StreamStatistics statistics = new StreamStatistics();
 	
 	public static StreamData filter(List<Event> stream) {
 		StreamData sm = new StreamData();
 		
-		Map<Event, Integer> occurrences = getFrequences(stream);
+		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
+		Logger.log("Minimal occurrence is %d", statistics.minFreq(occurrences));
 		
 		int sigletons = 0;
 		
-		sm.addEvent(DUMMY_EVENT);
+		Event dummyEvent = new Event();
+		dummyEvent.createDummyEvent();
+		
+		sm.addEvent(dummyEvent);
 		for (Event e : stream) {
 			if (occurrences.get(e) > 1) {
 				sm.addEvent(e);
@@ -58,19 +57,5 @@ public class EventsFilter {
 		Logger.log("Length of event stream data is: %d", stream.size());
 		
 		return sm;
-	}
-
-	private static Map<Event, Integer> getFrequences(List<Event> stream) {
-		Map<Event, Integer> occurrences = Maps.newHashMap();
-		
-		for (Event e : stream) {
-			if (occurrences.keySet().contains(e)) {
-				int freq = occurrences.get(e);
-				occurrences.put(e, freq + 1);
-			} else {
-				occurrences.put(e, 1);
-			}
-		}
-		return occurrences;
 	}
 }
