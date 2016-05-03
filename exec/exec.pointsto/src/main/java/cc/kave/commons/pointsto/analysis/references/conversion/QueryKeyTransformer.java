@@ -15,6 +15,7 @@ package cc.kave.commons.pointsto.analysis.references.conversion;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import cc.kave.commons.model.names.IMemberName;
@@ -171,13 +172,16 @@ public class QueryKeyTransformer
 	public List<PointsToQuery> visit(DistinctIndexAccessReference indexAccessRef,
 			DistinctReferenceContextCollector context) {
 		Collection<IMemberName> members = context.getMembers(indexAccessRef);
-		Asserts.assertLessOrEqual(members.size(), 1);
-		IMemberName member = members.isEmpty() ? null : members.iterator().next();
-
+		if (members.isEmpty()) {
+			members = Collections.singletonList(null);
+		}
 		Collection<IStatement> statements = context.getStatements(indexAccessRef);
-		List<PointsToQuery> queries = new ArrayList<>(statements.size());
-		for (IStatement stmt : statements) {
-			queries.add(new PointsToQuery(indexAccessRef.getReference(), indexAccessRef.getType(), stmt, member));
+
+		List<PointsToQuery> queries = new ArrayList<>(members.size() * statements.size());
+		for (IMemberName member : members) {
+			for (IStatement stmt : statements) {
+				queries.add(new PointsToQuery(indexAccessRef.getReference(), indexAccessRef.getType(), stmt, member));
+			}
 		}
 
 		return queries;
