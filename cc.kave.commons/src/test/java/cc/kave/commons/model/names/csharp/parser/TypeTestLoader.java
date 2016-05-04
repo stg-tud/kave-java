@@ -53,7 +53,7 @@ public class TypeTestLoader {
 			TypeNameTestCase t = new TypeNameTestCase(fields.get(0), fields.get(1), fields.get(2));
 			testCases.add(t);
 		}
-		assert (lines.size() == testCases.size());
+		assert(lines.size() == testCases.size());
 		return testCases;
 	}
 
@@ -63,9 +63,10 @@ public class TypeTestLoader {
 		for (String s : lines) {
 			String[] fields = s.split("\t");
 			MethodNameTestCase t = new MethodNameTestCase(fields[0], fields[1], fields[2], fields[3],
-					getBoolean(fields[4]), getBoolean(fields[5]), getList(fields[6]), getList(fields[7]));
+					getBoolean(fields[6]), getBoolean(fields[7]), getList(fields[4]), getList(fields[5]));
 			testCases.add(t);
 		}
+		assert(lines.size() == testCases.size());
 		return testCases;
 	}
 

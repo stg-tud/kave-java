@@ -27,7 +27,6 @@ import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NestedTypeName
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ResolvedTypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeNameContext;
-import cc.recommenders.exceptions.AssertionException;
 
 public class CsTypeName implements ITypeName {
 
@@ -35,12 +34,8 @@ public class CsTypeName implements ITypeName {
 	private TypeContext ctx;
 
 	public CsTypeName(String type) {
-		try {
-			TypeContext ctx = TypeNameParseUtil.validateTypeName(type);
-			this.ctx = ctx;
-		} catch (AssertionException e) {
-			throw e;
-		}
+		TypeContext ctx = TypeNameParseUtil.validateTypeName(type);
+		this.ctx = ctx;
 	}
 
 	public CsTypeName(TypeContext ctx) {
