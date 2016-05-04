@@ -76,7 +76,7 @@ method: (constructor | customMethod) '(' WS? ( formalParam ( WS? ',' WS? formalP
 constructor: '[' type '].' constructorName;
 constructorName: ('.ctor' | '.cctor');
 customMethod: '[' type ']' WS? (staticModifier)? WS? '[' type '].' id genericTypePart?;
-formalParam: (parameterModifier)? WS? '[' type ']' WS? id;
+formalParam: (WS? parameterModifier)? WS? '[' type ']' WS? id;
 parameterModifier: (paramsModifier | optsModifier | refModifier | outModifier | extensionModifier);
 
 staticModifier: 'static';

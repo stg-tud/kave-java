@@ -31,7 +31,7 @@ import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeNameContex
 public class CsTypeName implements ITypeName {
 
 	private static final String UNKNOWN_IDENTIFIER = "???";
-	private TypeContext ctx;
+	protected TypeContext ctx;
 
 	public CsTypeName(String type) {
 		TypeContext ctx = TypeNameParseUtil.validateTypeName(type);
