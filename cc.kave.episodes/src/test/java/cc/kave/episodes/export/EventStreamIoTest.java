@@ -22,78 +22,68 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.episodes.model.EventStream;
 
 public class EventStreamIoTest {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
-	
+
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-	
+
 	@Test
 	public void happyPath() throws IOException {
 
 		File a = file();
 		File b = file();
 
-		List<Event> stream = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), ctx(6), ctx(7), inv(2), ctx(1), inv(5));
-		List<Event> mapping = Lists.newArrayList(DUMMY_EVENT, ctx(1), inv(2), inv(5));
-		String expectedTxt = "0,0.000\n" + //
-				"1,0.501\n" + //
-				"2,0.502\n" + //
-				"3,1.003\n" + //
-				"2,2.004\n" + //
-				"1,2.505\n" + //
-				"3,2.506\n";
+		EventStream expected = new EventStream();
+		expected.addEvent(DUMMY_EVENT);
+		expected.addEvent(ctx(1));
+		expected.addEvent(inv(2));
+		expected.addEvent(hld());
+		expected.addEvent(inv(5));
+		expected.addEvent(hld());
+		expected.addEvent(hld());
+		expected.addEvent(inv(2));
+		expected.addEvent(ctx(1));
+		expected.addEvent(inv(5));
 
-		EventStreamIo.write(stream, a.getAbsolutePath(), b.getAbsolutePath());
+		EventStreamIo.write(expected, a.getAbsolutePath(), b.getAbsolutePath());
 
 		assertTrue(a.exists());
 		assertTrue(b.exists());
 
-		List<Event> actuals = EventStreamIo.readMapping(b.getAbsolutePath());
+		List<Event> actualsMapping = EventStreamIo.readMapping(b.getAbsolutePath());
 		String actualTxt = FileUtils.readFileToString(a);
-		assertEquals(mapping, actuals);
-		assertEquals(expectedTxt, actualTxt);
+		assertMapping(expected.getMapping().keySet(), actualsMapping);
+		assertEquals(expected.getStream(), actualTxt);
 	}
-//
-//	@Test
-//	public void mappingContainsUniqueEvents() throws IOException {
-//		
-//		File a = file();
-//		File b = file();
-//
-//		List<Event> stream = Lists.newArrayList(inv(1), inv(1), inv(1));
-//		List<Event> expected = Lists.newArrayList(DUMMY_EVENT, inv(1));
-//		String expectedTxt = "0,0.000\n" + //
-//				"1,0.001\n" + //
-//				"1,0.002\n" + //
-//				"1,0.003\n";
-//
-//		EventStreamIo.write(stream, a.getAbsolutePath(), b.getAbsolutePath());
-//
-//		assertTrue(a.exists());
-//		assertTrue(b.exists());
-//
-//		List<Event> actuals = EventStreamIo.readMapping(a.getAbsolutePath());
-//		String actualTxt = FileUtils.readFileToString(b);
-//		assertEquals(expected, actuals);
-//		assertEquals(expectedTxt, actualTxt);
-//	}
+
+	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {
+		if (expMapping.size() != actMapping.size()) {
+			return false;
+		}
+		for (Event event : expMapping) {
+			if (!actMapping.contains(event)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	private File file() throws IOException {
 		File file = tmp.newFile();
@@ -108,6 +98,10 @@ public class EventStreamIoTest {
 
 	private static Event ctx(int i) {
 		return Events.newContext(m(i));
+	}
+
+	private static Event hld() {
+		return Events.newHolder();
 	}
 
 	private static IMethodName m(int i) {

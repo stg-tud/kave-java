@@ -30,7 +30,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
-import cc.recommenders.io.Logger;
 
 public class EventStreamIo {
 	
@@ -41,15 +40,10 @@ public class EventStreamIo {
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
 	
-	public static void write(List<Event> stream, String fileStream, String fileMapping) {
+	public static void write(EventStream stream, String fileStream, String fileMapping) {
 		try {
-			EventStream sm = new EventStream();
-			sm = EventsFilter.filter(stream);
-			Logger.log("After filtering out one time events!");
-			Logger.log("Number of unique events is: %d",sm.getEventNumber());
-			Logger.log("Length of event stream data is: %d", sm.getStreamLength());
-			FileUtils.writeStringToFile(new File(fileStream), sm.getStream());
-			JsonUtils.toJson(sm.getMapping().keySet(), new File(fileMapping));
+			FileUtils.writeStringToFile(new File(fileStream), stream.getStream());
+			JsonUtils.toJson(stream.getMapping().keySet(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
