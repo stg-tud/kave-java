@@ -109,6 +109,8 @@ public class CsTypeName implements ITypeName {
 			identifier = ctx.regularType().assembly().getText();
 		} else if (ctx.arrayType() != null) {
 			return new CsTypeName(ctx.arrayType().type()).getAssembly();
+		} else if (ctx.delegateType() != null) {
+			return new CsMethodName(ctx.delegateType().method()).getDeclaringType().getAssembly();
 		}
 		return AssemblyName.newAssemblyName(identifier);
 	}
@@ -121,6 +123,8 @@ public class CsTypeName implements ITypeName {
 			identifier = ctx.regularType().resolvedType().namespace().getText();
 		} else if (ctx.regularType() != null && ctx.regularType().nestedType() != null) {
 			identifier = recursiveNested(ctx.regularType().nestedType().nestedTypeName());
+		} else if (ctx.delegateType() != null) {
+			return new CsMethodName(ctx.delegateType().method()).getDeclaringType().getNamespace();
 		}
 		return NamespaceName.newNamespaceName(identifier);
 	}

@@ -53,7 +53,7 @@ public class TypeTestLoader {
 			TypeNameTestCase t = new TypeNameTestCase(fields.get(0), fields.get(1), fields.get(2));
 			testCases.add(t);
 		}
-		assert(lines.size() == testCases.size());
+		assert (lines.size() == testCases.size());
 		return testCases;
 	}
 
@@ -66,7 +66,7 @@ public class TypeTestLoader {
 					getBoolean(fields[6]), getBoolean(fields[7]), getList(fields[4]), getList(fields[5]));
 			testCases.add(t);
 		}
-		assert(lines.size() == testCases.size());
+		assert (lines.size() == testCases.size());
 		return testCases;
 	}
 

@@ -24,6 +24,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.CsMethodName;
 import cc.recommenders.exceptions.AssertionException;
@@ -50,6 +52,12 @@ public class CsMethodNameTest {
 			assertEquals(t.getSimpleName(), name.getName());
 			assertEquals(t.isStatic(), name.isStatic());
 			assertEquals(t.isGeneric(), name.isGenericEntity());
+			List<String> parameters = Lists.newArrayList();
+			name.getParameters().forEach(p -> parameters.add(p.getIdentifier()));
+			assertEquals(t.getParameters(), parameters);
+			List<String> typeParameters = Lists.newArrayList();
+			name.getTypeParameters().forEach(p -> typeParameters.add(p.getIdentifier()));
+			assertEquals(t.getTypeParameters(), typeParameters);
 		}
 	}
 

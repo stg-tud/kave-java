@@ -73,13 +73,18 @@ assembly: id (',' WS? assemblyVersion)? ;
 assemblyVersion: num '.' num '.' num '.' num;	
 
 method: (constructor | customMethod) '(' WS? ( formalParam ( WS? ',' WS? formalParam)*)? WS? ')';
-constructor: '[' type '].' ('.ctor' | '.cctor');
+constructor: '[' type '].' constructorName;
+constructorName: ('.ctor' | '.cctor');
 customMethod: '[' type ']' WS? (staticModifier)? WS? '[' type '].' id genericTypePart?;
-formalParam: (paramsModifier | optsModifier | refModifier)? WS? '[' type ']' WS? id;
+formalParam: (parameterModifier)? WS? '[' type ']' WS? id;
+parameterModifier: (paramsModifier | optsModifier | refModifier | outModifier | extensionModifier);
+
 staticModifier: 'static';
 paramsModifier: 'params';
 optsModifier: 'opts';
 refModifier: 'ref';
+outModifier: 'out';
+extensionModifier: 'this';
 
 // basic
 UNKNOWN:'?';

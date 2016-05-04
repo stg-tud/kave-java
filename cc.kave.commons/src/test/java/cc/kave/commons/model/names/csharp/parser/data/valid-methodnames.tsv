@@ -1,7 +1,8 @@
 identifier	decltype	rettype	simplename	paras	typeparas	static	generic
 [T1,P] [T2,P].M()	T2,P	T1,P	M			f	f
 [?] [?].M( )	?	?	M			f	f
-[?] [?].M([?] p)	?	?	M			f	f
-[?] [?].M([?] p1,[?] p2)	?	?	M			f	f
-[?][?].M([?]p1,[?] p2, [?] p3 , [?] p4 )	?	?	M			f	f
+[?] [?].M([?] p)	?	?	M	[?] p		f	f
+[?] [?].M([?] p1,[?] p2)	?	?	M	[?] p1;[?] p2		f	f
+[?][?].M([?]p1,[?] p2, [?] p3 , [?] p4 )	?	?	M	[?]p1;[?] p2;[?] p3;[?] p4		f	f
 [T,P][T,P].M()	T,P	T,P	M			f	f
+[T,P] [n.T,P].M'1[[T -> ?]]()	n.T,P	T,P	M		[T -> ?]	f	t	
