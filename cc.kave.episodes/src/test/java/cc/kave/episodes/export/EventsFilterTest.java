@@ -59,7 +59,6 @@ public class EventsFilterTest {
 		expectedStream.addEvent(inv(3));
 
 		expectedPartition = new EventStream();
-		expectedPartition.addEvent(DUMMY_EVENT);
 		expectedPartition.addEvent(hld());
 		expectedPartition.addEvent(ctx(1));
 		expectedPartition.addEvent(inv(3));

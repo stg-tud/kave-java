@@ -62,10 +62,6 @@ public class EventsFilter {
 	
 	public static EventStream filterPartition(List<Event> partition, Set<Event> stream) {
 		EventStream partitionStream = new EventStream();
-		Event dummyEvent = new Event();
-		dummyEvent.createDummyEvent();
-		
-		partitionStream.addEvent(dummyEvent);
 		for (Event e : partition) {
 			if (stream.contains(e)) {
 				partitionStream.addEvent(e);
