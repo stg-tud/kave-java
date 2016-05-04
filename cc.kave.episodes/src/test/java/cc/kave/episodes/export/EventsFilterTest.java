@@ -36,34 +36,58 @@ public class EventsFilterTest {
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-	
-	private List<Event> events;
-	
+
+	private List<Event> streamEvents;
+	private List<Event> partitionEvents;
+
+	private EventStream expectedStream;
+	private EventStream expectedPartition;
+
 	@Before
 	public void setup() {
-		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		streamEvents = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		partitionEvents = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4), inv(3), inv(2));
+
+		expectedStream = new EventStream();
+		expectedStream.addEvent(DUMMY_EVENT);
+		expectedStream.addEvent(ctx(1));
+		expectedStream.addEvent(inv(2));
+		expectedStream.addEvent(inv(3));
+		expectedStream.addEvent(hld());
+		expectedStream.addEvent(inv(2));
+		expectedStream.addEvent(ctx(1));
+		expectedStream.addEvent(inv(3));
+
+		expectedPartition = new EventStream();
+		expectedPartition.addEvent(DUMMY_EVENT);
+		expectedPartition.addEvent(hld());
+		expectedPartition.addEvent(ctx(1));
+		expectedPartition.addEvent(inv(3));
+		expectedPartition.addEvent(inv(2));
 	}
-	
+
 	@Test
-	public void filterTest() {
-		EventStream expected = new EventStream();
-		expected.addEvent(DUMMY_EVENT);
-		expected.addEvent(ctx(1));
-		expected.addEvent(inv(2));
-		expected.addEvent(inv(3));
-		expected.addEvent(hld());
-		expected.addEvent(inv(2));
-		expected.addEvent(ctx(1));
-		expected.addEvent(inv(3));
-		
-		EventStream actuals = EventsFilter.filter(events);
-		
-		assertTrue(expected.equals(actuals));
-		assertEquals(expected.getMapping(), actuals.getMapping());
-		assertEquals(expected.getStreamLength(), actuals.getStreamLength());
-		assertEquals(expected.getEventNumber(), actuals.getEventNumber());
+	public void filterStream() {
+		EventStream actuals = EventsFilter.filterStream(streamEvents);
+
+		assertTrue(expectedStream.equals(actuals));
+		assertEquals(expectedStream.getStream(), actuals.getStream());
+		assertEquals(expectedStream.getMapping(), actuals.getMapping());
+		assertEquals(expectedStream.getStreamLength(), actuals.getStreamLength());
+		assertEquals(expectedStream.getEventNumber(), actuals.getEventNumber());
 	}
-	
+
+	@Test
+	public void filterPartition() {
+		EventStream actualsPartition = EventsFilter.filterPartition(partitionEvents, expectedStream.getMapping().keySet());
+		
+		assertTrue(expectedPartition.equals(actualsPartition));
+		assertEquals(expectedPartition.getStream(), actualsPartition.getStream());
+		assertEquals(expectedPartition.getMapping(), actualsPartition.getMapping());
+		assertEquals(expectedPartition.getStreamLength(), actualsPartition.getStreamLength());
+		assertEquals(expectedPartition.getEventNumber(), actualsPartition.getEventNumber());
+	}
+
 	private static Event inv(int i) {
 		return Events.newInvocation(m(i));
 	}
@@ -71,11 +95,11 @@ public class EventsFilterTest {
 	private static Event ctx(int i) {
 		return Events.newContext(m(i));
 	}
-	
+
 	private static Event hld() {
 		return Events.newHolder();
 	}
-	
+
 	private static IMethodName m(int i) {
 		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
 	}

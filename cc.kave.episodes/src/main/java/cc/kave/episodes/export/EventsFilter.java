@@ -17,6 +17,7 @@ package cc.kave.episodes.export;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -29,7 +30,7 @@ public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
 	
-	public static EventStream filter(List<Event> stream) {
+	public static EventStream filterStream(List<Event> stream) {
 		EventStream sm = new EventStream();
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
@@ -57,5 +58,23 @@ public class EventsFilter {
 		Logger.log("Length of event stream data is: %d", stream.size());
 		
 		return sm;
+	}
+	
+	public static EventStream filterPartition(List<Event> partition, Set<Event> stream) {
+		EventStream partitionStream = new EventStream();
+		Event dummyEvent = new Event();
+		dummyEvent.createDummyEvent();
+		
+		partitionStream.addEvent(dummyEvent);
+		for (Event e : partition) {
+			if (stream.contains(e)) {
+				partitionStream.addEvent(e);
+			} else {
+				if (e.getKind() == EventKind.METHOD_DECLARATION) {
+					partitionStream.addEvent(Events.newHolder());
+				}
+			}
+		}
+		return partitionStream;
 	}
 }
