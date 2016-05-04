@@ -1,3 +1,18 @@
+/**
+ * Copyright 2016 Technische Universität Darmstadt
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cc.kave.commons.model.names.csharp.parser;
 
 import static org.junit.Assert.assertEquals;
@@ -15,8 +30,8 @@ import cc.recommenders.exceptions.AssertionException;
 
 public class CsTypeNameTest {
 
-	private List<TypeTestCase> validTestCases;
-	private List<TypeTestCase> invalidTestCases;
+	private List<TypeNameTestCase> validTestCases;
+	private List<String> invalidTestCases;
 
 	@Before
 	public void loadTestCases() {
@@ -28,7 +43,7 @@ public class CsTypeNameTest {
 
 	@Test
 	public void validTestCases() {
-		for (TypeTestCase t : validTestCases) {
+		for (TypeNameTestCase t : validTestCases) {
 			ITypeName name = new CsTypeName(t.getIdentifier());
 			assertEquals(t.getIdentifier(), name.getIdentifier());
 			assertEquals(t.getIdentifier(), t.getNamespace(), name.getNamespace().getIdentifier());
@@ -38,10 +53,10 @@ public class CsTypeNameTest {
 
 	@Test
 	public void invalidTestCases() {
-		for (TypeTestCase t : invalidTestCases) {
+		for (String t : invalidTestCases) {
 			try {
-				ITypeName name = new CsTypeName(t.getIdentifier());
-				fail("Invalid name validated:" + t.getIdentifier());
+				ITypeName name = new CsTypeName(t);
+				fail("Invalid name validated:" + t);
 			} catch (AssertionException e) {
 			}
 		}

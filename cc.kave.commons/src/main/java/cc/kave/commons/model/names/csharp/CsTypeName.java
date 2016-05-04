@@ -31,6 +31,7 @@ import cc.recommenders.exceptions.AssertionException;
 
 public class CsTypeName implements ITypeName {
 
+	private static final String UNKNOWN_IDENTIFIER = "???";
 	private TypeContext ctx;
 
 	public CsTypeName(String type) {
@@ -108,7 +109,7 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public IBundleName getAssembly() {
-		String identifier = "";
+		String identifier = UNKNOWN_IDENTIFIER;
 		if (ctx.regularType() != null) {
 			identifier = ctx.regularType().assembly().getText();
 		} else if (ctx.arrayType() != null) {
@@ -119,7 +120,7 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public INamespaceName getNamespace() {
-		String identifier = "???";
+		String identifier = UNKNOWN_IDENTIFIER;
 		if (ctx.regularType() != null && ctx.regularType().resolvedType() != null
 				&& ctx.regularType().resolvedType().namespace() != null) {
 			identifier = ctx.regularType().resolvedType().namespace().getText();
@@ -132,7 +133,7 @@ public class CsTypeName implements ITypeName {
 	private String recursiveNested(NestedTypeNameContext nestedTypeName) {
 		if (nestedTypeName.resolvedType() != null)
 			return nestedTypeName.resolvedType().namespace() != null
-					? nestedTypeName.resolvedType().namespace().getText() : "";
+					? nestedTypeName.resolvedType().namespace().getText() : UNKNOWN_IDENTIFIER;
 		return recursiveNested(nestedTypeName.nestedType().nestedTypeName());
 	}
 
