@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.pointsto.analysis.inclusion.Allocator;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstraintResolver;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.DeclarationLambdaStore;
@@ -63,7 +64,8 @@ public class ConstraintGraph {
 	ConstraintGraph(Map<DistinctReference, SetVariable> referenceVariables, DeclarationLambdaStore declLambdaStore,
 			Map<SetExpression, ConstraintNode> constraintNodes, ContextFactory contextFactory) {
 		this.referenceVariables = HashBiMap.create(referenceVariables);
-		this.declLambdaStore = new DeclarationLambdaStore(declLambdaStore, this::getVariable, constraintResolver);
+		this.declLambdaStore = new DeclarationLambdaStore(declLambdaStore, this::getVariable,
+				new Allocator(constraintResolver, declLambdaStore.getVariableFactory()));
 		this.constraintNodes = constraintNodes;
 		this.contextFactory = contextFactory;
 	}
@@ -147,7 +149,8 @@ public class ConstraintGraph {
 				SetExpression succEdgeTarget = succEdge.getTarget().getSetExpression();
 
 				if (match(preEdge, succEdge)) {
-					boolean bothConstructedTerms = preEdgeTarget instanceof ConstructedTerm && succEdgeTarget instanceof ConstructedTerm;
+					boolean bothConstructedTerms = preEdgeTarget instanceof ConstructedTerm
+							&& succEdgeTarget instanceof ConstructedTerm;
 					if (bothConstructedTerms && succEdgeTarget instanceof LambdaTerm
 							&& succEdge.getInclusionAnnotation() instanceof InvocationAnnotation) {
 						processInvocation(preEdge, succEdge, changedNodes);

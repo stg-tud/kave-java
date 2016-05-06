@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.IEventName;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMemberName;
@@ -153,27 +154,34 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 
 	private SetVariable initializeMethodArgument(IMethodName method, IParameterName parameter) {
 		SetVariable parameterVar = builder.createTemporaryVariable();
-		EntryPointAllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
-		builder.allocate(parameterVar, parameterAllocationSite);
-
 		ITypeName type = parameter.getValueType();
-		if (type.isArrayType()) {
-			// provide an array with content
-			SetVariable tmp = builder.createTemporaryVariable();
-			builder.allocate(tmp, new ArrayEntryAllocationSite(parameterAllocationSite));
-			builder.writeArray(parameterVar, tmp);
-		} else if (type.equals(thisType)) {
-			for (IMemberName member : declMapper.getAssignableMembers()) {
-				AllocationSite memberAllocationSite = new EntryPointMemberAllocationSite(parameterAllocationSite,
-						member);
-				SetVariable memberVar = builder.createTemporaryVariable();
-				builder.allocate(memberVar, memberAllocationSite);
-				if (member.getValueType().isArrayType()) {
-					SetVariable arrayEntry = builder.createTemporaryVariable();
-					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(memberAllocationSite));
-					builder.writeArray(memberVar, arrayEntry);
+
+		if (type.isDelegateType()) {
+			builder.getAllocator().allocateDelegate((IDelegateTypeName) type, parameterVar);
+		} else {
+			EntryPointAllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
+			builder.allocate(parameterVar, parameterAllocationSite);
+			if (type.isArrayType()) {
+				builder.getAllocator().allocateArrayEntry(parameterAllocationSite, type, parameterVar);
+			} else if (type.equals(thisType)) {
+				for (IMemberName member : declMapper.getAssignableMembers()) {
+					SetVariable memberVar = builder.createTemporaryVariable();
+					ITypeName memberType = member.getValueType();
+					
+					if (memberType.isDelegateType()) {
+						builder.getAllocator().allocateDelegate((IDelegateTypeName) memberType, memberVar);
+					} else {
+						AllocationSite memberAllocationSite = new EntryPointMemberAllocationSite(
+								parameterAllocationSite, member);
+						builder.allocate(memberVar, memberAllocationSite);
+
+						if (memberType.isArrayType()) {
+							builder.getAllocator().allocateArrayEntry(memberAllocationSite, memberType, memberVar);
+						}
+					}
+
+					builder.writeMemberRaw(parameterVar, memberVar, member);
 				}
-				builder.writeMemberRaw(parameterVar, memberVar, member);
 			}
 		}
 

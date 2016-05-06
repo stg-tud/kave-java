@@ -28,6 +28,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.ILambdaName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
@@ -41,6 +42,7 @@ import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.pointsto.analysis.inclusion.Allocator;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstraintResolver;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.DeclarationLambdaStore;
@@ -82,6 +84,7 @@ public class ConstraintGraphBuilder {
 
 	private final ConstraintResolver constraintResolver = new ConstraintResolver(this::getNode);
 	private final DeclarationMapper declMapper;
+	private final Allocator allocator;
 	private final DeclarationLambdaStore declLambdaStore;
 
 	private final RefTerm staticObject;
@@ -92,8 +95,8 @@ public class ConstraintGraphBuilder {
 			DeclarationMapper declMapper, ContextFactory contextFactory) {
 		this.referenceResolver = referenceResolver;
 		this.declMapper = declMapper;
-		this.declLambdaStore = new DeclarationLambdaStore(this::getVariable, variableFactory, constraintResolver,
-				declMapper);
+		this.allocator = new Allocator(constraintResolver, variableFactory);
+		this.declLambdaStore = new DeclarationLambdaStore(this::getVariable, variableFactory, allocator, declMapper);
 		this.contextFactory = contextFactory;
 
 		staticObject = new RefTerm(new UniqueAllocationSite(TypeName.UNKNOWN_NAME), ConstructedTerm.BOTTOM);
@@ -101,6 +104,10 @@ public class ConstraintGraphBuilder {
 
 	public ContextFactory getContextFactory() {
 		return contextFactory;
+	}
+
+	public Allocator getAllocator() {
+		return allocator;
 	}
 
 	public ConstraintGraph createConstraintGraph() {
@@ -212,17 +219,21 @@ public class ConstraintGraphBuilder {
 
 			ConstraintNode memberNode = getNode(memberEntry.getValue());
 			if (memberNode.getPredecessors().isEmpty()) {
-				AllocationSite allocationSite = new UndefinedMemberAllocationSite(memberEntry.getKey(),
-						memberEntry.getKey().getValueType());
-				RefTerm obj = new RefTerm(allocationSite, getVariable(allocationSite));
-				memberNode.addPredecessor(
-						new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+				ITypeName type = memberEntry.getKey().getValueType();
+				if (type.isDelegateType()) {
+					allocator.allocateDelegate((IDelegateTypeName) type, memberEntry.getValue());
+				} else {
+					AllocationSite allocationSite = new UndefinedMemberAllocationSite(memberEntry.getKey(), type);
+					RefTerm obj = new RefTerm(allocationSite, getVariable(allocationSite));
+					memberNode.addPredecessor(
+							new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
 
-				if (allocationSite.getType().isArrayType()) {
-					// provide one entry for arrays
-					RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
-							variableFactory.createObjectVariable());
-					writeArrayRaw(obj, arrayEntry);
+					if (type.isArrayType()) {
+						// provide one entry for arrays
+						RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
+								variableFactory.createObjectVariable());
+						writeArrayRaw(obj, arrayEntry);
+					}
 				}
 			}
 		}
@@ -232,15 +243,20 @@ public class ConstraintGraphBuilder {
 		for (Map.Entry<IMemberName, Set<SetVariable>> memberEntry : undefinedStorageMembers.entrySet()) {
 			IMemberName member = memberEntry.getKey();
 			for (SetVariable recv : memberEntry.getValue()) {
-				AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, member.getValueType());
-				RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
-				writeMemberRaw(recv, obj, member);
+				ITypeName type = member.getValueType();
+				if (type.isDelegateType()) {
+					allocator.allocateDelegate((IDelegateTypeName) type, recv);
+				} else {
+					AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, type);
+					RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
+					writeMemberRaw(recv, obj, member);
 
-				if (allocationSite.getType().isArrayType()) {
-					// provide one entry for arrays
-					RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
-							variableFactory.createObjectVariable());
-					writeArrayRaw(obj, arrayEntry);
+					if (allocationSite.getType().isArrayType()) {
+						// provide one entry for arrays
+						RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
+								variableFactory.createObjectVariable());
+						writeArrayRaw(obj, arrayEntry);
+					}
 				}
 			}
 		}

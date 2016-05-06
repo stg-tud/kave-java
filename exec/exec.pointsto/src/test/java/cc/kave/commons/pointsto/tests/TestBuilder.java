@@ -16,17 +16,21 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.ILambdaName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
@@ -39,6 +43,7 @@ import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.SST;
@@ -46,14 +51,17 @@ import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
+import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
@@ -99,16 +107,20 @@ public abstract class TestBuilder {
 		return method(voidType(), declType, name, parameters);
 	}
 
+	private String getParameterIdentifiers(List<ITypeName> parameterTypes) {
+		return IntStream.range(0, parameterTypes.size())
+				.mapToObj(i -> "[" + parameterTypes.get(i).getIdentifier() + "] p" + i)
+				.collect(Collectors.joining(", "));
+	}
+
 	public IMethodName method(ITypeName retType, ITypeName declType, String name, ITypeName... parameters) {
-		String parameterIdentifiers = IntStream.range(0, parameters.length)
-				.mapToObj(i -> "[" + parameters[i].getIdentifier() + "] p" + i).collect(Collectors.joining(", "));
+		String parameterIdentifiers = getParameterIdentifiers(Arrays.asList(parameters));
 		return MethodName.newMethodName("[" + retType.getIdentifier() + "] [" + declType.getIdentifier() + "]." + name
 				+ "(" + parameterIdentifiers + ")");
 	}
 
 	public IMethodName constructor(ITypeName declType, ITypeName... parameters) {
-		String parameterIdentifiers = IntStream.range(0, parameters.length)
-				.mapToObj(i -> "[" + parameters[i].getIdentifier() + "] p" + i).collect(Collectors.joining(", "));
+		String parameterIdentifiers = getParameterIdentifiers(Arrays.asList(parameters));
 		return MethodName.newMethodName(
 				"[" + voidType() + "] [" + declType.getIdentifier() + "]..ctor(" + parameterIdentifiers + ")");
 	}
@@ -164,6 +176,15 @@ public abstract class TestBuilder {
 		return invocation;
 	}
 
+	public ILambdaExpression lambda(ITypeName returnType, List<ITypeName> parameterTypes, IStatement... stmts) {
+		LambdaExpression lambdaExpr = new LambdaExpression();
+		lambdaExpr.setBody(Arrays.asList(stmts));
+		ILambdaName lambdaName = LambdaName.newLambdaName(
+				"[" + returnType.getIdentifier() + "] (" + getParameterIdentifiers(parameterTypes) + ")");
+		lambdaExpr.setName(lambdaName);
+		return lambdaExpr;
+	}
+
 	public IReferenceExpression refExpr(IReference ref) {
 		ReferenceExpression referenceExpression = new ReferenceExpression();
 		referenceExpression.setReference(ref);
@@ -182,6 +203,13 @@ public abstract class TestBuilder {
 		loop.setLoopedReference(variableReference(source));
 		loop.setBody(Arrays.asList(stmts));
 		return loop;
+	}
+
+	public IReturnStatement ret(String id) {
+		ReturnStatement retStmt = new ReturnStatement();
+		retStmt.setExpression(refExpr(variableReference(id)));
+		retStmt.setIsVoid(false);
+		return retStmt;
 	}
 
 	public Context context(ITypeName type, Set<IMethodDeclaration> methods, Set<IFieldDeclaration> fields,

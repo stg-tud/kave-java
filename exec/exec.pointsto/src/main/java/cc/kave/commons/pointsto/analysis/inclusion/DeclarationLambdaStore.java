@@ -27,12 +27,6 @@ import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.OutParameterAllocationSite;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
-import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
-import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
 import cc.kave.commons.pointsto.analysis.names.DistinctMemberName;
 import cc.kave.commons.pointsto.analysis.names.DistinctMemberNameFactory;
 import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
@@ -49,22 +43,22 @@ public final class DeclarationLambdaStore {
 	private final Function<DistinctReference, SetVariable> variableResolver;
 	private final SetVariableFactory variableFactory;
 
-	private final ConstraintResolver constraintResolver;
+	private final Allocator allocator;
 	private final DeclarationMapper declMapper;
 
 	private final Map<DistinctMemberName, LambdaTerm> declarationLambdas = new HashMap<>();
 
 	public DeclarationLambdaStore(Function<DistinctReference, SetVariable> variableResolver,
-			SetVariableFactory variableFactory, ConstraintResolver constraintResolver, DeclarationMapper declMapper) {
+			SetVariableFactory variableFactory, Allocator allocator, DeclarationMapper declMapper) {
 		this.variableResolver = variableResolver;
 		this.variableFactory = variableFactory;
-		this.constraintResolver = constraintResolver;
+		this.allocator = allocator;
 		this.declMapper = declMapper;
 	}
 
 	public DeclarationLambdaStore(DeclarationLambdaStore other,
-			Function<DistinctReference, SetVariable> variableProvider, ConstraintResolver constraintResolver) {
-		this(variableProvider, other.variableFactory, constraintResolver, other.declMapper);
+			Function<DistinctReference, SetVariable> variableProvider, Allocator allocator) {
+		this(variableProvider, other.variableFactory, allocator, other.declMapper);
 		declarationLambdas.putAll(other.declarationLambdas);
 	}
 
@@ -113,7 +107,7 @@ public final class DeclarationLambdaStore {
 				// methods without a definition require an object for their out-parameters; struct out-parameters are
 				// allocated even for methods which have a definition as they already have a location on method entry
 				// (although they remain uninitialized)
-				allocateOutParameter(method, parameter, parameterVar);
+				allocator.allocateOutParameter(method, parameter, parameterVar);
 			}
 		}
 
@@ -122,7 +116,7 @@ public final class DeclarationLambdaStore {
 			SetVariable returnVar = variableFactory.createReferenceVariable();
 			// methods without a definition require an object to return
 			if (isMethodWithoutDefinition) {
-				allocateReturnObject(method, returnVar, returnType);
+				allocator.allocateUndefinedReturnObject(method, returnVar, returnType);
 			}
 			variables.add(returnVar);
 		}
@@ -138,45 +132,11 @@ public final class DeclarationLambdaStore {
 		SetVariable returnVar = variableFactory.createReferenceVariable();
 		// properties without a definition require an object to return
 		if (declMapper.get(property) == null) {
-			allocateReturnObject(property, returnVar, property.getValueType());
+			allocator.allocateUndefinedReturnObject(property, returnVar, property.getValueType());
 		}
 
 		List<SetVariable> variables = Arrays.asList(thisVar, setParameterVar, returnVar);
 		return LambdaTerm.newPropertyLambda(variables);
-	}
-
-	private void allocateReturnObject(IMemberName member, SetVariable returnVar, ITypeName type) {
-		AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, type);
-		RefTerm returnObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
-		constraintResolver.addConstraint(returnObject, returnVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
-
-		if (type.isArrayType()) {
-			allocateArrayEntry(allocationSite, returnVar);
-		}
-	}
-
-	private void allocateOutParameter(IMemberName member, IParameterName parameter, SetVariable parameterVar) {
-		AllocationSite allocationSite = new OutParameterAllocationSite(member, parameter);
-		RefTerm paramObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
-		constraintResolver.addConstraint(paramObject, parameterVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
-
-		ITypeName type = parameter.getValueType();
-		if (type.isArrayType()) {
-			allocateArrayEntry(allocationSite, parameterVar);
-		}
-	}
-
-	private void allocateArrayEntry(AllocationSite arrayAllocationSite, SetVariable returnVar) {
-		// provide one initialized array entry
-		RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(arrayAllocationSite),
-				variableFactory.createObjectVariable());
-		SetVariable temp = variableFactory.createProjectionVariable();
-		Projection projection = new Projection(RefTerm.class, RefTerm.WRITE_INDEX, temp);
-
-		// array ⊆ proj
-		constraintResolver.addConstraint(returnVar, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
-		// src ⊆ temp
-		constraintResolver.addConstraint(arrayEntry, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 	}
 
 }

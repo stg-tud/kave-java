@@ -14,11 +14,12 @@ package cc.kave.commons.pointsto.analysis;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
-import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.indexAccessReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.fieldReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.indexAccessReference;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
@@ -29,11 +30,15 @@ import org.junit.runners.Parameterized.Parameters;
 import com.google.common.collect.ImmutableSet;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.statements.IAssignment;
+import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.tests.AnalysesProvider;
 import cc.kave.commons.pointsto.tests.TestBuilder;
@@ -45,6 +50,12 @@ public class PointsToAnalysisTest extends TestBuilder {
 	public static Collection<Object[]> data() {
 		return AnalysesProvider.ANALYSES_AS_PARAMETERS;
 	}
+
+	private static final ITypeName TEST_DELEGATE_TYPE = TypeName.newTypeName(
+			"d:[TResult] [System.Func`2[[T -> System.String, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)");
+
+	private static final IMethodName TEST_TO_STRING_METHOD = MethodName
+			.newMethodName("[System.String, mscorlib] [System.Object, mscorlib].ToString()");
 
 	private final PointsToAnalysisFactory analysisFactory;
 
@@ -122,4 +133,40 @@ public class PointsToAnalysisTest extends TestBuilder {
 				enclosingMethod.getName());
 		assertEquals(1, analysis.query(query).size());
 	}
+
+	@Test
+	public void lambdaDelegateHasLocation() {
+		// fun = p0 =>
+		ITypeName enclosingType = type("ET");
+		IMethodDeclaration enclosingMethod = declareMethod(method(enclosingType, "Entry"), true,
+				declare("fun", TEST_DELEGATE_TYPE),
+				assign("fun", lambda(type("A"), Arrays.asList(type("A")), ret("p0"))),
+				exprStmt(invoke("fun", TEST_TO_STRING_METHOD)));
+		Context ctxt = context(enclosingType, ImmutableSet.of(enclosingMethod), emptySet(), emptySet());
+		PointsToAnalysis analysis = analysisFactory.create();
+		analysis.compute(ctxt);
+
+		IExpressionStatement stmt = (IExpressionStatement) enclosingMethod.getBody().get(2);
+		PointsToQuery query = new PointsToQuery(variableReference("fun"), TEST_DELEGATE_TYPE, stmt,
+				enclosingMethod.getName());
+		assertEquals(1, analysis.query(query).size());
+	}
+
+	@Test
+	public void parameterDelegateHasLocation() {
+		// p0.ToString()
+
+		ITypeName enclosingType = type("ET");
+		IMethodDeclaration enclosingMethod = declareMethod(method(enclosingType, "Entry", TEST_DELEGATE_TYPE), true,
+				exprStmt(invoke("p0", TEST_TO_STRING_METHOD)));
+		Context ctxt = context(enclosingType, ImmutableSet.of(enclosingMethod), emptySet(), emptySet());
+		PointsToAnalysis analysis = analysisFactory.create();
+		analysis.compute(ctxt);
+
+		IExpressionStatement stmt = (IExpressionStatement) enclosingMethod.getBody().get(0);
+		PointsToQuery query = new PointsToQuery(variableReference("p0"), TEST_DELEGATE_TYPE, stmt,
+				enclosingMethod.getName());
+		assertEquals(1, analysis.query(query).size());
+	}
+
 }
