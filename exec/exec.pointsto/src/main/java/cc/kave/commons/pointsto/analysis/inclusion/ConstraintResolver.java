@@ -117,8 +117,22 @@ public class ConstraintResolver {
 
 	public Set<ConstraintNode> resolve(ConstructedTerm c1, ConstructedTerm c2, InclusionAnnotation inclusionAnnotation,
 			ContextAnnotation contextAnnotation) {
-		int numArgs = c1.getNumberOfArguments();
-		Asserts.assertEquals(numArgs, c2.getNumberOfArguments());
+		final int numArgs = c1.getNumberOfArguments();
+		if (numArgs != c2.getNumberOfArguments()) {
+			if (c1 instanceof LambdaTerm && c2 instanceof LambdaTerm) {
+				// this happens when a delegate invocation does not match the type of the associated lambda: the SST
+				// generation analysis currently does not seem to support anonymous delegates and simply maps them to
+				// empty lambdas (which violate the delegate type)
+				LOGGER.warn(
+						"Skipping resolution of a constraint between two LambdaTerms because of a different number of arguments ({} vs. {})",
+						numArgs, c2.getNumberOfArguments());
+				return Collections.emptySet();
+			} else {
+				Asserts.fail(
+						"Cannot resolve constraint between two ConstructedTerms because of a different number of arguments ("
+								+ numArgs + " vs. " + c2.getNumberOfArguments() + ")");
+			}
+		}
 		Set<ConstraintNode> changedNodes = new HashSet<>(numArgs);
 
 		for (int i = 0; i < numArgs; ++i) {
