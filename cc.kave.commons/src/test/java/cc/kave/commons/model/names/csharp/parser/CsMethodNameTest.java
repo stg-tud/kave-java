@@ -65,7 +65,7 @@ public class CsMethodNameTest {
 	public void invalidTestCases() {
 		for (String t : invalidTestCases) {
 			try {
-				IMethodName name = new CsMethodName(t);
+				new CsMethodName(t);
 				fail("Invalid name validated:" + t);
 			} catch (AssertionException e) {
 			}

@@ -255,15 +255,45 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 */
 	void exitMethod(TypeNamingParser.MethodContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TypeNamingParser#constructor}.
+	 * Enter a parse tree produced by {@link TypeNamingParser#regularMethod}.
 	 * @param ctx the parse tree
 	 */
-	void enterConstructor(TypeNamingParser.ConstructorContext ctx);
+	void enterRegularMethod(TypeNamingParser.RegularMethodContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TypeNamingParser#constructor}.
+	 * Exit a parse tree produced by {@link TypeNamingParser#regularMethod}.
 	 * @param ctx the parse tree
 	 */
-	void exitConstructor(TypeNamingParser.ConstructorContext ctx);
+	void exitRegularMethod(TypeNamingParser.RegularMethodContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#methodParameters}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodParameters(TypeNamingParser.MethodParametersContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#methodParameters}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodParameters(TypeNamingParser.MethodParametersContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#nonStaticCtor}.
+	 * @param ctx the parse tree
+	 */
+	void enterNonStaticCtor(TypeNamingParser.NonStaticCtorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#nonStaticCtor}.
+	 * @param ctx the parse tree
+	 */
+	void exitNonStaticCtor(TypeNamingParser.NonStaticCtorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#staticCctor}.
+	 * @param ctx the parse tree
+	 */
+	void enterStaticCctor(TypeNamingParser.StaticCctorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#staticCctor}.
+	 * @param ctx the parse tree
+	 */
+	void exitStaticCctor(TypeNamingParser.StaticCctorContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#customMethod}.
 	 * @param ctx the parse tree
@@ -284,6 +314,16 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFormalParam(TypeNamingParser.FormalParamContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#parameterModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterParameterModifier(TypeNamingParser.ParameterModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#parameterModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitParameterModifier(TypeNamingParser.ParameterModifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#staticModifier}.
 	 * @param ctx the parse tree
@@ -324,6 +364,26 @@ public interface TypeNamingListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRefModifier(TypeNamingParser.RefModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#outModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterOutModifier(TypeNamingParser.OutModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#outModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitOutModifier(TypeNamingParser.OutModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TypeNamingParser#extensionModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterExtensionModifier(TypeNamingParser.ExtensionModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TypeNamingParser#extensionModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitExtensionModifier(TypeNamingParser.ExtensionModifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TypeNamingParser#id}.
 	 * @param ctx the parse tree

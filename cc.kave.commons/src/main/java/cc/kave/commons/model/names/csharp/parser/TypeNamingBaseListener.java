@@ -309,13 +309,49 @@ public class TypeNamingBaseListener implements TypeNamingListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConstructor(TypeNamingParser.ConstructorContext ctx) { }
+	@Override public void enterRegularMethod(TypeNamingParser.RegularMethodContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitConstructor(TypeNamingParser.ConstructorContext ctx) { }
+	@Override public void exitRegularMethod(TypeNamingParser.RegularMethodContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMethodParameters(TypeNamingParser.MethodParametersContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMethodParameters(TypeNamingParser.MethodParametersContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNonStaticCtor(TypeNamingParser.NonStaticCtorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNonStaticCtor(TypeNamingParser.NonStaticCtorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStaticCctor(TypeNamingParser.StaticCctorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStaticCctor(TypeNamingParser.StaticCctorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -340,6 +376,18 @@ public class TypeNamingBaseListener implements TypeNamingListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFormalParam(TypeNamingParser.FormalParamContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterParameterModifier(TypeNamingParser.ParameterModifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitParameterModifier(TypeNamingParser.ParameterModifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -388,6 +436,30 @@ public class TypeNamingBaseListener implements TypeNamingListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRefModifier(TypeNamingParser.RefModifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOutModifier(TypeNamingParser.OutModifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOutModifier(TypeNamingParser.OutModifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExtensionModifier(TypeNamingParser.ExtensionModifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExtensionModifier(TypeNamingParser.ExtensionModifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

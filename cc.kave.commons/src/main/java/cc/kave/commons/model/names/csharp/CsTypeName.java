@@ -19,8 +19,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.names.IArrayTypeName;
 import cc.kave.commons.model.names.IBundleName;
+import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.INamespaceName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.parser.TypeNameParseUtil;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.NestedTypeNameContext;
@@ -28,7 +31,7 @@ import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.ResolvedTypeCo
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeContext;
 import cc.kave.commons.model.names.csharp.parser.TypeNamingParser.TypeNameContext;
 
-public class CsTypeName implements ITypeName {
+public class CsTypeName implements ITypeName, IDelegateTypeName, IArrayTypeName {
 
 	private static final String UNKNOWN_IDENTIFIER = "???";
 	protected TypeContext ctx;
@@ -289,13 +292,15 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public ITypeName getArrayBaseType() {
-		// TODO Auto-generated method stub
-		return null;
+		ITypeName type = new CsTypeName(ctx.arrayType().type());
+		if (type.isArrayType()) {
+			return type.getArrayBaseType();
+		}
+		return type;
 	}
 
 	@Override
 	public ITypeName DeriveArrayTypeName(int rank) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -312,7 +317,51 @@ public class CsTypeName implements ITypeName {
 
 	@Override
 	public ITypeName getTypeParameterType() {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getSignature() {
+		return new CsMethodName(ctx.delegateType().method()).getSignature();
+	}
+
+	@Override
+	public List<IParameterName> getParameters() {
+		return new CsMethodName(ctx.delegateType().method()).getParameters();
+	}
+
+	@Override
+	public boolean hasParameters() {
+		return new CsMethodName(ctx.delegateType().method()).hasParameters();
+	}
+
+	@Override
+	public ITypeName getReturnType() {
+		return new CsMethodName(ctx.delegateType().method()).getReturnType();
+	}
+
+	@Override
+	public int getRank() {
+		if (isArrayType()) {
+			return 1 + new CsTypeName(ctx.arrayType().type()).getRank();
+		}
+		return 0;
+	}
+
+	public IDelegateTypeName toDelegateType() {
+		if (isDelegateType()) {
+			return this;
+		} else {
+			throw new ClassCastException();
+		}
+	}
+
+	public IArrayTypeName toArrayType() {
+		if (isArrayType()) {
+			return this;
+		} else {
+			throw new ClassCastException();
+		}
+	}
+
 }

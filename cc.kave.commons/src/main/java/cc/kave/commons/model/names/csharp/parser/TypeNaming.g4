@@ -72,12 +72,14 @@ boundTypeParameter: typeParameter (WS? '->' WS? type)?;
 assembly: id (',' WS? assemblyVersion)? ;
 assemblyVersion: num '.' num '.' num '.' num;	
 
-method: (constructor | customMethod) '(' WS? ( formalParam ( WS? ',' WS? formalParam)*)? WS? ')';
-constructor: '[' type '].' constructorName;
-constructorName: ('.ctor' | '.cctor');
-customMethod: '[' type ']' WS? (staticModifier)? WS? '[' type '].' id genericTypePart?;
+method: UNKNOWN | regularMethod;
+regularMethod: (nonStaticCtor | staticCctor | customMethod) methodParameters;
+methodParameters: '(' WS? ( formalParam ( WS? ',' WS? formalParam)*)? WS? ')';
+nonStaticCtor: WS? '[' UNKNOWN ']' WS? '[' type ']..ctor';
+staticCctor: staticModifier WS? '[' UNKNOWN ']' WS? '[' type ']..cctor';
+customMethod: staticModifier? WS? '[' type ']'  WS? '[' type '].' id genericTypePart?;
 formalParam: (WS? parameterModifier)? WS? '[' type ']' WS? id;
-parameterModifier: (paramsModifier | optsModifier | refModifier | outModifier | extensionModifier);
+parameterModifier: paramsModifier | optsModifier | refModifier | outModifier | extensionModifier;
 
 staticModifier: 'static';
 paramsModifier: 'params';

@@ -42,27 +42,37 @@ public class CsMethodName implements IMethodName {
 
 	@Override
 	public ITypeName getDeclaringType() {
-		return ctx.customMethod() != null ? new CsTypeName(ctx.customMethod().type(1))
-				: new CsTypeName(ctx.constructor().type());
+		if (isUnknown()) {
+			return new CsTypeName(ctx.UNKNOWN().getText());
+		} else if (isConstructor()) {
+			return new CsTypeName(ctx.regularMethod().staticCctor() != null ? ctx.regularMethod().staticCctor().type()
+					: ctx.regularMethod().nonStaticCtor().type());
+		}
+		return new CsTypeName(ctx.regularMethod().customMethod().type(1));
 	}
 
 	@Override
 	public ITypeName getValueType() {
-		if (ctx.customMethod() != null) {
-			return new CsTypeName(ctx.customMethod().type(0));
+		if (!isUnknown() && !isConstructor()) {
+			return new CsTypeName(ctx.regularMethod().customMethod().type(0));
 		}
 		return new CsTypeName("?");
 	}
 
 	@Override
 	public boolean isStatic() {
-		return ctx.customMethod() != null && ctx.customMethod().staticModifier() != null;
+		return !isUnknown()
+				&& (ctx.regularMethod().staticCctor() != null || ctx.regularMethod().nonStaticCtor() != null);
 	}
 
 	@Override
 	public String getName() {
-		// TODO implement for constructors
-		return ctx.customMethod() != null ? ctx.customMethod().id().getText() : ".cctor";
+		if (isConstructor()) {
+			return ctx.regularMethod().staticCctor() != null ? ".cctor" : ".ctor";
+		} else if (isUnknown()) {
+			return ctx.UNKNOWN().getText();
+		}
+		return ctx.regularMethod().customMethod().id().getText();
 	}
 
 	@Override
@@ -72,25 +82,25 @@ public class CsMethodName implements IMethodName {
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return ctx.UNKNOWN() != null;
 	}
 
 	@Override
 	public boolean isGenericEntity() {
-		return ctx.customMethod() != null && ctx.customMethod().genericTypePart() != null;
+		return !isUnknown() && !isConstructor() && ctx.regularMethod().customMethod() != null
+				&& ctx.regularMethod().customMethod().genericTypePart() != null;
 	}
 
 	@Override
 	public boolean hasTypeParameters() {
-		return isGenericEntity() && ctx.customMethod().genericTypePart().genericParam() != null;
+		return isGenericEntity() && ctx.regularMethod().customMethod().genericTypePart().genericParam() != null;
 	}
 
 	@Override
 	public List<ITypeName> getTypeParameters() {
 		List<ITypeName> typeParameters = Lists.newArrayList();
 		if (isGenericEntity() && hasTypeParameters()) {
-			for (GenericParamContext c : ctx.customMethod().genericTypePart().genericParam()) {
+			for (GenericParamContext c : ctx.regularMethod().customMethod().genericTypePart().genericParam()) {
 				typeParameters.add(TypeParameterName.newTypeParameterName(c.getText()));
 			}
 		}
@@ -107,7 +117,7 @@ public class CsMethodName implements IMethodName {
 	public List<IParameterName> getParameters() {
 		List<IParameterName> parameters = Lists.newArrayList();
 		if (hasParameters()) {
-			for (FormalParamContext c : ctx.formalParam()) {
+			for (FormalParamContext c : ctx.regularMethod().methodParameters().formalParam()) {
 				parameters.add(ParameterName.newParameterName(c.getText()));
 			}
 		}
@@ -116,12 +126,13 @@ public class CsMethodName implements IMethodName {
 
 	@Override
 	public boolean hasParameters() {
-		return ctx.formalParam() != null;
+		return !isUnknown() && !isConstructor() && ctx.regularMethod().methodParameters().formalParam() != null;
 	}
 
 	@Override
 	public boolean isConstructor() {
-		return ctx.constructor() != null;
+		return !isUnknown()
+				&& (ctx.regularMethod().staticCctor() != null || ctx.regularMethod().nonStaticCtor() != null);
 	}
 
 	@Override
