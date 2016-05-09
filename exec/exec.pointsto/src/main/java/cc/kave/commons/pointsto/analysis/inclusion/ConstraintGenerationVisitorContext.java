@@ -41,6 +41,7 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -53,6 +54,7 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.CatchBlockAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ContextAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.EntryPointMemberAllocationSite;
@@ -167,7 +169,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 				for (IMemberName member : declMapper.getAssignableMembers()) {
 					SetVariable memberVar = builder.createTemporaryVariable();
 					ITypeName memberType = member.getValueType();
-					
+
 					if (memberType.isDelegateType()) {
 						builder.getAllocator().allocateDelegate((IDelegateTypeName) memberType, memberVar);
 					} else {
@@ -372,6 +374,12 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 				builder.alias(lambdaStack.getFirst().getValue(), returnedValue);
 			}
 		}
+	}
+
+	@Override
+	public void declareParameter(IParameterName parameter, ICatchBlock catchBlock) {
+		super.declareParameter(parameter, catchBlock);
+		builder.allocate(variableReference(parameter.getName()), new CatchBlockAllocationSite(catchBlock));
 	}
 
 }

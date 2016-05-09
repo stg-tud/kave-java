@@ -12,8 +12,11 @@
  */
 package cc.kave.commons.pointsto.tests.analysis.inclusion;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.fieldReference;
+import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.indexAccessReference;
+import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -24,9 +27,11 @@ import java.util.Set;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
@@ -44,9 +49,10 @@ import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
+import cc.kave.commons.pointsto.tests.TestBuilder;
 import cc.kave.commons.pointsto.tests.TestSSTBuilder;
 
-public class InclusionAnalysisTest {
+public class InclusionAnalysisTest extends TestBuilder {
 
 	private static <T> T getLast(List<T> items) {
 		return items.get(items.size() - 1);
@@ -202,5 +208,30 @@ public class InclusionAnalysisTest {
 				.query(queryBuilder.newQuery(showArgRef, showDecl.getBody().get(0)));
 		assertEquals(1, showArgLocations.size());
 		assertThat(entry2ArgLocations, Matchers.hasItem(showArgLocations.iterator().next()));
+	}
+
+	@Test
+	public void fieldLocationsHaveNoEffectOnIndexAccessLocations() {
+		// b = p0.F0
+		// c = p0[x]
+
+		ITypeName enclosingType = type("ET");
+		IMethodDeclaration enclosingMethod = declareMethod(method(enclosingType, "Entry", type("A")), true,
+				declare("b", type("B")),
+				assign("b", refExpr(fieldReference(variableReference("p0"), field(type("B"), type("A"), 0)))),
+				declare("c", type("C")), assign("c", refExpr(indexAccessReference(variableReference("p0")))));
+		Context ctxt = context(enclosingType, ImmutableSet.of(enclosingMethod), emptySet(), emptySet());
+		PointsToAnalysis analysis = new InclusionAnalysis();
+		analysis.compute(ctxt);
+
+		IAssignment bAssignment = (IAssignment) enclosingMethod.getBody().get(1);
+		IAssignment cAssignment = (IAssignment) enclosingMethod.getBody().get(3);
+		Set<AbstractLocation> bLocations = analysis
+				.query(new PointsToQuery(variableReference("b"), type("B"), bAssignment, enclosingMethod.getName()));
+		assertFalse(bLocations.isEmpty());
+		Set<AbstractLocation> cLocations = analysis
+				.query(new PointsToQuery(variableReference("c"), type("C"), cAssignment, enclosingMethod.getName()));
+		assertFalse(cLocations.isEmpty());
+		assertThat(bLocations, Matchers.not(cLocations));
 	}
 }

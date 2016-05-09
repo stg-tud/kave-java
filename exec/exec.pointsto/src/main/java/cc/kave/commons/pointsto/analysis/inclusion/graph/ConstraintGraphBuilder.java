@@ -54,13 +54,16 @@ import cc.kave.commons.pointsto.analysis.inclusion.SetVariable;
 import cc.kave.commons.pointsto.analysis.inclusion.SetVariableFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.FallbackIndexAccessAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UniqueAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
+import cc.kave.commons.pointsto.analysis.inclusion.annotations.IndexAccessAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InvocationAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.StorageAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
+import cc.kave.commons.pointsto.analysis.references.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctLambdaParameterReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctMethodParameterReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
@@ -90,6 +93,7 @@ public class ConstraintGraphBuilder {
 	private final RefTerm staticObject;
 	private final Map<IMemberName, SetVariable> staticMembers = new HashMap<>();
 	private final Map<IMemberName, Set<SetVariable>> undefinedStorageMembers = new HashMap<>();
+	private final Set<DistinctIndexAccessReference> providedFallbackObjects = new HashSet<>();
 
 	public ConstraintGraphBuilder(Function<IReference, DistinctReference> referenceResolver,
 			DeclarationMapper declMapper, ContextFactory contextFactory) {
@@ -262,6 +266,16 @@ public class ConstraintGraphBuilder {
 		}
 	}
 
+	private void provideFallbackObjectForIndexAccess(IIndexAccessReference indexAccessRef) {
+		DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) referenceResolver.apply(indexAccessRef);
+		if (!providedFallbackObjects.contains(distRef) && !distRef.getBaseReference().getType().isArrayType()) {
+			providedFallbackObjects.add(distRef);
+			RefTerm fallbackObject = new RefTerm(new FallbackIndexAccessAllocationSite(),
+					variableFactory.createObjectVariable());
+			writeArrayRaw(getVariable(indexAccessRef.getExpression().getReference()), fallbackObject);
+		}
+	}
+
 	public SetVariable createTemporaryVariable() {
 		return variableFactory.createReferenceVariable();
 	}
@@ -330,6 +344,7 @@ public class ConstraintGraphBuilder {
 
 	public void readArray(SetVariable destSetVar, IIndexAccessReference src) {
 		ensureArrayAccessHasVariable(src);
+		provideFallbackObjectForIndexAccess(src);
 
 		SetVariable arraySetVar = getVariable(src.getExpression().getReference());
 		SetVariable temp = variableFactory.createProjectionVariable();
@@ -343,7 +358,7 @@ public class ConstraintGraphBuilder {
 		// temp ⊆ dest
 		ConstraintNode tempNode = getNode(temp);
 		tempNode.addSuccessor(
-				new ConstraintEdge(getNode(destSetVar), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+				new ConstraintEdge(getNode(destSetVar), IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY));
 	}
 
 	public void writeMember(IMemberReference dest, IVariableReference src, IMemberName member) {
@@ -416,7 +431,7 @@ public class ConstraintGraphBuilder {
 		// src ⊆ temp
 		ConstraintNode tempNode = getNode(temp);
 		tempNode.addPredecessor(
-				new ConstraintEdge(getNode(srcSetVar), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+				new ConstraintEdge(getNode(srcSetVar), IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY));
 	}
 
 	private void writeArrayRaw(SetExpression arrayExpr, SetExpression srcExpr) {
@@ -427,7 +442,7 @@ public class ConstraintGraphBuilder {
 		constraintResolver.addConstraint(arrayExpr, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 
 		// src ⊆ temp
-		constraintResolver.addConstraint(srcExpr, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+		constraintResolver.addConstraint(srcExpr, temp, IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY);
 	}
 
 	public void invoke(SetVariable dest, IVariableReference recv, List<SetVariable> normalizedActualParameters,

@@ -25,6 +25,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.allocations.OutParameterAlloc
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
+import cc.kave.commons.pointsto.analysis.inclusion.annotations.IndexAccessAnnotation;
 
 public class Allocator {
 
@@ -93,6 +94,6 @@ public class Allocator {
 		// array ⊆ proj
 		constraintResolver.addConstraint(dest, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 		// src ⊆ temp
-		constraintResolver.addConstraint(arrayEntry, temp, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+		constraintResolver.addConstraint(arrayEntry, temp, IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY);
 	}
 }
