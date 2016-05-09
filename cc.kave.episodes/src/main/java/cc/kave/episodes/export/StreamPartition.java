@@ -141,12 +141,12 @@ public class StreamPartition {
 	}
 
 	private FilesPath getFiles(int number) {
-		File folder = new File(rootFolder.getAbsolutePath() + "/partition" + number + "/");
+		File folder = new File(rootFolder.getAbsolutePath() + "/patterns/partition" + number + "/");
 		if (!folder.isDirectory()) {
-			folder.mkdir();
+			folder.mkdirs();
 		}
-		File streamFile = new File(folder.getAbsolutePath() + "/eventStream.txt");
-		File mappingFile = new File(folder.getAbsolutePath() + "/eventMapping.txt");
+		File streamFile = new File(folder.getAbsolutePath() + "/eventStream" + number + ".txt");
+		File mappingFile = new File(folder.getAbsolutePath() + "/eventMapping" + number + ".txt");
 
 		FilesPath path = new FilesPath();
 		path.streamFile = streamFile.getAbsolutePath();

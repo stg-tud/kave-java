@@ -43,6 +43,7 @@ public class EventStreamIoTest {
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+	public static final int STREAMIDX = 8;
 
 	@Test
 	public void happyPath() throws IOException {
@@ -70,7 +71,7 @@ public class EventStreamIoTest {
 		List<Event> actualsMapping = EventStreamIo.readMapping(b.getAbsolutePath());
 		String actualTxt = FileUtils.readFileToString(a);
 		assertMapping(expected.getMapping().keySet(), actualsMapping);
-		assertEquals(expected.getStream(), actualTxt);
+		assertEquals(expected.getStream().substring(STREAMIDX), actualTxt);
 	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {

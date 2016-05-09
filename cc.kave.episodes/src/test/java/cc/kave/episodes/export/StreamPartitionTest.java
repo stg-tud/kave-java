@@ -81,6 +81,7 @@ public class StreamPartitionTest {
 
 	private static final String REPO1 = "Github/repo1/usr1/ws";
 	private static final String REPO2 = "Github/repo1/usr2/ws";
+	private static final int STREAMIDX = 8;
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
@@ -259,10 +260,10 @@ public class StreamPartitionTest {
 		String actualStream2 = FileUtils.readFileToString(streamFile2);
 		String actualMapping2 = FileUtils.readFileToString(mappingFile2);
 
-		assertEquals(expected1.getStream(), actualStream1);
+		assertEquals(expected1.getStream().substring(STREAMIDX), actualStream1);
 		assertEquals(getMapping(1), actualMapping1);
 		
-		assertEquals(expected2.getStream(), actualStream2);
+		assertEquals(expected2.getStream().substring(STREAMIDX), actualStream2);
 		assertEquals(getMapping(2), actualMapping2);
 	}
 
@@ -302,7 +303,7 @@ public class StreamPartitionTest {
 		String actualStream = FileUtils.readFileToString(streamFile1);
 		String actualMapping = FileUtils.readFileToString(mappingFile1);
 
-		assertEquals(expected.getStream(), actualStream);
+		assertEquals(expected.getStream().substring(STREAMIDX), actualStream);
 		assertEquals(getMapping(), actualMapping);
 	}
 
@@ -319,12 +320,12 @@ public class StreamPartitionTest {
 	}
 
 	private String getStreamPath(int number) {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/partition" + number + "/eventStream.txt");
+		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/patterns/partition" + number + "/eventStream" + number + ".txt");
 		return streamFile.getAbsolutePath();
 	}
 
 	private String getMappingPath(int number) {
-		File mappingFile = new File(rootFolder.getRoot().getAbsolutePath() + "/partition" + number + "/eventMapping.txt");
+		File mappingFile = new File(rootFolder.getRoot().getAbsolutePath() + "/patterns/partition" + number + "/eventMapping" + number + ".txt");
 		return mappingFile.getAbsolutePath();
 	}
 	

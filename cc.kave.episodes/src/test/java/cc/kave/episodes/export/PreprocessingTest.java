@@ -75,6 +75,8 @@ public class PreprocessingTest {
 	@Mock
 	private FileUtils fileUtils;
 	
+	private static final int STREAMIDX = 8;
+	
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras; 
 	
@@ -210,15 +212,14 @@ public class PreprocessingTest {
 		
 		//ctx1 ctx2 inv1 inv2 inv2 ctx2 inv3 inv3
 		StringBuilder streamBuilder = new StringBuilder();
-		streamBuilder.append("0,0.000\n");
-		streamBuilder.append("1,1.001\n");
+		streamBuilder.append("1,1.000\n");
+		streamBuilder.append("2,1.001\n");
 		streamBuilder.append("2,1.002\n");
-		streamBuilder.append("2,1.003\n");
-		streamBuilder.append("1,1.504\n");
+		streamBuilder.append("1,1.503\n");
+		streamBuilder.append("3,1.504\n");
 		streamBuilder.append("3,1.505\n");
-		streamBuilder.append("3,1.506\n");
 		
-		String expectedStream = streamBuilder.toString();
+		String expectedStream = streamBuilder.toString().substring(STREAMIDX);
 		
 		StringBuilder mappingBuilder = new StringBuilder();
 		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
@@ -255,11 +256,10 @@ public class PreprocessingTest {
 		
 		//ctx1 ctx2 inv1 inv2 inv2
 		StringBuilder streamBuilder = new StringBuilder();
-		streamBuilder.append("0,0.000\n");
+		streamBuilder.append("1,1.000\n");
 		streamBuilder.append("1,1.001\n");
-		streamBuilder.append("1,1.002\n");
 		
-		String expectedStream = streamBuilder.toString();
+		String expectedStream = streamBuilder.toString().substring(STREAMIDX);
 		
 		StringBuilder mappingBuilder = new StringBuilder();
 		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");

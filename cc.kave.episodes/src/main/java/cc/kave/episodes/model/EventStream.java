@@ -72,7 +72,7 @@ public class EventStream {
 		}
 		this.isFirstMethod = false;
 		
-		if (idx != null) {
+		if ((idx != null) && (idx > 0)) {
 			this.sb.append(idx);
 			this.sb.append(',');
 			this.sb.append(String.format("%.3f", this.time));
@@ -102,9 +102,6 @@ public class EventStream {
 			return false;
 		}
 		if (!this.sb.toString().equals(sm.getStream())) {
-			return false;
-		}
-		if (this.streamLength != sm.getStreamLength()) {
 			return false;
 		}
 		return true;

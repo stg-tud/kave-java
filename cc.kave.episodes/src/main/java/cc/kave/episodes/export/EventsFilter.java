@@ -29,6 +29,7 @@ import cc.recommenders.io.Logger;
 public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
+	private static final int FREQUENCY = 1;
 	
 	public static EventStream filterStream(List<Event> stream) {
 		EventStream sm = new EventStream();
@@ -43,7 +44,7 @@ public class EventsFilter {
 		
 		sm.addEvent(dummyEvent);
 		for (Event e : stream) {
-			if (occurrences.get(e) > 1) {
+			if (occurrences.get(e) > FREQUENCY) {
 				sm.addEvent(e);
 			} else {
 				sigletons++;
