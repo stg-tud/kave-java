@@ -15,6 +15,9 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IParameterName;
@@ -29,6 +32,8 @@ import cc.kave.commons.pointsto.analysis.inclusion.annotations.IndexAccessAnnota
 
 public class Allocator {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(Allocator.class);
+
 	private final ConstraintResolver constraintResolver;
 	private final SetVariableFactory variableFactory;
 
@@ -39,9 +44,7 @@ public class Allocator {
 
 	public void allocateOutParameter(IMemberName member, IParameterName parameter, SetVariable parameterVar) {
 		ITypeName type = parameter.getValueType();
-		if (type.isDelegateType()) {
-			allocateDelegate((IDelegateTypeName) type, parameterVar);
-		} else {
+		if (!allocateDelegate(type, parameterVar)) {
 			AllocationSite allocationSite = new OutParameterAllocationSite(member, parameter);
 			RefTerm paramObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 			constraintResolver.addConstraint(paramObject, parameterVar, InclusionAnnotation.EMPTY,
@@ -61,6 +64,25 @@ public class Allocator {
 		if (type.isArrayType()) {
 			allocateArrayEntry(allocationSite, type, returnVar);
 		}
+	}
+
+	public boolean allocateDelegate(ITypeName type, SetVariable dest) {
+		if (type.isDelegateType()) {
+			if (type.isTypeParameter()) {
+				try {
+					allocateDelegate((IDelegateTypeName) type.getTypeParameterType(), dest);
+				} catch (RuntimeException ex) {
+					// there is a rare bug where a method parameter is erroneously thought to be a TypeParameterName
+					// although it ought to be a StructTypeName
+					LOGGER.error("Encountered TypeParameterName bug: {}", ex.getMessage());
+					return false;
+				}
+			} else {
+				allocateDelegate((IDelegateTypeName) type, dest);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public void allocateDelegate(IDelegateTypeName delegateType, SetVariable dest) {

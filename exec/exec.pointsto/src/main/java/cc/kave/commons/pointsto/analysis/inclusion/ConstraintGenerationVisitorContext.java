@@ -158,9 +158,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		SetVariable parameterVar = builder.createTemporaryVariable();
 		ITypeName type = parameter.getValueType();
 
-		if (type.isDelegateType()) {
-			builder.getAllocator().allocateDelegate((IDelegateTypeName) type, parameterVar);
-		} else {
+		if (!builder.getAllocator().allocateDelegate(type, parameterVar)) {
 			EntryPointAllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
 			builder.allocate(parameterVar, parameterAllocationSite);
 			if (type.isArrayType()) {

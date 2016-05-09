@@ -109,7 +109,7 @@ public class QueryKeyTransformer
 			DistinctReferenceContextCollector context) {
 		Collection<IStatement> statements = context.getStatements(catchBlockParameterRef);
 		Collection<IMemberName> members = context.getMembers(catchBlockParameterRef);
-		Asserts.assertEquals(1, members.size());
+		Asserts.assertLessOrEqual(members.size(), 1);
 		IMemberName member = members.isEmpty() ? null : members.iterator().next();
 		IReference reference = catchBlockParameterRef.getReference();
 		ITypeName type = catchBlockParameterRef.getType();

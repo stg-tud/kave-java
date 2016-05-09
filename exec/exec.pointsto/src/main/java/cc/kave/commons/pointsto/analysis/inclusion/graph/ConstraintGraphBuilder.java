@@ -28,7 +28,6 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.IDelegateTypeName;
 import cc.kave.commons.model.names.ILambdaName;
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.IMethodName;
@@ -224,9 +223,7 @@ public class ConstraintGraphBuilder {
 			ConstraintNode memberNode = getNode(memberEntry.getValue());
 			if (memberNode.getPredecessors().isEmpty()) {
 				ITypeName type = memberEntry.getKey().getValueType();
-				if (type.isDelegateType()) {
-					allocator.allocateDelegate((IDelegateTypeName) type, memberEntry.getValue());
-				} else {
+				if (!allocator.allocateDelegate(type, memberEntry.getValue())) {
 					AllocationSite allocationSite = new UndefinedMemberAllocationSite(memberEntry.getKey(), type);
 					RefTerm obj = new RefTerm(allocationSite, getVariable(allocationSite));
 					memberNode.addPredecessor(
@@ -248,9 +245,7 @@ public class ConstraintGraphBuilder {
 			IMemberName member = memberEntry.getKey();
 			for (SetVariable recv : memberEntry.getValue()) {
 				ITypeName type = member.getValueType();
-				if (type.isDelegateType()) {
-					allocator.allocateDelegate((IDelegateTypeName) type, recv);
-				} else {
+				if (!allocator.allocateDelegate(type, recv)) {
 					AllocationSite allocationSite = new UndefinedMemberAllocationSite(member, type);
 					RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 					writeMemberRaw(recv, obj, member);
