@@ -33,7 +33,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import com.google.common.base.Stopwatch;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
@@ -41,12 +43,15 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.evaluation.AbstractEvaluation;
+import cc.kave.commons.pointsto.evaluation.ContextSampler;
+import cc.kave.commons.pointsto.evaluation.Module;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
 
-public class TimeEvaluation extends AbstractCompletionEventEvaluation {
+public class TimeEvaluation extends AbstractEvaluation {
 
-	private static final int MAX_COMPLETION_EVENTS = 10000;
+	private static final int MAX_COMPLETION_EVENTS = 8000;
 
 	private static final int WARM_UP_RUNS = 5;
 
@@ -78,10 +83,8 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 						Integer.toString(entry.numStmts), format.apply(entry.time) }));
 	}
 
-	@Override
-	protected void evaluate(List<ICompletionEvent> completionEvents, List<PointsToAnalysisFactory> ptFactories)
+	public void run(List<Context> contexts, List<PointsToAnalysisFactory> ptFactories)
 			throws IOException {
-		List<Context> contexts = sampleEvents(completionEvents);
 		log("Using %d contexts for time measurement\n", contexts.size());
 
 		initializeStmtCountTimes(ptFactories, contexts);
@@ -155,5 +158,15 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 			this.time = time;
 		}
 
+	}
+	
+	public static void main(String[] args) throws IOException {
+		Injector injector = Guice.createInjector(new Module());
+		ContextSampler sampler = injector.getInstance(ContextSampler.class);
+		
+		List<Context> contexts = sampler.sample(BASE_DIR.resolve("cut"), MAX_COMPLETION_EVENTS);
+		TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
+		evaluation.run(contexts, POINTS_TO_FACTORIES);
+		evaluation.exportResults(EVALUATION_RESULTS_DIR, injector.getInstance(ResultExporter.class));
 	}
 }

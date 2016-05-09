@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -34,18 +35,13 @@ import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.pointsto.evaluation.Logger;
-import cc.kave.commons.pointsto.evaluation.Module;
+import cc.kave.commons.pointsto.evaluation.AbstractEvaluation;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.JsonUtils;
 
-public abstract class AbstractCompletionEventEvaluation {
-
-	protected void log(String format, Object... args) {
-		Logger.log(format, args);
-	}
+public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluation {
 
 	public void run(Path completionEventsArchive, List<PointsToAnalysisFactory> ptFactories) throws IOException {
 		List<Path> zipFiles;
@@ -61,7 +57,10 @@ public abstract class AbstractCompletionEventEvaluation {
 		log("%d/%d (%.2f%%) events used for evaluation\n", completionEvents.size(), totalNumberOfEvents,
 				completionEvents.size() / (double) totalNumberOfEvents * 100);
 
+		long startTime = System.nanoTime();
 		evaluate(completionEvents, ptFactories);
+		long diff = System.nanoTime() - startTime;
+		log("evaluation took %d min\n", TimeUnit.MINUTES.convert(diff, TimeUnit.NANOSECONDS));
 	}
 
 	protected Predicate<ICompletionEvent> createCompletionEventFilter() {
@@ -94,16 +93,11 @@ public abstract class AbstractCompletionEventEvaluation {
 		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;
-		// injector = Guice.createInjector(new StoreModule());
-		// MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
-		// evaluation.run(completionEventsArchive, ptFactories);
-		// evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
-		// injector.getInstance(ResultExporter.class));
-		// evaluation.close();
-
-		// injector = Guice.createInjector(new Module());
-		// TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
-		// evaluation.run(completionEventsArchive, ptFactories);
-		// evaluation.exportResults(evaluationResultsDir, injector.getInstance(ResultExporter.class));
+		 injector = Guice.createInjector(new StoreModule());
+		 MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
+		 evaluation.run(completionEventsArchive, ptFactories);
+		 evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
+		 injector.getInstance(ResultExporter.class));
+		 evaluation.close();
 	}
 }
