@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.mutable.MutableLong;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -39,6 +37,7 @@ import com.google.inject.Inject;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
@@ -54,7 +53,7 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 	private final RandomGenerator rndGenerator;
 
 	private Map<String, DescriptiveStatistics> analysisStatistics = new HashMap<>();
-	private Map<String, List<Pair<Integer, Double>>> analysisTimes = new HashMap<>();
+	private List<AnalysisTimeEntry> analysisTimes;
 
 	private Map<Context, Integer> stmtCounts = new IdentityHashMap<>();
 
@@ -75,8 +74,8 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 				outputDir
 						.resolve(
 								"StmtCountTimes.txt"),
-				analysisTimes.entrySet().stream().flatMap(entry -> entry.getValue().stream().map(value -> new String[] {
-						entry.getKey(), value.getLeft().toString(), format.apply(value.getRight()) })));
+				analysisTimes.stream().map(entry -> new String[] { entry.analysisName, entry.contextType.getFullName(),
+						Integer.toString(entry.numStmts), format.apply(entry.time) }));
 	}
 
 	@Override
@@ -110,20 +109,17 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 	}
 
 	private void initializeStmtCountTimes(Collection<PointsToAnalysisFactory> ptFactories, List<Context> contexts) {
-		for (PointsToAnalysisFactory ptFactory : ptFactories) {
-			analysisTimes.put(ptFactory.getName(), new ArrayList<>(contexts.size()));
-		}
+		analysisTimes = new ArrayList<>(ptFactories.size() * contexts.size());
 
 		StatementCounterVisitor counter = new StatementCounterVisitor();
 		for (Context context : contexts) {
-			stmtCounts.put(context, context.getSST().accept(counter, null));
+			int count = context.getSST().accept(counter, null);
+			stmtCounts.put(context, count);
 		}
 	}
 
 	private void clearStmtCountTimes() {
-		for (List<?> times : analysisTimes.values()) {
-			times.clear();
-		}
+		analysisTimes.clear();
 	}
 
 	private DescriptiveStatistics measurePointerAnalysis(List<Context> contexts, PointsToAnalysisFactory ptFactory,
@@ -139,9 +135,25 @@ public class TimeEvaluation extends AbstractCompletionEventEvaluation {
 			long time = watch.elapsed(TimeUnit.MICROSECONDS);
 			stats.addValue(time);
 
-			analysisTimes.get(ptFactory.getName()).add(ImmutablePair.of(stmtCounts.get(context), (double) time));
+			analysisTimes.add(new AnalysisTimeEntry(ptFactory.getName(),
+					context.getTypeShape().getTypeHierarchy().getElement(), stmtCounts.get(context), time));
 		}
 
 		return stats;
+	}
+
+	private static class AnalysisTimeEntry {
+		public final String analysisName;
+		public final ITypeName contextType;
+		public final int numStmts;
+		public final double time;
+
+		public AnalysisTimeEntry(String analysisName, ITypeName contextType, int numStmts, double time) {
+			this.analysisName = analysisName;
+			this.contextType = contextType;
+			this.numStmts = numStmts;
+			this.time = time;
+		}
+
 	}
 }
