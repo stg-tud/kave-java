@@ -102,8 +102,8 @@ public class GenericNameUtils {
 
 		for (ITypeName typeParam : type.getTypeParameters()) {
 			String name = typeParam.getTypeParameterShortName();
-			String pattern = name + " " + INSTANTIATION_ARROW + " "
-					+ Pattern.quote(typeParam.getTypeParameterType().getIdentifier());
+			String pattern = Pattern
+					.quote(name + " " + INSTANTIATION_ARROW + " " + typeParam.getTypeParameterType().getIdentifier());
 			id = id.replaceAll(pattern, name);
 		}
 		return TypeName.newTypeName(id);
