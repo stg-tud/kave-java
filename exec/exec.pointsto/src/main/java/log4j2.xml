@@ -7,6 +7,13 @@
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="${PATTERN}" />
 		</Console>
+		<RollingRandomAccessFile name="ROLLING_FILE"
+			fileName="pointsto.log" filePattern="pointsto-%i.log">
+			<PatternLayout pattern="${PATTERN}" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="20 MB" />
+			</Policies>
+		</RollingRandomAccessFile>
 	</Appenders>
 	<Loggers>
 		<Root level="DEBUG">
