@@ -45,6 +45,9 @@ import org.mockito.stubbing.Answer;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
+import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
@@ -54,6 +57,7 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.model.EventStream;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -65,7 +69,7 @@ public class StreamPartitionTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Mock
 	private Directory rootDirectory;
 	@Mock
@@ -74,30 +78,33 @@ public class StreamPartitionTest {
 	private EventStreamIo streamer;
 	@Mock
 	private FileUtils fileUtils;
-	
+
 	private static final String REPO1 = "Github/repo1/usr1/ws";
 	private static final String REPO2 = "Github/repo1/usr2/ws";
-	private static final String REPO3 = "Github/repo2/usr1/ws";
-	
+
 	private Map<String, Context> data;
-	private Map<String, ReadingArchive> ras; 
-	
+	private Map<String, ReadingArchive> ras;
+
 	private StreamPartition sut;
-	
-	@Before 
+
+	@Before
 	public void setup() throws IOException {
 		Logger.reset();
 		Logger.setCapturing(true);
-		
+
 		MockitoAnnotations.initMocks(this);
-		
+
 		data = Maps.newHashMap();
 		ras = Maps.newHashMap();
 		sut = new StreamPartition(rootDirectory, rootFolder.getRoot());
-		
+
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
 		md.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
+//		InvocationExpression ie5 = new InvocationExpression();
+//		IMethodName methodName5 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+//		ie5.setMethodName(methodName5);
+//		md.getBody().add(wrap(ie5));
 		md.getBody().add(new ContinueStatement());
 		sst.getMethods().add(md);
 
@@ -115,11 +122,11 @@ public class StreamPartitionTest {
 		md2.getBody().add(wrap(ie2));
 		md2.getBody().add(wrap(ie2));
 		sst.getMethods().add(md2);
-		
+
 		Context context = new Context();
 		context.setSST(sst);
 		data.put(REPO1, context);
-		
+
 		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
 			@Override
 			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
@@ -140,22 +147,22 @@ public class StreamPartitionTest {
 
 		Logger.setPrinting(false);
 	}
-	
+
 	@After
 	public void teardown() {
 		Logger.reset();
 	}
-	
+
 	@Test
 	public void contextTest() throws ZipException, IOException {
 		sut.partition();
 
-		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
-		verify(rootDirectory).getReadingArchive(REPO1);
+		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
+		verify(rootDirectory, times(2)).getReadingArchive(REPO1);
 		verify(ras.get(REPO1), times(2)).hasNext();
 		verify(ras.get(REPO1)).getNext(Context.class);
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
@@ -170,7 +177,7 @@ public class StreamPartitionTest {
 		thrown.expectMessage("Contexts is not a folder, but a file");
 		sut = new StreamPartition(rootDirectory, file);
 	}
-	
+
 	@Test
 	public void readTwoArchives() throws IOException {
 		SST sst = new SST();
@@ -201,102 +208,148 @@ public class StreamPartitionTest {
 		sut.partition();
 
 		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
-		verify(rootDirectory).getReadingArchive(REPO1);
-		verify(rootDirectory).getReadingArchive(REPO2);
+		verify(rootDirectory, times(2)).getReadingArchive(REPO1);
+		verify(rootDirectory, times(2)).getReadingArchive(REPO2);
 
 		verify(ras.get(REPO1), times(2)).hasNext();
 		verify(ras.get(REPO1)).getNext(Context.class);
 		verify(ras.get(REPO2), times(2)).hasNext();
 		verify(ras.get(REPO2)).getNext(Context.class);
+
+		File streamFile1 = new File(getStreamPath(1));
+		File mappingFile1 = new File(getMappingPath(1));
 		
-		File streamFile = new File(getStreamPath());
-		File mappingFile = new File(getMappingPath());
+		File streamFile2 = new File(getStreamPath(2));
+		File mappingFile2 = new File(getMappingPath(2));
+
+		EventStream expected1 = new EventStream();
 		
-		//ctx1 ctx2 inv1 inv2 inv2 ctx2 inv3 inv3
-		StringBuilder streamBuilder = new StringBuilder();
-		streamBuilder.append("0,0.000\n");
-		streamBuilder.append("1,1.001\n");
-		streamBuilder.append("2,1.002\n");
-		streamBuilder.append("2,1.003\n");
-		streamBuilder.append("1,1.504\n");
-		streamBuilder.append("3,1.505\n");
-		streamBuilder.append("3,1.506\n");
+		Event dummy = new Event();
+		dummy.createDummyEvent();
+		expected1.addEvent(dummy);
 		
-		String expectedStream = streamBuilder.toString();
+		Event ctx3 = new Event();
+		ctx3.setMethod(MethodName.newMethodName("[T,P] [T2,P].M3()"));
+		expected1.addEvent(ctx3);
+
+		Event inv3 = new Event();
+		inv3.setKind(EventKind.INVOCATION);
+		inv3.setMethod(MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()"));
+		expected1.addEvent(inv3);
+		expected1.addEvent(inv3);
 		
-		StringBuilder mappingBuilder = new StringBuilder();
-		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
-		mappingBuilder.append("{\"Kind\":0,\"Method\":\"CSharp.MethodName:[?] [?].???()\"},");
-		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"},");
-		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()\"}]");
+		EventStream expected2 = new EventStream();
+		expected2.addEvent(dummy);
 		
-		String expectedMapping = mappingBuilder.toString();
+		Event ctx2 = new Event();
+		ctx2.setMethod(MethodName.newMethodName("[T,P] [T3,P].M2()"));
+		expected2.addEvent(ctx2);
+
+		Event inv2 = new Event();
+		inv2.setKind(EventKind.INVOCATION);
+		inv2.setMethod(MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()"));
+		expected2.addEvent(inv2);
+		expected2.addEvent(inv2);
 		
-		String actualStream = FileUtils.readFileToString(streamFile);
-		String actualMapping = FileUtils.readFileToString(mappingFile);
+		// ctx1 ctx2 inv1 inv2 inv2 ctx2 inv3 inv3
+
+		String actualStream1 = FileUtils.readFileToString(streamFile1);
+		String actualMapping1 = FileUtils.readFileToString(mappingFile1);
 		
-		assertEquals(expectedStream, actualStream);
-		assertEquals(expectedMapping, actualMapping);
+		String actualStream2 = FileUtils.readFileToString(streamFile2);
+		String actualMapping2 = FileUtils.readFileToString(mappingFile2);
+
+		assertEquals(expected1.getStream(), actualStream1);
+		assertEquals(getMapping(1), actualMapping1);
+		
+		assertEquals(expected2.getStream(), actualStream2);
+		assertEquals(getMapping(2), actualMapping2);
 	}
-	
+
 	@Test
 	public void filesCreated() throws IOException {
 		sut.partition();
+
+		File streamFile1 = new File(getStreamPath(1));
+		File mappingFile1 = new File(getMappingPath(1));
 		
-		File streamFile = new File(getStreamPath());
-		File mappingFile = new File(getMappingPath());
-		
-		assertTrue(streamFile.exists());
-		assertTrue(mappingFile.exists());
+		assertTrue(streamFile1.exists());
+		assertTrue(mappingFile1.exists());
 	}
-	
+
 	@Test
 	public void filesContentTest() throws IOException {
 		sut.partition();
+
+		File streamFile1 = new File(getStreamPath(1));
+		File mappingFile1 = new File(getMappingPath(1));
 		
-		File streamFile = new File(getStreamPath());
-		File mappingFile = new File(getMappingPath());
+		EventStream expected = new EventStream();
 		
-		//ctx1 ctx2 inv1 inv2 inv2
-		StringBuilder streamBuilder = new StringBuilder();
-		streamBuilder.append("0,0.000\n");
-		streamBuilder.append("1,1.001\n");
-		streamBuilder.append("1,1.002\n");
-		
-		String expectedStream = streamBuilder.toString();
-		
-		StringBuilder mappingBuilder = new StringBuilder();
-		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
-		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"}]");
-		
-		String expectedMapping = mappingBuilder.toString();
-		
-		String actualStream = FileUtils.readFileToString(streamFile);
-		String actualMapping = FileUtils.readFileToString(mappingFile);
-		
-		assertEquals(expectedStream, actualStream);
-		assertEquals(expectedMapping, actualMapping);
+		Event dummy = new Event();
+		dummy.createDummyEvent();
+		expected.addEvent(dummy);
+		expected.addEvent(Events.newHolder());
+
+		Event inv2 = new Event();
+		inv2.setKind(EventKind.INVOCATION);
+		inv2.setMethod(MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()"));
+		expected.addEvent(inv2);
+		expected.addEvent(inv2);
+
+		// ctx1 ctx2 inv1 inv2 inv2
+
+		String actualStream = FileUtils.readFileToString(streamFile1);
+		String actualMapping = FileUtils.readFileToString(mappingFile1);
+
+		assertEquals(expected.getStream(), actualStream);
+		assertEquals(getMapping(), actualMapping);
 	}
-	
+
 	private <T> Predicate<T> anyPredicateOf(Class<T> clazz) {
 		@SuppressWarnings("unchecked")
 		Predicate<T> p = any(Predicate.class);
 		return p;
 	}
-	
+
 	private static ExpressionStatement wrap(InvocationExpression ie1) {
 		ExpressionStatement expressionStatement = new ExpressionStatement();
 		expressionStatement.setExpression(ie1);
 		return expressionStatement;
 	}
-	
-	private String getStreamPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/eventStream.txt");
+
+	private String getStreamPath(int number) {
+		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/partition" + number + "/eventStream.txt");
 		return streamFile.getAbsolutePath();
 	}
-	
-	private String getMappingPath() {
-		File mappingFile = new File(rootFolder.getRoot().getAbsolutePath() + "/eventMapping.txt");
+
+	private String getMappingPath(int number) {
+		File mappingFile = new File(rootFolder.getRoot().getAbsolutePath() + "/partition" + number + "/eventMapping.txt");
 		return mappingFile.getAbsolutePath();
+	}
+	
+	private String getMapping(int number) {
+		if (number == 1) {
+			StringBuilder mappingBuilder = new StringBuilder();
+			mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
+			mappingBuilder.append("{\"Kind\":0,\"Method\":\"CSharp.MethodName:[?] [?].???()\"},");
+			mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()\"}]");
+			
+			return mappingBuilder.toString();
+		}
+		StringBuilder mappingBuilder = new StringBuilder();
+		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
+		mappingBuilder.append("{\"Kind\":0,\"Method\":\"CSharp.MethodName:[?] [?].???()\"},");
+		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"}]");
+		
+		return mappingBuilder.toString();
+	}
+	
+	private String getMapping() {
+		StringBuilder mappingBuilder = new StringBuilder();
+		mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You, Can] [Safely, Ignore].ThisDummyValue()\"},");
+		mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"}]");
+		
+		return mappingBuilder.toString();
 	}
 }

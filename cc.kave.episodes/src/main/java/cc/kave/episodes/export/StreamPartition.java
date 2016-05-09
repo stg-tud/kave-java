@@ -19,9 +19,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
@@ -32,7 +30,6 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.episodes.model.EventStream;
-import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -66,11 +63,11 @@ public class StreamPartition {
 				startPrefix = getPrefix(zipName);
 			}
 			if (!zipName.startsWith(startPrefix)) {
-				partitionNo++;
-				Logger.log("Partition %d", partitionNo);
-
 				startPrefix = getPrefix(zipName);
 				storeStream(generator, allEvents, partitionNo);
+				
+				partitionNo++;
+				Logger.log("Partition %d", partitionNo);
 
 				generator = new EventStreamGenerator();
 			}
@@ -85,35 +82,22 @@ public class StreamPartition {
 			}
 			ra.close();
 		}
-		getNumberPartitions(partitionNo);
 		Logger.log("Total number of partitions is: %d", partitionNo);
 		
 		storeStream(generator, allEvents, partitionNo);
 	}
 
 	private void storeStream(EventStreamGenerator generator, Set<Event> allEvents, int partitionNo) throws IOException {
-		List<Event> stream = getPartitionStream(generator, allEvents);
+		EventStream partitionStream = getPartitionStream(generator, allEvents);
 		FilesPath path = getFiles(partitionNo);
-		EventStreamIo.write(stream, path.streamFile, path.mappingFile);
+		EventStreamIo.write(partitionStream, path.streamFile, path.mappingFile);
 	}
 
-	public int getNumberPartitions(int partitions) {
-		return partitions;
-	}
-
-	private List<Event> getPartitionStream(EventStreamGenerator generator, Set<Event> complStream) throws IOException {
-		StreamStatistics statistics = new StreamStatistics();
-
+	private EventStream getPartitionStream(EventStreamGenerator generator, Set<Event> complStream) throws IOException {
 		List<Event> es = generator.getEventStream();
-		List<Event> fes = filterPartition(es, complStream);
-		Map<Event, Integer> occurrences = statistics.getFrequences(fes);
+		EventStream partition = EventsFilter.filterPartition(es, complStream);
 
-		for (Map.Entry<Event, Integer> entry : occurrences.entrySet()) {
-			if (entry.getValue() == 1) {
-				Logger.log("%s", entry.getKey().getMethod().getName());
-			}
-		}
-		return fes;
+		return partition;
 	}
 
 	private String getPrefix(String zipName) {
@@ -151,20 +135,9 @@ public class StreamPartition {
 			ra.close();
 		}
 		List<Event> allEvents = generator.getEventStream();
-		EventStream complStream = EventsFilter.filter(allEvents);
+		EventStream complStream = EventsFilter.filterStream(allEvents);
 
 		return complStream.getMapping().keySet();
-	}
-
-	private List<Event> filterPartition(List<Event> partition, Set<Event> allEvents) throws IOException {
-		List<Event> result = new LinkedList<Event>();
-
-		for (Event event : partition) {
-			if (allEvents.contains(event)) {
-				result.add(event);
-			}
-		}
-		return result;
 	}
 
 	private FilesPath getFiles(int number) {
