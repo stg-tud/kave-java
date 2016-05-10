@@ -79,8 +79,8 @@ public class StreamPartitionTest {
 	@Mock
 	private FileUtils fileUtils;
 
-	private static final String REPO1 = "Github/repo1/usr1/ws";
-	private static final String REPO2 = "Github/repo1/usr2/ws";
+	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
+	private static final String REPO2 = "Github/usr1/repo2/ws.zip";
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
@@ -206,7 +206,7 @@ public class StreamPartitionTest {
 
 		data.put(REPO2, context);
 
-		sut.partition();
+		Map<String, Integer> actualMapper = sut.partition();
 
 		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory, times(2)).getReadingArchive(REPO1);
@@ -232,11 +232,16 @@ public class StreamPartitionTest {
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
 		String actualStream1 = FileUtils.readFileToString(partitionFile1);
 		String actualStream2 = FileUtils.readFileToString(partitionFile2);
+		
+		Map<String, Integer> expectedMapper = Maps.newLinkedHashMap();
+		expectedMapper.put("Github/usr1/repo1", 1);
+		expectedMapper.put("Github/usr1/repo2", 2);
 
 		assertEquals(expectedStream, actualStream);
 		assertEquals(expectedMapping(), actualMapping);
 		assertEquals(expectedPartition1, actualStream1);
 		assertEquals(expectedPartition2, actualStream2);
+		assertEquals(expectedMapper, actualMapper);
 		
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());

@@ -27,6 +27,7 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -49,30 +50,33 @@ public class StreamPartition {
 		this.rootDir = directory;
 		this.rootFolder = folder;
 	}
+	
+	private static String REPO = "";
 
-	public void partition() throws ZipException, IOException {
+	public Map<String, Integer> partition() throws ZipException, IOException {
+		Map<String, Integer> mapping = Maps.newLinkedHashMap();
 		EventStreamGenerator generator = new EventStreamGenerator();
 		Map<Event, Integer> allEvents = getStream();
 		
-		String startPrefix = "";
+		String zipName = "";
 		int partitionNo = 0;
 
 		for (String zip : findZips()) {
-			String zipName = zip.toString();
+			zipName = zip.toString();
 
-			if (startPrefix.equalsIgnoreCase("")) {
+			if (REPO.equalsIgnoreCase("")) {
 				partitionNo++;
 				Logger.log("Partition %d", partitionNo);
 
-				startPrefix = getPrefix(zipName);
+				REPO = getRepoName(zipName);
 			}
-			if (!zipName.startsWith(startPrefix)) {
-				startPrefix = getPrefix(zipName);
+			if (!zipName.startsWith(REPO)) {
+				mapping.put(REPO, partitionNo);
+				REPO = getRepoName(zipName);
 				storeStream(generator, allEvents, partitionNo);
 				
 				partitionNo++;
 				Logger.log("Partition %d", partitionNo);
-
 				generator = new EventStreamGenerator();
 			}
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
@@ -87,8 +91,9 @@ public class StreamPartition {
 			ra.close();
 		}
 		Logger.log("Total number of partitions is: %d", partitionNo);
-		
 		storeStream(generator, allEvents, partitionNo);
+		mapping.put(REPO, partitionNo);
+		return mapping;
 	}
 
 	private void storeStream(EventStreamGenerator generator, Map<Event, Integer> allEvents, int partitionNo) throws IOException {
@@ -103,7 +108,7 @@ public class StreamPartition {
 		return partition;
 	}
 
-	private String getPrefix(String zipName) {
+	private String getRepoName(String zipName) {
 		int index = zipName.indexOf("/", zipName.indexOf("/", zipName.indexOf("/") + 1) + 1);
 		String startPrefix = zipName.substring(0, index);
 
