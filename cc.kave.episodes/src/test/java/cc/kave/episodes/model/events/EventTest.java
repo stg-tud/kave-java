@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
@@ -34,18 +33,6 @@ public class EventTest {
 		assertEquals(EventKind.METHOD_DECLARATION, sut.getKind());
 		assertNull(sut.getType());
 		assertNull(sut.getMethod());
-	}
-
-	@Test
-	public void dummyEvent() {
-		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
-		Event expected = Events.newContext(DUMMY_METHOD);
-		
-		Event actual = new Event();
-		actual.createDummyEvent();
-		
-		assertEquals(expected, actual);
 	}
 	
 	@Test
