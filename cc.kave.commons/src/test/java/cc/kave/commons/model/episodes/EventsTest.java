@@ -53,4 +53,16 @@ public class EventsTest {
 		assertEquals(EventKind.CONTEXT_HOLDER, actual.getKind());
 		assertNull(actual.getType());
 	}
+	
+	@Test
+	public void dummy() {
+		Event actual = Events.newDummyEvent();
+		
+		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+		
+		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
+		assertSame(DUMMY_METHOD, actual.getMethod());
+		assertNull(actual.getType());
+	}
 }
