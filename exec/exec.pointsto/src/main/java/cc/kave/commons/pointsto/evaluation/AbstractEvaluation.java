@@ -31,6 +31,8 @@ public abstract class AbstractEvaluation {
 	protected static final Path BASE_DIR = Paths.get("E:\\Coding\\MT");
 	protected static final Path CONTEXT_DIR = BASE_DIR.resolve("Contexts");
 	protected static final Path EVALUATION_RESULTS_DIR = BASE_DIR.resolve("EvaluationResults");
+	
+	protected static final int MAX_USAGES = 50000;
 
 	protected static final List<PointsToAnalysisFactory> POINTS_TO_FACTORIES = Arrays.asList(
 			new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),

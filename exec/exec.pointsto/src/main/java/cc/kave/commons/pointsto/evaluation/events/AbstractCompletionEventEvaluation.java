@@ -93,11 +93,11 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;
-		 injector = Guice.createInjector(new StoreModule());
-		 MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
-		 evaluation.run(completionEventsArchive, ptFactories);
-		 evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
-		 injector.getInstance(ResultExporter.class));
-		 evaluation.close();
+		injector = Guice.createInjector(new StoreModule());
+		MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
+		evaluation.run(completionEventsArchive, ptFactories);
+		evaluation.exportResults(evaluationResultsDir.resolve(evaluation.getClass().getSimpleName() + ".txt"),
+				injector.getInstance(ResultExporter.class));
+		evaluation.close();
 	}
 }

@@ -12,21 +12,26 @@
  */
 package cc.kave.commons.pointsto.evaluation;
 
-import static cc.kave.commons.pointsto.evaluation.Logger.log;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -39,11 +44,11 @@ import cc.kave.commons.pointsto.evaluation.cv.SetProvider;
 import cc.kave.commons.pointsto.evaluation.cv.UsageSetProvider;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
-import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReNames;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
-public class UsageEvaluation {
+public class UsageEvaluation extends AbstractEvaluation {
 
 	private static final boolean HIDE_UNIQUE_TYPES = true;
 
@@ -131,7 +136,7 @@ public class UsageEvaluation {
 			return;
 		}
 
-		long numUsages = projectUsages.values().stream().mapToLong(usages -> usages.size()).sum();
+		int numUsages = pruneUsages(projectUsages);
 		log("\t%d usages in total\n", numUsages);
 
 		List<List<Usage>> folds = foldBuilder.createFolds(projectUsages);
@@ -140,6 +145,27 @@ public class UsageEvaluation {
 		results.put(type, score);
 		log("\tF1: %.3f\n", score);
 		log("\tFold size deviation: %.1f\n", setProvider.getAbsoluteFoldSizeDeviation());
+	}
+
+	private int pruneUsages(Map<ProjectIdentifier, List<Usage>> projectUsages) {
+		int numUsages = projectUsages.values().stream().mapToInt(usages -> usages.size()).sum();
+		if (numUsages <= MAX_USAGES) {
+			return numUsages;
+		}
+
+		LinkedList<Pair<ProjectIdentifier, Integer>> projects = projectUsages.entrySet().stream()
+				.map(entry -> ImmutablePair.of(entry.getKey(), entry.getValue().size()))
+				.sorted(Comparator.comparingInt(Pair::getValue)).collect(Collectors.toCollection(Lists::newLinkedList));
+		int numPrunedUsages = 0;
+		while (numUsages > MAX_USAGES) {
+			Pair<ProjectIdentifier, Integer> largestProject = projects.removeLast();
+			projectUsages.remove(largestProject.getKey());
+			numPrunedUsages += largestProject.getValue();
+			numUsages -= largestProject.getValue();
+		}
+		log("\tPruned %d usages\n", numPrunedUsages);
+
+		return numUsages;
 	}
 
 	private static final Injector INJECTOR = Guice.createInjector(new Module());

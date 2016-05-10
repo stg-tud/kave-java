@@ -12,8 +12,6 @@
  */
 package cc.kave.commons.pointsto.evaluation;
 
-import static cc.kave.commons.pointsto.evaluation.Logger.log;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.DirectoryStream;
@@ -45,11 +43,11 @@ import cc.kave.commons.pointsto.evaluation.cv.ProjectTrainValidateSetProvider;
 import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReNames;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 
-public class ProjectTrainValidateEvaluation {
+public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 
 	private final int numFolds;
 	private final PointsToUsageFilter usageFilter;
