@@ -43,8 +43,11 @@ public class EventStreamTest {
 	
 	@Test
 	public void defaultValues() {
-		assertEquals(Maps.newLinkedHashMap(), sut.getMapping());
-		assertEquals(0, sut.getEventNumber());
+		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
+		expMap.put(Events.newDummyEvent(), 0);
+		
+		assertEquals(expMap, sut.getMapping());
+		assertEquals(1, sut.getEventNumber());
 		assertEquals(0, sut.getStreamLength());
 		
 		assertTrue(sut.getStream().equals(""));
@@ -55,12 +58,47 @@ public class EventStreamTest {
 		sut.addEvent(ctx(1));
 		
 		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
-		expMap.put(ctx(1), 0);
+		expMap.put(Events.newDummyEvent(), 0);
+		expMap.put(ctx(1), 1);
+		
+		StringBuilder expectedStream = new StringBuilder();
+		expectedStream.append("1,0.500\n");
 		
 		assertEquals(expMap, sut.getMapping());
+		assertEquals(expectedStream.toString(), sut.getStream());
 		
 		assertEquals(1, sut.getStreamLength());
-		assertEquals(1, sut.getEventNumber());
+		assertEquals(2, sut.getEventNumber());
+	}
+	
+	@Test
+	public void addDummyContext() {
+		sut.addEvent(ctx(0));
+		sut.addEvent(ctx(1));
+		sut.addEvent(inv(2));
+		sut.addEvent(inv(3));
+		sut.addEvent(hld());
+		sut.addEvent(inv(2));
+		
+		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(ctx(0), 1);
+		expectedMap.put(ctx(1), 2);
+		expectedMap.put(inv(2), 3);
+		expectedMap.put(inv(3), 4);
+		
+		StringBuilder expSb = new StringBuilder();
+		expSb.append("1,0.500\n");
+		expSb.append("2,1.001\n");
+		expSb.append("3,1.002\n");
+		expSb.append("4,1.003\n");
+		expSb.append("3,1.504\n");
+		
+		assertEquals(expectedMap, sut.getMapping());
+		assertEquals(sut.getStream(), expSb.toString());
+		
+		assertEquals(5, sut.getStreamLength());
+		assertEquals(5, sut.getEventNumber());
 	}
 	
 	@Test
@@ -73,22 +111,24 @@ public class EventStreamTest {
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(ctx(0), 0);
-		expectedMap.put(ctx(1), 1);
-		expectedMap.put(inv(2), 2);
-		expectedMap.put(inv(3), 3);
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(ctx(0), 1);
+		expectedMap.put(ctx(1), 2);
+		expectedMap.put(inv(2), 3);
+		expectedMap.put(inv(3), 4);
 		
 		StringBuilder expSb = new StringBuilder();
 		expSb.append("1,0.500\n");
-		expSb.append("2,0.501\n");
-		expSb.append("3,0.502\n");
-		expSb.append("2,1.003\n");
+		expSb.append("2,1.001\n");
+		expSb.append("3,1.002\n");
+		expSb.append("4,1.003\n");
+		expSb.append("3,1.504\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(sut.getStream(), expSb.toString());
 		
-		assertEquals(6, sut.getStreamLength());
-		assertEquals(4, sut.getEventNumber());
+		assertEquals(5, sut.getStreamLength());
+		assertEquals(5, sut.getEventNumber());
 	}
 	
 	@Test
@@ -101,20 +141,22 @@ public class EventStreamTest {
 		sut.addEvent(inv(1));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(ctx(0), 0);
-		expectedMap.put(inv(1), 1);
-		expectedMap.put(inv(2), 2);
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(ctx(0), 1);
+		expectedMap.put(inv(1), 2);
+		expectedMap.put(inv(2), 3);
 		
 		StringBuilder expSb = new StringBuilder();
 		expSb.append("1,0.500\n");
-		expSb.append("2,0.501\n");
-		expSb.append("1,1.002\n");
+		expSb.append("2,1.001\n");
+		expSb.append("3,1.002\n");
+		expSb.append("2,1.503\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertTrue(sut.getStream().equals(expSb.toString()));
+		assertEquals(sut.getStream(), expSb.toString());
 		
-		assertEquals(6, sut.getStreamLength());
-		assertEquals(3, sut.getEventNumber());
+		assertEquals(4, sut.getStreamLength());
+		assertEquals(4, sut.getEventNumber());
 	}
 	
 	@Test
@@ -128,22 +170,24 @@ public class EventStreamTest {
 		sut.addEvent(inv(1));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(ctx(0), 0);
-		expectedMap.put(inv(1), 1);
-		expectedMap.put(inv(2), 2);
-		expectedMap.put(ctx(1), 3);
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(ctx(0), 1);
+		expectedMap.put(inv(1), 2);
+		expectedMap.put(inv(2), 3);
+		expectedMap.put(ctx(1), 4);
 		
 		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,1.000\n");
-		expSb.append("2,1.001\n");
+		expSb.append("1,0.500\n");
+		expSb.append("2,1.501\n");
 		expSb.append("3,1.502\n");
-		expSb.append("1,1.503\n");
+		expSb.append("4,2.003\n");
+		expSb.append("2,2.004\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertTrue(sut.getStream().equals(expSb.toString()));
+		assertEquals(sut.getStream(), expSb.toString());
 		
-		assertEquals(7, sut.getStreamLength());
-		assertEquals(4, sut.getEventNumber());
+		assertEquals(5, sut.getStreamLength());
+		assertEquals(5, sut.getEventNumber());
 	}
 	
 	@Test

@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.episodes.Events;
 
 public class EventStream {
 	public static final double DELTA = 0.001;
@@ -37,6 +38,10 @@ public class EventStream {
 
 	boolean isFirstMethod = true;
 	double time = 0.000;
+	
+	public EventStream() {
+		this.addEvent(Events.newDummyEvent());
+	}
 
 	public String getStream() {
 		return this.sb.toString();
@@ -55,8 +60,6 @@ public class EventStream {
 	}
 
 	public void addEvent(Event event) {
-		this.streamLength++;
-		
 		Integer idx = this.mappingData.get(event);
 
 		if (event.getKind() == EventKind.CONTEXT_HOLDER) {
@@ -67,7 +70,7 @@ public class EventStream {
 				this.mappingData.put(event, idx);
 			}
 		}
-		if (event.getKind() == EventKind.METHOD_DECLARATION && !this.isFirstMethod) {
+		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod) {
 			this.time += TIMEOUT;
 		}
 		this.isFirstMethod = false;
@@ -79,6 +82,7 @@ public class EventStream {
 			this.sb.append('\n');
 
 			this.time += DELTA;
+			this.streamLength++;
 		}
 	}
 
