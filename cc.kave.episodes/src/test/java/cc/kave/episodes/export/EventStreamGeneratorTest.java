@@ -53,11 +53,6 @@ public class EventStreamGeneratorTest {
 	}
 
 	@Test
-	public void dummyEventIsAlwaysCreated() {
-		assertStream(dummy());
-	}
-
-	@Test
 	public void notOverwritingAnything() {
 		Context ctx = new Context();
 
@@ -68,9 +63,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(//
-				dummy(), //
-				Events.newContext(unknown()), //
+		assertStream(Events.newContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -86,10 +79,8 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(//
-				dummy(), //
-				Events.newContext(m(3, 1)), //
-				Events.newInvocation(m(2, 3)));
+		assertStream(Events.newContext(m(3, 1)), //
+					Events.newInvocation(m(2, 3)));
 
 	}
 
@@ -104,9 +95,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(//
-				dummy(), //
-				Events.newContext(m(4, 1)), //
+		assertStream(Events.newContext(m(4, 1)), //
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -119,7 +108,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(dummy());
+		assertStream();
 
 	}
 
@@ -136,7 +125,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(dummy(), Events.newContext(unknown()), //
+		assertStream(Events.newContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 	}
 
@@ -151,7 +140,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(dummy());
+		assertStream();
 	}
 
 	@Test
@@ -169,9 +158,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(//
-				dummy(), //
-				Events.newContext(m(11, 1)), //
+		assertStream(Events.newContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newContext(m(12, 2)), //
 				Events.newInvocation(m(3, 4)) //
@@ -195,9 +182,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx1);
 		sut.add(ctx2);
 
-		assertStream(//
-				dummy(), //
-				Events.newContext(m(11, 1)), //
+		assertStream(Events.newContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newContext(m(12, 1)), //
 				Events.newInvocation(m(3, 4))//

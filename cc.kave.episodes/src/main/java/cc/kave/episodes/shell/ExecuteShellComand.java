@@ -20,19 +20,30 @@ import java.io.InputStreamReader;
 
 public class ExecuteShellComand {
 
+	public static final int TOTAL = 357;
+	public static final int THREADS = 8;
+
 	public static void main(String[] args) {
+
+		int partition = 0;
 
 		ExecuteShellComand obj = new ExecuteShellComand();
 
-		String domainName = "google.com";
-		
-		//in mac oxs
-		String command = "ping -c 3 " + domainName;
-		
-		String output = obj.executeCommand(command);
+		String command = "cd Documents/PhD_work/episode-miner/n-graph-miner/";
 
-		System.out.println(output);
+		obj.executeCommand(command);
 
+		while (partition < TOTAL) {
+			partition++;
+			ExecuteShellComand session = new ExecuteShellComand();
+
+			command = "script eventStream" + partition + ".txt"; 
+
+			String output = session.executeCommand(command);
+
+			System.out.println(output);
+
+		}
 	}
 
 	private String executeCommand(String command) {
@@ -43,20 +54,15 @@ public class ExecuteShellComand {
 		try {
 			p = Runtime.getRuntime().exec(command);
 			p.waitFor();
-			BufferedReader reader = 
-                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-                        String line = "";			
-			while ((line = reader.readLine())!= null) {
+			String line = "";
+			while ((line = reader.readLine()) != null) {
 				output.append(line + "\n");
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return output.toString();
-
 	}
-
 }
