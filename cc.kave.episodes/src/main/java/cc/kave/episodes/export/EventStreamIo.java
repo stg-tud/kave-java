@@ -36,14 +36,13 @@ public class EventStreamIo {
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-	public static final int STREAMIDX = 8;
 
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
 	
 	public static void write(EventStream stream, String fileStream, String fileMapping) {
 		try {
-			FileUtils.writeStringToFile(new File(fileStream), stream.getStream().substring(STREAMIDX));
+			FileUtils.writeStringToFile(new File(fileStream), stream.getStream());
 			JsonUtils.toJson(stream.getMapping().keySet(), new File(fileMapping));
 		} catch (IOException e) {
 			throw new RuntimeException(e);

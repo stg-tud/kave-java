@@ -71,7 +71,7 @@ public class EventStreamIoTest {
 		List<Event> actualsMapping = EventStreamIo.readMapping(b.getAbsolutePath());
 		String actualTxt = FileUtils.readFileToString(a);
 		assertMapping(expected.getMapping().keySet(), actualsMapping);
-		assertEquals(expected.getStream().substring(STREAMIDX), actualTxt);
+		assertEquals(expected.getStream(), actualTxt);
 	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {

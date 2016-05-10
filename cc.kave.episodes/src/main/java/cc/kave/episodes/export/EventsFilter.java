@@ -17,7 +17,6 @@ package cc.kave.episodes.export;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -31,6 +30,11 @@ public class EventsFilter {
 	private static StreamStatistics statistics = new StreamStatistics();
 	private static final int FREQUENCY = 1;
 	
+	private static final double DELTA = 0.001;
+	private static final double TIMEOUT = 0.5;
+	private static double time = 0.0;
+	private static boolean firstMethod = true;
+	
 	public static EventStream filterStream(List<Event> stream) {
 		EventStream sm = new EventStream();
 		
@@ -39,10 +43,6 @@ public class EventsFilter {
 		
 		int sigletons = 0;
 		
-		Event dummyEvent = new Event();
-		dummyEvent.createDummyEvent();
-		
-		sm.addEvent(dummyEvent);
 		for (Event e : stream) {
 			if (occurrences.get(e) > FREQUENCY) {
 				sm.addEvent(e);
@@ -61,17 +61,34 @@ public class EventsFilter {
 		return sm;
 	}
 	
-	public static EventStream filterPartition(List<Event> partition, Set<Event> stream) {
-		EventStream partitionStream = new EventStream();
+	public static String filterPartition(List<Event> partition, Map<Event, Integer> stream) {
+		StringBuilder sb = new StringBuilder();
+		
 		for (Event e : partition) {
-			if (stream.contains(e)) {
-				partitionStream.addEvent(e);
+			if (stream.keySet().contains(e)) {
+				sb.append(addToPartitionStream(e, stream.get(e)));
 			} else {
-				if (e.getKind() == EventKind.METHOD_DECLARATION) {
-					partitionStream.addEvent(Events.newHolder());
+				if (e.getKind() == EventKind.METHOD_DECLARATION  && !firstMethod) {
+					time += TIMEOUT;
 				}
 			}
+			firstMethod = false;
 		}
-		return partitionStream;
+		return sb.toString();
+	}
+	
+	private static String addToPartitionStream(Event event, int eventId) {
+		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !firstMethod) {
+			time += TIMEOUT;
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(eventId);
+		sb.append(',');
+		sb.append(String.format("%.3f", time));
+		sb.append('\n');
+
+		time += DELTA;
+		
+		return sb.toString();
 	}
 }

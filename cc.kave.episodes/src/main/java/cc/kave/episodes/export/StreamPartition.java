@@ -20,8 +20,11 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
+
+import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Predicate;
 import com.google.inject.Inject;
@@ -49,7 +52,8 @@ public class StreamPartition {
 
 	public void partition() throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
-		Set<Event> allEvents = getStream();
+		Map<Event, Integer> allEvents = getStream();
+		
 		String startPrefix = "";
 		int partitionNo = 0;
 
@@ -87,15 +91,14 @@ public class StreamPartition {
 		storeStream(generator, allEvents, partitionNo);
 	}
 
-	private void storeStream(EventStreamGenerator generator, Set<Event> allEvents, int partitionNo) throws IOException {
-		EventStream partitionStream = getPartitionStream(generator, allEvents);
-		FilesPath path = getFiles(partitionNo);
-		EventStreamIo.write(partitionStream, path.streamFile, path.mappingFile);
+	private void storeStream(EventStreamGenerator generator, Map<Event, Integer> allEvents, int partitionNo) throws IOException {
+		String partitionStream = getPartitionStream(generator, allEvents);
+		FileUtils.writeStringToFile(new File(getPartitionPath(partitionNo)), partitionStream);
 	}
 
-	private EventStream getPartitionStream(EventStreamGenerator generator, Set<Event> complStream) throws IOException {
+	private String getPartitionStream(EventStreamGenerator generator, Map<Event, Integer> complStream) throws IOException {
 		List<Event> es = generator.getEventStream();
-		EventStream partition = EventsFilter.filterPartition(es, complStream);
+		String partition = EventsFilter.filterPartition(es, complStream);
 
 		return partition;
 	}
@@ -118,7 +121,7 @@ public class StreamPartition {
 		return zips;
 	}
 
-	private Set<Event> getStream() throws IOException {
+	private Map<Event, Integer> getStream() throws IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 
 		for (String zip : findZips()) {
@@ -136,27 +139,36 @@ public class StreamPartition {
 		}
 		List<Event> allEvents = generator.getEventStream();
 		EventStream complStream = EventsFilter.filterStream(allEvents);
+		EventStreamIo.write(complStream, getStreamPath(), getMappingPath());
 
-		return complStream.getMapping().keySet();
+		return complStream.getMapping();
 	}
 
-	private FilesPath getFiles(int number) {
-		File folder = new File(rootFolder.getAbsolutePath() + "/patterns/partition" + number + "/");
+	private String getStreamPath() {
+		File folder = new File(rootFolder.getAbsolutePath() + "/patterns/");
+		if (!folder.isDirectory()) {
+			folder.mkdir();
+		}
+		File streamFile = new File(folder.getAbsolutePath() + "/eventStream.txt");
+		return streamFile.getAbsolutePath();
+	}
+
+	private String getMappingPath() {
+		File folder = new File(rootFolder.getAbsolutePath() + "/patterns/");
+		if (!folder.isDirectory()) {
+			folder.mkdir();
+		}
+		File mappingFile = new File(folder.getAbsolutePath() + "/eventMapping.txt");
+		return mappingFile.getAbsolutePath();
+	}
+
+	private String getPartitionPath(int number) {
+		File folder = new File(rootFolder.getAbsolutePath() + "/patterns/partitions/");
 		if (!folder.isDirectory()) {
 			folder.mkdirs();
 		}
-		File streamFile = new File(folder.getAbsolutePath() + "/eventStream" + number + ".txt");
-		File mappingFile = new File(folder.getAbsolutePath() + "/eventMapping" + number + ".txt");
+		File partitionFile = new File(folder.getAbsolutePath() + "/eventStream" + number + ".txt");
 
-		FilesPath path = new FilesPath();
-		path.streamFile = streamFile.getAbsolutePath();
-		path.mappingFile = mappingFile.getAbsolutePath();
-
-		return path;
-	}
-
-	private class FilesPath {
-		private String streamFile;
-		private String mappingFile;
+		return partitionFile.getAbsolutePath();
 	}
 }

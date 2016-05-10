@@ -38,31 +38,26 @@ public class EventsFilterTest {
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
 	private List<Event> streamEvents;
-	private List<Event> partitionEvents;
+	private List<Event> partitionEvents1;
 
 	private EventStream expectedStream;
-	private EventStream expectedPartition;
+	private String expectedPartition1 = "";
 
 	@Before
 	public void setup() {
 		streamEvents = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
-		partitionEvents = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4), inv(3), inv(2));
+		partitionEvents1 = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4), inv(3), inv(2));
 
 		expectedStream = new EventStream();
-		expectedStream.addEvent(DUMMY_EVENT);
-		expectedStream.addEvent(ctx(1));
-		expectedStream.addEvent(inv(2));
-		expectedStream.addEvent(inv(3));
+		expectedStream.addEvent(ctx(1));		//1
+		expectedStream.addEvent(inv(2));		//2
+		expectedStream.addEvent(inv(3));		//3
 		expectedStream.addEvent(hld());
 		expectedStream.addEvent(inv(2));
 		expectedStream.addEvent(ctx(1));
 		expectedStream.addEvent(inv(3));
 
-		expectedPartition = new EventStream();
-		expectedPartition.addEvent(hld());
-		expectedPartition.addEvent(ctx(1));
-		expectedPartition.addEvent(inv(3));
-		expectedPartition.addEvent(inv(2));
+		expectedPartition1 += "1,0.500\n3,0.501\n2,0.502\n";
 	}
 
 	@Test
@@ -78,13 +73,9 @@ public class EventsFilterTest {
 
 	@Test
 	public void filterPartition() {
-		EventStream actualsPartition = EventsFilter.filterPartition(partitionEvents, expectedStream.getMapping().keySet());
+		String actualsPartition = EventsFilter.filterPartition(partitionEvents1, expectedStream.getMapping());
 		
-		assertTrue(expectedPartition.equals(actualsPartition));
-		assertEquals(expectedPartition.getStream(), actualsPartition.getStream());
-		assertEquals(expectedPartition.getMapping(), actualsPartition.getMapping());
-		assertEquals(expectedPartition.getStreamLength(), actualsPartition.getStreamLength());
-		assertEquals(expectedPartition.getEventNumber(), actualsPartition.getEventNumber());
+		assertEquals(expectedPartition1, actualsPartition);
 	}
 
 	private static Event inv(int i) {

@@ -21,18 +21,17 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.Events;
 
 public class StreamStatistics {
 
 	public int minFreq(Map<Event, Integer> occ) {
 		int min = Integer.MAX_VALUE;
-		Event dummyEvent = new Event();
-		dummyEvent.createDummyEvent();
 		
 		for (Map.Entry<Event, Integer> entry : occ.entrySet()) {
 			int freq = entry.getValue();
 			
-			if (!entry.getKey().equals(dummyEvent) && freq < min) {
+			if (!entry.getKey().equals(Events.newDummyEvent()) && freq < min) {
 				min = freq;
 			}
 		}
