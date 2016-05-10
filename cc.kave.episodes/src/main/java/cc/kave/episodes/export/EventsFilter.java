@@ -63,6 +63,8 @@ public class EventsFilter {
 	
 	public static String filterPartition(List<Event> partition, Map<Event, Integer> stream) {
 		StringBuilder sb = new StringBuilder();
+		time = 0.0;
+		firstMethod = true;
 		
 		for (Event e : partition) {
 			if (stream.keySet().contains(e)) {

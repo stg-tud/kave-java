@@ -225,7 +225,7 @@ public class StreamPartitionTest {
 		String expectedStream = "1,0.500\n2,0.501\n2,0.502\n1,1.003\n3,1.004\n3,1.005\n";
 
 		String expectedPartition1 = "1,0.000\n2,0.001\n2,0.002\n";
-		String expectedPartition2 = "1,0.503\n3,0.504\n3,0.505\n";
+		String expectedPartition2 = "1,0.000\n3,0.001\n3,0.002\n";
 
 		// ctx1 ctx2 inv1 inv2 inv2 ctx2 inv3 inv3
 		String actualStream = FileUtils.readFileToString(streamFile);
