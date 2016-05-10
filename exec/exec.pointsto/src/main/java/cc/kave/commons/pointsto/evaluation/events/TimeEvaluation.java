@@ -83,11 +83,9 @@ public class TimeEvaluation extends AbstractEvaluation {
 						Integer.toString(entry.numStmts), format.apply(entry.time) }));
 	}
 
-	public void run(List<Context> contexts, List<PointsToAnalysisFactory> ptFactories)
-			throws IOException {
-		log("Using %d contexts for time measurement\n", contexts.size());
-
+	public void run(List<Context> contexts, List<PointsToAnalysisFactory> ptFactories) throws IOException {
 		initializeStmtCountTimes(ptFactories, contexts);
+		log("Using %d contexts for time measurement\n", contexts.size());
 
 		for (int i = 0; i < WARM_UP_RUNS + 1; ++i) {
 			clearStmtCountTimes();
@@ -114,11 +112,19 @@ public class TimeEvaluation extends AbstractEvaluation {
 	private void initializeStmtCountTimes(Collection<PointsToAnalysisFactory> ptFactories, List<Context> contexts) {
 		analysisTimes = new ArrayList<>(ptFactories.size() * contexts.size());
 
+		List<Context> zeroStmtsContexts = new ArrayList<>();
 		StatementCounterVisitor counter = new StatementCounterVisitor();
 		for (Context context : contexts) {
 			int count = context.getSST().accept(counter, null);
-			stmtCounts.put(context, count);
+			if (count == 0) {
+				zeroStmtsContexts.add(context);
+			} else {
+				stmtCounts.put(context, count);
+			}
 		}
+
+		contexts.removeAll(zeroStmtsContexts);
+		log("Removed %d contexts with zero statements\n", zeroStmtsContexts.size());
 	}
 
 	private void clearStmtCountTimes() {
@@ -159,11 +165,11 @@ public class TimeEvaluation extends AbstractEvaluation {
 		}
 
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		Injector injector = Guice.createInjector(new Module());
 		ContextSampler sampler = injector.getInstance(ContextSampler.class);
-		
+
 		List<Context> contexts = sampler.sample(BASE_DIR.resolve("cut"), MAX_COMPLETION_EVENTS);
 		TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
 		evaluation.run(contexts, POINTS_TO_FACTORIES);

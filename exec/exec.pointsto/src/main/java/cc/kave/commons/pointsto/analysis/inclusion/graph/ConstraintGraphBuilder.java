@@ -92,7 +92,7 @@ public class ConstraintGraphBuilder {
 	private final RefTerm staticObject;
 	private final Map<IMemberName, SetVariable> staticMembers = new HashMap<>();
 	private final Map<IMemberName, Set<SetVariable>> undefinedStorageMembers = new HashMap<>();
-	private final Set<DistinctIndexAccessReference> providedFallbackObjects = new HashSet<>();
+	private final Set<DistinctReference> providedFallbackObjects = new HashSet<>();
 
 	public ConstraintGraphBuilder(Function<IReference, DistinctReference> referenceResolver,
 			DeclarationMapper declMapper, ContextFactory contextFactory) {
@@ -263,8 +263,9 @@ public class ConstraintGraphBuilder {
 
 	private void provideFallbackObjectForIndexAccess(IIndexAccessReference indexAccessRef) {
 		DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) referenceResolver.apply(indexAccessRef);
-		if (!providedFallbackObjects.contains(distRef) && !distRef.getBaseReference().getType().isArrayType()) {
-			providedFallbackObjects.add(distRef);
+		DistinctReference baseDistRef = distRef.getBaseReference();
+		if (!providedFallbackObjects.contains(baseDistRef) && !baseDistRef.getType().isArrayType()) {
+			providedFallbackObjects.add(baseDistRef);
 			RefTerm fallbackObject = new RefTerm(new FallbackIndexAccessAllocationSite(),
 					variableFactory.createObjectVariable());
 			writeArrayRaw(getVariable(indexAccessRef.getExpression().getReference()), fallbackObject);
