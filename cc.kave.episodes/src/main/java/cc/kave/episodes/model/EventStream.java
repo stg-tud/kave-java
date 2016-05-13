@@ -38,9 +38,9 @@ public class EventStream {
 
 	boolean isFirstMethod = true;
 	double time = 0.000;
-	
+
 	public EventStream() {
-		this.addEvent(Events.newDummyEvent());
+		this.mappingData.put(Events.newDummyEvent(), 0);
 	}
 
 	public String getStream() {
@@ -50,7 +50,7 @@ public class EventStream {
 	public Map<Event, Integer> getMapping() {
 		return this.mappingData;
 	}
-	
+
 	public int getStreamLength() {
 		return this.streamLength;
 	}
@@ -62,7 +62,14 @@ public class EventStream {
 	public void addEvent(Event event) {
 		Integer idx = this.mappingData.get(event);
 
-		if (event.getKind() == EventKind.CONTEXT_HOLDER) {
+		if (event.equals(Events.newUnknownEvent())) {
+			if (idx == null) {
+				idx = getEventNumber();
+				this.mappingData.put(event, idx);
+			}
+			this.time += TIMEOUT;
+		}
+		if (event.equals(Events.newHolder())) {
 			this.time += TIMEOUT;
 		} else {
 			if (idx == null) {
@@ -70,12 +77,13 @@ public class EventStream {
 				this.mappingData.put(event, idx);
 			}
 		}
-		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod) {
+		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod
+				&& !event.equals(Events.newUnknownEvent())) {
 			this.time += TIMEOUT;
 		}
 		this.isFirstMethod = false;
-		
-		if ((idx != null) && (idx > 0)) {
+
+		if ((idx != null) && (idx > 0) && (!event.equals(Events.newUnknownEvent()))) {
 			this.sb.append(idx);
 			this.sb.append(',');
 			this.sb.append(String.format("%.3f", this.time));
@@ -100,7 +108,7 @@ public class EventStream {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
-	
+
 	public boolean equals(EventStream sm) {
 		if (!this.mappingData.equals(sm.getMapping())) {
 			return false;

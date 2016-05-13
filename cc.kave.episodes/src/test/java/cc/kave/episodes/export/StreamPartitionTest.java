@@ -222,7 +222,7 @@ public class StreamPartitionTest {
 		File partitionFile2 = new File(getStreamPartitionPath(2));
 		File mappingFile = new File(getMappingPath());
 
-		String expectedStream = "1,0.500\n2,0.501\n2,0.502\n1,1.003\n3,1.004\n3,1.005\n";
+		String expectedStream = "2,0.500\n2,0.501\n3,1.002\n3,1.003\n";
 
 		String expectedPartition1 = "1,0.000\n2,0.001\n2,0.002\n";
 		String expectedPartition2 = "1,0.000\n3,0.001\n3,0.002\n";
@@ -280,11 +280,7 @@ public class StreamPartitionTest {
 	private List<Event> expectedMapping() {
 		List<Event> events = new LinkedList<Event>();
 		events.add(Events.newDummyEvent());
-		
-		String methodName1 = "[?] [?].???()";
-		IMethodName method1 = MethodName.newMethodName(methodName1);
-		Event e1 = Events.newContext(method1);
-		events.add(e1);
+		events.add(Events.newUnknownEvent());
 		
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
 		IMethodName methodInv1 = MethodName.newMethodName(inv1);
@@ -298,14 +294,4 @@ public class StreamPartitionTest {
 		
 		return events;
 	}
-	//
-	// private String getMapping() {
-	// StringBuilder mappingBuilder = new StringBuilder();
-	// mappingBuilder.append("[{\"Kind\":0,\"Method\":\"CSharp.MethodName:[You,
-	// Can] [Safely, Ignore].ThisDummyValue()\"},");
-	// mappingBuilder.append("{\"Kind\":1,\"Method\":\"CSharp.MethodName:[System.Void,
-	// mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()\"}]");
-	//
-	// return mappingBuilder.toString();
-	// }
 }

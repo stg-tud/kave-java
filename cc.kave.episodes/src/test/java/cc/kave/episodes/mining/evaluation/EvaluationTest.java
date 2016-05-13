@@ -173,6 +173,7 @@ public class EvaluationTest {
 				maxEpisodeTracker, categorizer);
 	}
 
+	@Ignore
 	@Test
 	public void logger() throws ZipException, IOException {
 		Logger.clearLog();

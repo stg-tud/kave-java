@@ -39,6 +39,7 @@ public class EventsFilter {
 		EventStream sm = new EventStream();
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
+//		int maxFreq = statistics.
 		Logger.log("Minimal occurrence is %d", statistics.minFreq(occurrences));
 		
 		int sigletons = 0;

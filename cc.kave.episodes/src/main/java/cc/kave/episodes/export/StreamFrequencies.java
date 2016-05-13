@@ -20,8 +20,11 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
+
+import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Predicate;
 import com.google.inject.Inject;
@@ -29,31 +32,34 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.episodes.model.EventStream;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
-public class Preprocessing {
+public class StreamFrequencies {
 
 	private Directory rootDir;
 	private File rootFolder;
-	
+	private StreamStatistics statistics;
+
 	@Inject
-	public Preprocessing(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
+	public StreamFrequencies(@Named("contexts") Directory directory, @Named("statistics") File folder,
+			StreamStatistics statistics) {
 		assertTrue(folder.exists(), "Contexts folder does not exist");
 		assertTrue(folder.isDirectory(), "Contexts is not a folder, but a file");
 		this.rootDir = directory;
 		this.rootFolder = folder;
+		this.statistics = statistics;
 	}
 
-	public void readAllContexts() throws ZipException, IOException {
+	public void frequencies() throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
-		
+
 		for (String zip : findZips()) {
 			Logger.log("Reading zip file %s", zip.toString());
 			ReadingArchive ra = rootDir.getReadingArchive(zip);
-			
+
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				if (ctx == null) {
@@ -64,12 +70,55 @@ public class Preprocessing {
 			ra.close();
 		}
 		List<Event> es = generator.getEventStream();
-		EventStream stream = EventsFilter.filterStream(es);
-		EventStreamIo.write(stream, getStreamPath(), getMappingPath());
+		Map<Event, Integer> freqs = statistics.getFrequences(es);
+		getOutlierEvent(freqs);
 		
-		Logger.log("After filtering out one time events!");
-		Logger.log("Number of unique events is: %d", stream.getEventNumber());
-		Logger.log("Length of event stream data is: %d", stream.getStreamLength());
+//		Map<Integer, Integer> distr = statistics.getFreqDistr(freqs);
+//		storeFreqs(freqs);
+//		storeDistr(distr);
+	}
+
+	private void getOutlierEvent(Map<Event, Integer> freqs) {
+		for (Map.Entry<Event, Integer> entry : freqs.entrySet()) {
+			if (entry.getValue() == 1390000) {
+				Logger.log("%s", entry.getKey().getMethod().getDeclaringType().toString());
+				break;
+			}
+		}
+		
+	}
+
+	private void storeFreqs(Map<Event, Integer> occurrences) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		
+		for (Map.Entry<Event, Integer> entry : occurrences.entrySet()) {
+			sb.append(entry.getValue());
+			sb.append("\n");
+		}
+		FileUtils.writeStringToFile(new File(getFreqsFile()), sb.toString());
+	}
+	
+	private void storeDistr(Map<Integer, Integer> distributions) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Frequency\t#Events\n");
+		
+		for (Map.Entry<Integer, Integer> entry : distributions.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append("\t");
+			sb.append(entry.getValue());
+			sb.append("\n");
+		}
+		FileUtils.writeStringToFile(new File(getDistrFile()), sb.toString());
+	}
+
+	private String getFreqsFile() {
+		File freqsFile = new File(rootFolder.getAbsolutePath() + "/frequences.txt");
+		return freqsFile.getAbsolutePath();
+	}
+	
+	private String getDistrFile() {
+		File distrFile = new File(rootFolder.getAbsolutePath() + "/freqsDistr.txt");
+		return distrFile.getAbsolutePath();
 	}
 
 	private Set<String> findZips() {
@@ -81,15 +130,5 @@ public class Preprocessing {
 			}
 		});
 		return zips;
-	}
-	
-	private String getStreamPath() {
-		File streamFile = new File(rootFolder.getAbsolutePath() + "/eventStream.txt");
-		return streamFile.getAbsolutePath();
-	}
-	
-	private String getMappingPath() {
-		File mappingFile = new File(rootFolder.getAbsolutePath() + "/eventMapping.txt");
-		return mappingFile.getAbsolutePath();
 	}
 }

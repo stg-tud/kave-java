@@ -51,4 +51,20 @@ public class StreamStatistics {
 		}
 		return occurrences;
 	}
+	
+	public Map<Integer, Integer> getFreqDistr(Map<Event, Integer> frequencies) {
+		Map<Integer, Integer> distr = Maps.newHashMap();
+		
+		for (Map.Entry<Event, Integer> entry : frequencies.entrySet()) {
+			int freq = entry.getValue();
+			
+			if (distr.containsKey(freq)) {
+				int count = distr.get(freq);
+				distr.put(freq, count + 1);
+			} else {
+				distr.put(freq, 1);
+			}
+		} 
+		return distr;
+	}
 }

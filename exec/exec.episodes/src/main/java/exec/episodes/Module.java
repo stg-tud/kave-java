@@ -59,9 +59,12 @@ public class Module extends AbstractModule {
 		Directory episodeRootDir = new Directory(episodeRootFile.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
+		File statFile = new File(rootFolder + "statistics/");
+		Directory statDir = new Directory(statFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
 //		dirs.put("episode", episodeDir);
+		dirs.put("statistics", statDir);
 		dirs.put("events", eventStreamDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("rootDir", episodeRootDir);
@@ -73,6 +76,7 @@ public class Module extends AbstractModule {
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
 		bind(File.class).annotatedWith(Names.named("rootDir")).toInstance(episodeRootFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
+		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
 		
 
 		File episodeRoot = episodeFile;
