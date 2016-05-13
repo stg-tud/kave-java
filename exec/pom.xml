@@ -14,5 +14,6 @@
   	<module>exec.inlining</module>
   	<module>exec.pointsto</module>
   	<module>exec.examples</module>
+    <module>exec.recommender_reimplementation</module>
   </modules>
 </project>
