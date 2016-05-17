@@ -16,22 +16,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -52,11 +46,12 @@ public class UsageEvaluation extends AbstractEvaluation {
 
 	private static final boolean HIDE_UNIQUE_TYPES = true;
 
-	private int numFolds;
+	private final int numFolds;
 
-	private Predicate<Usage> usageFilter;
-	private CrossValidationFoldBuilder foldBuilder;
-	private CVEvaluator cvEvaluator;
+	private final Predicate<Usage> usageFilter;
+	private final CrossValidationFoldBuilder foldBuilder;
+	private final CVEvaluator cvEvaluator;
+	private final UsagePruning pruning;
 
 	private long skippedNumProjects;
 	private long skippedUsageFilter;
@@ -64,11 +59,12 @@ public class UsageEvaluation extends AbstractEvaluation {
 
 	@Inject
 	public UsageEvaluation(@NumberOfCVFolds int numFolds, @UsageFilter Predicate<Usage> usageFilter,
-			CrossValidationFoldBuilder foldBuilder, CVEvaluator cvEvaluator) {
+			CrossValidationFoldBuilder foldBuilder, CVEvaluator cvEvaluator, UsagePruning pruning) {
 		this.numFolds = numFolds;
 		this.usageFilter = usageFilter;
 		this.foldBuilder = foldBuilder;
 		this.cvEvaluator = cvEvaluator;
+		this.pruning = pruning;
 	}
 
 	private void reset() {
@@ -136,7 +132,9 @@ public class UsageEvaluation extends AbstractEvaluation {
 			return;
 		}
 
-		int numUsages = pruneUsages(projectUsages);
+		int numPrunedUsages = pruning.prune(MAX_USAGES, projectUsages);
+		log("\tPruned %d usages\n", numPrunedUsages);
+		int numUsages = projectUsages.values().stream().mapToInt(Collection::size).sum();
 		log("\t%d usages in total\n", numUsages);
 
 		List<List<Usage>> folds = foldBuilder.createFolds(projectUsages);
@@ -145,27 +143,6 @@ public class UsageEvaluation extends AbstractEvaluation {
 		results.put(type, score);
 		log("\tF1: %.3f\n", score);
 		log("\tFold size deviation: %.1f\n", setProvider.getAbsoluteFoldSizeDeviation());
-	}
-
-	private int pruneUsages(Map<ProjectIdentifier, List<Usage>> projectUsages) {
-		int numUsages = projectUsages.values().stream().mapToInt(usages -> usages.size()).sum();
-		if (numUsages <= MAX_USAGES) {
-			return numUsages;
-		}
-
-		LinkedList<Pair<ProjectIdentifier, Integer>> projects = projectUsages.entrySet().stream()
-				.map(entry -> ImmutablePair.of(entry.getKey(), entry.getValue().size()))
-				.sorted(Comparator.comparingInt(Pair::getValue)).collect(Collectors.toCollection(Lists::newLinkedList));
-		int numPrunedUsages = 0;
-		while (numUsages > MAX_USAGES) {
-			Pair<ProjectIdentifier, Integer> largestProject = projects.removeLast();
-			projectUsages.remove(largestProject.getKey());
-			numPrunedUsages += largestProject.getValue();
-			numUsages -= largestProject.getValue();
-		}
-		log("\tPruned %d usages\n", numPrunedUsages);
-
-		return numUsages;
 	}
 
 	private static final Injector INJECTOR = Guice.createInjector(new Module());

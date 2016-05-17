@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 	private final int numFolds;
 	private final PointsToUsageFilter usageFilter;
 	private final CVEvaluator cvEvaluator;
+	private final UsagePruning pruning;
 
 	private final GenericFoldBuilder foldBuilder;
 
@@ -62,10 +64,11 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 
 	@Inject
 	public ProjectTrainValidateEvaluation(@NumberOfCVFolds int numFolds, PointsToUsageFilter usageFilter,
-			CVEvaluator cvEvaluator) {
+			CVEvaluator cvEvaluator, UsagePruning pruning) {
 		this.numFolds = numFolds;
 		this.usageFilter = usageFilter;
 		this.cvEvaluator = cvEvaluator;
+		this.pruning = pruning;
 
 		foldBuilder = new GenericFoldBuilder(numFolds);
 	}
@@ -112,10 +115,6 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 			types.sort(new TypeNameComparator());
 
 			for (ICoReTypeName type : types) {
-				// if (!Names.vm2srcQualifiedType(type).equals("System.Collections.Generic.Stack")) {
-				// continue;
-				// }
-
 				if (!usageFilter.test(type) || !CoReNames.vm2srcQualifiedType(type).startsWith("System.")) {
 					continue;
 				}
@@ -164,18 +163,19 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		List<List<ProjectIdentifier>> projectFolds = createProjectFolds(projects, type, usageStores);
 		List<EvaluationResult> localResults = new ArrayList<>(usageStores.size() * usageStores.size());
 		for (ProjectUsageStore trainingStore : usageStores) {
-			Map<ProjectIdentifier, List<Usage>> trainingUsages = trainingStore.loadUsagesPerProject(type, usageFilter);
+			Map<ProjectIdentifier, List<Usage>> trainingUsages = loadUsages(trainingStore, type);
 
 			for (ProjectUsageStore validationStore : usageStores) {
 				// avoid unnecessary loading of usages
 				Map<ProjectIdentifier, List<Usage>> validationUsages = (trainingStore == validationStore)
-						? trainingUsages : validationStore.loadUsagesPerProject(type, usageFilter);
+						? trainingUsages : loadUsages(validationStore, type);
 				ProjectTrainValidateSetProvider setProvider = new ProjectTrainValidateSetProvider(projectFolds,
 						trainingUsages, validationUsages);
 				double score;
 				try {
 					score = cvEvaluator.evaluate(setProvider);
-					localResults.add(new EvaluationResult(trainingStore.getName(), validationStore.getName(), score));
+					localResults.add(new EvaluationResult(trainingStore.getName(), validationStore.getName(), score,
+							getNumberOfUsages(trainingUsages), getNumberOfUsages(validationUsages)));
 				} catch (RuntimeException e) {
 					if (e.getCause() instanceof EmptySetException) {
 						++skippedUsageFilter;
@@ -189,7 +189,6 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 			}
 		}
 		results.put(type, localResults);
-
 	}
 
 	private List<List<ProjectIdentifier>> createProjectFolds(Set<ProjectIdentifier> projects, ICoReTypeName type,
@@ -217,15 +216,31 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		return foldBuilder.createFolds(sortedProjects, numberOfUsages);
 	}
 
+	private static int getNumberOfUsages(Map<ProjectIdentifier, List<Usage>> usages) {
+		return usages.values().stream().mapToInt(Collection::size).sum();
+	}
+
+	private Map<ProjectIdentifier, List<Usage>> loadUsages(ProjectUsageStore store, ICoReTypeName type)
+			throws IOException {
+		Map<ProjectIdentifier, List<Usage>> usages = store.loadUsagesPerProject(type, usageFilter);
+		pruning.prune(MAX_USAGES, usages);
+		return usages;
+	}
+
 	private static class EvaluationResult {
 		public String training;
 		public String validation;
 		public double score;
+		public int numTrainingUsages;
+		public int numValidationUsages;
 
-		public EvaluationResult(String training, String validation, double score) {
+		public EvaluationResult(String training, String validation, double score, int numTrainingUsages,
+				int numValidationUsages) {
 			this.training = training;
 			this.validation = validation;
 			this.score = score;
+			this.numTrainingUsages = numTrainingUsages;
+			this.numValidationUsages = numValidationUsages;
 		}
 
 	}
@@ -245,7 +260,9 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		INJECTOR.getInstance(ResultExporter.class).export(resultFile, evaluator.getResults().entrySet().stream()
 				.flatMap(e -> e.getValue().stream().map(er -> ImmutablePair.of(e.getKey(), er))).map(p -> {
 					return new String[] { CoReNames.vm2srcQualifiedType(p.left), p.right.training, p.right.validation,
-							String.format(Locale.US, "%.3f", p.right.score) };
+							String.format(Locale.US, "%.3f", p.right.score),
+							Integer.toString(p.right.numTrainingUsages),
+							Integer.toString(p.right.numValidationUsages) };
 				}));
 
 		INJECTOR.getInstance(ExecutorService.class).shutdown();

@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,11 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
+import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
@@ -49,9 +51,9 @@ import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
+import cc.recommenders.names.CoReNames;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.names.Names;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -63,6 +65,8 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	private final Provider<PBNMiner> pbnMinerProvider;
 
 	private final Map<Triple<ICoReTypeName, String, String>, Double> results = new HashMap<>();
+	private final Map<Pair<ICoReTypeName, String>, Integer> numQueries = new HashMap<>();
+	private final Map<String, Integer> zeroExtractedQueries = new HashMap<>();
 
 	@Inject
 	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter,
@@ -72,12 +76,23 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		this.pbnMinerProvider = pbnMinerProvider;
 	}
 
-	public void exportResults(Path target, ResultExporter exporter) throws IOException {
-		exporter.export(target, results.entrySet().stream().map(entry -> {
+	public void exportResults(Path dir, ResultExporter exporter) throws IOException {
+		Path resultFile = dir.resolve(getClass().getSimpleName() + ".txt");
+		exporter.export(resultFile, results.entrySet().stream().map(entry -> {
 			ICoReTypeName type = entry.getKey().getLeft();
-			return new String[] { Names.vm2srcQualifiedType(type), entry.getKey().getMiddle(),
+			return new String[] { CoReNames.vm2srcQualifiedType(type), entry.getKey().getMiddle(),
 					entry.getKey().getRight(), String.format(Locale.US, "%.3f", entry.getValue()) };
 		}));
+
+		Path numQueriesFile = dir.resolve(getClass().getSimpleName() + ".nq.txt");
+		exporter.export(numQueriesFile,
+				numQueries.entrySet().stream()
+						.map(entry -> new String[] { CoReNames.vm2srcQualifiedType(entry.getKey().getLeft()),
+								entry.getKey().getRight(), Integer.toString(entry.getValue()) }));
+
+		Path zeroExtractedQueriesFile = dir.resolve(getClass().getSimpleName() + ".zeq.txt");
+		exporter.export(zeroExtractedQueriesFile, zeroExtractedQueries.entrySet().stream()
+				.map(entry -> new String[] { entry.getKey(), Integer.toString(entry.getValue()) }));
 	}
 
 	@Override
@@ -97,7 +112,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 	private void evaluateType(String validationAnalysisName, ICoReTypeName type,
 			Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries) throws IOException {
-		log("\t%s:\n", Names.vm2srcQualifiedType(type));
+		log("\t%s:\n", CoReNames.vm2srcQualifiedType(type));
 		for (UsageStore store : usageStores) {
 
 			ICallsRecommender<Query> recommender = null;
@@ -128,14 +143,18 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 		for (ICompletionEvent event : completionEvents) {
 			try {
-				Context context = event.getContext();
+				PointsToContext context = ptFactory.create().compute(event.getContext());
 				PointsToQueryBuilder queryBuilder = new PointsToQueryBuilder(context);
 				SSTNodeHierarchy nodeHierarchy = new SSTNodeHierarchy(context.getSST());
 				List<ICompletionExpression> completionExprs = completionExprCollector.collect(context);
 
 				for (ICompletionExpression expr : completionExprs) {
-					List<Usage> exprQueries = usageExtractor.extractQueries(expr, ptFactory.create().compute(context),
-							queryBuilder, nodeHierarchy);
+					List<Usage> exprQueries = usageExtractor.extractQueries(expr, context, queryBuilder, nodeHierarchy);
+
+					if (exprQueries.isEmpty()) {
+						increaseZeroExtractedQueries(ptFactory.getName());
+					}
+
 					for (Usage query : exprQueries) {
 						Map<ICompletionEvent, List<Usage>> typeBin = queries.get(query.getType());
 						if (typeBin == null) {
@@ -149,10 +168,12 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 							typeBin.put(event, eventBin);
 						}
 						eventBin.add(query);
+
+						increaseNumberOfQueries(query.getType(), ptFactory.getName());
 					}
 				}
 			} catch (RuntimeException ex) {
-				if (ex.getMessage().startsWith("Invalid Signature Syntax: ")) {
+				if (ex.getMessage() != null && ex.getMessage().startsWith("Invalid Signature Syntax: ")) {
 					LoggerFactory.getLogger(getClass()).error(
 							"Failed to extract queries for context due to MethodName.getSignature bug: {}",
 							ex.getMessage());
@@ -163,6 +184,17 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		}
 
 		return queries;
+	}
+
+	private void increaseNumberOfQueries(ICoReTypeName type, String analysis) {
+		Pair<ICoReTypeName, String> key = ImmutablePair.of(type, analysis);
+		Integer currentNumber = numQueries.getOrDefault(key, 0);
+		numQueries.put(key, currentNumber + 1);
+	}
+
+	private void increaseZeroExtractedQueries(String analysis) {
+		int currentCount = zeroExtractedQueries.getOrDefault(analysis, 0);
+		zeroExtractedQueries.put(analysis, currentCount + 1);
 	}
 
 	private Set<ICoReTypeName> getQueryTypes(Collection<Map<ICompletionEvent, List<Usage>>> eventUsages) {
