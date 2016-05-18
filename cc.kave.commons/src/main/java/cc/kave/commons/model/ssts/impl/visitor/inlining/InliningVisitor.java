@@ -420,7 +420,9 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 				context.setPreparedGuards(false);
 			}
 		} else {
-			expr.getReference().accept(this, context);
+			if (!(expr.getMethodName().isConstructor() || expr.getMethodName().isStatic())) {
+				expr.getReference().accept(this, context);
+			}
 			context.setReturnExpression(expr);
 		}
 		return null;

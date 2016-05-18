@@ -33,6 +33,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
@@ -672,6 +673,17 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
+	public void testRecursivePair() {
+		ISST sst = buildSST( //
+				declareEntryPoint("m1", invocationStatement("m2")), //
+				declareNonEntryPoint("m2",
+						usingBlock(ref("a"),
+								simpleIf(Lists.newArrayList(), constant("true"), invocationStatement("m3")))), //
+				declareNonEntryPoint("m3", forEachLoop("i", "b", invocationStatement("m2"))));
+		assertSSTs(sst, sst);
+	}
+
+	@Test
 	public void testRefMethodKeyWord() {
 		IMethodName name = MethodName.newMethodName("[?] [?].m2(ref [Integer] b)");
 		ISST sst = buildSST( //
@@ -1239,6 +1251,42 @@ public class InliningVisitorTest extends InliningBaseTest {
 								assign(ref("$0"), constant("true")), //
 								returnStatement(refExpr("$0"), false)), //
 								declareVar("b"))));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void emptyVarRefConstructorStaysEmpty() {
+		InvocationExpression e = new InvocationExpression();
+		e.setMethodName(MethodName.newMethodName("[?] [?]..ctor()"));
+		e.setReference(ref(""));
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						expr(e), //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						expr(e)));
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						expr(e), //
+						expr(e)));
+		assertSSTs(sst, inlinedSST);
+	}
+
+	@Test
+	public void emptyRefStaticMethodStaysEmpty() {
+		InvocationExpression e = new InvocationExpression();
+		e.setMethodName(MethodName.newMethodName("static [?] [?].m()"));
+		e.setReference(ref(""));
+		ISST sst = buildSST(//
+				declareEntryPoint("ep1", //
+						expr(e), //
+						invocationStatement("h1")), //
+				declareNonEntryPoint("h1", //
+						expr(e)));
+		ISST inlinedSST = buildSST(//
+				declareEntryPoint("ep1", //
+						expr(e), //
+						expr(e)));
 		assertSSTs(sst, inlinedSST);
 	}
 

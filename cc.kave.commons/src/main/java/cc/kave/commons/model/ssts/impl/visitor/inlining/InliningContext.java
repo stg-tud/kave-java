@@ -93,7 +93,7 @@ public class InliningContext {
 
 	private boolean checkCallTree(Set<IMethodName> invocations, Map<IMethodName, Set<IMethodName>> calls,
 			HashSet<IMethodName> met, IMethodDeclaration method) {
-		if (met.size() == calls.size() || invocations == null) {
+		if (invocations == null) {
 			return false;
 		} else {
 			for (IMethodName call : invocations) {
@@ -101,7 +101,8 @@ public class InliningContext {
 					continue;
 				}
 				met.add(call);
-				if (call.equals(method.getName()) || checkCallTree(calls.get(call), calls, met, method)) {
+				if (call.getIdentifier().equals(method.getName().getIdentifier())
+						|| checkCallTree(calls.get(call), calls, met, method)) {
 					return true;
 				}
 			}
