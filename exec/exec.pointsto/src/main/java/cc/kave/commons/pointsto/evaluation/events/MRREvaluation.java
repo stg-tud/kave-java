@@ -81,7 +81,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		exporter.export(resultFile, results.entrySet().stream().map(entry -> {
 			ICoReTypeName type = entry.getKey().getLeft();
 			return new String[] { CoReNames.vm2srcQualifiedType(type), entry.getKey().getMiddle(),
-					entry.getKey().getRight(), String.format(Locale.US, "%.3f", entry.getValue()) };
+					entry.getKey().getRight(), String.format(Locale.US, "%.5f", entry.getValue()) };
 		}));
 
 		Path numQueriesFile = dir.resolve(getClass().getSimpleName() + ".nq.txt");

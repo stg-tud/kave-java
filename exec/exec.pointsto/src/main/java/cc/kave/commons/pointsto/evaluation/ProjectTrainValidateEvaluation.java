@@ -245,7 +245,7 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 
 	}
 
-	private static final Injector INJECTOR = Guice.createInjector(new Module());
+	private static final Injector INJECTOR = Guice.createInjector(new DefaultModule());
 
 	public static void main(String[] args) throws IOException {
 		Locale.setDefault(Locale.US);

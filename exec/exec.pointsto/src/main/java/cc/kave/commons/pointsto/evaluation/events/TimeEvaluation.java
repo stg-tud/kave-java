@@ -16,20 +16,19 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.mutable.MutableLong;
-import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import com.google.common.base.Stopwatch;
@@ -38,24 +37,20 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.evaluation.AbstractEvaluation;
+import cc.kave.commons.pointsto.evaluation.ContextSampleEvaluation;
 import cc.kave.commons.pointsto.evaluation.ContextSampler;
-import cc.kave.commons.pointsto.evaluation.Module;
+import cc.kave.commons.pointsto.evaluation.DefaultModule;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
 
-public class TimeEvaluation extends AbstractEvaluation {
-
-	private static final int MAX_COMPLETION_EVENTS = 8000;
+public class TimeEvaluation extends ContextSampleEvaluation {
 
 	private static final int WARM_UP_RUNS = 5;
-
-	private final RandomGenerator rndGenerator;
+	private static final int MEASUREMENT_RUNS = 3;
 
 	private Map<String, DescriptiveStatistics> analysisStatistics = new HashMap<>();
 	private List<AnalysisTimeEntry> analysisTimes;
@@ -63,8 +58,8 @@ public class TimeEvaluation extends AbstractEvaluation {
 	private Map<Context, Integer> stmtCounts = new IdentityHashMap<>();
 
 	@Inject
-	public TimeEvaluation(RandomGenerator rndGenerator) {
-		this.rndGenerator = rndGenerator;
+	public TimeEvaluation(ContextSampler sampler) {
+		super(sampler);
 	}
 
 	public void exportResults(Path outputDir, ResultExporter exporter) throws IOException {
@@ -83,30 +78,30 @@ public class TimeEvaluation extends AbstractEvaluation {
 						Integer.toString(entry.numStmts), format.apply(entry.time) }));
 	}
 
+	public void run(Path contextsDir, List<PointsToAnalysisFactory> ptFactories) throws IOException {
+		run(getSamples(contextsDir), ptFactories);
+	}
+
 	public void run(List<Context> contexts, List<PointsToAnalysisFactory> ptFactories) throws IOException {
 		initializeStmtCountTimes(ptFactories, contexts);
 		log("Using %d contexts for time measurement\n", contexts.size());
 
-		for (int i = 0; i < WARM_UP_RUNS + 1; ++i) {
-			clearStmtCountTimes();
+		Map<Pair<String, ITypeName>, AnalysisTimeEntry> timesRegistry = new LinkedHashMap<>(
+				contexts.size() * ptFactories.size());
+		for (int i = 0; i < WARM_UP_RUNS + MEASUREMENT_RUNS; ++i) {
+			if (i == WARM_UP_RUNS) {
+				timesRegistry.clear();
+			}
 
 			for (PointsToAnalysisFactory ptFactory : ptFactories) {
 				analysisStatistics.put(ptFactory.getName(),
 						measurePointerAnalysis(contexts, ptFactory, new MutableLong()));
 			}
+			updateTimesRegistry(timesRegistry);
 		}
-	}
 
-	private List<Context> sampleEvents(List<ICompletionEvent> completionEvents) {
-		Random rnd = new Random(rndGenerator.nextLong());
-		Collections.shuffle(completionEvents, rnd);
-		Stream<ICompletionEvent> eventStream;
-		if (completionEvents.size() > MAX_COMPLETION_EVENTS) {
-			eventStream = completionEvents.subList(0, MAX_COMPLETION_EVENTS).stream();
-		} else {
-			eventStream = completionEvents.stream();
-		}
-		return eventStream.map(event -> event.getContext()).collect(Collectors.toList());
+		analysisTimes = timesRegistry.values().stream().map(entry -> new AnalysisTimeEntry(entry.analysisName,
+				entry.contextType, entry.numStmts, entry.time / MEASUREMENT_RUNS)).collect(Collectors.toList());
 	}
 
 	private void initializeStmtCountTimes(Collection<PointsToAnalysisFactory> ptFactories, List<Context> contexts) {
@@ -127,7 +122,19 @@ public class TimeEvaluation extends AbstractEvaluation {
 		log("Removed %d contexts with zero statements\n", zeroStmtsContexts.size());
 	}
 
-	private void clearStmtCountTimes() {
+	private void updateTimesRegistry(Map<Pair<String, ITypeName>, AnalysisTimeEntry> registry) {
+		if (registry.isEmpty()) {
+			for (AnalysisTimeEntry timeEntry : analysisTimes) {
+				registry.put(ImmutablePair.of(timeEntry.analysisName, timeEntry.contextType), timeEntry);
+			}
+		} else {
+			for (AnalysisTimeEntry timeEntry : analysisTimes) {
+				Pair<String, ITypeName> key = ImmutablePair.of(timeEntry.analysisName, timeEntry.contextType);
+				AnalysisTimeEntry currentEntry = registry.get(key);
+				registry.put(key, new AnalysisTimeEntry(timeEntry.analysisName, timeEntry.contextType,
+						timeEntry.numStmts, timeEntry.time + currentEntry.time));
+			}
+		}
 		analysisTimes.clear();
 	}
 
@@ -167,12 +174,10 @@ public class TimeEvaluation extends AbstractEvaluation {
 	}
 
 	public static void main(String[] args) throws IOException {
-		Injector injector = Guice.createInjector(new Module());
-		ContextSampler sampler = injector.getInstance(ContextSampler.class);
+		Injector injector = Guice.createInjector(new DefaultModule());
 
-		List<Context> contexts = sampler.sample(BASE_DIR.resolve("cut"), MAX_COMPLETION_EVENTS);
 		TimeEvaluation evaluation = injector.getInstance(TimeEvaluation.class);
-		evaluation.run(contexts, POINTS_TO_FACTORIES);
+		evaluation.run(CONTEXT_DIR, POINTS_TO_FACTORIES);
 		evaluation.exportResults(EVALUATION_RESULTS_DIR, injector.getInstance(ResultExporter.class));
 	}
 }

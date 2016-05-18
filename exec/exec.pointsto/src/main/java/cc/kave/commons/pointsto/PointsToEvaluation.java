@@ -34,6 +34,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
+import cc.kave.commons.pointsto.extraction.DescentStrategy;
 import cc.kave.commons.pointsto.extraction.SimpleDescentStrategy;
 import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
@@ -78,8 +79,9 @@ public class PointsToEvaluation {
 				}
 			};
 
+			DescentStrategy descentStrategy = new SimpleDescentStrategy();
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, usageStoreFactory,
-					new TypeStatisticsCollector(new PointsToUsageFilter()), new SimpleDescentStrategy());
+					new TypeStatisticsCollector(new PointsToUsageFilter()), descentStrategy);
 
 			Stopwatch stopwatch = Stopwatch.createStarted();
 			generator.generateUsages();

@@ -145,7 +145,7 @@ public class UsageEvaluation extends AbstractEvaluation {
 		log("\tFold size deviation: %.1f\n", setProvider.getAbsoluteFoldSizeDeviation());
 	}
 
-	private static final Injector INJECTOR = Guice.createInjector(new Module());
+	private static final Injector INJECTOR = Guice.createInjector(new DefaultModule());
 
 	public static UsageEvaluation run(Path storePath, Path exportFile) throws IOException {
 		UsageEvaluation evaluation = INJECTOR.getInstance(UsageEvaluation.class);
@@ -160,14 +160,6 @@ public class UsageEvaluation extends AbstractEvaluation {
 
 	public static void shutdown() {
 		INJECTOR.getInstance(ExecutorService.class).shutdown();
-	}
-
-	public static void main(String[] args) throws IOException {
-		Locale.setDefault(Locale.US);
-		Path storePath = Paths.get("E:\\Coding\\MT\\Usages\\UnificationAnalysis_FULL");
-		Path exportFile = Paths.get("E:\\Coding\\MT\\EvaluationResults\\UnificationAnalysis_FULL.txt");
-		run(storePath, exportFile);
-		shutdown();
 	}
 
 }

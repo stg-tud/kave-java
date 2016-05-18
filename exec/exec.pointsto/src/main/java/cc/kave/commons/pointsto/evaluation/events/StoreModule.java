@@ -22,11 +22,11 @@ import java.util.List;
 
 import com.google.inject.TypeLiteral;
 
-import cc.kave.commons.pointsto.evaluation.Module;
+import cc.kave.commons.pointsto.evaluation.DefaultModule;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.kave.commons.pointsto.stores.UsageStore;
 
-public class StoreModule extends Module {
+public class StoreModule extends DefaultModule {
 
 	private final Path BASE_DIR = Paths.get("E:\\Coding\\MT");
 	private final Path USAGES_DIR = BASE_DIR.resolve("Usages");

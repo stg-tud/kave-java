@@ -42,7 +42,7 @@ import cc.recommenders.mining.features.UsageFeatureWeighter;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
 
-public class Module extends AbstractModule {
+public class DefaultModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
