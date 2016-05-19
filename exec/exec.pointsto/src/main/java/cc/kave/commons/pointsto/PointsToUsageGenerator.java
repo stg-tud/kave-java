@@ -30,11 +30,13 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
+import cc.kave.commons.pointsto.extraction.CallsitePruning;
+import cc.kave.commons.pointsto.extraction.DescentStrategy;
+import cc.kave.commons.pointsto.extraction.MethodContextReplacement;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.StreamingZipReader;
 import cc.kave.commons.pointsto.io.ZipArchive;
-import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.kave.commons.utils.json.JsonUtils;
@@ -54,14 +56,11 @@ public class PointsToUsageGenerator {
 
 	private Map<PointsToAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
 
-	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
-			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory) throws IOException {
-		this(factories, srcDirectory, pointstoDestDir, usageStoreFactory, new NopUsageStatisticsCollector());
-	}
+	private final DescentStrategy descentStrategy;
 
 	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory,
-			UsageStatisticsCollector statisticsCollector) throws IOException {
+			UsageStatisticsCollector statisticsCollector, DescentStrategy descentStrategy) throws IOException {
 		this.factories = factories;
 		this.srcDir = srcDirectory;
 		this.sources = IOHelper.getZipFiles(srcDirectory);
@@ -71,6 +70,8 @@ public class PointsToUsageGenerator {
 			usageStores.put(factory, usageStoreFactory.apply(factory));
 			statisticsCollectors.put(factory, statisticsCollector.create());
 		}
+
+		this.descentStrategy = descentStrategy;
 	}
 
 	public Map<PointsToAnalysisFactory, UsageStatisticsCollector> getStatisticsCollectors() {
@@ -156,7 +157,8 @@ public class PointsToUsageGenerator {
 				return;
 			}
 
-			PointsToUsageExtractor extractor = new PointsToUsageExtractor();
+			PointsToUsageExtractor extractor = new PointsToUsageExtractor(descentStrategy,
+					CallsitePruning.EMPTY_RECV_CALLSITES, MethodContextReplacement.FIRST_OR_SUPER_OR_ELEMENT);
 
 			for (PointsToAnalysisFactory factory : factories) {
 				PointsToAnalysis pa = factory.create();

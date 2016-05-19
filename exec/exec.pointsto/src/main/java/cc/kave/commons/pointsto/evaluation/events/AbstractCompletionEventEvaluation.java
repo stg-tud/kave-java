@@ -28,6 +28,7 @@ import com.google.inject.Injector;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.pointsto.AdvancedPointsToAnalysisFactory;
+import cc.kave.commons.pointsto.InliningPointsToAnalysisFactory;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
@@ -89,7 +90,10 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
 				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
 				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
-				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class));
+				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)//,
+				//new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
+				//new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
+				);
 		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;

@@ -30,9 +30,11 @@ import com.google.common.io.Files;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
+import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
+import cc.kave.commons.pointsto.extraction.SimpleDescentStrategy;
 import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
@@ -53,9 +55,13 @@ public class PointsToEvaluation {
 	public static void main(String[] args) {
 
 		List<PointsToAnalysisFactory> factories = Arrays.asList(
-				// new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
-				// new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL));
+				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
+				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
+				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
+				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)// ,
+				// new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
+				// new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
+		);
 
 		generateUsages(factories);
 		// evaluateUsages(factories);
@@ -73,7 +79,7 @@ public class PointsToEvaluation {
 			};
 
 			PointsToUsageGenerator generator = new PointsToUsageGenerator(factories, SRC_PATH, null, usageStoreFactory,
-					new TypeStatisticsCollector(new PointsToUsageFilter()));
+					new TypeStatisticsCollector(new PointsToUsageFilter()), new SimpleDescentStrategy());
 
 			Stopwatch stopwatch = Stopwatch.createStarted();
 			generator.generateUsages();
