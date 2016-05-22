@@ -157,34 +157,7 @@ public class PBNAnalysisVisitorTest {
 		assertEquals(convert(int32Type), uut.findTypeForVarReference(invocation));
 	}
 	
-	@Test
-	public void returnsUsageWhenAlreadyInList() {
-		List<Usage> usageList = new ArrayList<>();
-		Query query = new Query();
-		query.setType(convert(int32Type));
-		usageList.add(query);
-		
-		Optional<Usage> actual = uut.usageListContainsType(usageList, convert(int32Type));
-		assertTrue(actual.isPresent());
-	}
-	
-	@Test
-	public void returnsEmptyOptionalWhenUsageNotPresentInList() {
-		List<Usage> usageList = new ArrayList<>();
-		Query query = new Query();
-		query.setType(CoReNameConverter.convert(stringType));
-		usageList.add(query);
-		Optional<Usage> actual = uut.usageListContainsType(usageList, convert(int32Type));
-		assertFalse(actual.isPresent());
-	}
-	
-	@Test
-	public void returnsEmptyOptionalWhenListEmpty() {
-		List<Usage> usageList = new ArrayList<>();
-		Optional<Usage> actual = uut.usageListContainsType(usageList, convert(int32Type));
-		assertFalse(actual.isPresent());
-	}
-	
+
 	@Test
 	public void succesfullyCreatesUsageFromInvocation() {
 		Query expected = new Query();

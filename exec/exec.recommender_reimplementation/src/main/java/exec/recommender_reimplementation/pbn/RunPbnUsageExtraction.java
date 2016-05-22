@@ -17,6 +17,8 @@ package exec.recommender_reimplementation.pbn;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -48,15 +50,17 @@ public class RunPbnUsageExtraction {
 		
 		List<Usage> usageList = new ArrayList<Usage>();  
 		
-		StringBuilder errorLog = new StringBuilder();
+		StringWriter errorLog = new StringWriter();
+		PrintWriter errorWriter = new PrintWriter(errorLog);	
 		
 		for (Context context : contextList) {
 			try {
 				usageExtractor.extractUsageFromContext(context, usageList);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				errorLog.append(e.toString());
-				errorLog.append("\n");
+				e.printStackTrace(errorWriter);
+				errorWriter.append("\n");
+				errorWriter.flush();
 			}
 		}
 		

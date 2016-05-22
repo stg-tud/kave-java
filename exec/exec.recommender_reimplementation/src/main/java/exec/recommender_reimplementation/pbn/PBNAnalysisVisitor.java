@@ -19,6 +19,7 @@ import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,22 +84,21 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 			if (!isCallToSuperClass(expr))
 				return super.visit(expr, usages);
 			ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
+			if(!typeHierarchy.hasSuperclass()) return super.visit(expr, usages);
 			type = convert(typeHierarchy.getExtends().getElement());
 		} else {
 			type = findTypeForVarReference(expr);
 		}
 		// Handle Receiver first
-		Optional<Usage> usage = usageListContainsType(usages, type);
-		handleObjectInstance(expr, usages, usage, -1, type);
+		handleObjectInstance(expr, usages, -1, type);
 
 		// Handle Parameters
 		List<ISimpleExpression> parameters = expr.getParameters();
 		List<ITypeName> parameterTypes = createTypeListFromParameters(parameters);
 		for (int i = 0; i < parameterTypes.size(); i++) {
 			ITypeName parameterType = parameterTypes.get(i);
-			usage = usageListContainsType(usages, convert(parameterType));
 			int parameterIndex = getIndexOfParameter(parameters, parameterType);
-			handleObjectInstance(expr, usages, usage, parameterIndex, convert(parameterType));
+			handleObjectInstance(expr, usages, parameterIndex, convert(parameterType));
 		}
 
 		return super.visit(expr, usages);
@@ -112,8 +112,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		return null;
 	}
 
-	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, Optional<Usage> usage,
-			int parameterIndex, ICoReTypeName parameterType) {
+	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, int parameterIndex, ICoReTypeName parameterType) {
 
 		Query newUsage = createNewObjectUsage(expr, parameterType);
 		addClassContext(newUsage);
@@ -122,8 +121,9 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 			return;
 		addCallSite(newUsage, expr, parameterIndex);
 				
-		if (usage.isPresent() && similarUsage(usage.get(), newUsage)) {
-			addCallSite((Query) usage.get(), expr, parameterIndex);
+		Optional<Usage> similarUsage = usageListContainsSimilarUsage(usages, newUsage);
+		if (similarUsage.isPresent()) {
+			addCallSite((Query) similarUsage.get(), expr, parameterIndex);
 		}
 		else {
 			usages.add(newUsage);
@@ -131,11 +131,10 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	}
 
 	public boolean similarUsage(Usage usage, Usage otherUsage) {
-		return usage.getClassContext().equals(otherUsage.getClassContext()) &&
-				usage.getDefinitionSite().equals(otherUsage.getDefinitionSite()) &&
-				usage.getMethodContext().equals(otherUsage.getMethodContext()) &&
-				usage.getType().equals(otherUsage.getType());
- 		
+		return Objects.equals(usage.getClassContext(),otherUsage.getClassContext()) &&
+				Objects.equals(usage.getDefinitionSite(),otherUsage.getDefinitionSite()) &&
+				Objects.equals(usage.getMethodContext(),otherUsage.getMethodContext()) &&
+				Objects.equals(usage.getType(),otherUsage.getType());
 	}
 
 	public int getIndexOfParameter(List<ISimpleExpression> parameters, ITypeName parameterType) {
@@ -143,7 +142,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 			ISimpleExpression expr = parameters.get(i);
 			if (expr instanceof IReferenceExpression) {
 				IReferenceExpression refExpr = (IReferenceExpression) expr;
-				if (typeCollector.getType(refExpr.getReference()).equals(parameterType))
+				if (parameterType.equals(typeCollector.getType(refExpr.getReference())))
 					return i;
 			}
 
@@ -222,6 +221,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 
 		List<IStatement> body = methodDecl.getBody();
 		PointsToQuery queryForVarReference = queryBuilder.newQuery(reference,
+				// TODO Search for statement here instead of direct cast
 				(IStatement) sstNodeHierarchy.getParent(expr));
 		Set<AbstractLocation> varRefLocations = pointsToContext.getPointerAnalysis().query(queryForVarReference);
 
@@ -338,8 +338,8 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		return convert(typeCollector.getType(invocation.getReference()));
 	}
 
-	public Optional<Usage> usageListContainsType(List<Usage> usages, ICoReTypeName type) {
-		return usages.stream().filter(usage -> usage.getType().equals(type)).findAny();
+	public Optional<Usage> usageListContainsSimilarUsage(List<Usage> usages, Usage otherUsage) {
+		return usages.stream().filter(usage -> similarUsage(usage, otherUsage)).findFirst();
 	}
 
 	public boolean isMethodCallToEntryPoint(IMethodName methodName) {
