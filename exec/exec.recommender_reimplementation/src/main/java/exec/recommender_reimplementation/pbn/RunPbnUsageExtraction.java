@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 import exec.recommender_reimplementation.ContextReader;
 
 
-public class RunPbnModelGeneration {
+public class RunPbnUsageExtraction {
 	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Small Testset");
 
 
@@ -48,13 +48,30 @@ public class RunPbnModelGeneration {
 		
 		List<Usage> usageList = new ArrayList<Usage>();  
 		
+		StringBuilder errorLog = new StringBuilder();
+		
 		for (Context context : contextList) {
-			usageExtractor.extractUsageFromContext(context, usageList);
+			try {
+				usageExtractor.extractUsageFromContext(context, usageList);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				errorLog.append(e.toString());
+				errorLog.append("\n");
+			}
 		}
 		
+		printErrorLog(errorLog.toString());		
 		printUsages(usageList);
 	}
 	
+	private static void printErrorLog(String log) {
+		try {
+			FileUtils.writeStringToFile(new File(FOLDERPATH + "\\pbn_errorLog.txt"), log);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}    
+	}
+
 	private static void printUsages(List<Usage> usageList) {
 		StringBuilder sb = new StringBuilder();
 		for (Usage usage : usageList) 
@@ -63,7 +80,7 @@ public class RunPbnModelGeneration {
 			sb.append("\n");
 		}
 		try {
-			FileUtils.writeStringToFile(new File(FOLDERPATH + "\\pbn_usages.txt"), sb.toString());
+			FileUtils.writeStringToFile(new File(FOLDERPATH + "\\pbn_usages.json"), sb.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}    

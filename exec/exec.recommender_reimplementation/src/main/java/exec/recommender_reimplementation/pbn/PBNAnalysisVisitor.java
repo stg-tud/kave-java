@@ -78,10 +78,18 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 
 	@Override
 	public Object visit(IInvocationExpression expr, List<Usage> usages) {
+		ICoReTypeName type;
+		if (expr.getReference().getIdentifier().equals("this")) {
+			if (!isCallToSuperClass(expr))
+				return super.visit(expr, usages);
+			ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
+			type = convert(typeHierarchy.getExtends().getElement());
+		} else {
+			type = findTypeForVarReference(expr);
+		}
 		// Handle Receiver first
-		ICoReTypeName type = findTypeForVarReference(expr);
 		Optional<Usage> usage = usageListContainsType(usages, type);
-		handleObjectInstance(expr, usages, usage, -1, null);
+		handleObjectInstance(expr, usages, usage, -1, type);
 
 		// Handle Parameters
 		List<ISimpleExpression> parameters = expr.getParameters();
@@ -90,7 +98,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 			ITypeName parameterType = parameterTypes.get(i);
 			usage = usageListContainsType(usages, convert(parameterType));
 			int parameterIndex = getIndexOfParameter(parameters, parameterType);
-			handleObjectInstance(expr, usages, usage, parameterIndex, parameterType);
+			handleObjectInstance(expr, usages, usage, parameterIndex, convert(parameterType));
 		}
 
 		return super.visit(expr, usages);
@@ -105,17 +113,29 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	}
 
 	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, Optional<Usage> usage,
-			int parameterIndex, ITypeName parameterType) {
-		if (usage.isPresent()) {
+			int parameterIndex, ICoReTypeName parameterType) {
+
+		Query newUsage = createNewObjectUsage(expr, parameterType);
+		addClassContext(newUsage);
+		addMethodContext(newUsage);
+		if (!addDefinitionSite(newUsage, expr, parameterIndex))
+			return;
+		addCallSite(newUsage, expr, parameterIndex);
+				
+		if (usage.isPresent() && similarUsage(usage.get(), newUsage)) {
 			addCallSite((Query) usage.get(), expr, parameterIndex);
-		} else {
-			Query newUsage = createNewObjectUsage(expr, parameterType);
-			addClassContext(newUsage);
-			addMethodContext(newUsage);
-			if (!addDefinitionSite(newUsage, expr, parameterIndex)) return;
-			addCallSite(newUsage, expr, parameterIndex);
+		}
+		else {
 			usages.add(newUsage);
 		}
+	}
+
+	public boolean similarUsage(Usage usage, Usage otherUsage) {
+		return usage.getClassContext().equals(otherUsage.getClassContext()) &&
+				usage.getDefinitionSite().equals(otherUsage.getDefinitionSite()) &&
+				usage.getMethodContext().equals(otherUsage.getMethodContext()) &&
+				usage.getType().equals(otherUsage.getType());
+ 		
 	}
 
 	public int getIndexOfParameter(List<ISimpleExpression> parameters, ITypeName parameterType) {
@@ -175,11 +195,13 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		}
 		int parameterOfEntryPointIndex = getParameterIndexInEntryPoint(expr, parameterIndex);
 		if (parameterOfEntryPointIndex > -1) {
-			newUsage.setDefinition(DefinitionSites.createDefinitionByParam(convert(lastVisitedMethodDeclaration.getName()), parameterOfEntryPointIndex));
+			newUsage.setDefinition(DefinitionSites.createDefinitionByParam(
+					convert(lastVisitedMethodDeclaration.getName()), parameterOfEntryPointIndex));
 			return true;
 		}
-		DefinitionSite definitionSite = findDefinitionSiteByReference(expr, parameterIndex, lastVisitedMethodDeclaration);
-		if(definitionSite != null) {
+		DefinitionSite definitionSite = findDefinitionSiteByReference(expr, parameterIndex,
+				lastVisitedMethodDeclaration);
+		if (definitionSite != null) {
 			newUsage.setDefinition(definitionSite);
 			return true;
 		}
@@ -188,27 +210,38 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 
 	public DefinitionSite findDefinitionSiteByReference(IInvocationExpression expr, int parameterIndex,
 			IMethodDeclaration methodDecl) {
-		IReference varRef = parameterIndex == -1 ? expr.getReference()
-				: ((IReferenceExpression) expr.getParameters().get(parameterIndex)).getReference();
-		
+		IReference reference = parameterIndex == -1 ? expr.getReference() : ((IReferenceExpression) expr
+				.getParameters().get(parameterIndex)).getReference();
+
+		if (reference instanceof IFieldReference) {
+			IFieldReference fieldRef = (IFieldReference) reference;
+			if (fieldRef.getReference().getIdentifier().equals("this")) {
+				return DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
+			}
+		}
+
 		List<IStatement> body = methodDecl.getBody();
-		PointsToQuery queryForVarReference = queryBuilder.newQuery(varRef, (IStatement) sstNodeHierarchy.getParent(expr));
+		PointsToQuery queryForVarReference = queryBuilder.newQuery(reference,
+				(IStatement) sstNodeHierarchy.getParent(expr));
 		Set<AbstractLocation> varRefLocations = pointsToContext.getPointerAnalysis().query(queryForVarReference);
-		
+
 		List<IAssignment> assignments = getAssignmentList(body);
-		
+
 		for (IAssignment assignment : assignments) {
-			// TODO: maybe traverse backwards to use last assignment for reference
+			// TODO: maybe traverse backwards to use last assignment for
+			// reference
 			PointsToQuery queryForLeftSide = queryBuilder.newQuery(assignment.getReference(), assignment);
 			Set<AbstractLocation> leftSideLocations = pointsToContext.getPointerAnalysis().query(queryForLeftSide);
-			if(varRefLocations.equals(leftSideLocations)) {
+			if (varRefLocations.equals(leftSideLocations)) {
 				IAssignableExpression assignExpr = assignment.getExpression();
 				DefinitionSite fieldSite = tryGetFieldDefinitionSite(assignExpr);
-				if(fieldSite != null) return fieldSite;
-				
+				if (fieldSite != null)
+					return fieldSite;
+
 				DefinitionSite invocationSite = tryGetInvocationDefinition(assignExpr);
-				if(invocationSite != null) return invocationSite;
-				
+				if (invocationSite != null)
+					return invocationSite;
+
 				break;
 			}
 		}
@@ -216,10 +249,10 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	}
 
 	public DefinitionSite tryGetInvocationDefinition(IAssignableExpression assignExpr) {
-		if(assignExpr instanceof IInvocationExpression) {
+		if (assignExpr instanceof IInvocationExpression) {
 			IInvocationExpression invocation = (IInvocationExpression) assignExpr;
 			IMethodName methodName = invocation.getMethodName();
-			if(methodName.isConstructor()) {
+			if (methodName.isConstructor()) {
 				return DefinitionSites.createDefinitionByConstructor(convert(methodName));
 			}
 			return DefinitionSites.createDefinitionByReturn(convert(methodName));
@@ -228,20 +261,17 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	}
 
 	public List<IAssignment> getAssignmentList(List<IStatement> body) {
-		return body
-				.stream()
-				.filter(statement -> statement instanceof IAssignment)
-				.map(statement -> (IAssignment) statement)
-				.collect(Collectors.toList());
+		return body.stream().filter(statement -> statement instanceof IAssignment)
+				.map(statement -> (IAssignment) statement).collect(Collectors.toList());
 	}
 
 	public DefinitionSite tryGetFieldDefinitionSite(IAssignableExpression assignExpr) {
-		if(assignExpr instanceof IReferenceExpression) {
+		if (assignExpr instanceof IReferenceExpression) {
 			IReferenceExpression refExpr = (IReferenceExpression) assignExpr;
 			IReference reference = refExpr.getReference();
-			if(reference instanceof IFieldReference) {
+			if (reference instanceof IFieldReference) {
 				IFieldReference fieldRef = (IFieldReference) reference;
-				if(fieldRef.getReference().getIdentifier().equals("this")) {
+				if (fieldRef.getReference().getIdentifier().equals("this")) {
 					return DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
 				}
 			}
@@ -250,13 +280,15 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	}
 
 	public int getParameterIndexInEntryPoint(IInvocationExpression expr, int parameterIndex) {
-		IReference reference = parameterIndex == -1 ? expr.getReference() : ((IReferenceExpression) expr.getParameters().get(parameterIndex)).getReference();
-		if(!(reference instanceof IVariableReference)) return -1;
+		IReference reference = parameterIndex == -1 ? expr.getReference() : ((IReferenceExpression) expr
+				.getParameters().get(parameterIndex)).getReference();
+		if (!(reference instanceof IVariableReference))
+			return -1;
 		IVariableReference varRef = (IVariableReference) reference;
 		List<IParameterName> parameterNames = lastVisitedMethodDeclaration.getName().getParameters();
 		for (int i = 0; i < parameterNames.size(); i++) {
 			IParameterName parameterName = parameterNames.get(i);
-			if(parameterName.getName().equals(varRef.getIdentifier()))
+			if (parameterName.getName().equals(varRef.getIdentifier()))
 				return i;
 		}
 		return -1;
@@ -279,7 +311,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
 		// TODO: only use super class or also add interfaces as class context?
 		ITypeName classType = typeHierarchy.hasSuperclass() ? typeHierarchy.getExtends().getElement() : typeHierarchy
-					.getElement();		
+				.getElement();
 		return classType;
 	}
 
@@ -289,14 +321,14 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 				.filter(mh -> mh.getElement().equals(methodName)).findAny();
 		IMethodName firstMethodName = null;
 		if (methodHierarchy.isPresent()) {
-			firstMethodName = methodHierarchy.get().getFirst();
+			firstMethodName = methodHierarchy.get().getSuper();
 		}
 		return firstMethodName != null ? firstMethodName : methodName;
 	}
 
-	public Query createNewObjectUsage(IInvocationExpression expr, ITypeName parameterType) {
+	public Query createNewObjectUsage(IInvocationExpression expr, ICoReTypeName parameterType) {
 		Query result = new Query();
-		ICoReTypeName type = parameterType == null ? findTypeForVarReference(expr) : convert(parameterType);
+		ICoReTypeName type = parameterType == null ? findTypeForVarReference(expr) : parameterType;
 		result.setType(type);
 
 		return result;
@@ -309,4 +341,13 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	public Optional<Usage> usageListContainsType(List<Usage> usages, ICoReTypeName type) {
 		return usages.stream().filter(usage -> usage.getType().equals(type)).findAny();
 	}
+
+	public boolean isMethodCallToEntryPoint(IMethodName methodName) {
+		for (IMethodDeclaration methodDecl : pointsToContext.getSST().getEntryPoints()) {
+			if (methodDecl.getName().equals(methodName))
+				return true;
+		}
+		return false;
+	}
+
 }

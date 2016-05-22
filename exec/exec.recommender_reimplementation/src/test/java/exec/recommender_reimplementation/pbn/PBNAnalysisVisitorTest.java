@@ -15,8 +15,14 @@
  */
 package exec.recommender_reimplementation.pbn;
 
+import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,12 +31,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.mockito.Mockito.*;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
@@ -63,12 +67,10 @@ import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
-import com.google.common.base.Verify;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.frequency_recommender.TestUtil;
-import static cc.kave.commons.pointsto.extraction.CoReNameConverter.*;
 
 public class PBNAnalysisVisitorTest {
 
@@ -85,6 +87,7 @@ public class PBNAnalysisVisitorTest {
 	private TestSSTBuilder builder;
 	private FieldDeclaration fieldDecl;
 	private VariableReference varRef;
+	private IFieldReference fieldRef;
 	
 	@Before
 	public void contextCreation() {
@@ -100,7 +103,7 @@ public class PBNAnalysisVisitorTest {
 		fieldDecl = new FieldDeclaration();
 		fieldDecl.setName(FieldName.newFieldName("[" + int32Type + "] [MyClass, MyAssembly, 1.2.3.4].Apple"));
 		
-		IFieldReference fieldRef = builder.buildFieldReference("this", fieldDecl.getName());
+		fieldRef = builder.buildFieldReference("this", fieldDecl.getName());
 		
 		VariableDeclaration varDecl = new VariableDeclaration();
 		varDecl.setType(int32Type);
@@ -151,7 +154,7 @@ public class PBNAnalysisVisitorTest {
 	
 	@Test
 	public void retrievesCorrectTypeForVariableReference() {
-		Assert.assertEquals(convert(int32Type), uut.findTypeForVarReference(invocation));
+		assertEquals(convert(int32Type), uut.findTypeForVarReference(invocation));
 	}
 	
 	@Test
@@ -189,30 +192,30 @@ public class PBNAnalysisVisitorTest {
 		
 		Query actual = uut.createNewObjectUsage(invocation, null);
 		
-		Assert.assertEquals(expected,actual);
+		assertEquals(expected,actual);
 	}
 	
 	@Test
 	public void returnsMethodItselfIfNotOverriden() {
 		IMethodName actual = uut.findFirstMethodName(methodDecl.getName());
-		Assert.assertEquals(actual, methodDecl.getName());
+		assertEquals(actual, methodDecl.getName());
 	}
 	
 	@Test
 	public void returnsFirstMethod() {
 		IMethodHierarchy methodHierarchy = ptContext.getTypeShape().getMethodHierarchies().stream().findAny().get();
 		IMethodName methodName = TestUtil.method3;
-		methodHierarchy.setFirst(methodName);
+		methodHierarchy.setSuper(methodName);
 		
 		IMethodName actual = uut.findFirstMethodName(methodDecl.getName());
-		Assert.assertEquals(methodName, actual);
+		assertEquals(methodName, actual);
 	}
 	
 	@Test
 	public void returnsClassItselfNoDirectSuperType() {
 		ITypeName actual = uut.findClassContext();
 		
-		Assert.assertEquals(enclosingType, actual);
+		assertEquals(enclosingType, actual);
 	}
 	
 	@Test
@@ -225,7 +228,7 @@ public class PBNAnalysisVisitorTest {
 		
 		ITypeName actual = uut.findClassContext();
 		
-		Assert.assertEquals(superType, actual);
+		assertEquals(superType, actual);
 	}
 	
 	@Test
@@ -238,7 +241,7 @@ public class PBNAnalysisVisitorTest {
 		Set<CallSite> allCallsites = query.getAllCallsites();
 		assertTrue(allCallsites.size() == 1);
 		CallSite callSite = CallSites.createReceiverCallSite(convert(invocation.getMethodName()));
-		Assert.assertThat(allCallsites, Matchers.contains(callSite));
+		assertThat(allCallsites, Matchers.contains(callSite));
 		
 	}
 	
@@ -252,7 +255,7 @@ public class PBNAnalysisVisitorTest {
 		Set<CallSite> allCallsites = query.getAllCallsites();
 		assertTrue(allCallsites.size() == 1);
 		CallSite callSite = CallSites.createParameterCallSite(convert(invocation.getMethodName()),0);
-		Assert.assertThat(allCallsites, Matchers.contains(callSite));
+		assertThat(allCallsites, Matchers.contains(callSite));
 	}
 	
 	@Test
@@ -279,7 +282,7 @@ public class PBNAnalysisVisitorTest {
 		queryB.setDefinition(DefinitionSites.createDefinitionByParam(convert(methodDecl.getName()), 0));
 		queryB.setAllCallsites(Sets.newHashSet(CallSites.createParameterCallSite(convert(invocation.getMethodName()),0)));
 		
-		Assert.assertThat(usageList, Matchers.containsInAnyOrder(queryA, queryB));
+		assertThat(usageList, Matchers.containsInAnyOrder(queryA, queryB));
 	}
 	
 	@Test
@@ -329,7 +332,7 @@ public class PBNAnalysisVisitorTest {
 		
 		DefinitionSite actual = uut.tryGetInvocationDefinition(constructorInvocation);
 		
-		Assert.assertThat(constructorDefinitionSite, Matchers.is(actual));
+		assertThat(constructorDefinitionSite, Matchers.is(actual));
 	}
 	
 	@Test
@@ -337,6 +340,19 @@ public class PBNAnalysisVisitorTest {
 		DefinitionSite returnDefinitionSite = DefinitionSites.createDefinitionByReturn(convert(invocation.getMethodName()));
 		DefinitionSite actual = uut.tryGetInvocationDefinition(invocation);
 		
-		Assert.assertThat(returnDefinitionSite, Matchers.is(actual));
+		assertThat(returnDefinitionSite, Matchers.is(actual));
+	}
+	
+	@Test
+	public void createsFieldDefinitionSiteWhenFieldParameterOfInvocation() {
+		ReferenceExpression referenceExpression = new ReferenceExpression();
+		referenceExpression.setReference(fieldRef);
+		invocation.setParameters(Lists.newArrayList(referenceExpression));
+		
+		DefinitionSite fieldDefinitionSite = DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
+		
+		DefinitionSite actual = uut.findDefinitionSiteByReference(invocation, 0, methodDecl);
+		
+		assertThat(actual, Matchers.is(fieldDefinitionSite));
 	}
 }
