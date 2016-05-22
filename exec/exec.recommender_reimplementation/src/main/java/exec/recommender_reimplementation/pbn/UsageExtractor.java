@@ -15,7 +15,6 @@
  */
 package exec.recommender_reimplementation.pbn;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +30,7 @@ import cc.recommenders.usages.Usage;
 
 public class UsageExtractor {
 	
-	public List<Usage> extractUsageFromContext(Context context) {
+	public List<Usage> extractUsageFromContext(Context context, List<Usage> usageList) {
 		ISST sst = context.getSST();
 		
 		ISST inlinedSST = inlineSST(sst);
@@ -41,8 +40,6 @@ public class UsageExtractor {
 		PointsToContext pointsToContext = performPointsToAnalysis(context);
 			
 		Set<IMethodDeclaration> entrypoints = inlinedSST.getEntryPoints();
-		
-		List<Usage> usageList = new ArrayList<>();
 		
 		for (IMethodDeclaration methodDecl : entrypoints) {
 			methodDecl.accept(new PBNAnalysisVisitor(pointsToContext), usageList);
