@@ -19,6 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,13 +28,18 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import static org.mockito.Mockito.*;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
@@ -52,10 +58,12 @@ import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
+import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
+import com.google.common.base.Verify;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -66,6 +74,7 @@ public class PBNAnalysisVisitorTest {
 
 	public PBNAnalysisVisitor uut;
 	private InvocationExpression invocation;
+	private InvocationExpression invocation2;
 	private ExpressionStatement exprStatement;
 	private MethodDeclaration methodDecl;
 	private SST sst;
@@ -75,6 +84,7 @@ public class PBNAnalysisVisitorTest {
 	private ITypeName enclosingType;
 	private TestSSTBuilder builder;
 	private FieldDeclaration fieldDecl;
+	private VariableReference varRef;
 	
 	@Before
 	public void contextCreation() {
@@ -94,7 +104,7 @@ public class PBNAnalysisVisitorTest {
 		
 		VariableDeclaration varDecl = new VariableDeclaration();
 		varDecl.setType(int32Type);
-		VariableReference varRef = new VariableReference();
+		varRef = new VariableReference();
 		varRef.setIdentifier("a");
 		varDecl.setReference(varRef);
 		
@@ -119,8 +129,14 @@ public class PBNAnalysisVisitorTest {
 		exprStatement = new ExpressionStatement();
 		exprStatement.setExpression(invocation);
 		
+		invocation2 = new InvocationExpression();
+		invocation2.setReference(varRef);
+		invocation2.setMethodName(TestUtil.method3);
+		ExpressionStatement exprStatement2 = new ExpressionStatement();
+		exprStatement2.setExpression(invocation2);
+		
 		methodDecl = new MethodDeclaration();
-		methodDecl.setBody(Lists.newArrayList(varDecl, varDecl2, assignment, exprStatement));
+		methodDecl.setBody(Lists.newArrayList(varDecl, varDecl2, assignment, exprStatement, exprStatement2));
 		methodDecl.setName(MethodName.newMethodName("[System.Void, mscorlib, 4.0.0.0] [SSTDiff.Util.StringSimilarity, SSTDiff].CompareStrings([" + stringType.getIdentifier() + "] b)"));
 		methodDecl.setEntryPoint(true);
 		
@@ -241,6 +257,7 @@ public class PBNAnalysisVisitorTest {
 	
 	@Test
 	public void createsUsageListForExampleSST() {
+		// also tests creation of Field and Parameter Definition Site
 		List<Usage> usageList = new ArrayList<>();
 		sst.accept(uut, usageList);
 		
@@ -249,7 +266,11 @@ public class PBNAnalysisVisitorTest {
 		queryA.setClassContext(convert(enclosingType));
 		queryA.setMethodContext(convert(methodDecl.getName()));
 		queryA.setDefinition(DefinitionSites.createDefinitionByField(convert(fieldDecl.getName())));
-		queryA.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(invocation.getMethodName()))));
+		HashSet<CallSite> callSiteSet = Sets.newHashSet(
+				CallSites.createReceiverCallSite(convert(invocation.getMethodName())),
+				CallSites.createReceiverCallSite(convert(invocation2.getMethodName())));
+		
+		queryA.setAllCallsites(callSiteSet);
 		
 		Query queryB = new Query();
 		queryB.setType(convert(stringType));
@@ -259,5 +280,63 @@ public class PBNAnalysisVisitorTest {
 		queryB.setAllCallsites(Sets.newHashSet(CallSites.createParameterCallSite(convert(invocation.getMethodName()),0)));
 		
 		Assert.assertThat(usageList, Matchers.containsInAnyOrder(queryA, queryB));
+	}
+	
+	@Test
+	public void ignoresStatementsInExceptionHandling() {
+		InvocationExpression otherInvocation = Mockito.mock(InvocationExpression.class);
+		otherInvocation.setReference(varRef);
+		otherInvocation.setMethodName(TestUtil.method1);
+		exprStatement = new ExpressionStatement();
+		exprStatement.setExpression(otherInvocation);
+		
+		TryBlock tryBlock = new TryBlock();
+		CatchBlock catchBlock = new CatchBlock();
+		
+		catchBlock.setBody(Lists.newArrayList(exprStatement));
+		List<ICatchBlock> catchBlocks = Lists.newArrayList(catchBlock); 
+		tryBlock.setCatchBlocks(catchBlocks);
+		
+		methodDecl.getBody().add(tryBlock);
+		
+		methodDecl.accept(uut, Lists.newArrayList());
+		
+		verify(otherInvocation, never()).accept(eq(uut), Mockito.any());
+	}
+	
+	@Test
+	public void detectsCallsToSuperClassCorrectly() {
+		assertFalse(uut.isCallToSuperClass(invocation));
+		
+		InvocationExpression otherInvocation = new InvocationExpression();
+		VariableReference otherVarRef = new VariableReference();
+		otherVarRef.setIdentifier("this");
+		otherInvocation.setReference(otherVarRef);
+		otherInvocation.setMethodName(TestUtil.method1);
+		assertTrue(uut.isCallToSuperClass(otherInvocation));
+	}
+	
+	@Test
+	public void createsConstructorDefinitionSite() {
+		InvocationExpression constructorInvocation = new InvocationExpression();
+		VariableReference otherVarRef = new VariableReference();
+		otherVarRef.setIdentifier("c");
+		constructorInvocation.setReference(otherVarRef);
+		IMethodName constructorMethodName = MethodName.newMethodName("[System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]..ctor()");
+		constructorInvocation.setMethodName(constructorMethodName);
+		
+		DefinitionSite constructorDefinitionSite = DefinitionSites.createDefinitionByConstructor(convert(constructorMethodName));
+		
+		DefinitionSite actual = uut.tryGetInvocationDefinition(constructorInvocation);
+		
+		Assert.assertThat(constructorDefinitionSite, Matchers.is(actual));
+	}
+	
+	@Test
+	public void createsReturnDefinitionSite() {
+		DefinitionSite returnDefinitionSite = DefinitionSites.createDefinitionByReturn(convert(invocation.getMethodName()));
+		DefinitionSite actual = uut.tryGetInvocationDefinition(invocation);
+		
+		Assert.assertThat(returnDefinitionSite, Matchers.is(actual));
 	}
 }

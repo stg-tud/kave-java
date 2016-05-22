@@ -37,9 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
@@ -65,12 +62,14 @@ import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
-import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
 import cc.kave.commons.utils.json.JsonUtils;
+
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 /**
  * Provides functionality related to SST construction for tests.
