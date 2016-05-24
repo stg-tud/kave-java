@@ -124,6 +124,7 @@ public class DoSomething {
 			System.out.println(e);
 			if (e.getMethod().getDeclaringType().toString().startsWith("System")) {
 				System.out.println(e.getMethod().getDeclaringType().toString());
+//				usage.getType().getIdentifier().startsWith("Lorg/eclipse/swt/widgets/");
 			}
 		}
 		System.out.println(events.size());

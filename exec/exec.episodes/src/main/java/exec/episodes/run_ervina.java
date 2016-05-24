@@ -24,7 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.episodes.export.StreamPartition;
+import cc.kave.episodes.export.FrameworksData;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -44,8 +44,9 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
+		load(FrameworksData.class).getFrameworks();
 //		load(StreamFrequencies.class).frequencies();
-		load(StreamPartition.class).partition();
+//		load(StreamPartition.class).partition();
 //		load(Sample.class).sample();
 		
 		// load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
