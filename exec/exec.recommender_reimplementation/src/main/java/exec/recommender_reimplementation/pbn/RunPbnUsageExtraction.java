@@ -57,7 +57,6 @@ public class RunPbnUsageExtraction {
 			try {
 				usageExtractor.extractUsageFromContext(context, usageList);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace(errorWriter);
 				errorWriter.append("\n");
 				errorWriter.flush();

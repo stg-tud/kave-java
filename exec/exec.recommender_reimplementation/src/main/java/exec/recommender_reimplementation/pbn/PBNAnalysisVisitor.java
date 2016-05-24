@@ -16,42 +16,23 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-
-import java.util.ArrayList;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
-import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IAssignment;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.usages.CallSite;
-import cc.recommenders.usages.CallSites;
-import cc.recommenders.usages.DefinitionSite;
-import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
@@ -62,42 +43,50 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	private SSTNodeHierarchy sstNodeHierarchy;
 	private TypeCollector typeCollector;
 
-	private IMethodDeclaration lastVisitedMethodDeclaration;
+	private IMethodDeclaration currentEntryPoint;
+	
+	private UsageContextHelper usageContextHelper;
 
 	public PBNAnalysisVisitor(PointsToContext pointsToContext) {
 		this.pointsToContext = pointsToContext;
-		queryBuilder = new PointsToQueryBuilder(pointsToContext);
-		sstNodeHierarchy = new SSTNodeHierarchy(pointsToContext.getSST());
-		typeCollector = new TypeCollector(pointsToContext);
+		setSSTNodeHierarchy(new SSTNodeHierarchy(pointsToContext.getSST()));
+		setTypeCollector(new TypeCollector(pointsToContext));
+		queryBuilder = new PointsToQueryBuilder(getTypeCollector(), getSSTNodeHierarchy());
+		
+		usageContextHelper = new UsageContextHelper(typeCollector, pointsToContext, queryBuilder, sstNodeHierarchy);
 	}
 
 	@Override
 	public Object visit(IMethodDeclaration decl, List<Usage> context) {
-		lastVisitedMethodDeclaration = decl;
+		setCurrentEntryPoint(decl);
 		return super.visit(decl, context);
 	}
 
 	@Override
 	public Object visit(IInvocationExpression expr, List<Usage> usages) {
-		ICoReTypeName type;
+		ITypeName type;
 		if (expr.getReference().getIdentifier().equals("this")) {
-			if (!isCallToSuperClass(expr))
+			// Handle possible call to super type
+			if (!PBNAnalysisUtil.isCallToSuperClass(expr, pointsToContext.getSST()))
 				return super.visit(expr, usages);
 			ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
 			if(!typeHierarchy.hasSuperclass()) return super.visit(expr, usages);
-			type = convert(typeHierarchy.getExtends().getElement());
+			type = typeHierarchy.getExtends().getElement();
 		} else {
-			type = findTypeForVarReference(expr);
+			type = findTypeForVarReference(expr, getTypeCollector());
 		}
 		// Handle Receiver first
-		handleObjectInstance(expr, usages, -1, type);
+		
+		// ignore Unknown Types
+		if(type != null && !type.isUnknownType()) 
+			handleObjectInstance(expr, usages, -1, convert(type));
 
 		// Handle Parameters
 		List<ISimpleExpression> parameters = expr.getParameters();
-		List<ITypeName> parameterTypes = createTypeListFromParameters(parameters);
+		List<ITypeName> parameterTypes = createTypeListFromParameters(parameters, getTypeCollector());
 		for (int i = 0; i < parameterTypes.size(); i++) {
 			ITypeName parameterType = parameterTypes.get(i);
-			int parameterIndex = getIndexOfParameter(parameters, parameterType);
+			int parameterIndex = getIndexOfParameter(parameters, parameterType, getTypeCollector());
 			handleObjectInstance(expr, usages, parameterIndex, convert(parameterType));
 		}
 
@@ -112,242 +101,52 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		return null;
 	}
 
-	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, int parameterIndex, ICoReTypeName parameterType) {
-
-		Query newUsage = createNewObjectUsage(expr, parameterType);
-		addClassContext(newUsage);
-		addMethodContext(newUsage);
-		if (!addDefinitionSite(newUsage, expr, parameterIndex))
-			return;
-		addCallSite(newUsage, expr, parameterIndex);
-				
-		Optional<Usage> similarUsage = usageListContainsSimilarUsage(usages, newUsage);
-		if (similarUsage.isPresent()) {
-			addCallSite((Query) similarUsage.get(), expr, parameterIndex);
-		}
-		else {
-			usages.add(newUsage);
-		}
-	}
-
-	public boolean similarUsage(Usage usage, Usage otherUsage) {
-		return Objects.equals(usage.getClassContext(),otherUsage.getClassContext()) &&
-				Objects.equals(usage.getDefinitionSite(),otherUsage.getDefinitionSite()) &&
-				Objects.equals(usage.getMethodContext(),otherUsage.getMethodContext()) &&
-				Objects.equals(usage.getType(),otherUsage.getType());
-	}
-
-	public int getIndexOfParameter(List<ISimpleExpression> parameters, ITypeName parameterType) {
-		for (int i = 0; i < parameters.size(); i++) {
-			ISimpleExpression expr = parameters.get(i);
-			if (expr instanceof IReferenceExpression) {
-				IReferenceExpression refExpr = (IReferenceExpression) expr;
-				if (parameterType.equals(typeCollector.getType(refExpr.getReference())))
-					return i;
-			}
-
-		}
-		// TODO: Is this branch possible?
-		return -1;
-	}
-
-	public List<ITypeName> createTypeListFromParameters(List<ISimpleExpression> parameters) {
-		List<ITypeName> typeList = new ArrayList<ITypeName>();
-		for (ISimpleExpression parameter : parameters) {
-			if (parameter instanceof IReferenceExpression) {
-				IReferenceExpression refExpr = (IReferenceExpression) parameter;
-				IReference reference = refExpr.getReference();
-				ITypeName type = typeCollector.getType(reference);
-				if (type != null)
-					typeList.add(type);
-			}
-		}
-		return typeList;
-	}
-
 	private void visit(List<IStatement> body, List<Usage> context) {
 		for (IStatement stmt : body) {
 			stmt.accept(this, context);
 		}
 	}
 
-	public void addCallSite(Query usage, IInvocationExpression expr, int argIndex) {
-		if (argIndex > -1) {
-			CallSite callSite = CallSites.createParameterCallSite(convert(expr.getMethodName()), argIndex);
-			usage.addCallSite(callSite);
-		} else {
-			IMethodName firstMethodName = findFirstMethodName(expr.getMethodName());
-			CallSite callSite = CallSites.createReceiverCallSite(convert(firstMethodName));
-			usage.addCallSite(callSite);
+	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, int parameterIndex, ICoReTypeName parameterType) {
+
+		Query newUsage = usageContextHelper.createNewObjectUsage(expr, parameterType);
+		usageContextHelper.addClassContext(newUsage);
+		usageContextHelper.addMethodContext(newUsage, getCurrentEntryPoint());
+		if (!usageContextHelper.addDefinitionSite(newUsage, expr, parameterIndex, getCurrentEntryPoint()))
+			return;
+		usageContextHelper.addCallSite(newUsage, expr, parameterIndex);
+				
+		Optional<Usage> similarUsage = usageListContainsSimilarUsage(usages, newUsage);
+		if (similarUsage.isPresent()) {
+			usageContextHelper.addCallSite((Query) similarUsage.get(), expr, parameterIndex);
+		}
+		else {
+			usages.add(newUsage);
 		}
 	}
 
-	private void addClassContext(Query newUsage) {
-		ITypeName classType = findClassContext();
-		newUsage.setClassContext(convert(classType));
+	public IMethodDeclaration getCurrentEntryPoint() {
+		return currentEntryPoint;
 	}
 
-	private boolean addDefinitionSite(Query newUsage, IInvocationExpression expr, int parameterIndex) {
-		if (isCallToSuperClass(expr)) {
-			newUsage.setDefinition(DefinitionSites.createDefinitionByThis());
-			return true;
-		}
-		int parameterOfEntryPointIndex = getParameterIndexInEntryPoint(expr, parameterIndex);
-		if (parameterOfEntryPointIndex > -1) {
-			newUsage.setDefinition(DefinitionSites.createDefinitionByParam(
-					convert(lastVisitedMethodDeclaration.getName()), parameterOfEntryPointIndex));
-			return true;
-		}
-		DefinitionSite definitionSite = findDefinitionSiteByReference(expr, parameterIndex,
-				lastVisitedMethodDeclaration);
-		if (definitionSite != null) {
-			newUsage.setDefinition(definitionSite);
-			return true;
-		}
-		return false;
+	public void setCurrentEntryPoint(IMethodDeclaration currentEntryPoint) {
+		this.currentEntryPoint = currentEntryPoint;
 	}
 
-	public DefinitionSite findDefinitionSiteByReference(IInvocationExpression expr, int parameterIndex,
-			IMethodDeclaration methodDecl) {
-		IReference reference = parameterIndex == -1 ? expr.getReference() : ((IReferenceExpression) expr
-				.getParameters().get(parameterIndex)).getReference();
-
-		if (reference instanceof IFieldReference) {
-			IFieldReference fieldRef = (IFieldReference) reference;
-			if (fieldRef.getReference().getIdentifier().equals("this")) {
-				return DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
-			}
-		}
-
-		List<IStatement> body = methodDecl.getBody();
-		PointsToQuery queryForVarReference = queryBuilder.newQuery(reference,
-				// TODO Search for statement here instead of direct cast
-				(IStatement) sstNodeHierarchy.getParent(expr));
-		Set<AbstractLocation> varRefLocations = pointsToContext.getPointerAnalysis().query(queryForVarReference);
-
-		List<IAssignment> assignments = getAssignmentList(body);
-
-		for (IAssignment assignment : assignments) {
-			// TODO: maybe traverse backwards to use last assignment for
-			// reference
-			PointsToQuery queryForLeftSide = queryBuilder.newQuery(assignment.getReference(), assignment);
-			Set<AbstractLocation> leftSideLocations = pointsToContext.getPointerAnalysis().query(queryForLeftSide);
-			if (varRefLocations.equals(leftSideLocations)) {
-				IAssignableExpression assignExpr = assignment.getExpression();
-				DefinitionSite fieldSite = tryGetFieldDefinitionSite(assignExpr);
-				if (fieldSite != null)
-					return fieldSite;
-
-				DefinitionSite invocationSite = tryGetInvocationDefinition(assignExpr);
-				if (invocationSite != null)
-					return invocationSite;
-
-				break;
-			}
-		}
-		return null;
+	public SSTNodeHierarchy getSSTNodeHierarchy() {
+		return sstNodeHierarchy;
 	}
 
-	public DefinitionSite tryGetInvocationDefinition(IAssignableExpression assignExpr) {
-		if (assignExpr instanceof IInvocationExpression) {
-			IInvocationExpression invocation = (IInvocationExpression) assignExpr;
-			IMethodName methodName = invocation.getMethodName();
-			if (methodName.isConstructor()) {
-				return DefinitionSites.createDefinitionByConstructor(convert(methodName));
-			}
-			return DefinitionSites.createDefinitionByReturn(convert(methodName));
-		}
-		return null;
+	public void setSSTNodeHierarchy(SSTNodeHierarchy sstNodeHierarchy) {
+		this.sstNodeHierarchy = sstNodeHierarchy;
 	}
 
-	public List<IAssignment> getAssignmentList(List<IStatement> body) {
-		return body.stream().filter(statement -> statement instanceof IAssignment)
-				.map(statement -> (IAssignment) statement).collect(Collectors.toList());
+	public TypeCollector getTypeCollector() {
+		return typeCollector;
 	}
 
-	public DefinitionSite tryGetFieldDefinitionSite(IAssignableExpression assignExpr) {
-		if (assignExpr instanceof IReferenceExpression) {
-			IReferenceExpression refExpr = (IReferenceExpression) assignExpr;
-			IReference reference = refExpr.getReference();
-			if (reference instanceof IFieldReference) {
-				IFieldReference fieldRef = (IFieldReference) reference;
-				if (fieldRef.getReference().getIdentifier().equals("this")) {
-					return DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
-				}
-			}
-		}
-		return null;
-	}
-
-	public int getParameterIndexInEntryPoint(IInvocationExpression expr, int parameterIndex) {
-		IReference reference = parameterIndex == -1 ? expr.getReference() : ((IReferenceExpression) expr
-				.getParameters().get(parameterIndex)).getReference();
-		if (!(reference instanceof IVariableReference))
-			return -1;
-		IVariableReference varRef = (IVariableReference) reference;
-		List<IParameterName> parameterNames = lastVisitedMethodDeclaration.getName().getParameters();
-		for (int i = 0; i < parameterNames.size(); i++) {
-			IParameterName parameterName = parameterNames.get(i);
-			if (parameterName.getName().equals(varRef.getIdentifier()))
-				return i;
-		}
-		return -1;
-	}
-
-	public boolean isCallToSuperClass(IInvocationExpression expr) {
-		if (!expr.getReference().getIdentifier().equals("this"))
-			return false;
-		IMethodName methodName = expr.getMethodName();
-		return pointsToContext.getSST().getMethods().stream()
-				.noneMatch(methodDecl -> methodDecl.getName().equals(methodName));
-	}
-
-	private void addMethodContext(Query newUsage) {
-		IMethodName firstMethodName = findFirstMethodName(lastVisitedMethodDeclaration.getName());
-		newUsage.setMethodContext(convert(firstMethodName));
-	}
-
-	public ITypeName findClassContext() {
-		ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
-		// TODO: only use super class or also add interfaces as class context?
-		ITypeName classType = typeHierarchy.hasSuperclass() ? typeHierarchy.getExtends().getElement() : typeHierarchy
-				.getElement();
-		return classType;
-	}
-
-	public IMethodName findFirstMethodName(IMethodName methodName) {
-		Set<IMethodHierarchy> methodHierarchies = pointsToContext.getTypeShape().getMethodHierarchies();
-		Optional<IMethodHierarchy> methodHierarchy = methodHierarchies.stream()
-				.filter(mh -> mh.getElement().equals(methodName)).findAny();
-		IMethodName firstMethodName = null;
-		if (methodHierarchy.isPresent()) {
-			firstMethodName = methodHierarchy.get().getSuper();
-		}
-		return firstMethodName != null ? firstMethodName : methodName;
-	}
-
-	public Query createNewObjectUsage(IInvocationExpression expr, ICoReTypeName parameterType) {
-		Query result = new Query();
-		ICoReTypeName type = parameterType == null ? findTypeForVarReference(expr) : parameterType;
-		result.setType(type);
-
-		return result;
-	}
-
-	public ICoReTypeName findTypeForVarReference(IInvocationExpression invocation) {
-		return convert(typeCollector.getType(invocation.getReference()));
-	}
-
-	public Optional<Usage> usageListContainsSimilarUsage(List<Usage> usages, Usage otherUsage) {
-		return usages.stream().filter(usage -> similarUsage(usage, otherUsage)).findFirst();
-	}
-
-	public boolean isMethodCallToEntryPoint(IMethodName methodName) {
-		for (IMethodDeclaration methodDecl : pointsToContext.getSST().getEntryPoints()) {
-			if (methodDecl.getName().equals(methodName))
-				return true;
-		}
-		return false;
+	public void setTypeCollector(TypeCollector typeCollector) {
+		this.typeCollector = typeCollector;
 	}
 
 }

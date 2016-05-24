@@ -17,7 +17,6 @@ package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hamcrest.Matchers;
@@ -41,6 +39,7 @@ import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
@@ -58,8 +57,8 @@ import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
+import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
@@ -72,7 +71,7 @@ import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.frequency_recommender.TestUtil;
 
-public class PBNAnalysisVisitorTest {
+public class PBNAnalysisTest {
 
 	public PBNAnalysisVisitor uut;
 	private InvocationExpression invocation;
@@ -88,6 +87,8 @@ public class PBNAnalysisVisitorTest {
 	private FieldDeclaration fieldDecl;
 	private VariableReference varRef;
 	private IFieldReference fieldRef;
+	private ReferenceExpression referenceExpression;
+	private UsageContextHelper usageContextHelper;
 	
 	@Before
 	public void contextCreation() {
@@ -126,7 +127,7 @@ public class PBNAnalysisVisitorTest {
 		invocation = new InvocationExpression();
 		invocation.setReference(varRef);
 		invocation.setMethodName(TestUtil.method1);
-		ReferenceExpression referenceExpression = new ReferenceExpression();
+		referenceExpression = new ReferenceExpression();
 		referenceExpression.setReference(varRef2);
 		invocation.setParameters(Lists.newArrayList(referenceExpression));
 		exprStatement = new ExpressionStatement();
@@ -150,11 +151,13 @@ public class PBNAnalysisVisitorTest {
 		ptContext = pointsToAnalysis.compute(builder.createContext(sst));
 		
 		uut = new PBNAnalysisVisitor(ptContext);
+		usageContextHelper = new UsageContextHelper(uut.getTypeCollector(), ptContext, new PointsToQueryBuilder(uut.getTypeCollector(), uut.getSSTNodeHierarchy()), uut.getSSTNodeHierarchy());
+
 	}
 	
 	@Test
 	public void retrievesCorrectTypeForVariableReference() {
-		assertEquals(convert(int32Type), uut.findTypeForVarReference(invocation));
+		assertEquals(int32Type, PBNAnalysisUtil.findTypeForVarReference(invocation, uut.getTypeCollector()));
 	}
 	
 
@@ -163,14 +166,14 @@ public class PBNAnalysisVisitorTest {
 		Query expected = new Query();
 		expected.setType(convert(int32Type));
 		
-		Query actual = uut.createNewObjectUsage(invocation, null);
+		Query actual = usageContextHelper.createNewObjectUsage(invocation, null);
 		
 		assertEquals(expected,actual);
 	}
 	
 	@Test
 	public void returnsMethodItselfIfNotOverriden() {
-		IMethodName actual = uut.findFirstMethodName(methodDecl.getName());
+		IMethodName actual = PBNAnalysisUtil.findFirstMethodName(methodDecl.getName(), ptContext.getTypeShape());
 		assertEquals(actual, methodDecl.getName());
 	}
 	
@@ -180,13 +183,13 @@ public class PBNAnalysisVisitorTest {
 		IMethodName methodName = TestUtil.method3;
 		methodHierarchy.setSuper(methodName);
 		
-		IMethodName actual = uut.findFirstMethodName(methodDecl.getName());
+		IMethodName actual = PBNAnalysisUtil.findFirstMethodName(methodDecl.getName(), ptContext.getTypeShape());
 		assertEquals(methodName, actual);
 	}
 	
 	@Test
 	public void returnsClassItselfNoDirectSuperType() {
-		ITypeName actual = uut.findClassContext();
+		ITypeName actual = usageContextHelper.findClassContext();
 		
 		assertEquals(enclosingType, actual);
 	}
@@ -199,7 +202,7 @@ public class PBNAnalysisVisitorTest {
 		extendTypeHierarchy.setElement(superType);
 		typeHierarchy.setExtends(extendTypeHierarchy);
 		
-		ITypeName actual = uut.findClassContext();
+		ITypeName actual = usageContextHelper.findClassContext();
 		
 		assertEquals(superType, actual);
 	}
@@ -209,7 +212,7 @@ public class PBNAnalysisVisitorTest {
 		Query query = new Query();
 		query.setType(convert(int32Type));
 		
-		uut.addCallSite(query, invocation, -1);
+		usageContextHelper.addCallSite(query, invocation, -1);
 		
 		Set<CallSite> allCallsites = query.getAllCallsites();
 		assertTrue(allCallsites.size() == 1);
@@ -223,7 +226,7 @@ public class PBNAnalysisVisitorTest {
 		Query query = new Query();
 		query.setType(convert(stringType));
 		
-		uut.addCallSite(query, invocation, 0);
+		usageContextHelper.addCallSite(query, invocation, 0);
 		
 		Set<CallSite> allCallsites = query.getAllCallsites();
 		assertTrue(allCallsites.size() == 1);
@@ -280,17 +283,6 @@ public class PBNAnalysisVisitorTest {
 		verify(otherInvocation, never()).accept(eq(uut), Mockito.any());
 	}
 	
-	@Test
-	public void detectsCallsToSuperClassCorrectly() {
-		assertFalse(uut.isCallToSuperClass(invocation));
-		
-		InvocationExpression otherInvocation = new InvocationExpression();
-		VariableReference otherVarRef = new VariableReference();
-		otherVarRef.setIdentifier("this");
-		otherInvocation.setReference(otherVarRef);
-		otherInvocation.setMethodName(TestUtil.method1);
-		assertTrue(uut.isCallToSuperClass(otherInvocation));
-	}
 	
 	@Test
 	public void createsConstructorDefinitionSite() {
@@ -303,7 +295,7 @@ public class PBNAnalysisVisitorTest {
 		
 		DefinitionSite constructorDefinitionSite = DefinitionSites.createDefinitionByConstructor(convert(constructorMethodName));
 		
-		DefinitionSite actual = uut.tryGetInvocationDefinition(constructorInvocation);
+		DefinitionSite actual = UsageContextHelper.tryGetInvocationDefinition(constructorInvocation);
 		
 		assertThat(constructorDefinitionSite, Matchers.is(actual));
 	}
@@ -311,7 +303,7 @@ public class PBNAnalysisVisitorTest {
 	@Test
 	public void createsReturnDefinitionSite() {
 		DefinitionSite returnDefinitionSite = DefinitionSites.createDefinitionByReturn(convert(invocation.getMethodName()));
-		DefinitionSite actual = uut.tryGetInvocationDefinition(invocation);
+		DefinitionSite actual = UsageContextHelper.tryGetInvocationDefinition(invocation);
 		
 		assertThat(returnDefinitionSite, Matchers.is(actual));
 	}
@@ -324,8 +316,13 @@ public class PBNAnalysisVisitorTest {
 		
 		DefinitionSite fieldDefinitionSite = DefinitionSites.createDefinitionByField(convert(fieldRef.getFieldName()));
 		
-		DefinitionSite actual = uut.findDefinitionSiteByReference(invocation, 0, methodDecl);
+		DefinitionSite actual = usageContextHelper.findDefinitionSiteByReference(invocation, 0, (IMethodDeclaration) methodDecl);
 		
 		assertThat(actual, Matchers.is(fieldDefinitionSite));
+	}
+	
+	@Test
+	public void ReturnsStatementParent() {
+		assertEquals(exprStatement, PBNAnalysisUtil.getStatementParentForInvocation(invocation, uut.getSSTNodeHierarchy()));	
 	}
 }
