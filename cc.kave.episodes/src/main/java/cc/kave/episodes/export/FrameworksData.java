@@ -72,6 +72,7 @@ public class FrameworksData {
 
 	private Map<String, Integer> frameworkDistribution(List<Event> allEvents) throws IOException {
 		Map<String, Integer> distribution = Maps.newHashMap();
+		Logger.log("\nFrameworks:");
 		
 		for (Event event : allEvents) {
 			String framework = event.getMethod().getDeclaringType().toString();
