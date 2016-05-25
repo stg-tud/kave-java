@@ -32,6 +32,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -40,13 +41,16 @@ public class FrameworksData {
 
 	private Directory rootDir;
 	private File rootFolder;
+	private StreamStatistics statistics;
 
 	@Inject
-	public FrameworksData(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
+	public FrameworksData(@Named("contexts") Directory directory, @Named("rootDir") File folder,
+			StreamStatistics stat) {
 		assertTrue(folder.exists(), "Data folder does not exist");
 		assertTrue(folder.isDirectory(), "Data folder is not a folder, but a file");
 		this.rootDir = directory;
 		this.rootFolder = folder;
+		this.statistics = stat;
 	}
 
 	public void getFrameworks() throws IOException {
@@ -66,42 +70,61 @@ public class FrameworksData {
 			ra.close();
 		}
 		List<Event> allEvents = generator.getEventStream();
-		Map<String, Integer> distribution = frameworkDistribution(allEvents);
+		Map<Event, Integer> frequencies = statistics.getFrequences(allEvents);
+		Map<String, Map<Event, Integer>> distribution = frameworkDistribution(frequencies);
 		storeFrameworks(distribution);
 	}
 
-	private Map<String, Integer> frameworkDistribution(List<Event> allEvents) throws IOException {
-		Map<String, Integer> distribution = Maps.newHashMap();
-		Logger.log("\nFrameworks:");
-		
-		for (Event event : allEvents) {
-			String framework = event.getMethod().getDeclaringType().toString();
-			Logger.log("%s", framework);
+	private Map<String, Map<Event, Integer>> frameworkDistribution(Map<Event, Integer> frequencies) throws IOException {
+		Map<String, Map<Event, Integer>> distribution = Maps.newHashMap();
+
+		for (Map.Entry<Event, Integer> entry : frequencies.entrySet()) {
 			
-			if (distribution.containsKey(framework)) {
-				int count = distribution.get(framework);
-				distribution.put(framework, count + 1);
-			} else {
-				distribution.put(framework, 1);
+			if (entry.getValue() == 1) {
+				continue;
 			}
-		}
+			String frameworkName = entry.getKey().getMethod().getDeclaringType().getFullName();
+			String framework = frameworkName;
+			if (frameworkName.contains(".")) {
+				int index = frameworkName.indexOf(".");
+				framework = frameworkName.substring(0, index);
+			}
+			if (distribution.containsKey(framework)) {
+				Map<Event, Integer> frameworkEvents = distribution.get(framework);
+				if (!frameworkEvents.containsKey(entry.getKey())) {
+					frameworkEvents.put(entry.getKey(), entry.getValue());
+				}
+				distribution.put(framework, frameworkEvents);
+			} else {
+				Map<Event, Integer> newFramework = Maps.newHashMap();
+				newFramework.put(entry.getKey(), entry.getValue());
+				distribution.put(framework, newFramework);
+			}
+		} 
 		return distribution;
 	}
 
-	private void storeFrameworks(Map<String, Integer> distribution) throws IOException {
+	private void storeFrameworks(Map<String, Map<Event, Integer>> distribution) throws IOException {
 		StringBuilder sb = new StringBuilder();
-		 
-		for (Map.Entry<String, Integer> entry : distribution.entrySet()) {
-			sb.append(entry.getKey());
+
+		for (Map.Entry<String, Map<Event, Integer>> framework : distribution.entrySet()) {
+			sb.append(framework.getKey());
 			sb.append("\t");
-			sb.append(entry.getValue());
+			sb.append(framework.getValue().size());
+			sb.append("\t");
+
+			int freqTotal = 0;
+			for (Map.Entry<Event, Integer> events : framework.getValue().entrySet()) {
+				freqTotal += events.getValue();
+			}
+			sb.append(freqTotal);
 			sb.append("\n");
 		}
 		FileUtils.writeStringToFile(new File(getPath()), sb.toString());
 	}
 
 	private String getPath() {
-		String fileName = rootFolder.getAbsolutePath() + "frameworks.txt";
+		String fileName = rootFolder.getAbsolutePath() + "/frameworks.txt";
 		return fileName;
 	}
 

@@ -28,7 +28,7 @@ import cc.recommenders.io.Logger;
 public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
-	private static final int FREQUENCY = 5;
+	private static final int FREQUENCY = 1;
 	
 	private static final double DELTA = 0.001;
 	private static final double TIMEOUT = 0.5;
