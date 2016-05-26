@@ -102,7 +102,6 @@ public class PBNAnalysisUtil {
 					return i;
 			}
 		}
-		// TODO: Is this branch possible?
 		return -1;
 	}
 
