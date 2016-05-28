@@ -48,12 +48,12 @@ public class UsageExtractor {
 		return usageList;
 	}
 
-	private PointsToContext performPointsToAnalysis(Context context) {
+	public static PointsToContext performPointsToAnalysis(Context context) {
 		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		return pointsToAnalysis.compute(context);
 	}
 
-	private ISST inlineSST(ISST sst) {
+	public static ISST inlineSST(ISST sst) {
 		InliningContext inlining = new InliningContext();
 		sst.accept(inlining.getVisitor(), inlining);
 		ISST inlinedSST = inlining.getSST();

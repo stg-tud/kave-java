@@ -29,6 +29,7 @@ import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -119,8 +120,18 @@ public class PBNAnalysisUtil {
 		}
 		return -1;
 	}
+	
+	public static int getParameterIndexInEntryPoint(IVariableReference varRef, IMethodDeclaration entryPoint) {
+		List<IParameterName> parameterNames = entryPoint.getName().getParameters();
+		for (int i = 0; i < parameterNames.size(); i++) {
+			IParameterName parameterName = parameterNames.get(i);
+			if (parameterName.getName().equals(varRef.getIdentifier()))
+				return i;
+		}
+		return -1;
+	}
 
-	public static IStatement getStatementParentForInvocation(IInvocationExpression expr, SSTNodeHierarchy sstNodeHierarchy) {
+	public static IStatement getStatementParentForExpression(IAssignableExpression expr, SSTNodeHierarchy sstNodeHierarchy) {
 		ISSTNode parent = sstNodeHierarchy.getParent(expr);
 		while(!(parent instanceof IStatement)) {
 			parent = sstNodeHierarchy.getParent(parent);

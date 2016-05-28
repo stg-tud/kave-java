@@ -112,7 +112,7 @@ public class PbnPaperExample {
 		assertThat(usageList, Matchers.containsInAnyOrder(bS,cS,sS,bC,dC));
 	}
 
-	public IMethodName createMethodName(ITypeName returnType, ITypeName className, String name, String parameter) {
+	public static IMethodName createMethodName(ITypeName returnType, ITypeName className, String name, String parameter) {
 		return MethodName.newMethodName(
 				String.format("[%s] [%s].%s(%s)", returnType.getIdentifier(), className.getIdentifier(), name, parameter));
 	}

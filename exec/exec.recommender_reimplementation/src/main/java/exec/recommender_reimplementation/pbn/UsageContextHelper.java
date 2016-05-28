@@ -20,7 +20,7 @@ import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.findTypeForVarReference;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getAssignmentList;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getParameterIndexInEntryPoint;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getStatementParentForInvocation;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getStatementParentForExpression;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isCallToSuperClass;
 
 import java.util.List;
@@ -33,9 +33,11 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
@@ -83,6 +85,12 @@ public class UsageContextHelper {
 		return result;
 	}
 
+	public Query createNewObjectUsage(ITypeName type) {
+		Query result = new Query();
+		result.setType(convert(type));
+		return result;
+	}
+	
 	public void addMethodContext(Query newUsage, IMethodDeclaration entryPoint) {
 		IMethodName firstMethodName = PBNAnalysisUtil.findFirstMethodName(
 				entryPoint.getName(), typeShape);
@@ -132,6 +140,25 @@ public class UsageContextHelper {
 		return false;
 	}
 
+	public boolean addDefinitionSite(Query newUsage,
+			IVariableReference varRef, ICompletionExpression completionExpr,
+			IMethodDeclaration currentEntryPoint) {
+		int parameterOfEntryPointIndex = getParameterIndexInEntryPoint(varRef, currentEntryPoint);
+		if (parameterOfEntryPointIndex > -1) {
+			newUsage.setDefinition(DefinitionSites.createDefinitionByParam(
+					convert(currentEntryPoint.getName()),
+					parameterOfEntryPointIndex));
+			return true;
+		}
+		DefinitionSite definitionSite = findDefinitionSiteByReference(varRef, completionExpr,currentEntryPoint);
+		if (definitionSite != null) {
+			newUsage.setDefinition(definitionSite);
+			return true;
+		}
+		return false;
+	}
+
+	
 	public ITypeName findClassContext() {
 		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 		// TODO: only use super class or also add interfaces as class context?
@@ -158,7 +185,41 @@ public class UsageContextHelper {
 		List<IStatement> body = methodDecl.getBody();
 		PointsToQuery queryForVarReference = pointsToQueryBuilder.newQuery(
 				reference,
-				getStatementParentForInvocation(expr, sstNodeHierarchy));
+				getStatementParentForExpression(expr, sstNodeHierarchy));
+		Set<AbstractLocation> varRefLocations = pointerAnalysis
+				.query(queryForVarReference);
+
+		List<IAssignment> assignments = getAssignmentList(body);
+
+		for (IAssignment assignment : assignments) {
+			// TODO: maybe traverse backwards to use last assignment for reference
+			PointsToQuery queryForLeftSide = pointsToQueryBuilder.newQuery(
+					assignment.getReference(), assignment);
+			Set<AbstractLocation> leftSideLocations = pointerAnalysis
+					.query(queryForLeftSide);
+			if (varRefLocations.equals(leftSideLocations)) {
+				// found assignment with Variable Reference as right side
+				IAssignableExpression assignExpr = assignment.getExpression();
+				DefinitionSite fieldSite = tryGetFieldDefinitionSite(assignExpr);
+				if (fieldSite != null)
+					return fieldSite;
+
+				DefinitionSite invocationSite = tryGetInvocationDefinition(assignExpr);
+				if (invocationSite != null)
+					return invocationSite;
+
+				break;
+			}
+		}
+		return null;
+	}
+	
+	public DefinitionSite findDefinitionSiteByReference(IVariableReference varRef, ICompletionExpression expr,
+			IMethodDeclaration methodDecl) {
+		List<IStatement> body = methodDecl.getBody();
+		PointsToQuery queryForVarReference = pointsToQueryBuilder.newQuery(
+				varRef,
+				getStatementParentForExpression(expr, sstNodeHierarchy));
 		Set<AbstractLocation> varRefLocations = pointerAnalysis
 				.query(queryForVarReference);
 
