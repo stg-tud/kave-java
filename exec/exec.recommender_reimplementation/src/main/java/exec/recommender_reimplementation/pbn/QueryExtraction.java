@@ -16,6 +16,8 @@
 package exec.recommender_reimplementation.pbn;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -71,7 +73,7 @@ public class QueryExtraction {
 			IVariableReference receiverRef = firstNonNull(entity.getVariableReference(), SSTUtil.variableReference("this")); 
 			ITypeName typeName = firstNonNull(entity.getTypeReference(), typeCollector.getType(receiverRef));
 			
-			query = usageContextHelper.createNewObjectUsage(typeName);
+			query = usageContextHelper.createNewObjectUsage(convert(typeName));
 			usageContextHelper.addClassContext(query);
 			usageContextHelper.addDefinitionSite(query, receiverRef, entity , currentEntryPoint);
 			usageContextHelper.addMethodContext(query, currentEntryPoint);

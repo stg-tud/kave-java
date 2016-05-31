@@ -112,13 +112,7 @@ public class PBNAnalysisUtil {
 		if (!(reference instanceof IVariableReference))
 			return -1;
 		IVariableReference varRef = (IVariableReference) reference;
-		List<IParameterName> parameterNames = entryPoint.getName().getParameters();
-		for (int i = 0; i < parameterNames.size(); i++) {
-			IParameterName parameterName = parameterNames.get(i);
-			if (parameterName.getName().equals(varRef.getIdentifier()))
-				return i;
-		}
-		return -1;
+		return getParameterIndexInEntryPoint(varRef, entryPoint);
 	}
 	
 	public static int getParameterIndexInEntryPoint(IVariableReference varRef, IMethodDeclaration entryPoint) {

@@ -77,17 +77,14 @@ public class UsageContextHelper {
 	
 	public Query createNewObjectUsage(IInvocationExpression expr,
 			ICoReTypeName parameterType) {
-		Query result = new Query();
 		ICoReTypeName type = parameterType == null ? convert(findTypeForVarReference(
 				expr, typeCollector)) : parameterType;
-		result.setType(type);
-
-		return result;
+		return createNewObjectUsage(type);
 	}
 
-	public Query createNewObjectUsage(ITypeName type) {
+	public Query createNewObjectUsage(ICoReTypeName type) {
 		Query result = new Query();
-		result.setType(convert(type));
+		result.setType(type);
 		return result;
 	}
 	
@@ -182,39 +179,14 @@ public class UsageContextHelper {
 			}
 		}
 
-		List<IStatement> body = methodDecl.getBody();
-		PointsToQuery queryForVarReference = pointsToQueryBuilder.newQuery(
-				reference,
-				getStatementParentForExpression(expr, sstNodeHierarchy));
-		Set<AbstractLocation> varRefLocations = pointerAnalysis
-				.query(queryForVarReference);
-
-		List<IAssignment> assignments = getAssignmentList(body);
-
-		for (IAssignment assignment : assignments) {
-			// TODO: maybe traverse backwards to use last assignment for reference
-			PointsToQuery queryForLeftSide = pointsToQueryBuilder.newQuery(
-					assignment.getReference(), assignment);
-			Set<AbstractLocation> leftSideLocations = pointerAnalysis
-					.query(queryForLeftSide);
-			if (varRefLocations.equals(leftSideLocations)) {
-				// found assignment with Variable Reference as right side
-				IAssignableExpression assignExpr = assignment.getExpression();
-				DefinitionSite fieldSite = tryGetFieldDefinitionSite(assignExpr);
-				if (fieldSite != null)
-					return fieldSite;
-
-				DefinitionSite invocationSite = tryGetInvocationDefinition(assignExpr);
-				if (invocationSite != null)
-					return invocationSite;
-
-				break;
-			}
+		if(reference instanceof IVariableReference) {
+			IVariableReference varRef = (IVariableReference) reference;
+			return findDefinitionSiteByReference(varRef, expr, methodDecl);
 		}
 		return null;
 	}
 	
-	public DefinitionSite findDefinitionSiteByReference(IVariableReference varRef, ICompletionExpression expr,
+	public DefinitionSite findDefinitionSiteByReference(IVariableReference varRef, IAssignableExpression expr,
 			IMethodDeclaration methodDecl) {
 		List<IStatement> body = methodDecl.getBody();
 		PointsToQuery queryForVarReference = pointsToQueryBuilder.newQuery(

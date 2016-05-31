@@ -77,8 +77,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		}
 		// Handle Receiver first
 		
-		// ignore Unknown Types
-		if(type != null && !type.isUnknownType()) 
+		if(isSupportedType(type)) 
 			handleObjectInstance(expr, usages, -1, convert(type));
 
 		// Handle Parameters
@@ -87,10 +86,17 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		for (int i = 0; i < parameterTypes.size(); i++) {
 			ITypeName parameterType = parameterTypes.get(i);
 			int parameterIndex = getIndexOfParameter(parameters, parameterType, getTypeCollector());
-			handleObjectInstance(expr, usages, parameterIndex, convert(parameterType));
+			if (isSupportedType(parameterType)) {
+				handleObjectInstance(expr, usages, parameterIndex, convert(parameterType));
+			}
 		}
 
 		return super.visit(expr, usages);
+	}
+
+	public boolean isSupportedType(ITypeName type) {
+		// ignore Unknown Types, Array, Delegate and Enum Types
+		return type != null && !type.isUnknownType() && !type.isArrayType() && !type.isEnumType() && !type.isDelegateType();
 	}
 
 	@Override

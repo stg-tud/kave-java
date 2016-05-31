@@ -16,11 +16,8 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.names.IMethodName;
@@ -28,7 +25,6 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 
