@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
@@ -60,6 +61,8 @@ import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
 public class MRREvaluation extends AbstractCompletionEventEvaluation implements Closeable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MRREvaluation.class);
 
 	private final List<UsageStore> usageStores;
 	private final PointsToUsageFilter usageFilter;
@@ -157,6 +160,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		CompletionExpressionCollector completionExprCollector = new CompletionExpressionCollector();
 		PointsToUsageExtractor usageExtractor = new PointsToUsageExtractor();
 
+		int numFailedEvents = 0;
 		for (ICompletionEvent event : completionEvents) {
 			try {
 				PointsToContext context = ptFactory.create().compute(event.getContext());
@@ -189,14 +193,18 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 					}
 				}
 			} catch (RuntimeException ex) {
+				++numFailedEvents;
 				if (ex.getMessage() != null && ex.getMessage().startsWith("Invalid Signature Syntax: ")) {
-					LoggerFactory.getLogger(getClass()).error(
-							"Failed to extract queries for context due to MethodName.getSignature bug: {}",
+					LOGGER.error("Failed to extract queries for context due to MethodName.getSignature bug: {}",
 							ex.getMessage());
 				} else {
-					throw ex;
+					LOGGER.error("Failed to create queries from completion event", ex);
 				}
 			}
+		}
+
+		if (numFailedEvents > 0) {
+			log("Failed to create queries from %d completion events\n", numFailedEvents);
 		}
 
 		return queries;
