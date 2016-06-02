@@ -45,6 +45,7 @@ import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.evaluation.TypeNameComparator;
+import cc.kave.commons.pointsto.evaluation.UsagePruning;
 import cc.kave.commons.pointsto.evaluation.measures.AbstractMeasure;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
@@ -62,6 +63,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 
 	private final List<UsageStore> usageStores;
 	private final PointsToUsageFilter usageFilter;
+	private final UsagePruning pruning;
 
 	private final Provider<PBNMiner> pbnMinerProvider;
 	private final AbstractMeasure measure;
@@ -69,12 +71,14 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	private final Map<Triple<ICoReTypeName, String, String>, Double> results = new HashMap<>();
 	private final Map<Pair<ICoReTypeName, String>, Integer> numQueries = new HashMap<>();
 	private final Map<String, Integer> zeroExtractedQueries = new HashMap<>();
+	private final List<Triple<String, ICoReTypeName, Integer>> prunedUsages = new ArrayList<>();
 
 	@Inject
 	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter, UsagePruning pruning,
 			Provider<PBNMiner> pbnMinerProvider, AbstractMeasure measure) {
 		this.usageStores = usageStores;
 		this.usageFilter = usageFilter;
+		this.pruning = pruning;
 		this.pbnMinerProvider = pbnMinerProvider;
 		this.measure = measure;
 	}
@@ -96,6 +100,10 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		Path zeroExtractedQueriesFile = dir.resolve(getClass().getSimpleName() + ".zeq.txt");
 		exporter.export(zeroExtractedQueriesFile, zeroExtractedQueries.entrySet().stream()
 				.map(entry -> new String[] { entry.getKey(), Integer.toString(entry.getValue()) }));
+
+		Path prunedUsagesFile = dir.resolve(getClass().getSimpleName() + ".pruned.txt");
+		exporter.export(prunedUsagesFile, prunedUsages.stream().map(entry -> new String[] { entry.getLeft(),
+				CoReNames.vm2srcQualifiedType(entry.getMiddle()), entry.getRight().toString() }));
 	}
 
 	@Override
@@ -121,6 +129,11 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 			ICallsRecommender<Query> recommender = null;
 			{
 				List<Usage> usages = store.load(type, usageFilter);
+				int numPrunedUsages = pruning.prune(MAX_USAGES, usages);
+				if (numPrunedUsages > 0) {
+					prunedUsages.add(ImmutableTriple.of(store.getName(), type, numPrunedUsages));
+				}
+
 				if (!usages.isEmpty()) {
 					recommender = trainRecommender(usages);
 				}

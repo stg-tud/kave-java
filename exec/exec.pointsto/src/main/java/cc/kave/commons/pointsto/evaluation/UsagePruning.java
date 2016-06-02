@@ -66,4 +66,25 @@ public class UsagePruning {
 
 		return initialNumUsages - numUsages;
 	}
+
+	/**
+	 * @return The number of pruned usages
+	 */
+	public int prune(final int maxUsages, List<Usage> usages) {
+		if (maxUsages <= 0) {
+			throw new IllegalArgumentException("maxUsages must be greater than zero");
+		}
+		if (usages.size() < maxUsages) {
+			return 0;
+		}
+
+		Random rnd = new Random(rndGenerator.nextLong());
+		Collections.shuffle(usages, rnd);
+		final int initialNumUsages = usages.size();
+		for (int i = usages.size() - 1; i >= maxUsages; --i) {
+			usages.remove(i);
+		}
+
+		return initialNumUsages - usages.size();
+	}
 }
