@@ -28,6 +28,7 @@ import java.util.Set;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -158,12 +159,11 @@ public class UsageContextHelper {
 	
 	public ITypeName findClassContext() {
 		ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
-		// TODO: only use super class or also add interfaces as class context?
 		ITypeName classType = typeHierarchy.hasSuperclass() ? typeHierarchy
-				.getExtends().getElement() : typeHierarchy.getElement();
+				.getExtends().getElement() : getObjectType();
 		return classType;
 	}
-
+	
 	public DefinitionSite findDefinitionSiteByReference(
 			IInvocationExpression expr, int parameterIndex,
 			IMethodDeclaration methodDecl) {
@@ -249,6 +249,10 @@ public class UsageContextHelper {
 			}
 		}
 		return null;
+	}
+
+	public static ITypeName getObjectType() {
+		return TypeName.newTypeName("System.Object, mscorlib");
 	}
 
 }

@@ -96,14 +96,14 @@ public class PbnPaperExample {
 		sS.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(cType, sType, "fromS", "")))));
 		
 		Query bC = new Query();
-		bC.setClassContext(convert(cType));
+		bC.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
 		bC.setMethodContext(convert(cEntry2));
 		bC.setType(convert(bType));
 		bC.setDefinition(DefinitionSites.createDefinitionByParam(convert(cEntry2), 0));
 		bC.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(voidType, bType, "m3", "")))));
 		
 		Query dC = new Query();
-		dC.setClassContext(convert(cType));
+		dC.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
 		dC.setMethodContext(convert(cEntry3));
 		dC.setType(convert(dType));
 		dC.setDefinition(DefinitionSites.createDefinitionByConstructor(convert(createMethodName(voidType, dType, ".ctor", ""))));

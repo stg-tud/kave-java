@@ -29,6 +29,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
@@ -55,7 +56,7 @@ public class PBNAnalysisVisitorTest extends PBNAnalysisBaseTest {
 		
 		Query queryA = new Query();
 		queryA.setType(convert(int32Type));
-		queryA.setClassContext(convert(enclosingType));
+		queryA.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
 		queryA.setMethodContext(convert(methodDecl.getName()));
 		queryA.setDefinition(DefinitionSites.createDefinitionByField(convert(fieldDecl.getName())));
 		HashSet<CallSite> callSiteSet = Sets.newHashSet(
@@ -66,7 +67,7 @@ public class PBNAnalysisVisitorTest extends PBNAnalysisBaseTest {
 		
 		Query queryB = new Query();
 		queryB.setType(convert(stringType));
-		queryB.setClassContext(convert(enclosingType));
+		queryB.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
 		queryB.setMethodContext(convert(methodDecl.getName()));
 		queryB.setDefinition(DefinitionSites.createDefinitionByParam(convert(methodDecl.getName()), 0));
 		queryB.setAllCallsites(Sets.newHashSet(CallSites.createParameterCallSite(convert(invocation.getMethodName()),0)));
