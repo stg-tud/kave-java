@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -44,11 +45,11 @@ import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.evaluation.TypeNameComparator;
+import cc.kave.commons.pointsto.evaluation.measures.AbstractMeasure;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.kave.commons.utils.SSTNodeHierarchy;
-import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
 import cc.recommenders.names.CoReNames;
@@ -63,17 +64,19 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	private final PointsToUsageFilter usageFilter;
 
 	private final Provider<PBNMiner> pbnMinerProvider;
+	private final AbstractMeasure measure;
 
 	private final Map<Triple<ICoReTypeName, String, String>, Double> results = new HashMap<>();
 	private final Map<Pair<ICoReTypeName, String>, Integer> numQueries = new HashMap<>();
 	private final Map<String, Integer> zeroExtractedQueries = new HashMap<>();
 
 	@Inject
-	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter,
-			Provider<PBNMiner> pbnMinerProvider) {
+	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter, UsagePruning pruning,
+			Provider<PBNMiner> pbnMinerProvider, AbstractMeasure measure) {
 		this.usageStores = usageStores;
 		this.usageFilter = usageFilter;
 		this.pbnMinerProvider = pbnMinerProvider;
+		this.measure = measure;
 	}
 
 	public void exportResults(Path dir, ResultExporter exporter) throws IOException {
@@ -223,26 +226,13 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 					.convert((cc.kave.commons.model.names.IMethodName) expectedProposal.getName());
 
 			for (Usage query : eventEntry.getValue()) {
-				int rank = getRank(expectedMethod, new ArrayList<>(recommender.query(Query.createAsCopyFrom(query))));
-				if (rank == 0) {
-					reciprocalRank.addValue(0);
-				} else {
-					reciprocalRank.addValue(1.0 / rank);
-				}
+				double rr = measure.calculate(recommender, Query.createAsCopyFrom(query),
+						ImmutableSet.of(expectedMethod));
+				reciprocalRank.addValue(rr);
 			}
 		}
 
 		return reciprocalRank.getMean();
-	}
-
-	private int getRank(ICoReMethodName expectedMethod, List<Tuple<ICoReMethodName, Double>> recommendations) {
-		for (int r = 0; r < recommendations.size(); ++r) {
-			ICoReMethodName method = recommendations.get(r).getFirst();
-			if (expectedMethod.equals(method)) {
-				return r + 1;
-			}
-		}
-		return 0;
 	}
 
 	@Override

@@ -13,6 +13,8 @@
 package cc.kave.commons.pointsto;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -25,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.io.Files;
+import static com.google.common.io.Files.createParentDirs;
 
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
@@ -35,6 +37,7 @@ import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
 import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
 import cc.kave.commons.pointsto.extraction.DescentStrategy;
+import cc.kave.commons.pointsto.extraction.NopDescentStrategy;
 import cc.kave.commons.pointsto.extraction.SimpleDescentStrategy;
 import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
@@ -99,13 +102,34 @@ public class PointsToEvaluation {
 		try {
 			for (Map.Entry<PointsToAnalysisFactory, UsageStatisticsCollector> entry : collectors.entrySet()) {
 				Path statFile = STATISTICS_DEST.resolve(entry.getKey().getName() + ".txt");
-				Files.createParentDirs(statFile.toFile());
+				createParentDirs(statFile.toFile());
 
 				entry.getValue().output(statFile);
 			}
 		} catch (IOException e) {
 			LOGGER.error("Failed to write the results of the statistics collectors to disk", e);
 		}
+	}
+
+	private static void evaluateUsages() {
+		Locale.setDefault(Locale.US);
+
+		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(USAGE_DEST)) {
+			for (Path dir : dirStream) {
+				if (Files.isDirectory(dir)) {
+					Path evaluationExportFile = EVALUATION_RESULTS_DEST.resolve(dir.getFileName() + ".txt");
+					try {
+						UsageEvaluation.run(dir, evaluationExportFile);
+					} catch (IOException e) {
+						LOGGER.error("Failed to evaluate usages in " + dir.toString(), e);
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOGGER.error("Failed to find usage stores", e);
+		}
+		
+		UsageEvaluation.shutdown();
 	}
 
 	private static void evaluateUsages(List<PointsToAnalysisFactory> factories) {

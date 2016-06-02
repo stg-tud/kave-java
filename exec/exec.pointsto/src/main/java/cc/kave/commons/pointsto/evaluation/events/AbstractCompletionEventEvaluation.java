@@ -84,23 +84,21 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 			throws IOException;
 
 	public static void main(String[] args) throws IOException {
-		Path baseDir = Paths.get("E:\\Coding\\MT");
-		Path completionEventsArchive = baseDir.resolve("OnlyCompletion");
+		Path completionEventsArchive = BASE_DIR.resolve("OnlyCompletion");
 		List<PointsToAnalysisFactory> ptFactories = Arrays.asList(
 				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
 				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
 				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
 				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)//,
-				//new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
-				//new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
+				// new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
+				// new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
 				);
-		Path evaluationResultsDir = baseDir.resolve("EvaluationResults");
 
 		Injector injector;
 		injector = Guice.createInjector(new StoreModule());
 		MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
 		evaluation.run(completionEventsArchive, ptFactories);
-		evaluation.exportResults(evaluationResultsDir,
+		evaluation.exportResults(EVALUATION_RESULTS_DIR,
 				injector.getInstance(ResultExporter.class));
 		evaluation.close();
 	}

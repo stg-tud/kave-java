@@ -32,10 +32,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.evaluation.data.Measure;
+import cc.kave.commons.pointsto.evaluation.measures.AbstractMeasure;
 import cc.recommenders.evaluation.queries.QueryBuilder;
-import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
 import cc.recommenders.names.ICoReMethodName;
@@ -46,17 +44,24 @@ import cc.recommenders.usages.Usage;
 public class CVEvaluator {
 
 	private final int numFolds;
-	private Provider<PBNMiner> pbnMinerProvider;
-	private QueryBuilderFactory queryBuilderFactory;
-	private ExecutorService executorService;
+	private final Provider<PBNMiner> pbnMinerProvider;
+	private final Provider<QueryBuilder<Usage, Query>> queryBuilderProvider;
+	private final AbstractMeasure measure;
+	private final ExecutorService executorService;
 
 	@Inject
 	public CVEvaluator(@NumberOfCVFolds int numFolds, Provider<PBNMiner> pbnMinerProvider,
-			QueryBuilderFactory queryBuilderFactory, ExecutorService executorService) {
+			Provider<QueryBuilder<Usage, Query>> queryBuilderProvider, AbstractMeasure measure,
+			ExecutorService executorService) {
 		this.numFolds = numFolds;
 		this.pbnMinerProvider = pbnMinerProvider;
-		this.queryBuilderFactory = queryBuilderFactory;
+		this.queryBuilderProvider = queryBuilderProvider;
+		this.measure = measure;
 		this.executorService = executorService;
+	}
+
+	public AbstractMeasure getMeasure() {
+		return measure;
 	}
 
 	public double evaluate(SetProvider setProvider) {
@@ -95,15 +100,6 @@ public class CVEvaluator {
 		return expectation;
 	}
 
-	private static Set<ICoReMethodName> getProposals(ICallsRecommender<Query> recommender, Query q) {
-		Set<Tuple<ICoReMethodName, Double>> recommendations = recommender.query(q);
-		Set<ICoReMethodName> proposals = new HashSet<>(recommendations.size());
-		for (Tuple<ICoReMethodName, Double> rec : recommendations) {
-			proposals.add(rec.getFirst());
-		}
-		return proposals;
-	}
-
 	private class FoldEvaluation implements Callable<Pair<Integer, Double>> {
 
 		private final int validationFoldIndex;
@@ -128,18 +124,18 @@ public class CVEvaluator {
 			DescriptiveStatistics statistics = new DescriptiveStatistics();
 
 			for (Usage validationUsage : validation) {
-				QueryBuilder<Usage, Query> queryBuilder = queryBuilderFactory.get();
+				QueryBuilder<Usage, Query> queryBuilder = queryBuilderProvider.get();
 				List<Query> queries;
-				// PartialUsageQueryBuilder is not thread safe due to the static Random in Collections.shuffle
+				// QueryBuilder may not be thread safe due to their reliance on random number generators
+				// (PartialUsageQueryBuilder uses the static Random in Collections.shuffle)
 				synchronized (queryBuilder) {
 					queries = queryBuilder.createQueries(validationUsage);
 				}
 
 				for (Query q : queries) {
 					Set<ICoReMethodName> expectation = getExpectation(validationUsage, q);
-					Set<ICoReMethodName> proposals = getProposals(recommender, q);
-					Measure measure = Measure.newMeasure(expectation, proposals);
-					statistics.addValue(measure.getF1());
+					double score = measure.calculate(recommender, q, expectation);
+					statistics.addValue(score);
 				}
 			}
 

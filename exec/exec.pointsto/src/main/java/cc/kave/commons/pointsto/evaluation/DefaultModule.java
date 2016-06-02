@@ -22,12 +22,17 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
 import cc.kave.commons.pointsto.evaluation.annotations.NumberOfCVFolds;
 import cc.kave.commons.pointsto.evaluation.annotations.UsageFilter;
 import cc.kave.commons.pointsto.evaluation.cv.CrossValidationFoldBuilder;
 import cc.kave.commons.pointsto.evaluation.cv.ProjectCVFoldBuilder;
+import cc.kave.commons.pointsto.evaluation.measures.AbstractMeasure;
+import cc.kave.commons.pointsto.evaluation.measures.F1Measure;
+import cc.kave.commons.pointsto.evaluation.measures.RRMeasure;
+import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;
 import cc.recommenders.mining.calls.MiningOptions.DistanceMeasure;
@@ -39,6 +44,7 @@ import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
 import cc.recommenders.mining.features.FeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
+import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
 
@@ -48,6 +54,8 @@ public class DefaultModule extends AbstractModule {
 	protected void configure() {
 		configCrossValidation();
 		configOptions();
+
+		configMeasure();
 
 		bind(new TypeLiteral<Predicate<Usage>>() {
 		}).annotatedWith(UsageFilter.class).to(PointsToUsageFilter.class);
@@ -84,6 +92,11 @@ public class DefaultModule extends AbstractModule {
 		bind(MiningOptions.class).toInstance(mOpts);
 	}
 
+	protected void configMeasure() {
+		// bind(AbstractMeasure.class).toInstance(new RRMeasure());
+		bind(AbstractMeasure.class).toInstance(new F1Measure());
+	}
+
 	@Provides
 	public RandomGenerator provideRandomGenerator() {
 		return new Well19937c(1457288501271L);
@@ -102,6 +115,12 @@ public class DefaultModule extends AbstractModule {
 	@Provides
 	public ModelBuilder<UsageFeature, BayesianNetwork> provideModelBuilder() {
 		return new PBNModelBuilder();
+	}
+
+	@Provides
+	@Singleton
+	public QueryBuilder<Usage, Query> provideQueryBuilder(RandomGenerator rndGenerator) {
+		return new OneMissingQueryBuilder(rndGenerator);
 	}
 
 }

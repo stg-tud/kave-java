@@ -14,13 +14,11 @@ package cc.kave.commons.pointsto.evaluation;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -141,7 +139,7 @@ public class UsageEvaluation extends AbstractEvaluation {
 		SetProvider setProvider = new UsageSetProvider(folds);
 		double score = cvEvaluator.evaluate(setProvider);
 		results.put(type, score);
-		log("\tF1: %.3f\n", score);
+		log("\t%s: %.3f\n", cvEvaluator.getMeasure().getClass().getSimpleName(), score);
 		log("\tFold size deviation: %.1f\n", setProvider.getAbsoluteFoldSizeDeviation());
 	}
 
