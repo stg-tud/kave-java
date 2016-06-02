@@ -28,11 +28,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 public class ZipArchive implements Closeable {
@@ -88,6 +90,9 @@ public class ZipArchive implements Closeable {
 		Files.write(fileSystem.getPath(filename), data);
 	}
 
+	/**
+	 * Provides a {@link Stream} of the deserialized contents of this archive.
+	 */
 	public <T> Stream<T> stream(Class<T> targetClass, BiFunction<InputStream, Class<T>, T> deserializer)
 			throws IOException {
 		return Files.walk(getRoot())
@@ -96,9 +101,30 @@ public class ZipArchive implements Closeable {
 					try {
 						return load(file, targetClass, deserializer);
 					} catch (Exception e) {
-						throw new RuntimeException(e);
+						throw Throwables.propagate(e);
 					}
 				});
+	}
+
+	/**
+	 * Provides a {@link Stream} of the deserialized contents of this archive that does not abort when a specific
+	 * exception is encountered during loading of a context. Note that {@code null} values are discarded.
+	 */
+	public <T, E> Stream<T> stream(Class<T> targetClass, BiFunction<InputStream, Class<T>, T> deserializer,
+			Class<E> exceptionToIgnore) throws IOException {
+		return Files.walk(getRoot())
+				.filter(path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(".json"))
+				.map(file -> {
+					try {
+						return load(file, targetClass, deserializer);
+					} catch (Exception e) {
+						if (e.getClass().equals(exceptionToIgnore)) {
+							return null;
+						} else {
+							throw Throwables.propagate(e);
+						}
+					}
+				}).filter(Objects::nonNull);
 	}
 
 	public <T> T load(Path filename, Class<T> targetClass, BiFunction<InputStream, Class<T>, T> deserializer)

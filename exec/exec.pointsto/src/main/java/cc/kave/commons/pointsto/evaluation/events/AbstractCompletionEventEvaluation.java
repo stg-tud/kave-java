@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonParseException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -72,7 +73,7 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 		int totalNumberOfEvents = 0;
 		for (Path file : zipFiles) {
 			try (ZipArchive archive = new ZipArchive(file)) {
-				completionEvents.addAll(archive.stream(ICompletionEvent.class, JsonUtils::fromJson).parallel()
+				completionEvents.addAll(archive.stream(ICompletionEvent.class, JsonUtils::fromJson, JsonParseException.class).parallel()
 						.filter(createCompletionEventFilter()).collect(Collectors.toList()));
 				totalNumberOfEvents += archive.countFiles();
 			}
