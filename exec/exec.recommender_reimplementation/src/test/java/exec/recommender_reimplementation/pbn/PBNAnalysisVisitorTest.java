@@ -30,9 +30,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;
-import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
-import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
+import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -83,14 +81,10 @@ public class PBNAnalysisVisitorTest extends PBNAnalysisBaseTest {
 	public void ignoresStatementsInExceptionHandling() {
 		InvocationExpression otherInvocation = Mockito.mock(InvocationExpression.class);
 
-		TryBlock tryBlock = new TryBlock();
-		CatchBlock catchBlock = new CatchBlock();
-		catchBlock.setBody(Lists.newArrayList(invokeStmt(otherInvocation)));
-		List<ICatchBlock> catchBlocks = Lists.newArrayList(catchBlock);
-		tryBlock.setCatchBlocks(catchBlocks);
-
+		ITryBlock tryBlock = tryBlock(Lists.newArrayList(), Lists.newArrayList(invokeStmt(otherInvocation)));
+		
 		PBNAnalysisVisitor uut = new PBNAnalysisVisitor(context);
-		methodDecl(DefaultMethodContext, tryBlock).accept(uut, Lists.newArrayList());
+		methodDecl(DefaultMethodContext,true, tryBlock).accept(uut, Lists.newArrayList());
 
 		verify(otherInvocation, never()).accept(eq(uut), Mockito.any());
 	}

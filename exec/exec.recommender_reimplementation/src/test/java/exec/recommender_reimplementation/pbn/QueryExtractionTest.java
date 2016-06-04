@@ -16,42 +16,41 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 
-public class QueryExtractionTest {
+public class QueryExtractionTest extends PBNAnalysisBaseTest {
 
 	@Test
 	public void extractionOfQuery() {
 		CompletionEvent completionEvent = new CompletionEvent();
 		
-		TestSSTBuilder builder = new TestSSTBuilder();
-		
-		completionEvent.context = builder.createPaperTest().get(0);
+		PbnPaperExample pbnPaperExample = new PbnPaperExample();
+		pbnPaperExample.LoadPaperExample();
+		completionEvent.context = pbnPaperExample.contexts.get(0);
 		
 		IMethodDeclaration methodDecl = completionEvent.context.getSST().getMethods().stream().findFirst().get();
 		methodDecl.getBody().add(SSTUtil.expr(SSTUtil.completionExpr("c")));
 		
-		ITypeName sType = TypeName.newTypeName("Test.PaperTest.S, Test");
-		ITypeName cType = TypeName.newTypeName("Test.PaperTest.C, Test");
-		ITypeName voidType = TypeName.newTypeName("System.Void, mscorlib");
-
-		IMethodName sEntry1 = PbnPaperExample.createMethodName(voidType, sType, "entry1", "");
+		ITypeName sType = type("S");
+		ITypeName cType = type("C");
+		
+		IMethodName sEntry1 = method(voidType, sType, "entry1");
 
 		Query cS = new Query();
 		cS.setClassContext(convert(sType));
 		cS.setMethodContext(convert(sEntry1));
 		cS.setType(convert(cType));
-		cS.setDefinition(DefinitionSites.createDefinitionByReturn(convert(PbnPaperExample.createMethodName(cType, sType, "fromS", ""))));
+		cS.setDefinition(DefinitionSites.createDefinitionByReturn(convert(method(cType, sType, "fromS"))));
 		
 	}
 

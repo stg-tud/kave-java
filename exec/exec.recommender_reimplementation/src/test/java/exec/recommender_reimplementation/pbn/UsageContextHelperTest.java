@@ -95,7 +95,7 @@ public class UsageContextHelperTest extends PBNAnalysisBaseTest {
 	public void returnsObjectTypeIfNoDirectSuperType() {
 		ITypeName actual = usageContextHelper.findClassContext();
 
-		assertEquals(TypeName.newTypeName("System.Object, mscorlib"), actual);
+		assertEquals(objectType, actual);
 	}
 
 	@Test

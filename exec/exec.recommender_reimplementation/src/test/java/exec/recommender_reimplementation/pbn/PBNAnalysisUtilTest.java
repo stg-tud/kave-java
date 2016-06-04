@@ -133,7 +133,7 @@ public class PBNAnalysisUtilTest extends PBNAnalysisBaseTest {
 		IAssignment someOtherAssignment = assign("bar", constant("someValue"));
 		
 		List<IAssignment> expectedAssignments = Lists.newArrayList(someAssignment, someOtherAssignment);
-		IMethodDeclaration methodDecl = methodDecl(DefaultMethodContext, someAssignment, someOtherAssignment);
+		IMethodDeclaration methodDecl = methodDecl(DefaultMethodContext, true, someAssignment, someOtherAssignment);
 		
 		assertThat(PBNAnalysisUtil.getAssignmentList(methodDecl.getBody()), Matchers.is(expectedAssignments));
 	}
@@ -157,7 +157,7 @@ public class PBNAnalysisUtilTest extends PBNAnalysisBaseTest {
 		IInvocationExpression someInvocation = invoke("a", method(voidType, DefaultClassContext, "SomeOtherMethod"));
 		IMethodDeclaration someMethodDecl = methodDecl(
 				method(voidType, DefaultClassContext, "SomeMethod", parameter(intType, "a")),
-				invokeStmt(someInvocation));
+				true, invokeStmt(someInvocation));
 		SST sst = new SST();
 		sst.setMethods(Sets.newHashSet(someMethodDecl));
 		
@@ -169,7 +169,7 @@ public class PBNAnalysisUtilTest extends PBNAnalysisBaseTest {
 		IInvocationExpression someInvocation = invokeWithParameters("a", method(voidType, DefaultClassContext, "SomeOtherMethod"), referenceExpr(varRef("b")));
 		IMethodDeclaration someMethodDecl = methodDecl(
 				method(voidType, DefaultClassContext, "SomeMethod", parameter(intType, "a"), parameter(stringType, "b")),
-				invokeStmt(someInvocation));
+				true, invokeStmt(someInvocation));
 		SST sst = new SST();
 		sst.setMethods(Sets.newHashSet(someMethodDecl));
 		

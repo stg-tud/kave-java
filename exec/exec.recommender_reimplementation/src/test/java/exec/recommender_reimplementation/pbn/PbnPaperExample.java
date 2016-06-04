@@ -16,13 +16,12 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-import static org.junit.Assert.assertThat;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.objectType;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,91 +29,102 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
-import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
-public class PbnPaperExample {
+public class PbnPaperExample extends PBNAnalysisBaseTest {
 
-	
-	private List<Context> contexts;
+	public List<Context> contexts;
 
 	private UsageExtractor uut = new UsageExtractor();
-	
+
 	@Before
 	public void LoadPaperExample() {
-		TestSSTBuilder sstBuilder = new TestSSTBuilder();
-		contexts = sstBuilder.createPaperTest();
+		SST sstA = sst(
+				type("A"),
+				methodDecl(
+						method(voidType, type("A"), "entry1"),
+						true,
+						varDecl("tmpB", type("B")),
+						assign("tmpB", referenceExpr(fieldReference("this", field(type("B"), type("A"), "b")))),
+						invokeStmt("tmpB", method(voidType, type("B"), "m1")),
+						invokeStmt("this", method(voidType, type("A"), "helper")),
+						varDecl("c", type("C")),
+						assign("c", invoke("this", method(type("C"), type("S"), "fromS"))),
+						invokeStmt(invokeWithParameters("c",
+								method(voidType, type("C"), "entry2", parameter(type("B"), "b")),
+								referenceExpr(fieldReference("this", field(type("B"), type("A"), "b")))))),
+				methodDecl(method(voidType, type("A"), "helper"), false, varDecl("tmpB", type("B")),
+						assign("tmpB", referenceExpr(fieldReference("this", field(type("B"), type("A"), "b")))),
+						invokeStmt("tmpB", method(voidType, type("B"), "m2"))));
+
+		sstA.getFields().add(fieldDecl(field(type("B"), type("A"), "b")));
+
+		PointsToContext ctxA = getContextFor(sstA, typeHierarchy(type("A"), type("S")),
+				methodHierarchy(method(voidType, type("A"), "entry1"), method(voidType, type("S"), "entry1")));
+
+		SST sstC = sst(
+				type("C"),
+				methodDecl(method(voidType, type("C"), "entry2", parameter(type("B"), "b")), true,
+						invokeStmt("b", method(voidType, type("B"), "m3")),
+						invokeStmt("this", method(voidType, type("C"), "entry3"))),
+				methodDecl(
+						method(voidType, type("C"), "entry3"),
+						true,
+						varDecl("d", type("D")),
+						assign("d", constructor(type("D"))),
+						tryBlock(Lists.newArrayList(invokeStmt("d", method(voidType, type("D"), "m4"))),
+								Lists.newArrayList(invokeStmt("d", method(voidType, type("D"), "m5"))))));
+
+		PointsToContext ctxB = getContextFor(sstC, typeHierarchy(type("A")),
+				methodHierarchy(method(voidType, type("C"), "entry2", parameter(type("B"), "b"))),
+				methodHierarchy(method(voidType, type("C"), "entry3")));
+
+		contexts = Lists.newArrayList(ctxA, ctxB);
 	}
-	
+
 	@Test
 	public void CheckPaperExample() {
 		List<Usage> usageList = new ArrayList<>();
-		for (Context context : contexts) {
-			uut.extractUsageFromContext(context, usageList);
+		for (Context ctx : contexts) {
+			uut.extractUsageFromContext(ctx, usageList);
 		}
-		ITypeName sType = TypeName.newTypeName("Test.PaperTest.S, Test");
-		ITypeName aType = TypeName.newTypeName("Test.PaperTest.A, Test");
-		ITypeName bType = TypeName.newTypeName("Test.PaperTest.B, Test");
-		ITypeName cType = TypeName.newTypeName("Test.PaperTest.C, Test");
-		ITypeName dType = TypeName.newTypeName("Test.PaperTest.D, Test");
-		
-		ITypeName voidType = TypeName.newTypeName("System.Void, mscorlib");
-		IMethodName sEntry1 = createMethodName(voidType, sType, "entry1", "");
-		IMethodName cEntry2 = createMethodName(voidType, cType, "entry2","[" + bType.getIdentifier() + "]" + " b");
-		IMethodName cEntry3 = createMethodName(voidType, cType, "entry3", "");
-		
-		IFieldName bField = FieldName.newFieldName(String.format(Locale.US, "[%s] [%s].b", bType.getIdentifier(), aType.getIdentifier()));
-		
-		Query bS = new Query();
-		bS.setClassContext(convert(sType));
-		bS.setMethodContext(convert(sEntry1));
-		bS.setType(convert(bType));
-		bS.setDefinition(DefinitionSites.createDefinitionByField(convert(bField)));
-		bS.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(voidType, bType, "m1", ""))), 
-				CallSites.createReceiverCallSite(convert(createMethodName(voidType, bType, "m2", ""))),
-				CallSites.createParameterCallSite(convert(cEntry2), 0)));
-		
-		Query cS = new Query();
-		cS.setClassContext(convert(sType));
-		cS.setMethodContext(convert(sEntry1));
-		cS.setType(convert(cType));
-		cS.setDefinition(DefinitionSites.createDefinitionByReturn(convert(createMethodName(cType, sType, "fromS", ""))));
-		cS.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(cEntry2))));
-		
-		Query sS = new Query();
-		sS.setClassContext(convert(sType));
-		sS.setMethodContext(convert(sEntry1));
-		sS.setType(convert(sType));
-		sS.setDefinition(DefinitionSites.createDefinitionByThis());
-		sS.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(cType, sType, "fromS", "")))));
-		
-		Query bC = new Query();
-		bC.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
-		bC.setMethodContext(convert(cEntry2));
-		bC.setType(convert(bType));
-		bC.setDefinition(DefinitionSites.createDefinitionByParam(convert(cEntry2), 0));
-		bC.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(voidType, bType, "m3", "")))));
-		
-		Query dC = new Query();
-		dC.setClassContext(convert(TypeName.newTypeName("System.Object, mscorlib")));
-		dC.setMethodContext(convert(cEntry3));
-		dC.setType(convert(dType));
-		dC.setDefinition(DefinitionSites.createDefinitionByConstructor(convert(createMethodName(voidType, dType, ".ctor", ""))));
-		dC.setAllCallsites(Sets.newHashSet(CallSites.createReceiverCallSite(convert(createMethodName(voidType, dType, "m4", "")))));
-		
-		assertThat(usageList, Matchers.containsInAnyOrder(bS,cS,sS,bC,dC));
-	}
+		ITypeName sType = type("S");
+		ITypeName aType = type("A");
+		ITypeName bType = type("B");
+		ITypeName cType = type("C");
+		ITypeName dType = type("D");
 
-	public static IMethodName createMethodName(ITypeName returnType, ITypeName className, String name, String parameter) {
-		return MethodName.newMethodName(
-				String.format("[%s] [%s].%s(%s)", returnType.getIdentifier(), className.getIdentifier(), name, parameter));
+		IMethodName sEntry1 = method(voidType, sType, "entry1");
+		IMethodName cEntry2 = method(voidType, cType, "entry2", parameter(bType, "b"));
+		IMethodName cEntry3 = method(voidType, cType, "entry3");
+
+		IFieldName bField = field(bType, aType, "b");
+
+		Usage bS = query(bType, sType, sEntry1, DefinitionSites.createDefinitionByField(convert(bField)),
+				CallSites.createReceiverCallSite(convert(method(voidType, bType, "m1"))),
+				CallSites.createReceiverCallSite(convert(method(voidType, bType, "m2"))),
+				CallSites.createParameterCallSite(convert(cEntry2), 0));
+
+		Usage cS = query(cType, sType, sEntry1,
+				DefinitionSites.createDefinitionByReturn(convert(method(cType, sType, "fromS"))),
+				CallSites.createReceiverCallSite(convert(cEntry2)));
+
+		Usage sS = query(sType, sType, sEntry1, DefinitionSites.createDefinitionByThis(),
+				CallSites.createReceiverCallSite(convert(method(cType, sType, "fromS"))));
+
+		Usage bC = query(bType, objectType, cEntry2, DefinitionSites.createDefinitionByParam(convert(cEntry2), 0),
+				CallSites.createReceiverCallSite(convert(method(voidType, bType, "m3"))));
+
+		Usage dC = query(dType, objectType, cEntry3, DefinitionSites.createDefinitionByConstructor(convert(method(voidType, dType, ".ctor"))), 
+				CallSites.createReceiverCallSite(convert(method(voidType, dType, "m4"))));
+		
+		assertQueriesWithoutSettingContexts(usageList, bS,cS,sS,bC,dC);;
 	}
 
 }

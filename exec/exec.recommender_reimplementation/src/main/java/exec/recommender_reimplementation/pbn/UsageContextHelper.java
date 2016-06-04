@@ -252,7 +252,7 @@ public class UsageContextHelper {
 	}
 
 	public static ITypeName getObjectType() {
-		return TypeName.newTypeName("System.Object, mscorlib");
+		return TypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
 	}
 
 }

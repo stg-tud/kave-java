@@ -16,7 +16,6 @@
 package exec.recommender_reimplementation.pbn;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +34,7 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -43,6 +43,8 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
@@ -59,6 +61,7 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
@@ -109,19 +112,18 @@ public class PBNAnalysisBaseTest {
 		context = pointsToAnalysis.compute(context);
 	}
 	
-	protected void setupContextFor(ISST sst) {
+	protected PointsToContext getContextFor(ISST sst, TypeHierarchy typeHierarchy, MethodHierarchy... methodHierarchies) {
 		pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
+		
+		PointsToContext ctx = new PointsToContext();
+		ctx.getTypeShape().setTypeHierarchy(typeHierarchy);
+		Set<IMethodHierarchy> methodHierarchiesSet = Sets.newHashSet(methodHierarchies);
+		ctx.getTypeShape().setMethodHierarchies(methodHierarchiesSet);
 
-		context.getTypeShape().setTypeHierarchy(defaultTypeHierarchy());
-		Set<IMethodHierarchy> methodHierarchies = new HashSet<>();
-		for (IMethodDeclaration methodDecl : sst.getEntryPoints()) {
-			methodHierarchies.add(new MethodHierarchy(methodDecl.getName()));
-		}
-		context.getTypeShape().setMethodHierarchies(methodHierarchies);
+		ctx.setSST(sst);
 
-		context.setSST(sst);
-
-		context = pointsToAnalysis.compute(context);
+		ctx = pointsToAnalysis.compute(ctx);
+		return ctx;
 	}
 	
 	protected void resetMethodHierarchies(IMethodHierarchy... methodHierarchies) {
@@ -129,6 +131,10 @@ public class PBNAnalysisBaseTest {
 		for (IMethodHierarchy methodHierarchy : methodHierarchies) {
 			context.getTypeShape().getMethodHierarchies().add(methodHierarchy);
 		}
+	}
+	
+	protected void resetTypeHierarchy(ITypeHierarchy typeHierarchy) {
+		context.getTypeShape().setTypeHierarchy(typeHierarchy);
 	}
 
 	/** Assertion Helpers **/
@@ -151,8 +157,7 @@ public class PBNAnalysisBaseTest {
 	}
 
 	protected void assertQueriesWithoutSettingContexts(List<Usage> queries, Usage... expectedsArr) {
-		List<Usage> expecteds = Lists.newArrayList(expectedsArr);
-		assertThat(queries, Matchers.is(expecteds));
+		assertThat(queries, Matchers.containsInAnyOrder(expectedsArr));
 	}
 
 	protected Usage findQueryWith(List<Usage> usages, ITypeName type) {
@@ -205,14 +210,32 @@ public class PBNAnalysisBaseTest {
 	/** Instantiation Helpers **/
 
 	protected static TypeHierarchy defaultTypeHierarchy() {
+		return typeHierarchy(DefaultClassContext);
+	}
+	
+	protected static TypeHierarchy typeHierarchy(ITypeName element) {
 		TypeHierarchy typeHierarchy = new TypeHierarchy();
-		typeHierarchy.setElement(DefaultClassContext);
+		typeHierarchy.setElement(element);
+		return typeHierarchy;
+	}
+	
+	protected static TypeHierarchy typeHierarchy(ITypeName element, ITypeName superType) {
+		TypeHierarchy typeHierarchy = new TypeHierarchy();
+		typeHierarchy.setElement(element);
+		TypeHierarchy _extends = new TypeHierarchy();
+		_extends.setElement(superType);
+		typeHierarchy.setExtends(_extends);
 		return typeHierarchy;
 	}
 
 	protected static MethodHierarchy methodHierarchy(IMethodName enclosingMethod, IMethodName superMethod) {
 		MethodHierarchy methodHierarchy = new MethodHierarchy(enclosingMethod);
 		methodHierarchy.setSuper(superMethod);
+		return methodHierarchy;
+	}
+	
+	protected static MethodHierarchy methodHierarchy(IMethodName enclosingMethod) {
+		MethodHierarchy methodHierarchy = new MethodHierarchy(enclosingMethod);
 		return methodHierarchy;
 	}
 
@@ -242,7 +265,14 @@ public class PBNAnalysisBaseTest {
 	protected static SST sst(ITypeName declaringType, IMethodName enclosingMethod, IStatement... statements) {
 		SST sst = new SST();
 		sst.setEnclosingType(declaringType);
-		sst.setMethods(Sets.newHashSet(methodDecl(enclosingMethod, statements)));
+		sst.setMethods(Sets.newHashSet(methodDecl(enclosingMethod, true, statements)));
+		return sst;
+	}
+	
+	protected static SST sst(ITypeName declaringType, IMethodDeclaration... methodDecls) {
+		SST sst = new SST();
+		sst.setEnclosingType(declaringType);
+		sst.setMethods(Sets.newHashSet(methodDecls));
 		return sst;
 	}
 
@@ -258,11 +288,11 @@ public class PBNAnalysisBaseTest {
 		return fieldDecl;
 	}
 
-	protected static IMethodDeclaration methodDecl(IMethodName enclosingMethod, IStatement... statements) {
+	protected static IMethodDeclaration methodDecl(IMethodName enclosingMethod,boolean entryPoint, IStatement... statements) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
 		methodDecl.setName(enclosingMethod);
 		methodDecl.setBody(Lists.newArrayList(statements));
-		methodDecl.setEntryPoint(true);
+		methodDecl.setEntryPoint(entryPoint);
 		return methodDecl;
 	}
 
@@ -335,7 +365,15 @@ public class PBNAnalysisBaseTest {
 		refExpr.setReference(reference);
 		return refExpr;
 	}
-
+	
+	protected static ITryBlock tryBlock(List<IStatement> body, List<IStatement> catchBlockBody) {
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setBody(body);
+		CatchBlock catchBlock = new CatchBlock();
+		catchBlock.setBody(catchBlockBody);
+		tryBlock.setCatchBlocks(Lists.newArrayList(catchBlock));
+		return tryBlock;
+	}
 	protected static IVariableDeclaration varDecl(String name, ITypeName type) {
 		VariableDeclaration varDecl = new VariableDeclaration();
 		varDecl.setReference(varRef(name));
