@@ -133,11 +133,16 @@ public class ConstraintResolver {
 								+ numArgs + " vs. " + c2.getNumberOfArguments() + ")");
 			}
 		}
-		Set<ConstraintNode> changedNodes = new HashSet<>(numArgs);
+		if (!checkForEqualVariance(c1, c2, numArgs)) {
+			LOGGER.error(
+					"Cannot resolve constraint between {} and {} because at least one argument pair has different variances",
+					c1.getClass().getSimpleName(), c2.getClass().getSimpleName());
+			return Collections.emptySet();
+		}
 
+		Set<ConstraintNode> changedNodes = new HashSet<>(numArgs);
 		for (int i = 0; i < numArgs; ++i) {
 			Variance variance = c1.getArgumentVariance(i);
-			Asserts.assertEquals(variance, c2.getArgumentVariance(i), "Terms must have equal variance");
 
 			SetVariable v1 = c1.getArgument(i);
 			SetVariable v2 = c2.getArgument(i);
@@ -193,5 +198,14 @@ public class ConstraintResolver {
 		} else {
 			return new ContextAnnotation(contextAnnotation.getRight(), contextAnnotation.getLeft());
 		}
+	}
+
+	private boolean checkForEqualVariance(ConstructedTerm c1, ConstructedTerm c2, int numArgs) {
+		for (int i = 0; i < numArgs; ++i) {
+			if (c1.getArgumentVariance(i) != c2.getArgumentVariance(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
