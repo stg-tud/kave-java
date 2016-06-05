@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.names.IEventName;
@@ -102,6 +103,12 @@ public class GenericNameUtils {
 
 		for (ITypeName typeParam : type.getTypeParameters()) {
 			String name = typeParam.getTypeParameterShortName();
+
+			// guard against a bug in TypeName.getTypeParameters producing invalid type parameters
+			if (Strings.isNullOrEmpty(name)) {
+				return type;
+			}
+
 			String pattern = Pattern
 					.quote(name + " " + INSTANTIATION_ARROW + " " + typeParam.getTypeParameterType().getIdentifier());
 			id = id.replaceAll(pattern, name);
