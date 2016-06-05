@@ -711,11 +711,17 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	private void updateFunctionLocation(FunctionLocation functionLocation, List<DistinctReference> newParameters,
 			ITypeName newReturnType, ReferenceLocation newReturnLocation) {
 		List<ReferenceLocation> funLocParameters = functionLocation.getParameterLocations();
-		Asserts.assertEquals(funLocParameters.size(), newParameters.size());
-
-		for (int i = 0; i < newParameters.size(); ++i) {
-			DistinctReference distParameterRef = newParameters.get(i);
+		List<ReferenceLocation> newParameterLocations = new ArrayList<>(newParameters.size());
+		for (DistinctReference distParameterRef : newParameters) {
 			ReferenceLocation newParameterLocation = getOrCreateLocation(distParameterRef);
+			newParameterLocations.add(newParameterLocation);
+		}
+
+		// the number of parameters can be different in rare cases
+		int commonNumParameters = Math.min(funLocParameters.size(), newParameters.size());
+		for (int i = 0; i < commonNumParameters; ++i) {
+			DistinctReference distParameterRef = newParameters.get(i);
+			ReferenceLocation newParameterLocation = newParameterLocations.get(i);
 			LocationIdentifier newParameterIdentifier = getIdentifierForSimpleRefLoc(distParameterRef.getType());
 			SetRepresentative derefNewParameterLocationRep = unionFind
 					.find(newParameterLocation.getLocation(newParameterIdentifier).getSetRepresentative());
@@ -725,6 +731,9 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			if (derefFunLocParameterRep != derefNewParameterLocationRep) {
 				join(derefNewParameterLocationRep, derefFunLocParameterRep);
 			}
+		}
+		if (newParameterLocations.size() > funLocParameters.size()) {
+			funLocParameters.addAll(newParameterLocations.subList(commonNumParameters, newParameterLocations.size()));
 		}
 
 		LocationIdentifier newReturnIdentifier = getIdentifierForSimpleRefLoc(newReturnType);
