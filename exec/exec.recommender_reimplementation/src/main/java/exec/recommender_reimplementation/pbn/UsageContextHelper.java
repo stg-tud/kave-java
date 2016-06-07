@@ -197,8 +197,8 @@ public class UsageContextHelper {
 
 		List<IAssignment> assignments = getAssignmentList(body);
 
-		for (IAssignment assignment : assignments) {
-			// TODO: maybe traverse backwards to use last assignment for reference
+		for (int i = assignments.size() - 1; i >= 0; i--) {
+			IAssignment assignment = assignments.get(i);
 			PointsToQuery queryForLeftSide = pointsToQueryBuilder.newQuery(
 					assignment.getReference(), assignment);
 			Set<AbstractLocation> leftSideLocations = pointerAnalysis
@@ -217,6 +217,7 @@ public class UsageContextHelper {
 				break;
 			}
 		}
+				
 		return null;
 	}
 
