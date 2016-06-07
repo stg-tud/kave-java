@@ -39,6 +39,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
+import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.Usage;
 
@@ -74,11 +75,15 @@ public class PBNAnalysisUtil {
 	}
 
 	public static boolean isCallToSuperClass(IInvocationExpression expr, ISST sst) {
-		if (!expr.getReference().getIdentifier().equals("this"))
+		if (!isThisOrSuper(expr.getReference().getIdentifier()))
 			return false;
 		IMethodName methodName = expr.getMethodName();
 		return sst.getMethods().stream()
 				.noneMatch(methodDecl -> methodDecl.getName().equals(methodName));
+	}
+	
+	public static boolean isThisOrSuper(String variableName) {
+		return variableName.equals("this") || variableName.equals("base");
 	}
 
 	public static boolean isMethodCallToEntryPoint(IMethodName methodName, ISST sst) {

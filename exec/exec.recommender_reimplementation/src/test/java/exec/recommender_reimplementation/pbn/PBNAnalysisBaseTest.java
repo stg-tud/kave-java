@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 
 import cc.kave.commons.model.names.IFieldName;
@@ -94,9 +95,12 @@ public class PBNAnalysisBaseTest {
 	protected static IMethodName DefaultMethodContext = method(type("A"), DefaultClassContext, "M");
 	protected PointsToAnalysis pointsToAnalysis;
 
+	private UsageExtractor uut;
+
 	@Before
 	public void Setup() {
 		context = new PointsToContext();
+		uut = new UsageExtractor();
 	}
 
 	protected void setupDefaultEnclosingMethod(IStatement... statements) {
@@ -160,7 +164,9 @@ public class PBNAnalysisBaseTest {
 		assertThat(queries, Matchers.containsInAnyOrder(expectedsArr));
 	}
 
-	protected Usage findQueryWith(List<Usage> usages, ITypeName type) {
+	protected Usage findQueryWith(ITypeName type) {
+    	List<Usage> usages = Lists.newArrayList();
+        uut.extractUsageFromContext(context, usages);
 		for (Usage actual : usages) {
 			if (Objects.equal(actual.getType(), convert(type))) {
 				return actual;
@@ -170,24 +176,35 @@ public class PBNAnalysisBaseTest {
 		return null;
 	}
 
-	protected void assertQueriesExistFor(List<Usage> usages, ITypeName... expecteds) {
+	protected void assertQueriesExistFor(ITypeName... expecteds) {
+    	List<Usage> usages = Lists.newArrayList();
+        uut.extractUsageFromContext(context, usages);
 		List<ICoReTypeName> expectedsCore = Arrays.asList(expecteds).stream().map(t -> convert(t))
 				.collect(Collectors.toList());
 		List<ICoReTypeName> actuals = usages.stream().map(u -> u.getType()).collect(Collectors.toList());
-		assertThat(actuals, Matchers.is(expectedsCore));
+		assertThat(actuals, Matchers.containsInAnyOrder(expectedsCore.toArray()));
 	}
+	
+    protected Usage assertSingleQuery()
+    {
+    	List<Usage> actuals = Lists.newArrayList();
+        uut.extractUsageFromContext(context, actuals);
+        assertEquals(1, actuals.size());
+        return actuals.get(0);
+    }
 
-	protected void assertQueryWithType(Usage query, ITypeName expected) {
+	protected void assertSingleQueryWithType(ITypeName expected) {
+		Usage query = assertSingleQuery();
 		ICoReTypeName actual = query.getType();
 		assertEquals(convert(expected), actual);
 	}
 
-	protected void assertQueryWithDefinition(Usage query, DefinitionSite expected) {
+	protected void assertSingleQueryWithDefinition(DefinitionSite expected) {
+		Usage query = assertSingleQuery();
 		DefinitionSite actual = query.getDefinitionSite();
 		assertEquals(expected, actual);
 	}
-	
-	
+		
 
 	/** Query Helper **/
 

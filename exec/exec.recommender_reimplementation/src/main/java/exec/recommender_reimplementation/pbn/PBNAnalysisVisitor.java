@@ -65,18 +65,18 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	@Override
 	public Object visit(IInvocationExpression expr, List<Usage> usages) {
 		ITypeName type;
-		if (expr.getReference().getIdentifier().equals("this")) {
+		if (isThisOrSuper(expr.getReference().getIdentifier())) {
 			// Handle possible call to super type
-			if (!PBNAnalysisUtil.isCallToSuperClass(expr, pointsToContext.getSST()))
+			if (isMethodCallToEntryPoint(expr.getMethodName(), pointsToContext.getSST()))
 				return super.visit(expr, usages);
 			ITypeHierarchy typeHierarchy = pointsToContext.getTypeShape().getTypeHierarchy();
-			if(!typeHierarchy.hasSuperclass()) return super.visit(expr, usages);
-			type = typeHierarchy.getExtends().getElement();
+			if(typeHierarchy.hasSuperclass()) type = typeHierarchy.getExtends().getElement();
+			else type = typeHierarchy.getElement();
 		} else {
 			type = findTypeForVarReference(expr, getTypeCollector());
 		}
-		// Handle Receiver first
 		
+		// Handle Receiver first
 		if(isSupportedType(type)) 
 			handleObjectInstance(expr, usages, -1, convert(type));
 
@@ -118,8 +118,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		Query newUsage = usageContextHelper.createNewObjectUsage(expr, parameterType);
 		usageContextHelper.addClassContext(newUsage);
 		usageContextHelper.addMethodContext(newUsage, getCurrentEntryPoint());
-		if (!usageContextHelper.addDefinitionSite(newUsage, expr, parameterIndex, getCurrentEntryPoint()))
-			return;
+		usageContextHelper.addDefinitionSite(newUsage, expr, parameterIndex, getCurrentEntryPoint());
 		usageContextHelper.addCallSite(newUsage, expr, parameterIndex);
 				
 		Optional<Usage> similarUsage = usageListContainsSimilarUsage(usages, newUsage);

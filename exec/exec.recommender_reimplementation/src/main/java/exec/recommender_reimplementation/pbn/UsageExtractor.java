@@ -30,7 +30,7 @@ import cc.recommenders.usages.Usage;
 
 public class UsageExtractor {
 	
-	public List<Usage> extractUsageFromContext(Context context, List<Usage> usageList) {
+	public void extractUsageFromContext(Context context, List<Usage> usageList) {
 		ISST sst = context.getSST();
 		
 		ISST inlinedSST = inlineSST(sst);
@@ -44,8 +44,7 @@ public class UsageExtractor {
 		for (IMethodDeclaration methodDecl : entrypoints) {
 			methodDecl.accept(new PBNAnalysisVisitor(pointsToContext), usageList);
 		}
-		
-		return usageList;
+	
 	}
 
 	public static PointsToContext performPointsToAnalysis(Context context) {

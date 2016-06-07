@@ -17,11 +17,7 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.findTypeForVarReference;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getAssignmentList;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getParameterIndexInEntryPoint;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getStatementParentForExpression;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isCallToSuperClass;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +28,7 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -115,12 +112,12 @@ public class UsageContextHelper {
 		newUsage.setClassContext(convert(classType));
 	}
 
-	public boolean addDefinitionSite(Query newUsage,
+	public void addDefinitionSite(Query newUsage,
 			IInvocationExpression expr, int parameterIndex,
 			IMethodDeclaration currentEntryPoint) {
 		if (isCallToSuperClass(expr, sst)) {
 			newUsage.setDefinition(DefinitionSites.createDefinitionByThis());
-			return true;
+			return;
 		}
 		int parameterOfEntryPointIndex = getParameterIndexInEntryPoint(expr,
 				parameterIndex, currentEntryPoint);
@@ -128,14 +125,15 @@ public class UsageContextHelper {
 			newUsage.setDefinition(DefinitionSites.createDefinitionByParam(
 					convert(currentEntryPoint.getName()),
 					parameterOfEntryPointIndex));
-			return true;
+			return;
 		}
 		DefinitionSite definitionSite = findDefinitionSiteByReference(expr, parameterIndex,currentEntryPoint);
 		if (definitionSite != null) {
 			newUsage.setDefinition(definitionSite);
-			return true;
 		}
-		return false;
+		else {		
+			newUsage.setDefinition(DefinitionSites.createUnknownDefinitionSite());
+		}
 	}
 
 	public boolean addDefinitionSite(Query newUsage,
@@ -173,7 +171,7 @@ public class UsageContextHelper {
 
 		if (reference instanceof IFieldReference) {
 			IFieldReference fieldRef = (IFieldReference) reference;
-			if (fieldRef.getReference().getIdentifier().equals("this")) {
+			if (isThisOrSuper(fieldRef.getReference().getIdentifier())) {
 				return DefinitionSites.createDefinitionByField(convert(fieldRef
 						.getFieldName()));
 			}
@@ -194,7 +192,8 @@ public class UsageContextHelper {
 				getStatementParentForExpression(expr, sstNodeHierarchy));
 		Set<AbstractLocation> varRefLocations = pointerAnalysis
 				.query(queryForVarReference);
-
+	
+		// search Assignments
 		List<IAssignment> assignments = getAssignmentList(body);
 
 		for (int i = assignments.size() - 1; i >= 0; i--) {
@@ -213,7 +212,7 @@ public class UsageContextHelper {
 				DefinitionSite invocationSite = tryGetInvocationDefinition(assignExpr);
 				if (invocationSite != null)
 					return invocationSite;
-
+				
 				break;
 			}
 		}
@@ -242,7 +241,7 @@ public class UsageContextHelper {
 			IReference reference = refExpr.getReference();
 			if (reference instanceof IFieldReference) {
 				IFieldReference fieldRef = (IFieldReference) reference;
-				if (fieldRef.getReference().getIdentifier().equals("this")) {
+				if (isThisOrSuper(fieldRef.getReference().getIdentifier())) {
 					return DefinitionSites
 							.createDefinitionByField(convert(fieldRef
 									.getFieldName()));
