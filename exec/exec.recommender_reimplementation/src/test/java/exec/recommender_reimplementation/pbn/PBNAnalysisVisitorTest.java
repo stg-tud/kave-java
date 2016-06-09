@@ -31,6 +31,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
@@ -79,14 +81,26 @@ public class PBNAnalysisVisitorTest extends PBNAnalysisBaseTest {
 
 	@Test
 	public void ignoresStatementsInExceptionHandling() {
-		InvocationExpression otherInvocation = Mockito.mock(InvocationExpression.class);
+		InvocationExpression someInvocation = Mockito.mock(InvocationExpression.class);
 
-		ITryBlock tryBlock = tryBlock(Lists.newArrayList(), Lists.newArrayList(invokeStmt(otherInvocation)));
+		ITryBlock tryBlock = tryBlock(Lists.newArrayList(), Lists.newArrayList(invokeStmt(someInvocation)));
 		
 		PBNAnalysisVisitor uut = new PBNAnalysisVisitor(context);
 		methodDecl(DefaultMethodContext,true, tryBlock).accept(uut, Lists.newArrayList());
 
-		verify(otherInvocation, never()).accept(eq(uut), Mockito.any());
+		verify(someInvocation, never()).accept(eq(uut), Mockito.any());
 	}
 
+	
+	@Test
+	public void ignoresStatementsInLambdaExpressions() {
+		InvocationExpression someInvocation = Mockito.mock(InvocationExpression.class);
+
+		ILambdaExpression lambda = SSTUtil.lambdaExpr(invokeStmt(someInvocation));
+				
+		PBNAnalysisVisitor uut = new PBNAnalysisVisitor(context);
+		methodDecl(DefaultMethodContext,true, assign("i", lambda)).accept(uut, Lists.newArrayList());
+		
+		verify(someInvocation, never()).accept(Mockito.any(), Mockito.any());	
+	}
 }

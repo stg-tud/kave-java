@@ -39,7 +39,6 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
-import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.Usage;
 

@@ -28,11 +28,11 @@ import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
@@ -205,6 +205,7 @@ public class UsageContextHelper {
 			if (varRefLocations.equals(leftSideLocations)) {
 				// found assignment with Variable Reference as right side
 				IAssignableExpression assignExpr = assignment.getExpression();
+			
 				DefinitionSite fieldSite = tryGetFieldDefinitionSite(assignExpr);
 				if (fieldSite != null)
 					return fieldSite;
@@ -213,10 +214,21 @@ public class UsageContextHelper {
 				if (invocationSite != null)
 					return invocationSite;
 				
+				DefinitionSite constantSite = tryGetConstantDefinition(assignExpr);
+				if(constantSite != null)
+					return constantSite;
+				
 				break;
 			}
 		}
 				
+		return null;
+	}
+
+	private DefinitionSite tryGetConstantDefinition(IAssignableExpression assignExpr) {
+		if(assignExpr instanceof IConstantValueExpression) {
+			return DefinitionSites.createDefinitionByConstant();
+		}
 		return null;
 	}
 

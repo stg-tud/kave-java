@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
@@ -28,6 +29,18 @@ import static cc.kave.commons.pointsto.extraction.CoReNameConverter.*;
 
 public class DefinitionDetectionTest extends PBNAnalysisBaseTest {
 
+    @Test
+    public void varDefinitionByConstant()
+    {
+        setupDefaultEnclosingMethod(
+            varDecl("a", type("A")),
+            assign("a", new ConstantValueExpression()),
+            invokeStmt("a", method(voidType, type("A"), "M")));
+
+        assertSingleQueryWithType(type("A"));
+        assertSingleQueryWithDefinition(DefinitionSites.createDefinitionByConstant());
+    }
+    
     @Test
     public void varDefinitionByConstructor_SameType()
     {

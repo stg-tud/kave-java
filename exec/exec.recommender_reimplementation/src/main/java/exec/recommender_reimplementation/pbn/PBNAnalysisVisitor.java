@@ -17,6 +17,7 @@ package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
@@ -97,6 +99,12 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 	public boolean isSupportedType(ITypeName type) {
 		// ignore Unknown Types, Array, Delegate and Enum Types
 		return type != null && !type.isUnknownType() && !type.isArrayType() && !type.isEnumType() && !type.isDelegateType();
+	}
+	
+	@Override
+	public Object visit(ILambdaExpression expr, List<Usage> context) {
+		// ignore lambda expressions
+		return null;
 	}
 
 	@Override
