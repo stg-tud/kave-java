@@ -21,6 +21,7 @@ import java.util.Map;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Logger;
@@ -28,7 +29,8 @@ import cc.recommenders.io.Logger;
 public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
-	private static final int FREQUENCY = 1;
+	private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
+	private static final int FREQUENCY = 2;
 	
 	private static final double DELTA = 0.001;
 	private static final double TIMEOUT = 0.5;
@@ -41,23 +43,18 @@ public class EventsFilter {
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
 		Logger.log("Minimal occurrence is %d", statistics.minFreq(occurrences));
 		
-		int sigletons = 0;
-		
 		for (Event e : stream) {
+			if (e.getKind() == EventKind.METHOD_DECLARATION) {
+				sm.addEvent(Events.newHolder());
+				continue;
+			}
 			if (occurrences.get(e) > FREQUENCY) {
-				sm.addEvent(e);
-			} else {
-				sigletons++;
-				if (e.getKind() == EventKind.METHOD_DECLARATION) {
-					sm.addEvent(Events.newHolder());
+				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
+				if(asm.getIdentifier().equalsIgnoreCase(FRAMEWORKNAME)) {
+					sm.addEvent(e);;
 				}
 			}
 		}
-		Logger.log("Before filtering out one time events!");
-		Logger.log("One time occured events are: %d", sigletons);
-		Logger.log("Number of unique events is: %d", occurrences.size());
-		Logger.log("Length of event stream data is: %d", stream.size());
-		
 		return sm;
 	}
 	
