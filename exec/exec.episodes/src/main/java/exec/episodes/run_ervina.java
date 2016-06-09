@@ -44,7 +44,7 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		load(FrameworksData.class).getFrameworks();
+		load(FrameworksData.class).getFrameworksDistribution();
 //		load(StreamFrequencies.class).frequencies();
 //		load(StreamPartition.class).partition();
 //		load(Sample.class).sample();

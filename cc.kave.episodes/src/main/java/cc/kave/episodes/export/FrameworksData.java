@@ -26,12 +26,15 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IAssemblyName;
+import cc.kave.commons.model.names.csharp.AssemblyVersion;
 import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -53,7 +56,20 @@ public class FrameworksData {
 		this.statistics = stat;
 	}
 
-	public void getFrameworks() throws IOException {
+	public void getFrameworksDistribution() throws IOException {
+
+		List<Event> allEvents = getAllEvents();
+		Map<Event, Integer> frequencies = statistics.getFrequences(allEvents);
+		
+//		for (Map.Entry<Event, Integer> entry : frequencies.entrySet()) {
+//			Logger.log("Type: %s", entry.getKey().getMethod().getDeclaringType().getFullName());
+//		}
+
+		Frameworks distribution = getEventsAndTypes(frequencies);
+		storeFrameworks(distribution);
+	}
+
+	private List<Event> getAllEvents() throws IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 
 		for (String zip : findZips()) {
@@ -70,61 +86,77 @@ public class FrameworksData {
 			ra.close();
 		}
 		List<Event> allEvents = generator.getEventStream();
-		Map<Event, Integer> frequencies = statistics.getFrequences(allEvents);
-		Map<String, Map<Event, Integer>> distribution = frameworkDistribution(frequencies);
-		storeFrameworks(distribution);
+		return allEvents;
 	}
 
-	private Map<String, Map<Event, Integer>> frameworkDistribution(Map<Event, Integer> frequencies) throws IOException {
-		Map<String, Map<Event, Integer>> distribution = Maps.newHashMap();
+	private Frameworks getEventsAndTypes(Map<Event, Integer> frequencies) throws IOException {
+		Frameworks frameworks = new Frameworks();
 
 		for (Map.Entry<Event, Integer> entry : frequencies.entrySet()) {
-			
 			if (entry.getValue() == 1) {
 				continue;
 			}
-			String frameworkName = entry.getKey().getMethod().getDeclaringType().getFullName();
-			String framework = frameworkName;
-			if (frameworkName.contains(".")) {
-				int index = frameworkName.indexOf(".");
-				framework = frameworkName.substring(0, index);
+			// number of events per framework
+			// + number of types for each framework
+			IAssemblyName asm = entry.getKey().getMethod().getDeclaringType().getAssembly();
+			String frameworkName = asm.getIdentifier();
+			String typeName = entry.getKey().getMethod().getDeclaringType().getFullName();
+			if(AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
+				continue;
 			}
-			if (distribution.containsKey(framework)) {
-				Map<Event, Integer> frameworkEvents = distribution.get(framework);
+			if (frameworks.events.containsKey(frameworkName)) {
+				Map<Event, Integer> frameworkEvents = frameworks.events.get(frameworkName);
 				if (!frameworkEvents.containsKey(entry.getKey())) {
 					frameworkEvents.put(entry.getKey(), entry.getValue());
 				}
-				distribution.put(framework, frameworkEvents);
+				frameworks.events.put(frameworkName, frameworkEvents);
+
+				if (!frameworks.types.get(frameworkName).contains(typeName)) {
+					frameworks.types.get(frameworkName).add(typeName);
+				}
 			} else {
-				Map<Event, Integer> newFramework = Maps.newHashMap();
-				newFramework.put(entry.getKey(), entry.getValue());
-				distribution.put(framework, newFramework);
+				Map<Event, Integer> newFrameworkEvent = Maps.newHashMap();
+				newFrameworkEvent.put(entry.getKey(), entry.getValue());
+				frameworks.events.put(frameworkName, newFrameworkEvent);
+
+				frameworks.types.put(frameworkName, Lists.newArrayList(typeName));
 			}
-		} 
-		return distribution;
+		}
+		return frameworks;
 	}
 
-	private void storeFrameworks(Map<String, Map<Event, Integer>> distribution) throws IOException {
-		StringBuilder sb = new StringBuilder();
+	private class Frameworks {
+		private Map<String, Map<Event, Integer>> events = Maps.newHashMap();
+		private Map<String, List<String>> types = Maps.newHashMap();
+	}
 
-		for (Map.Entry<String, Map<Event, Integer>> framework : distribution.entrySet()) {
-			sb.append(framework.getKey());
-			sb.append("\t");
-			sb.append(framework.getValue().size());
-			sb.append("\t");
+	private void storeFrameworks(Frameworks distribution) throws IOException {
+		StringBuilder eventsBuilder = new StringBuilder();
+		StringBuilder typesBuilder = new StringBuilder();
+
+		for (Map.Entry<String, Map<Event, Integer>> framework : distribution.events.entrySet()) {
+			eventsBuilder.append(framework.getKey() + "\t" + framework.getValue().size() + "\t");
 
 			int freqTotal = 0;
 			for (Map.Entry<Event, Integer> events : framework.getValue().entrySet()) {
 				freqTotal += events.getValue();
 			}
-			sb.append(freqTotal);
-			sb.append("\n");
+			eventsBuilder.append(freqTotal);
+			eventsBuilder.append("\n");
+
+			typesBuilder.append(framework.getKey() + "\t" + framework.getValue().size() + "\n");
 		}
-		FileUtils.writeStringToFile(new File(getPath()), sb.toString());
+		FileUtils.writeStringToFile(new File(getEventsPath()), eventsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getTypesPath()), typesBuilder.toString());
 	}
 
-	private String getPath() {
-		String fileName = rootFolder.getAbsolutePath() + "/frameworks.txt";
+	private String getEventsPath() {
+		String fileName = rootFolder.getAbsolutePath() + "/eventsPerFramework.txt";
+		return fileName;
+	}
+
+	private String getTypesPath() {
+		String fileName = rootFolder.getAbsolutePath() + "/typesPerFramework.txt";
 		return fileName;
 	}
 
