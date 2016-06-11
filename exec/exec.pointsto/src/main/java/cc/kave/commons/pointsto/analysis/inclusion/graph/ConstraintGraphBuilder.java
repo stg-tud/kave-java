@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ import cc.kave.commons.model.ssts.references.IMemberReference;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.pointsto.analysis.inclusion.Allocator;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstraintResolver;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
@@ -53,7 +56,6 @@ import cc.kave.commons.pointsto.analysis.inclusion.SetVariable;
 import cc.kave.commons.pointsto.analysis.inclusion.SetVariableFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.FallbackIndexAccessAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UndefinedMemberAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.UniqueAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
@@ -92,7 +94,7 @@ public class ConstraintGraphBuilder {
 	private final RefTerm staticObject;
 	private final Map<IMemberName, SetVariable> staticMembers = new HashMap<>();
 	private final Map<IMemberName, Set<SetVariable>> undefinedStorageMembers = new HashMap<>();
-	private final Set<DistinctReference> providedFallbackObjects = new HashSet<>();
+	private final Map<Pair<DistinctReference, Class<? extends ISSTNode>>, SetVariable> volatileEntities = new HashMap<>();
 
 	public ConstraintGraphBuilder(Function<IReference, DistinctReference> referenceResolver,
 			DeclarationMapper declMapper, ContextFactory contextFactory) {
@@ -116,7 +118,8 @@ public class ConstraintGraphBuilder {
 	public ConstraintGraph createConstraintGraph() {
 		initializeStaticMembers();
 		initializeNonStaticMembers();
-		return new ConstraintGraph(referenceVariables, declLambdaStore, constraintNodes, contextFactory);
+		return new ConstraintGraph(referenceVariables, declLambdaStore, constraintNodes,
+				new HashSet<>(volatileEntities.values()), contextFactory);
 	}
 
 	private SetVariable getVariable(DistinctReference distRef) {
@@ -261,14 +264,30 @@ public class ConstraintGraphBuilder {
 		}
 	}
 
-	private void provideFallbackObjectForIndexAccess(IIndexAccessReference indexAccessRef) {
+	private void registerVolatileEntity(IIndexAccessReference indexAccessRef) {
 		DistinctIndexAccessReference distRef = (DistinctIndexAccessReference) referenceResolver.apply(indexAccessRef);
 		DistinctReference baseDistRef = distRef.getBaseReference();
-		if (!providedFallbackObjects.contains(baseDistRef) && !baseDistRef.getType().isArrayType()) {
-			providedFallbackObjects.add(baseDistRef);
-			RefTerm fallbackObject = new RefTerm(new FallbackIndexAccessAllocationSite(),
-					variableFactory.createObjectVariable());
-			writeArrayRaw(getVariable(indexAccessRef.getExpression().getReference()), fallbackObject);
+		SetVariable setVar = getVariable(baseDistRef);
+		Pair<DistinctReference, Class<? extends ISSTNode>> key = ImmutablePair.of(baseDistRef,
+				IIndexAccessReference.class);
+		if (!volatileEntities.containsKey(key)) {
+			SetVariable content = createTemporaryVariable();
+			volatileEntities.put(key, content);
+			writeArrayRaw(setVar, content);
+			readArrayRaw(content, setVar);
+		}
+	}
+
+	private void registerVolatileEntities(ILambdaExpression lambdaExpr) {
+		for (IParameterName parameter : lambdaExpr.getName().getParameters()) {
+			if (!parameter.isOutput()) {
+				DistinctReference distRef = new DistinctLambdaParameterReference(parameter, lambdaExpr);
+				Pair<DistinctReference, Class<? extends ISSTNode>> key = ImmutablePair.of(distRef,
+						ILambdaExpression.class);
+				if (!volatileEntities.containsKey(key)) {
+					volatileEntities.put(key, getVariable(distRef));
+				}
+			}
 		}
 	}
 
@@ -340,7 +359,7 @@ public class ConstraintGraphBuilder {
 
 	public void readArray(SetVariable destSetVar, IIndexAccessReference src) {
 		ensureArrayAccessHasVariable(src);
-		provideFallbackObjectForIndexAccess(src);
+		registerVolatileEntity(src);
 
 		SetVariable arraySetVar = getVariable(src.getExpression().getReference());
 		SetVariable temp = variableFactory.createProjectionVariable();
@@ -355,6 +374,17 @@ public class ConstraintGraphBuilder {
 		ConstraintNode tempNode = getNode(temp);
 		tempNode.addSuccessor(
 				new ConstraintEdge(getNode(destSetVar), IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY));
+	}
+
+	private void readArrayRaw(SetVariable dest, SetExpression arrayExpr) {
+		SetVariable temp = variableFactory.createProjectionVariable();
+
+		Projection projection = new Projection(RefTerm.class, RefTerm.READ_INDEX, temp);
+		// array ⊆ proj
+		constraintResolver.addConstraint(arrayExpr, projection, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
+
+		// temp ⊆ dest
+		constraintResolver.addConstraint(temp, dest, IndexAccessAnnotation.INSTANCE, ContextAnnotation.EMPTY);
 	}
 
 	public void writeMember(IMemberReference dest, IVariableReference src, IMemberName member) {
@@ -572,6 +602,8 @@ public class ConstraintGraphBuilder {
 		ILambdaName lambdaName = lambdaExpr.getName();
 		LambdaTerm term = storeFunction(dest, ConstructedTerm.BOTTOM, lambdaName.getParameters(),
 				lambdaName.getReturnType(), p -> new DistinctLambdaParameterReference(p, lambdaExpr));
+
+		registerVolatileEntities(lambdaExpr);
 
 		if (!lambdaName.getReturnType().isVoidType()) {
 			return term.getArgument(term.getNumberOfArguments() - 1);

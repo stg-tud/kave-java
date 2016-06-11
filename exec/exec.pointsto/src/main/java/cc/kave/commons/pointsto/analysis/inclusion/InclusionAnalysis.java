@@ -14,11 +14,8 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -26,11 +23,9 @@ import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.AbstractPointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
-import cc.kave.commons.pointsto.analysis.inclusion.allocations.FallbackIndexAccessAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintEdge;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintGraph;
-import cc.kave.commons.pointsto.analysis.references.DistinctIndexAccessReference;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.references.conversion.DistinctReferenceContextCollector;
 import cc.kave.commons.pointsto.analysis.references.conversion.DistinctReferenceContextCollectorVisitor;
@@ -66,13 +61,10 @@ public class InclusionAnalysis extends AbstractPointsToAnalysis {
 		context.getSST().accept(new DistinctReferenceContextCollectorVisitor(), contextCollector);
 		QueryKeyTransformer queryKeyTransformer = new QueryKeyTransformer(true);
 
-		Set<AbstractLocation> redundantFallbackObjects = new HashSet<>();
 		for (DistinctReference distRef : ls.keySet()) {
 			// System.out.println(distRef.toString() + ":");
 
 			Collection<ConstraintEdge> edges = ls.get(distRef);
-			Set<AbstractLocation> fallbackObjects = new HashSet<>(edges.size());
-			boolean hasAnyNonFallbackObjects = false;
 			for (ConstraintEdge edge : edges) {
 				ConstructedTerm cTerm = (ConstructedTerm) edge.getTarget().getSetExpression();
 				AbstractLocation location = locations.get(cTerm);
@@ -83,28 +75,12 @@ public class InclusionAnalysis extends AbstractPointsToAnalysis {
 				// System.out.println("\t\t" + edge.toString());
 				// System.out.println("\t\t" + location.toString());
 
-				if (distRef instanceof DistinctIndexAccessReference && cTerm instanceof RefTerm
-						&& ((RefTerm) cTerm).getAllocationSite() instanceof FallbackIndexAccessAllocationSite) {
-					fallbackObjects.add(location);
-				} else {
-					hasAnyNonFallbackObjects = true;
-				}
-
 				List<PointsToQuery> queries = distRef.accept(queryKeyTransformer, contextCollector);
 				for (PointsToQuery query : queries) {
 					contextToLocations.put(query, location);
 				}
 			}
-			// a fallback object is redundant if its spawning index access has other 'normal' objects
-			// in that case the fallback object is completely removed from the end result (including other points-to
-			// sets)
-			if (hasAnyNonFallbackObjects && !fallbackObjects.isEmpty()) {
-				redundantFallbackObjects.addAll(fallbackObjects);
-			}
 		}
-
-		// remove locations that have been marked as redundant
-		contextToLocations.values().removeAll(redundantFallbackObjects);
 
 		return new PointsToContext(context, this);
 	}

@@ -12,6 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.references;
 
+import com.google.common.base.MoreObjects;
+
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -77,6 +79,12 @@ public class DistinctIndexAccessReference implements DistinctReference {
 		} else if (!reference.equals(other.reference))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(DistinctIndexAccessReference.class).add("base", getBaseReference())
+				.toString();
 	}
 
 }

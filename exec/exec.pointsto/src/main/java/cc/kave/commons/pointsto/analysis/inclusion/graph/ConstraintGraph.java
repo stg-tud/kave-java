@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.names.IMemberName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.pointsto.analysis.inclusion.Allocator;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstraintResolver;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
@@ -38,6 +39,7 @@ import cc.kave.commons.pointsto.analysis.inclusion.LambdaTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.RefTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.SetExpression;
 import cc.kave.commons.pointsto.analysis.inclusion.SetVariable;
+import cc.kave.commons.pointsto.analysis.inclusion.allocations.UniqueAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InvocationAnnotation;
@@ -55,6 +57,7 @@ public class ConstraintGraph {
 	private final BiMap<DistinctReference, SetVariable> referenceVariables;
 	private final DeclarationLambdaStore declLambdaStore;
 	private final Map<SetExpression, ConstraintNode> constraintNodes;
+	private final Set<SetVariable> volatileEntities;
 
 	private final ConstraintResolver constraintResolver = new ConstraintResolver(this::getNode);
 	private final ContextFactory contextFactory;
@@ -62,11 +65,13 @@ public class ConstraintGraph {
 	private Multimap<SetVariable, ConstraintEdge> leastSolution = HashMultimap.create();
 
 	ConstraintGraph(Map<DistinctReference, SetVariable> referenceVariables, DeclarationLambdaStore declLambdaStore,
-			Map<SetExpression, ConstraintNode> constraintNodes, ContextFactory contextFactory) {
+			Map<SetExpression, ConstraintNode> constraintNodes, Set<SetVariable> volatileEntities,
+			ContextFactory contextFactory) {
 		this.referenceVariables = HashBiMap.create(referenceVariables);
 		this.declLambdaStore = new DeclarationLambdaStore(declLambdaStore, this::getVariable,
 				new Allocator(constraintResolver, declLambdaStore.getVariableFactory()));
 		this.constraintNodes = constraintNodes;
+		this.volatileEntities = volatileEntities;
 		this.contextFactory = contextFactory;
 	}
 
@@ -126,8 +131,23 @@ public class ConstraintGraph {
 	}
 
 	public void computeClosure() {
+		leastSolution.clear();
 		LinkedHashSet<ConstraintNode> worklist = new LinkedHashSet<>(constraintNodes.values());
 
+		do {
+			computeClosure(worklist);
+
+			for (SetVariable entity : volatileEntities) {
+				if (computeLeastSolution(entity, new HashSet<>()).isEmpty()) {
+					RefTerm obj = new RefTerm(new UniqueAllocationSite(TypeName.UNKNOWN_NAME), declLambdaStore.getVariableFactory().createObjectVariable());
+					worklist.addAll(constraintResolver.addConstraint(obj, entity, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+				}
+			}
+		} while (!worklist.isEmpty());
+
+	}
+
+	private void computeClosure(LinkedHashSet<ConstraintNode> worklist) {
 		while (!worklist.isEmpty()) {
 			ConstraintNode node = worklist.iterator().next();
 			worklist.remove(node);
