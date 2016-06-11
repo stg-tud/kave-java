@@ -184,8 +184,9 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 						throw e;
 					}
 				}
-				log("\t%s-%s: F1=%.3f, Fold size deviation=%.1f\n", trainingStore.getName(), validationStore.getName(),
-						score, setProvider.getAbsoluteFoldSizeDeviation());
+				log("\t%s-%s: %s=%.3f, Fold size deviation=%.1f\n", trainingStore.getName(), validationStore.getName(),
+						cvEvaluator.getMeasure().getClass().getSimpleName(), score,
+						setProvider.getAbsoluteFoldSizeDeviation());
 			}
 		}
 		results.put(type, localResults);

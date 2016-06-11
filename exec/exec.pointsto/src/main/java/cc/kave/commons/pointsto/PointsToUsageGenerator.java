@@ -19,12 +19,15 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
@@ -57,6 +60,14 @@ public class PointsToUsageGenerator {
 	private Map<PointsToAnalysisFactory, UsageStatisticsCollector> statisticsCollectors = new HashMap<>();
 
 	private final DescentStrategy descentStrategy;
+
+	private final Set<String> blacklist = Sets.newHashSet("Microsoft.SPOT.Platform.Tests.XmlBasicTests, SPOTXmlTests" // causes
+																														// OutOfMemory
+																														// in
+																														// the
+																														// inclusion
+																														// analysis
+	);
 
 	public PointsToUsageGenerator(List<PointsToAnalysisFactory> factories, Path srcDirectory, Path pointstoDestDir,
 			Function<PointsToAnalysisFactory, UsageStore> usageStoreFactory,
@@ -105,7 +116,8 @@ public class PointsToUsageGenerator {
 		initializeWriters(relativeInput, annotatedContextWriters);
 
 		try (StreamingZipReader reader = new StreamingZipReader(inputZipFile.toFile())) {
-			Stream<Context> contextStream = reader.stream(Context.class);
+			Stream<Context> contextStream = reader.stream(Context.class).filter(
+					ctxt -> !blacklist.contains(ctxt.getTypeShape().getTypeHierarchy().getElement().getIdentifier()));
 			contextStream.forEach(new ContextConsumer(relativeInput, annotatedContextWriters));
 		}
 

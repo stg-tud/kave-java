@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -38,11 +39,14 @@ import cc.kave.commons.pointsto.stores.ProjectIdentifier;
 import cc.kave.commons.pointsto.stores.ProjectUsageStore;
 import cc.recommenders.names.CoReNames;
 import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Usage;
 
 public class UsageEvaluation extends AbstractEvaluation {
 
 	private static final boolean HIDE_UNIQUE_TYPES = true;
+
+	private static final int MIN_USAGES = 100;
 
 	private final int numFolds;
 
@@ -53,6 +57,8 @@ public class UsageEvaluation extends AbstractEvaluation {
 
 	private long skippedNumProjects;
 	private long skippedUsageFilter;
+	private long skippedMinUsages;
+	private long skippedOneMethod;
 	private Map<ICoReTypeName, Double> results = new HashMap<>();
 
 	@Inject
@@ -68,6 +74,7 @@ public class UsageEvaluation extends AbstractEvaluation {
 	private void reset() {
 		skippedNumProjects = 0;
 		skippedUsageFilter = 0;
+		skippedMinUsages = 0;
 		results.clear();
 	}
 
@@ -93,10 +100,13 @@ public class UsageEvaluation extends AbstractEvaluation {
 			}
 
 			long totalTypesSkipped = skippedNumProjects + skippedUsageFilter;
+			long totalTypesSkipped = skippedNumProjects + skippedUsageFilter + skippedMinUsages + skippedOneMethod;
 			log("Skipped %d/%d (%.2f%%) types\n", totalTypesSkipped, types.size(),
 					((double) totalTypesSkipped) / types.size() * 100);
 			log("\t%d types due to an insufficient number of projects\n", skippedNumProjects);
 			log("\t%d types due to an insufficient number of projects after filtering\n", skippedUsageFilter);
+			log("\t%d types due to an insufficient number of usages\n", skippedMinUsages);
+			log("\t%d types due to an insufficient number of distinct callsites\n", skippedOneMethod);
 		}
 
 	}
@@ -134,6 +144,17 @@ public class UsageEvaluation extends AbstractEvaluation {
 		log("\tPruned %d usages\n", numPrunedUsages);
 		int numUsages = projectUsages.values().stream().mapToInt(Collection::size).sum();
 		log("\t%d usages in total\n", numUsages);
+		if (numUsages < MIN_USAGES) {
+			++skippedMinUsages;
+			log("\tSkipping because %d < %d\n", numUsages, MIN_USAGES);
+			return;
+		}
+		
+		if (projectUsages.values().stream().flatMap(List::stream).flatMap(u -> u.getReceiverCallsites().stream()).map(CallSite::getMethod).collect(Collectors.toSet()).size() <= 1) {
+			++skippedOneMethod;
+			log("\tSkipping because type has no more than one distinct receiver callsite\n");
+			return;
+		}
 
 		List<List<Usage>> folds = foldBuilder.createFolds(projectUsages);
 		SetProvider setProvider = new UsageSetProvider(folds);
