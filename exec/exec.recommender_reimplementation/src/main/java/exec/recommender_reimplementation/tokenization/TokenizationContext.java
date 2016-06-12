@@ -1,5 +1,21 @@
+/**
+ * Copyright 2016 Technische Universität Darmstadt
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package exec.recommender_reimplementation.tokenization;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,12 +26,18 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 
 public class TokenizationContext {
 
-	List<String> tokenStream;
+	private List<String> tokenStream;
 	
 	boolean useFullyQualifiedTypes;
 	
 	ITypeShape typeShape;
 	
+	public TokenizationContext(ITypeShape typeShape, boolean useFullyQualifiedTypes) {
+		this.useFullyQualifiedTypes = useFullyQualifiedTypes;
+		this.typeShape = typeShape;
+		tokenStream = new ArrayList<String>();
+	}
+		
 	public TokenizationContext pushToken(String token) {
 		tokenStream.add(token);
 		return this;
@@ -61,34 +83,7 @@ public class TokenizationContext {
 		 for (Iterator<IParameterName> iterator = parameters.iterator(); iterator.hasNext();) {
 			IParameterName parameter = (IParameterName) iterator.next();
 			
-            if (parameter.isPassedByReference() && parameter.getValueType().isValueType())
-            {
-                pushToken("ref");
-            }
-
-            if (parameter.isOutput())
-            {
-                pushToken("out");
-            }
-
-            if (parameter.isOptional())
-            {
-                pushToken("opt");
-            }
-
-            if (parameter.isParameterArray())
-            {
-                pushToken("params");
-            }
-
-            if (parameter.isExtensionMethodParameter())
-            {
-                pushToken("this");
-            }
-
-            pushType(parameter.getValueType());
-            
-            pushToken(parameter.getName());
+            pushParameter(parameter);
             
             if(iterator.hasNext()) {
             	pushToken(",");
@@ -96,6 +91,39 @@ public class TokenizationContext {
 		}
 		 
 		pushClosingBracket(); 
+		
+		return this;
+	}
+
+	public TokenizationContext pushParameter(IParameterName parameter) {
+		if (parameter.isPassedByReference() && parameter.getValueType().isValueType())
+		{
+		    pushToken("ref");
+		}
+
+		if (parameter.isOutput())
+		{
+		    pushToken("out");
+		}
+
+		if (parameter.isOptional())
+		{
+		    pushToken("opt");
+		}
+
+		if (parameter.isParameterArray())
+		{
+		    pushToken("params");
+		}
+
+		if (parameter.isExtensionMethodParameter())
+		{
+		    pushToken("this");
+		}
+
+		pushType(parameter.getValueType());
+		
+		pushToken(parameter.getName());
 		
 		return this;
 	}
@@ -131,4 +159,9 @@ public class TokenizationContext {
 	public TokenizationContext pushUnknown() {
 		return pushToken("???");
 	}
+
+	List<String> getTokenStream() {
+		return tokenStream;
+	}
+
 }
