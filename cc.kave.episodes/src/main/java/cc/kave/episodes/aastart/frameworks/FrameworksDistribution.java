@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.aastart.frameworks;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -21,72 +21,44 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.csharp.AssemblyVersion;
 import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.io.Directory;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
 
-public class FrameworksData {
+public class FrameworksDistribution {
 
 	private Directory rootDir;
 	private File rootFolder;
-	private StreamStatistics statistics;
 
 	@Inject
-	public FrameworksData(@Named("contexts") Directory directory, @Named("rootDir") File folder,
-			StreamStatistics stat) {
-		assertTrue(folder.exists(), "Data folder does not exist");
-		assertTrue(folder.isDirectory(), "Data folder is not a folder, but a file");
+	public FrameworksDistribution(@Named("contexts") Directory directory, @Named("statistics") File folder) {
+		assertTrue(folder.exists(), "Statistics folder does not exist");
+		assertTrue(folder.isDirectory(), "Statistics folder is not a folder, but a file");
 		this.rootDir = directory;
 		this.rootFolder = folder;
-		this.statistics = stat;
 	}
 
-	public void getFrameworksDistribution() throws IOException {
+	private ReductionByRepos repos = new ReductionByRepos();
+	private StreamStatistics statistics = new StreamStatistics();
 
-		List<Event> allEvents = getAllEvents();
-		Map<Event, Integer> frequencies = statistics.getFrequences(allEvents);
-		
-//		for (Map.Entry<Event, Integer> entry : frequencies.entrySet()) {
-//			Logger.log("Type: %s", entry.getKey().getMethod().getDeclaringType().getFullName());
-//		}
+	private static final int NUMOFREPOS = 100;
 
-		Frameworks distribution = getEventsAndTypes(frequencies);
+	public void getDistribution() throws IOException {
+
+		List<Event> allEvents = repos.select(rootDir, NUMOFREPOS);
+		Map<Event, Integer> eventsFreqs = statistics.getFrequences(allEvents);
+		Frameworks distribution = getEventsAndTypes(eventsFreqs);
 		storeFrameworks(distribution);
-	}
-
-	private List<Event> getAllEvents() throws IOException {
-		EventStreamGenerator generator = new EventStreamGenerator();
-
-		for (String zip : findZips()) {
-			Logger.log("Reading zip file %s", zip.toString());
-			ReadingArchive ra = rootDir.getReadingArchive(zip);
-
-			while (ra.hasNext()) {
-				Context ctx = ra.getNext(Context.class);
-				if (ctx == null) {
-					continue;
-				}
-				generator.add(ctx);
-			}
-			ra.close();
-		}
-		List<Event> allEvents = generator.getEventStream();
-		return allEvents;
 	}
 
 	private Frameworks getEventsAndTypes(Map<Event, Integer> frequencies) throws IOException {
@@ -96,20 +68,16 @@ public class FrameworksData {
 			if (entry.getValue() == 1) {
 				continue;
 			}
-			// number of events per framework
-			// + number of types for each framework
 			IAssemblyName asm = entry.getKey().getMethod().getDeclaringType().getAssembly();
 			String frameworkName = asm.getIdentifier();
 			String typeName = entry.getKey().getMethod().getDeclaringType().getFullName();
-			if(AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
+			if (AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
 				continue;
 			}
+			// String methodName = entry.getKey().getMethod().getName();
+
 			if (frameworks.events.containsKey(frameworkName)) {
-				Map<Event, Integer> frameworkEvents = frameworks.events.get(frameworkName);
-				if (!frameworkEvents.containsKey(entry.getKey())) {
-					frameworkEvents.put(entry.getKey(), entry.getValue());
-				}
-				frameworks.events.put(frameworkName, frameworkEvents);
+				frameworks.events.get(frameworkName).put(entry.getKey(), entry.getValue());
 
 				if (!frameworks.types.get(frameworkName).contains(typeName)) {
 					frameworks.types.get(frameworkName).add(typeName);
@@ -135,7 +103,9 @@ public class FrameworksData {
 		StringBuilder typesBuilder = new StringBuilder();
 
 		for (Map.Entry<String, Map<Event, Integer>> framework : distribution.events.entrySet()) {
-			eventsBuilder.append(framework.getKey() + "\t" + framework.getValue().size() + "\t");
+			
+			String frameworkName = framework.getKey();
+			eventsBuilder.append(frameworkName + "\t" + framework.getValue().size() + "\t");
 
 			int freqTotal = 0;
 			for (Map.Entry<Event, Integer> events : framework.getValue().entrySet()) {
@@ -144,30 +114,26 @@ public class FrameworksData {
 			eventsBuilder.append(freqTotal);
 			eventsBuilder.append("\n");
 
-			typesBuilder.append(framework.getKey() + "\t" + framework.getValue().size() + "\n");
+			typesBuilder.append(frameworkName + "\t" + distribution.types.get(frameworkName).size() + "\n");
 		}
-		FileUtils.writeStringToFile(new File(getEventsPath()), eventsBuilder.toString());
-		FileUtils.writeStringToFile(new File(getTypesPath()), typesBuilder.toString());
+		FileUtils.writeStringToFile(new File(getPath().eventsPath), eventsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getPath().typesPath), typesBuilder.toString());
 	}
 
-	private String getEventsPath() {
-		String fileName = rootFolder.getAbsolutePath() + "/eventsPerFramework.txt";
-		return fileName;
+	private FilePaths getPath() {
+		File pathName = new File(rootFolder.getAbsolutePath() + "/100Repos");
+		if (!pathName.isDirectory()) {
+			pathName.mkdir();
+		}
+		FilePaths paths = new FilePaths();
+		paths.eventsPath = pathName.getAbsolutePath() + "/eventsPerFramework.txt";
+		paths.typesPath = pathName.getAbsolutePath() + "/typesPerFramework.txt";
+		
+		return paths;
 	}
-
-	private String getTypesPath() {
-		String fileName = rootFolder.getAbsolutePath() + "/typesPerFramework.txt";
-		return fileName;
-	}
-
-	private Set<String> findZips() {
-		Set<String> zips = rootDir.findFiles(new Predicate<String>() {
-
-			@Override
-			public boolean apply(String arg0) {
-				return arg0.endsWith(".zip");
-			}
-		});
-		return zips;
+	
+	private class FilePaths {
+		private String eventsPath = "";
+		private String typesPath = "";
 	}
 }
