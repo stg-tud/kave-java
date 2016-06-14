@@ -77,10 +77,17 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
 public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, Object> {
 
+	private ITypeShape typeShape;
+	
+	public TokenizationVisitor(ITypeShape typeShape) {
+		this.typeShape = typeShape;
+	}
+	
 	@Override
 	public Object visit(ISST sst, TokenizationContext c) {
 		if(sst.isPartialClass()) {
@@ -105,10 +112,10 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushType(enclosingType);
 		
 		// handle class extensions
-		if(c.typeShape != null && c.typeShape.getTypeHierarchy().hasSupertypes()) {
+		if(typeShape != null && typeShape.getTypeHierarchy().hasSupertypes()) {
 			c.pushToken(":");
 			
-			ITypeHierarchy typeHierarchy = c.typeShape.getTypeHierarchy();
+			ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 			
 			if(typeHierarchy.hasSuperclass() && typeHierarchy.getExtends() != null) {
 				c.pushType(typeHierarchy.getExtends().getElement());

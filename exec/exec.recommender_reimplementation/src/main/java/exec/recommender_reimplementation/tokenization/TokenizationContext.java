@@ -22,7 +22,6 @@ import java.util.List;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.typeshapes.ITypeShape;
 
 public class TokenizationContext {
 
@@ -30,11 +29,8 @@ public class TokenizationContext {
 	
 	boolean useFullyQualifiedTypes;
 	
-	ITypeShape typeShape;
-	
-	public TokenizationContext(ITypeShape typeShape, boolean useFullyQualifiedTypes) {
+	public TokenizationContext(boolean useFullyQualifiedTypes) {
 		this.useFullyQualifiedTypes = useFullyQualifiedTypes;
-		this.typeShape = typeShape;
 		tokenStream = new ArrayList<String>();
 	}
 		
@@ -59,6 +55,8 @@ public class TokenizationContext {
 	}
 
 	public TokenizationContext pushTypeParameters(List<ITypeName> typeParameters) {
+		pushLeftAngleBracket();
+		
 		for (Iterator<ITypeName> iterator = typeParameters.iterator(); iterator.hasNext();) {
 			ITypeName typeParameter= (ITypeName) iterator.next();
 			
@@ -73,6 +71,8 @@ public class TokenizationContext {
 				pushToken(",");
 			}
 		}
+		
+		pushRightAngleBracket();
 		
 		return this;
 	}
