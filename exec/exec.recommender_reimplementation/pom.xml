@@ -26,5 +26,20 @@
 			<artifactId>exec.pointsto</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>6.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+			<version>6.0.1</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.apache.lucene</groupId>
+    		<artifactId>lucene-misc</artifactId>
+    		<version>6.0.1</version>
+		</dependency>
 	</dependencies>
 </project>
