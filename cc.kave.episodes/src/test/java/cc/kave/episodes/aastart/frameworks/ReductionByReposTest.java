@@ -64,8 +64,8 @@ import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByReposTest {
 
-	@Rule
-	public TemporaryFolder rootFolder = new TemporaryFolder();
+//	@Rule
+//	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
@@ -97,7 +97,7 @@ public class ReductionByReposTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ReductionByRepos(rootDirectory);
+		sut = new ReductionByRepos();
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
@@ -164,7 +164,7 @@ public class ReductionByReposTest {
 
 	@Test
 	public void contextTest() throws ZipException, IOException {
-		sut.select(NUMBEROFREPOS);
+		sut.select(rootDirectory, NUMBEROFREPOS);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
@@ -200,7 +200,7 @@ public class ReductionByReposTest {
 
 		data.put(REPO2, context);
 
-		List<Event> actualEvents = sut.select(NUMBEROFREPOS);
+		List<Event> actualEvents = sut.select(rootDirectory, NUMBEROFREPOS);
 		List<Event> exoectedEvents = getExpectedEvents();
 		
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));

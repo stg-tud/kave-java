@@ -51,8 +51,8 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "configurations/");
 //		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File eventStreamData = new File(rootFolder + "EpisodeMining/dataSet/SST/");
-		Directory eventStreamDir = new Directory(eventStreamData.getAbsolutePath());
+		File eventsData = new File(rootFolder + "EpisodeMining/dataSet/events/");
+		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File episodeRootFile = new File(rootFolder + "dataSet/");
@@ -65,14 +65,14 @@ public class Module extends AbstractModule {
 		Map<String, Directory> dirs = Maps.newHashMap();
 //		dirs.put("episode", episodeDir);
 		dirs.put("statistics", statDir);
-		dirs.put("events", eventStreamDir);
+		dirs.put("events", eventsDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("rootDir", episodeRootDir);
 		dirs.put("evaluation", evaluationDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
-		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventStreamData);
+		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventsData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
 		bind(File.class).annotatedWith(Names.named("rootDir")).toInstance(episodeRootFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
@@ -83,7 +83,7 @@ public class Module extends AbstractModule {
 		FileReader reader = new FileReader();
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
 
-		File eventStreamRoot = eventStreamData;
+		File eventStreamRoot = eventsData;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
 
 		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);

@@ -35,7 +35,7 @@ public class EpisodeParser {
 	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(@Named("episode") File directory, FileReader reader) {
+	public EpisodeParser(@Named("rootDir") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Frequent episode folder does not exist");
 		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
 		this.rootFolder = directory;

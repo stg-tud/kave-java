@@ -36,8 +36,6 @@ import java.util.Set;
 import java.util.zip.ZipException;
 
 import com.google.common.base.Predicate;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -48,19 +46,19 @@ import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByRepos {
 
-	private Directory contextsDir;
+//	private Directory contextsDir;
+//
+//	@Inject
+//	public ReductionByRepos(@Named("contexts") Directory directory) {
+//		this.contextsDir = directory;
+//	}
 
-	@Inject
-	public ReductionByRepos(@Named("contexts") Directory directory) {
-		this.contextsDir = directory;
-	}
-
-	public List<Event> select(int numberOfRepos) throws ZipException, IOException {
+	public List<Event> select(Directory contextsDir, int numberOfRepos) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 		String repoName = "";
 		int repoID = 0;
 
-		for (String zip : findZips()) {
+		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if (repoName.equalsIgnoreCase("")) {
 				repoName = getRepoName(zip);
@@ -95,7 +93,7 @@ public class ReductionByRepos {
 		return startPrefix;
 	}
 
-	private Set<String> findZips() {
+	private Set<String> findZips(Directory contextsDir) {
 		Set<String> zips = contextsDir.findFiles(new Predicate<String>() {
 
 			@Override

@@ -34,7 +34,7 @@ public class EventMappingParser {
 	private File rootFolder;
 
 	@Inject
-	public EventMappingParser(@Named("events") File directory) {
+	public EventMappingParser(@Named("rootDir") File directory) {
 		assertTrue(directory.exists(), "Event mapping folder does not exist");
 		assertTrue(directory.isDirectory(), "Event mapping folder is not a folder, but a file");
 		this.rootFolder = directory;
