@@ -33,10 +33,7 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -63,11 +60,6 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByReposTest {
-
-//	@Rule
-//	public TemporaryFolder rootFolder = new TemporaryFolder();
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
 	private Directory rootDirectory;

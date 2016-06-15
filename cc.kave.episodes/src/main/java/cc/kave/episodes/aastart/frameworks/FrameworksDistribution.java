@@ -39,17 +39,19 @@ public class FrameworksDistribution {
 
 	private Directory rootDir;
 	private File rootFolder;
+	private ReductionByRepos repos;
+	private StreamStatistics statistics;
 
 	@Inject
-	public FrameworksDistribution(@Named("contexts") Directory directory, @Named("statistics") File folder) {
+	public FrameworksDistribution(@Named("contexts") Directory directory, @Named("statistics") File folder,
+			ReductionByRepos repos, StreamStatistics statistics) {
 		assertTrue(folder.exists(), "Statistics folder does not exist");
-		assertTrue(folder.isDirectory(), "Statistics folder is not a folder, but a file");
+		assertTrue(folder.isDirectory(), "Statistics is not a folder, but a file");
 		this.rootDir = directory;
 		this.rootFolder = folder;
+		this.repos = repos;
+		this.statistics = statistics;
 	}
-
-	private ReductionByRepos repos = new ReductionByRepos();
-	private StreamStatistics statistics = new StreamStatistics();
 
 	private static final int NUMOFREPOS = 100;
 
@@ -58,7 +60,7 @@ public class FrameworksDistribution {
 		List<Event> allEvents = repos.select(rootDir, NUMOFREPOS);
 		Map<Event, Integer> eventsFreqs = statistics.getFrequences(allEvents);
 		Frameworks distribution = getEventsAndTypes(eventsFreqs);
-		storeFrameworks(distribution);
+		storeFrameworks(distribution, NUMOFREPOS);
 	}
 
 	private Frameworks getEventsAndTypes(Map<Event, Integer> frequencies) throws IOException {
@@ -98,12 +100,12 @@ public class FrameworksDistribution {
 		private Map<String, List<String>> types = Maps.newHashMap();
 	}
 
-	private void storeFrameworks(Frameworks distribution) throws IOException {
+	private void storeFrameworks(Frameworks distribution, int numOfRepos) throws IOException {
 		StringBuilder eventsBuilder = new StringBuilder();
 		StringBuilder typesBuilder = new StringBuilder();
 
 		for (Map.Entry<String, Map<Event, Integer>> framework : distribution.events.entrySet()) {
-			
+
 			String frameworkName = framework.getKey();
 			eventsBuilder.append(frameworkName + "\t" + framework.getValue().size() + "\t");
 
@@ -116,22 +118,23 @@ public class FrameworksDistribution {
 
 			typesBuilder.append(frameworkName + "\t" + distribution.types.get(frameworkName).size() + "\n");
 		}
-		FileUtils.writeStringToFile(new File(getPath().eventsPath), eventsBuilder.toString());
-		FileUtils.writeStringToFile(new File(getPath().typesPath), typesBuilder.toString());
+		FilePaths paths = getPath(numOfRepos);
+		FileUtils.writeStringToFile(new File(paths.eventsPath), eventsBuilder.toString());
+		FileUtils.writeStringToFile(new File(paths.typesPath), typesBuilder.toString());
 	}
 
-	private FilePaths getPath() {
+	private FilePaths getPath(int numOfRepos) {
 		File pathName = new File(rootFolder.getAbsolutePath() + "/100Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();
 		}
 		FilePaths paths = new FilePaths();
-		paths.eventsPath = pathName.getAbsolutePath() + "/eventsPerFramework.txt";
-		paths.typesPath = pathName.getAbsolutePath() + "/typesPerFramework.txt";
-		
+		paths.eventsPath = pathName.getAbsolutePath() + "/eventsPerFramework" + numOfRepos + ".txt";
+		paths.typesPath = pathName.getAbsolutePath() + "/typesPerFramework" + numOfRepos + ".txt";
+
 		return paths;
 	}
-	
+
 	private class FilePaths {
 		private String eventsPath = "";
 		private String typesPath = "";

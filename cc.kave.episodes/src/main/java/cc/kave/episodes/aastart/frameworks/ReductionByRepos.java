@@ -46,13 +46,6 @@ import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByRepos {
 
-//	private Directory contextsDir;
-//
-//	@Inject
-//	public ReductionByRepos(@Named("contexts") Directory directory) {
-//		this.contextsDir = directory;
-//	}
-
 	public List<Event> select(Directory contextsDir, int numberOfRepos) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 		String repoName = "";
