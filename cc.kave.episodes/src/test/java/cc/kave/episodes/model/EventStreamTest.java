@@ -77,7 +77,7 @@ public class EventStreamTest {
 		sut.addEvent(ctx(1));
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
@@ -107,7 +107,7 @@ public class EventStreamTest {
 		sut.addEvent(ctx(1));
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
@@ -134,16 +134,16 @@ public class EventStreamTest {
 	@Test
 	public void addUnkownEvent() {
 		sut.addEvent(ctx(0));
-		sut.addEvent(Events.newUnknownEvent());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
 		expectedMap.put(ctx(0), 1);
-		expectedMap.put(Events.newUnknownEvent(), 2);
+		expectedMap.put(unknown(), 2);
 		expectedMap.put(inv(2), 3);
 		expectedMap.put(inv(3), 4);
 		
@@ -192,10 +192,10 @@ public class EventStreamTest {
 	@Test
 	public void addHolderAsStartEvent() {
 		sut.addEvent(ctx(0));
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(1));
 		sut.addEvent(inv(2));
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(1));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
@@ -220,8 +220,8 @@ public class EventStreamTest {
 	@Test
 	public void twoHolders() {
 		sut.addEvent(ctx(0));
-		sut.addEvent(hld());
-		sut.addEvent(hld());
+		sut.addEvent(unknown());
+		sut.addEvent(unknown());
 		sut.addEvent(inv(1));
 		sut.addEvent(inv(2));
 		sut.addEvent(ctx(1));
@@ -335,8 +335,8 @@ public class EventStreamTest {
 		return Events.newContext(m(i));
 	}
 	
-	private static Event hld() {
-		return Events.newHolder();
+	private static Event unknown() {
+		return Events.newUnknownEvent();
 	}
 	
 	private static IMethodName m(int i) {

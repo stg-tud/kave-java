@@ -69,21 +69,20 @@ public class EventStream {
 			}
 			this.time += TIMEOUT;
 		}
-		if (event.equals(Events.newHolder())) {
+		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod
+				&& !event.equals(Events.newDummyEvent())) {
 			this.time += TIMEOUT;
-		} else {
+		}
+		this.isFirstMethod = false;
+
+		if (event.getKind() == EventKind.INVOCATION) {
 			if (idx == null) {
 				idx = getEventNumber();
 				this.mappingData.put(event, idx);
 			}
 		}
-		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod
-				&& !event.equals(Events.newUnknownEvent())) {
-			this.time += TIMEOUT;
-		}
-		this.isFirstMethod = false;
 
-		if ((idx != null) && (idx > 0) && (!event.equals(Events.newUnknownEvent()))) {
+		if ((idx != null) && (!event.equals(Events.newUnknownEvent())) && !(event.equals(Events.newDummyEvent()))) {
 			this.sb.append(idx);
 			this.sb.append(',');
 			this.sb.append(String.format("%.3f", this.time));

@@ -53,7 +53,7 @@ public class FrameworksDistribution {
 		this.statistics = statistics;
 	}
 
-	private static final int NUMOFREPOS = 100;
+	private static final int NUMOFREPOS = 10;
 
 	public void getDistribution() throws IOException {
 
@@ -124,7 +124,7 @@ public class FrameworksDistribution {
 	}
 
 	private FilePaths getPath(int numOfRepos) {
-		File pathName = new File(rootFolder.getAbsolutePath() + "/100Repos");
+		File pathName = new File(rootFolder.getAbsolutePath() + "/" + numOfRepos + "Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();
 		}

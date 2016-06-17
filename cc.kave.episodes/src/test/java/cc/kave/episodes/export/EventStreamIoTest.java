@@ -55,10 +55,10 @@ public class EventStreamIoTest {
 		expected.addEvent(DUMMY_EVENT);
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(2));
-		expected.addEvent(hld());
+		expected.addEvent(unknown());
 		expected.addEvent(inv(5));
-		expected.addEvent(hld());
-		expected.addEvent(hld());
+		expected.addEvent(unknown());
+		expected.addEvent(unknown());
 		expected.addEvent(inv(2));
 		expected.addEvent(ctx(1));
 		expected.addEvent(inv(5));
@@ -101,8 +101,8 @@ public class EventStreamIoTest {
 		return Events.newContext(m(i));
 	}
 
-	private static Event hld() {
-		return Events.newHolder();
+	private static Event unknown() {
+		return Events.newUnknownEvent();
 	}
 
 	private static IMethodName m(int i) {

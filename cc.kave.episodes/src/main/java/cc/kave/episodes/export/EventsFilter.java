@@ -30,7 +30,7 @@ public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
 	private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
-	private static final int FREQUENCY = 2;
+	private static final int FREQUENCY = 1;
 	
 	private static final double DELTA = 0.001;
 	private static final double TIMEOUT = 0.5;
@@ -45,7 +45,11 @@ public class EventsFilter {
 		
 		for (Event e : stream) {
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
-				sm.addEvent(Events.newHolder());
+				if (occurrences.get(e) == FREQUENCY) {
+					sm.addEvent(Events.newUnknownEvent());
+				} else {
+					sm.addEvent(e);
+				}
 				continue;
 			}
 			if (occurrences.get(e) > FREQUENCY) {

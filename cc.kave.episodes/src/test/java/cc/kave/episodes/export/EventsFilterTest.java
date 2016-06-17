@@ -52,7 +52,7 @@ public class EventsFilterTest {
 		expectedStream.addEvent(ctx(1));		//1
 		expectedStream.addEvent(inv(2));		//2
 		expectedStream.addEvent(inv(3));		//3
-		expectedStream.addEvent(hld());
+		expectedStream.addEvent(unknown());
 		expectedStream.addEvent(inv(2));
 		expectedStream.addEvent(ctx(1));
 		expectedStream.addEvent(inv(3));
@@ -86,8 +86,8 @@ public class EventsFilterTest {
 		return Events.newContext(m(i));
 	}
 
-	private static Event hld() {
-		return Events.newHolder();
+	private static Event unknown() {
+		return Events.newUnknownEvent();
 	}
 
 	private static IMethodName m(int i) {

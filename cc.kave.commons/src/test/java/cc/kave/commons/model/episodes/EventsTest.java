@@ -47,14 +47,6 @@ public class EventsTest {
 	}
 	
 	@Test
-	public void holder() {
-		Event actual = Events.newHolder();
-		
-		assertEquals(EventKind.CONTEXT_HOLDER, actual.getKind());
-		assertNull(actual.getType());
-	}
-	
-	@Test
 	public void dummy() {
 		Event actual = Events.newDummyEvent();
 		
