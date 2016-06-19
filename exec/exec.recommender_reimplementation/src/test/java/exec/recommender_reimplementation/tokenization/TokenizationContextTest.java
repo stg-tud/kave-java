@@ -33,7 +33,7 @@ public class TokenizationContextTest {
 	
 	@Before
 	public void setup() {
-		uut = new TokenizationContext(false);
+		uut = new TokenizationContext(new TokenizationSettings(true));
 	}
 	
 	@Test
@@ -41,6 +41,20 @@ public class TokenizationContextTest {
 		uut.pushToken("someToken");
 		
 		assertListContainsToken("someToken");
+	}
+	
+	@Test
+	public void pushesKeyword() {
+		uut.pushKeyword("if");
+		
+		assertListContainsToken("if");
+	}
+	
+	@Test
+	public void pushesOperator() {
+		uut.pushOperator("=");
+		
+		assertListContainsToken("=");
 	}
 	
 	@Test
@@ -103,7 +117,6 @@ public class TokenizationContextTest {
 		assertListContainsTokens("opt", "String", "someString");
 	}
 	
-		
 	@Test
 	public void pushesParameterList() {
 		IParameterName someStringParameter = ParameterName.newParameterName("[System.String, mscore, 4.0.0.0] someString");

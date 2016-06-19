@@ -27,10 +27,10 @@ public class TokenizationContext {
 
 	private List<String> tokenStream;
 	
-	boolean useFullyQualifiedTypes;
+	TokenizationSettings tokenizationSettings;
 	
-	public TokenizationContext(boolean useFullyQualifiedTypes) {
-		this.useFullyQualifiedTypes = useFullyQualifiedTypes;
+	public TokenizationContext(TokenizationSettings tokenizationSettings) {
+		this.tokenizationSettings = tokenizationSettings;
 		tokenStream = new ArrayList<String>();
 	}
 		
@@ -40,7 +40,7 @@ public class TokenizationContext {
 	}
 
 	public TokenizationContext pushType(ITypeName type) {
-		if(useFullyQualifiedTypes) {
+		if(tokenizationSettings.isUseFullyQualifiedTypes()) {
 			pushToken(type.getFullName());
 		}
 		else {
@@ -68,7 +68,7 @@ public class TokenizationContext {
 			}
 			
 			if(iterator.hasNext()) {
-				pushToken(",");
+				pushComma();
 			}
 		}
 		
@@ -86,7 +86,7 @@ public class TokenizationContext {
             pushParameter(parameter);
             
             if(iterator.hasNext()) {
-            	pushToken(",");
+            	pushComma();
             }
 		}
 		 
@@ -129,31 +129,73 @@ public class TokenizationContext {
 	}
 	
 	public TokenizationContext pushLeftAngleBracket() {
-		return pushToken("<");
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("<");
+		return this;
 	}
 	
 	public TokenizationContext pushRightAngleBracket() {
-		return pushToken(">");
+		if(tokenizationSettings.isActiveBrackets()) return pushToken(">");		
+		return this;
 	}
 	
 	public TokenizationContext pushOpeningBracket() {
-		return pushToken("(");
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("(");		
+		return this;
 	}
 	
 	public TokenizationContext pushClosingBracket() {
-		return pushToken(")");
+		if(tokenizationSettings.isActiveBrackets()) return pushToken(")");		
+		return this;
 	}
 	
 	public TokenizationContext pushOpeningCurlyBracket() {
-		return pushToken("{");
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("{");		
+		return this;
+	}
+	
+	public TokenizationContext pushClosingCurlyBracket() {
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("}");		
+		return this;
 	}
 
-	public TokenizationContext pushClosingCurlyBracket() {
-		return pushToken("}");
+	public TokenizationContext pushOpeningSquareBracket() {
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("[");		
+		return this;
+	}
+	
+	public TokenizationContext pushClosingSquareBracket() {
+		if(tokenizationSettings.isActiveBrackets()) return pushToken("]");		
+		return this;
 	}
 	
 	public TokenizationContext pushSemicolon() {
-		return pushToken(";");
+		if(tokenizationSettings.isActivePuncutuation()) return pushToken(";");		
+		return this;
+	}
+	
+	public TokenizationContext pushColon() {
+		if(tokenizationSettings.isActivePuncutuation()) return pushToken(":");
+		return this;
+	}
+	
+	public TokenizationContext pushComma() {
+		if(tokenizationSettings.isActivePuncutuation()) return pushToken(",");
+		return this;
+	}
+
+	public TokenizationContext pushPeriod() {
+		if(tokenizationSettings.isActivePuncutuation()) return pushToken(".");
+		return this;
+	}
+	
+	public TokenizationContext pushOperator(String operator) {
+		if(tokenizationSettings.isActiveOperators()) return pushToken(operator);
+		return this;
+	}
+	
+	public TokenizationContext pushKeyword(String keyword) {
+		if(tokenizationSettings.isActiveKeywords()) return pushToken(keyword);
+		return this;
 	}
 	
 	public TokenizationContext pushUnknown() {

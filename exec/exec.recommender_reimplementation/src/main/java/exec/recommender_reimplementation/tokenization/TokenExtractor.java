@@ -22,7 +22,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 public class TokenExtractor {
 
 	public static List<String> extractTokenStream(Context context) {
-		TokenizationContext tokenizationContext = new TokenizationContext(false);
+		TokenizationContext tokenizationContext = new TokenizationContext(new TokenizationSettings(true));
 		
 		context.getSST().accept(new TokenizationVisitor(context.getTypeShape()), tokenizationContext);
 		

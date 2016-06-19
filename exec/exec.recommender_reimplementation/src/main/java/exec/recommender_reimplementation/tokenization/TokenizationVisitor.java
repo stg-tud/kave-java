@@ -91,29 +91,29 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(ISST sst, TokenizationContext c) {
 		if(sst.isPartialClass()) {
-			c.pushToken("partial");
+			c.pushKeyword("partial");
 		}
 		
 		// class classifier
 		ITypeName enclosingType = sst.getEnclosingType();
 		if(enclosingType.isInterfaceType()) {
-			c.pushToken("interface");
+			c.pushKeyword("interface");
 		}
 		else if(enclosingType.isEnumType()) {
-			c.pushToken("enum");
+			c.pushKeyword("enum");
 		}
 		else if(enclosingType.isStructType()) {
-			c.pushToken("struct");
+			c.pushKeyword("struct");
 		}
 		else {
-			c.pushToken("class");
+			c.pushKeyword("class");
 		}
 		
 		c.pushType(enclosingType);
 		
 		// handle class extensions
 		if(typeShape != null && typeShape.getTypeHierarchy().hasSupertypes()) {
-			c.pushToken(":");
+			c.pushColon();
 			
 			ITypeHierarchy typeHierarchy = typeShape.getTypeHierarchy();
 			
@@ -121,7 +121,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 				c.pushType(typeHierarchy.getExtends().getElement());
 				
 				if(typeHierarchy.isImplementingInterfaces()) {
-					c.pushToken(",");
+					c.pushComma();
 				}
 			}
 			
@@ -131,7 +131,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 				c.pushType(interfaceTypeHierarchy.getElement());
 				
 				if(iterator.hasNext()) {
-					c.pushToken(",");
+					c.pushComma();
 				}
 							
 			}
@@ -151,7 +151,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IDelegateDeclaration decl, TokenizationContext c) {
-		c.pushToken("delegate")
+		c.pushKeyword("delegate")
 		.pushType(decl.getName())
 		.pushParameters(decl.getName().getParameters())
 		.pushSemicolon();
@@ -161,7 +161,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IEventDeclaration decl, TokenizationContext c) {
-		c.pushToken("event")
+		c.pushKeyword("event")
 		.pushType(decl.getName().getHandlerType())
 		.pushToken(decl.getName().getName())
 		.pushSemicolon();
@@ -171,7 +171,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IFieldDeclaration decl, TokenizationContext c) {
 		if(decl.getName().isStatic()) {
-			c.pushToken("static");
+			c.pushKeyword("static");
 		}
 		
 		c.pushType(decl.getName().getValueType())
@@ -184,7 +184,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IMethodDeclaration decl, TokenizationContext c) {
 		if(decl.getName().isStatic()) {
-			c.pushToken("static");
+			c.pushKeyword("static");
 		}
 		
 		c.pushType(decl.getName().getReturnType())
@@ -207,7 +207,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IPropertyDeclaration decl, TokenizationContext c) {
 		if(decl.getName().isStatic()) {
-			c.pushToken("static");
+			c.pushKeyword("static");
 		}
 		
 		c.pushType(decl.getName().getValueType())
@@ -221,7 +221,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			
 			if(decl.getName().hasGetter()) {
 				c.pushOpeningCurlyBracket()
-				.pushToken("get");
+				.pushKeyword("get");
 				
 				visitStatements(decl.getGet(), c);
 				
@@ -230,7 +230,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			
 			if(decl.getName().hasSetter()) {
 				c.pushOpeningCurlyBracket()
-				.pushToken("set");
+				.pushKeyword("set");
 				
 				visitStatements(decl.getSet(), c);
 				
@@ -238,9 +238,9 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			}
 		}
 		else {
-			c.pushToken("get")
+			c.pushKeyword("get")
 			.pushSemicolon()
-			.pushToken("set")
+			.pushKeyword("set")
 			.pushSemicolon();
 		}
 		
@@ -256,7 +256,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	public Object visit(IAssignment stmt, TokenizationContext c) {
 		stmt.getReference().accept(this, c);
 		
-		c.pushToken("=");
+		c.pushOperator("=");
 		
 		stmt.getExpression().accept(this, c);
 		
@@ -266,13 +266,13 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IBreakStatement stmt, TokenizationContext c) {
-		c.pushToken("break").pushSemicolon();
+		c.pushKeyword("break").pushSemicolon();
 		return null;
 	}
 	
 	@Override
 	public Object visit(IContinueStatement stmt, TokenizationContext c) {
-		c.pushToken("continue").pushSemicolon();
+		c.pushKeyword("continue").pushSemicolon();
 		return null;
 	}
 	
@@ -282,10 +282,10 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		
 		switch (stmt.getOperation()) {
 		case Add:
-			c.pushToken("+=");
+			c.pushOperator("+=");
 			break;
 		case Remove:
-			c.pushToken("-=");
+			c.pushOperator("-=");
 			break;
 		}
 		
@@ -305,13 +305,13 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IGotoStatement stmt, TokenizationContext c) {
-		c.pushToken("goto").pushToken(stmt.getLabel()).pushSemicolon();
+		c.pushKeyword("goto").pushToken(stmt.getLabel()).pushSemicolon();
 		return null;
 	}
 	
 	@Override
 	public Object visit(ILabelledStatement stmt, TokenizationContext c) {
-		c.pushToken(stmt.getLabel()).pushToken(":");
+		c.pushToken(stmt.getLabel()).pushColon();
 		stmt.getStatement().accept(this, c);
 		return null;
 	}
@@ -319,7 +319,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IReturnStatement stmt, TokenizationContext c) {
-		c.pushToken("return");
+		c.pushKeyword("return");
 		if(!stmt.isVoid()) stmt.getExpression().accept(this, c);
 		c.pushSemicolon();
 		return null;
@@ -327,7 +327,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IThrowStatement stmt, TokenizationContext c) {
-		c.pushToken("throw");
+		c.pushKeyword("throw");
 		if(!stmt.isReThrow()) stmt.getReference().accept(this, c);
 		c.pushSemicolon();
 		return null;
@@ -351,9 +351,9 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IDoLoop block, TokenizationContext c) {
-		c.pushToken("do").pushOpeningCurlyBracket();
+		c.pushKeyword("do").pushOpeningCurlyBracket();
 		visitStatements(block.getBody(), c);
-		c.pushClosingCurlyBracket().pushOpeningBracket().pushToken("while");
+		c.pushClosingCurlyBracket().pushOpeningBracket().pushKeyword("while");
 		block.getCondition().accept(this, c);
 		c.pushClosingBracket();
 		
@@ -362,11 +362,11 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IForEachLoop block, TokenizationContext c) {
-		c.pushToken("foreach")
+		c.pushKeyword("foreach")
 		.pushOpeningBracket()
 		.pushType(block.getDeclaration().getType());
 		block.getDeclaration().getReference().accept(this, c);
-		c.pushToken("in");
+		c.pushKeyword("in");
 		block.getLoopedReference().accept(this, c);
 		c.pushClosingBracket();
 		
@@ -379,7 +379,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IForLoop block, TokenizationContext c) {
-		c.pushToken("for").pushOpeningBracket();
+		c.pushKeyword("for").pushOpeningBracket();
 		visitStatements(block.getInit(), c);
 		c.pushSemicolon();
 		block.getCondition().accept(this, c);
@@ -396,14 +396,14 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IIfElseBlock block, TokenizationContext c) {
-		c.pushToken("if").pushOpeningBracket();
+		c.pushKeyword("if").pushOpeningBracket();
 		block.getCondition().accept(this, c);
 		c.pushClosingBracket().pushOpeningCurlyBracket();
 		visitStatements(block.getThen(), c);
 		c.pushClosingCurlyBracket();
 		
 		if(!block.getElse().isEmpty()) {
-			c.pushToken("else").pushOpeningCurlyBracket();
+			c.pushKeyword("else").pushOpeningCurlyBracket();
 			visitStatements(block.getElse(), c);
 			c.pushClosingCurlyBracket();
 		}
@@ -413,7 +413,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(ILockBlock block, TokenizationContext c) {
-		c.pushToken("lock").pushOpeningBracket();
+		c.pushKeyword("lock").pushOpeningBracket();
 		block.getReference().accept(this, c);
 		c.pushClosingBracket()
 		
@@ -426,21 +426,21 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(ISwitchBlock block, TokenizationContext c) {
-		c.pushToken("switch").pushOpeningBracket();
+		c.pushKeyword("switch").pushOpeningBracket();
 		block.getReference().accept(this, c);
 		c.pushClosingBracket();
 		
 		c.pushOpeningCurlyBracket();
 		
 		for (ICaseBlock caseBlock : block.getSections()) {
-			c.pushToken("case");
+			c.pushKeyword("case");
 			caseBlock.getLabel().accept(this, c);
-			c.pushToken(":");
+			c.pushColon();
 			visitStatements(caseBlock.getBody(), c);
 		}
 
 		if(!block.getDefaultSection().isEmpty()) {
-			c.pushToken("default").pushToken(":");
+			c.pushKeyword("default").pushColon();
 			visitStatements(block.getDefaultSection(), c);
 		}
 		
@@ -451,12 +451,12 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(ITryBlock block, TokenizationContext c) {
-		c.pushToken("try").pushOpeningCurlyBracket();
+		c.pushKeyword("try").pushOpeningCurlyBracket();
 		visitStatements(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			c.pushToken("catch");
+			c.pushKeyword("catch");
             
 			if (catchBlock.getKind() != CatchBlockKind.General)
             {
@@ -477,7 +477,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		}
 		
 		if(!block.getFinally().isEmpty()) {
-			c.pushToken("finally").pushOpeningCurlyBracket();
+			c.pushKeyword("finally").pushOpeningCurlyBracket();
 			visitStatements(block.getFinally(), c);
 			c.pushClosingCurlyBracket();
 		}
@@ -487,7 +487,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IUncheckedBlock block, TokenizationContext c) {
-		c.pushToken("unchecked").pushOpeningCurlyBracket();
+		c.pushKeyword("unchecked").pushOpeningCurlyBracket();
 		visitStatements(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
@@ -496,7 +496,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IUnsafeBlock block, TokenizationContext c) {
-		c.pushToken("unsafe").pushOpeningCurlyBracket();
+		c.pushKeyword("unsafe").pushOpeningCurlyBracket();
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -504,7 +504,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IUsingBlock block, TokenizationContext c) {
-		c.pushToken("using").pushOpeningBracket();
+		c.pushKeyword("using").pushOpeningBracket();
 		block.getReference().accept(this, c);
 		c.pushClosingBracket();
 		
@@ -517,7 +517,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IWhileLoop block, TokenizationContext c) {
-		c.pushToken("while").pushOpeningBracket();
+		c.pushKeyword("while").pushOpeningBracket();
 		block.getCondition().accept(this, c);
 		c.pushClosingBracket();
 		
@@ -534,7 +534,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	public Object visit(IBinaryExpression expr, TokenizationContext c) {
 		expr.getLeftOperand().accept(this, c);
 		// TODO convert operator to C# syntax 
-		c.pushToken(expr.getOperator().name());
+		c.pushOperator(expr.getOperator().name());
 				expr.getRightOperand().accept(this, c);
 		return null;
 	}
@@ -547,7 +547,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		}
 		else {
 			expr.getReference().accept(this, c);		
-			c.pushToken("as")
+			c.pushKeyword("as")
 			.pushType(expr.getTargetType());
 		}
 		
@@ -557,10 +557,10 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(ICompletionExpression entity, TokenizationContext c) {
 		if(entity.getVariableReference() != null) {
-			c.pushToken(entity.getVariableReference().getIdentifier()).pushToken(".");
+			c.pushToken(entity.getVariableReference().getIdentifier()).pushPeriod();
 		}
 		else if (entity.getTypeReference() != null) {
-			c.pushType(entity.getTypeReference()).pushToken(".");
+			c.pushType(entity.getTypeReference()).pushPeriod();
 		}
 		
 		c.pushToken(entity.getToken());
@@ -569,14 +569,14 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(IComposedExpression expr, TokenizationContext c) {
-		c.pushToken("composed").pushOpeningBracket();
+		c.pushKeyword("composed").pushOpeningBracket();
 		
 		for (Iterator<IVariableReference> iterator = expr.getReferences().iterator(); iterator.hasNext();) {
 			IVariableReference varRef= (IVariableReference) iterator.next();
 			
 			varRef.accept(this, c);
 			
-			if(iterator.hasNext()) c.pushToken(",");
+			if(iterator.hasNext()) c.pushComma();
 		}
 		
 		c.pushClosingBracket();
@@ -592,9 +592,9 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IIfElseExpression expr, TokenizationContext c) {
 		expr.getCondition().accept(this, c);
-		c.pushToken("?");
+		c.pushOperator("?");
 		expr.getThenExpression().accept(this, c);
-		c.pushToken(":");
+		c.pushColon();
 		expr.getElseExpression().accept(this, c);
 		return null;
 	}
@@ -603,17 +603,17 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	public Object visit(IIndexAccessExpression expr, TokenizationContext c) {
 		expr.getReference().accept(this, c);
 		
-		c.pushToken("[");
+		c.pushOpeningSquareBracket();
 		
 		for (Iterator<ISimpleExpression> iterator = expr.getIndices().iterator(); iterator.hasNext();) {
 			ISimpleExpression simpleExpression = (ISimpleExpression) iterator.next();
 			
 			simpleExpression.accept(this, c);
 			
-			if(iterator.hasNext()) c.pushToken(",");
+			if(iterator.hasNext()) c.pushComma();
 		}
 		
-		c.pushToken("]");
+		c.pushClosingSquareBracket();
 		
 		return null;
 	}
@@ -621,7 +621,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IInvocationExpression expr, TokenizationContext c) {
 		if(expr.getMethodName().isConstructor()) {
-			c.pushToken("new").pushType(expr.getMethodName().getDeclaringType());			
+			c.pushKeyword("new").pushType(expr.getMethodName().getDeclaringType());			
 		}
 		else {
 			if(expr.getMethodName().isStatic()) {
@@ -631,10 +631,10 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 				expr.getReference().accept(this, c);
 			}
 			
-			c.pushToken(".").pushToken(expr.getMethodName().getName());
+			c.pushPeriod().pushToken(expr.getMethodName().getName());
 		}
 		
-		c.pushToken("(");
+		c.pushOpeningBracket();
 		
 		// add parameters
 		for (Iterator<ISimpleExpression> iterator = expr.getParameters().iterator(); iterator.hasNext();) {
@@ -642,17 +642,17 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			
 			simpleExpression.accept(this, c);
 			
-			if(iterator.hasNext()) c.pushToken(",");
+			if(iterator.hasNext()) c.pushComma();
 		}
 		
-		c.pushToken(")");
+		c.pushClosingBracket();
 		
 		return null;
 	}
 	
 	@Override
 	public Object visit(ILambdaExpression expr, TokenizationContext c) {
-		c.pushParameters(expr.getName().getParameters()).pushToken("=>");
+		c.pushParameters(expr.getName().getParameters()).pushOperator("=>");
 		c.pushOpeningCurlyBracket();
 		visitStatements(expr.getBody(), c);
 		c.pushClosingCurlyBracket();
@@ -669,7 +669,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	
 	@Override
 	public Object visit(INullExpression expr, TokenizationContext c) {
-		c.pushToken("null");
+		c.pushKeyword("null");
 		return null;
 	}
 	
@@ -682,7 +682,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(ITypeCheckExpression expr, TokenizationContext c) {
 		expr.getReference().accept(this, c);
-		c.pushToken("is").pushType(expr.getType());
+		c.pushKeyword("is").pushType(expr.getType());
 		return null;
 	}
 	
@@ -692,10 +692,10 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		
 		if(operator == UnaryOperator.PostIncrement|| operator == UnaryOperator.PostDecrement) {
 			expr.getOperand().accept(this, c);
-			c.pushToken(operator.name());
+			c.pushOperator(operator.name());
 		}
 		else {
-			c.pushToken(operator.name());
+			c.pushOperator(operator.name());
 			expr.getOperand().accept(this, c);
 		}
 		
@@ -719,7 +719,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			c.pushToken(eventRef.getReference().getIdentifier());
 		}
 		
-		c.pushToken(".").pushToken(eventRef.getEventName().getName());
+		c.pushPeriod().pushToken(eventRef.getEventName().getName());
 		return null;
 	}
 	
@@ -732,7 +732,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			c.pushToken(fieldRef.getReference().getIdentifier());
 		}
 		
-		c.pushToken(".").pushToken(fieldRef.getFieldName().getName());
+		c.pushPeriod().pushToken(fieldRef.getFieldName().getName());
 		return null;
 	}
 	
@@ -751,7 +751,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			c.pushToken(methodRef.getReference().getIdentifier());
 		}
 		
-		c.pushToken(".").pushToken(methodRef.getMethodName().getName());
+		c.pushPeriod().pushToken(methodRef.getMethodName().getName());
 		return null;
 	}
 	
@@ -764,7 +764,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			c.pushToken(propertyRef.getReference().getIdentifier());
 		}
 		
-		c.pushToken(".").pushToken(propertyRef.getPropertyName().getName());
+		c.pushPeriod().pushToken(propertyRef.getPropertyName().getName());
 		return null;
 	}
 	
