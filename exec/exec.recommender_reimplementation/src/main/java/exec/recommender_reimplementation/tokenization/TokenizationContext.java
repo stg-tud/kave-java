@@ -58,7 +58,7 @@ public class TokenizationContext {
 		pushLeftAngleBracket();
 		
 		for (Iterator<ITypeName> iterator = typeParameters.iterator(); iterator.hasNext();) {
-			ITypeName typeParameter= (ITypeName) iterator.next();
+			ITypeName typeParameter= iterator.next();
 			
 			if(typeParameter.isUnknown() || typeParameter.getTypeParameterType().isUnknownType()) {
 				pushToken(TypeName.UNKNOWN_NAME.getIdentifier());
@@ -81,7 +81,7 @@ public class TokenizationContext {
 		pushOpeningBracket();
 		
 		 for (Iterator<IParameterName> iterator = parameters.iterator(); iterator.hasNext();) {
-			IParameterName parameter = (IParameterName) iterator.next();
+			IParameterName parameter = iterator.next();
 			
             pushParameter(parameter);
             
@@ -194,6 +194,7 @@ public class TokenizationContext {
 	}
 	
 	public TokenizationContext pushKeyword(String keyword) {
+		if(tokenizationSettings.isActiveKeywords() && tokenizationSettings.isActiveWrapKeywords()) 	return pushToken("<" + keyword + ">");
 		if(tokenizationSettings.isActiveKeywords()) return pushToken(keyword);
 		return this;
 	}
@@ -202,7 +203,7 @@ public class TokenizationContext {
 		return pushToken("???");
 	}
 
-	List<String> getTokenStream() {
+	public List<String> getTokenStream() {
 		return tokenStream;
 	}
 

@@ -22,6 +22,8 @@ public class TokenizationSettings {
 	private boolean activePuncutuation;
 	private boolean activeOperators;
 	private boolean activeKeywords;
+	private boolean activeWrapKeywords;
+	
 	
 	public TokenizationSettings(boolean allCharactersActive) {
 		activeBrackets = true;
@@ -29,6 +31,8 @@ public class TokenizationSettings {
 		activeOperators = true;
 		activePuncutuation = true;
 	}
+
+	public TokenizationSettings() {}
 
 	public boolean isUseFullyQualifiedTypes() {
 		return useFullyQualifiedTypes;
@@ -73,6 +77,14 @@ public class TokenizationSettings {
 		this.activeKeywords = activeKeywords;
 	}
 
+	public boolean isActiveWrapKeywords() {
+		return activeWrapKeywords;
+	}
 
+	public void setActiveWrapKeywords(boolean activeWrapKeywords) {
+		this.activeWrapKeywords = activeWrapKeywords;
+	}
+
+	
 
 }
