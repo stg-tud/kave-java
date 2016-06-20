@@ -1,18 +1,15 @@
 package exec.recommender_reimplementation.heinemann_analysis;
 
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.objectType;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.typeshapes.TypeShape;
@@ -40,34 +37,7 @@ public class HeinemannTokenizationVisitorTest extends PBNAnalysisBaseTest {
 		
 		tokenizationContext = new TokenizationContext(settings);
 	}
-	
-	@Test
-	public void collectTokenTest() {
-		List<String> tokens = Lists.newArrayList("readFile", "<catch>", "IOException", "e", "String", "errorMessage", "e", "getMessage");
-		List<String> identifiers = uut.collectTokens(tokens, 5);
-		assertThat(identifiers, Matchers.contains("String", "errorMessage", "e", "getMessage"));
-	}
-	
-	@Test
-	public void filterSingleCharactersTest() {
-		List<String> identifiers = Lists.newArrayList("IOException", "String", "errorMessage", "e", "getMessage");
-		uut.filterSingleCharacterIdentifier(identifiers);
-		assertThat(identifiers, Matchers.contains("IOException", "String", "errorMessage", "getMessage"));
-	}
-	
-	@Test
-	public void isStopWordTest() {
-		assertTrue(uut.isStopWord("a"));
-	}
-	
-	@Test
-	public void createsAndStoresNewEntry() {
-		List<String> identifiers = Lists.newArrayList("io", "except", "string", "error", "message", "get");
-		IMethodName methodName = method(voidType, type("JOptionPane"), "showMessageDialog", parameter(type("Component"), "component"), parameter(objectType, "message"));
-		uut.createAndStoreNewEntry(methodName, identifiers);
-		assertThat(uut.getIndex(), Matchers.contains(new Entry(identifiers,"JOptionPane#showMessageDialog(Component,Object)")));
-	}
-	
+			
 	@Test
 	public void onlyIdentifiersInSameMethodBody() {
 		ISST sst = sst(DefaultClassContext, 
