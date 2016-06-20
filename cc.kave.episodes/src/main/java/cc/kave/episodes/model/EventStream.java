@@ -69,8 +69,7 @@ public class EventStream {
 			}
 			this.time += TIMEOUT;
 		}
-		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !this.isFirstMethod
-				&& !event.equals(Events.newDummyEvent())) {
+		if (!this.isFirstMethod && !event.equals(Events.newDummyEvent())) {
 			this.time += TIMEOUT;
 		}
 		this.isFirstMethod = false;

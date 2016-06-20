@@ -142,16 +142,14 @@ public class EventStreamTest {
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(0), 1);
-		expectedMap.put(unknown(), 2);
-		expectedMap.put(inv(2), 3);
-		expectedMap.put(inv(3), 4);
+		expectedMap.put(unknown(), 1);
+		expectedMap.put(inv(2), 2);
+		expectedMap.put(inv(3), 3);
 		
 		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,0.000\n");
-		expSb.append("3,0.501\n");
-		expSb.append("4,0.502\n");
-		expSb.append("3,1.003\n");
+		expSb.append("2,1.000\n");
+		expSb.append("3,1.001\n");
+		expSb.append("2,1.502\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(expSb.toString(), sut.getStream());
