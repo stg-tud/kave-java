@@ -35,10 +35,8 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.ZipException;
 
-import com.google.common.base.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -67,28 +65,24 @@ public class Preprocessing {
 
 	public void generate() throws ZipException, IOException {
 		List<Event> allEvents = repos.select(contextsDir, NUMOFREPOS);
-		EventStream complStream = EventsFilter.filterStream(allEvents, REMFREQS);
-		EventStreamIo.write(complStream, getStreamPath(), getMappingPath());
+		EventStream stream = EventsFilter.filterStream(allEvents, REMFREQS);
+		EventStreamIo.write(stream, getPath().streamPath, getPath().mappingPath);
+	}
+	
+	private FilePaths getPath() {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + NUMOFREPOS + "Repos");
+		if (!pathName.isDirectory()) {
+			pathName.mkdir();
+		}
+		FilePaths paths = new FilePaths();
+		paths.streamPath = pathName.getAbsolutePath() + "/stream.txt";
+		paths.mappingPath = pathName.getAbsolutePath() + "/mapping.txt";
+
+		return paths;
 	}
 
-	private Set<String> findZips() {
-		Set<String> zips = contextsDir.findFiles(new Predicate<String>() {
-
-			@Override
-			public boolean apply(String arg0) {
-				return arg0.endsWith(".zip");
-			}
-		});
-		return zips;
-	}
-
-	private String getStreamPath() {
-		File streamFile = new File(eventsFolder.getAbsolutePath() + "/eventStream.txt");
-		return streamFile.getAbsolutePath();
-	}
-
-	private String getMappingPath() {
-		File mappingFile = new File(eventsFolder.getAbsolutePath() + "/eventMapping.txt");
-		return mappingFile.getAbsolutePath();
+	private class FilePaths {
+		private String streamPath = "";
+		private String mappingPath = "";
 	}
 }

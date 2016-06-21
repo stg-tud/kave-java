@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.aastart.frameworks;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,8 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
@@ -41,11 +38,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
@@ -56,12 +51,13 @@ import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
-import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.export.EventStreamIo;
+import cc.kave.episodes.export.EventsFilter;
+import cc.kave.episodes.model.EventStream;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
 
 public class PreprocessingTest {
 
@@ -73,17 +69,10 @@ public class PreprocessingTest {
 	@Mock
 	private Directory rootDirectory;
 	@Mock
-	private EventStreamGenerator generator;
-	@Mock
-	private EventStreamIo streamer;
-	@Mock
-	private FileUtils fileUtils;
+	private ReductionByRepos repos;
 
-	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
-	private static final String REPO2 = "Github/usr1/repo2/ws.zip";
-
-	private Map<String, Context> data;
-	private Map<String, ReadingArchive> ras;
+	private List<Event> events;
+	private EventStream stream;
 
 	private Preprocessing sut;
 
@@ -94,57 +83,20 @@ public class PreprocessingTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		data = Maps.newLinkedHashMap();
-		ras = Maps.newLinkedHashMap();
-		sut = new Preprocessing(rootDirectory, rootFolder.getRoot());
+		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		stream = new EventStream();
+		stream.addEvent(ctx(1));
+		stream.addEvent(inv(2));
+		stream.addEvent(inv(3));
+		stream.addEvent(unknown());
+		stream.addEvent(inv(2));
+		stream.addEvent(ctx(1));
+		stream.addEvent(inv(3));
+		
+		sut = new Preprocessing(rootDirectory, rootFolder.getRoot(), repos);
 
-		SST sst = new SST();
-		MethodDeclaration md = new MethodDeclaration();
-		md.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
-		// InvocationExpression ie5 = new InvocationExpression();
-		// IMethodName methodName5 = MethodName.newMethodName("[System.Void,
-		// mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
-		// ie5.setMethodName(methodName5);
-		// md.getBody().add(wrap(ie5));
-		md.getBody().add(new ContinueStatement());
-		sst.getMethods().add(md);
-
-		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(MethodName.newMethodName("[T,P] [T3,P].M2()"));
-
-		InvocationExpression ie1 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
-		ie1.setMethodName(methodName);
-		InvocationExpression ie2 = new InvocationExpression();
-		IMethodName methodName2 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
-		ie2.setMethodName(methodName2);
-
-		md2.getBody().add(wrap(ie1));
-		md2.getBody().add(wrap(ie2));
-		md2.getBody().add(wrap(ie2));
-		sst.getMethods().add(md2);
-
-		Context context = new Context();
-		context.setSST(sst);
-		data.put(REPO1, context);
-
-		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
-			@Override
-			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
-				return data.keySet();
-			}
-		});
-		when(rootDirectory.getReadingArchive(anyString())).then(new Answer<ReadingArchive>() {
-			@Override
-			public ReadingArchive answer(InvocationOnMock invocation) throws Throwable {
-				String file = (String) invocation.getArguments()[0];
-				ReadingArchive ra = mock(ReadingArchive.class);
-				ras.put(file, ra);
-				when(ra.hasNext()).thenReturn(true).thenReturn(false);
-				when(ra.getNext(Context.class)).thenReturn(data.get(file));
-				return ra;
-			}
-		});
+		when(repos.select(any(Directory.class), anyInt())).thenReturn(events);
+		when(EventsFilter.filterStream(any(List.class), anyInt())).thenReturn(stream);
 
 		Logger.setPrinting(false);
 	}
@@ -158,17 +110,14 @@ public class PreprocessingTest {
 	public void contextTest() throws ZipException, IOException {
 		sut.generate();;
 
-		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
-		verify(rootDirectory, times(2)).getReadingArchive(REPO1);
-		verify(ras.get(REPO1), times(2)).hasNext();
-		verify(ras.get(REPO1)).getNext(Context.class);
+//		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Contexts folder does not exist");
-		sut = new Preprocessing(rootDirectory, new File("does not exist"));
+		sut = new Preprocessing(rootDirectory, new File("does not exist"), repos);
 	}
 
 	@Test
@@ -176,7 +125,7 @@ public class PreprocessingTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Contexts is not a folder, but a file");
-		sut = new Preprocessing(rootDirectory, file);
+		sut = new Preprocessing(rootDirectory, file, repos);
 	}
 
 	@Test
@@ -204,18 +153,10 @@ public class PreprocessingTest {
 		Context context = new Context();
 		context.setSST(sst);
 
-		data.put(REPO2, context);
 
 		sut.generate();;
 
 		verify(rootDirectory, times(2)).findFiles(anyPredicateOf(String.class));
-		verify(rootDirectory, times(2)).getReadingArchive(REPO1);
-		verify(rootDirectory, times(2)).getReadingArchive(REPO2);
-
-		verify(ras.get(REPO1), times(2)).hasNext();
-		verify(ras.get(REPO1)).getNext(Context.class);
-		verify(ras.get(REPO2), times(2)).hasNext();
-		verify(ras.get(REPO2)).getNext(Context.class);
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
@@ -271,5 +212,21 @@ public class PreprocessingTest {
 		events.add(e3);
 		
 		return events;
+	}
+	
+	private static Event inv(int i) {
+		return Events.newInvocation(m(i));
+	}
+
+	private static Event ctx(int i) {
+		return Events.newContext(m(i));
+	}
+
+	private static Event unknown() {
+		return Events.newUnknownEvent();
+	}
+
+	private static IMethodName m(int i) {
+		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
 	}
 }

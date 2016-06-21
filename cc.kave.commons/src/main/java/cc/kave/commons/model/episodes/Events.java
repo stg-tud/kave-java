@@ -43,7 +43,6 @@ public class Events {
 		String UNKOWN_METHOD_NAME = "[?] [?].???()";
 		IMethodName UNKOWN_METHOD = MethodName.newMethodName(UNKOWN_METHOD_NAME);
 		Event UNKNOWN_EVENT = Events.newContext(UNKOWN_METHOD);
-		UNKNOWN_EVENT.setKind(EventKind.METHOD_DECLARATION);
 		return UNKNOWN_EVENT;
 	}
 }

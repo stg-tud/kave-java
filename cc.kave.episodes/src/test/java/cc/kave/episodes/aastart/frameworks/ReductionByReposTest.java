@@ -198,14 +198,11 @@ public class ReductionByReposTest {
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
 		verify(rootDirectory).getReadingArchive(REPO3);
-//		verify(rootDirectory).getReadingArchive(REPO2);
 
 		verify(ras.get(REPO1), times(2)).hasNext();
 		verify(ras.get(REPO1)).getNext(Context.class);
 		verify(ras.get(REPO3), times(2)).hasNext();
 		verify(ras.get(REPO3)).getNext(Context.class);
-//		verify(ras.get(REPO2), times(2)).hasNext();
-//		verify(ras.get(REPO2)).getNext(Context.class);
 		
 		assertEquals(exoectedEvents.size(), actualEvents.size());
 		assertEquals(exoectedEvents, actualEvents);

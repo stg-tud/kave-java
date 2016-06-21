@@ -25,18 +25,11 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 
 public class EventStreamIo {
 	
-	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
-	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-
 	public static final double DELTA = 0.001;
 	public static final double TIMEOUT = 0.5;
 	
