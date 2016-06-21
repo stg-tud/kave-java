@@ -42,6 +42,8 @@ public class StreamPartition {
 
 	private Directory rootDir;
 	private File rootFolder;
+	
+	private static final int REMFREQS = 1;
 
 	@Inject
 	public StreamPartition(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
@@ -143,7 +145,7 @@ public class StreamPartition {
 			ra.close();
 		}
 		List<Event> allEvents = generator.getEventStream();
-		EventStream complStream = EventsFilter.filterStream(allEvents);
+		EventStream complStream = EventsFilter.filterStream(allEvents, REMFREQS);
 		EventStreamIo.write(complStream, getStreamPath(), getMappingPath());
 
 		return complStream.getMapping();

@@ -32,12 +32,10 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.model.EventStream;
 
 public class EventsFilterTest {
+	
+	private static final int REMFREQS = 1;
 
-	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
-	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-
-	private List<Event> streamEvents;
+	private List<Event> events;
 	private List<Event> partitionEvents1;
 
 	private EventStream expectedStream;
@@ -45,7 +43,7 @@ public class EventsFilterTest {
 
 	@Before
 	public void setup() {
-		streamEvents = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
 		partitionEvents1 = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4), inv(3), inv(2));
 
 		expectedStream = new EventStream();
@@ -62,7 +60,7 @@ public class EventsFilterTest {
 
 	@Test
 	public void filterStream() {
-		EventStream actuals = EventsFilter.filterStream(streamEvents);
+		EventStream actuals = EventsFilter.filterStream(events, REMFREQS);
 
 		assertTrue(expectedStream.equals(actuals));
 		assertEquals(expectedStream.getStream(), actuals.getStream());

@@ -53,6 +53,8 @@ public class Preprocessing {
 
 	private Directory rootDir;
 	private File rootFolder;
+	
+	private static final int REMFREQS = 1;
 
 	@Inject
 	public Preprocessing(@Named("contexts") Directory directory, @Named("rootDir") File folder) {
@@ -79,7 +81,7 @@ public class Preprocessing {
 			ra.close();
 		}
 		List<Event> allEvents = generator.getEventStream();
-		EventStream complStream = EventsFilter.filterStream(allEvents);
+		EventStream complStream = EventsFilter.filterStream(allEvents, REMFREQS);
 		EventStreamIo.write(complStream, getStreamPath(), getMappingPath());
 	}
 

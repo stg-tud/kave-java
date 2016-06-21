@@ -63,10 +63,11 @@ public class Preprocessing {
 		this.repos = repos;
 	}
 	private static final int NUMOFREPOS = 10;
+	private static final int REMFREQS = 1;
 
 	public void generate() throws ZipException, IOException {
 		List<Event> allEvents = repos.select(contextsDir, NUMOFREPOS);
-		EventStream complStream = EventsFilter.filterStream(allEvents);
+		EventStream complStream = EventsFilter.filterStream(allEvents, REMFREQS);
 		EventStreamIo.write(complStream, getStreamPath(), getMappingPath());
 	}
 

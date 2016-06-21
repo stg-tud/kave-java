@@ -21,43 +21,42 @@ import java.util.Map;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
-import cc.recommenders.io.Logger;
 
 public class EventsFilter {
 	
 	private static StreamStatistics statistics = new StreamStatistics();
-	private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
-	private static final int FREQUENCY = 1;
+//	private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
 	
 	private static final double DELTA = 0.001;
 	private static final double TIMEOUT = 0.5;
 	private static double time = 0.0;
 	private static boolean firstMethod = true;
 	
-	public static EventStream filterStream(List<Event> stream) {
-		EventStream sm = new EventStream();
+	public static EventStream filterStream(List<Event> stream, int remFreqs) {
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
-		Logger.log("Minimal occurrence is %d", statistics.minFreq(occurrences));
+		EventStream sm = new EventStream();
 		
 		for (Event e : stream) {
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
-				if (occurrences.get(e) == FREQUENCY) {
+				if (occurrences.get(e) == remFreqs) {
 					sm.addEvent(Events.newUnknownEvent());
 				} else {
 					sm.addEvent(e);
 				}
 				continue;
 			}
-			if (occurrences.get(e) > FREQUENCY) {
-				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-				if(asm.getIdentifier().equalsIgnoreCase(FRAMEWORKNAME)) {
-					sm.addEvent(e);;
-				}
+			if (occurrences.get(e) > remFreqs) {
+				sm.addEvent(e);;
 			}
+//			if (occurrences.get(e) > remFreqs) {
+//				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
+//				if(asm.getIdentifier().equalsIgnoreCase(FRAMEWORKNAME)) {
+//					sm.addEvent(e);;
+//				}
+//			}
 		}
 		return sm;
 	}
