@@ -33,20 +33,22 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
 public class EventStreamTest {
+	
+	Map<Event, Integer> expectedMap;
 
 	private EventStream sut;
 	
 	@Before
 	public void setup() {
+		expectedMap =  Maps.newLinkedHashMap();
 		sut = new EventStream();
 	}
 	
 	@Test
 	public void defaultValues() {
-		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
-		expMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(Events.newDummyEvent(), 0);
 		
-		assertEquals(expMap, sut.getMapping());
+		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(1, sut.getEventNumber());
 		assertEquals(0, sut.getStreamLength());
 		
@@ -54,51 +56,52 @@ public class EventStreamTest {
 	}
 	
 	@Test
-	public void valuesCanBeSet() {
-		sut.addEvent(ctx(1));
+	public void addUnknownEvent() {
+		sut.addEvent(Events.newUnknownEvent());
 		
-		Map<Event, Integer> expMap = Maps.newLinkedHashMap();
-		expMap.put(Events.newDummyEvent(), 0);
-		expMap.put(ctx(1), 1);
+		expectedMap = Maps.newLinkedHashMap();
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(Events.newUnknownEvent(), 1);
 		
-		StringBuilder expectedStream = new StringBuilder();
-		expectedStream.append("1,0.000\n");
-		
-		assertEquals(expMap, sut.getMapping());
-		assertEquals(expectedStream.toString(), sut.getStream());
-		
-		assertEquals(1, sut.getStreamLength());
+		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(2, sut.getEventNumber());
+		assertEquals(0, sut.getStreamLength());
+		
+		assertTrue(sut.getStream().equals(""));
 	}
 	
 	@Test
-	public void addDummyContext() {
-		sut.addEvent(ctx(0));
+	public void addContext() {
 		sut.addEvent(ctx(1));
-		sut.addEvent(inv(2));
-		sut.addEvent(inv(3));
-		sut.addEvent(unknown());
-		sut.addEvent(inv(2));
 		
-		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
+		expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(0), 1);
-		expectedMap.put(ctx(1), 2);
-		expectedMap.put(inv(2), 3);
-		expectedMap.put(inv(3), 4);
+		expectedMap.put(ctx(1), 1);
 		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,0.000\n");
-		expSb.append("2,0.501\n");
-		expSb.append("3,0.502\n");
-		expSb.append("4,0.503\n");
-		expSb.append("3,1.004\n");
+		String expectedStream = "1,0.500\n";
+		String actualStream = sut.getStream();
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
+		assertEquals(2, sut.getEventNumber());
+		assertEquals(1, sut.getStreamLength());
+		assertEquals(expectedStream, actualStream);
+	}
+	
+	@Test
+	public void addInvocation() {
+		sut.addEvent(inv(1));
 		
-		assertEquals(5, sut.getStreamLength());
-		assertEquals(5, sut.getEventNumber());
+		expectedMap = Maps.newLinkedHashMap();
+		expectedMap.put(Events.newDummyEvent(), 0);
+		expectedMap.put(inv(1), 1);
+		
+		String expectedStream = "1,0.000\n";
+		String actualStream = sut.getStream();
+		
+		assertEquals(expectedMap, sut.getMapping());
+		assertEquals(2, sut.getEventNumber());
+		assertEquals(1, sut.getStreamLength());
+		assertEquals(expectedStream, actualStream);
 	}
 	
 	@Test
@@ -116,134 +119,19 @@ public class EventStreamTest {
 		expectedMap.put(ctx(1), 2);
 		expectedMap.put(inv(2), 3);
 		expectedMap.put(inv(3), 4);
+		expectedMap.put(unknown(), 5);
 		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,0.000\n");
-		expSb.append("2,0.501\n");
-		expSb.append("3,0.502\n");
-		expSb.append("4,0.503\n");
-		expSb.append("3,1.004\n");
+		StringBuilder expectedSb = new StringBuilder();
+		expectedSb.append("1,0.500\n");
+		expectedSb.append("2,1.001\n");
+		expectedSb.append("3,1.002\n");
+		expectedSb.append("4,1.003\n");
+		expectedSb.append("3,1.504\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
-		
+		assertEquals(6, sut.getEventNumber());
 		assertEquals(5, sut.getStreamLength());
-		assertEquals(5, sut.getEventNumber());
-	}
-	
-	@Test
-	public void addUnkownEvent() {
-		sut.addEvent(ctx(0));
-		sut.addEvent(unknown());
-		sut.addEvent(inv(2));
-		sut.addEvent(inv(3));
-		sut.addEvent(unknown());
-		sut.addEvent(inv(2));
-		
-		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(unknown(), 1);
-		expectedMap.put(inv(2), 2);
-		expectedMap.put(inv(3), 3);
-		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("2,1.000\n");
-		expSb.append("3,1.001\n");
-		expSb.append("2,1.502\n");
-		
-		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
-		
-		assertEquals(4, sut.getStreamLength());
-		assertEquals(5, sut.getEventNumber());
-	}
-	
-	@Test
-	public void addMultipleUnkownEvents() {
-		sut.addEvent(Events.newUnknownEvent());
-		sut.addEvent(ctx(1));
-		sut.addEvent(inv(2));
-		sut.addEvent(inv(3));
-		sut.addEvent(Events.newUnknownEvent());
-		sut.addEvent(inv(2));
-		
-		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(Events.newUnknownEvent(), 1);
-		expectedMap.put(ctx(1), 2);
-		expectedMap.put(inv(2), 3);
-		expectedMap.put(inv(3), 4);
-		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("2,1.000\n");
-		expSb.append("3,1.001\n");
-		expSb.append("4,1.002\n");
-		expSb.append("3,1.503\n");
-		
-		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
-		
-		assertEquals(4, sut.getStreamLength());
-		assertEquals(5, sut.getEventNumber());
-	}
-	
-	@Test
-	public void addHolderAsStartEvent() {
-		sut.addEvent(ctx(0));
-		sut.addEvent(unknown());
-		sut.addEvent(inv(1));
-		sut.addEvent(inv(2));
-		sut.addEvent(unknown());
-		sut.addEvent(inv(1));
-		
-		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(0), 1);
-		expectedMap.put(inv(1), 2);
-		expectedMap.put(inv(2), 3);
-		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,0.000\n");
-		expSb.append("2,0.501\n");
-		expSb.append("3,0.502\n");
-		expSb.append("2,1.003\n");
-		
-		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
-		
-		assertEquals(4, sut.getStreamLength());
-		assertEquals(4, sut.getEventNumber());
-	}
-	
-	@Test
-	public void twoHolders() {
-		sut.addEvent(ctx(0));
-		sut.addEvent(unknown());
-		sut.addEvent(unknown());
-		sut.addEvent(inv(1));
-		sut.addEvent(inv(2));
-		sut.addEvent(ctx(1));
-		sut.addEvent(inv(1));
-		
-		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
-		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(0), 1);
-		expectedMap.put(inv(1), 2);
-		expectedMap.put(inv(2), 3);
-		expectedMap.put(ctx(1), 4);
-		
-		StringBuilder expSb = new StringBuilder();
-		expSb.append("1,0.000\n");
-		expSb.append("2,1.001\n");
-		expSb.append("3,1.002\n");
-		expSb.append("4,1.503\n");
-		expSb.append("2,1.504\n");
-		
-		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expSb.toString(), sut.getStream());
-		
-		assertEquals(5, sut.getStreamLength());
-		assertEquals(5, sut.getEventNumber());
+		assertEquals(expectedSb.toString(), sut.getStream());
 	}
 	
 	@Test
@@ -264,12 +152,11 @@ public class EventStreamTest {
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		
-		assertTrue(a.equals(b));
-		assertTrue(a.getStream().equalsIgnoreCase(b.getStream()));
-		assertEquals(a.getStream(), b.getStream());
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertEquals(a.getStreamLength(), b.getStreamLength());
+		assertEquals(a.getStream(), b.getStream());		
+		assertTrue(a.equals(b));
 	}
 	
 	@Test
@@ -282,11 +169,11 @@ public class EventStreamTest {
 		b.addEvent(ctx(1));
 		b.addEvent(inv(3));
 		
-		assertFalse(a.equals(b));
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getStream(), b.getStream());
-		assertTrue(a.getStreamLength() == b.getStreamLength());
 		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertEquals(a.getStreamLength(), b.getStreamLength());
+		assertEquals(a.getStream(), b.getStream());
+		assertFalse(a.equals(b));
 	}
 	
 	@Test
@@ -300,11 +187,11 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 		b.addEvent(inv(3));
 		
-		assertFalse(a.equals(b));
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertNotEquals(a.getStream(), b.getStream());
-		assertTrue(a.getStreamLength() != b.getStreamLength());
 		assertNotEquals(a.getEventNumber(), b.getEventNumber());
+		assertNotEquals(a.getStreamLength(), b.getStreamLength());
+		assertNotEquals(a.getStream(), b.getStream());
+		assertFalse(a.equals(b));
 	}
 	
 	@Test
@@ -318,11 +205,11 @@ public class EventStreamTest {
 		b.addEvent(ctx(1));
 		b.addEvent(inv(2));
 		
-		assertFalse(a.equals(b));
 		assertEquals(a.getMapping(), b.getMapping());
-		assertNotEquals(a.getStream(), b.getStream());
-		assertTrue(a.getStreamLength() != b.getStreamLength());
 		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertNotEquals(a.getStreamLength(), b.getStreamLength());
+		assertNotEquals(a.getStream(), b.getStream());
+		assertFalse(a.equals(b));
 	}
 	
 	private static Event inv(int i) {

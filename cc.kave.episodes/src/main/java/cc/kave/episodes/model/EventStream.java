@@ -62,24 +62,14 @@ public class EventStream {
 	public void addEvent(Event event) {
 		Integer idx = this.mappingData.get(event);
 
-		if (event.equals(Events.newUnknownEvent())) {
-			if (idx == null) {
-				idx = getEventNumber();
-				this.mappingData.put(event, idx);
-			}
+		if ((!event.equals(Events.newDummyEvent())) && (event.getKind() == EventKind.METHOD_DECLARATION)) {
 			this.time += TIMEOUT;
 		}
-		if (!this.isFirstMethod && !event.equals(Events.newDummyEvent())) {
-			this.time += TIMEOUT;
+		if (idx == null) {
+			idx = getEventNumber();
+			this.mappingData.put(event, idx);
 		}
 		this.isFirstMethod = false;
-
-		if (event.getKind() == EventKind.INVOCATION) {
-			if (idx == null) {
-				idx = getEventNumber();
-				this.mappingData.put(event, idx);
-			}
-		}
 
 		if ((idx != null) && (!event.equals(Events.newUnknownEvent())) && !(event.equals(Events.newDummyEvent()))) {
 			this.sb.append(idx);
