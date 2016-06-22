@@ -51,7 +51,7 @@ public class Module extends AbstractModule {
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "configurations/");
 //		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
-		File eventsData = new File(rootFolder + "EpisodeMining/dataSet/events/");
+		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());

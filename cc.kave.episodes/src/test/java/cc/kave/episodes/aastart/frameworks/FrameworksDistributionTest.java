@@ -64,7 +64,7 @@ public class FrameworksDistributionTest {
 	@Mock 
 	private StreamStatistics statistics;
 	
-	private static final int NUMOFREPOS = 100;
+	private static final int NUMOFREPOS = 10;
 	
 	private List<Event> events = new LinkedList<Event>();
 	
@@ -165,12 +165,12 @@ public class FrameworksDistributionTest {
 	}
 	
 	private String getEventsFile() {
-		String eventsPath = rootFolder.getRoot().getAbsolutePath() + "/100Repos/eventsPerFramework100.txt";
-		return eventsPath;
+		String eventsFile = rootFolder.getRoot().getAbsolutePath() + "/" + NUMOFREPOS + "Repos/eventsPerFramework" + NUMOFREPOS + ".txt";
+		return eventsFile;
 	}
 	
 	private String getTypesFile() {
-		String typesPath = rootFolder.getRoot().getAbsolutePath() + "/100Repos/typesPerFramework100.txt";
+		String typesPath = rootFolder.getRoot().getAbsolutePath() + "/" + NUMOFREPOS + "Repos/typesPerFramework" + NUMOFREPOS + ".txt";
 		return typesPath;
 	}
 	
