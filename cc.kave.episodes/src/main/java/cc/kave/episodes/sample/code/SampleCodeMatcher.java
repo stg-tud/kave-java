@@ -62,7 +62,7 @@ public class SampleCodeMatcher {
 //		Set<String> types = Sets.newHashSet();
 //		types.add("ArrayList");
 		
-		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(600, 0.5);
+		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(600);
 		List<Event> mapper = mapParser.parse();
 		
 		int nodeLevel = allEpisodes.size() - 1;

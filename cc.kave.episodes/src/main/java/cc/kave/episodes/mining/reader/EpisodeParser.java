@@ -35,16 +35,16 @@ public class EpisodeParser {
 	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(@Named("rootDir") File directory, FileReader reader) {
+	public EpisodeParser(@Named("events") File directory, FileReader reader) {
 		assertTrue(directory.exists(), "Frequent episode folder does not exist");
 		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
 		this.rootFolder = directory;
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> parse(int freq, double bd) {
+	public Map<Integer, Set<Episode>> parse(int numRepos) {
 
-		File filePath = getFilePath(freq, bd);
+		File filePath = getFilePath(numRepos);
 		List<String> lines = reader.readFile(filePath);
 
 		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
@@ -90,8 +90,8 @@ public class EpisodeParser {
 		return episode;
 	}
 
-	private File getFilePath(int freq, double bd) {
-		String fileName = rootFolder.getAbsolutePath() + "/outputF" + freq + "B" + bd + ".txt";
+	private File getFilePath(int numbRepos) {
+		String fileName = rootFolder.getAbsolutePath() + "/" + numbRepos + "Repos/episodes.txt";
 		File file = new File(fileName);
 		return file;
 	}

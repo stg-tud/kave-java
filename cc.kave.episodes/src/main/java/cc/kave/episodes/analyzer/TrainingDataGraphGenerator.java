@@ -20,11 +20,6 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -38,7 +33,6 @@ import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.model.Episode;
-import cc.recommenders.io.Logger;
 
 public class TrainingDataGraphGenerator {
 
@@ -69,33 +63,33 @@ public class TrainingDataGraphGenerator {
 		this.writer = writer;
 	}
 
-	public void generateGraphs(int frequencyThreshold, double bidirectionalThreshold) throws Exception {
-		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
-		Map<Integer, Set<Episode>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
-		List<Event> eventMapping = mappingParser.parse();
-
-		String directory = createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
-
-		int graphIndex = 0;
-
-		for (Map.Entry<Integer, Set<Episode>> entry : maxEpisodes.entrySet()) {
-			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
-			Logger.append("\n");
-			if (entry.getKey() > 1) {
-				Set<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(entry.getValue());
-				
-				for (Episode e : learnedEpisodes) {
-					Logger.log("Writting episode number %s.\n", graphIndex);
-					DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
-					List<String> types = getAPIType(e, eventMapping);
-					for (String t : types) {
-						writer.write(graph, getFilePath(directory, t, graphIndex));
-					}
-					graphIndex++;
-				}
-			}
-		}
-	}
+//	public void generateGraphs(int frequencyThreshold, double bidirectionalThreshold) throws Exception {
+//		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(frequencyThreshold, bidirectionalThreshold);
+//		Map<Integer, Set<Episode>> maxEpisodes = maxEpisodeTracker.getMaximalEpisodes(allEpisodes);
+//		List<Event> eventMapping = mappingParser.parse();
+//
+//		String directory = createDirectoryStructure(frequencyThreshold, bidirectionalThreshold);
+//
+//		int graphIndex = 0;
+//
+//		for (Map.Entry<Integer, Set<Episode>> entry : maxEpisodes.entrySet()) {
+//			Logger.log("Writting episodes with %d number of events.\n", entry.getKey());
+//			Logger.append("\n");
+//			if (entry.getKey() > 1) {
+//				Set<Episode> learnedEpisodes = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+//				
+//				for (Episode e : learnedEpisodes) {
+//					Logger.log("Writting episode number %s.\n", graphIndex);
+//					DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
+//					List<String> types = getAPIType(e, eventMapping);
+//					for (String t : types) {
+//						writer.write(graph, getFilePath(directory, t, graphIndex));
+//					}
+//					graphIndex++;
+//				}
+//			}
+//		}
+//	}
 
 	private List<String> getAPIType(Episode episode, List<Event> events) {
 		List<String> apiTypes = new LinkedList<String>();

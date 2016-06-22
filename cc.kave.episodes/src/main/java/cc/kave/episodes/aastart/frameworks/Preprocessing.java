@@ -60,17 +60,16 @@ public class Preprocessing {
 		this.eventsFolder = folder;
 		this.repos = repos;
 	}
-	private static final int NUMOFREPOS = 10;
 	private static final int REMFREQS = 1;
 
-	public void generate() throws ZipException, IOException {
-		List<Event> allEvents = repos.select(contextsDir, NUMOFREPOS);
+	public void generate(int numbRepos) throws ZipException, IOException {
+		List<Event> allEvents = repos.select(contextsDir, numbRepos);
 		EventStream stream = EventsFilter.filterStream(allEvents, REMFREQS);
-		EventStreamIo.write(stream, getPath().streamPath, getPath().mappingPath);
+		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath);
 	}
 	
-	private FilePaths getPath() {
-		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + NUMOFREPOS + "Repos");
+	private FilePaths getPath(int numbRepos) {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numbRepos + "Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();
 		}

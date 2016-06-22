@@ -53,14 +53,12 @@ public class FrameworksDistribution {
 		this.statistics = statistics;
 	}
 
-	private static final int NUMOFREPOS = 10;
+	public void getDistribution(int numbRepos) throws IOException {
 
-	public void getDistribution() throws IOException {
-
-		List<Event> allEvents = repos.select(rootDir, NUMOFREPOS);
+		List<Event> allEvents = repos.select(rootDir, numbRepos);
 		Map<Event, Integer> eventsFreqs = statistics.getFrequences(allEvents);
 		Frameworks distribution = getEventsAndTypes(eventsFreqs);
-		storeFrameworks(distribution, NUMOFREPOS);
+		storeFrameworks(distribution, numbRepos);
 	}
 
 	private Frameworks getEventsAndTypes(Map<Event, Integer> frequencies) throws IOException {

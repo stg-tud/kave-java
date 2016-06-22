@@ -145,7 +145,7 @@ public class EvaluationTest {
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		when(episodeParser.parse(eq(FREQUENCY), eq(BIDIRECTIONAL))).thenReturn(patterns);
+		when(episodeParser.parse(eq(FREQUENCY))).thenReturn(patterns);
 		when(mappingParser.parse()).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
@@ -179,7 +179,7 @@ public class EvaluationTest {
 		Logger.clearLog();
 		sut.evaluate();
 
-		verify(episodeParser).parse(eq(FREQUENCY), eq(BIDIRECTIONAL));
+		verify(episodeParser).parse(eq(FREQUENCY));
 		verify(mappingParser).parse();
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);

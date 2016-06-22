@@ -300,7 +300,7 @@ public class Evaluation {
 
 	private Map<Integer, Set<Episode>> readPatterns() {
 		Logger.log("Reading the learned patterns");
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(FREQUENCY, BIDIRECTIONAL);
+		Map<Integer, Set<Episode>> patterns = episodeParser.parse(FREQUENCY);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		return maxPatterns;
 	}

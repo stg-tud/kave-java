@@ -15,14 +15,10 @@
  */
 package cc.kave.episodes.analyzer;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.Inject;
 
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.model.Episode;
 
 public class PatternAnalyzer {
 
@@ -38,29 +34,29 @@ public class PatternAnalyzer {
 		this.maxEpisodes = me;
 	}
 	
-	public void readPatterns() {
-		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
-		Map<Integer, Set<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
-		
-		int allEpisodeCounter = 0;
-		int maxEpisodeCounter = 0;
-		
-		System.out.println("Maximal node-level is " + allEpisodes.size());
-		System.out.println();
-		
-		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
-			System.out.println("Node level = " + entry.getKey());
-			System.out.println("All episodes = " + entry.getValue().size());
-			allEpisodeCounter += entry.getValue().size();
-		}
-		System.out.println("Total number of maximal episodes is " + allEpisodeCounter);
-		System.out.println();
-		
-		for (Map.Entry<Integer, Set<Episode>> entry : maximalEpisodes.entrySet()) {
-			System.out.println("Node level = " + entry.getKey());
-			System.out.println("Maximal episodes = " + entry.getValue().size());
-			maxEpisodeCounter += entry.getValue().size();
-		}
-		System.out.println("Total number of maximal episodes is " + maxEpisodeCounter);
-	}
+//	public void readPatterns() {
+//		Map<Integer, Set<Episode>> allEpisodes = episodeParser.parse(FREQTHRESH, BDTHRESH);
+//		Map<Integer, Set<Episode>> maximalEpisodes = maxEpisodes.getMaximalEpisodes(allEpisodes);
+//		
+//		int allEpisodeCounter = 0;
+//		int maxEpisodeCounter = 0;
+//		
+//		System.out.println("Maximal node-level is " + allEpisodes.size());
+//		System.out.println();
+//		
+//		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
+//			System.out.println("Node level = " + entry.getKey());
+//			System.out.println("All episodes = " + entry.getValue().size());
+//			allEpisodeCounter += entry.getValue().size();
+//		}
+//		System.out.println("Total number of maximal episodes is " + allEpisodeCounter);
+//		System.out.println();
+//		
+//		for (Map.Entry<Integer, Set<Episode>> entry : maximalEpisodes.entrySet()) {
+//			System.out.println("Node level = " + entry.getKey());
+//			System.out.println("Maximal episodes = " + entry.getValue().size());
+//			maxEpisodeCounter += entry.getValue().size();
+//		}
+//		System.out.println("Total number of maximal episodes is " + maxEpisodeCounter);
+//	}
 }

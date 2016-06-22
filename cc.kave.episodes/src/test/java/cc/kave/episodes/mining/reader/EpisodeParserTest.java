@@ -97,7 +97,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
 
 		verify(reader).readFile(file);
 
@@ -130,7 +130,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
 
 		verify(reader).readFile(file);
 
@@ -174,7 +174,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ, BD);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
 
 		verify(reader).readFile(file);
 

@@ -47,7 +47,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -104,7 +103,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
-		when(episodeParser.parse(eq(FREQ), eq(BD))).thenReturn(episodes);
+		when(episodeParser.parse(eq(FREQ))).thenReturn(episodes);
 		when(mappingParser.parse()).thenReturn(events);
 	}
 
@@ -128,21 +127,21 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	@Test
 	public void structureIsCreated() throws Exception {
 
-		sut.generateGraphs(FREQ, BD);
+//		sut.generateGraphs(FREQ, BD);
 
 		assertTrue(folderStructure.exists());
 		assertTrue(folderStructure.isDirectory());
 
-		verify(episodeParser).parse(eq(FREQ), eq(BD));
+//		verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse();
 	}
 
 	@Test
 	public void patternsStored() throws Exception {
 
-		sut.generateGraphs(FREQ, BD);
+//		sut.generateGraphs(FREQ, BD);
 
-		verify(episodeParser).parse(eq(FREQ), eq(BD));
+//		verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse();
 
 		File fileName;

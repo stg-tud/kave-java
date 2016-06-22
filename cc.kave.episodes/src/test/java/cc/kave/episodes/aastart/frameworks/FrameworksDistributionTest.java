@@ -132,7 +132,7 @@ public class FrameworksDistributionTest {
 	
 	@Test
 	public void filesCreated() throws IOException {
-		sut.getDistribution();
+		sut.getDistribution(NUMOFREPOS);
 		
 		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));
@@ -143,7 +143,7 @@ public class FrameworksDistributionTest {
 	
 	@Test
 	public void filesContent() throws IOException {
-		sut.getDistribution();
+		sut.getDistribution(NUMOFREPOS);
 		
 		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));

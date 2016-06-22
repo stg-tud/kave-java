@@ -18,20 +18,10 @@ package cc.kave.episodes.analyzer;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -41,9 +31,6 @@ import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.EventMappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
-import cc.kave.episodes.model.Episode;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 public class RecommenderGraphGenerator {
 	
@@ -83,72 +70,72 @@ public class RecommenderGraphGenerator {
 		this.maxEpisodeTracker = maxEpisodeTracker;
 	}
 
-	public void generateGraphs() throws Exception {
-		
-		Logger.setPrinting(true);
-		
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(5, 0.01);
-		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
-		
-		List<Event> eventMapping = mappingParser.parse();
-		
-		Set<Episode> validationData = validationParser.parse(eventMapping);
-		
-		Map<Integer, Set<Episode>> simPatterns = new HashMap<Integer, Set<Episode>>();
-		for (Map.Entry<Integer, Set<Episode>> entry : maxPatterns.entrySet()) {
-			Set<Episode> setPatterns = transitivityClosure.removeTransitivelyClosure(entry.getValue());
-			simPatterns.put(entry.getKey(), setPatterns);
-		}
-		String directory = createDirectoryStructure();
-
-		int episodeID = 0;
-
-		for (Episode e : validationData) {
-			
-			if (e.getNumEvents() > 2) {
-				int queryID = 0;
-				
-				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
-				
-				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
-				Episode targetQuery = wrap(simpEpisode);
-				
-				DirectedGraph<Fact, DefaultEdge> epGraph = graphConverter.convert(targetQuery, eventMapping);
-				writer.write(epGraph, getEpisodePath(directory, episodeID));
-				
-				for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
-					for (Episode query : entry.getValue()) {
-						Set<Episode> simpQuery = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(query));
-						DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(wrap(simpQuery), eventMapping);
-						writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
-					
-						int proposalID = 0;
-					
-						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns, PROPOSALS);
-						Set<Double> probProposals = Sets.newLinkedHashSet();
-						for (Tuple<Episode, Double> tuple : proposals) {
-							probProposals.add(tuple.getSecond());
-							Set<Episode> proposal = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(tuple.getFirst()));
-							DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(wrap(proposal), eventMapping);
-							writer.write(proposalGraph, getProposalPath(directory, episodeID, queryID, proposalID));
-							proposalID++;
-						}
-						Logger.log("Episode = %d\tQuery = %d", episodeID, queryID);
-						System.out.println("Proposals: " + probProposals.toString());
-						queryID++;
-					}
-				} 
-				episodeID++;
-			}
-		}
-	}
-
-	private Episode wrap(Set<Episode> simpEpisode) {
-		for (Episode episode : simpEpisode) {
-			return episode;
-		} 
-		return null;
-	}
+//	public void generateGraphs() throws Exception {
+//		
+//		Logger.setPrinting(true);
+//		
+//		Map<Integer, Set<Episode>> patterns = episodeParser.parse(5, 0.01);
+//		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
+//		
+//		List<Event> eventMapping = mappingParser.parse();
+//		
+//		Set<Episode> validationData = validationParser.parse(eventMapping);
+//		
+//		Map<Integer, Set<Episode>> simPatterns = new HashMap<Integer, Set<Episode>>();
+//		for (Map.Entry<Integer, Set<Episode>> entry : maxPatterns.entrySet()) {
+//			Set<Episode> setPatterns = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+//			simPatterns.put(entry.getKey(), setPatterns);
+//		}
+//		String directory = createDirectoryStructure();
+//
+//		int episodeID = 0;
+//
+//		for (Episode e : validationData) {
+//			
+//			if (e.getNumEvents() > 2) {
+//				int queryID = 0;
+//				
+//				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
+//				
+//				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
+//				Episode targetQuery = wrap(simpEpisode);
+//				
+//				DirectedGraph<Fact, DefaultEdge> epGraph = graphConverter.convert(targetQuery, eventMapping);
+//				writer.write(epGraph, getEpisodePath(directory, episodeID));
+//				
+//				for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
+//					for (Episode query : entry.getValue()) {
+//						Set<Episode> simpQuery = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(query));
+//						DirectedGraph<Fact, DefaultEdge> queryGraph = graphConverter.convert(wrap(simpQuery), eventMapping);
+//						writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
+//					
+//						int proposalID = 0;
+//					
+//						Set<Tuple<Episode, Double>> proposals = recommender.getProposals(query, maxPatterns, PROPOSALS);
+//						Set<Double> probProposals = Sets.newLinkedHashSet();
+//						for (Tuple<Episode, Double> tuple : proposals) {
+//							probProposals.add(tuple.getSecond());
+//							Set<Episode> proposal = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(tuple.getFirst()));
+//							DirectedGraph<Fact, DefaultEdge> proposalGraph = graphConverter.convert(wrap(proposal), eventMapping);
+//							writer.write(proposalGraph, getProposalPath(directory, episodeID, queryID, proposalID));
+//							proposalID++;
+//						}
+//						Logger.log("Episode = %d\tQuery = %d", episodeID, queryID);
+//						System.out.println("Proposals: " + probProposals.toString());
+//						queryID++;
+//					}
+//				} 
+//				episodeID++;
+//			}
+//		}
+//	}
+//
+//	private Episode wrap(Set<Episode> simpEpisode) {
+//		for (Episode episode : simpEpisode) {
+//			return episode;
+//		} 
+//		return null;
+//	}
 
 	private String getQueryPath(String directory, int episodeID, int queryID) {
 		String queryFolder = directory + "/episode" + episodeID + "/query" + queryID + "/";

@@ -24,13 +24,16 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import cc.kave.episodes.aastart.frameworks.FrameworksDistribution;
 import cc.kave.episodes.aastart.frameworks.Preprocessing;
+import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
+	private static final int NUMBREPOS = 10;
 
 	private static Injector injector;
 
@@ -44,8 +47,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-//		load(FrameworksDistribution.class).getDistribution();
-		load(Preprocessing.class).generate();
+//		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
+//		load(Preprocessing.class).generate(NUMBREPOS);
+		
+		load(EpisodeParser.class).parse(NUMBREPOS);
 
 //		load(FrameworksData.class).getFrameworksDistribution();
 //		load(StreamFrequencies.class).frequencies();

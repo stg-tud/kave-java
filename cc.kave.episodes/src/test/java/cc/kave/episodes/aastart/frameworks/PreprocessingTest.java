@@ -124,14 +124,14 @@ public class PreprocessingTest {
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.generate();
+		sut.generate(NUMBREPOS);
 
 		verify(repos).select(any(Directory.class), anyInt());
 	}
 
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.generate();
+		sut.generate(NUMBREPOS);
 
 		verify(repos).select(any(Directory.class), anyInt());
 
@@ -144,7 +144,7 @@ public class PreprocessingTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.generate();
+		sut.generate(NUMBREPOS);
 
 		verify(repos).select(any(Directory.class), anyInt());
 
