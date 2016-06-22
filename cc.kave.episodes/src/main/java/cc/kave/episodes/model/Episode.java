@@ -30,23 +30,44 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Fact;
 
 public class Episode {
-	
+
 	private Set<Fact> facts = Sets.newHashSet();
 	private int frequency;
-	
+	private double bidirectMeasure;
+
 	public Set<Fact> getFacts() {
-		return facts;
+		return this.facts;
 	}
-	
+
 	public int getFrequency() {
-		return frequency;
+		return this.frequency;
 	}
-	
+
+	public double getBidirectMeasure() {
+		return this.bidirectMeasure;
+	}
+
+	public Set<Fact> getEvents() {
+		Set<Fact> events = Sets.newHashSet();
+		
+		for (Fact fact : this.facts) {
+			if (!fact.isRelation()) {
+				events.add(fact);
+			}
+		}
+		return events;
+	}
+
 	public void setFrequency(int freq) {
 		assertTrue(freq >= 0, "Frequency cannot be a negative value!");
 		this.frequency = freq;
 	}
-	
+
+	public void setBidirectMeasure(double bidirect) {
+		assertTrue(bidirect > 0.0 && bidirect <= 1.0, "Bidirectional measure should be a probability value!");
+		this.bidirectMeasure = bidirect;
+	}
+
 	public void addFact(Fact fact) {
 		facts.add(fact);
 	}
@@ -66,7 +87,7 @@ public class Episode {
 			addFact(fact);
 		}
 	}
-	
+
 	public boolean containsFact(Fact fact1) {
 		if (facts.contains(fact1)) {
 			return true;
@@ -87,7 +108,7 @@ public class Episode {
 		}
 		return numberEvents;
 	}
-
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -102,18 +123,16 @@ public class Episode {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
-	
+
 	public boolean equals(Episode ep) {
 		if (this.frequency != ep.frequency) {
 			return false;
 		}
-		if (this.facts.size() != ep.facts.size()) {
+		if (this.bidirectMeasure != ep.bidirectMeasure) {
 			return false;
 		}
-		for (Fact fact : ep.facts) {
-			if (!this.facts.contains(fact)) {
-				return false;
-			}
+		if (!(this.facts.equals(ep.facts))) {
+			return false;
 		}
 		return true;
 	}

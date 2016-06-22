@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,21 +52,43 @@ public class EpisodeTest {
 		thrown.expectMessage("Frequency cannot be a negative value!");
 		sut.setFrequency(-1);
 	}
+	
+	@Test
+	public void BiDirectIsPositive() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Bidirectional measure should be a probability value!");
+		sut.setBidirectMeasure(-0.5);
+	}
+	
+	@Test
+	public void BiDirectIsLessThenOne() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Bidirectional measure should be a probability value!");
+		sut.setBidirectMeasure(1.5);
+	}
 
 	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getFrequency());
+		assertTrue(sut.getBidirectMeasure() == 0.0);
 		assertEquals(0, sut.getNumFacts());
-
+		assertEquals(0, sut.getNumEvents());
+		assertEquals(Sets.newHashSet(), sut.getEvents());
 		assertEquals(Sets.newHashSet(), sut.getFacts());
 	}
 
 	@Test
 	public void valuesCanBeSet() {
 		sut.setFrequency(3);
-		assertEquals(3, sut.getFrequency());
+		sut.setBidirectMeasure(0.5);
 		sut.addFact("f");
-		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
+		
+		Set<Fact> facts = Sets.newHashSet(new Fact("f"));
+		
+		assertEquals(3, sut.getFrequency());
+		assertTrue(sut.getBidirectMeasure() == 0.5);
+		assertEquals(facts, sut.getFacts());
+		assertEquals(facts, sut.getEvents());
 		assertEquals(1, sut.getNumEvents());
 		assertEquals(1, sut.getNumFacts());
 	}
@@ -73,43 +96,39 @@ public class EpisodeTest {
 	@Test
 	public void addMultipleFacts() {
 		sut.addStringsOfFacts("f", "g", "f>g");
-		assertEquals(Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g")), sut.getFacts());
+		
+		Set<Fact> facts = Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g"));
+		Set<Fact> events = Sets.newHashSet(new Fact("f"), new Fact("g"));
+		
+		assertEquals(facts, sut.getFacts());
+		assertEquals(events, sut.getEvents());
 		assertEquals(sut.getNumEvents(), 2);
 		assertEquals(sut.getNumFacts(), 3);
 	}
 
 	@Test
-	public void addFactTest() {
-		Fact fact = new Fact("f");
-		sut.addFact(fact);
-		sut.setFrequency(3);
-
-		assertEquals(Sets.newHashSet(new Fact("f")), sut.getFacts());
-		assertEquals(1, sut.getNumEvents());
-		assertEquals(1, sut.getNumFacts());
-		assertEquals(3, sut.getFrequency());
-	}
-
-	@Test
 	public void addListOfFactTest() {
-		List<Fact> facts = new LinkedList<Fact>();
-		facts.add(new Fact("f"));
-		facts.add(new Fact("g"));
-		facts.add(new Fact("f>g"));
+		List<Fact> ListOffacts = new LinkedList<Fact>();
+		ListOffacts.add(new Fact("f"));
+		ListOffacts.add(new Fact("g"));
+		ListOffacts.add(new Fact("f>g"));
 
-		sut.addListOfFacts(facts);
-		sut.setFrequency(3);
+		sut.addListOfFacts(ListOffacts);
+		
+		Set<Fact> facts = Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g"));
+		Set<Fact> events = Sets.newHashSet(new Fact("f"), new Fact("g"));
 
-		assertEquals(Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g")), sut.getFacts());
+		assertEquals(facts, sut.getFacts());
+		assertEquals(events, sut.getEvents());
 		assertEquals(2, sut.getNumEvents());
 		assertEquals(3, sut.getNumFacts());
-		assertEquals(3, sut.getFrequency());
 	}
 
 	@Test
 	public void equality_default() {
 		Episode a = new Episode();
 		Episode b = new Episode();
+		
 		assertEquals(a, b);
 		assertEquals(a.hashCode(), b.hashCode());
 		assertTrue(a.equals(b));
@@ -120,69 +139,35 @@ public class EpisodeTest {
 		Episode a = new Episode();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		a.setFrequency(3);
+		a.setBidirectMeasure(0.5);
 
 		Episode b = new Episode();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setFrequency(3);
-
+		b.setBidirectMeasure(0.5);
+		
 		assertEquals(a, b);
 		assertTrue(a.equals(b));
 		assertEquals(a.hashCode(), b.hashCode());
 
 		assertEquals(a.getFrequency(), b.getFrequency());
+		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
+		assertEquals(a.getEvents(), b.getEvents());
 	}
-
-	@Test
-	public void equality_diffEvents() {
-		Episode a = new Episode();
-		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
-		a.setFrequency(3);
-
-		Episode b = new Episode();
-		b.addStringsOfFacts("3", "4", "3>4");
-		b.setFrequency(3);
-
-		assertNotEquals(a, b);
-		assertFalse(a.equals(b));
-		assertNotEquals(a.hashCode(), b.hashCode());
-
-		assertEquals(a.getFrequency(), b.getFrequency());
-		assertNotEquals(a.getNumEvents(), b.getNumEvents());
-		assertNotEquals(a.getNumFacts(), b.getNumFacts());
-		assertNotEquals(a.getFacts(), b.getFacts());
-	}
-
-	@Test
-	public void equality_sameEventsDiffRelations() {
-		Episode a = new Episode();
-		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
-		a.setFrequency(3);
-
-		Episode b = new Episode();
-		b.addStringsOfFacts("1", "2", "3", "1>2", "2>3");
-		b.setFrequency(3);
-
-		assertNotEquals(a, b);
-		assertFalse(a.equals(b));
-		assertNotEquals(a.hashCode(), b.hashCode());
-
-		assertEquals(a.getFrequency(), b.getFrequency());
-		assertEquals(a.getNumEvents(), b.getNumEvents());
-		assertEquals(a.getNumFacts(), b.getNumFacts());
-		assertNotEquals(a.getFacts(), b.getFacts());
-	}
-
+	
 	@Test
 	public void diffFreq() {
 		Episode a = new Episode();
 		a.setFrequency(3);
+		a.setBidirectMeasure(0.5);
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
 		b.setFrequency(5);
+		b.setBidirectMeasure(0.5);
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertNotEquals(a, b);
@@ -190,9 +175,83 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 
 		assertNotEquals(a.getFrequency(), b.getFrequency());
+		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
+		assertEquals(a.getEvents(), b.getEvents());
+	}
+	
+	@Test
+	public void diffBiDirect() {
+		Episode a = new Episode();
+		a.setFrequency(3);
+		a.setBidirectMeasure(0.5);
+		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
+
+		Episode b = new Episode();
+		b.setFrequency(3);
+		b.setBidirectMeasure(0.8);
+		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
+
+		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
+		assertNotEquals(a.hashCode(), b.hashCode());
+
+		assertEquals(a.getFrequency(), b.getFrequency());
+		assertTrue(a.getBidirectMeasure() != b.getBidirectMeasure());
+		assertEquals(a.getNumEvents(), b.getNumEvents());
+		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertEquals(a.getFacts(), b.getFacts());
+		assertEquals(a.getEvents(), b.getEvents());
+	}
+
+	@Test
+	public void equality_diffEvents() {
+		Episode a = new Episode();
+		a.setFrequency(3);
+		a.setBidirectMeasure(0.5);
+		a.addStringsOfFacts("1", "2", "1>2");
+
+		Episode b = new Episode();
+		b.setFrequency(3);
+		b.setBidirectMeasure(0.5);
+		b.addStringsOfFacts("3", "4", "3>4");
+
+		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
+		assertNotEquals(a.hashCode(), b.hashCode());
+
+		assertEquals(a.getFrequency(), b.getFrequency());
+		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertEquals(a.getNumEvents(), b.getNumEvents());
+		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertNotEquals(a.getFacts(), b.getFacts());
+		assertNotEquals(a.getEvents(), b.getEvents());
+	}
+
+	@Test
+	public void equality_sameEventsDiffRelations() {
+		Episode a = new Episode();
+		a.setFrequency(3);
+		a.setBidirectMeasure(0.5);
+		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
+
+		Episode b = new Episode();
+		b.setFrequency(3);
+		b.setBidirectMeasure(0.5);
+		b.addStringsOfFacts("1", "2", "3", "1>2", "2>3");
+
+		assertNotEquals(a, b);
+		assertFalse(a.equals(b));
+		assertNotEquals(a.hashCode(), b.hashCode());
+
+		assertEquals(a.getFrequency(), b.getFrequency());
+		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertEquals(a.getNumEvents(), b.getNumEvents());
+		assertEquals(a.getNumFacts(), b.getNumFacts());
+		assertNotEquals(a.getFacts(), b.getFacts());
+		assertEquals(a.getEvents(), b.getEvents());
 	}
 
 	@Test
