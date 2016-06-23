@@ -20,7 +20,7 @@ import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUti
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.filterSingleCharacterIdentifier;
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.stemTokens;
 
-import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -32,7 +32,7 @@ import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 import exec.recommender_reimplementation.tokenization.TokenizationVisitor;
 
 public class QueryExtractor {
-	public List<String> extractQueryFromCompletion(CompletionEvent completion, int lookback, boolean removeStopwords, boolean removeKeywords) {
+	public Set<String> extractQueryFromCompletion(CompletionEvent completion, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		Context context = completion.context;
 		TokenizationSettings settings = new TokenizationSettings();
 		settings.setActiveBrackets(false);
@@ -52,7 +52,7 @@ public class QueryExtractor {
 	
 	public class QueryVisitor extends TokenizationVisitor {
 
-		private List<String> identifiers;
+		private Set<String> identifiers;
 		private int lookback;
 		private boolean removeStopwords; 
 		
@@ -64,7 +64,7 @@ public class QueryExtractor {
 		
 		@Override
 		public Object visit(ICompletionExpression expr, TokenizationContext c) {
-			List<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
+			Set<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
 			if(!identifiers.isEmpty()) {
 				filterSingleCharacterIdentifier(identifiers);
 				identifiers = camelCaseSplitTokens(identifiers);
@@ -82,7 +82,7 @@ public class QueryExtractor {
 			return super.visit(decl, c);
 		}
 
-		public List<String> getIdentifiers() {
+		public Set<String> getIdentifiers() {
 			return identifiers;
 		}
 		

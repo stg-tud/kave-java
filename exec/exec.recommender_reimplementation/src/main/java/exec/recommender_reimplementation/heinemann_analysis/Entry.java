@@ -15,39 +15,41 @@
  */
 package exec.recommender_reimplementation.heinemann_analysis;
 
-import java.util.List;
+import java.util.Set;
+
+import cc.kave.commons.model.names.IMethodName;
 
 public class Entry {
-	private List<String> identifiers;
-	private String methodCall;
+	private Set<String> lookback;
+	private IMethodName methodName;
 	
-	public Entry(List<String> identifiers, String methodCall) {
-		this.identifiers = identifiers;
-		this.methodCall = methodCall;
+	public Entry(Set<String> lookback, IMethodName methodName) {
+		this.lookback = lookback;
+		this.methodName = methodName;
 	}
 	
-	public List<String> getIdentifiers() {
-		return identifiers;
+	public Set<String> getLookback() {
+		return lookback;
 	}
 
-	public void setIdentifiers(List<String> identifiers) {
-		this.identifiers = identifiers;
+	public void setLookback(Set<String> lookback) {
+		this.lookback = lookback;
 	}
 
-	public String getMethodCall() {
-		return methodCall;
+	public IMethodName getMethodName() {
+		return methodName;
 	}
 
-	public void setMethodCall(String methodCall) {
-		this.methodCall = methodCall;
+	public void setMethodName(IMethodName methodName) {
+		this.methodName = methodName;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((identifiers == null) ? 0 : identifiers.hashCode());
-		result = prime * result + ((methodCall == null) ? 0 : methodCall.hashCode());
+		result = prime * result + ((lookback == null) ? 0 : lookback.hashCode());
+		result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
 		return result;
 	}
 
@@ -60,22 +62,22 @@ public class Entry {
 		if (getClass() != obj.getClass())
 			return false;
 		Entry other = (Entry) obj;
-		if (identifiers == null) {
-			if (other.identifiers != null)
+		if (lookback == null) {
+			if (other.lookback != null)
 				return false;
-		} else if (!identifiers.equals(other.identifiers))
+		} else if (!lookback.equals(other.lookback))
 			return false;
-		if (methodCall == null) {
-			if (other.methodCall != null)
+		if (methodName == null) {
+			if (other.methodName != null)
 				return false;
-		} else if (!methodCall.equals(other.methodCall))
+		} else if (!methodName.equals(other.methodName))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Entry [identifiers=" + identifiers + ", methodCall=" + methodCall + "]";
+		return "Entry [Lookback=" + lookback + ", MethodName=" + methodName + "]";
 	}
 	
 	

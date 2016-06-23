@@ -18,7 +18,7 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -32,6 +32,7 @@ import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.expressions.simple.NullExpression;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
@@ -41,13 +42,15 @@ public class IndexExtractorTest extends PBNAnalysisBaseTest {
 	public void standardPaperTest() {
 		Context context = getContextFor(sst(DefaultClassContext, createPaperTest()), defaultTypeHierarchy());
 		
-		List<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
+		Set<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
 		
-		Entry entry1 = new Entry(Lists.newArrayList("io","except","string","error","messag"), "TDecl#getMessage()");
-		Entry entry2 = new Entry(Lists.newArrayList("string", "error", "messag", "get"), 
-				"JOptionPane#showMessageDialog(Component,Object)");
+		Entry entry1 = new Entry(Sets.newHashSet("io","except","string","error","messag"), method(stringType, DefaultClassContext, "getMessage"));
+		Entry entry2 = new Entry(Sets.newHashSet("string", "error", "messag", "get"), 
+				method(voidType, type("JOptionPane"), "showMessageDialog", parameter(type("Component"), "component"),   
+						parameter(objectType, "message")));
+		Entry entry3 = new Entry(Sets.newHashSet(ExtractionUtil.EMPTY_TOKEN), method(voidType, DefaultClassContext, "readFile"));
 		
-		assertThat(index, Matchers.contains(entry1,entry2));
+		assertThat(index, Matchers.containsInAnyOrder(entry1,entry2, entry3));
 	}
 	
 	@Test
@@ -61,11 +64,11 @@ public class IndexExtractorTest extends PBNAnalysisBaseTest {
 				varDecl("foo", intType),
 				ifBlock);
 		
-		List<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
+		Set<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
 		
-		Entry entry = new Entry(Lists.newArrayList("<if>","true","string","some","messag"), "TDecl#getMessage()");
+		Entry entry = new Entry(Sets.newHashSet("<if>","true","string","some","messag"), method(stringType, DefaultClassContext, "getMessage"));
 		
-		assertThat(index, Matchers.is(Lists.newArrayList(entry)));
+		assertThat(index, Matchers.containsInAnyOrder(entry));
 	}
 	
 	@Test
@@ -79,11 +82,11 @@ public class IndexExtractorTest extends PBNAnalysisBaseTest {
 				varDecl("foo", intType),
 				ifBlock);
 		
-		List<Entry> index = IndexExtractor.extractIndex(context, 5, false, true);
+		Set<Entry> index = IndexExtractor.extractIndex(context, 5, false, true);
 		
-		Entry entry = new Entry(Lists.newArrayList("foo","true","string","some","messag"), "TDecl#getMessage()");
+		Entry entry = new Entry(Sets.newHashSet("foo","true","string","some","messag"), method(stringType, DefaultClassContext, "getMessage"));
 		
-		assertThat(index, Matchers.is(Lists.newArrayList(entry)));
+		assertThat(index, Matchers.containsInAnyOrder(entry));
 	}
 	
 	@Test
@@ -93,11 +96,11 @@ public class IndexExtractorTest extends PBNAnalysisBaseTest {
 				assign("foo", referenceExpr(fieldReference("this", field(stringType, DefaultClassContext, "someField")))),
 				invokeStmt("this", method(voidType, DefaultClassContext, "someMethod")));
 		
-		List<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
+		Set<Entry> index = IndexExtractor.extractIndex(context, 5, false, false);
 		
-		Entry entry = new Entry(Lists.newArrayList("string","foo","this", "some","field"), "TDecl#someMethod()");
+		Entry entry = new Entry(Sets.newHashSet("string","foo","this", "some","field"), method(voidType, DefaultClassContext, "someMethod"));
 		
-		assertThat(index, Matchers.is(Lists.newArrayList(entry)));
+		assertThat(index, Matchers.is(Sets.newHashSet(entry)));
 	}
 	
 	@Test
@@ -105,13 +108,13 @@ public class IndexExtractorTest extends PBNAnalysisBaseTest {
 		setupDefaultEnclosingMethod(				
 				varDecl("foo", stringType),
 				assign("foo", referenceExpr(fieldReference("this", field(stringType, DefaultClassContext, "someField")))),
-				invokeStmt("this", method(voidType, DefaultClassContext, "someMethod")));
+				invokeStmt("who", method(voidType, DefaultClassContext, "someMethod")));
 		
-		List<Entry> index = IndexExtractor.extractIndex(context, 5, true, false);
+		Set<Entry> index = IndexExtractor.extractIndex(context, 5, true, false);
 		
-		Entry entry = new Entry(Lists.newArrayList("string","foo", "some","field"), "TDecl#someMethod()");
+		Entry entry = new Entry(Sets.newHashSet("string","foo", "this","some","field"), method(voidType, DefaultClassContext, "someMethod"));
 		
-		assertThat(index, Matchers.is(Lists.newArrayList(entry)));
+		assertThat(index, Matchers.is(Sets.newHashSet(entry)));
 	}
 
 	public IMethodDeclaration createPaperTest() {

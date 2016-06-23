@@ -18,7 +18,7 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
 import static org.junit.Assert.assertThat;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -41,9 +41,9 @@ public class QueryExtractorTest extends PBNAnalysisBaseTest {
 		
 		QueryExtractor queryExtractor = new QueryExtractor();
 		
-		List<String> identifiers = queryExtractor.extractQueryFromCompletion(completionEvent, 5, false, false);
+		Set<String> identifiers = queryExtractor.extractQueryFromCompletion(completionEvent, 5, false, false);
 		
-		assertThat(identifiers, Matchers.contains("string","foo","this", "some","field"));
+		assertThat(identifiers, Matchers.containsInAnyOrder("string","foo","this", "some","field"));
 	}
 
 }

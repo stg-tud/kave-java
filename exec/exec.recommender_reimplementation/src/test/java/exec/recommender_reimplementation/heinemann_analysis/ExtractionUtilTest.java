@@ -4,8 +4,9 @@ import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.objec
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -13,58 +14,79 @@ import org.junit.Test;
 import cc.kave.commons.model.names.IMethodName;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class ExtractionUtilTest extends PBNAnalysisBaseTest {
 
 	@Test
+	public void camelSplitTwoWords() {
+		assertTokenization("HelloWorld", "Hello", "World");
+	}
+	
+	@Test
+	public void camelSplitAcronym() {
+		assertTokenization("SSTParser", "SST", "Parser");
+	}
+	
+	@Test
+	public void camelSplitMultipleWords() {
+		assertTokenization("AGoodDay", "A", "Good", "Day");
+	}
+	
+	private static void assertTokenization(String input, String... expecteds) {
+		String[] actuals = ExtractionUtil.camelCaseSplit(input);
+		assertArrayEquals(expecteds, actuals);
+	}
+	
+	@Test
 	public void camelCaseSplitJavaTokens() {
-		List<String> identifiers = Lists.newArrayList("IOException", "String", "errorMessage", "e", "getMessage");
-		List<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
-		assertThat(splitIdentifiers, Matchers.contains("io", "exception", "string", "error", "message", "e", "get", "message"));
+		Set<String> identifiers = Sets.newHashSet("IOException", "String", "errorMessage", "e", "getMessage");
+		Set<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
+		assertThat(splitIdentifiers, Matchers.containsInAnyOrder("io", "exception", "string", "error", "message", "e", "get"));
 	}
 	
 	@Test
 	public void camelCaseSplitCSharpTokens() {
-		List<String> identifiers = Lists.newArrayList("IOException", "String", "errorMessage", "e", "GetMessage");
-		List<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
-		assertThat(splitIdentifiers, Matchers.contains("io", "exception", "string", "error", "message", "e", "get", "message"));
+		Set<String> identifiers = Sets.newHashSet("IOException", "String", "errorMessage", "e", "GetMessage");
+		Set<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
+		assertThat(splitIdentifiers, Matchers.containsInAnyOrder("io", "exception", "string", "error", "message", "e", "get"));
 	}
 	
 	@Test
 	public void emptyListCamelCaseSplit() {
-		List<String> identifiers = new ArrayList<>();
-		List<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
+		Set<String> identifiers = new HashSet<>();
+		Set<String> splitIdentifiers = ExtractionUtil.camelCaseSplitTokens(identifiers);
 		assertTrue(splitIdentifiers.isEmpty());
 	}
 	
 	@Test
 	public void stemsTokens() {
-		List<String> identifiers = Lists.newArrayList("exception", "get", "message");
-		List<String> stemmedIdentifiers = ExtractionUtil.stemTokens(identifiers);
-		assertThat(stemmedIdentifiers, Matchers.contains("except", "get", "messag"));
+		Set<String> identifiers = Sets.newHashSet("exception", "get", "message");
+		Set<String> stemmedIdentifiers = ExtractionUtil.stemTokens(identifiers);
+		assertThat(stemmedIdentifiers, Matchers.containsInAnyOrder("except", "get", "messag"));
 	}
 	
 	@Test
 	public void noDuplicatesAfterStemming() {
-		List<String> identifiers = Lists.newArrayList("message", "e", "get", "message");
-		List<String> stemmedIdentifiers = ExtractionUtil.stemTokens(identifiers);
-		assertThat(stemmedIdentifiers, Matchers.contains("messag","e", "get"));
+		Set<String> identifiers = Sets.newHashSet("message", "e", "get", "message");
+		Set<String> stemmedIdentifiers = ExtractionUtil.stemTokens(identifiers);
+		assertThat(stemmedIdentifiers, Matchers.containsInAnyOrder("messag","e", "get"));
 	}
 	
 	@Test
 	public void collectTokenTest() {
 		List<String> tokens = Lists.newArrayList("readFile", "<catch>", "IOException", "e", "String", "errorMessage", "e", "getMessage");
-		List<String> identifiers = ExtractionUtil.collectTokens(tokens, 5, false);
-		assertThat(identifiers, Matchers.contains("String", "errorMessage", "e", "getMessage"));
+		Set<String> identifiers = ExtractionUtil.collectTokens(tokens, 5, false);
+		assertThat(identifiers, Matchers.containsInAnyOrder("String", "errorMessage", "e", "getMessage"));
 	}
 	
 	@Test
 	public void filterSingleCharactersTest() {
-		List<String> identifiers = Lists.newArrayList("IOException", "String", "errorMessage", "e", "getMessage");
+		Set<String> identifiers = Sets.newHashSet("IOException", "String", "errorMessage", "e", "getMessage");
 		ExtractionUtil.filterSingleCharacterIdentifier(identifiers);
-		assertThat(identifiers, Matchers.contains("IOException", "String", "errorMessage", "getMessage"));
+		assertThat(identifiers, Matchers.containsInAnyOrder("IOException", "String", "errorMessage", "getMessage"));
 	}
 	
 	@Test
@@ -74,9 +96,9 @@ public class ExtractionUtilTest extends PBNAnalysisBaseTest {
 	
 	@Test
 	public void createsNewEntry() {
-		List<String> identifiers = Lists.newArrayList("io", "except", "string", "error", "message", "get");
+		Set<String> identifiers = Sets.newHashSet("io", "except", "string", "error", "message", "get");
 		IMethodName methodName = method(voidType, type("JOptionPane"), "showMessageDialog", parameter(type("Component"), "component"), parameter(objectType, "message"));
 		Entry entry = ExtractionUtil.createNewEntry(methodName, identifiers);
-		assertThat(entry, Matchers.is(new Entry(identifiers,"JOptionPane#showMessageDialog(Component,Object)")));
+		assertThat(entry, Matchers.is(new Entry(identifiers,methodName)));
 	}
 }

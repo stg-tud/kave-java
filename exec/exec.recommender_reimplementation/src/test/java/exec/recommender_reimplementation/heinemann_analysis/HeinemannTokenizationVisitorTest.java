@@ -3,9 +3,6 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +11,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.typeshapes.TypeShape;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
@@ -52,7 +49,7 @@ public class HeinemannTokenizationVisitorTest extends PBNAnalysisBaseTest {
 					
 		sst.accept(uut, tokenizationContext);
 		
-		assertThat(uut.getIndex(),Matchers.contains(new Entry(Lists.newArrayList("string", "error","messag","bar"), "TDecl#M()")));
+		assertThat(uut.getIndex(),Matchers.containsInAnyOrder(new Entry(Sets.newHashSet("string", "error","messag","bar"), DefaultMethodContext)));
 	}
 		
 	@Test
@@ -62,7 +59,19 @@ public class HeinemannTokenizationVisitorTest extends PBNAnalysisBaseTest {
 		
 		methodDecl.accept(uut, tokenizationContext);
 		
-		assertTrue(uut.getIndex().isEmpty());
+		assertThat(uut.getIndex(), Matchers.containsInAnyOrder(new Entry(Sets.newHashSet(ExtractionUtil.EMPTY_TOKEN), DefaultMethodContext)));
+	}
+
+	@Test
+	public void ignoresMethodHeader() {
+		uut = new HeinemannTokenizationVisitor(new TypeShape(), 2, false);
+		
+		IMethodDeclaration methodDecl = methodDecl(method(voidType, DefaultClassContext, "m2"), true,
+				invokeStmt("foo", DefaultMethodContext));
+		
+		methodDecl.accept(uut, tokenizationContext);
+		
+		assertThat(uut.getIndex(), Matchers.containsInAnyOrder(new Entry(Sets.newHashSet(ExtractionUtil.EMPTY_TOKEN), DefaultMethodContext)));
 	}
 
 }

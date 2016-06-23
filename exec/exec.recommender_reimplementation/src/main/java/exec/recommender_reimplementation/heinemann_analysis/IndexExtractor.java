@@ -15,14 +15,14 @@
  */
 package exec.recommender_reimplementation.heinemann_analysis;
 
-import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 
 public class IndexExtractor {
-	public static List<Entry> extractIndex(Context context, int lookback, boolean removeStopwords, boolean removeKeywords) {
+	public static Set<Entry> extractIndex(Context context, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		TokenizationSettings settings = new TokenizationSettings();
 		settings.setActiveBrackets(false);
 		if (!removeKeywords) {

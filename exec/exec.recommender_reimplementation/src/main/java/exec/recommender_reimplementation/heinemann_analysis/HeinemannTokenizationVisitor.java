@@ -15,21 +15,24 @@
  */
 package exec.recommender_reimplementation.heinemann_analysis;
 
-import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.*;
+import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.camelCaseSplitTokens;
+import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.collectTokens;
+import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.createNewEntry;
+import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.filterSingleCharacterIdentifier;
+import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.stemTokens;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.typeshapes.ITypeShape;
-
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationVisitor;
 
 public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 
-	private List<Entry> index;
+	private Set<Entry> index;
 
 	int lookback;
 
@@ -37,14 +40,14 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 
 	public HeinemannTokenizationVisitor(ITypeShape typeShape, int lookback, boolean removeStopwords) {
 		super(typeShape);
-		index = new ArrayList<>();
+		index = new HashSet<>();
 		this.lookback = lookback;
 		this.removeStopwords = removeStopwords;
 	}
 
 	@Override
 	public Object visit(IInvocationExpression expr, TokenizationContext c) {
-		List<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
+		Set<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
 		if(!identifiers.isEmpty()) {
 			filterSingleCharacterIdentifier(identifiers);
 			identifiers = camelCaseSplitTokens(identifiers);
@@ -58,12 +61,14 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 
 	@Override
 	public Object visit(IMethodDeclaration decl, TokenizationContext c) {
-		// clears TokenStream on every methodDeclaration to only have identifiers in same method body
+		// clears TokenStream on every methodDeclaration to only have identifiers in same method body 
+		// and ignores method header
 		c.getTokenStream().clear();
-		return super.visit(decl, c);
-	}
+
+		visitStatements(decl.getBody(), c);
+		return null;	}
 	
-	public List<Entry> getIndex() {
+	public Set<Entry> getIndex() {
 		return index;
 	}
 
