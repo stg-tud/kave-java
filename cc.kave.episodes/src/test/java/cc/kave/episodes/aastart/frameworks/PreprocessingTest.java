@@ -110,7 +110,7 @@ public class PreprocessingTest {
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Contexts folder does not exist");
+		thrown.expectMessage("Events folder does not exist");
 		sut = new Preprocessing(rootDirectory, new File("does not exist"), repos);
 	}
 
@@ -118,7 +118,7 @@ public class PreprocessingTest {
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Contexts is not a folder, but a file");
+		thrown.expectMessage("Events is not a folder, but a file");
 		sut = new Preprocessing(rootDirectory, file, repos);
 	}
 

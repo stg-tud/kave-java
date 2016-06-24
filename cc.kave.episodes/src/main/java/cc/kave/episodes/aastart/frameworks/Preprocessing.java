@@ -54,8 +54,8 @@ public class Preprocessing {
 
 	@Inject
 	public Preprocessing(@Named("contexts") Directory directory, @Named("events") File folder, ReductionByRepos repos) {
-		assertTrue(folder.exists(), "Contexts folder does not exist");
-		assertTrue(folder.isDirectory(), "Contexts is not a folder, but a file");
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.contextsDir = directory;
 		this.eventsFolder = folder;
 		this.repos = repos;

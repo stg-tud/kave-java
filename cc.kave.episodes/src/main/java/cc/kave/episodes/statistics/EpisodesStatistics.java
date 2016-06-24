@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.statistics;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 
 import cc.kave.episodes.model.Episode;
 
-public class EpisodesDistribution {
+public class EpisodesStatistics {
 
 	public Map<Integer, Integer> freqsEpisodes(List<Episode> episodes) {
 		Map<Integer, Integer> total = Maps.newHashMap();

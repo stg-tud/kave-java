@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.statistics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,12 +27,13 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.statistics.EpisodesStatistics;
 
-public class EpisodesDistributionTest {
+public class EpisodesStatisticsTest {
 	
 	private List<Episode> episodes;
 
-	private EpisodesDistribution sut;
+	private EpisodesStatistics sut;
 	
 	@Before
 	public void setup() {
@@ -43,7 +44,7 @@ public class EpisodesDistributionTest {
 		episodes.add(createEpisode(2, 0.9, "1", "3", "4", "3>1", "4>1"));
 		episodes.add(createEpisode(7, 1, "1", "3", "5"));
 		
-		sut = new EpisodesDistribution();
+		sut = new EpisodesStatistics();
 	}
 	
 	@Test
