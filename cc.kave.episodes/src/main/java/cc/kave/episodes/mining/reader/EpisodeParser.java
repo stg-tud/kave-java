@@ -62,21 +62,26 @@ public class EpisodeParser {
 				rowValues = line.split("\\s+");
 				if (!episodes.isEmpty()) {
 					episodeIndexed.put(numNodes, episodes);
-				}
+				} 
 				if (Integer.parseInt(rowValues[3]) > 0) {
 					String[] nodeString = rowValues[0].split("-");
 					numNodes = Integer.parseInt(nodeString[0]);
 					episodes = Sets.newHashSet();
+				} else {
+					break;
 				}
 			}
 		}
-		episodeIndexed.put(numNodes, episodes);
+		if (!episodeIndexed.containsKey(numNodes)) {
+			episodeIndexed.put(numNodes, episodes);
+		}
 		return episodeIndexed;
 	}
 
 	private Episode readEpisode(int numberOfNodes, String[] rowValues) {
 		Episode episode = new Episode();
 		episode.setFrequency(Integer.parseInt(rowValues[1].trim()));
+		episode.setBidirectMeasure(Double.parseDouble(rowValues[2].trim()));
 		String[] events = rowValues[0].split("\\s+");
 		for (int idx = 0; idx < numberOfNodes; idx++) {
 			episode.addFact(events[idx]);

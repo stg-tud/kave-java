@@ -41,8 +41,7 @@ public class EpisodeParserTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private static final int FREQ = 2;
-	private static final double BD = 0.1;
+	private static final int NUMREPOS = 2;
 
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
@@ -97,7 +96,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
+		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
 
 		verify(reader).readFile(file);
 
@@ -130,7 +129,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
+		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
 
 		verify(reader).readFile(file);
 
@@ -167,23 +166,24 @@ public class EpisodeParserTest {
 
 		episodes = Sets.newHashSet();
 
-		episode = createEpisode(3, 2, "1", "2", "1>2");
+		episode = createEpisode(3, 1, "1", "2", "1>2");
 		episodes.add(episode);
 
 		expected.put(2, episodes);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQ);
+		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
 
 		verify(reader).readFile(file);
 
 		assertEquals(expected, actual);
 	}
 
-	private Episode createEpisode(int freq, int numberOfExistenceFacts, String... strings) {
+	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
+		episode.setBidirectMeasure(bdmeas);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}
@@ -191,7 +191,7 @@ public class EpisodeParserTest {
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/outputF2B0.1.txt");
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/" + NUMREPOS + "Repos/episodes.txt");
 		return fileName;
 	}
 }
