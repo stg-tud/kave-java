@@ -25,7 +25,7 @@ import com.google.inject.name.Names;
 import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.export.ThresholdsDistribution;
+import cc.kave.episodes.export.ThresholdsFrequency;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -84,9 +84,9 @@ public class Module extends AbstractModule {
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
 		bind(File.class).annotatedWith(Names.named("patterns")).toInstance(patternsFile);
 
-		File episodeRoot = episodeFile;
+		File eventsRoot = eventsData;
 		FileReader reader = new FileReader();
-		bind(EpisodeParser.class).toInstance(new EpisodeParser(episodeRoot, reader));
+		bind(EpisodeParser.class).toInstance(new EpisodeParser(eventsRoot, reader));
 
 		File eventStreamRoot = eventsData;
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
@@ -98,7 +98,7 @@ public class Module extends AbstractModule {
 		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
 
-		EpisodeParser episodeParser = new EpisodeParser(episodeRoot, reader);
+		EpisodeParser episodeParser = new EpisodeParser(eventsRoot, reader);
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
@@ -106,7 +106,7 @@ public class Module extends AbstractModule {
 
 		File patternsRoot = patternsFile;
 		EpisodesStatistics stats = new EpisodesStatistics();
-		bind(ThresholdsDistribution.class).toInstance(new ThresholdsDistribution(patternsRoot, episodeParser, stats));
+		bind(ThresholdsFrequency.class).toInstance(new ThresholdsFrequency(patternsRoot, episodeParser, stats));
 
 		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
 		EpisodeRecommender recommender = new EpisodeRecommender();

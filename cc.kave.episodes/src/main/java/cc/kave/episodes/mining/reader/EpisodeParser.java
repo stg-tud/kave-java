@@ -28,6 +28,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.episodes.model.Episode;
+import cc.recommenders.io.Logger;
 
 public class EpisodeParser {
 
@@ -45,6 +46,7 @@ public class EpisodeParser {
 	public Map<Integer, Set<Episode>> parse(int numRepos) {
 
 		File filePath = getFilePath(numRepos);
+		Logger.log("%s", filePath.getAbsolutePath());
 		List<String> lines = reader.readFile(filePath);
 
 		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();

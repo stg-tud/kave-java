@@ -30,6 +30,8 @@ import cc.kave.episodes.model.Episode;
 
 public class EpisodesStatisticsTest {
 	
+	private static final int FREQTHRESH = 3;
+	
 	private Set<Episode> episodes;
 
 	private EpisodesStatistics sut;
@@ -61,11 +63,11 @@ public class EpisodesStatisticsTest {
 	@Test
 	public void bidirectTest() {
 		Map<Double, Integer> expected = Maps.newLinkedHashMap();
-		expected.put(1.0, 2);
-		expected.put(0.9, 4);
-		expected.put(0.6, 5);
+		expected.put(0.9, 2);
+		expected.put(0.6, 3);
+		expected.put(1.0, 1);
 		
-		Map<Double, Integer> actuals = sut.bidirectEpisodes(episodes);
+		Map<Double, Integer> actuals = sut.bidirectEpisodes(episodes, FREQTHRESH);
 		
 		assertEquals(expected, actuals);
 	}

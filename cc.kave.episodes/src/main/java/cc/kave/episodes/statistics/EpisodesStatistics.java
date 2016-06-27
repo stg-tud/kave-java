@@ -25,6 +25,8 @@ import com.google.common.collect.Maps;
 import cc.kave.episodes.model.Episode;
 
 public class EpisodesStatistics {
+	
+	private static final int ROUNDVALUE = 3;
 
 	public Map<Integer, Integer> freqsEpisodes(Set<Episode> episodes) {
 		Map<Integer, Integer> total = initFreqs(episodes);
@@ -58,20 +60,24 @@ public class EpisodesStatistics {
 		return initializer;
 	}
 
-	public Map<Double, Integer> bidirectEpisodes(Set<Episode> episodes) {
+	public Map<Double, Integer> bidirectEpisodes(Set<Episode> episodes, int frequency) {
 		Map<Double, Integer> total = initBd(episodes);
 
 		for (Episode ep : episodes) {
+			if (!valid(ep, frequency)){
+				continue;
+			}
 			double bd = ep.getBidirectMeasure();
-			int count = total.get(bd);
-			total.put(bd, count + 1);
+			double roundBd = Precision.round(bd, ROUNDVALUE);
+			int count = total.get(roundBd);
+			total.put(roundBd, count + 1);
 			
-			if (bd > 0.1) {
+			if (roundBd > 0.1) {
 				for (double distr = bd - 0.1; distr >= 0.1; distr -= 0.1) {
-					double tempBd = Precision.round(distr, 1);
-					if (total.containsKey(tempBd)) {
-						int tempCount = total.get(tempBd);
-						total.put(tempBd, tempCount + 1);
+					double tempDistr = Precision.round(distr, ROUNDVALUE);
+					if (total.containsKey(tempDistr)) {
+						int tempCount = total.get(tempDistr);
+						total.put(tempDistr, tempCount + 1);
 					}
 				}
 			}
@@ -79,13 +85,22 @@ public class EpisodesStatistics {
 		return total;
 	}
 
+	private boolean valid(Episode ep, int threshFreq) {
+		int epFreq = ep.getFrequency();
+		if (epFreq >= threshFreq) {
+			return true;
+		} 
+		return false;
+	}
+
 	private Map<Double, Integer> initBd(Set<Episode> episodes) {
 		Map<Double, Integer> initializer = Maps.newLinkedHashMap();
 
 		for (Episode ep : episodes) {
 			double bd = ep.getBidirectMeasure();
-			if (!initializer.containsKey(bd)) {
-				initializer.put(bd, 0);
+			double reoundBd = Precision.round(bd, ROUNDVALUE);
+			if (!initializer.containsKey(reoundBd)) {
+				initializer.put(reoundBd, 0);
 			}
 		}
 		return initializer;

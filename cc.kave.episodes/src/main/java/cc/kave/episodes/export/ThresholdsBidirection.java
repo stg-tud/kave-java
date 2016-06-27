@@ -31,14 +31,14 @@ import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 
-public class ThresholdsDistribution {
+public class ThresholdsBidirection {
 
 	private File patternsFolder;
 	private EpisodeParser parser;
 	private EpisodesStatistics statistics;
 
 	@Inject
-	public ThresholdsDistribution(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
+	public ThresholdsBidirection(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -46,7 +46,7 @@ public class ThresholdsDistribution {
 		this.statistics = stats;
 	}
 
-	public void writer(int numbRepos) throws IOException {
+	public void writer(int numbRepos, int frequency) throws IOException {
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
 		StringBuilder freqsBuilder = new StringBuilder();
 		StringBuilder bdsBuilder = new StringBuilder();
@@ -59,11 +59,11 @@ public class ThresholdsDistribution {
 			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
 			freqsBuilder.append(freqsLevel);
 			
-			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue());
+			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue(), frequency);
 			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
 			bdsBuilder.append(bdsLevel);
 		}
-		FileUtils.writeStringToFile(new File(getPath(numbRepos).freqsPath), freqsBuilder.toString());
+//		FileUtils.writeStringToFile(new File(getPath(numbRepos).freqsPath), freqsBuilder.toString());
 		FileUtils.writeStringToFile(new File(getPath(numbRepos).bdsPath), bdsBuilder.toString());
 	}
 
@@ -92,7 +92,7 @@ public class ThresholdsDistribution {
 	private FilePaths getPath(int numbRepos) {
 		FilePaths paths = new FilePaths();
 		paths.freqsPath = patternsFolder.getAbsolutePath() + "/freqs" + numbRepos + "Repos.txt";
-		paths.bdsPath = patternsFolder.getAbsolutePath() + "/bds" + numbRepos + "Repos.txt";
+		paths.bdsPath = patternsFolder.getAbsolutePath() + "/freq40bds" + numbRepos + "Repos.txt";
 
 		return paths;
 	}

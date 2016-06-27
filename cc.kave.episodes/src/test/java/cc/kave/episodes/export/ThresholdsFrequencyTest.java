@@ -47,7 +47,7 @@ import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
-public class ThresholdsDistributionTest {
+public class ThresholdsFrequencyTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -56,7 +56,7 @@ public class ThresholdsDistributionTest {
 
 	@Mock
 	private EpisodeParser parser;
-//	@Mock
+
 	private EpisodesStatistics stats;
 	
 	private static final int NUMBREPOS = 2;
@@ -129,10 +129,8 @@ public class ThresholdsDistributionTest {
 		verify(parser).parse(eq(NUMBREPOS));
 
 		File freqsFile = new File(getFreqsPath());
-		File bdsFile = new File(getBdsPath());
 
 		assertTrue(freqsFile.exists());
-		assertTrue(bdsFile.exists());
 	}
 	
 	@Test
@@ -142,7 +140,6 @@ public class ThresholdsDistributionTest {
 		verify(parser).parse(eq(NUMBREPOS));
 
 		File freqsFile = new File(getFreqsPath());
-		File bdsFile = new File(getBdsPath());
 		
 		StringBuilder expFreqs = new StringBuilder();
 		expFreqs.append("Frequency distribution for 2-node episodes:\n");
@@ -155,22 +152,9 @@ public class ThresholdsDistributionTest {
 		expFreqs.append("2\t2\n");
 		expFreqs.append("3\t1\n\n");
 		
-		StringBuilder expBds = new StringBuilder();
-		expBds.append("Bidirectional distribution for 2-node episodes:\n");
-		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("0.6\t3\n");
-		expBds.append("0.8\t1\n\n");
-		
-		expBds.append("Bidirectional distribution for 3-node episodes:\n");
-		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("0.9\t2\n");
-		expBds.append("1.0\t1\n\n");
-		
 		String actualFreqs = FileUtils.readFileToString(freqsFile);
-		String actualBds = FileUtils.readFileToString(bdsFile);
 		
 		assertEquals(expFreqs.toString(), actualFreqs);
-		assertEquals(expBds.toString(), actualBds);
 	}
 	
 	private String getFreqsPath() {
@@ -178,11 +162,6 @@ public class ThresholdsDistributionTest {
 		return streamFile.getAbsolutePath();
 	}
 
-	private String getBdsPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/bds" + NUMBREPOS + "Repos.txt");
-		return streamFile.getAbsolutePath();
-	}
-	
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
