@@ -18,8 +18,11 @@ package cc.kave.episodes.export;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -43,22 +46,59 @@ public class ThresholdsDistribution {
 		this.statistics = stats;
 	}
 
-	public void writer(int numbRepos) {
+	public void writer(int numbRepos) throws IOException {
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
+		StringBuilder freqsBuilder = new StringBuilder();
+		StringBuilder bdsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			if (entry.getKey() == 1) {
+				continue;
+			}
 			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
-			String freqsLevel = getStringRep(entry.getKey(), frequences);
+			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
+			freqsBuilder.append(freqsLevel);
+			
+			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue());
+			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
+			bdsBuilder.append(bdsLevel);
 		}
-
+		FileUtils.writeStringToFile(new File(getPath(numbRepos).freqsPath), freqsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getPath(numbRepos).bdsPath), bdsBuilder.toString());
 	}
 
-	private String getStringRep(Integer epLevel, Map<Integer, Integer> frequences) {
-		String data = "Frequency distribution for " + epLevel + "-node episodes:";
+	private String getBdsStringRep(Integer epLevel, Map<Double, Integer> bds) {
+		String data = "Bidirectional distribution for " + epLevel + "-node episodes:\n";
+		data += "Bidirectional\tCounter\n";
+		
+		for (Map.Entry<Double, Integer> entry : bds.entrySet()) {
+			data += entry.getKey() + "\t" + entry.getValue() + "\n";
+		}
+		data += "\n";
+		return data;
+	}
+
+	private String getFreqsStringRep(Integer epLevel, Map<Integer, Integer> frequences) {
+		String data = "Frequency distribution for " + epLevel + "-node episodes:\n";
+		data += "Frequency\tCounter\n";
 		
 		for (Map.Entry<Integer, Integer> entry : frequences.entrySet()) {
-			
+			data += entry.getKey() + "\t" + entry.getValue() + "\n";
 		}
-		return null;
+		data += "\n";
+		return data;
+	}
+	
+	private FilePaths getPath(int numbRepos) {
+		FilePaths paths = new FilePaths();
+		paths.freqsPath = patternsFolder.getAbsolutePath() + "/freqs" + numbRepos + "Repos.txt";
+		paths.bdsPath = patternsFolder.getAbsolutePath() + "/bds" + numbRepos + "Repos.txt";
+
+		return paths;
+	}
+
+	private class FilePaths {
+		private String freqsPath = "";
+		private String bdsPath = "";
 	}
 }

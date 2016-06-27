@@ -47,7 +47,7 @@ public class EpisodesStatistics {
 	}
 
 	private Map<Integer, Integer> initFreqs(Set<Episode> episodes) {
-		Map<Integer, Integer> initializer = Maps.newHashMap();
+		Map<Integer, Integer> initializer = Maps.newLinkedHashMap();
 
 		for (Episode ep : episodes) {
 			int frequency = ep.getFrequency();
@@ -80,7 +80,7 @@ public class EpisodesStatistics {
 	}
 
 	private Map<Double, Integer> initBd(Set<Episode> episodes) {
-		Map<Double, Integer> initializer = Maps.newHashMap();
+		Map<Double, Integer> initializer = Maps.newLinkedHashMap();
 
 		for (Episode ep : episodes) {
 			double bd = ep.getBidirectMeasure();
