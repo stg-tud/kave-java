@@ -25,26 +25,37 @@
 			<groupId>exec</groupId>
 			<artifactId>exec.pointsto</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>lucene-analyzers</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>6.0.1</version>
+			<version>6.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-highlighter</artifactId>
-			<version>6.0.1</version>
+			<version>6.1.0</version>
 		</dependency>
 		<dependency>
     		<groupId>org.apache.lucene</groupId>
     		<artifactId>lucene-misc</artifactId>
-    		<version>6.0.1</version>
+    		<version>6.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-tools</artifactId>
 			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.apache.lucene</groupId>
+    		<artifactId>lucene-suggest</artifactId>
+    		<version>6.1.0</version>
 		</dependency>
 	</dependencies>
 </project>
