@@ -29,6 +29,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.events.ActivityEvent;
+import cc.kave.commons.model.events.CommandEvent;
+import cc.kave.commons.model.events.ErrorEvent;
+import cc.kave.commons.model.events.IIDEEvent;
+import cc.kave.commons.model.events.InfoEvent;
+import cc.kave.commons.model.events.NavigationEvent;
+import cc.kave.commons.model.events.SystemEvent;
 import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -38,6 +45,19 @@ import cc.kave.commons.model.events.completionevents.IProposalSelection;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
+import cc.kave.commons.model.events.testrunevents.TestRunEvent;
+import cc.kave.commons.model.events.userprofiles.UserProfileEvent;
+import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
+import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import cc.kave.commons.model.events.visualstudio.DebuggerEvent;
+import cc.kave.commons.model.events.visualstudio.DocumentEvent;
+import cc.kave.commons.model.events.visualstudio.EditEvent;
+import cc.kave.commons.model.events.visualstudio.FindEvent;
+import cc.kave.commons.model.events.visualstudio.IDEStateEvent;
+import cc.kave.commons.model.events.visualstudio.InstallEvent;
+import cc.kave.commons.model.events.visualstudio.SolutionEvent;
+import cc.kave.commons.model.events.visualstudio.UpdateEvent;
+import cc.kave.commons.model.events.visualstudio.WindowEvent;
 import cc.kave.commons.model.names.IAliasName;
 import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IDelegateTypeName;
@@ -201,6 +221,17 @@ public abstract class JsonUtils {
 		registerName(gb, ArrayTypeName.class);
 		// resharper names
 		registerName(gb, LiveTemplateName.class);
+
+		// events
+		registerHierarchy(gb, IIDEEvent.class,
+				// general
+				ActivityEvent.class, CommandEvent.class, ErrorEvent.class, InfoEvent.class, NavigationEvent.class,
+				SystemEvent.class,
+				// visual studio
+				BuildEvent.class, DebuggerEvent.class, DocumentEvent.class, EditEvent.class, FindEvent.class,
+				IDEStateEvent.class, InstallEvent.class, SolutionEvent.class, UpdateEvent.class, WindowEvent.class,
+				// complex events
+				CompletionEvent.class, TestRunEvent.class, UserProfileEvent.class, VersionControlEvent.class);
 
 		// SST Model
 		registerHierarchy(gb, ISST.class, SST.class);

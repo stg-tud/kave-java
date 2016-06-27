@@ -13,13 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events;
+package cc.kave.commons.model.events.versioncontrolevents;
 
-public class CommandEvent extends IDEEvent {
+import cc.kave.commons.model.events.IDEEvent;
 
-	public String CommandId;
+public class VersionControlEvent extends IDEEvent {
 
-	public String getCommandId() {
-		return CommandId;
-	}
 }

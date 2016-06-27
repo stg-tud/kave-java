@@ -45,7 +45,7 @@ import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 /**
- * This class contains several code examples that explain how to use our CART
+ * This class contains several code examples that explain how to use our CARET
  * platform. It cannot be run, the code snippets serve as documentation.
  */
 @SuppressWarnings("unused")

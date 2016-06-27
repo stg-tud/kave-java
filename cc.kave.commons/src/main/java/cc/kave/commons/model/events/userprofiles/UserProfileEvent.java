@@ -13,13 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events;
+package cc.kave.commons.model.events.userprofiles;
 
-public class CommandEvent extends IDEEvent {
+import cc.kave.commons.model.events.IDEEvent;
 
-	public String CommandId;
+public class UserProfileEvent extends IDEEvent {
+	public String ProfileId;
 
-	public String getCommandId() {
-		return CommandId;
-	}
+	boolean ProjectsCourses;
+	boolean ProjectsPersonal;
+	boolean ProjectsSharedSmall;
+	boolean ProjectsSharedMedium;
+	boolean ProjectsSharedLarge;
 }

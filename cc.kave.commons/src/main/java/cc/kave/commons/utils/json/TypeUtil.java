@@ -29,13 +29,32 @@ public class TypeUtil {
 	private static Pattern regex6 = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
 
 	public static String toCSharpTypeNames(String json) {
-		return replacePattern(replacePattern(json, regex1, "[SST:", "]", false), regex2, "KaVE.Commons.Model.",
-				", KaVE.Commons", false);
+		// TODO: ugly hack to handle type conversion that is both slow and hard
+		// to maintain... improve solution!
+		String sstReplaced = replacePattern(json, "cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)",
+				"[SST:", "]", false);
+		String vsReplaced = replacePattern(sstReplaced,
+				"cc\\.kave\\.commons\\.model\\.events\\.visualstudio\\.([.a-zA-Z0-9_]+)",
+				"KaVE.Commons.Model.Events.VisualStudio.", ", KaVE.Commons", false);
+		String testsReplaced = replacePattern(vsReplaced,
+				"cc\\.kave\\.commons\\.model\\.events\\.testrunevents\\.([.a-zA-Z0-9_]+)",
+				"KaVE.Commons.Model.Events.TestRunEvents.", ", KaVE.Commons", false);
+		String upeReplaced = replacePattern(testsReplaced,
+				"cc\\.kave\\.commons\\.model\\.events\\.userprofiles\\.([.a-zA-Z0-9_]+)",
+				"KaVE.Commons.Model.Events.UserProfiles.", ", KaVE.Commons", false);
+		String vcsReplaced = replacePattern(upeReplaced,
+				"cc\\.kave\\.commons\\.model\\.events\\.versioncontrolevents\\.([.a-zA-Z0-9_]+)",
+				"KaVE.Commons.Model.Events.VersionControlEvents.", ", KaVE.Commons", false);
+		String modelClassesReplaced = replacePattern(vcsReplaced, "cc\\.kave\\.commons\\.model\\.([.a-zA-Z0-9_]+)",
+				"KaVE.Commons.Model.", ", KaVE.Commons", false);
+		return modelClassesReplaced;
 	}
 
 	public static String toJavaTypeNames(String json) {
-		return legacySupport_CompletionEvents(
-				completionEvent_formatting(toJavaPackages(legacySupport_PackageNames(json))));
+		String legacySupport_PackageNames = legacySupport_PackageNames(json);
+		String javaPackages = toJavaPackages(legacySupport_PackageNames);
+		String completionEvent_formatting = completionEvent_formatting(javaPackages);
+		return legacySupport_CompletionEvents(completionEvent_formatting);
 
 	}
 
@@ -53,6 +72,11 @@ public class TypeUtil {
 
 	private static String toJavaPackages(String json) {
 		return replacePattern(json, regex6, "cc.kave.commons.model.ssts.impl.", "", true);
+	}
+
+	private static String replacePattern(String type, String pattern, String prefix, String suffix, boolean lower) {
+		Pattern regex = Pattern.compile(pattern);
+		return replacePattern(type, regex, prefix, suffix, lower);
 	}
 
 	private static String replacePattern(String type, Pattern regex, String prefix, String suffix, boolean lower) {

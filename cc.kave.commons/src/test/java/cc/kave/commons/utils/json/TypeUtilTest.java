@@ -52,4 +52,50 @@ public class TypeUtilTest {
 		Assert.assertEquals(expected, actual);
 	}
 
+	@Test
+	public void typeAnnotation_events_CompletionEvents() {
+		String java = "\"cc.kave.commons.model.events.completionevents.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.CompletionEvents.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	@Test
+	public void typeAnnotation_events_TestRunEvents() {
+		String java = "\"cc.kave.commons.model.events.testrunevents.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.TestRunEvents.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	@Test
+	public void typeAnnotation_events_UserProfiles() {
+		String java = "\"cc.kave.commons.model.events.userprofiles.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.UserProfiles.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	@Test
+	public void typeAnnotation_events_VersionControlEvents() {
+		String java = "\"cc.kave.commons.model.events.versioncontrolevents.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.VersionControlEvents.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	@Test
+	public void typeAnnotation_events_VisualStudio() {
+		String java = "\"cc.kave.commons.model.events.visualstudio.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.VisualStudio.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	@Test
+	public void typeAnnotation_events_Base() {
+		String java = "\"cc.kave.commons.model.events.Foo\"";
+		String csharp = "\"KaVE.Commons.Model.Events.Foo, KaVE.Commons\"";
+		assertTypeAnnotationConversion(java, csharp);
+	}
+
+	private static void assertTypeAnnotationConversion(String java, String csharp) {
+		Assert.assertEquals(csharp, TypeUtil.toCSharpTypeNames(java));
+		Assert.assertEquals(java, TypeUtil.toJavaTypeNames(csharp));
+	}
 }

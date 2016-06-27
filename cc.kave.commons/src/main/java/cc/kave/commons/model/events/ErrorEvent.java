@@ -15,11 +15,6 @@
  */
 package cc.kave.commons.model.events;
 
-public class CommandEvent extends IDEEvent {
+public class ErrorEvent extends IDEEvent {
 
-	public String CommandId;
-
-	public String getCommandId() {
-		return CommandId;
-	}
 }
