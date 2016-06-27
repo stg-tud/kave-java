@@ -17,27 +17,26 @@ package cc.kave.episodes.statistics;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.statistics.EpisodesStatistics;
 
 public class EpisodesStatisticsTest {
 	
-	private List<Episode> episodes;
+	private Set<Episode> episodes;
 
 	private EpisodesStatistics sut;
 	
 	@Before
 	public void setup() {
-		episodes = new LinkedList<>();
+		episodes = Sets.newLinkedHashSet();
 		episodes.add(createEpisode(2, 1, "1", "2", "3", "2>1", "2>3", "3>1"));
 		episodes.add(createEpisode(3, 0.9, "1", "3", "4", "3>1", "4>1"));
 		episodes.add(createEpisode(7, 0.6, "1", "3", "5", "3>1", "5>1"));
@@ -49,9 +48,9 @@ public class EpisodesStatisticsTest {
 	
 	@Test
 	public void frequencyTest() {
-		Map<Integer, Integer> expected = Maps.newHashMap();
-		expected.put(2, 2);
-		expected.put(3, 1);
+		Map<Integer, Integer> expected = Maps.newLinkedHashMap();
+		expected.put(2, 5);
+		expected.put(3, 3);
 		expected.put(7, 2);
 		
 		Map<Integer, Integer> actuals = sut.freqsEpisodes(episodes);
@@ -61,10 +60,10 @@ public class EpisodesStatisticsTest {
 	
 	@Test
 	public void bidirectTest() {
-		Map<Double, Integer> expected = Maps.newHashMap();
+		Map<Double, Integer> expected = Maps.newLinkedHashMap();
 		expected.put(1.0, 2);
-		expected.put(0.9, 2);
-		expected.put(0.6, 1);
+		expected.put(0.9, 4);
+		expected.put(0.6, 5);
 		
 		Map<Double, Integer> actuals = sut.bidirectEpisodes(episodes);
 		

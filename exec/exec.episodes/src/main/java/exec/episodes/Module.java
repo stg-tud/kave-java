@@ -25,6 +25,7 @@ import com.google.inject.name.Names;
 import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
+import cc.kave.episodes.export.ThresholdsDistribution;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -37,6 +38,7 @@ import cc.kave.episodes.mining.reader.EventStreamReader;
 import cc.kave.episodes.mining.reader.FileReader;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.TargetsCategorization;
+import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Directory;
 
 public class Module extends AbstractModule {
@@ -50,7 +52,7 @@ public class Module extends AbstractModule {
 	@Override
 	protected void configure() {
 		File episodeFile = new File(rootFolder + "configurations/");
-//		Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
+		// Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
 		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
@@ -61,14 +63,17 @@ public class Module extends AbstractModule {
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
 		File statFile = new File(rootFolder + "statistics/");
 		Directory statDir = new Directory(statFile.getAbsolutePath());
+		File patternsFile = new File(rootFolder + "dataSet/patterns/");
+		Directory patternsDir = new Directory(patternsFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
-//		dirs.put("episode", episodeDir);
+		// dirs.put("episode", episodeDir);
 		dirs.put("statistics", statDir);
 		dirs.put("events", eventsDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("rootDir", episodeRootDir);
 		dirs.put("evaluation", evaluationDir);
+		dirs.put("patterns", patternsDir);
 		bindInstances(dirs);
 
 		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
@@ -77,7 +82,7 @@ public class Module extends AbstractModule {
 		bind(File.class).annotatedWith(Names.named("rootDir")).toInstance(episodeRootFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
-		
+		bind(File.class).annotatedWith(Names.named("patterns")).toInstance(patternsFile);
 
 		File episodeRoot = episodeFile;
 		FileReader reader = new FileReader();
@@ -99,15 +104,22 @@ public class Module extends AbstractModule {
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
 
+		File patternsRoot = patternsFile;
+		EpisodesStatistics stats = new EpisodesStatistics();
+		bind(ThresholdsDistribution.class).toInstance(new ThresholdsDistribution(patternsRoot, episodeParser, stats));
+
 		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
 		EpisodeRecommender recommender = new EpisodeRecommender();
-		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot, validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
-		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser, episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot,
+				validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser,
+				episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
 
 		File evaluationRoot = evaluationFile;
 		QueryStrategy queryGenerator = new QueryStrategy();
 		TargetsCategorization categorizer = new TargetsCategorization();
-		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser, queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
+		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser,
+				queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
 	}
 
 	private void bindInstances(Map<String, Directory> dirs) {
