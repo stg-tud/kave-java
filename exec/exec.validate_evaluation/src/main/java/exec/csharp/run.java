@@ -33,6 +33,9 @@ import exec.csharp.queries.QueryBuilderFactory;
 import exec.csharp.utils.ModelHelper;
 import exec.csharp.utils.StorageCase;
 import exec.csharp.utils.StorageHelper;
+import exec.demographics.Demographics;
+import exec.demographics.DemographicsCollector;
+import exec.demographics.DemographicsIO;
 import exec.validate_evaluation.categorized.MicroCommitIoExtension;
 import exec.validate_evaluation.categorized.NoiseCategorizedEvaluation;
 import exec.validate_evaluation.categorized.ScenarioCategorizedEvaluation;
@@ -45,7 +48,6 @@ import exec.validate_evaluation.queryhistory.QueryHistoryGenerationLogger;
 import exec.validate_evaluation.queryhistory.QueryHistoryGenerationRunner;
 import exec.validate_evaluation.queryhistory.QueryHistoryIo;
 import exec.validate_evaluation.queryhistory.UsageExtractor;
-import exec.validate_evaluation.stats.MicroCommitStats;
 import exec.validate_evaluation.streaks.EditStreakGenerationIo;
 import exec.validate_evaluation.streaks.EditStreakGenerationLogger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner;
@@ -98,9 +100,9 @@ public class run {
 
 		/* new evals */
 		// load(BasicExcelEvaluation.class).run();
-		// runMicroCommitTransformation();
-		runCategorizedEvaluation();
-		// runStats();
+		runMicroCommitTransformation();
+		// runCategorizedEvaluation();
+		runStats();
 		// runGreedyVsGoalEval();
 	}
 
@@ -125,14 +127,20 @@ public class run {
 	private static void runStats() throws IOException {
 		MicroCommitIo mcIo = new MicroCommitIo(dirMC);
 		QueryHistoryIo qhIo = new QueryHistoryIo(dirQH);
+		EditStreakGenerationIo esIo = new EditStreakGenerationIo(dirCE, dirES);
 		StorageHelper sh = new StorageHelper(dirRoot);
 
 		NestedZipFolders<ICoReTypeName> usages = storageHelper.getNestedZipFolder(StorageCase.USAGES);
 		// new QueryContentStats(usages, new
 		// MicroCommitIoExtension(mcIo)).run();
-		new MicroCommitStats(mcIo, usages).run();
+		// new MicroCommitStats(mcIo, usages).run();
 		// new QueryHistoryStats(qhIo, usages).run();
 		// new UsageToMicroCommitRatioCalculator(sh, mcIo).run();
+
+		DemographicsIO demIo = new DemographicsIO(mcIo, esIo, usages);
+		Demographics demographics = new DemographicsCollector(demIo).collect();
+		System.out.println(demographics.toCSV());
+		demographics.printRatios();
 	}
 
 	private static void runMicroCommitTransformation() {
@@ -153,11 +161,11 @@ public class run {
 		// MicroCommitGenerationRunner(qhIo, mcIo, mcLog);
 		FinalStateMicroCommitGenerationRunner mcGen = new FinalStateMicroCommitGenerationRunner(qhIo, mcIo, mcLog);
 
-		// clean(dirES);
-		// esGen.run();
-		//
-		// clean(dirQH);
-		// qhGen.run();
+		clean(dirES);
+		esGen.run();
+
+		clean(dirQH);
+		qhGen.run();
 
 		clean(dirMC);
 		mcGen.run();

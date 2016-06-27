@@ -28,7 +28,6 @@ import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.data.Measure;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
-import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
@@ -67,10 +66,11 @@ public abstract class CategorizedEvaluation<Category> {
 		Map<QueryMode, CategorizedResults<Category>> allResUnmerged = Maps.newHashMap();
 		Map<QueryMode, List<CategorizedResults<Category>>> allRes = Maps.newHashMap();
 
-		// Set<ICoReTypeName> keys = usages.findKeys();
-		// log.foundTypes(keys.size());
-		ICoReTypeName[] keys = new ICoReTypeName[] { CoReTypeName.get("LSystem/Enum"),
-				CoReTypeName.get("LSystem/Text/StringBuilder") };
+		Set<ICoReTypeName> keys = usages.findKeys();
+		log.foundTypes(keys.size());
+		// ICoReTypeName[] keys = new ICoReTypeName[] {
+		// CoReTypeName.get("LSystem/Enum"),
+		// CoReTypeName.get("LSystem/Text/StringBuilder") };
 		for (ICoReTypeName type : keys) {
 			log.type(type);
 			rec = mh.get(type);
@@ -142,7 +142,9 @@ public abstract class CategorizedEvaluation<Category> {
 			double f1 = shouldEvaluate(c) ? measurePredictionQuality(start, end) : 0;
 			res.add(c, f1);
 			resUnmerged.add(c, f1);
-			resByMode.add(f1);
+			if (shouldEvaluate(c)) {
+				resByMode.add(f1);
+			}
 		}
 		log.finishedMicroCommits();
 	}
