@@ -18,32 +18,34 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
 import static org.junit.Assert.assertThat;
 
-import java.util.Set;
-
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class QueryExtractorTest extends PBNAnalysisBaseTest {
 
 	@Test
 	public void extractsIdentifiers() {
+		CompletionExpression completionExpr = (CompletionExpression) SSTUtil.completionExpr("c");
+		completionExpr.setTypeReference(DefaultClassContext);
 		setupDefaultEnclosingMethod(				
 				varDecl("foo", stringType),
 				assign("foo", referenceExpr(fieldReference("this", field(stringType, DefaultClassContext, "someField")))),
-				SSTUtil.expr(SSTUtil.completionExpr("c")));
+				SSTUtil.expr(completionExpr));
 		
 		CompletionEvent completionEvent = new CompletionEvent();
 		completionEvent.context = context;
 		
 		QueryExtractor queryExtractor = new QueryExtractor();
 		
-		Set<String> identifiers = queryExtractor.extractQueryFromCompletion(completionEvent, 5, false, false);
+		HeinemannQuery query = queryExtractor.extractQueryFromCompletion(completionEvent, 5, false, false);
 		
-		assertThat(identifiers, Matchers.containsInAnyOrder("string","foo","this", "some","field"));
+		assertThat(query.getLookback(), Matchers.containsInAnyOrder("string","foo","this", "some","field"));
+		assertThat(query.getDeclaringType(), Matchers.is(DefaultClassContext));
 	}
 
 }

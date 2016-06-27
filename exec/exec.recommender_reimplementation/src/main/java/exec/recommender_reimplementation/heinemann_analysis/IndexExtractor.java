@@ -15,13 +15,50 @@
  */
 package exec.recommender_reimplementation.heinemann_analysis;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.ITypeName;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 
 public class IndexExtractor {
+	
+	public static Map<ITypeName, Set<Entry>> buildModel(List<Context> contexts, int lookback, boolean removeStopwords, boolean removeKeywords) {
+		Set<Entry> entrySet = new HashSet<>();
+		
+		for (Context context : contexts) {
+			try {
+				entrySet.addAll(extractIndex(context, lookback, removeStopwords, removeKeywords));
+			} catch (Exception e) {
+				// eat exception because context has errors
+			}
+		}
+		
+		return buildMap(entrySet);
+	}
+
+	public static Map<ITypeName, Set<Entry>> buildMap(Set<Entry> entrySet) {
+		Map<ITypeName, Set<Entry>> entryMap = new HashMap<>();
+		
+		for (Entry entry : entrySet) {
+			ITypeName declaringType = entry.getMethodName().getDeclaringType();
+			if(entryMap.containsKey(declaringType)) {
+				entryMap.get(declaringType).add(entry);
+			}
+			else {
+				entryMap.put(declaringType, Sets.newHashSet(entry));
+			}
+		}
+		return entryMap;
+	}
+	
 	public static Set<Entry> extractIndex(Context context, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		TokenizationSettings settings = new TokenizationSettings();
 		settings.setActiveBrackets(false);

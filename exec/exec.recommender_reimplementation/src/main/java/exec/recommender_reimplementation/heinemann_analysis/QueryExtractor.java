@@ -32,7 +32,7 @@ import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 import exec.recommender_reimplementation.tokenization.TokenizationVisitor;
 
 public class QueryExtractor {
-	public Set<String> extractQueryFromCompletion(CompletionEvent completion, int lookback, boolean removeStopwords, boolean removeKeywords) {
+	public HeinemannQuery extractQueryFromCompletion(CompletionEvent completion, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		Context context = completion.context;
 		TokenizationSettings settings = new TokenizationSettings();
 		settings.setActiveBrackets(false);
@@ -47,14 +47,15 @@ public class QueryExtractor {
 		QueryVisitor queryVisitor = new QueryVisitor(context.getTypeShape(), lookback, removeStopwords);
 		context.getSST().accept(queryVisitor, tokenizationContext);
 
-		return queryVisitor.getIdentifiers();
+		return queryVisitor.getQuery();
 	}
 	
 	public class QueryVisitor extends TokenizationVisitor {
 
-		private Set<String> identifiers;
 		private int lookback;
 		private boolean removeStopwords; 
+		
+		private HeinemannQuery query;
 		
 		public QueryVisitor(ITypeShape typeShape, int lookback, boolean removeStopwords) {
 			super(typeShape);
@@ -69,7 +70,8 @@ public class QueryExtractor {
 				filterSingleCharacterIdentifier(identifiers);
 				identifiers = camelCaseSplitTokens(identifiers);
 				identifiers = stemTokens(identifiers);
-				this.identifiers = identifiers;
+				
+				query = new HeinemannQuery(identifiers, expr.getTypeReference());				
 			}
 
 			return null;
@@ -82,8 +84,8 @@ public class QueryExtractor {
 			return super.visit(decl, c);
 		}
 
-		public Set<String> getIdentifiers() {
-			return identifiers;
+		public HeinemannQuery getQuery() {
+			return query;
 		}
 		
 	}
