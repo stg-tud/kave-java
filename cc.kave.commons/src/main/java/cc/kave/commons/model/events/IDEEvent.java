@@ -35,9 +35,6 @@ public abstract class IDEEvent implements IIDEEvent {
 	@Nullable
 	public LocalDateTime TriggeredAt;
 
-	@Nullable
-	public LocalDateTime TerminatedAt;
-
 	@Override
 	public LocalDateTime getTriggeredAt() {
 		return TriggeredAt;
@@ -45,7 +42,7 @@ public abstract class IDEEvent implements IIDEEvent {
 
 	@Override
 	public LocalDateTime getTerminatedAt() {
-		return TerminatedAt;
+		throw new RuntimeException("not implemented yet");
 	}
 
 	public Trigger TriggeredBy;
