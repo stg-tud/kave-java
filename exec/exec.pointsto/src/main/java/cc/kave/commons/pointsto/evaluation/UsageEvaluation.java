@@ -86,7 +86,8 @@ public class UsageEvaluation extends AbstractEvaluation {
 		reset();
 
 		try (ProjectUsageStore usageStore = new ProjectUsageStore(storePath)) {
-			// store types in a list and sort it alphabetically to get a consistent ordering in which types are
+			// store types in a list and sort it alphabetically to get a
+			// consistent ordering in which types are
 			// evaluated
 			List<ICoReTypeName> types = new ArrayList<>(usageStore.getAllTypes());
 			types.sort(new TypeNameComparator());
@@ -99,7 +100,6 @@ public class UsageEvaluation extends AbstractEvaluation {
 				usageStore.flush();
 			}
 
-			long totalTypesSkipped = skippedNumProjects + skippedUsageFilter;
 			long totalTypesSkipped = skippedNumProjects + skippedUsageFilter + skippedMinUsages + skippedOneMethod;
 			log("Skipped %d/%d (%.2f%%) types\n", totalTypesSkipped, types.size(),
 					((double) totalTypesSkipped) / types.size() * 100);
@@ -131,7 +131,8 @@ public class UsageEvaluation extends AbstractEvaluation {
 				((double) numProjectsWithType) / numProjects * 100);
 
 		Map<ProjectIdentifier, List<Usage>> projectUsages = usageStore.loadUsagesPerProject(type, usageFilter);
-		// re-check whether enough projects with usages are available after filtering
+		// re-check whether enough projects with usages are available after
+		// filtering
 		projectUsages.values().removeIf(usages -> usages.isEmpty());
 		numProjectsWithType = projectUsages.size();
 		if (numProjectsWithType < numFolds) {
@@ -149,8 +150,9 @@ public class UsageEvaluation extends AbstractEvaluation {
 			log("\tSkipping because %d < %d\n", numUsages, MIN_USAGES);
 			return;
 		}
-		
-		if (projectUsages.values().stream().flatMap(List::stream).flatMap(u -> u.getReceiverCallsites().stream()).map(CallSite::getMethod).collect(Collectors.toSet()).size() <= 1) {
+
+		if (projectUsages.values().stream().flatMap(List::stream).flatMap(u -> u.getReceiverCallsites().stream())
+				.map(CallSite::getMethod).collect(Collectors.toSet()).size() <= 1) {
 			++skippedOneMethod;
 			log("\tSkipping because type has no more than one distinct receiver callsite\n");
 			return;
