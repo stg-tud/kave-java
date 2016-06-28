@@ -13,13 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events.visualstudio;
+package cc.kave.commons.model.events.testrunevents;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+import cc.kave.commons.model.names.IMethodName;
+
+public class TestCaseResult {
+	public IMethodName TestMethod;
+	public String Parameters;
+	public String Duration;
+	public TestResult Result;
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
 }

@@ -16,5 +16,6 @@
 package cc.kave.commons.model.events;
 
 public class ErrorEvent extends IDEEvent {
-
+	public String Content;
+	public String[] StackTrace;
 }

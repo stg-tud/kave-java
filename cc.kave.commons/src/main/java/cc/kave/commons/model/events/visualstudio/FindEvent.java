@@ -18,5 +18,5 @@ package cc.kave.commons.model.events.visualstudio;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class FindEvent extends IDEEvent {
-
+	public boolean Cancelled;
 }

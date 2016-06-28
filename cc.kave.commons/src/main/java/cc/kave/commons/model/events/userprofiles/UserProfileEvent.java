@@ -18,11 +18,27 @@ package cc.kave.commons.model.events.userprofiles;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class UserProfileEvent extends IDEEvent {
+
 	public String ProfileId;
 
-	boolean ProjectsCourses;
-	boolean ProjectsPersonal;
-	boolean ProjectsSharedSmall;
-	boolean ProjectsSharedMedium;
-	boolean ProjectsSharedLarge;
+	public Educations Education;
+
+	public Positions Position;
+
+	public boolean ProjectsCourses;
+	public boolean ProjectsPersonal;
+	public boolean ProjectsSharedSmall;
+	public boolean ProjectsSharedMedium;
+	public boolean ProjectsSharedLarge;
+
+	public boolean TeamsSolo;
+	public boolean TeamsSmall;
+	public boolean TeamsMedium;
+	public boolean TeamsLarge;
+
+	public YesNoUnknown CodeReviews;
+
+	public Likert7Point ProgrammingGeneral;
+
+	public Likert7Point ProgrammingCSharp;
 }

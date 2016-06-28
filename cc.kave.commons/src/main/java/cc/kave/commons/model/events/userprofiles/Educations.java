@@ -13,13 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events.visualstudio;
+package cc.kave.commons.model.events.userprofiles;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
-
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+public enum Educations {
+	// keep order and mixed case to stay consistent to C#
+	Unknown, // default
+	None, Autodidact, Training, Bachelor, Master, PhD
 }

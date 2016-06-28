@@ -13,13 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events.visualstudio;
+package cc.kave.commons.model.events.versioncontrolevents;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
-
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+public enum VersionControlActionType {
+	// keep order and mixed case to stay consistent to C#
+	Unknown, // default
+	Branch, Checkout, Clone, Commit, CommitAmend, CommitInitial, Merge, Pull, Rebase, RebaseFinished, Reset
 }

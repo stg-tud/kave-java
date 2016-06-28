@@ -17,7 +17,7 @@
 package cc.kave.commons.model.events;
 
 public enum Trigger {
-	// keep mixed case to stay consistent to C#
+	// keep order and mixed case to stay consistent to C#
 	Unknown, // default
 	Click, Shortcut, Typing, Automatic
 }

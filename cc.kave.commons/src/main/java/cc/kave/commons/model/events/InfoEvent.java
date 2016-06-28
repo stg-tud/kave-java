@@ -16,5 +16,5 @@
 package cc.kave.commons.model.events;
 
 public class InfoEvent extends IDEEvent {
-
+	public String Info;
 }

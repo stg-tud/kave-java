@@ -15,11 +15,8 @@
  */
 package cc.kave.commons.model.events.visualstudio;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
-
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+public enum DocumentAction {
+	// keep order and mixed case to stay consistent to C#
+	Opened, // default
+	Saved, Closing
 }

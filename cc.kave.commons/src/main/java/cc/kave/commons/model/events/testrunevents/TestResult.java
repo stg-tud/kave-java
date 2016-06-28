@@ -13,13 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.events.visualstudio;
+package cc.kave.commons.model.events.testrunevents;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
-
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+public enum TestResult {
+	// keep order and mixed case!
+	Unknown, // default
+	Success, Failed, Error, Ignored
 }

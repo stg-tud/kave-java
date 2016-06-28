@@ -15,8 +15,11 @@
  */
 package cc.kave.commons.model.events.versioncontrolevents;
 
+import java.util.List;
+
 import cc.kave.commons.model.events.IDEEvent;
 
 public class VersionControlEvent extends IDEEvent {
-
+	public String Solution;
+	public List<VersionControlAction> Actions;
 }

@@ -15,8 +15,14 @@
  */
 package cc.kave.commons.model.events.visualstudio;
 
+import java.util.List;
+
 import cc.kave.commons.model.events.IDEEvent;
 
 public class IDEStateEvent extends IDEEvent {
+	public LifecyclePhase IDELifecyclePhase;
 
+    public List<String> OpenWindows;
+
+    public List<String> OpenDocuments;
 }

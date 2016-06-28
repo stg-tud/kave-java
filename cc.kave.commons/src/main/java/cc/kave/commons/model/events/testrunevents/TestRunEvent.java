@@ -15,8 +15,11 @@
  */
 package cc.kave.commons.model.events.testrunevents;
 
+import java.util.Set;
+
 import cc.kave.commons.model.events.IDEEvent;
 
 public class TestRunEvent extends IDEEvent {
-
+	public boolean WasAborted;
+	public Set<TestCaseResult> Tests;
 }

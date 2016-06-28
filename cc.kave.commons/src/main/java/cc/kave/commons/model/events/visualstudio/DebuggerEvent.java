@@ -18,5 +18,9 @@ package cc.kave.commons.model.events.visualstudio;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class DebuggerEvent extends IDEEvent {
+	public DebuggerMode Mode;
 
+	public String Reason;
+
+	public String Action;
 }

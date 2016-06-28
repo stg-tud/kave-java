@@ -16,5 +16,5 @@
 package cc.kave.commons.model.events;
 
 public class SystemEvent extends IDEEvent {
-
+	public SystemEventType Type;
 }

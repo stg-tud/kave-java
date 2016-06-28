@@ -15,11 +15,26 @@
  */
 package cc.kave.commons.model.events.visualstudio;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.completionevents.Context;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class EditEvent extends IDEEvent {
-	public Context Context2;
-	public int NumberOfChanges;
-	public int SizeOfChanges;
+public class BuildTarget {
+	public String Project;
+
+	public String ProjectConfiguration;
+
+	public String Platform;
+
+	public String SolutionConfiguration;
+
+	public String StartedAt;
+
+	public String Duration;
+
+	public boolean Successful;
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
 }

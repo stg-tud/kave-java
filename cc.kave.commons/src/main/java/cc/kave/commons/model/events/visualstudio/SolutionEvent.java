@@ -18,5 +18,6 @@ package cc.kave.commons.model.events.visualstudio;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class SolutionEvent extends IDEEvent {
-
+	public SolutionAction Action;
+	public String Target;
 }

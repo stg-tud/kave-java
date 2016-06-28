@@ -28,8 +28,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 // TODO use correct types instead of just "String"
 public abstract class IDEEvent implements IIDEEvent {
 
-	public String Id;
-
 	public String IDESessionUUID;
 
 	public String KaVEVersion;

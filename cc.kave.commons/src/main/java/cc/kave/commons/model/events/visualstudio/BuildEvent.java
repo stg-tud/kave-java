@@ -15,8 +15,12 @@
  */
 package cc.kave.commons.model.events.visualstudio;
 
+import java.util.List;
+
 import cc.kave.commons.model.events.IDEEvent;
 
 public class BuildEvent extends IDEEvent {
-
+	public String Scope;
+	public String Action;
+	public List<BuildTarget> Targets;
 }

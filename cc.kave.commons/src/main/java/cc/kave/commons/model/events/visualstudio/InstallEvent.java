@@ -18,5 +18,5 @@ package cc.kave.commons.model.events.visualstudio;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class InstallEvent extends IDEEvent {
-
+	public String PluginVersion;
 }

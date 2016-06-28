@@ -18,5 +18,7 @@ package cc.kave.commons.model.events.visualstudio;
 import cc.kave.commons.model.events.IDEEvent;
 
 public class UpdateEvent extends IDEEvent {
+	public String OldPluginVersion;
+	public String NewPluginVersion;
 
 }
