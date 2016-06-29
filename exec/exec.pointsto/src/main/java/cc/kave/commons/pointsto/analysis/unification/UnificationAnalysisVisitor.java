@@ -212,7 +212,7 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 			List<ISimpleExpression> parameters = entity.getParameters();
 			int numberOfFormalParameters = method.getParameters().size();
-			if (numberOfFormalParameters == 0 && !parameters.isEmpty()) {
+			if ((numberOfFormalParameters == 0 || parameterLocations.isEmpty()) && !parameters.isEmpty()) {
 				LOGGER.error("Attempted to invoke method {}.{} which expects zero parameters with {} actual parameters",
 						method.getDeclaringType().getName(), method.getName(), parameters.size());
 			} else {

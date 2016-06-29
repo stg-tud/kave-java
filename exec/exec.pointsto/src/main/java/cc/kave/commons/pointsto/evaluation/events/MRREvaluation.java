@@ -132,15 +132,16 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 			ICallsRecommender<Query> recommender = null;
 			{
 				List<Usage> usages = store.load(type, usageFilter);
+				store.flush();
 				int numPrunedUsages = pruning.prune(MAX_USAGES, usages);
 				if (numPrunedUsages > 0) {
+					usages = new ArrayList<>(usages);
 					prunedUsages.add(ImmutableTriple.of(store.getName(), type, numPrunedUsages));
 				}
 
 				if (!usages.isEmpty()) {
 					recommender = trainRecommender(usages);
 				}
-				store.flush();
 			}
 
 			double score = 0;

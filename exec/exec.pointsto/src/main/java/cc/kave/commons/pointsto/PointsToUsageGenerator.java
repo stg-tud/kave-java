@@ -116,8 +116,13 @@ public class PointsToUsageGenerator {
 		initializeWriters(relativeInput, annotatedContextWriters);
 
 		try (StreamingZipReader reader = new StreamingZipReader(inputZipFile.toFile())) {
-			Stream<Context> contextStream = reader.stream(Context.class).filter(
-					ctxt -> !blacklist.contains(ctxt.getTypeShape().getTypeHierarchy().getElement().getIdentifier()));
+			Stream<Context> contextStream = reader.stream(Context.class).filter(ctxt -> {
+				try {
+					return !blacklist.contains(ctxt.getTypeShape().getTypeHierarchy().getElement().getIdentifier());
+				} catch (RuntimeException ex) {
+					return false;
+				}
+			});
 			contextStream.forEach(new ContextConsumer(relativeInput, annotatedContextWriters));
 		}
 

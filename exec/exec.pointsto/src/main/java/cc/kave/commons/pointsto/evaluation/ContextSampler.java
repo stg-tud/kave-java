@@ -25,6 +25,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import com.google.inject.Inject;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.JsonUtils;
@@ -60,7 +61,11 @@ public class ContextSampler {
 
 			List<Context> contexts = new ArrayList<>(number);
 			for (Integer index : contextIndices) {
-				contexts.add(getContext(registry, index));
+				Context ctxt = getContext(registry, index);
+				if (ctxt == null) {
+					ctxt = new Context();
+				}
+				contexts.add(ctxt);
 			}
 
 			return contexts;
