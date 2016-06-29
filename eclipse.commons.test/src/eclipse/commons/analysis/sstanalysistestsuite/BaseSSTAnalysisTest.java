@@ -205,7 +205,7 @@ public abstract class BaseSSTAnalysisTest {
 
 	protected static ExpressionStatement newInvokeStatement(String target, MethodName methodName,
 			ISimpleExpression... parameters) {
-		assertThat("methodName is static", !methodName.isStatic());
+		assertThat("methodName is not static", !methodName.isStatic());
 		InvocationExpression invocation = newInvokeExpression(target, methodName, parameters);
 		return expressionToStatement(invocation);
 	}

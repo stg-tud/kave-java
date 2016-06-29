@@ -240,7 +240,6 @@ public class BodyVisitor extends ASTVisitor {
 		ref.setIdentifier(variableIdentifier);
 		decl.setReference(ref);
 		decl.setType(type);
-		stmt.getParameter();
 		loop.setDeclaration(decl);
 
 		stmt.getExpression().accept(exprVisitor);
