@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto.evaluation.events;
+package cc.kave.commons.pointsto.evaluation;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,11 +41,6 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.evaluation.ContextSampleEvaluation;
-import cc.kave.commons.pointsto.evaluation.ContextSampler;
-import cc.kave.commons.pointsto.evaluation.DefaultModule;
-import cc.kave.commons.pointsto.evaluation.ResultExporter;
-import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
 
 public class TimeEvaluation extends ContextSampleEvaluation {
 

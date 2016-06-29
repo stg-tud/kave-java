@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto;
+package cc.kave.commons.pointsto.evaluation.runners;
 
 import static cc.kave.commons.pointsto.evaluation.Logger.log;
 
@@ -31,15 +31,14 @@ import cc.recommenders.usages.Usage;
 
 public class StatisticsCollectorRunner {
 
-	private static final Path BASE_PATH = Paths.get("E:\\Coding\\MT");
-
-	private static final Path USAGE_STORES = BASE_PATH.resolve("Usages");
-	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
-
 	public static void main(String[] args) throws IOException {
+		final Path baseDir = (args.length == 1) ? Paths.get(args[0]) : Paths.get(".");
+		final Path usageStoresDir = baseDir.resolve("Usages");
+		final Path statisticsDir = baseDir.resolve("Statistics");
+
 		UsageStatisticsCollector statisticsCollector = new TypeStatisticsCollector(new PointsToUsageFilter());
 
-		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(USAGE_STORES)) {
+		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(usageStoresDir)) {
 			for (Path dir : dirStream) {
 				if (!Files.isDirectory(dir)) {
 					continue;
@@ -51,7 +50,7 @@ public class StatisticsCollectorRunner {
 				try (UsageStore usageStore = new ProjectUsageStore(dir)) {
 					int numTypes = usageStore.getAllTypes().size();
 					log("\tStore contains %d types\n", numTypes);
-					
+
 					for (ICoReTypeName type : usageStore.getAllTypes()) {
 						List<Usage> usages = usageStore.load(type);
 						statisticsCollector.process(usages);
@@ -60,7 +59,7 @@ public class StatisticsCollectorRunner {
 				}
 
 				String fileName = statisticsCollector.getClass().getSimpleName() + ".txt";
-				statisticsCollector.output(STATISTICS_DEST.resolve(dir.getFileName()).resolve(fileName));
+				statisticsCollector.output(statisticsDir.resolve(dir.getFileName()).resolve(fileName));
 			}
 		}
 	}

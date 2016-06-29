@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package cc.kave.commons.pointsto;
+package cc.kave.commons.pointsto.evaluation;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -29,15 +29,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import static com.google.common.io.Files.createParentDirs;
 
+import cc.kave.commons.pointsto.AdvancedPointsToAnalysisFactory;
+import cc.kave.commons.pointsto.InliningPointsToAnalysisFactory;
+import cc.kave.commons.pointsto.PointsToAnalysisFactory;
+import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.pointsto.evaluation.PointsToUsageFilter;
-import cc.kave.commons.pointsto.evaluation.UsageEvaluation;
 import cc.kave.commons.pointsto.extraction.DescentStrategy;
-import cc.kave.commons.pointsto.extraction.NopDescentStrategy;
 import cc.kave.commons.pointsto.extraction.SimpleDescentStrategy;
 import cc.kave.commons.pointsto.statistics.TypeStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
@@ -51,7 +52,6 @@ public class PointsToEvaluation {
 	private static final Path BASE_PATH = Paths.get("E:\\Coding\\MT");
 
 	private static final Path SRC_PATH = BASE_PATH.resolve("Contexts");
-	private static final Path CONTEXT_DEST = BASE_PATH.resolve("annotatedContexts");
 	private static final Path USAGE_DEST = BASE_PATH.resolve("Usages");
 	private static final Path STATISTICS_DEST = BASE_PATH.resolve("Statistics");
 	private static final Path EVALUATION_RESULTS_DEST = BASE_PATH.resolve("EvaluationResults");
@@ -62,10 +62,10 @@ public class PointsToEvaluation {
 				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
 				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
 				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
-				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)// ,
-				// new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
-				// new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
-		);
+				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class),
+				new InliningPointsToAnalysisFactory(
+						new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
+				new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)));
 
 		generateUsages(factories);
 		// evaluateUsages(factories);
@@ -128,7 +128,7 @@ public class PointsToEvaluation {
 		} catch (IOException e) {
 			LOGGER.error("Failed to find usage stores", e);
 		}
-		
+
 		UsageEvaluation.shutdown();
 	}
 
