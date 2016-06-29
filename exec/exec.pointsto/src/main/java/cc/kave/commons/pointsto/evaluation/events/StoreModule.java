@@ -28,8 +28,15 @@ import cc.kave.commons.pointsto.stores.UsageStore;
 
 public class StoreModule extends DefaultModule {
 
-	private final Path BASE_DIR = Paths.get("E:\\Coding\\MT");
-	private final Path USAGES_DIR = BASE_DIR.resolve("Usages");
+	private final Path usagesDir;
+
+	public StoreModule() {
+		this.usagesDir = Paths.get("e:", "Coding", "MT", "Usages");
+	}
+
+	public StoreModule(Path usagesDir) {
+		this.usagesDir = usagesDir;
+	}
 
 	@Override
 	protected void configure() {
@@ -38,9 +45,13 @@ public class StoreModule extends DefaultModule {
 		configStores();
 	}
 
+	protected Path getUsagesDir() {
+		return usagesDir;
+	}
+
 	private void configStores() {
 		List<UsageStore> stores = new ArrayList<>();
-		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(USAGES_DIR)) {
+		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(getUsagesDir())) {
 			for (Path dir : dirStream) {
 				if (Files.isDirectory(dir)) {
 					stores.add(new ProjectUsageStore(dir));

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,6 +80,16 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		results.clear();
 	}
 
+	public void export(Path dir, ResultExporter exporter) throws IOException {
+		exporter.export(dir.resolve("TrainValidate.txt"), getResults().entrySet().stream()
+				.flatMap(e -> e.getValue().stream().map(er -> ImmutablePair.of(e.getKey(), er))).map(p -> {
+					return new String[] { CoReNames.vm2srcQualifiedType(p.left), p.right.training, p.right.validation,
+							String.format(Locale.US, "%.3f", p.right.score),
+							Integer.toString(p.right.numTrainingUsages),
+							Integer.toString(p.right.numValidationUsages) };
+				}));
+	}
+
 	public Map<ICoReTypeName, List<EvaluationResult>> getResults() {
 		return Collections.unmodifiableMap(results);
 	}
@@ -110,12 +121,11 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 
 		List<ProjectUsageStore> usageStores = getUsageStores(usageStoresDir);
 		try {
-			List<ICoReTypeName> types = new ArrayList<>(
-					usageStores.stream().flatMap(store -> store.getAllTypes().stream()).collect(Collectors.toSet()));
+			List<ICoReTypeName> types = new ArrayList<>(getStoreTypes(usageStores));
 			types.sort(new TypeNameComparator());
 
 			for (ICoReTypeName type : types) {
-				if (!usageFilter.test(type) || !CoReNames.vm2srcQualifiedType(type).startsWith("System.")) {
+				if (!usageFilter.test(type)) {
 					continue;
 				}
 
@@ -147,6 +157,20 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		}
 
 		return stores;
+	}
+
+	private Set<ICoReTypeName> getStoreTypes(Collection<? extends UsageStore> stores) {
+		Set<ICoReTypeName> storeTypes = new HashSet<>();
+		for (UsageStore store : stores) {
+			Set<ICoReTypeName> types = store.getAllTypes().stream().filter(usageFilter::test)
+					.collect(Collectors.toSet());
+			if (storeTypes.isEmpty()) {
+				storeTypes.addAll(types);
+			} else {
+				storeTypes.retainAll(types);
+			}
+		}
+		return storeTypes;
 	}
 
 	private void evaluateType(ICoReTypeName type, List<ProjectUsageStore> usageStores) throws IOException {
@@ -197,6 +221,7 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 		Map<ProjectIdentifier, Double> numberOfUsages = new HashMap<>(projects.size());
 		for (ProjectUsageStore store : usageStores) {
 			Map<ProjectIdentifier, Integer> numberOfStoreUsages = store.getNumberOfUsagesPerProject(type);
+			store.flush();
 			for (Map.Entry<ProjectIdentifier, Integer> entry : numberOfStoreUsages.entrySet()) {
 				double currentAverage = numberOfUsages.getOrDefault(entry.getKey(), 0.0);
 				numberOfUsages.put(entry.getKey(), currentAverage + (1.0 / usageStores.size()) * entry.getValue());
@@ -224,6 +249,7 @@ public class ProjectTrainValidateEvaluation extends AbstractEvaluation {
 	private Map<ProjectIdentifier, List<Usage>> loadUsages(ProjectUsageStore store, ICoReTypeName type)
 			throws IOException {
 		Map<ProjectIdentifier, List<Usage>> usages = store.loadUsagesPerProject(type, usageFilter);
+		store.flush();
 		pruning.prune(MAX_USAGES, usages);
 		return usages;
 	}

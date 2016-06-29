@@ -15,7 +15,6 @@ package cc.kave.commons.pointsto.evaluation.events;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,21 +23,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonParseException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.kave.commons.pointsto.AdvancedPointsToAnalysisFactory;
-import cc.kave.commons.pointsto.InliningPointsToAnalysisFactory;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
-import cc.kave.commons.pointsto.SimplePointsToAnalysisFactory;
-import cc.kave.commons.pointsto.analysis.FieldSensitivity;
-import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
-import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
-import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.AbstractEvaluation;
-import cc.kave.commons.pointsto.evaluation.ResultExporter;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.utils.json.JsonUtils;
@@ -73,8 +61,9 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 		int totalNumberOfEvents = 0;
 		for (Path file : zipFiles) {
 			try (ZipArchive archive = new ZipArchive(file)) {
-				completionEvents.addAll(archive.stream(ICompletionEvent.class, JsonUtils::fromJson, JsonParseException.class).parallel()
-						.filter(createCompletionEventFilter()).collect(Collectors.toList()));
+				completionEvents
+						.addAll(archive.stream(ICompletionEvent.class, JsonUtils::fromJson, JsonParseException.class)
+								.parallel().filter(createCompletionEventFilter()).collect(Collectors.toList()));
 				totalNumberOfEvents += archive.countFiles();
 			}
 		}
@@ -84,23 +73,4 @@ public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluati
 	protected abstract void evaluate(List<ICompletionEvent> completionEvents, List<PointsToAnalysisFactory> ptFactories)
 			throws IOException;
 
-	public static void main(String[] args) throws IOException {
-		Path completionEventsArchive = BASE_DIR.resolve("OnlyCompletion");
-		List<PointsToAnalysisFactory> ptFactories = Arrays.asList(
-				new SimplePointsToAnalysisFactory<>(ReferenceBasedAnalysis.class),
-				new SimplePointsToAnalysisFactory<>(TypeBasedAnalysis.class),
-				new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL),
-				new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class)//,
-				// new InliningPointsToAnalysisFactory(new AdvancedPointsToAnalysisFactory<>(UnificationAnalysis.class, FieldSensitivity.FULL)),
-				// new InliningPointsToAnalysisFactory(new SimplePointsToAnalysisFactory<>(InclusionAnalysis.class))
-				);
-
-		Injector injector;
-		injector = Guice.createInjector(new StoreModule());
-		MRREvaluation evaluation = injector.getInstance(MRREvaluation.class);
-		evaluation.run(completionEventsArchive, ptFactories);
-		evaluation.exportResults(EVALUATION_RESULTS_DIR,
-				injector.getInstance(ResultExporter.class));
-		evaluation.close();
-	}
 }

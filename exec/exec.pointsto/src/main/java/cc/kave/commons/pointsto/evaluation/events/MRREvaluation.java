@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -75,6 +76,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	private final Map<Pair<ICoReTypeName, String>, Integer> numQueries = new HashMap<>();
 	private final Map<String, Integer> zeroExtractedQueries = new HashMap<>();
 	private final List<Triple<String, ICoReTypeName, Integer>> prunedUsages = new ArrayList<>();
+	private final Map<String, Set<ICoReTypeName>> missingStoreTypes = new HashMap<>();
 
 	@Inject
 	public MRREvaluation(List<UsageStore> usageStores, PointsToUsageFilter usageFilter, UsagePruning pruning,
@@ -107,6 +109,13 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		Path prunedUsagesFile = dir.resolve(getClass().getSimpleName() + ".pruned.txt");
 		exporter.export(prunedUsagesFile, prunedUsages.stream().map(entry -> new String[] { entry.getLeft(),
 				CoReNames.vm2srcQualifiedType(entry.getMiddle()), entry.getRight().toString() }));
+
+		exporter.export(dir.resolve(getClass().getSimpleName() + ".mst.txt"),
+				missingStoreTypes.entrySet().stream().map(entry -> {
+					String typeNames = entry.getValue().stream().map(CoReNames::vm2srcQualifiedType)
+							.collect(Collectors.joining(","));
+					return new String[] { entry.getKey(), typeNames };
+				}));
 	}
 
 	@Override
@@ -115,8 +124,11 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 		for (PointsToAnalysisFactory ptFactory : ptFactories) {
 			Map<ICoReTypeName, Map<ICompletionEvent, List<Usage>>> queries = createQueries(completionEvents, ptFactory);
 			Set<ICoReTypeName> types = getQueryTypes(queries.values());
-			types.retainAll(getStoreTypes());
-			log("%s: %d types\n", ptFactory.getName(), types.size());
+			int numQueryTypes = types.size();
+			Set<ICoReTypeName> storeTypes = getStoreTypes();
+			missingStoreTypes.put(ptFactory.getName(), ImmutableSet.copyOf(Sets.difference(types, storeTypes)));
+			types.retainAll(storeTypes);
+			log("%s: %d types, queries for %d\n", ptFactory.getName(), types.size(), numQueryTypes);
 
 			for (ICoReTypeName type : types) {
 				evaluateType(ptFactory.getName(), type, queries);
@@ -230,8 +242,17 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 	}
 
 	private Set<ICoReTypeName> getStoreTypes() {
-		return usageStores.stream().flatMap(store -> store.getAllTypes().stream()).filter(t -> usageFilter.test(t))
-				.collect(Collectors.toSet());
+		Set<ICoReTypeName> storeTypes = new HashSet<>();
+		for (UsageStore store : usageStores) {
+			Set<ICoReTypeName> types = store.getAllTypes().stream().filter(usageFilter::test)
+					.collect(Collectors.toSet());
+			if (storeTypes.isEmpty()) {
+				storeTypes.addAll(types);
+			} else {
+				storeTypes.retainAll(types);
+			}
+		}
+		return storeTypes;
 	}
 
 	private ICallsRecommender<Query> trainRecommender(List<Usage> usages) {

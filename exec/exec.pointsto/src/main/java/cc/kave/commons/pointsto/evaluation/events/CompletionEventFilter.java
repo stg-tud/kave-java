@@ -32,6 +32,8 @@ public class CompletionEventFilter implements Predicate<ICompletionEvent> {
 			return false;
 		} else if (!(proposal.getName() instanceof IMethodName)) {
 			return false;
+		} else if (((IMethodName) proposal.getName()).isStatic()) {
+			return false;
 		}
 
 		return true;

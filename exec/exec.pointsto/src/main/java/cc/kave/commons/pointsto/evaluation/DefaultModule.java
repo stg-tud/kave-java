@@ -61,7 +61,14 @@ public class DefaultModule extends AbstractModule {
 		}).annotatedWith(UsageFilter.class).to(PointsToUsageFilter.class);
 		bind(ResultExporter.class).to(CSVExporter.class);
 
-		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		// Executor for CVEvaluator
+		int numThreads;
+		if (System.getProperties().containsKey("evaluation.numthreads")) {
+			numThreads = Integer.parseInt(System.getProperty("evaluation.numthreads"));
+		} else {
+			numThreads = Math.min(6, Runtime.getRuntime().availableProcessors());
+		}
+		ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 		// ExecutorService executorService = Executors.newSingleThreadExecutor();
 		bind(ExecutorService.class).toInstance(executorService);
 	}
@@ -74,8 +81,8 @@ public class DefaultModule extends AbstractModule {
 	private void configOptions() {
 		QueryOptions qOpts = new QueryOptions();
 		qOpts.queryType = QueryType.NM;
-		qOpts.minProbability = 0.01;
-		qOpts.useClassContext = true;
+		qOpts.minProbability = 0.3;
+		qOpts.useClassContext = false;
 		qOpts.useMethodContext = true;
 		qOpts.useDefinition = true;
 		qOpts.useParameterSites = false;
@@ -85,16 +92,17 @@ public class DefaultModule extends AbstractModule {
 		MiningOptions mOpts = new MiningOptions();
 		mOpts.setDistanceMeasure(DistanceMeasure.COSINE);
 		mOpts.setAlgorithm(Algorithm.CANOPY);
-		mOpts.setT1(0.101);
-		mOpts.setT2(0.1);
+		mOpts.setT1(0.151);
+		mOpts.setT2(0.15);
 
+		// mOpts.setFeatureDropping(false);
 		mOpts.setFeatureDropping(true);
 		bind(MiningOptions.class).toInstance(mOpts);
 	}
 
 	protected void configMeasure() {
-		// bind(AbstractMeasure.class).toInstance(new RRMeasure());
-		bind(AbstractMeasure.class).toInstance(new F1Measure());
+		bind(AbstractMeasure.class).toInstance(new RRMeasure());
+		// bind(AbstractMeasure.class).toInstance(new F1Measure());
 	}
 
 	@Provides

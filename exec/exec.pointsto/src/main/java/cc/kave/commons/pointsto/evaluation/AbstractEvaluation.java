@@ -25,6 +25,7 @@ import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.inclusion.InclusionAnalysis;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.recommenders.names.ICoReTypeName;
 
 public abstract class AbstractEvaluation {
 
@@ -42,5 +43,9 @@ public abstract class AbstractEvaluation {
 
 	protected void log(String format, Object... args) {
 		Logger.log(format, args);
+	}
+
+	public boolean shouldEvaluateType(ICoReTypeName type) {
+		return true;
 	}
 }

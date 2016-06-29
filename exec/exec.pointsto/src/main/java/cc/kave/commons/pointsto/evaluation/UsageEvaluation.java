@@ -96,8 +96,10 @@ public class UsageEvaluation extends AbstractEvaluation {
 			log("Loaded usage store containing %d projects and %d types\n", numProjects, types.size());
 
 			for (ICoReTypeName type : types) {
-				evaluateType(usageStore, type);
-				usageStore.flush();
+				if (shouldEvaluateType(type)) {
+					evaluateType(usageStore, type);
+					usageStore.flush();
+				}
 			}
 
 			long totalTypesSkipped = skippedNumProjects + skippedUsageFilter + skippedMinUsages + skippedOneMethod;
