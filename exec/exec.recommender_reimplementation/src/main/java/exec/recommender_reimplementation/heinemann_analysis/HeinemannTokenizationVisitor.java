@@ -27,6 +27,7 @@ import java.util.Set;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationVisitor;
 
@@ -48,11 +49,17 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 	@Override
 	public Object visit(IInvocationExpression expr, TokenizationContext c) {
 		Set<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
-		if(!identifiers.isEmpty()) {
-			filterSingleCharacterIdentifier(identifiers);
-			identifiers = camelCaseSplitTokens(identifiers);
-			identifiers = stemTokens(identifiers);
-			index.add(createNewEntry(expr.getMethodName(), identifiers));
+
+		filterSingleCharacterIdentifier(identifiers);
+		identifiers = camelCaseSplitTokens(identifiers);
+		identifiers = stemTokens(identifiers);
+		
+		try {
+			// check if conversion to CoReNameConverter is possible
+			CoReNameConverter.convert(expr.getMethodName());
+			index.add(createNewEntry(expr.getMethodName(), identifiers));			
+		} catch (Exception e) {
+			// TODO: maybe have some fallback here?
 		}
 
 		// call super method to tokenize invocation after extraction of identifiers
@@ -61,13 +68,15 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 
 	@Override
 	public Object visit(IMethodDeclaration decl, TokenizationContext c) {
-		// clears TokenStream on every methodDeclaration to only have identifiers in same method body 
+		// clears TokenStream on every methodDeclaration to only have
+		// identifiers in same method body
 		// and ignores method header
 		c.getTokenStream().clear();
 
 		visitStatements(decl.getBody(), c);
-		return null;	}
-	
+		return null;
+	}
+
 	public Set<Entry> getIndex() {
 		return index;
 	}

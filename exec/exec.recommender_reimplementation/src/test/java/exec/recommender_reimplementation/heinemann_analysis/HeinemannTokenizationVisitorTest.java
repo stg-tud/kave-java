@@ -53,7 +53,7 @@ public class HeinemannTokenizationVisitorTest extends PBNAnalysisBaseTest {
 	}
 		
 	@Test
-	public void noEntryWhenNotEnoughIdentifiers() {
+	public void emtpyTokenWhenNotEnoughIdentifiers() {
 		IMethodDeclaration methodDecl = methodDecl(method(voidType, DefaultClassContext, "m2"), true,
 				invokeStmt("foo", DefaultMethodContext));
 		
