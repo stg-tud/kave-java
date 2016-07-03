@@ -32,12 +32,6 @@ public class HeinemannQuery {
 		this.declaringType = declaringType;
 	}
 	
-	public HeinemannQuery(Set<String> lookback, ITypeName declaringType, double minimumProbability) {
-		this.lookback = lookback;
-		this.declaringType = declaringType;
-		this.minimumSimilarity = minimumProbability;
-	}
-
 	public Set<String> getLookback() {
 		return lookback;
 	}

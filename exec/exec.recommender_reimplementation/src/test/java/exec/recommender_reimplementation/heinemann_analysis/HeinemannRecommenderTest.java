@@ -45,7 +45,7 @@ public class HeinemannRecommenderTest {
 	
 	@Before
 	public void setup() {
-		uut = new HeinemannRecommender(createSampleModel(), 10);
+		uut = new HeinemannRecommender(createSampleModel(), 0.5);
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ public class HeinemannRecommenderTest {
 	}
 	
 	private HeinemannQuery createQuery(ITypeName declaringType, String... lookback) {
-		return new HeinemannQuery(Sets.newHashSet(lookback), declaringType, 0.5);
+		return new HeinemannQuery(Sets.newHashSet(lookback), declaringType);
 	}
 	
 	private Map<ITypeName, Set<Entry>> createSampleModel() {

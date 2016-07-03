@@ -18,7 +18,6 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -33,11 +32,11 @@ public class HeinemannRecommender implements ICallsRecommender<HeinemannQuery> {
 
 	private Map<ITypeName, Set<Entry>> model;
 	private Set<Entry> completeSet;
-	private int numberOfRecommendations;
-
-	public HeinemannRecommender(Map<ITypeName,Set<Entry>> model, int numberOfRecommendations) {
+	private double minimumProbability;
+	
+	public HeinemannRecommender(Map<ITypeName,Set<Entry>> model, double minimumProbability) {
 		this.model = model;
-		this.numberOfRecommendations = numberOfRecommendations;
+		this.minimumProbability = minimumProbability;
 				
 		completeSet = new HashSet<>();
 		for (Set<Entry> entrySet : model.values()) {
@@ -53,8 +52,6 @@ public class HeinemannRecommender implements ICallsRecommender<HeinemannQuery> {
 			// Fallback if no matching declaring type
 			entrySet = completeSet;
 		}
-		double minimumProbability = query.getMinimumSimilarity();
-		
 		Set<Tuple<ICoReMethodName, Double>> result = ProposalHelper.createSortedSet();
 		
 		for (Entry entry : entrySet) {
@@ -64,7 +61,7 @@ public class HeinemannRecommender implements ICallsRecommender<HeinemannQuery> {
 			}
 		}
 		
-		return result.stream().limit(numberOfRecommendations).collect(Collectors.toSet());
+		return result;
 	}
 
 	public double calculateJaccardSimilarity(Set<String> indexLookback, Set<String> queryLookback) {

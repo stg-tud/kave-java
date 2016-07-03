@@ -48,7 +48,7 @@ public class RunHeinemannRecommender {
 		}
 		
 		Map<ITypeName, Set<Entry>> model = IndexExtractor.buildModel(contextList, 3, false, false);
-		HeinemannRecommender heinemannRecommender = new HeinemannRecommender(model,10);
+		HeinemannRecommender heinemannRecommender = new HeinemannRecommender(model,0.5);
 		
 		// read queries here...
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -64,7 +64,7 @@ public class RunHeinemannRecommender {
 				String typeNameString = reader.readLine();
 				ITypeName declaringType = TypeName.newTypeName(typeNameString);
 				
-				HeinemannQuery query = new HeinemannQuery(lookback, declaringType, 0.4);
+				HeinemannQuery query = new HeinemannQuery(lookback, declaringType);
 				Set<Tuple<ICoReMethodName, Double>> results = heinemannRecommender.query(query);
 				
 				for (Tuple<ICoReMethodName, Double> tuple : results) {
