@@ -55,7 +55,7 @@ public class ThresholdsFrequency {
 			if (entry.getKey() == 1) {
 				continue;
 			}
-			Logger.log("Writting %d - node episodes\n", entry.getKey());
+			Logger.log("Writting %d - node episodes", entry.getKey());
 			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
 			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
 			freqsBuilder.append(freqsLevel);

@@ -55,7 +55,7 @@ public class ThresholdsBidirection {
 			if (entry.getKey() == 1) {
 				continue;
 			}
-			Logger.log("Writting %d - node episodes\n", entry.getKey());
+			Logger.log("Writting %d - node episodes", entry.getKey());
 			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue(), frequency);
 			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
 			bdsBuilder.append(bdsLevel);

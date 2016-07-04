@@ -64,6 +64,7 @@ public class PreprocessingTest {
 	private ReductionByRepos repos;
 	
 	private static final int NUMBREPOS = 10;
+	private static final int FREQTHRESH = 2;
 
 	private List<Event> events;
 	private EventStream stream;
@@ -124,14 +125,14 @@ public class PreprocessingTest {
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.generate(NUMBREPOS);
+		sut.generate(NUMBREPOS, FREQTHRESH);
 
 		verify(repos).select(any(Directory.class), anyInt());
 	}
 
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.generate(NUMBREPOS);
+		sut.generate(NUMBREPOS, FREQTHRESH);
 
 		verify(repos).select(any(Directory.class), anyInt());
 
@@ -144,7 +145,7 @@ public class PreprocessingTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.generate(NUMBREPOS);
+		sut.generate(NUMBREPOS, FREQTHRESH);
 
 		verify(repos).select(any(Directory.class), anyInt());
 

@@ -73,7 +73,7 @@ public class EpisodesStatistics {
 			total.put(roundBd, count + 1);
 			
 			if (roundBd > 0.1) {
-				for (double distr = bd - 0.1; distr >= 0.1; distr -= 0.1) {
+				for (double distr = bd - 0.001; distr > 0.0999; distr -= 0.001) {
 					double tempDistr = Precision.round(distr, ROUNDVALUE);
 					if (total.containsKey(tempDistr)) {
 						int tempCount = total.get(tempDistr);

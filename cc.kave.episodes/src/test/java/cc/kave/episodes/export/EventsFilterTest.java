@@ -33,7 +33,7 @@ import cc.kave.episodes.model.EventStream;
 
 public class EventsFilterTest {
 	
-	private static final int REMFREQS = 1;
+	private static final int REMFREQS = 2;
 
 	private List<Event> events;
 	private List<Event> partitionEvents1;

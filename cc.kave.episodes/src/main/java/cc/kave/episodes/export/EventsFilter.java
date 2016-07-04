@@ -34,29 +34,23 @@ public class EventsFilter {
 	private static double time = 0.0;
 	private static boolean firstMethod = true;
 	
-	public static EventStream filterStream(List<Event> stream, int remFreqs) {
+	public static EventStream filterStream(List<Event> stream, int freqThresh) {
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
 		EventStream sm = new EventStream();
 		
 		for (Event e : stream) {
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
-				if (occurrences.get(e) == remFreqs) {
+				if (occurrences.get(e) < freqThresh) {
 					sm.addEvent(Events.newUnknownEvent());
 				} else {
 					sm.addEvent(e);
 				}
 				continue;
 			}
-			if (occurrences.get(e) > remFreqs) {
-				sm.addEvent(e);;
+			if (occurrences.get(e) >= freqThresh) {
+				sm.addEvent(e);
 			}
-//			if (occurrences.get(e) > remFreqs) {
-//				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-//				if(asm.getIdentifier().equalsIgnoreCase(FRAMEWORKNAME)) {
-//					sm.addEvent(e);;
-//				}
-//			}
 		}
 		return sm;
 	}
