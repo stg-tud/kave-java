@@ -47,7 +47,7 @@ import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
-public class ThresholdsDistributionTest {
+public class ThresholdsBidirectionalTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -56,12 +56,13 @@ public class ThresholdsDistributionTest {
 
 	@Mock
 	private EpisodeParser parser;
-//	@Mock
+
 	private EpisodesStatistics stats;
 	
 	private static final int NUMBREPOS = 2;
+	private static final int FREQTHRESH = 3;
 	
-	private ThresholdsFrequency sut;
+	private ThresholdsBidirection sut;
 	
 	@Before
 	public void setup() throws IOException {
@@ -90,7 +91,7 @@ public class ThresholdsDistributionTest {
 		
 		stats = new EpisodesStatistics();
 		
-		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
+		sut = new ThresholdsBidirection(rootFolder.getRoot(), parser, stats);
 		
 		when(parser.parse(anyInt())).thenReturn(episodes);
 	}
@@ -104,7 +105,7 @@ public class ThresholdsDistributionTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new ThresholdsFrequency(new File("does not exist"), parser, stats);
+		sut = new ThresholdsBidirection(new File("does not exist"), parser, stats);
 	}
 
 	@Test
@@ -112,74 +113,52 @@ public class ThresholdsDistributionTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns is not a folder, but a file");
-		sut = new ThresholdsFrequency(file, parser, stats);
+		sut = new ThresholdsBidirection(file, parser, stats);
 	}
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(NUMBREPOS, FREQTHRESH);
 
 		verify(parser).parse(eq(NUMBREPOS));
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(NUMBREPOS, FREQTHRESH);
 
 		verify(parser).parse(eq(NUMBREPOS));
 
-		File freqsFile = new File(getFreqsPath());
 		File bdsFile = new File(getBdsPath());
 
-		assertTrue(freqsFile.exists());
 		assertTrue(bdsFile.exists());
 	}
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(NUMBREPOS, FREQTHRESH);
 
 		verify(parser).parse(eq(NUMBREPOS));
 
-		File freqsFile = new File(getFreqsPath());
 		File bdsFile = new File(getBdsPath());
-		
-		StringBuilder expFreqs = new StringBuilder();
-		expFreqs.append("Frequency distribution for 2-node episodes:\n");
-		expFreqs.append("Frequency\tCounter\n");
-		expFreqs.append("3\t2\n");
-		expFreqs.append("2\t3\n\n");
-		
-		expFreqs.append("Frequency distribution for 3-node episodes:\n");
-		expFreqs.append("Frequency\tCounter\n");
-		expFreqs.append("2\t2\n");
-		expFreqs.append("3\t1\n\n");
 		
 		StringBuilder expBds = new StringBuilder();
 		expBds.append("Bidirectional distribution for 2-node episodes:\n");
 		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("0.6\t3\n");
+		expBds.append("0.6\t2\n");
 		expBds.append("0.8\t1\n\n");
 		
 		expBds.append("Bidirectional distribution for 3-node episodes:\n");
 		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("0.9\t2\n");
 		expBds.append("1.0\t1\n\n");
 		
-		String actualFreqs = FileUtils.readFileToString(freqsFile);
 		String actualBds = FileUtils.readFileToString(bdsFile);
 		
-		assertEquals(expFreqs.toString(), actualFreqs);
 		assertEquals(expBds.toString(), actualBds);
-	}
-	
-	private String getFreqsPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/freqs" + NUMBREPOS + "Repos.txt");
-		return streamFile.getAbsolutePath();
 	}
 
 	private String getBdsPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/bds" + NUMBREPOS + "Repos.txt");
+		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/bds" + FREQTHRESH + "Freq" + NUMBREPOS + "Repos.txt");
 		return streamFile.getAbsolutePath();
 	}
 	

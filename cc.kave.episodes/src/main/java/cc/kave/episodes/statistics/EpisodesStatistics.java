@@ -61,7 +61,7 @@ public class EpisodesStatistics {
 	}
 
 	public Map<Double, Integer> bidirectEpisodes(Set<Episode> episodes, int frequency) {
-		Map<Double, Integer> total = initBd(episodes);
+		Map<Double, Integer> total = initBd(episodes, frequency);
 
 		for (Episode ep : episodes) {
 			if (!valid(ep, frequency)){
@@ -93,10 +93,14 @@ public class EpisodesStatistics {
 		return false;
 	}
 
-	private Map<Double, Integer> initBd(Set<Episode> episodes) {
+	private Map<Double, Integer> initBd(Set<Episode> episodes, int freqThresh) {
 		Map<Double, Integer> initializer = Maps.newLinkedHashMap();
 
 		for (Episode ep : episodes) {
+			int epFreq = ep.getFrequency();
+			if (epFreq < freqThresh) {
+				continue;
+			}
 			double bd = ep.getBidirectMeasure();
 			double reoundBd = Precision.round(bd, ROUNDVALUE);
 			if (!initializer.containsKey(reoundBd)) {

@@ -24,6 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import cc.kave.episodes.export.ThresholdsBidirection;
 import cc.kave.episodes.export.ThresholdsFrequency;
 import cc.recommenders.io.Logger;
 
@@ -32,6 +33,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 	private static final int NUMBREPOS = 2;
+	private static final int THREQTHRESH = 50;
 
 	private static Injector injector;
 
@@ -47,7 +49,8 @@ public class run_ervina {
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
 //		load(Preprocessing.class).generate(NUMBREPOS);
-		load(ThresholdsFrequency.class).writer(NUMBREPOS);
+//		load(ThresholdsFrequency.class).writer(NUMBREPOS);
+		load(ThresholdsBidirection.class).writer(NUMBREPOS, THREQTHRESH);
 		
 //		load(EpisodeParser.class).parse(NUMBREPOS);
 

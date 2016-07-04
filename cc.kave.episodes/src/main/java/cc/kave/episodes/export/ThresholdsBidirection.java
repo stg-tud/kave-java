@@ -30,6 +30,7 @@ import com.google.inject.name.Named;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
+import cc.recommenders.io.Logger;
 
 public class ThresholdsBidirection {
 
@@ -48,23 +49,18 @@ public class ThresholdsBidirection {
 
 	public void writer(int numbRepos, int frequency) throws IOException {
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
-		StringBuilder freqsBuilder = new StringBuilder();
 		StringBuilder bdsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
 			}
-			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
-			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
-			freqsBuilder.append(freqsLevel);
-			
+			Logger.log("Writting %d - node episodes\n", entry.getKey());
 			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue(), frequency);
 			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
 			bdsBuilder.append(bdsLevel);
 		}
-//		FileUtils.writeStringToFile(new File(getPath(numbRepos).freqsPath), freqsBuilder.toString());
-		FileUtils.writeStringToFile(new File(getPath(numbRepos).bdsPath), bdsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getPath(numbRepos, frequency)), bdsBuilder.toString());
 	}
 
 	private String getBdsStringRep(Integer epLevel, Map<Double, Integer> bds) {
@@ -77,28 +73,9 @@ public class ThresholdsBidirection {
 		data += "\n";
 		return data;
 	}
-
-	private String getFreqsStringRep(Integer epLevel, Map<Integer, Integer> frequences) {
-		String data = "Frequency distribution for " + epLevel + "-node episodes:\n";
-		data += "Frequency\tCounter\n";
-		
-		for (Map.Entry<Integer, Integer> entry : frequences.entrySet()) {
-			data += entry.getKey() + "\t" + entry.getValue() + "\n";
-		}
-		data += "\n";
-		return data;
-	}
 	
-	private FilePaths getPath(int numbRepos) {
-		FilePaths paths = new FilePaths();
-		paths.freqsPath = patternsFolder.getAbsolutePath() + "/freqs" + numbRepos + "Repos.txt";
-		paths.bdsPath = patternsFolder.getAbsolutePath() + "/freq40bds" + numbRepos + "Repos.txt";
-
+	private String getPath(int numbRepos, int freq) {
+		String paths = patternsFolder.getAbsolutePath() + "/bds" + freq + "Freq" + numbRepos + "Repos.txt";
 		return paths;
-	}
-
-	private class FilePaths {
-		private String freqsPath = "";
-		private String bdsPath = "";
 	}
 }

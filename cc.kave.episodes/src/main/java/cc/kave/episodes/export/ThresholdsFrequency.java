@@ -30,6 +30,7 @@ import com.google.inject.name.Named;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
+import cc.recommenders.io.Logger;
 
 public class ThresholdsFrequency {
 
@@ -54,6 +55,7 @@ public class ThresholdsFrequency {
 			if (entry.getKey() == 1) {
 				continue;
 			}
+			Logger.log("Writting %d - node episodes\n", entry.getKey());
 			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
 			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
 			freqsBuilder.append(freqsLevel);
