@@ -64,18 +64,18 @@ public class ValidationDataGraphGenerator {
 		this.writer = writer;
 	}
 
-	public void generateGraphs() throws Exception {
+	public void generateGraphs(int numbRepos) throws Exception {
 		
 		Logger.setPrinting(false);
 		
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse();
+		List<Event> eventMapping = mappingParser.parse(numbRepos);
 		
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
 		
 		Logger.log("Removing transitivity closures");
-		Set<Episode> simplifiedValData = transitivityClosure.removeTransitivelyClosure(validationData);
+		Set<Episode> simplifiedValData = transitivityClosure.remTransClosure(validationData);
 		
 		String directory = createDirectoryStructure();
 

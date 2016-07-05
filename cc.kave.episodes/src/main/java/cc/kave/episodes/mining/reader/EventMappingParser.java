@@ -34,23 +34,23 @@ public class EventMappingParser {
 	private File rootFolder;
 
 	@Inject
-	public EventMappingParser(@Named("rootDir") File directory) {
+	public EventMappingParser(@Named("events") File directory) {
 		assertTrue(directory.exists(), "Event mapping folder does not exist");
 		assertTrue(directory.isDirectory(), "Event mapping folder is not a folder, but a file");
 		this.rootFolder = directory;
 	}
 
-	public List<Event> parse() {
+	public List<Event> parse(int numbRepos) {
 
 		@SuppressWarnings("serial")
 		Type listType = new TypeToken<LinkedList<Event>>() {
 		}.getType();
-		List<Event> events = JsonUtils.fromJson(getFilePath(), listType);
+		List<Event> events = JsonUtils.fromJson(getFilePath(numbRepos), listType);
 		return events;
 	}
 
-	private File getFilePath() {
-		String fileName = rootFolder.getAbsolutePath() + "/eventMapping.txt";
+	private File getFilePath(int numbRepos) {
+		String fileName = rootFolder.getAbsolutePath() + numbRepos + "Repos/mapping.txt";
 		File file = new File(fileName);
 		return file;
 	}

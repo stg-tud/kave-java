@@ -57,16 +57,16 @@ public class SampleCodeMatcher {
 	private TransitivelyClosedEpisodes transitivity = new TransitivelyClosedEpisodes();
 	private EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 	
-	public void generateGraphs() throws IOException {
+	public void generateGraphs(int numbRepos) throws IOException {
 		String type = "ArrayList";
 //		Set<String> types = Sets.newHashSet();
 //		types.add("ArrayList");
 		
 		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(600);
-		List<Event> mapper = mapParser.parse();
+		List<Event> mapper = mapParser.parse(numbRepos);
 		
 		int nodeLevel = allEpisodes.size() - 1;
-		Set<Episode> closedEpisodes = transitivity.removeTransitivelyClosure(allEpisodes.get(nodeLevel));
+		Set<Episode> closedEpisodes = transitivity.remTransClosure(allEpisodes.get(nodeLevel));
 		
 		int graphID = 0;
 		

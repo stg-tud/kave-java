@@ -93,11 +93,11 @@ public class Evaluation {
 		this.categorizer = categorizer;
 	}
 
-	public void evaluate() throws ZipException, IOException {
+	public void evaluate(int numbRepos) throws ZipException, IOException {
 
 		Logger.setPrinting(true);
 		Map<Integer, Set<Episode>> maxPatterns = readPatterns();
-		List<Event> eventMapping = readMapper();
+		List<Event> eventMapping = readMapper(numbRepos);
 		Set<Episode> validationData = readValidationData(eventMapping);
 		Map<String, Set<Episode>> targets = categorizer.categorize(validationData);
 		configurations();
@@ -292,9 +292,9 @@ public class Evaluation {
 		return validationData;
 	}
 
-	private List<Event> readMapper() {
+	private List<Event> readMapper(int numbRepos) {
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse();
+		List<Event> eventMapping = mappingParser.parse(numbRepos);
 		return eventMapping;
 	}
 

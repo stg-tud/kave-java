@@ -92,7 +92,6 @@ public class Module extends AbstractModule {
 		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
 
 		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
-		bind(EventStreamReader.class).toInstance(new EventStreamReader(eventStreamRoot, reader, mappingParser));
 		File graphRoot = episodeRootFile;
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());

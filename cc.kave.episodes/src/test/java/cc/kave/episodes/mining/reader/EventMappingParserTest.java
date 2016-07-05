@@ -36,6 +36,8 @@ public class EventMappingParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
+	
+	private static final int NUMBREPOS = 2;
 
 	private EventMappingParser sut;
 
@@ -59,13 +61,13 @@ public class EventMappingParserTest {
 
 		FileUtils.writeStringToFile(file, jsonString);
 
-		List<Event> actuals = sut.parse();
+		List<Event> actuals = sut.parse(NUMBREPOS);
 
 		assertEquals(expected, actuals);
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/eventMapping.txt");
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + NUMBREPOS + "REPOS/mapping.txt");
 		return fileName;
 	}
 }

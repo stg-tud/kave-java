@@ -69,12 +69,12 @@ public class QueriesGraphGenerator {
 		this.queryGenerator = queryGenerator;
 	}
 
-	public void generateGraphs() throws Exception {
+	public void generateGraphs(int numbRepos) throws Exception {
 		
 		Logger.setPrinting(true);
 		
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse();
+		List<Event> eventMapping = mappingParser.parse(numbRepos);
 		
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
@@ -92,7 +92,7 @@ public class QueriesGraphGenerator {
 				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 				
 				Logger.log("Removing transitivity closures");
-				Set<Episode> simpEpisode = transitivityClosure.removeTransitivelyClosure(Sets.newHashSet(e));
+				Set<Episode> simpEpisode = transitivityClosure.remTransClosure(Sets.newHashSet(e));
 				Episode ep = wrap(simpEpisode);
 				
 				Logger.log("Writting episode number %s.\n", episodeID);
@@ -101,7 +101,7 @@ public class QueriesGraphGenerator {
 				
 				if (!queries.isEmpty()) {
 					for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
-						Set<Episode> simQueries = transitivityClosure.removeTransitivelyClosure(entry.getValue());
+						Set<Episode> simQueries = transitivityClosure.remTransClosure(entry.getValue());
 						for (Episode query : simQueries) {
 							DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
 							writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));

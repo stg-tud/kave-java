@@ -67,6 +67,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private String tmpFolderName;
 	private static final int FREQ = 12;
 	private static final double BD = 0.8;
+	private static final int REPOS = 2;
 
 	@Mock
 	private EpisodeParser episodeParser;
@@ -104,7 +105,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
 		when(episodeParser.parse(eq(FREQ))).thenReturn(episodes);
-		when(mappingParser.parse()).thenReturn(events);
+		when(mappingParser.parse(REPOS)).thenReturn(events);
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		assertTrue(folderStructure.isDirectory());
 
 //		verify(episodeParser).parse(eq(FREQ), eq(BD));
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 	}
 
 	@Test
@@ -142,7 +143,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 //		sut.generateGraphs(FREQ, BD);
 
 //		verify(episodeParser).parse(eq(FREQ), eq(BD));
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 
 		File fileName;
 		int epCounter = 0;

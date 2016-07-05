@@ -29,7 +29,7 @@ import cc.recommenders.datastructures.Tuple;
 
 public class TransitivelyClosedEpisodes {
 
-	public Set<Episode> removeTransitivelyClosure(Set<Episode> allEpisodes) {
+	public Set<Episode> remTransClosure(Set<Episode> allEpisodes) {
 		
 		assertTrue(!allEpisodes.isEmpty(), "The list of learned episodes is empty!");
 

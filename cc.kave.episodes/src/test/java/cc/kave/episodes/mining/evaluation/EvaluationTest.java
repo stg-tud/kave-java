@@ -78,6 +78,7 @@ public class EvaluationTest {
 
 	private static final int FREQUENCY = 5;
 	private static final double BIDIRECTIONAL = 0.01;
+	private static final int REPOS = 2;
 
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
@@ -146,7 +147,7 @@ public class EvaluationTest {
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		when(episodeParser.parse(eq(FREQUENCY))).thenReturn(patterns);
-		when(mappingParser.parse()).thenReturn(events);
+		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
 	}
@@ -177,10 +178,10 @@ public class EvaluationTest {
 	@Test
 	public void logger() throws ZipException, IOException {
 		Logger.clearLog();
-		sut.evaluate();
+		sut.evaluate(REPOS);
 
 		verify(episodeParser).parse(eq(FREQUENCY));
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);
 
@@ -231,7 +232,7 @@ public class EvaluationTest {
 	@Ignore
 	@Test
 	public void Inv2() throws ZipException, IOException {
-		sut.evaluate();
+		sut.evaluate(REPOS);
 
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/2.txt");
 		assertTrue(fileName.exists());
@@ -262,7 +263,7 @@ public class EvaluationTest {
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		Logger.clearLog();
-		sut.evaluate();
+		sut.evaluate(REPOS);
 
 		assertLogContains(0, "Reading the learned patterns");
 		assertLogContains(1, "Reading the mapping file");
@@ -304,7 +305,7 @@ public class EvaluationTest {
 				.newHashSet(createQuery("11", "12", "20", "21", "11>12", "11>20", "11>21", "12>20", "12>21", "20>21")));
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		sut.evaluate();
+		sut.evaluate(REPOS);
 
 		File fileName1 = new File(rootFolder.getRoot().getAbsolutePath() + "/2.txt");
 		assertTrue(fileName1.exists());

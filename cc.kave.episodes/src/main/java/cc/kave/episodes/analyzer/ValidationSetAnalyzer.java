@@ -45,11 +45,11 @@ public class ValidationSetAnalyzer {
 		this.validationParser = vParser;
 	}
 	
-	public void categorize() throws ZipException, IOException {
+	public void categorize(int numbRepos) throws ZipException, IOException {
 		Logger.setPrinting(true);
 		
 		Logger.log("Reading the events mapping file ...");
-		List<Event> events = mappingParser.parse();
+		List<Event> events = mappingParser.parse(numbRepos);
 		
 		Logger.log("Reading validation data ...");
 		Set<Episode> targets = validationParser.parse(events);

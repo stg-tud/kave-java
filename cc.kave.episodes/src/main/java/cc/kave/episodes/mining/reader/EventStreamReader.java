@@ -40,9 +40,9 @@ public class EventStreamReader {
 		this.eventMapper = eventMapping;
 	}
 
-	public void read() {
+	public void read(int numbRepos) {
 		File filePath = getFilePath();
-		List<Event> allEvents = eventMapper.parse();
+		List<Event> allEvents = eventMapper.parse(numbRepos);
 		List<String> lines = reader.readFile(filePath);
 
 		int counter = 0;

@@ -45,6 +45,8 @@ public class ValidationSetAnalyzerTest {
 	@Mock
 	private ValidationContextsParser validationParser;
 	
+	private static final int REPOS = 2;
+	
 	private LinkedList<Event> events;
 	
 	private ValidationSetAnalyzer sut;
@@ -60,7 +62,7 @@ public class ValidationSetAnalyzerTest {
 		
 		sut = new ValidationSetAnalyzer(mappingParser, validationParser);
 		
-		when(mappingParser.parse()).thenReturn(events);
+		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(Sets.newHashSet(createTarget("11"),
 				createTarget("11", "12", "11>12"), createTarget("11", "13", "11>13"),
 				createTarget("11", "12", "13", "11>12", "11>13", "12>13")));
@@ -75,9 +77,9 @@ public class ValidationSetAnalyzerTest {
 	public void logTest() throws ZipException, IOException {
 		Logger.clearLog();
 		
-		sut.categorize();
+		sut.categorize(REPOS);
 		
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 		verify(validationParser).parse(events);
 		
 		assertLogContains(0, "Reading the events mapping file ...");

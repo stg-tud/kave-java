@@ -31,8 +31,8 @@ public class MappingReader {
 		this.eventMapper = eventMapping;
 	}
 
-	public void read() {
-		List<Event> events = eventMapper.parse();
+	public void read(int numbRepos) {
+		List<Event> events = eventMapper.parse(numbRepos);
 		int counter = 0;
 
 		for (Event e : events) {

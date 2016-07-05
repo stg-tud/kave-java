@@ -49,7 +49,7 @@ public class TransitivelyClosedEpisodesTest {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("The list of learned episodes is empty!");
 
-		sut.removeTransitivelyClosure(Sets.newHashSet());
+		sut.remTransClosure(Sets.newHashSet());
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class TransitivelyClosedEpisodesTest {
 		episode = newEpisode(3, 3, "a", "b", "c");
 		expected.add(episode);
 
-		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.remTransClosure(maximalEpisodes);
 
 		for (Episode ep : expected) {
 			assertTrue(actuals.contains(ep));
@@ -83,7 +83,7 @@ public class TransitivelyClosedEpisodesTest {
 
 		Set<Episode> expected = createSetOfEpisodes(3, false);
 
-		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.remTransClosure(maximalEpisodes);
 
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;
@@ -103,7 +103,7 @@ public class TransitivelyClosedEpisodesTest {
 
 		Set<Episode> expected = createSetOfEpisodes(4, false);
 
-		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.remTransClosure(maximalEpisodes);
 
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;
@@ -123,7 +123,7 @@ public class TransitivelyClosedEpisodesTest {
 
 		Set<Episode> expected = createSetOfEpisodes(5, false);
 
-		Set<Episode> actuals = sut.removeTransitivelyClosure(maximalEpisodes);
+		Set<Episode> actuals = sut.remTransClosure(maximalEpisodes);
 
 		assertEquals(expected.size(), actuals.size());
 		boolean comparison = false;

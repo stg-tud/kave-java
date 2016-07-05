@@ -63,15 +63,16 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private String tmpFolderName;
-
 	@Mock
 	private ValidationContextsParser contextParser;
 	@Mock
 	private EventMappingParser mappingParser;
 	@Mock
 	private Directory episodeDirectory;
+	
+	private static final int REPOS = 2;
 
+	private String tmpFolderName;
 	private EpisodeToGraphConverter graphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -98,7 +99,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/ValidationData/");
 
-		when(mappingParser.parse()).thenReturn(events);
+		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(contextParser.parse(eq(events))).thenReturn(episodes);
 	}
 
@@ -122,21 +123,21 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	@Test
 	public void structureIsCreated() throws Exception {
 
-		sut.generateGraphs();
+		sut.generateGraphs(REPOS);
 
 		assertTrue(folderStructure.exists());
 		assertTrue(folderStructure.isDirectory());
 
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 		verify(contextParser).parse(events);
 	}
 
 	@Test
 	public void validationGraphStored() throws Exception {
 
-		sut.generateGraphs();
+		sut.generateGraphs(REPOS);
 
-		verify(mappingParser).parse();
+		verify(mappingParser).parse(REPOS);
 		verify(contextParser).parse(events);
 
 		File fileName;
