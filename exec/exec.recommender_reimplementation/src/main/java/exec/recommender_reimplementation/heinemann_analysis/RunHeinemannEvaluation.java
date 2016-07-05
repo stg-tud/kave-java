@@ -42,19 +42,20 @@ public class RunHeinemannEvaluation {
 		
 		Tuple<List<Context>, List<Context>> contextTuple = splitContexts(contextList);
 		
-		Map<ITypeName, Set<Entry>> model = IndexExtractor.buildModel(contextTuple.getFirst(), 5, false, false);
-		HeinemannRecommender heinemannRecommender = new HeinemannRecommender(model,0.5);
+		Map<ITypeName, Set<Entry>> model = IndexExtractor.buildModel(contextTuple.getFirst(), 4, false, false);
+		HeinemannRecommender heinemannRecommender = new HeinemannRecommender(model,0.8);
 		
-		HeinemannEvaluation heinemannEvaluation = new HeinemannEvaluation(heinemannRecommender, 5, false, false);
+		HeinemannEvaluation heinemannEvaluation = new HeinemannEvaluation(heinemannRecommender, 4, false, false);
 		double mrrScore = heinemannEvaluation.evaluateSet(contextTuple.getSecond());
 		
-		System.out.print("MRR: " + mrrScore);
+		System.out.println("MRR: " + mrrScore);
+		System.out.print("Invocation Count: " + heinemannEvaluation.invocationCount);
 	}
 
 	private static Tuple<List<Context>, List<Context>> splitContexts(List<Context> contextList) {
 		int size = contextList.size();
 		int splitIndex = size / 10 * 9;
-		return Tuple.newTuple(contextList.subList(0, splitIndex - 1), contextList.subList(splitIndex, size));
+		return Tuple.newTuple(contextList.subList(0, splitIndex), contextList.subList(splitIndex, size));
 	}
 
 }

@@ -17,8 +17,10 @@ package exec.recommender_reimplementation.heinemann_analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -33,7 +35,10 @@ public class IndexExtractor {
 	public static Map<ITypeName, Set<Entry>> buildModel(List<Context> contexts, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		Set<Entry> entrySet = new HashSet<>();
 		
-		for (Context context : contexts) {
+		Queue<Context> contextQueue = new LinkedList<>(contexts);
+		
+		while (!contextQueue.isEmpty()) {
+			Context context = contextQueue.poll();
 			try {
 				entrySet.addAll(extractIndex(context, lookback, removeStopwords, removeKeywords));
 			} catch (Exception e) {

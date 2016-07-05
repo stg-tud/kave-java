@@ -40,7 +40,7 @@ public class HeinemannEvaluation {
 
 	private double reciprocalRank;
 
-	private int invocationCount;
+	public int invocationCount;
 
 	private int lookback;
 
@@ -83,38 +83,40 @@ public class HeinemannEvaluation {
 		@Override
 		public Object visit(IInvocationExpression expr, TokenizationContext c) {
 			IMethodName expectedMethodName = expr.getMethodName();
-			if(expectedMethodName.equals(MethodName.UNKNOWN_NAME)) return super.visit(expr, c);
+			if (expectedMethodName.equals(MethodName.UNKNOWN_NAME))
+				return super.visit(expr, c);
 			Set<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
 			filterSingleCharacterIdentifier(identifiers);
 			identifiers = camelCaseSplitTokens(identifiers);
 			identifiers = stemTokens(identifiers);
 			ICoReMethodName expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
-			
+
 			HeinemannQuery query = new HeinemannQuery(identifiers, expr.getMethodName().getDeclaringType());
-			
+
 			Set<Tuple<ICoReMethodName, Double>> proposals = recommender.query(query);
-			
-			calculateReciprocalRank(expectedCoReMethodName, proposals);
-			
+
+			reciprocalRank += calculateReciprocalRank(expectedCoReMethodName, proposals);
+
 			invocationCount++;
-			
-			// call super method to tokenize invocation after extraction of identifiers
+
+			// call super method to tokenize invocation after extraction of
+			// identifiers
 			return super.visit(expr, c);
 		}
 
-		public void calculateReciprocalRank(ICoReMethodName coReMethodName,
-				Set<Tuple<ICoReMethodName, Double>> proposals) {
-			Iterator<Tuple<ICoReMethodName, Double>> iterator = proposals.iterator();
-			int i = 1;
-			while (iterator.hasNext()) {
-				Tuple<ICoReMethodName, Double> proposal = iterator.next();
-				if(coReMethodName.equals(proposal.getFirst())) {
-					reciprocalRank += 1 / (double) i;
-					break;
-				}
-				i++;
-			}
-		}
+	}
 
+	public static double calculateReciprocalRank(ICoReMethodName coReMethodName,
+			Set<Tuple<ICoReMethodName, Double>> proposals) {
+		Iterator<Tuple<ICoReMethodName, Double>> iterator = proposals.iterator();
+		int i = 1;
+		while (iterator.hasNext()) {
+			Tuple<ICoReMethodName, Double> proposal = iterator.next();
+			if (coReMethodName.equals(proposal.getFirst())) {
+				return 1 / (double) i;
+			}
+			i++;
+		}
+		return 0;
 	}
 }
