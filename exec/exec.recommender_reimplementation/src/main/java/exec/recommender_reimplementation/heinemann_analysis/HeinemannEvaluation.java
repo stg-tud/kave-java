@@ -29,6 +29,7 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.pointsto.analysis.exceptions.MissingTypeNameException;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
@@ -89,7 +90,13 @@ public class HeinemannEvaluation {
 			filterSingleCharacterIdentifier(identifiers);
 			identifiers = camelCaseSplitTokens(identifiers);
 			identifiers = stemTokens(identifiers);
-			ICoReMethodName expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
+			ICoReMethodName expectedCoReMethodName;
+			try {
+				expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
+			} catch (Exception e) {
+				// ignore this invocation
+				return super.visit(expr, c);
+			}
 
 			HeinemannQuery query = new HeinemannQuery(identifiers, expr.getMethodName().getDeclaringType());
 

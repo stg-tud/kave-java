@@ -60,6 +60,7 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 			index.add(createNewEntry(expr.getMethodName(), identifiers));			
 		} catch (Exception e) {
 			// TODO: maybe have some fallback here?
+			return null;
 		}
 
 		// call super method to tokenize invocation after extraction of identifiers

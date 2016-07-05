@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -54,8 +55,16 @@ public class RunHeinemannEvaluation {
 
 	private static Tuple<List<Context>, List<Context>> splitContexts(List<Context> contextList) {
 		int size = contextList.size();
-		int splitIndex = size / 10 * 9;
-		return Tuple.newTuple(contextList.subList(0, splitIndex), contextList.subList(splitIndex, size));
+		int evaluationSize = size / 10;
+		Random randomGen = new Random();
+		List<Context> evaluationSet = new LinkedList<>();
+		for (int i = 0; i < evaluationSize; i++) {
+			int index = randomGen.nextInt(size);
+			evaluationSet.add(contextList.get(index));
+			contextList.remove(index);
+			size--;
+		}
+		return Tuple.newTuple(contextList, evaluationSet);
 	}
 
 }
