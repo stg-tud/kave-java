@@ -24,15 +24,15 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.episodes.aastart.frameworks.Preprocessing;
+import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	private static final int NUMBREPOS = 20;
-	private static final int THREQTHRESH = 50;
+	private static final int NUMBREPOS = 2;
+	private static final int FREQTHRESH = 50;
 
 	private static Injector injector;
 
@@ -47,9 +47,11 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-		load(Preprocessing.class).generate(NUMBREPOS, THREQTHRESH);
+//		load(Preprocessing.class).generate(NUMBREPOS, THREQTHRESH);
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, THREQTHRESH);
+		
+		load(EpisodesPostprocessor.class).postprocess(NUMBREPOS, FREQTHRESH, 0.5);
 		
 //		load(EpisodeParser.class).parse(NUMBREPOS);
 

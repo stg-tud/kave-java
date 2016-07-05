@@ -50,7 +50,7 @@ public class EpisodeParser {
 		List<String> lines = reader.readFile(filePath);
 
 		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
-		Set<Episode> episodes = Sets.newHashSet();
+		Set<Episode> episodes = Sets.newLinkedHashSet();
 
 		String[] rowValues;
 		int numNodes = 0;

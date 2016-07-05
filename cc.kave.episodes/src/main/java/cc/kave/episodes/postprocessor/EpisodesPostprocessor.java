@@ -40,11 +40,13 @@ public class EpisodesPostprocessor {
 		Map<Integer, Set<Episode>> patterns = Maps.newHashMap();
 		
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
+		Logger.log("Finished parsing the episodes!");
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
 			}
+			Logger.log("Postprocessing %d-node episodes!", entry.getKey());
 			Map<Set<Fact>, Episode> filtered = Maps.newLinkedHashMap();
 			
 			for (Episode ep : entry.getValue()) {
@@ -57,7 +59,7 @@ public class EpisodesPostprocessor {
 						Set<Fact> events = ep.getEvents();
 						Episode filterEp = filtered.get(events);
 						
-						Episode repEp = getRepresentative(filterEp, ep);
+						Episode repEp = getRepresentative(filterEp, ep, freqThresh, bidirectThresh);
 						
 						if (repEp.equals(ep)) {
 							filtered.put(events, repEp);
@@ -67,6 +69,13 @@ public class EpisodesPostprocessor {
 					}
 				}
 			}
+//			Set<Fact> someFacts = Sets.newHashSet();
+//			if (entry.getKey() == 3) {
+//				someFacts.add(new Fact("492"));
+//				someFacts.add(new Fact("493"));
+//				someFacts.add(new Fact("494"));
+//				Logger.log("Selected episodes is %s: ", filtered.get(someFacts));
+//			}
 			Set<Episode> repEpisodes = getfilteredEp(filtered);
 			patterns.put(entry.getKey(), repEpisodes);
 		}
@@ -82,7 +91,7 @@ public class EpisodesPostprocessor {
 		return episodes;
 	}
 
-	private Episode getRepresentative(Episode filterEp, Episode currEp) throws Exception {
+	private Episode getRepresentative(Episode filterEp, Episode currEp, int freqThresh, double bidirectThresh) throws Exception {
 		int ffreq = filterEp.getFrequency();
 		double fbidirect = filterEp.getBidirectMeasure();
 		
@@ -103,8 +112,9 @@ public class EpisodesPostprocessor {
 				return currEp;
 			}
 		}
-		Logger.log("Episode 1: %s", filterEp.toString());
-		Logger.log("Episode 2: %s", currEp.toString());
-		throw new Exception("There are two episodes exactly the same!");
+		return filterEp;
+//		Logger.log("Episode 1: %s", filterEp.toString());
+//		Logger.log("Episode 2: %s", currEp.toString());
+//		throw new Exception("There are two episodes exactly the same!");
 	}
 }
