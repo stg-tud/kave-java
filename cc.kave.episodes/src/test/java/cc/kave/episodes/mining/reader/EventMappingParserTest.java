@@ -67,7 +67,7 @@ public class EventMappingParserTest {
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + NUMBREPOS + "REPOS/mapping.txt");
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/" + NUMBREPOS + "Repos/mapping.txt");
 		return fileName;
 	}
 }

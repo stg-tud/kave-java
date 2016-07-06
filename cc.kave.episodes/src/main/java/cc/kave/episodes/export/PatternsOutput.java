@@ -25,8 +25,6 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -65,13 +63,11 @@ public class PatternsOutput {
 		this.graphWriter = writer;
 	}
 
-	public void write(int numbRepos, int freqThresh, int bidirectThresh) throws Exception {
+	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
 		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
 		List<Event> events = mappingParser.parse(numbRepos);
 
-		Map<Integer, Set<Episode>> closedPatterns = Maps.newLinkedHashMap();
 		int graphNumber = 0;
-
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
@@ -80,17 +76,19 @@ public class PatternsOutput {
 
 			for (Episode episode : closedEpisodes) {
 				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
+				graphWriter.write(graph, getGraphPath(numbRepos, freqThresh, bidirectThresh, graphNumber));
+				graphNumber++;
 			}
 		}
 	}
 
-	private String getGraphPath(int numbRepos, int freqThresh, int bidirectThresh, int graphNum) {
+	private String getGraphPath(int numbRepos, int freqThresh, double bidirectThresh, int graphNum) {
 		File folder = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
 				+ "/Bidirect" + bidirectThresh + "/");
 		if (!folder.isDirectory()) {
 			folder.mkdirs();
 		}
-		String filePath = folder.getAbsolutePath() + "/pattern" + graphNum + ".txt";
+		String filePath = folder.getAbsolutePath() + "/pattern" + graphNum + ".dot";
 		return filePath;
 	}
 }

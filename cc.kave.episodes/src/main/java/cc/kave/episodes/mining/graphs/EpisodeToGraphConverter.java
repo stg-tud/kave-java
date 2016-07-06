@@ -58,6 +58,7 @@ public class EpisodeToGraphConverter {
 			String out = toLabel(method);
 			labels += fact.getFactID() + ". " + kind.toString() + ": " + out + "\\l";
 		}
+		labels += "Freq = " + episode.getFrequency() + ", bd = " + episode.getBidirectMeasure();
 		Fact labelFact = new Fact(labels);
 		graph.addVertex(labelFact);
 

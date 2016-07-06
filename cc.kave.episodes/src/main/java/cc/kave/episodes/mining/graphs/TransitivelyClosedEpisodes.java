@@ -61,6 +61,9 @@ public class TransitivelyClosedEpisodes {
 			finalRelations = doubleCheckClosureRemoval(finalRelations);
 		}
 		episodeResult.addListOfFacts(finalRelations);
+		episodeResult.setFrequency(episode.getFrequency());
+		episodeResult.setBidirectMeasure(episode.getBidirectMeasure());
+		
 		return episodeResult;
 	}
 

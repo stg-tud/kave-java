@@ -134,12 +134,27 @@ public class EpisodesPostprocessorTest {
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "1>2"));
 		twoNodes.add(createEpisode(8, 0.8, "1", "2", "2>1"));
 		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
+		twoNodes.add(createEpisode(6, 0.8, "1", "3", "3>1"));
+		twoNodes.add(createEpisode(6, 0.7, "1", "3", "1>3"));
+		twoNodes.add(createEpisode(6, 0.5, "1", "3"));
 		episodes.put(2, twoNodes);
 		
+		Set<Episode> threeNodes = Sets.newLinkedHashSet();
+		threeNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "1>3"));
+		threeNodes.add(createEpisode(8, 0.8, "1", "2", "3", "2>1", "2>3"));
+		threeNodes.add(createEpisode(8, 0.7, "1", "2", "3", "3>1", "3>2"));
+		threeNodes.add(createEpisode(8, 0.5, "1", "2", "3"));
+		episodes.put(3, threeNodes);
+		
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
-		Set<Episode> set = Sets.newLinkedHashSet();
-		set.add(createEpisode(8, 0.6, "1", "2", "1>2"));
-		expected.put(2, set);
+		Set<Episode> set2 = Sets.newLinkedHashSet();
+		set2.add(createEpisode(8, 0.6, "1", "2", "1>2"));
+		set2.add(createEpisode(6, 0.5, "1", "3"));
+		expected.put(2, set2);
+		
+		Set<Episode> set3 = Sets.newLinkedHashSet();
+		set3.add(createEpisode(8, 0.5, "1", "2", "3"));
+		expected.put(3, set3);
 		
 		Map<Integer, Set<Episode>> actuals = sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 		

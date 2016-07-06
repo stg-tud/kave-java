@@ -50,7 +50,7 @@ public class EventMappingParser {
 	}
 
 	private File getFilePath(int numbRepos) {
-		String fileName = rootFolder.getAbsolutePath() + numbRepos + "Repos/mapping.txt";
+		String fileName = rootFolder.getAbsolutePath() + "/" + numbRepos + "Repos/mapping.txt";
 		File file = new File(fileName);
 		return file;
 	}
