@@ -35,6 +35,26 @@ public class EventsTest {
 		assertSame(m, actual.getMethod());
 		assertNull(actual.getType());
 	}
+	
+	@Test
+	public void firstDecl() {
+		IMethodName m = mock(IMethodName.class);
+		Event actual = Events.newFirstContext(m);
+
+		assertEquals(EventKind.FIRST_DECLARATION, actual.getKind());
+		assertSame(m, actual.getMethod());
+		assertNull(actual.getType());
+	}
+	
+	@Test
+	public void superDecl() {
+		IMethodName m = mock(IMethodName.class);
+		Event actual = Events.newSuperContext(m);
+
+		assertEquals(EventKind.SUPER_DECLARATION, actual.getKind());
+		assertSame(m, actual.getMethod());
+		assertNull(actual.getType());
+	}
 
 	@Test
 	public void invocations() {

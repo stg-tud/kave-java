@@ -48,20 +48,30 @@ public class EventStreamGenerator {
 
 	private class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
-		private IMethodName currentCtx;
+//		private IMethodName currentCtx;
+		private IMethodName firstCtx;
+		private IMethodName superCtx;
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
-			currentCtx = MethodName.UNKNOWN_NAME;
+//			currentCtx = MethodName.UNKNOWN_NAME;
+			firstCtx = MethodName.UNKNOWN_NAME;
+			superCtx = MethodName.UNKNOWN_NAME;
 			IMethodName name = decl.getName();
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
 					if (h.getFirst() != null) {
-						currentCtx = h.getFirst();
-					} else if (h.getSuper() != null) {
-						currentCtx = h.getSuper();
+						firstCtx = h.getFirst();
+					} 
+					if (h.getSuper() != null) {
+						superCtx = h.getSuper();
 					}
+//					if (h.getFirst() != null) {
+//						currentCtx = h.getFirst();
+//					} else if (h.getSuper() != null) {
+//						currentCtx = h.getSuper();
+//					}
 				}
 			}
 			return super.visit(decl, context);
@@ -103,9 +113,20 @@ public class EventStreamGenerator {
 //			events.add(Events.newContext(currentCtx));
 //			currentCtx = null;
 
-			if (currentCtx != null) {
-				events.add(Events.newContext(currentCtx));
-				currentCtx = null;
+//			if (currentCtx != null) {
+//				events.add(Events.newContext(currentCtx));
+//				currentCtx = null;
+//			}
+			if (firstCtx != null) {
+				events.add(Events.newContext(firstCtx));
+				firstCtx = null;
+			}
+			if (superCtx != null) {
+				Event superEvent = Events.newContext(superCtx);
+				if (!superEvent.equals(Events.newUnknownEvent())) {
+					events.add(superEvent);
+				}
+				superCtx = null;
 			}
 		}
 	}

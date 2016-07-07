@@ -24,6 +24,20 @@ public class Events {
 		event.setMethod(ctx);
 		return event;
 	}
+	
+	public static Event newFirstContext(IMethodName ctx) {
+		Event event = new Event();
+		event.setKind(EventKind.FIRST_DECLARATION);
+		event.setMethod(ctx);
+		return event;
+	}
+	
+	public static Event newSuperContext(IMethodName ctx) {
+		Event event = new Event();
+		event.setKind(EventKind.SUPER_DECLARATION);
+		event.setMethod(ctx);
+		return event;
+	}
 
 	public static Event newInvocation(IMethodName m) {
 		Event event = new Event();
