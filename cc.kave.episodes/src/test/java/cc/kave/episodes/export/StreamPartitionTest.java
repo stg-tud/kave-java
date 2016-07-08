@@ -280,7 +280,7 @@ public class StreamPartitionTest {
 	private List<Event> expectedMapping() {
 		List<Event> events = new LinkedList<Event>();
 		events.add(Events.newDummyEvent());
-		events.add(Events.newUnknownEvent());
+		events.add(Events.newContext(MethodName.UNKNOWN_NAME));
 		
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
 		IMethodName methodInv1 = MethodName.newMethodName(inv1);

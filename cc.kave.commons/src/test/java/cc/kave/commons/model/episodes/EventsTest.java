@@ -77,16 +77,4 @@ public class EventsTest {
 		assertSame(DUMMY_METHOD, actual.getMethod());
 		assertNull(actual.getType());
 	}
-	
-	@Test
-	public void unkown() {
-		Event actual = Events.newUnknownEvent();
-		
-		String UNKOWN_METHOD_NAME = "[?] [?].???()";
-		IMethodName UNKOWN_METHOD = MethodName.newMethodName(UNKOWN_METHOD_NAME);
-		
-		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
-		assertSame(UNKOWN_METHOD, actual.getMethod());
-		assertNull(actual.getType());
-	}
 }

@@ -102,7 +102,7 @@ public class EventStreamIoTest {
 	}
 
 	private static Event unknown() {
-		return Events.newUnknownEvent();
+		return Events.newContext(MethodName.UNKNOWN_NAME);
 	}
 
 	private static IMethodName m(int i) {

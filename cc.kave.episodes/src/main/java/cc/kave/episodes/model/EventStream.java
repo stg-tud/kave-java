@@ -27,6 +27,7 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
+import cc.kave.commons.model.names.csharp.MethodName;
 
 public class EventStream {
 	public static final double DELTA = 0.001;
@@ -55,23 +56,23 @@ public class EventStream {
 		return this.streamLength;
 	}
 
-	public int getEventNumber() {
+	public int getNumberEvents() {
 		return this.mappingData.size();
 	}
 
 	public void addEvent(Event event) {
 		Integer idx = this.mappingData.get(event);
 
-		if ((!event.equals(Events.newDummyEvent())) && (event.getKind() == EventKind.METHOD_DECLARATION)) {
+		if (event.getKind() == EventKind.FIRST_DECLARATION && !(this.isFirstMethod)) {
 			this.time += TIMEOUT;
 		}
-		if (idx == null) {
-			idx = getEventNumber();
+		if (idx == null && !(event.getMethod().equals(MethodName.UNKNOWN_NAME))) {
+			idx = getNumberEvents();
 			this.mappingData.put(event, idx);
 		}
 		this.isFirstMethod = false;
 
-		if ((idx != null) && (!event.equals(Events.newUnknownEvent())) && !(event.equals(Events.newDummyEvent()))) {
+		if (idx != null) {
 			this.sb.append(idx);
 			this.sb.append(',');
 			this.sb.append(String.format("%.3f", this.time));

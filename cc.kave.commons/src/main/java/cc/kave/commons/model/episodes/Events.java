@@ -52,11 +52,4 @@ public class Events {
 		Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 		return DUMMY_EVENT;
 	}
-	
-	public static Event newUnknownEvent() {
-		String UNKOWN_METHOD_NAME = "[?] [?].???()";
-		IMethodName UNKOWN_METHOD = MethodName.newMethodName(UNKOWN_METHOD_NAME);
-		Event UNKNOWN_EVENT = Events.newContext(UNKOWN_METHOD);
-		return UNKNOWN_EVENT;
-	}
 }

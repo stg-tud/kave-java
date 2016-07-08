@@ -63,7 +63,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(unknown()), //
+		assertStream(Events.newFirstContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -79,7 +79,8 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(3, 1)), //
+		assertStream(Events.newFirstContext(unknown()), //
+					Events.newSuperContext(m(3, 1)), //
 					Events.newInvocation(m(2, 3)));
 
 	}
@@ -95,7 +96,8 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(4, 1)), //
+		assertStream(Events.newFirstContext(m(4, 1)), //
+				Events.newSuperContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -125,7 +127,7 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(unknown()), //
+		assertStream(Events.newFirstContext(unknown()), //
 				Events.newInvocation(m(2, 3)));
 	}
 
@@ -158,9 +160,9 @@ public class EventStreamGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(11, 1)), //
+		assertStream(Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(12, 2)), //
+				Events.newFirstContext(m(12, 2)), //
 				Events.newInvocation(m(3, 4)) //
 		);
 	}
@@ -182,9 +184,9 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx1);
 		sut.add(ctx2);
 
-		assertStream(Events.newContext(m(11, 1)), //
+		assertStream(Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(12, 1)), //
+				Events.newFirstContext(m(12, 1)), //
 				Events.newInvocation(m(3, 4))//
 		);
 	}
@@ -240,9 +242,5 @@ public class EventStreamGeneratorTest {
 
 	private ITypeName t(int typeNum) {
 		return TypeName.newTypeName(String.format("T%d,P", typeNum));
-	}
-
-	private Event dummy() {
-		return Events.newContext(MethodName.newMethodName("[You, Can] [Safely, Ignore].ThisDummyValue()"));
 	}
 }

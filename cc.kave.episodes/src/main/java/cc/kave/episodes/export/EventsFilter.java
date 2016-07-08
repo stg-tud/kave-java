@@ -20,7 +20,6 @@ import java.util.Map;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Events;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 
@@ -37,22 +36,27 @@ public class EventsFilter {
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {
 		
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
-		EventStream sm = new EventStream();
+		EventStream es = new EventStream();
 		
 		for (Event e : stream) {
-			if (e.getKind() == EventKind.METHOD_DECLARATION) {
-				if (occurrences.get(e) < freqThresh) {
-					sm.addEvent(Events.newUnknownEvent());
-				} else {
-					sm.addEvent(e);
-				}
-				continue;
+			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.SUPER_DECLARATION)) {
+				es.addEvent(e);
+			} else if (occurrences.get(e) >= freqThresh) {
+				es.addEvent(e);
 			}
-			if (occurrences.get(e) >= freqThresh) {
-				sm.addEvent(e);
-			}
+//			if (e.getKind() == EventKind.METHOD_DECLARATION) {
+//				if (occurrences.get(e) < freqThresh) {
+//					es.addEvent(Events.newUnknownEvent());
+//				} else {
+//					es.addEvent(e);
+//				}
+//				continue;
+//			}
+//			if (occurrences.get(e) >= freqThresh) {
+//				es.addEvent(e);
+//			}
 		}
-		return sm;
+		return es;
 	}
 	
 	public static String filterPartition(List<Event> partition, Map<Event, Integer> stream) {

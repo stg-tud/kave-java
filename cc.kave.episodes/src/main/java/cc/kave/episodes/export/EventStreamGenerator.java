@@ -118,12 +118,12 @@ public class EventStreamGenerator {
 //				currentCtx = null;
 //			}
 			if (firstCtx != null) {
-				events.add(Events.newContext(firstCtx));
+				events.add(Events.newFirstContext(firstCtx));
 				firstCtx = null;
 			}
 			if (superCtx != null) {
-				Event superEvent = Events.newContext(superCtx);
-				if (!superEvent.equals(Events.newUnknownEvent())) {
+				Event superEvent = Events.newSuperContext(superCtx);
+				if (!superEvent.getMethod().equals(MethodName.UNKNOWN_NAME)) {
 					events.add(superEvent);
 				}
 				superCtx = null;

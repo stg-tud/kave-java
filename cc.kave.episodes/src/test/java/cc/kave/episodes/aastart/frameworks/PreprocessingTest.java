@@ -160,7 +160,7 @@ public class PreprocessingTest {
 		expectedMapping.add(ctx(1));
 		expectedMapping.add(inv(2));
 		expectedMapping.add(inv(3));
-		expectedMapping.add(Events.newUnknownEvent());
+		expectedMapping.add(Events.newFirstContext(MethodName.UNKNOWN_NAME));
 		
 		String actualStream = FileUtils.readFileToString(streamFile);
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
@@ -188,7 +188,7 @@ public class PreprocessingTest {
 	}
 
 	private static Event unknown() {
-		return Events.newUnknownEvent();
+		return Events.newFirstContext(MethodName.UNKNOWN_NAME);
 	}
 
 	private static IMethodName m(int i) {

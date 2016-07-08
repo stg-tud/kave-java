@@ -49,7 +49,7 @@ public class EventStreamTest {
 		expectedMap.put(Events.newDummyEvent(), 0);
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(1, sut.getEventNumber());
+		assertEquals(1, sut.getNumberEvents());
 		assertEquals(0, sut.getStreamLength());
 		
 		assertTrue(sut.getStream().equals(""));
@@ -57,14 +57,13 @@ public class EventStreamTest {
 	
 	@Test
 	public void addUnknownEvent() {
-		sut.addEvent(Events.newUnknownEvent());
+		sut.addEvent(Events.newFirstContext(MethodName.UNKNOWN_NAME));
 		
 		expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(Events.newUnknownEvent(), 1);
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(2, sut.getEventNumber());
+		assertEquals(1, sut.getNumberEvents());
 		assertEquals(0, sut.getStreamLength());
 		
 		assertTrue(sut.getStream().equals(""));
@@ -72,17 +71,17 @@ public class EventStreamTest {
 	
 	@Test
 	public void addContext() {
-		sut.addEvent(ctx(1));
+		sut.addEvent(firstCtx(1));
 		
 		expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(1), 1);
+		expectedMap.put(firstCtx(1), 1);
 		
-		String expectedStream = "1,0.500\n";
+		String expectedStream = "1,0.000\n";
 		String actualStream = sut.getStream();
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(2, sut.getEventNumber());
+		assertEquals(2, sut.getNumberEvents());
 		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
 	}
@@ -99,37 +98,36 @@ public class EventStreamTest {
 		String actualStream = sut.getStream();
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(2, sut.getEventNumber());
+		assertEquals(2, sut.getNumberEvents());
 		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
 	}
 	
 	@Test
 	public void addMultipleEvents() {
-		sut.addEvent(ctx(0));
-		sut.addEvent(ctx(1));
+		sut.addEvent(firstCtx(1));
+		sut.addEvent(superCtx(2));
 		sut.addEvent(inv(2));
 		sut.addEvent(inv(3));
-		sut.addEvent(unknown());
+		sut.addEvent(firstCtx(0));
 		sut.addEvent(inv(2));
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(ctx(0), 1);
-		expectedMap.put(ctx(1), 2);
+		expectedMap.put(firstCtx(1), 1);
+		expectedMap.put(superCtx(2), 2);
 		expectedMap.put(inv(2), 3);
 		expectedMap.put(inv(3), 4);
-		expectedMap.put(unknown(), 5);
 		
 		StringBuilder expectedSb = new StringBuilder();
-		expectedSb.append("1,0.500\n");
-		expectedSb.append("2,1.001\n");
-		expectedSb.append("3,1.002\n");
-		expectedSb.append("4,1.003\n");
-		expectedSb.append("3,1.504\n");
+		expectedSb.append("1,0.000\n");
+		expectedSb.append("2,0.001\n");
+		expectedSb.append("3,0.002\n");
+		expectedSb.append("4,0.003\n");
+		expectedSb.append("3,0.504\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(6, sut.getEventNumber());
+		assertEquals(5, sut.getNumberEvents());
 		assertEquals(5, sut.getStreamLength());
 		assertEquals(expectedSb.toString(), sut.getStream());
 	}
@@ -145,15 +143,15 @@ public class EventStreamTest {
 	@Test
 	public void equlityReallySame() {
 		EventStream a = new EventStream();
-		a.addEvent(ctx(1));
+		a.addEvent(firstCtx(1));
 		a.addEvent(inv(2));
 		
 		EventStream b = new EventStream();
-		b.addEvent(ctx(1));
+		b.addEvent(firstCtx(1));
 		b.addEvent(inv(2));
 		
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());		
 		assertTrue(a.equals(b));
@@ -162,15 +160,15 @@ public class EventStreamTest {
 	@Test
 	public void notEqual1() {
 		EventStream a = new EventStream();
-		a.addEvent(ctx(1));
+		a.addEvent(firstCtx(1));
 		a.addEvent(inv(2));
 		
 		EventStream b = new EventStream();
-		b.addEvent(ctx(1));
+		b.addEvent(firstCtx(1));
 		b.addEvent(inv(3));
 		
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
 		assertFalse(a.equals(b));
@@ -179,16 +177,16 @@ public class EventStreamTest {
 	@Test
 	public void notEqual2() {
 		EventStream a = new EventStream();
-		a.addEvent(ctx(1));
+		a.addEvent(firstCtx(1));
 		a.addEvent(inv(2));
 		
 		EventStream b = new EventStream();
-		b.addEvent(ctx(1));
+		b.addEvent(firstCtx(1));
 		b.addEvent(inv(2));
 		b.addEvent(inv(3));
 		
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertNotEquals(a.getEventNumber(), b.getEventNumber());
+		assertNotEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
 		assertFalse(a.equals(b));
@@ -197,16 +195,16 @@ public class EventStreamTest {
 	@Test
 	public void notEqualStream() {
 		EventStream a = new EventStream();
-		a.addEvent(ctx(1));
+		a.addEvent(firstCtx(1));
 		a.addEvent(inv(2));
 		a.addEvent(inv(2));
 		
 		EventStream b = new EventStream();
-		b.addEvent(ctx(1));
+		b.addEvent(firstCtx(1));
 		b.addEvent(inv(2));
 		
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getEventNumber(), b.getEventNumber());
+		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
 		assertFalse(a.equals(b));
@@ -216,15 +214,19 @@ public class EventStreamTest {
 		return Events.newInvocation(m(i));
 	}
 
-	private static Event ctx(int i) {
-		return Events.newContext(m(i));
+	private static Event firstCtx(int i) {
+		return Events.newFirstContext(m(i));
 	}
 	
-	private static Event unknown() {
-		return Events.newUnknownEvent();
+	private static Event superCtx(int i) {
+		return Events.newSuperContext(m(i));
 	}
 	
 	private static IMethodName m(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		if (i == 0) {
+		return MethodName.UNKNOWN_NAME;
+		} else {
+			return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		}
 	}
 }
