@@ -16,6 +16,7 @@
 package cc.kave.episodes.aastart.frameworks;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +35,10 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -53,22 +58,20 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.export.EventStreamGenerator;
-import cc.kave.episodes.export.EventStreamIo;
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByReposTest {
 
+	@Rule
+	public TemporaryFolder rootFolder = new TemporaryFolder();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	@Mock
 	private Directory rootDirectory;
-	@Mock
-	private EventStreamGenerator generator;
-	@Mock
-	private EventStreamIo streamer;
-	@Mock
-	private FileUtils fileUtils;
 
 	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
 	private static final String REPO3 = "Github/usr1/repo3/ws.zip";
@@ -89,7 +92,7 @@ public class ReductionByReposTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ReductionByRepos();
+		sut = new ReductionByRepos(rootFolder.getRoot());
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
@@ -152,6 +155,45 @@ public class ReductionByReposTest {
 	@After
 	public void teardown() {
 		Logger.reset();
+	}
+	
+	@Test
+	public void cannotBeInitializedWithNonExistingFolder() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events folder does not exist");
+		sut = new ReductionByRepos(new File("does not exist"));
+	}
+
+	@Test
+	public void cannotBeInitializedWithFile() throws IOException {
+		File file = rootFolder.newFile("a");
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events is not a folder, but a file");
+		sut = new ReductionByRepos(file);
+	}
+
+	@Test
+	public void filesAreCreated() throws IOException {
+		sut.select(rootDirectory, NUMBEROFREPOS);
+
+		File fileName = new File(getReposPath());
+
+		assertTrue(fileName.exists());
+	}
+	
+	@Test
+	public void contentTest() throws IOException {
+		sut.select(rootDirectory, NUMBEROFREPOS);
+
+		File fileName = new File(getReposPath());
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("Github/usr1/repo1\n");
+		expected.append("Github/usr1/repo3\n");
+		
+		String actuals = FileUtils.readFileToString(fileName);
+		
+		assertEquals(expected.toString(), actuals);
 	}
 
 	@Test
@@ -225,7 +267,7 @@ public class ReductionByReposTest {
 		
 		String md1 = "[?] [?].???()";
 		IMethodName methodDecl1 = MethodName.newMethodName(md1);
-		Event e1 = Events.newContext(methodDecl1);
+		Event e1 = Events.newFirstContext(methodDecl1);
 		events.add(e1);
 		
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
@@ -241,7 +283,7 @@ public class ReductionByReposTest {
 		
 		String md2 = "[?] [?].???()";
 		IMethodName methodDecl2 = MethodName.newMethodName(md2);
-		Event e4 = Events.newContext(methodDecl2);
+		Event e4 = Events.newFirstContext(methodDecl2);
 		events.add(e4);
 		
 		String inv3 = "[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
@@ -250,5 +292,10 @@ public class ReductionByReposTest {
 		events.add(e5);
 
 		return events;
+	}
+	
+	private String getReposPath() {
+		String fileName = rootFolder.getRoot().getAbsolutePath() + "/" + NUMBEROFREPOS + "Repos/repositories.txt";
+		return fileName;
 	}
 }

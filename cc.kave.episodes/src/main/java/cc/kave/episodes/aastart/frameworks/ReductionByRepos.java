@@ -30,12 +30,19 @@
  */
 package cc.kave.episodes.aastart.frameworks;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipException;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.base.Predicate;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
@@ -45,9 +52,19 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 public class ReductionByRepos {
+	
+	private File eventsFolder;
+	
+	@Inject
+	public ReductionByRepos(@Named("events") File folder) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.eventsFolder = folder;
+	}
 
 	public List<Event> select(Directory contextsDir, int numberOfRepos) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
+		StringBuilder repositories = new StringBuilder();
 		String repoName = "";
 		int repoID = 0;
 
@@ -55,9 +72,11 @@ public class ReductionByRepos {
 			Logger.log("Reading zip file %s", zip.toString());
 			if (repoName.equalsIgnoreCase("")) {
 				repoName = getRepoName(zip);
+				repositories.append(repoName + "\n");
 				repoID++;
 			} else if (!zip.startsWith(repoName)) {
 				repoName = getRepoName(zip);
+				repositories.append(repoName + "\n");
 				repoID++;
 			}
 
@@ -75,6 +94,7 @@ public class ReductionByRepos {
 			}
 			ra.close();
 		}
+		FileUtils.writeStringToFile(new File(getFilePath(numberOfRepos)), repositories.toString());
 		List<Event> allEvents = generator.getEventStream();
 		return allEvents;
 	}
@@ -95,5 +115,14 @@ public class ReductionByRepos {
 			}
 		});
 		return zips;
+	}
+	
+	private String getFilePath(int numberOfRepos) {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
+		if (!pathName.isDirectory()) {
+			pathName.mkdir();
+		}
+		String fileName = pathName.getAbsolutePath() + "/repositories.txt";
+		return fileName;
 	}
 }
