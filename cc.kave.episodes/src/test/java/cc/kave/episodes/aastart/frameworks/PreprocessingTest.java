@@ -62,7 +62,7 @@ public class PreprocessingTest {
 	private Directory rootDirectory;
 	@Mock
 	private ReductionByRepos repos;
-	
+
 	private static final int NUMBREPOS = 10;
 	private static final int FREQTHRESH = 2;
 
@@ -79,23 +79,27 @@ public class PreprocessingTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		events = Lists.newArrayList(firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(2), firstCtx(1), superCtx(0), inv(3));
 		stream = new EventStream();
-		stream.addEvent(ctx(1));
+		stream.addEvent(firstCtx(1));
 		stream.addEvent(inv(2));
 		stream.addEvent(inv(3));
-		stream.addEvent(unknown());
+		stream.addEvent(firstCtx(0));
+		stream.addEvent(superCtx(2));
 		stream.addEvent(inv(2));
-		stream.addEvent(ctx(1));
+		stream.addEvent(firstCtx(1));
+		stream.addEvent(superCtx(0));
 		stream.addEvent(inv(3));
-		
+
 		frequencies = Maps.newHashMap();
-		frequencies.put(ctx(1), 2);
+		frequencies.put(firstCtx(1), 2);
 		frequencies.put(inv(2), 2);
 		frequencies.put(inv(3), 2);
-		frequencies.put(ctx(4), 1);
+		frequencies.put(firstCtx(0), 1);
+		frequencies.put(superCtx(2), 1);
 		frequencies.put(inv(5), 1);
-		
+		frequencies.put(superCtx(0), 1);
+
 		sut = new Preprocessing(rootDirectory, rootFolder.getRoot(), repos);
 
 		when(repos.select(any(Directory.class), anyInt())).thenReturn(events);
@@ -107,7 +111,7 @@ public class PreprocessingTest {
 	public void teardown() {
 		Logger.reset();
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
@@ -142,29 +146,30 @@ public class PreprocessingTest {
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());
 	}
-	
+
 	@Test
 	public void contentTest() throws IOException {
 		sut.generate(NUMBREPOS, FREQTHRESH);
+//			1			2		3						4				2			1						3
+//		firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(2), firstCtx(1), superCtx(0), inv(3)
 
 		verify(repos).select(any(Directory.class), anyInt());
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
-		
-		// ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3)
-		String expectedStream = "1,0.500\n2,0.501\n3,0.502\n2,1.003\n1,1.504\n3,1.505\n";
-		
+
+		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n1,1.005\n3,1.006\n";
+
 		List<Event> expectedMapping = Lists.newLinkedList();
 		expectedMapping.add(Events.newDummyEvent());
-		expectedMapping.add(ctx(1));
+		expectedMapping.add(firstCtx(1));
 		expectedMapping.add(inv(2));
 		expectedMapping.add(inv(3));
-		expectedMapping.add(Events.newFirstContext(MethodName.UNKNOWN_NAME));
-		
+		expectedMapping.add(superCtx(2));
+
 		String actualStream = FileUtils.readFileToString(streamFile);
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
-		
+
 		assertEquals(expectedStream, actualStream);
 		assertEquals(expectedMapping, actualMapping);
 	}
@@ -183,15 +188,19 @@ public class PreprocessingTest {
 		return Events.newInvocation(m(i));
 	}
 
-	private static Event ctx(int i) {
-		return Events.newContext(m(i));
+	private static Event firstCtx(int i) {
+		return Events.newFirstContext(m(i));
 	}
-
-	private static Event unknown() {
-		return Events.newFirstContext(MethodName.UNKNOWN_NAME);
+	
+	private static Event superCtx(int i) {
+		return Events.newSuperContext(m(i));
 	}
 
 	private static IMethodName m(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		if (i == 0) {
+			return MethodName.UNKNOWN_NAME;
+		} else {
+			return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		}
 	}
 }
