@@ -37,6 +37,12 @@ public class Interaction {
 		return methodName;
 	}
 
+	@Override
+	public String toString() {
+		return "Interaction [methodName=" + methodName + ", position=" + position + ", interactionType="
+				+ interactionType + "]";
+	}
+
 	public void setMethodName(IMethodName methodName) {
 		this.methodName = methodName;
 	}
