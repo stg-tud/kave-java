@@ -17,7 +17,6 @@ package cc.kave.episodes.mining.reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,12 +36,7 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.exceptions.AssertionException;
 
 public class StreamParserTest {
@@ -54,13 +48,10 @@ public class StreamParserTest {
 	
 	@Mock
 	private FileReader reader;
-	@Mock
-	private MappingParser mapper;
 	
 	private static final int NUMBREPOS = 3;
 	
 	private List<String> stream = Lists.newLinkedList();
-	private List<Event> map = Lists.newLinkedList();
 	
 	private StreamParser sut;
 	
@@ -77,27 +68,16 @@ public class StreamParserTest {
 		stream.add("7,1.006");
 		stream.add("8,1.007");
 		
-		map.add(Events.newDummyEvent());
-		map.add(Events.newFirstContext(m(1, 1)));
-		map.add(Events.newSuperContext(m(1, 2)));
-		map.add(Events.newInvocation(m(1, 3)));
-		map.add(Events.newInvocation(m(1, 4)));
-		map.add(Events.newInvocation(m(1, 5)));
-		map.add(Events.newFirstContext(m(2, 6)));
-		map.add(Events.newFirstContext(m(3, 7)));
-		map.add(Events.newSuperContext(m(3, 8)));
-		
-		sut = new StreamParser(rootFolder.getRoot(), reader, mapper);
+		sut = new StreamParser(rootFolder.getRoot(), reader);
 		
 		when(reader.readFile(any(File.class))).thenReturn(stream);
-		when(mapper.parse(anyInt())).thenReturn(map);
 	}
 	
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Event stream folder does not exist");
-		sut = new StreamParser(new File("does not exist"), reader, mapper);
+		sut = new StreamParser(new File("does not exist"), reader);
 	}
 
 	@Test
@@ -105,7 +85,7 @@ public class StreamParserTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Event stream is not a folder, but a file");
-		sut = new StreamParser(file, reader, mapper);
+		sut = new StreamParser(file, reader);
 	}
 	
 	@Test
@@ -113,40 +93,31 @@ public class StreamParserTest {
 		sut.parseStream(NUMBREPOS);
 		
 		verify(reader).readFile(any(File.class));
-		verify(mapper).parse(anyInt());
 	}
 	
 	@Test
 	public void testContent() {
-		Set<Set<Event>> expected = Sets.newLinkedHashSet();
+		Set<Set<Fact>> expected = Sets.newLinkedHashSet();
 		
-		Set<Event> events = Sets.newLinkedHashSet();
-		events.add(Events.newFirstContext(m(1, 1)));
-		events.add(Events.newSuperContext(m(1, 2)));
-		events.add(Events.newInvocation(m(1, 3)));
-		events.add(Events.newInvocation(m(1, 4)));
-		events.add(Events.newInvocation(m(1, 5)));
-		expected.add(events);
+		Set<Fact> facts = Sets.newLinkedHashSet();
+		facts.add(new Fact(1));
+		facts.add(new Fact(2));
+		facts.add(new Fact(3));
+		facts.add(new Fact(4));
+		facts.add(new Fact(5));
+		expected.add(facts);
 		
-		events = Sets.newLinkedHashSet();
-		events.add(Events.newFirstContext(m(2, 6)));
-		expected.add(events);
+		facts = Sets.newLinkedHashSet();
+		facts.add(new Fact(6));
+		expected.add(facts);
 		
-		events = Sets.newLinkedHashSet();
-		events.add(Events.newFirstContext(m(3, 7)));
-		events.add(Events.newSuperContext(m(3, 8)));
-		expected.add(events);
+		facts = Sets.newLinkedHashSet();
+		facts.add(new Fact(7));
+		facts.add(new Fact(8));
+		expected.add(facts);
 		
-		Set<Set<Event>> actuals = sut.parseStream(NUMBREPOS);
+		Set<Set<Fact>> actuals = sut.parseStream(NUMBREPOS);
 		
 		assertEquals(expected, actuals);
-	}
-	
-	private IMethodName m(int typeNum, int methodNum) {
-		return MethodName.newMethodName(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
-	}
-
-	private ITypeName t(int typeNum) {
-		return TypeName.newTypeName(String.format("T%d,P", typeNum));
 	}
 }

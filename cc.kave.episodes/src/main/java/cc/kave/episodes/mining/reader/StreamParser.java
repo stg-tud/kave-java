@@ -25,29 +25,26 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.Fact;
 
 public class StreamParser {
 
 	private File rootFolder;
 	private FileReader reader;
-	private MappingParser mapper;
 
 	@Inject
-	public StreamParser(@Named("events") File folder, FileReader reader, MappingParser mapParser) {
+	public StreamParser(@Named("events") File folder, FileReader reader) {
 		assertTrue(folder.exists(), "Event stream folder does not exist");
 		assertTrue(folder.isDirectory(), "Event stream is not a folder, but a file");
 		this.rootFolder = folder;
 		this.reader = reader;
-		this.mapper = mapParser;
 	}
 
-	public Set<Set<Event>> parseStream(int numbRepos) {
-		Set<Set<Event>> stream = Sets.newLinkedHashSet();
-		Set<Event> eventsFacts = Sets.newLinkedHashSet();
+	public Set<Set<Fact>> parseStream(int numbRepos) {
+		Set<Set<Fact>> stream = Sets.newLinkedHashSet();
+		Set<Fact> eventsFacts = Sets.newLinkedHashSet();
 		
 		List<String> lines = reader.readFile(getStreamPath(numbRepos));
-		List<Event> eventsMapper = mapper.parse(numbRepos);
 		
 		double timer = -1;
 
@@ -62,7 +59,7 @@ public class StreamParser {
 				eventsFacts = Sets.newLinkedHashSet();
 			} 
 			timer = timestamp;
-			eventsFacts.add(eventsMapper.get(eventID));
+			eventsFacts.add(new Fact(eventID));
 		}
 		stream.add(eventsFacts);
 		return stream;
