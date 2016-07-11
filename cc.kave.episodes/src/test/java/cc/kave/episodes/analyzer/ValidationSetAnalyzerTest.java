@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.analyzer.ValidationSetAnalyzer;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
@@ -41,7 +41,7 @@ import cc.recommenders.io.Logger;
 public class ValidationSetAnalyzerTest {
 
 	@Mock
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	@Mock
 	private ValidationContextsParser validationParser;
 	

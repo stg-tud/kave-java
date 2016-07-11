@@ -36,7 +36,7 @@ import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.FileReader;
 import cc.kave.episodes.model.Episode;
 
@@ -52,7 +52,7 @@ public class SampleCodeMatcher {
 	}
 	private FileReader reader = new FileReader();
 	private EpisodeParser epParser = new EpisodeParser(rootFolder, reader);
-	private EventMappingParser mapParser = new EventMappingParser(rootFolder);
+	private MappingParser mapParser = new MappingParser(rootFolder);
 	private EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 	private TransitivelyClosedEpisodes transitivity = new TransitivelyClosedEpisodes();
 	private EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();

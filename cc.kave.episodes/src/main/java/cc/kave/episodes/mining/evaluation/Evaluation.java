@@ -39,7 +39,7 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
@@ -57,7 +57,7 @@ public class Evaluation {
 	private static final double BIDIRECTIONAL = 0.01;
 
 	private ValidationContextsParser validationParser;
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
 	private EpisodeParser episodeParser;
@@ -78,7 +78,7 @@ public class Evaluation {
 
 	@Inject
 	public Evaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
-			EventMappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
+			MappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
 			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
 		assertTrue(directory.exists(), "Evaluations folder does not exist");

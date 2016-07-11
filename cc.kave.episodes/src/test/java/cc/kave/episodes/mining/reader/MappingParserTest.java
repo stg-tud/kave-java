@@ -32,18 +32,18 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.utils.json.JsonUtils;
 
-public class EventMappingParserTest {
+public class MappingParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	
 	private static final int NUMBREPOS = 2;
 
-	private EventMappingParser sut;
+	private MappingParser sut;
 
 	@Before
 	public void setup() {
-		sut = new EventMappingParser(rootFolder.getRoot());
+		sut = new MappingParser(rootFolder.getRoot());
 	}
 
 	@Test

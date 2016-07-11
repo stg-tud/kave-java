@@ -52,7 +52,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
@@ -72,7 +72,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	@Mock
 	private EpisodeParser episodeParser;
 	@Mock
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	@Mock
 	private Directory episodeDirectory;
 

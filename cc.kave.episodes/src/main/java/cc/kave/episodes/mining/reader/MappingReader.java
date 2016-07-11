@@ -19,15 +19,15 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.commons.model.episodes.Event;
 
 public class MappingReader {
 
-	private EventMappingParser eventMapper;
+	private MappingParser eventMapper;
 
 	@Inject
-	public MappingReader(EventMappingParser eventMapping) {
+	public MappingReader(MappingParser eventMapping) {
 		this.eventMapper = eventMapping;
 	}
 

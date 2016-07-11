@@ -50,7 +50,7 @@ import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
@@ -66,7 +66,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	@Mock
 	private ValidationContextsParser contextParser;
 	@Mock
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	@Mock
 	private Directory episodeDirectory;
 	

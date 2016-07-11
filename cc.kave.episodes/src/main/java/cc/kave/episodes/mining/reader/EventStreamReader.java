@@ -29,10 +29,10 @@ public class EventStreamReader {
 
 	private File rootFolder;
 	private FileReader reader;
-	private EventMappingParser eventMapper;
+	private MappingParser eventMapper;
 
 	@Inject
-	public EventStreamReader(@Named("events") File directory, FileReader reader, EventMappingParser eventMapping) {
+	public EventStreamReader(@Named("events") File directory, FileReader reader, MappingParser eventMapping) {
 		assertTrue(directory.exists(), "Event Stream folder does not exist");
 		assertTrue(directory.isDirectory(), "Event Stream folder is not a folder, but a file");
 		this.rootFolder = directory;

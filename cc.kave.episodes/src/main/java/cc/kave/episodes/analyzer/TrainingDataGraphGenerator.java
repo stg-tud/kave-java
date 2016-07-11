@@ -31,14 +31,14 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
 
 public class TrainingDataGraphGenerator {
 
 	private EpisodeParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -47,7 +47,7 @@ public class TrainingDataGraphGenerator {
 
 	@Inject
 	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
-			MaximalEpisodes episodeLearned, EventMappingParser mappingParser,
+			MaximalEpisodes episodeLearned, MappingParser mappingParser,
 			TransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {
 

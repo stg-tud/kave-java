@@ -29,7 +29,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 
 public class RecommenderGraphGenerator {
@@ -37,7 +37,7 @@ public class RecommenderGraphGenerator {
 	private static final int PROPOSALS = 3;
 
 	private ValidationContextsParser validationParser;
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	private EpisodeToGraphConverter graphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -50,7 +50,7 @@ public class RecommenderGraphGenerator {
 
 	@Inject
 	public RecommenderGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
-			EventMappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
+			MappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator, EpisodeRecommender recommender, 
 			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker) {

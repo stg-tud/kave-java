@@ -33,7 +33,7 @@ import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 
@@ -42,14 +42,14 @@ public class PatternsOutput {
 	private File patternsFolder;
 
 	private EpisodesPostprocessor episodesProcessor;
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	private TransitivelyClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
 	public PatternsOutput(@Named("patterns") File folder, EpisodesPostprocessor episodes,
-			EventMappingParser mappingParser, TransitivelyClosedEpisodes transitivityClosure,
+			MappingParser mappingParser, TransitivelyClosedEpisodes transitivityClosure,
 			EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter writer) {
 
 		assertTrue(folder.exists(), "Patterns folder does not exist");

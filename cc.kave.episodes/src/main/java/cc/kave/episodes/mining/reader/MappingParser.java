@@ -29,12 +29,12 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.utils.json.JsonUtils;
 
-public class EventMappingParser {
+public class MappingParser {
 
 	private File rootFolder;
 
 	@Inject
-	public EventMappingParser(@Named("events") File directory) {
+	public MappingParser(@Named("events") File directory) {
 		assertTrue(directory.exists(), "Event mapping folder does not exist");
 		assertTrue(directory.isDirectory(), "Event mapping folder is not a folder, but a file");
 		this.rootFolder = directory;

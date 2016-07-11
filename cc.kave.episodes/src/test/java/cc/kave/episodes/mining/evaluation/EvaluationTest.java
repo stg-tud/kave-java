@@ -50,7 +50,7 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.TargetsCategorization;
@@ -68,7 +68,7 @@ public class EvaluationTest {
 	@Mock
 	private ValidationContextsParser validationParser;
 	@Mock
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	@Mock
 	private EpisodeParser episodeParser;
 	@Mock

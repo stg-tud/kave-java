@@ -33,7 +33,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.EventStreamReader;
 import cc.kave.episodes.mining.reader.FileReader;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
@@ -89,9 +89,9 @@ public class Module extends AbstractModule {
 		bind(EpisodeParser.class).toInstance(new EpisodeParser(eventsRoot, reader));
 
 		File eventStreamRoot = eventsData;
-		bind(EventMappingParser.class).toInstance(new EventMappingParser(eventStreamRoot));
+		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
 
-		EventMappingParser mappingParser = new EventMappingParser(eventStreamRoot);
+		MappingParser mappingParser = new MappingParser(eventStreamRoot);
 		File graphRoot = episodeRootFile;
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());

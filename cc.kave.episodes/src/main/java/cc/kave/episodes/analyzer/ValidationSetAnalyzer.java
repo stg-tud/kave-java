@@ -27,20 +27,20 @@ import java.util.zip.ZipException;
 import com.google.inject.Inject;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.episodes.mining.reader.EventMappingParser;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.io.Logger;
 
 public class ValidationSetAnalyzer {
 
-	private EventMappingParser mappingParser;
+	private MappingParser mappingParser;
 	private ValidationContextsParser validationParser;
 	
 	private Map<Integer, Integer> structure = new HashMap<Integer, Integer>();
 	
 	@Inject
-	public ValidationSetAnalyzer(EventMappingParser mParser, ValidationContextsParser vParser) {
+	public ValidationSetAnalyzer(MappingParser mParser, ValidationContextsParser vParser) {
 		this.mappingParser = mParser;
 		this.validationParser = vParser;
 	}

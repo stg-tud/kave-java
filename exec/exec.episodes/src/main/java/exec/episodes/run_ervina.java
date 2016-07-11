@@ -31,7 +31,7 @@ public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	private static final int NUMBREPOS = 100;
+	private static final int NUMBREPOS = 50;
 	private static final int FREQTHRESH = 250;
 	private static final double BIDIRECTTHRESH = 0.85;
 
