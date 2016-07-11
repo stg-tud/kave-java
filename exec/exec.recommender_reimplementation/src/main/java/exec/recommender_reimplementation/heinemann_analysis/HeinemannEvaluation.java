@@ -29,7 +29,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.typeshapes.ITypeShape;
-import cc.kave.commons.pointsto.analysis.exceptions.MissingTypeNameException;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
