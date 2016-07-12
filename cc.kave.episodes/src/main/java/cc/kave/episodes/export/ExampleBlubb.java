@@ -29,64 +29,92 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
 public class ExampleBlubb {
-	public Set<IMethodName> findEnclosignMethods(List<Fact> stream, List<Event> eventMapping,
-			Set<Fact> interestingExistenceFacts) {
-
-		Iterable<Event> events = toEvents(stream, eventMapping);
-
-		Set<IMethodName> interestingCalls = getInterestingCalls(interestingExistenceFacts, eventMapping);
-		
-		return findOccurences(events, interestingCalls);
-	}
-
-	private Set<IMethodName> getInterestingCalls(Set<Fact> interestingExistenceFacts, List<Event> eventMapping) {
-		Set<IMethodName> result = Sets.newHashSet();
-		for(Fact f : interestingExistenceFacts) {
-			if(f.isExistence()) {
-				Event e = eventMapping.get(f.getFactID());
-				if(e.getKind() == EventKind.INVOCATION) {
-					result.add(e.getMethod());
-				}
-			}
-		}
-		return result;
-	}
 
 	private IMethodName enclosignMethod = MethodName.UNKNOWN_NAME;
 	private IMethodName nextEnclosignMethod = MethodName.UNKNOWN_NAME;
+	private boolean isFirstEnclosingMethod = true;
+	
+	public Set<IMethodName> findEnclosignMethods(List<Fact> stream, List<Event> eventMapping,
+			Set<Fact> patternExistenceFacts) {
 
-	private Set<IMethodName> findOccurences(Iterable<Event> events, Set<IMethodName> calls) {
-		Set<IMethodName> result = Sets.newHashSet();
-		Iterator<Event> it = events.iterator();
+		List<Event> streamEvents = getStreamEvents(stream, eventMapping);
 
-		while (it.hasNext()) {
-			Set<IMethodName> body = getBody(it);
-			if(!body.isEmpty() && body.containsAll(calls)) {
-				result.add(enclosignMethod);
+		Set<Event> patternEvents = getPatternsEvents(patternExistenceFacts, eventMapping);
+
+		return findOccurences(streamEvents, patternEvents);
+	}
+
+	private Set<Event> getPatternsEvents(Set<Fact> PatternsExistenceFacts, List<Event> eventMapping) {
+		Set<Event> result = Sets.newHashSet();
+		for (Fact f : PatternsExistenceFacts) {
+			Event e = eventMapping.get(f.getFactID());
+			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.INVOCATION)) {
+				result.add(e);
 			}
-			enclosignMethod = nextEnclosignMethod;
 		}
-
 		return result;
 	}
-
-	private Set<IMethodName> getBody(Iterator<Event> it) {
-		Set<IMethodName> callsInBody = Sets.newHashSet();
-		while (it.hasNext()) {
-			Event cur = it.next();
-			if (cur.getKind() == EventKind.METHOD_DECLARATION) {
-				nextEnclosignMethod = cur.getMethod();
-				return callsInBody;
+	
+	private Set<IMethodName> findOccurences(List<Event> streamEvents, Set<Event> patternEvents) {
+		Set<IMethodName> results = Sets.newLinkedHashSet();
+		Set<Event> completeMethod = Sets.newLinkedHashSet();
+		
+		for (Event event : streamEvents) {
+			if (event.getKind() == EventKind.FIRST_DECLARATION) {
+				completeMethod.add(event);
 			}
-			if(cur.getKind() == EventKind.INVOCATION) {
-				callsInBody.add(cur.getMethod());
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+				if (isFirstEnclosingMethod) {
+					enclosignMethod = event.getMethod();
+					isFirstEnclosingMethod = false;
+				} else {
+					nextEnclosignMethod = event.getMethod();
+					if (completeMethod.containsAll(streamEvents)) {
+						results.add(enclosignMethod);
+						completeMethod = Sets.newLinkedHashSet();
+					}
+					enclosignMethod = nextEnclosignMethod;
+				}
+			}
+			if (event.getKind() == EventKind.INVOCATION) {
+				completeMethod.add(event);
 			}
 		}
-		nextEnclosignMethod = MethodName.UNKNOWN_NAME;
-		return callsInBody;
+		return results;
 	}
 
-	private Iterable<Event> toEvents(List<Fact> stream, List<Event> eventMapping) {
+//	private Set<IMethodName> findOccurences(Iterable<Event> events, Set<IMethodName> calls) {
+//		Set<IMethodName> result = Sets.newHashSet();
+//		Iterator<Event> it = events.iterator();
+//
+//		while (it.hasNext()) {
+//			Set<IMethodName> body = getBody(it);
+//			if (!body.isEmpty() && body.containsAll(calls)) {
+//				result.add(enclosignMethod);
+//			}
+//			enclosignMethod = nextEnclosignMethod;
+//		}
+//
+//		return result;
+//	}
+//
+//	private Set<IMethodName> getBody(Iterator<Event> it) {
+//		Set<IMethodName> callsInBody = Sets.newHashSet();
+//		while (it.hasNext()) {
+//			Event cur = it.next();
+//			if (cur.getKind() == EventKind.METHOD_DECLARATION) {
+//				nextEnclosignMethod = cur.getMethod();
+//				return callsInBody;
+//			}
+//			if (cur.getKind() == EventKind.INVOCATION) {
+//				callsInBody.add(cur.getMethod());
+//			}
+//		}
+//		nextEnclosignMethod = MethodName.UNKNOWN_NAME;
+//		return callsInBody;
+//	}
+
+	private List<Event> getStreamEvents(List<Fact> stream, List<Event> eventMapping) {
 		List<Event> events = Lists.newArrayList();
 		for (Fact f : stream) {
 			events.add(eventMapping.get(f.getFactID()));

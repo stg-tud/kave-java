@@ -50,11 +50,6 @@ public class Fact {
 		return rawFact.contains("\\l");
 	}
 	
-	public boolean isExistence() {
-		throw new RuntimeException("test me"); 
-		//return !(isRelation() || isLabel());
-	}
-	
 	public boolean isContained(Fact fact) {
 		if (fact.isRelation() && fact.rawFact.contains(this.rawFact)) {
 			return true;

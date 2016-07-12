@@ -64,6 +64,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(unknown()), //
+				Events.newContext(m(1, 1)),
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -81,6 +82,7 @@ public class EventStreamGeneratorTest {
 
 		assertStream(Events.newFirstContext(unknown()), //
 					Events.newSuperContext(m(3, 1)), //
+					Events.newContext(m(1, 1)),
 					Events.newInvocation(m(2, 3)));
 
 	}
@@ -98,6 +100,7 @@ public class EventStreamGeneratorTest {
 
 		assertStream(Events.newFirstContext(m(4, 1)), //
 				Events.newSuperContext(m(3, 1)), //
+				Events.newContext(m(1, 1)),
 				Events.newInvocation(m(2, 3)));
 
 	}
@@ -128,6 +131,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(unknown()), //
+				Events.newContext(m(1, 1)),
 				Events.newInvocation(m(2, 3)));
 	}
 
@@ -161,8 +165,10 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(m(11, 1)), //
+				Events.newContext(m(1, 1)),
 				Events.newInvocation(m(2, 3)), //
 				Events.newFirstContext(m(12, 2)), //
+				Events.newContext(m(1, 2)),
 				Events.newInvocation(m(3, 4)) //
 		);
 	}
@@ -185,8 +191,10 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx2);
 
 		assertStream(Events.newFirstContext(m(11, 1)), //
+				Events.newContext(m(1, 1)),
 				Events.newInvocation(m(2, 3)), //
 				Events.newFirstContext(m(12, 1)), //
+				Events.newContext(m(2, 1)),
 				Events.newInvocation(m(3, 4))//
 		);
 	}
