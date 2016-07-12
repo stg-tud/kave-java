@@ -68,7 +68,7 @@ public class EpisodeToGraphConverter {
 	private String toLabel(IMethodName method) {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(method.getDeclaringType().getName());
+		sb.append(method.getDeclaringType().getFullName());
 		sb.append('.');
 		sb.append(method.getName());
 		sb.append('(');
