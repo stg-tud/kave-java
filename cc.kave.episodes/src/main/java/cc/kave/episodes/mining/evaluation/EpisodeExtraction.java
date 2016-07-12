@@ -21,6 +21,7 @@ import java.util.Set;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.model.Episode;
 
@@ -33,25 +34,45 @@ public class EpisodeExtraction {
 		for (Set<Fact> streamFacts : stream) {
 			if (streamFacts.containsAll(episodeFacts)) {
 				String methodName = getSuperMethod(streamFacts, events);
-				sb.append(methodName + "\n");
+				if (!methodName.equals("")) {
+					sb.append(methodName + "\n");
+				}
 			}
 		}
 		return sb;
 	}
-	
+
 	private String getSuperMethod(Set<Fact> streamFacts, List<Event> events) {
+		String firstMethod = "";
+		String method = "";
 		for (Fact fact : streamFacts) {
 			int eventID = fact.getFactID();
 			Event event = events.get(eventID);
 			if (event.getKind() == EventKind.SUPER_DECLARATION) {
-//				String framework = event.getMethod().getDeclaringType().getAssembly().getIdentifier()
-//				String namespace = event.getMethod().getDeclaringType().getNamespace().getIdentifier();
-//				String typeName = event.getMethod().getDeclaringType().getFullName();
-//				String methodName = event.getMethod().getName();
-				String label = event.getMethod().getIdentifier(); 
-				return label;
+				String superMethod = toLabel(event);
+				return superMethod;
+			}
+			if (event.getKind() == EventKind.FIRST_DECLARATION) {
+				if (!event.getMethod().equals(MethodName.UNKNOWN_NAME)) { 
+					firstMethod = toLabel(event);
+				}
+			}
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+				
 			}
 		}
-		return MethodName.UNKNOWN_NAME.getName();
+		return null;
+	}
+
+	private String toLabel(Event event) {
+		StringBuilder sb = new StringBuilder();
+		IMethodName method = event.getMethod();
+		EventKind kind = event.getKind();
+		
+		sb.append(kind + ": ");
+		sb.append(method.getDeclaringType().getFullName());
+		sb.append('.');
+		sb.append(method.getName());
+		return sb.toString();
 	}
 }

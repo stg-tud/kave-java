@@ -51,6 +51,7 @@ public class EventStreamGenerator {
 //		private IMethodName currentCtx;
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
+		private IMethodName element;
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
@@ -58,6 +59,7 @@ public class EventStreamGenerator {
 //			currentCtx = MethodName.UNKNOWN_NAME;
 			firstCtx = MethodName.UNKNOWN_NAME;
 			superCtx = MethodName.UNKNOWN_NAME;
+			element = MethodName.UNKNOWN_NAME;
 			IMethodName name = decl.getName();
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
@@ -67,6 +69,7 @@ public class EventStreamGenerator {
 					if (h.getSuper() != null) {
 						superCtx = h.getSuper();
 					}
+					element = h.getElement();
 //					if (h.getFirst() != null) {
 //						currentCtx = h.getFirst();
 //					} else if (h.getSuper() != null) {
@@ -128,6 +131,7 @@ public class EventStreamGenerator {
 				}
 				superCtx = null;
 			}
+			events.add(Events.newContext(element));
 		}
 	}
 }

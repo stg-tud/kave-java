@@ -24,51 +24,51 @@ import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 
 public class EventsFilter {
-	
+
 	private static StreamStatistics statistics = new StreamStatistics();
-//	private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
-	
+	// private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
+
 	private static final double DELTA = 0.001;
 	private static final double TIMEOUT = 0.5;
 	private static double time = 0.0;
 	private static boolean firstMethod = true;
-	
+
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {
-		
+
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
 		EventStream es = new EventStream();
-		
+
 		for (Event e : stream) {
-			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.SUPER_DECLARATION)) {
+			if (e.getKind() != EventKind.INVOCATION) {
 				es.addEvent(e);
 			} else if (occurrences.get(e) >= freqThresh) {
 				es.addEvent(e);
 			}
-//			if (e.getKind() == EventKind.METHOD_DECLARATION) {
-//				if (occurrences.get(e) < freqThresh) {
-//					es.addEvent(Events.newUnknownEvent());
-//				} else {
-//					es.addEvent(e);
-//				}
-//				continue;
-//			}
-//			if (occurrences.get(e) >= freqThresh) {
-//				es.addEvent(e);
-//			}
+			// if (e.getKind() == EventKind.METHOD_DECLARATION) {
+			// if (occurrences.get(e) < freqThresh) {
+			// es.addEvent(Events.newUnknownEvent());
+			// } else {
+			// es.addEvent(e);
+			// }
+			// continue;
+			// }
+			// if (occurrences.get(e) >= freqThresh) {
+			// es.addEvent(e);
+			// }
 		}
 		return es;
 	}
-	
+
 	public static String filterPartition(List<Event> partition, Map<Event, Integer> stream) {
 		StringBuilder sb = new StringBuilder();
 		time = 0.0;
 		firstMethod = true;
-		
+
 		for (Event e : partition) {
 			if (stream.keySet().contains(e)) {
 				sb.append(addToPartitionStream(e, stream.get(e)));
 			} else {
-				if (e.getKind() == EventKind.METHOD_DECLARATION  && !firstMethod) {
+				if (e.getKind() == EventKind.METHOD_DECLARATION && !firstMethod) {
 					time += TIMEOUT;
 				}
 			}
@@ -76,7 +76,7 @@ public class EventsFilter {
 		}
 		return sb.toString();
 	}
-	
+
 	private static String addToPartitionStream(Event event, int eventId) {
 		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !firstMethod) {
 			time += TIMEOUT;
@@ -88,7 +88,7 @@ public class EventsFilter {
 		sb.append('\n');
 
 		time += DELTA;
-		
+
 		return sb.toString();
 	}
 }

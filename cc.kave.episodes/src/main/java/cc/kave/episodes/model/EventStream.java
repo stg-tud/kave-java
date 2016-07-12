@@ -66,6 +66,13 @@ public class EventStream {
 		if (event.getKind() == EventKind.FIRST_DECLARATION && !(this.isFirstMethod)) {
 			this.time += TIMEOUT;
 		}
+		if (event.getKind() == EventKind.METHOD_DECLARATION) {
+			if (idx == null) {
+				idx = getNumberEvents();
+				this.mappingData.put(event, idx);
+			}
+		}
+		
 		if (idx == null && !(event.getMethod().equals(MethodName.UNKNOWN_NAME))) {
 			idx = getNumberEvents();
 			this.mappingData.put(event, idx);

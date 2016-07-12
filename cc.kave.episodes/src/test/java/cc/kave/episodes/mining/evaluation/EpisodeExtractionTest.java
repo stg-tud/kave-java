@@ -82,8 +82,7 @@ public class EpisodeExtractionTest {
 		episode.addFact(new Fact(5));
 		
 		StringBuilder expected = new StringBuilder();
-		expected.append("[R,P] [T1,P].m2()\n");
-		expected.append("???\n");
+		expected.append("T1.m2\n");
 		
 		StringBuilder actuals = sut.getMethods(episode, stream, events);
 		

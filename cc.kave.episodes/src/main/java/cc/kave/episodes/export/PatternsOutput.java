@@ -30,9 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.mining.evaluation.EpisodeExtraction;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -85,61 +83,41 @@ public class PatternsOutput {
 			Set<Episode> closedEpisodes = transClosure.remTransClosure(entry.getValue());
 
 			for (Episode episode : closedEpisodes) {
+				File filePath = getPath(numbRepos, freqThresh, bidirectThresh, graphNumber);
+				
 				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
-				graphWriter.write(graph, getFilePaths(numbRepos, freqThresh, bidirectThresh, graphNumber).graphPath);
+				graphWriter.write(graph, getGraphPaths(filePath, graphNumber));
 
-				StringBuilder sb = getEpisodeLocations(episode, stream, events);
-				File fileName = new File(getFilePaths(numbRepos, freqThresh, bidirectThresh, graphNumber).methodPath);
-				FileUtils.writeStringToFile(fileName, sb.toString());
+				StringBuilder sb = extractor.getMethods(episode, stream, events);
+				
+				if (!sb.toString().isEmpty()) {
+					FileUtils.writeStringToFile(getMethodsPath(filePath, graphNumber), sb.toString());
+				}
 				graphNumber++;
 			}
 		}
 	}
-
-	private StringBuilder getEpisodeLocations(Episode episode, Set<Set<Fact>> stream, List<Event> events) {
-		StringBuilder sb = new StringBuilder();
-		Set<Fact> episodeFacts = episode.getEvents();
-
-		for (Set<Fact> streamFacts : stream) {
-			if (streamFacts.containsAll(episodeFacts)) {
-				String methodName = getSuperMethod(streamFacts, events);
-				sb.append(methodName + "\n");
-			}
-		}
-		return sb;
-	}
-
-	private String getSuperMethod(Set<Fact> streamFacts, List<Event> events) {
-		for (Fact fact : streamFacts) {
-			int eventID = fact.getFactID();
-			Event event = events.get(eventID);
-			if (event.getKind() == EventKind.SUPER_DECLARATION) {
-				return event.getMethod().getDeclaringType().getFullName();
-			}
-		}
-		return MethodName.UNKNOWN_NAME.getName();
-	}
-
-	private FilePaths getFilePaths(int numbRepos, int freqThresh, double bidirectThresh, int graphNum) {
-		FilePaths filePaths = new FilePaths();
-
-		File graphFolder = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
+	
+	private File getPath(int numbRepos, int freqThresh, double bidirectThresh, int graphNum) {
+		File folderPath = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
 				+ "/Bidirect" + bidirectThresh + "/");
-		if (!graphFolder.isDirectory()) {
-			graphFolder.mkdirs();
+		if (!folderPath.isDirectory()) {
+			folderPath.mkdirs();
 		}
-		filePaths.graphPath = graphFolder.getAbsolutePath() + "/pattern" + graphNum + ".dot";
+		return folderPath;
+	}
 
-		File methodFolder = new File(graphFolder.getAbsolutePath() + "/methods/");
+	private String getGraphPaths(File folderPath, int patternNumber) {
+		String graphPath = folderPath + "/pattern" + patternNumber + ".dot";
+		return graphPath;
+	}
+	
+	private File getMethodsPath(File folderPath, int patternNumber) {
+		File methodFolder = new File(folderPath.getAbsolutePath() + "/methods/");
 		if (!methodFolder.isDirectory()) {
 			methodFolder.mkdir();
 		}
-		filePaths.methodPath = methodFolder.getAbsolutePath() + "/pattern" + graphNum + ".txt";
-		return filePaths;
-	}
-
-	private class FilePaths {
-		String graphPath;
-		String methodPath;
+		File methodPath = new File(methodFolder.getAbsolutePath() + "/pattern" + patternNumber + ".txt");
+		return methodPath;
 	}
 }
