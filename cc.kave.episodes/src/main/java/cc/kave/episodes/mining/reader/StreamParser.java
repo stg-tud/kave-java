@@ -18,10 +18,9 @@ package cc.kave.episodes.mining.reader;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -40,28 +39,15 @@ public class StreamParser {
 		this.reader = reader;
 	}
 
-	public Set<Set<Fact>> parseStream(int numbRepos) {
-		Set<Set<Fact>> stream = Sets.newLinkedHashSet();
-		Set<Fact> eventsFacts = Sets.newLinkedHashSet();
-		
+	public List<Fact> parseStream(int numbRepos) {
+		List<Fact> stream = new LinkedList<Fact>();
 		List<String> lines = reader.readFile(getStreamPath(numbRepos));
 		
-		double timer = -1;
-
 		for (String line : lines) {
 			String[] eventTime = line.split(",");
 			int eventID = Integer.parseInt(eventTime[0]);
-			double timestamp = Double.parseDouble(eventTime[1]);
-			if (timer == -1) {
-				timer = timestamp;
-			} else if ((timestamp - timer) >= 0.5) {
-				stream.add(eventsFacts);
-				eventsFacts = Sets.newLinkedHashSet();
-			} 
-			timer = timestamp;
-			eventsFacts.add(new Fact(eventID));
+			stream.add(new Fact(eventID));
 		}
-		stream.add(eventsFacts);
 		return stream;
 	}
 

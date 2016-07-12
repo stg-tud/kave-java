@@ -71,31 +71,31 @@ public class PatternsOutput {
 	}
 
 	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
-		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
-		List<Event> events = mappingParser.parse(numbRepos);
-		Set<Set<Fact>> stream = streamParser.parseStream(numbRepos);
-
-		int graphNumber = 0;
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			if (entry.getKey() == 1) {
-				continue;
-			}
-			Set<Episode> closedEpisodes = transClosure.remTransClosure(entry.getValue());
-
-			for (Episode episode : closedEpisodes) {
-				File filePath = getPath(numbRepos, freqThresh, bidirectThresh, graphNumber);
-				
-				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
-				graphWriter.write(graph, getGraphPaths(filePath, graphNumber));
-
-				StringBuilder sb = extractor.getMethods(episode, stream, events);
-				
-				if (!sb.toString().isEmpty()) {
-					FileUtils.writeStringToFile(getMethodsPath(filePath, graphNumber), sb.toString());
-				}
-				graphNumber++;
-			}
-		}
+//		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
+//		List<Event> events = mappingParser.parse(numbRepos);
+//		Set<Set<Fact>> stream = streamParser.parseStream(numbRepos);
+//
+//		int graphNumber = 0;
+//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+//			if (entry.getKey() == 1) {
+//				continue;
+//			}
+//			Set<Episode> closedEpisodes = transClosure.remTransClosure(entry.getValue());
+//
+//			for (Episode episode : closedEpisodes) {
+//				File filePath = getPath(numbRepos, freqThresh, bidirectThresh, graphNumber);
+//				
+//				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
+//				graphWriter.write(graph, getGraphPaths(filePath, graphNumber));
+//
+//				StringBuilder sb = extractor.getMethods(episode, stream, events);
+//				
+//				if (!sb.toString().isEmpty()) {
+//					FileUtils.writeStringToFile(getMethodsPath(filePath, graphNumber), sb.toString());
+//				}
+//				graphNumber++;
+//			}
+//		}
 	}
 	
 	private File getPath(int numbRepos, int freqThresh, double bidirectThresh, int graphNum) {

@@ -22,8 +22,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +34,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.recommenders.exceptions.AssertionException;
@@ -97,26 +96,18 @@ public class StreamParserTest {
 	
 	@Test
 	public void testContent() {
-		Set<Set<Fact>> expected = Sets.newLinkedHashSet();
+		List<Fact> expected = new LinkedList<Fact>();
 		
-		Set<Fact> facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(1));
-		facts.add(new Fact(2));
-		facts.add(new Fact(3));
-		facts.add(new Fact(4));
-		facts.add(new Fact(5));
-		expected.add(facts);
+		expected.add(new Fact(1));
+		expected.add(new Fact(2));
+		expected.add(new Fact(3));
+		expected.add(new Fact(4));
+		expected.add(new Fact(5));
+		expected.add(new Fact(6));
+		expected.add(new Fact(7));
+		expected.add(new Fact(8));
 		
-		facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(6));
-		expected.add(facts);
-		
-		facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(7));
-		facts.add(new Fact(8));
-		expected.add(facts);
-		
-		Set<Set<Fact>> actuals = sut.parseStream(NUMBREPOS);
+		List<Fact> actuals = sut.parseStream(NUMBREPOS);
 		
 		assertEquals(expected, actuals);
 	}
