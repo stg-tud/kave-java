@@ -21,8 +21,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 public class ConcreteHistory {
-	private List<Interaction> history;
 
+	private List<Interaction> history;
 	
 	public ConcreteHistory() {
 		history = new ArrayList<>();
@@ -75,5 +75,10 @@ public class ConcreteHistory {
 	
 	public ConcreteHistory clone() {
 		return new ConcreteHistory(new ArrayList<>(history));
+	}	
+	
+	@Override
+	public String toString() {
+		return history.toString();
 	}
 }

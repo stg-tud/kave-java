@@ -114,12 +114,9 @@ public class RaychevAnalysisVisitorTest extends PBNAnalysisBaseTest {
 				new Interaction(method(voidType, DefaultClassContext, "m2"), 0, InteractionType.MethodCall),
 				new Interaction(method(voidType, DefaultClassContext, "m3"), 0, InteractionType.MethodCall)));
 
-		assertEquals(3, actual.getHistorySet().size());
+		assertEquals(2, actual.getHistorySet().size());
 
 		assertThat(actual.getHistorySet(), Matchers.containsInAnyOrder(
-				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
-						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m3"), 0,
-						InteractionType.MethodCall)),
 				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m1"), 0,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m3"), 0,
@@ -356,12 +353,9 @@ public class RaychevAnalysisVisitorTest extends PBNAnalysisBaseTest {
 				new Interaction(method(voidType, DefaultClassContext, "m2"), 0, InteractionType.MethodCall),
 				new Interaction(method(voidType, DefaultClassContext, "m3"), 0, InteractionType.MethodCall)));
 
-		assertEquals(4, actual.getHistorySet().size());
+		assertEquals(3, actual.getHistorySet().size());
 
 		assertThat(actual.getHistorySet(), Matchers.containsInAnyOrder(
-				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
-						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m3"), 0,
-						InteractionType.MethodCall)),
 				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m1"), 0,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m3"), 0,
