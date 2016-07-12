@@ -25,7 +25,7 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.model.Episode;
 
-public class EpisodeExtraction {
+public class EpisodeExtractionPrevious {
 
 	public StringBuilder getMethods(Episode episode, Set<Set<Fact>> stream, List<Event> events) {
 		StringBuilder sb = new StringBuilder();

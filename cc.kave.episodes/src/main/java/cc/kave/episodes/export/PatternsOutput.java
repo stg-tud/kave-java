@@ -31,7 +31,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.mining.evaluation.EpisodeExtraction;
+import cc.kave.episodes.mining.evaluation.EpisodeExtractionPrevious;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -47,14 +47,14 @@ public class PatternsOutput {
 	private EpisodesPostprocessor episodesProcessor;
 	private MappingParser mappingParser;
 	private StreamParser streamParser;
-	private EpisodeExtraction extractor;
+	private EpisodeExtractionPrevious extractor;
 	private TransitivelyClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
 	public PatternsOutput(@Named("patterns") File folder, EpisodesPostprocessor episodes, MappingParser mappingParser,
-			StreamParser streamParser, EpisodeExtraction extractor, TransitivelyClosedEpisodes transitivityClosure,
+			StreamParser streamParser, EpisodeExtractionPrevious extractor, TransitivelyClosedEpisodes transitivityClosure,
 			EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter writer) {
 
 		assertTrue(folder.exists(), "Patterns folder does not exist");

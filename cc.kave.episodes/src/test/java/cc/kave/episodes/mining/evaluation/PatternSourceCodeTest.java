@@ -24,8 +24,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.episodes.Fact;
@@ -35,33 +33,25 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.episodes.model.Episode;
 
-public class EpisodeExtractionTest {
+public class PatternSourceCodeTest {
 
-	private Set<Set<Fact>> stream = Sets.newLinkedHashSet();
+	private List<Fact> stream = new LinkedList<Fact>();
 	private List<Event> events = new LinkedList<>();
 	
-	private EpisodeExtraction sut;
+	private PatternSourceCode sut;
 	
 	@Before 
 	public void setup() {
-		Set<Fact> facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(1));
-		facts.add(new Fact(2));
-		facts.add(new Fact(3));
-		facts.add(new Fact(4));
-		facts.add(new Fact(5));
-		stream.add(facts);
-		
-		facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(4));
-		stream.add(facts);
-		
-		facts = Sets.newLinkedHashSet();
-		facts.add(new Fact(6));
-		facts.add(new Fact(3));
-		facts.add(new Fact(5));
-		facts.add(new Fact(7));
-		stream.add(facts);
+		stream.add(new Fact(1));
+		stream.add(new Fact(2));
+		stream.add(new Fact(3));
+		stream.add(new Fact(4));
+		stream.add(new Fact(5));
+		stream.add(new Fact(4));
+		stream.add(new Fact(6));
+		stream.add(new Fact(3));
+		stream.add(new Fact(5));
+		stream.add(new Fact(7));
 		
 		events.add(Events.newDummyEvent());
 		events.add(Events.newFirstContext(m(1, 1)));
@@ -72,7 +62,7 @@ public class EpisodeExtractionTest {
 		events.add(Events.newFirstContext(m(2, 6)));
 		events.add(Events.newInvocation(m(2, 7)));
 		
-		sut = new EpisodeExtraction();
+		sut = new PatternSourceCode();
 	}
 	
 	@Test
@@ -84,7 +74,7 @@ public class EpisodeExtractionTest {
 		StringBuilder expected = new StringBuilder();
 		expected.append("T1.m2\n");
 		
-		StringBuilder actuals = sut.getMethods(episode, stream, events);
+		Set<IMethodName> actuals = sut.findEnclosignMethods(stream, events, episode.getEvents());
 		
 		assertEquals(expected.toString(), actuals.toString());
 	}

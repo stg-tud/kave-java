@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.mining.evaluation;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +27,7 @@ import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 
-public class ExampleBlubb {
+public class PatternSourceCode {
 
 	private IMethodName enclosignMethod = MethodName.UNKNOWN_NAME;
 	private IMethodName nextEnclosignMethod = MethodName.UNKNOWN_NAME;
@@ -60,9 +59,6 @@ public class ExampleBlubb {
 		Set<Event> completeMethod = Sets.newLinkedHashSet();
 		
 		for (Event event : streamEvents) {
-			if (event.getKind() == EventKind.FIRST_DECLARATION) {
-				completeMethod.add(event);
-			}
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
 				if (isFirstEnclosingMethod) {
 					enclosignMethod = event.getMethod();
@@ -75,8 +71,7 @@ public class ExampleBlubb {
 					}
 					enclosignMethod = nextEnclosignMethod;
 				}
-			}
-			if (event.getKind() == EventKind.INVOCATION) {
+			} else {
 				completeMethod.add(event);
 			}
 		}
