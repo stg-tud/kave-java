@@ -16,7 +16,7 @@
 package exec.recommender_reimplementation.raychev_analysis;
 
 public enum InteractionType {
-	MethodCall,
-	PropertyGet,
-	PropertySet
+	METHOD_CALL,
+	PROPERTY_GET,
+	PROPERTY_SET
 }

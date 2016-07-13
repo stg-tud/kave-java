@@ -61,42 +61,42 @@ public class HistoryExtractorTest extends PBNAnalysisBaseTest {
 		assertThat(concreteHistories, Matchers.containsInAnyOrder(
 				new ConcreteHistory(new Interaction(method(type("SmsManager"),
 						DefaultClassContext, "getDefault"), Interaction.RETURN,
-						InteractionType.MethodCall), new Interaction(method(
+						InteractionType.METHOD_CALL), new Interaction(method(
 						voidType, type("SmsManager"), "sendTextMessage",
 						parameter(type("Message"), "message")), 0,
-						InteractionType.MethodCall)),
+						InteractionType.METHOD_CALL)),
 				new ConcreteHistory(new Interaction(method(intType,
 						DefaultClassContext, "length"), Interaction.RETURN,
-						InteractionType.MethodCall)),
+						InteractionType.METHOD_CALL)),
 				new ConcreteHistory(new Interaction(method(type("SmsManager"),
 						DefaultClassContext, "getDefault"), Interaction.RETURN,
-						InteractionType.MethodCall), new Interaction(method(
+						InteractionType.METHOD_CALL), new Interaction(method(
 						type("ArrayList"), type("SmsManager"), "divideMsg",
 						parameter(type("Message"), "message")), 0,
-						InteractionType.MethodCall), new Interaction(method(
+						InteractionType.METHOD_CALL), new Interaction(method(
 						voidType, type("SmsManager"),
 						"sendMultipartTextMessage",
 						parameter(type("ArrayList"), "msgList")), 0,
-						InteractionType.MethodCall)),
+						InteractionType.METHOD_CALL)),
 				new ConcreteHistory(new Interaction(method(intType,
 						DefaultClassContext, "length"), 0,
-						InteractionType.MethodCall), new Interaction(method(
+						InteractionType.METHOD_CALL), new Interaction(method(
 						type("ArrayList"), type("SmsManager"), "divideMsg",
 						parameter(type("Message"), "message")), 1,
-						InteractionType.MethodCall)),
+						InteractionType.METHOD_CALL)),
 				new ConcreteHistory(new Interaction(method(intType,
 						DefaultClassContext, "length"), 0,
-						InteractionType.MethodCall), new Interaction(method(
+						InteractionType.METHOD_CALL), new Interaction(method(
 						voidType, type("SmsManager"), "sendTextMessage",
 						parameter(type("Message"), "message")), 1,
-						InteractionType.MethodCall)),
+						InteractionType.METHOD_CALL)),
 				new ConcreteHistory(new Interaction(method(type("ArrayList"),
 						type("SmsManager"), "divideMsg",
 						parameter(type("Message"), "message")),
-						Interaction.RETURN, InteractionType.MethodCall),
+						Interaction.RETURN, InteractionType.METHOD_CALL),
 						new Interaction(method(voidType, type("SmsManager"),
 								"sendMultipartTextMessage",
 								parameter(type("ArrayList"), "msgList")), 1,
-								InteractionType.MethodCall))));
+								InteractionType.METHOD_CALL))));
 	}
 }

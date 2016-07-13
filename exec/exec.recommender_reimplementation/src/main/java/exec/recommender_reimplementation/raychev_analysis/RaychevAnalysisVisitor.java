@@ -275,7 +275,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		Set<AbstractLocation> abstractLocations = tryFindAbstractLocationsForSimpleExpression(expression);
 		if (abstractLocations != null) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), parameterPosition,
-					InteractionType.MethodCall);
+					InteractionType.METHOD_CALL);
 			addInteractionToAbstractHistory(getOrCreateAbstractHistory(abstractLocations, historyMap), interaction);
 		}
 	}
@@ -284,7 +284,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 			Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationForInvocation(invocation);
 		if (!abstractLocations.isEmpty()) {
-			Interaction interaction = new Interaction(invocation.getMethodName(), 0, InteractionType.MethodCall);
+			Interaction interaction = new Interaction(invocation.getMethodName(), 0, InteractionType.METHOD_CALL);
 			addInteractionToAbstractHistory(getOrCreateAbstractHistory(abstractLocations, historyMap), interaction);
 		}
 	}
@@ -294,8 +294,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 		AbstractHistory abstractHistory = getOrCreateAbstractHistory(abstractLocations, historyMap);
 		
-		Interaction interaction = new Interaction(methodName, Interaction.RETURN, InteractionType.MethodCall);
-		
+		Interaction interaction = new Interaction(methodName, Interaction.RETURN, InteractionType.METHOD_CALL);
 		addInteractionToAbstractHistory(abstractHistory, interaction);
 	}
 
