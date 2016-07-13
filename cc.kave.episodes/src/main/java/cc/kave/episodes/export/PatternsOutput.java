@@ -31,13 +31,13 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.mining.evaluation.PatternExtractor;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.patterns.PatternExtractor;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
 

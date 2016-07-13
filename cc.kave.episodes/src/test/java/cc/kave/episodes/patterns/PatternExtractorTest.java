@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.patterns;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,6 +34,7 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.patterns.PatternExtractor;
 
 public class PatternExtractorTest {
 

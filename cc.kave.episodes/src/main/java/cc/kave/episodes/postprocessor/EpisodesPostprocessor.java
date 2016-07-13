@@ -36,7 +36,7 @@ public class EpisodesPostprocessor {
 		this.parser = parser;
 	}
 	
-	public Map<Integer, Set<Episode>> postprocess(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
+	public Map<Integer, Set<Episode>> postprocess(int numbRepos, int freqThresh, double bidirectThresh) {
 		Map<Integer, Set<Episode>> patterns = Maps.newHashMap();
 		
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
@@ -91,7 +91,7 @@ public class EpisodesPostprocessor {
 		return episodes;
 	}
 
-	private Episode getRepresentative(Episode filterEp, Episode currEp, int freqThresh, double bidirectThresh) throws Exception {
+	private Episode getRepresentative(Episode filterEp, Episode currEp, int freqThresh, double bidirectThresh) {
 		int ffreq = filterEp.getFrequency();
 		double fbidirect = filterEp.getBidirectMeasure();
 		

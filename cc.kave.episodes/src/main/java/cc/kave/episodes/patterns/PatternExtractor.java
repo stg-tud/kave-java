@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.patterns;
 
 import java.util.LinkedList;
 import java.util.List;
