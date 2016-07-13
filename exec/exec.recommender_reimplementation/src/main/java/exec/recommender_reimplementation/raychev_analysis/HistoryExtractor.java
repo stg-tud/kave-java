@@ -15,15 +15,12 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
@@ -39,7 +36,7 @@ public class HistoryExtractor {
 		Set<ConcreteHistory> concreteHistorySet = new HashSet<>();
 		
 		for (IMethodDeclaration methodDecl : sst.getMethods()) {
-			Map<Set<AbstractLocation>, AbstractHistory> historyMap = new HashMap<>();
+			HistoryMap historyMap = new HistoryMap();
 			methodDecl.accept(new RaychevAnalysisVisitor(pointsToContext), historyMap);
 			
 			for (AbstractHistory abstractHistory : historyMap.values()) {

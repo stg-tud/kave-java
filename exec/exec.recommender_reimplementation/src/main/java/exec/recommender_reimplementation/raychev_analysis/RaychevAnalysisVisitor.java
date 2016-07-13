@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -29,7 +28,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
@@ -38,6 +36,7 @@ import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -57,17 +56,11 @@ import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
 import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 
-public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLocation>, AbstractHistory>, Object> {
+public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object> {
 
 	private PointsToQueryBuilder queryBuilder;
 
 	private PointsToAnalysis pointsToAnalysis;
-
-	static final int LOOP_ITERATIONS = 2;
-
-	static final int HISTORY_THRESHOLD = 16;
-
-	private Random randomizer;
 
 	private EnclosingNodeHelper enclosingNodes;
 
@@ -81,14 +74,13 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		queryBuilder = new PointsToQueryBuilder(typeCollector, enclosingNodes);
 		pointsToAnalysis = pointsToContext.getPointerAnalysis();
 
-		randomizer = new Random();
-		
 		returnConcreteHistories = new HashMap<>();
 	}
-	
+
 	@Override
-	public Object visit(ISST sst, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
-		super.visit(sst, historyMap);
+	public Object visit(IMethodDeclaration stmt,
+			HistoryMap historyMap) {
+		super.visit(stmt, historyMap);
 		
 		// add concreteHistories which stopped on return statements to historyMap
 		for (Entry<Set<AbstractLocation>, Set<ConcreteHistory>> entry : returnConcreteHistories.entrySet()) {
@@ -96,12 +88,13 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 				historyMap.get(entry.getKey()).getHistorySet().addAll(entry.getValue());
 			}
 		}
+		returnConcreteHistories.clear();
 		
 		return null;
 	}
 
 	@Override
-	public Object visit(IAssignment assignment, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IAssignment assignment, HistoryMap historyMap) {
 		IAssignableExpression expression = assignment.getExpression();
 		if (expression instanceof IInvocationExpression) {
 			IInvocationExpression invocation = (IInvocationExpression) expression;
@@ -111,14 +104,12 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 			addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
 		}
 		
-		// TODO: does points to analysis creates AbstractLocations for Properties?
-		
 		// Handle Property Get
 		IPropertyReference propertyReference = expressionContainsPropertyReference(assignment.getExpression());
 		if(propertyReference != null) {
 			Set<AbstractLocation> propertyAbstractLocations = findAbstractLocationsForReference(propertyReference,assignment);
 			AbstractHistory propertyAbstractHistory = getOrCreateAbstractHistory(propertyAbstractLocations, historyMap);
-			Interaction propertyInteraction = new Interaction(createPropertyMethodName(propertyReference), 0, InteractionType.PropertyGet);
+			Interaction propertyInteraction = new Interaction(createPropertyMethodName(propertyReference), 0, InteractionType.PROPERTY_GET);
 			addInteractionToAbstractHistory(propertyAbstractHistory, propertyInteraction);
 		}
 		
@@ -128,7 +119,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 			Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 			AbstractHistory abstractHistory = getOrCreateAbstractHistory(abstractLocations, historyMap);
 			
-			Interaction interaction = new Interaction(createPropertyMethodName((IPropertyReference) reference), 0, InteractionType.PropertySet);
+			Interaction interaction = new Interaction(createPropertyMethodName((IPropertyReference) reference), 0, InteractionType.PROPERTY_SET);
 			
 			addInteractionToAbstractHistory(abstractHistory, interaction);
 		}
@@ -137,50 +128,50 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 	}
 
 	@Override
-	public Object visit(IIfElseBlock block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IIfElseBlock block, HistoryMap historyMap) {
 		block.getCondition().accept(this, historyMap);
 
 		if(block.getElse().isEmpty()) {
-			Map<Set<AbstractLocation>, AbstractHistory> cloneThenBranch = cloneHistoryMap(historyMap);
+			HistoryMap cloneThenBranch = historyMap.clone();
 			visitStatements(block.getThen(), cloneThenBranch);
-			mergeHistoryMaps(historyMap, cloneThenBranch);
+			historyMap.mergeInto(cloneThenBranch);
 		}
 		else {
-			Map<Set<AbstractLocation>, AbstractHistory> cloneElseBranch = cloneHistoryMap(historyMap);
+			HistoryMap cloneElseBranch = historyMap.clone();
 			visitStatements(block.getThen(), historyMap);
 			visitStatements(block.getElse(), cloneElseBranch);
-			mergeHistoryMaps(historyMap, cloneElseBranch);
+			historyMap.mergeInto(cloneElseBranch);
 		}
 		
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
 
 	@Override
-	public Object visit(ITryBlock block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(ITryBlock block, HistoryMap historyMap) {
 		visitStatements(block.getBody(), historyMap);
 		
-		List<Map<Set<AbstractLocation>, AbstractHistory>> tempListAbstractHistories = new ArrayList<>();
+		List<HistoryMap> tempListAbstractHistories = new ArrayList<>();
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			Map<Set<AbstractLocation>, AbstractHistory> cloneCatchBlock = cloneHistoryMap(historyMap);
+			HistoryMap cloneCatchBlock = historyMap.clone();
 			visitStatements(catchBlock.getBody(), cloneCatchBlock);
 			tempListAbstractHistories.add(cloneCatchBlock);
 		}
 		
-		for (Map<Set<AbstractLocation>, AbstractHistory> map : tempListAbstractHistories) {
-			mergeHistoryMaps(historyMap, map);
+		for (HistoryMap map : tempListAbstractHistories) {
+			historyMap.mergeInto(map);
 		}
 
 		// finally block runs always
 		visitStatements(block.getFinally(), historyMap);
 
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
 
 	@Override
-	public Object visit(IDoLoop block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IDoLoop block, HistoryMap historyMap) {
 		List<ISSTNode> loopedNodes = new ArrayList<>();
 		loopedNodes.addAll(block.getBody());
 		loopedNodes.add(block.getCondition());
@@ -189,56 +180,66 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		loopedNodes.forEach(node -> node.accept(this, historyMap));
 		
 		// adds one loop iteration for concrete histories
-		Map<Set<AbstractLocation>, AbstractHistory> cloneLoopTwoIterations = cloneHistoryMap(historyMap);
+		HistoryMap cloneLoopTwoIterations = historyMap.clone();
 		loopedNodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
 				
-		mergeHistoryMaps(historyMap, cloneLoopTwoIterations);
+		historyMap.mergeInto(cloneLoopTwoIterations);
 
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
 
 	@Override
-	public Object visit(IForEachLoop block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IForEachLoop block, HistoryMap historyMap) {
 		block.getDeclaration().accept(this, historyMap);
 
 		block.getLoopedReference().accept(this, historyMap);
 
 		List<ISSTNode> loopedNodes = Lists.newArrayList(block.getBody());
-		loopNodes(loopedNodes, historyMap);
+		loopNodesTwoIterations(loopedNodes, historyMap);
 		
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
 
 	@Override
-	public Object visit(IForLoop block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IForLoop block, HistoryMap historyMap) {
+		visitStatements(block.getInit(), historyMap);
+		
 		List<ISSTNode> loopedNodes = new ArrayList<>();
-		loopedNodes.addAll(block.getInit());
-		loopedNodes.add(block.getCondition());
+
+		HistoryMap cloneFailedCondition = historyMap.clone();
+		loopedNodes.add(block.getCondition());	
+		loopNodesOneIteration(loopedNodes, cloneFailedCondition);
+
+		HistoryMap cloneLoopTwoIterations = cloneFailedCondition.clone();
+		loopedNodes.addAll(block.getBody());
 		loopedNodes.addAll(block.getStep());
-		loopedNodes.addAll(block.getBody());
-
-		loopNodes(loopedNodes, historyMap);
+		loopedNodes.add(block.getCondition());	
+		loopNodesTwoIterations(loopedNodes, cloneLoopTwoIterations);
+	
+		historyMap.mergeInto(cloneFailedCondition);
+		historyMap.mergeInto(cloneLoopTwoIterations);
 		
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
+		
 		return null;
 	}
 
 	@Override
-	public Object visit(IWhileLoop block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IWhileLoop block, HistoryMap historyMap) {
 		List<ISSTNode> loopedNodes = new ArrayList<>();
 		loopedNodes.add(block.getCondition());
 		loopedNodes.addAll(block.getBody());
 
-		loopNodes(loopedNodes, historyMap);
+		loopNodesTwoIterations(loopedNodes, historyMap);
 
-		checkForAbstractHistoryThreshold(historyMap);
+		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
 
 	@Override
-	public Object visit(IInvocationExpression invocation, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IInvocationExpression invocation, HistoryMap historyMap) {
 		addInteractionForReceiver(invocation, historyMap);
 
 		int parameterPosition = 1;
@@ -251,14 +252,13 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 	}
 	
 	@Override
-	public Object visit(IReturnStatement stmt, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	public Object visit(IReturnStatement stmt, HistoryMap historyMap) {
 		stmt.getExpression().accept(this, historyMap);
 		
-		Map<Set<AbstractLocation>, AbstractHistory> clone = cloneHistoryMap(historyMap);
-		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : clone.entrySet()) {
+		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : historyMap.entrySet()) {
 			returnConcreteHistories.put(entry.getKey(), entry.getValue().getHistorySet());
+			entry.getValue().getHistorySet().clear();
 		}
-		
 		return null;
 	}
 
@@ -271,7 +271,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 	}
 
 	private void addInteractionForParameter(ISimpleExpression expression, IInvocationExpression invocation,
-			int parameterPosition, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+			int parameterPosition, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = tryFindAbstractLocationsForSimpleExpression(expression);
 		if (abstractLocations != null) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), parameterPosition,
@@ -281,7 +281,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 	}
 
 	private void addInteractionForReceiver(IInvocationExpression invocation,
-			Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+			HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationForInvocation(invocation);
 		if (!abstractLocations.isEmpty()) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), 0, InteractionType.METHOD_CALL);
@@ -289,7 +289,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		}
 	}
 
-	private void addInteractionForReturn(IAssignment assignment, Map<Set<AbstractLocation>, AbstractHistory> historyMap,
+	private void addInteractionForReturn(IAssignment assignment, HistoryMap historyMap,
 			IMethodName methodName) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 		AbstractHistory abstractHistory = getOrCreateAbstractHistory(abstractLocations, historyMap);
@@ -313,29 +313,34 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		return null;
 	}
 
-	private void handleObjectAllocation(IAssignment assignment, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+	private void handleObjectAllocation(IAssignment assignment, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 		AbstractHistory abstractHistory = new AbstractHistory();
 		historyMap.put(abstractLocations, abstractHistory);
 		abstractHistory.getHistorySet().add(new ConcreteHistory());
 	}
+	
+	private void loopNodesOneIteration(List<ISSTNode> nodes, HistoryMap historyMap) {
+		HistoryMap cloneLoopOneIteration = historyMap.clone();
+		nodes.forEach(node -> node.accept(this, cloneLoopOneIteration));
+					
+		historyMap.mergeInto(cloneLoopOneIteration);
+	}
+	
+	private void loopNodesTwoIterations(List<ISSTNode> nodes, HistoryMap historyMap) {
 
-	private void loopNodes(List<ISSTNode> nodes, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
-
-		Map<Set<AbstractLocation>, AbstractHistory> cloneLoopOneIteration = cloneHistoryMap(historyMap);
+		HistoryMap cloneLoopOneIteration = historyMap.clone();
 		nodes.forEach(node -> node.accept(this, cloneLoopOneIteration));
 		
-		// TODO: if necessary this could be optimized to add everything added in previous iteration to all histories two times
-		Map<Set<AbstractLocation>, AbstractHistory> cloneLoopTwoIterations = cloneHistoryMap(historyMap);
-		nodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
+		HistoryMap cloneLoopTwoIterations = cloneLoopOneIteration.clone();
 		nodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
 				
-		mergeHistoryMaps(historyMap, cloneLoopOneIteration);
-		mergeHistoryMaps(historyMap, cloneLoopTwoIterations);
+		historyMap.mergeInto(cloneLoopOneIteration);
+		historyMap.mergeInto(cloneLoopTwoIterations);
 	}
 
 	private AbstractHistory getOrCreateAbstractHistory(Set<AbstractLocation> abstractLocations,
-			Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
+			HistoryMap historyMap) {
 		if (historyMap.containsKey(abstractLocations))
 			return historyMap.get(abstractLocations);
 
@@ -371,52 +376,5 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 		return null;
 	}
 
-	private void checkForAbstractHistoryThreshold(Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
-		if (historyMap.size() > HISTORY_THRESHOLD) {
-			evictRandomAbstractHistory(historyMap);
-		}
-	}
-
-	void evictRandomAbstractHistory(Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
-		int size = historyMap.size();
-		int indexRandomEntry = randomizer.nextInt(size);
-
-		Entry<Set<AbstractLocation>, AbstractHistory> entryToRemove = null;
-
-		int i = 0;
-		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : historyMap.entrySet()) {
-			if (i == indexRandomEntry) {
-				entryToRemove = entry;
-				break;
-			}
-			i++;
-		}
-
-		if (entryToRemove != null)
-			historyMap.remove(entryToRemove.getKey(), entryToRemove.getValue());
-	}
-
-	private void mergeHistoryMaps(Map<Set<AbstractLocation>, AbstractHistory> historyMap,
-			Map<Set<AbstractLocation>, AbstractHistory> clone) {
-		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : clone.entrySet()) {
-			Set<AbstractLocation> key = entry.getKey();
-			if (historyMap.containsKey(key)) {
-				historyMap.get(key).mergeAbstractHistory(entry.getValue());
-			} else {
-				historyMap.put(entry.getKey(), entry.getValue());
-			}
-		}
-
-	}
-
-	private Map<Set<AbstractLocation>, AbstractHistory> cloneHistoryMap(
-			Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
-		Map<Set<AbstractLocation>, AbstractHistory> clone = new HashMap<>();
-		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : historyMap.entrySet()) {
-			clone.put(entry.getKey(), entry.getValue().clone());
-		}
-
-		return clone;
-	}
 
 }
