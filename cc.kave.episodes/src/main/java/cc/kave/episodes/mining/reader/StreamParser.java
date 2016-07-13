@@ -39,15 +39,28 @@ public class StreamParser {
 		this.reader = reader;
 	}
 
-	public List<Fact> parseStream(int numbRepos) {
-		List<Fact> stream = new LinkedList<Fact>();
+	public List<List<Fact>> parseStream(int numbRepos) {
+		List<List<Fact>> stream = new LinkedList<>();
+		List<Fact> method = new LinkedList<>();
+		
 		List<String> lines = reader.readFile(getStreamPath(numbRepos));
 		
+		double timer = -1;
+
 		for (String line : lines) {
 			String[] eventTime = line.split(",");
 			int eventID = Integer.parseInt(eventTime[0]);
-			stream.add(new Fact(eventID));
+			double timestamp = Double.parseDouble(eventTime[1]);
+			if (timer == -1) {
+				timer = timestamp;
+			} else if ((timestamp - timer) >= 0.5) {
+				stream.add(method);
+				method = new LinkedList<>();
+			} 
+			timer = timestamp;
+			method.add(new Fact(eventID));
 		}
+		stream.add(method);
 		return stream;
 	}
 

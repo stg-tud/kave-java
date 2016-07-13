@@ -24,7 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.episodes.aastart.frameworks.Preprocessing;
+import cc.kave.episodes.export.PatternsOutput;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -48,10 +48,10 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
+//		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
-//		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 		
 //		load(EpisodesPostprocessor.class).postprocess(NUMBREPOS, FREQTHRESH, 0.5);
 		

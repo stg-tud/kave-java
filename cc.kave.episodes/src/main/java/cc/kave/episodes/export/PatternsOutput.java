@@ -31,7 +31,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.episodes.mining.evaluation.EpisodeExtractionPrevious;
+import cc.kave.episodes.mining.evaluation.PatternExtractor;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -39,6 +39,7 @@ import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.recommenders.io.Logger;
 
 public class PatternsOutput {
 
@@ -47,14 +48,14 @@ public class PatternsOutput {
 	private EpisodesPostprocessor episodesProcessor;
 	private MappingParser mappingParser;
 	private StreamParser streamParser;
-	private EpisodeExtractionPrevious extractor;
+	private PatternExtractor extractor;
 	private TransitivelyClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
 	public PatternsOutput(@Named("patterns") File folder, EpisodesPostprocessor episodes, MappingParser mappingParser,
-			StreamParser streamParser, EpisodeExtractionPrevious extractor, TransitivelyClosedEpisodes transitivityClosure,
+			StreamParser streamParser, PatternExtractor extractor, TransitivelyClosedEpisodes transitivityClosure,
 			EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter writer) {
 
 		assertTrue(folder.exists(), "Patterns folder does not exist");
@@ -72,7 +73,8 @@ public class PatternsOutput {
 
 	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
 //		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
-//		List<Event> events = mappingParser.parse(numbRepos);
+		List<Event> events = mappingParser.parse(numbRepos);
+		Logger.log("Number of unique events is: %d", events.size());
 //		Set<Set<Fact>> stream = streamParser.parseStream(numbRepos);
 //
 //		int graphNumber = 0;

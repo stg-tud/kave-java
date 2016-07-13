@@ -96,18 +96,26 @@ public class StreamParserTest {
 	
 	@Test
 	public void testContent() {
-		List<Fact> expected = new LinkedList<Fact>();
+		List<List<Fact>> expected = new LinkedList<>();
+		List<Fact> method = new LinkedList<>();
 		
-		expected.add(new Fact(1));
-		expected.add(new Fact(2));
-		expected.add(new Fact(3));
-		expected.add(new Fact(4));
-		expected.add(new Fact(5));
-		expected.add(new Fact(6));
-		expected.add(new Fact(7));
-		expected.add(new Fact(8));
+		method.add(new Fact(1));
+		method.add(new Fact(2));
+		method.add(new Fact(3));
+		method.add(new Fact(4));
+		method.add(new Fact(5));
+		expected.add(method);
 		
-		List<Fact> actuals = sut.parseStream(NUMBREPOS);
+		method = new LinkedList<>();
+		method.add(new Fact(6));
+		expected.add(method);
+		
+		method = new LinkedList<>();
+		method.add(new Fact(7));
+		method.add(new Fact(8));
+		expected.add(method);
+		
+		List<List<Fact>> actuals = sut.parseStream(NUMBREPOS);
 		
 		assertEquals(expected, actuals);
 	}
