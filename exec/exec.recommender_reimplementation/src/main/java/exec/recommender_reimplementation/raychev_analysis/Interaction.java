@@ -15,7 +15,11 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class Interaction {
 	
@@ -35,12 +39,6 @@ public class Interaction {
 	
 	public IMethodName getMethodName() {
 		return methodName;
-	}
-
-	@Override
-	public String toString() {
-		return "Interaction [methodName=" + methodName + ", position=" + position + ", interactionType="
-				+ interactionType + "]";
 	}
 
 	public void setMethodName(IMethodName methodName) {
@@ -65,33 +63,17 @@ public class Interaction {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((interactionType == null) ? 0 : interactionType.hashCode());
-		result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
-		result = prime * result + position;
-		return result;
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Interaction other = (Interaction) obj;
-		if (interactionType != other.interactionType)
-			return false;
-		if (methodName == null) {
-			if (other.methodName != null)
-				return false;
-		} else if (!methodName.equals(other.methodName))
-			return false;
-		if (position != other.position)
-			return false;
-		return true;
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 	
 	

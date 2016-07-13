@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import cc.kave.commons.utils.ToStringUtils;
+
 public class AbstractHistory {
 	
 	private List<Interaction> abstractHistory;
@@ -64,38 +68,17 @@ public class AbstractHistory {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((abstractHistory == null) ? 0 : abstractHistory.hashCode());
-		result = prime * result + ((historySet == null) ? 0 : historySet.hashCode());
-		return result;
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AbstractHistory other = (AbstractHistory) obj;
-		if (abstractHistory == null) {
-			if (other.abstractHistory != null)
-				return false;
-		} else if (!abstractHistory.equals(other.abstractHistory))
-			return false;
-		if (historySet == null) {
-			if (other.historySet != null)
-				return false;
-		} else {
-			// TODO: test custom equals method for AbstractHistory
-			if(historySet.size() != other.historySet.size()) return false;
-			for (ConcreteHistory concreteHistory : historySet) {
-				if(!other.historySet.contains(concreteHistory)) return false;
-			}
-		}
-		return true;
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 
 	public void mergeAbstractHistory(AbstractHistory other) {

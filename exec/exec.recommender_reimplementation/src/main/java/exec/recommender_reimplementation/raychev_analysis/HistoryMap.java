@@ -3,7 +3,12 @@ package exec.recommender_reimplementation.raychev_analysis;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
+import cc.kave.commons.utils.ToStringUtils;
 
 public class HistoryMap extends HashMap<Set<AbstractLocation>, AbstractHistory>{
 
@@ -63,5 +68,20 @@ public class HistoryMap extends HashMap<Set<AbstractLocation>, AbstractHistory>{
 		if (entryToRemove != null) {
 			remove(entryToRemove.getKey(), entryToRemove.getValue());
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

@@ -18,6 +18,11 @@ package exec.recommender_reimplementation.raychev_analysis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import cc.kave.commons.utils.ToStringUtils;
+
 import com.google.common.collect.Lists;
 
 public class ConcreteHistory {
@@ -50,35 +55,20 @@ public class ConcreteHistory {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((history == null) ? 0 : history.hashCode());
-		return result;
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ConcreteHistory other = (ConcreteHistory) obj;
-		if (history == null) {
-			if (other.history != null)
-				return false;
-		} else if (!history.equals(other.history))
-			return false;
-		return true;
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 	
 	public ConcreteHistory clone() {
 		return new ConcreteHistory(new ArrayList<>(history));
 	}	
-	
-	@Override
-	public String toString() {
-		return history.toString();
-	}
 }
