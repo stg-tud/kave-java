@@ -28,7 +28,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.mining.reader;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -51,18 +51,21 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
-public class ReductionByRepos {
+public class ReposParser {
 	
+	private Directory contextsDir;
 	private File eventsFolder;
+	private FileReader reader;
 	
 	@Inject
-	public ReductionByRepos(@Named("events") File folder) {
+	public ReposParser(@Named("contexts") Directory directory, @Named("events") File folder, FileReader reader) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.contextsDir = directory;
 		this.eventsFolder = folder;
+		this.reader = reader;
 	}
-
-	public List<Event> select(Directory contextsDir, int numberOfRepos) throws ZipException, IOException {
+	public List<Event> learningStream(int numberOfRepos) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 		StringBuilder repositories = new StringBuilder();
 		String repoName = "";
@@ -94,7 +97,32 @@ public class ReductionByRepos {
 			}
 			ra.close();
 		}
-		FileUtils.writeStringToFile(new File(getFilePath(numberOfRepos)), repositories.toString());
+		FileUtils.writeStringToFile(new File(getReposPath(numberOfRepos)), repositories.toString());
+		List<Event> allEvents = generator.getEventStream();
+		return allEvents;
+	}
+	
+	public List<Event> validationStream(int numbRepos) throws IOException {
+		List<String> learningRepos = reader.readFile(new File(getReposPath(numbRepos)));
+		EventStreamGenerator generator = new EventStreamGenerator();
+		
+		for (String zip : findZips(contextsDir)) {
+			String repoName = getRepoName(zip);
+			if (learningRepos.contains(repoName)) {
+				continue;
+			}
+			Logger.log("Reading zip file %s", zip.toString());
+			ReadingArchive ra = contextsDir.getReadingArchive(zip);
+
+			while (ra.hasNext()) {
+				Context ctx = ra.getNext(Context.class);
+				if (ctx == null) {
+					continue;
+				}
+				generator.add(ctx);
+			}
+			ra.close();
+		}
 		List<Event> allEvents = generator.getEventStream();
 		return allEvents;
 	}
@@ -117,7 +145,7 @@ public class ReductionByRepos {
 		return zips;
 	}
 	
-	private String getFilePath(int numberOfRepos) {
+	private String getReposPath(int numberOfRepos) {
 		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();

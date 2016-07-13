@@ -28,7 +28,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.repositories;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -43,26 +43,24 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.export.EventsFilter;
+import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.model.EventStream;
-import cc.recommenders.io.Directory;
 
 public class Preprocessing {
 
-	private Directory contextsDir;
 	private File eventsFolder;
-	private ReductionByRepos repos;
+	private ReposParser repos;
 
 	@Inject
-	public Preprocessing(@Named("contexts") Directory directory, @Named("events") File folder, ReductionByRepos repos) {
+	public Preprocessing(@Named("events") File folder, ReposParser repos) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
-		this.contextsDir = directory;
 		this.eventsFolder = folder;
 		this.repos = repos;
 	}
 
 	public void generate(int numbRepos, int freqThresh) throws ZipException, IOException {
-		List<Event> allEvents = repos.select(contextsDir, numbRepos);
+		List<Event> allEvents = repos.learningStream(numbRepos);
 		EventStream stream = EventsFilter.filterStream(allEvents, freqThresh);
 		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath);
 	}

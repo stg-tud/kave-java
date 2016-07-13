@@ -41,7 +41,7 @@ public class StreamParser {
 
 	public List<List<Fact>> parseStream(int numbRepos) {
 		List<List<Fact>> stream = new LinkedList<>();
-		List<Fact> method = new LinkedList<>();
+		List<Fact> method = new LinkedList<Fact>();
 		
 		List<String> lines = reader.readFile(getStreamPath(numbRepos));
 		
@@ -55,7 +55,7 @@ public class StreamParser {
 				timer = timestamp;
 			} else if ((timestamp - timer) >= 0.5) {
 				stream.add(method);
-				method = new LinkedList<>();
+				method = new LinkedList<Fact>();
 			} 
 			timer = timestamp;
 			method.add(new Fact(eventID));

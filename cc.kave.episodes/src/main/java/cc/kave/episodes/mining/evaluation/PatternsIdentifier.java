@@ -37,6 +37,8 @@ public class PatternsIdentifier {
 	private MappingParser mappingParser;
 	private EpisodesPostprocessor episodeProcessor;
 	private PatternExtractor extractor;
+	
+	private static final int OUTPUT = 10;
 
 	@Inject
 	public PatternsIdentifier(StreamParser streamParser, EpisodesPostprocessor episodes, MappingParser mappingParser,
@@ -55,9 +57,19 @@ public class PatternsIdentifier {
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode episode : entry.getValue()) {
 				Set<IMethodName> enclosingMethods = extractor.getMethods(episode, stream, events);
-				Logger.log("Episode is identified in %d methods, while the frequency is %d!", enclosingMethods.size(),
+				int numberEnclosingMethods = enclosingMethods.size();
+				Logger.log("Episode is identified in %d methods, while the frequency is %d!", numberEnclosingMethods,
 						frequency);
-				if (enclosingMethods.size() < frequency) {
+				if (numberEnclosingMethods < frequency) {
+					int counter = 0;
+					
+					for (IMethodName methodName : enclosingMethods) {
+						Logger.log("%s", methodName.getDeclaringType().getFullName());
+						counter++;
+						if (counter == OUTPUT) {
+							break;
+						}
+					}
 					throw new Exception("The problematic episode is " + episode.getFacts().toString());
 				}
 			}

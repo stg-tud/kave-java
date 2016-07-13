@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.mining.reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,12 +58,13 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.mining.reader.ReposParser;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
-public class ReductionByReposTest {
+public class ReposParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -72,6 +73,8 @@ public class ReductionByReposTest {
 	
 	@Mock
 	private Directory rootDirectory;
+	@Mock 
+	FileReader reader;
 
 	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
 	private static final String REPO3 = "Github/usr1/repo3/ws.zip";
@@ -81,7 +84,7 @@ public class ReductionByReposTest {
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
 
-	private ReductionByRepos sut;
+	private ReposParser sut;
 
 	@Before
 	public void setup() throws IOException {
@@ -92,7 +95,7 @@ public class ReductionByReposTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ReductionByRepos(rootFolder.getRoot());
+		sut = new ReposParser(rootDirectory, rootFolder.getRoot(), reader);
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
@@ -161,7 +164,7 @@ public class ReductionByReposTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events folder does not exist");
-		sut = new ReductionByRepos(new File("does not exist"));
+		sut = new ReposParser(rootDirectory, new File("does not exist"), reader);
 	}
 
 	@Test
@@ -169,12 +172,12 @@ public class ReductionByReposTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events is not a folder, but a file");
-		sut = new ReductionByRepos(file);
+		sut = new ReposParser(rootDirectory, file, reader);
 	}
 
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.select(rootDirectory, NUMBEROFREPOS);
+		sut.learningStream(NUMBEROFREPOS);
 
 		File fileName = new File(getReposPath());
 
@@ -183,7 +186,7 @@ public class ReductionByReposTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.select(rootDirectory, NUMBEROFREPOS);
+		sut.learningStream(NUMBEROFREPOS);
 
 		File fileName = new File(getReposPath());
 		
@@ -198,7 +201,7 @@ public class ReductionByReposTest {
 
 	@Test
 	public void contextTest() throws ZipException, IOException {
-		sut.select(rootDirectory, NUMBEROFREPOS);
+		sut.learningStream(NUMBEROFREPOS);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
@@ -210,7 +213,7 @@ public class ReductionByReposTest {
 	}
 
 	@Test
-	public void readTwoArchives() throws IOException {
+	public void readThreeArchives() throws IOException {
 		SST sst = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
 		md3.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
@@ -234,7 +237,7 @@ public class ReductionByReposTest {
 
 		data.put(REPO2, context);
 
-		List<Event> actualEvents = sut.select(rootDirectory, NUMBEROFREPOS);
+		List<Event> actualEvents = sut.learningStream(NUMBEROFREPOS);
 		List<Event> exoectedEvents = getExpectedEvents();
 		
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
@@ -246,8 +249,8 @@ public class ReductionByReposTest {
 		verify(ras.get(REPO3), times(2)).hasNext();
 		verify(ras.get(REPO3)).getNext(Context.class);
 		
-		assertEquals(exoectedEvents.size(), actualEvents.size());
 		assertEquals(exoectedEvents, actualEvents);
+		assertEquals(exoectedEvents.size(), actualEvents.size());
 	}
 
 	private <T> Predicate<T> anyPredicateOf(Class<T> clazz) {

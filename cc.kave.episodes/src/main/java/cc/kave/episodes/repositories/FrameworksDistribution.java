@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.repositories;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -32,22 +32,20 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.csharp.AssemblyVersion;
+import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.statistics.StreamStatistics;
-import cc.recommenders.io.Directory;
 
 public class FrameworksDistribution {
 
-	private Directory rootDir;
 	private File rootFolder;
-	private ReductionByRepos repos;
+	private ReposParser repos;
 	private StreamStatistics statistics;
 
 	@Inject
-	public FrameworksDistribution(@Named("contexts") Directory directory, @Named("statistics") File folder,
-			ReductionByRepos repos, StreamStatistics statistics) {
+	public FrameworksDistribution(@Named("statistics") File folder,
+			ReposParser repos, StreamStatistics statistics) {
 		assertTrue(folder.exists(), "Statistics folder does not exist");
 		assertTrue(folder.isDirectory(), "Statistics is not a folder, but a file");
-		this.rootDir = directory;
 		this.rootFolder = folder;
 		this.repos = repos;
 		this.statistics = statistics;
@@ -55,7 +53,7 @@ public class FrameworksDistribution {
 
 	public void getDistribution(int numbRepos) throws IOException {
 
-		List<Event> allEvents = repos.select(rootDir, numbRepos);
+		List<Event> allEvents = repos.learningStream(numbRepos);
 		Map<Event, Integer> eventsFreqs = statistics.getFrequences(allEvents);
 		Frameworks distribution = getEventsAndTypes(eventsFreqs);
 		storeFrameworks(distribution, numbRepos);

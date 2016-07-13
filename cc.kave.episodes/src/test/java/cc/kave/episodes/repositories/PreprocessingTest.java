@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.repositories;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,9 +45,9 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.episodes.export.EventStreamIo;
+import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.model.EventStream;
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 
 public class PreprocessingTest {
@@ -59,9 +58,7 @@ public class PreprocessingTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private Directory rootDirectory;
-	@Mock
-	private ReductionByRepos repos;
+	private ReposParser repos;
 
 	private static final int NUMBREPOS = 10;
 	private static final int FREQTHRESH = 2;
@@ -100,9 +97,9 @@ public class PreprocessingTest {
 		frequencies.put(inv(5), 1);
 		frequencies.put(superCtx(0), 1);
 
-		sut = new Preprocessing(rootDirectory, rootFolder.getRoot(), repos);
+		sut = new Preprocessing(rootFolder.getRoot(), repos);
 
-		when(repos.select(any(Directory.class), anyInt())).thenReturn(events);
+		when(repos.learningStream(anyInt())).thenReturn(events);
 
 		Logger.setPrinting(false);
 	}
@@ -116,7 +113,7 @@ public class PreprocessingTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events folder does not exist");
-		sut = new Preprocessing(rootDirectory, new File("does not exist"), repos);
+		sut = new Preprocessing(new File("does not exist"), repos);
 	}
 
 	@Test
@@ -124,21 +121,21 @@ public class PreprocessingTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events is not a folder, but a file");
-		sut = new Preprocessing(rootDirectory, file, repos);
+		sut = new Preprocessing(file, repos);
 	}
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
 		sut.generate(NUMBREPOS, FREQTHRESH);
 
-		verify(repos).select(any(Directory.class), anyInt());
+		verify(repos).learningStream(anyInt());
 	}
 
 	@Test
 	public void filesAreCreated() throws IOException {
 		sut.generate(NUMBREPOS, FREQTHRESH);
 
-		verify(repos).select(any(Directory.class), anyInt());
+		verify(repos).learningStream(anyInt());
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
@@ -153,7 +150,7 @@ public class PreprocessingTest {
 //			1			2		3						4				2			1						3
 //		firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(2), firstCtx(1), superCtx(0), inv(3)
 
-		verify(repos).select(any(Directory.class), anyInt());
+		verify(repos).learningStream(anyInt());
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());

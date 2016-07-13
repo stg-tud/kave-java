@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.aastart.frameworks;
+package cc.kave.episodes.repositories;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,9 +45,9 @@ import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.exceptions.AssertionException;
-import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 
 public class FrameworksDistributionTest {
@@ -58,9 +58,7 @@ public class FrameworksDistributionTest {
 	public ExpectedException thrown = ExpectedException.none();
 	
 	@Mock
-	private Directory rootDirectory;
-	@Mock
-	private ReductionByRepos repos;
+	private ReposParser repos;
 	@Mock 
 	private StreamStatistics statistics;
 	
@@ -77,7 +75,7 @@ public class FrameworksDistributionTest {
 		
 		MockitoAnnotations.initMocks(this);
 		
-		sut = new FrameworksDistribution(rootDirectory, rootFolder.getRoot(), repos, statistics);
+		sut = new FrameworksDistribution(rootFolder.getRoot(), repos, statistics);
 		
 		Event ed1 = createDeclaration("[s:System.DateTime, mscorlib, 4.0.0.0] [s:System.DateTime, mscorlib, 4.0.0.0].FromBinary([System.Int64, mscorlib, 4.0.0.0] dateData)");
 		Event ed2 = createDeclaration("[System.Void, mscorlib, 4.0.0.0] [System.NotSupportedException, mscorlib, 4.0.0.0]..ctor()");
@@ -95,7 +93,7 @@ public class FrameworksDistributionTest {
 		events.add(ei2);
 		events.add(ei1);
 		
-		when(repos.select(any(Directory.class), anyInt())).thenReturn(events);
+		when(repos.learningStream(anyInt())).thenReturn(events);
 		
 		Map<Event, Integer> frequencies = Maps.newHashMap();
 		frequencies.put(ed1, 1);
@@ -113,9 +111,9 @@ public class FrameworksDistributionTest {
 	public void cannotBeInitializedWithNonExistingFolder() throws ZipException, IOException {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Statistics folder does not exist");
-		sut = new FrameworksDistribution(rootDirectory, new File("does not exist"), repos, statistics);
+		sut = new FrameworksDistribution(new File("does not exist"), repos, statistics);
 		
-		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
+		verify(repos).learningStream(eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));
 	}
 
@@ -124,9 +122,9 @@ public class FrameworksDistributionTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Statistics is not a folder, but a file");
-		sut = new FrameworksDistribution(rootDirectory, file, repos, statistics);
+		sut = new FrameworksDistribution(file, repos, statistics);
 		
-		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
+		verify(repos).learningStream(eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));
 	}
 	
@@ -134,7 +132,7 @@ public class FrameworksDistributionTest {
 	public void filesCreated() throws IOException {
 		sut.getDistribution(NUMOFREPOS);
 		
-		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
+		verify(repos).learningStream(eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));
 		
 		assertTrue(new File(getEventsFile()).exists());
@@ -145,7 +143,7 @@ public class FrameworksDistributionTest {
 	public void filesContent() throws IOException {
 		sut.getDistribution(NUMOFREPOS);
 		
-		verify(repos).select(eq(rootDirectory), eq(NUMOFREPOS));
+		verify(repos).learningStream(eq(NUMOFREPOS));
 		verify(statistics).getFrequences(eq(events));
 		
 		StringBuilder expEvents = new StringBuilder();
