@@ -94,7 +94,7 @@ public class RaychevAnalysisVisitorTest extends PBNAnalysisBaseTest {
 	}
 
 	@Test
-	public void ifBranchCreatesMultipleConcreteHistories() {
+	public void ifElseBlockCreatesMultipleConcreteHistories() {
 		IIfElseBlock ifElseBlock = new IfElseBlock();
 		ifElseBlock.getThen().add(invokeStmt("foo", method(voidType, DefaultClassContext, "m1")));
 		ifElseBlock.getElse().add(invokeStmt("foo", method(voidType, DefaultClassContext, "m2")));
@@ -124,6 +124,37 @@ public class RaychevAnalysisVisitorTest extends PBNAnalysisBaseTest {
 				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m2"), 0,
 						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m3"), 0,
+						InteractionType.MethodCall))));
+	}
+	
+	@Test
+	public void ifWithoutElseBlockCreatesMultipleConcreteHistories() {
+		IIfElseBlock ifElseBlock = new IfElseBlock();
+		ifElseBlock.getThen().add(invokeStmt("foo", method(voidType, DefaultClassContext, "m1")));
+		setupDefaultEnclosingMethod(varDecl("foo", objectType), assign("foo", constructor(stringType)), ifElseBlock,
+				invokeStmt("foo", method(voidType, DefaultClassContext, "m2")));
+
+		Map<Set<AbstractLocation>, AbstractHistory> historyMap = new HashMap<>();
+		context.getSST().accept(new RaychevAnalysisVisitor(context), historyMap);
+
+		assertEquals(1, historyMap.size());
+
+		AbstractHistory actual = (AbstractHistory) historyMap.values().toArray()[0];
+
+		assertThat(actual.getAbstractHistory(), Matchers.contains(new Interaction(
+				method(voidType, stringType, ".ctor"), Interaction.RETURN, InteractionType.MethodCall),
+				new Interaction(method(voidType, DefaultClassContext, "m1"), 0, InteractionType.MethodCall),
+				new Interaction(method(voidType, DefaultClassContext, "m2"), 0, InteractionType.MethodCall)));
+
+		assertEquals(2, actual.getHistorySet().size());
+
+		assertThat(actual.getHistorySet(), Matchers.containsInAnyOrder(
+				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
+						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m1"), 0,
+						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m2"), 0,
+						InteractionType.MethodCall)),
+				new ConcreteHistory(new Interaction(method(voidType, stringType, ".ctor"), Interaction.RETURN,
+						InteractionType.MethodCall), new Interaction(method(voidType, DefaultClassContext, "m2"), 0,
 						InteractionType.MethodCall))));
 	}
 

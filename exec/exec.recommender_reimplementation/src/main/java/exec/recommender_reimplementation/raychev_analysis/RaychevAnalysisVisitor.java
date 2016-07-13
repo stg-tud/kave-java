@@ -140,13 +140,18 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<Map<Set<AbstractLo
 	public Object visit(IIfElseBlock block, Map<Set<AbstractLocation>, AbstractHistory> historyMap) {
 		block.getCondition().accept(this, historyMap);
 
-		Map<Set<AbstractLocation>, AbstractHistory> cloneElseBranch = cloneHistoryMap(historyMap);
+		if(block.getElse().isEmpty()) {
+			Map<Set<AbstractLocation>, AbstractHistory> cloneThenBranch = cloneHistoryMap(historyMap);
+			visitStatements(block.getThen(), cloneThenBranch);
+			mergeHistoryMaps(historyMap, cloneThenBranch);
+		}
+		else {
+			Map<Set<AbstractLocation>, AbstractHistory> cloneElseBranch = cloneHistoryMap(historyMap);
+			visitStatements(block.getThen(), historyMap);
+			visitStatements(block.getElse(), cloneElseBranch);
+			mergeHistoryMaps(historyMap, cloneElseBranch);
+		}
 		
-		visitStatements(block.getThen(), historyMap);
-		visitStatements(block.getElse(), cloneElseBranch);
-
-		mergeHistoryMaps(historyMap, cloneElseBranch);
-
 		checkForAbstractHistoryThreshold(historyMap);
 		return null;
 	}
