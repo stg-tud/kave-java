@@ -83,6 +83,7 @@ public class ReposParserTest {
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
+	private List<String> repositories;
 
 	private ReposParser sut;
 
@@ -158,6 +159,10 @@ public class ReposParserTest {
 
 		data.put(REPO2, context2);
 		
+		repositories = new LinkedList<>();
+		repositories.add("Github/usr1/repo1");
+		repositories.add("Github/usr1/repo3");
+		
 		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
 			@Override
 			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
@@ -175,6 +180,8 @@ public class ReposParserTest {
 				return ra;
 			}
 		});
+		when(reader.readFile(any(File.class))).thenReturn(repositories);
+		
 		Logger.setPrinting(false);
 	}
 
@@ -237,8 +244,8 @@ public class ReposParserTest {
 
 	@Test
 	public void readThreeArchives() throws IOException {
+		List<Event> expectedEvents = getExpectedEvents();
 		List<Event> actualEvents = sut.learningStream(NUMBEROFREPOS);
-		List<Event> exoectedEvents = getExpectedEvents();
 		
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
@@ -249,8 +256,37 @@ public class ReposParserTest {
 		verify(ras.get(REPO3), times(2)).hasNext();
 		verify(ras.get(REPO3)).getNext(Context.class);
 		
-		assertEquals(exoectedEvents, actualEvents);
-		assertEquals(exoectedEvents.size(), actualEvents.size());
+		assertEquals(expectedEvents.size(), actualEvents.size());
+		assertEquals(expectedEvents, actualEvents);
+	}
+	
+	@Test
+	public void validationArchives() throws IOException {
+		List<Event> expectedEvents = new LinkedList<Event>();
+		
+		IMethodName declName = MethodName.newMethodName("[?] [?].???()");
+		Event firstMethod = Events.newFirstContext(declName);
+		Event enclosingMethod = Events.newContext(declName);
+		expectedEvents.add(firstMethod);
+		expectedEvents.add(enclosingMethod);
+		
+		IMethodName invName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		Event invocation = Events.newInvocation(invName);
+		expectedEvents.add(invocation);
+		expectedEvents.add(invocation);
+		
+		List<Event> actualEvents = sut.validationStream(NUMBEROFREPOS);
+		
+		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
+		verify(rootDirectory).getReadingArchive(REPO2);
+
+		verify(ras.get(REPO2), times(2)).hasNext();
+		verify(ras.get(REPO2)).getNext(Context.class);
+		
+		verify(reader).readFile(any(File.class));
+		
+		assertEquals(expectedEvents.size(), actualEvents.size());
+		assertEquals(expectedEvents, actualEvents);
 	}
 
 	private <T> Predicate<T> anyPredicateOf(Class<T> clazz) {
