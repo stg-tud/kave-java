@@ -55,7 +55,7 @@ public class PatternsIdentifier {
 		this.repos = repos;
 	}
 
-	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
+	public void trainingCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
@@ -63,7 +63,7 @@ public class PatternsIdentifier {
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode episode : entry.getValue()) {
-				Set<IMethodName> enclosingMethods = extractor.getMethodsFromCode(episode, stream, events);
+				Set<IMethodName> enclosingMethods = extractor.getMethodsFromCode(episode, stream, events, order);
 				int numberEnclosingMethods = enclosingMethods.size();
 				Logger.log("Episode is identified in %d methods, while the frequency is %d!", numberEnclosingMethods,
 						frequency);
@@ -86,7 +86,7 @@ public class PatternsIdentifier {
 		Logger.log("All patterns are identified with a sufficient number of times from the training source code!");
 	}
 
-	public void validationCode(int numbRepos, int frequency, double entropy) throws Exception {
+	public void validationCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
 		List<Event> streamOfEvents = repos.validationStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
 		List<List<Fact>> streamOfFacts = eventsToFacts(streamOfEvents, events);
@@ -96,7 +96,7 @@ public class PatternsIdentifier {
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode episode : entry.getValue()) {
-				Set<IMethodName> enclosingMethods = extractor.getMethodsFromCode(episode, streamOfFacts, events);
+				Set<IMethodName> enclosingMethods = extractor.getMethodsFromCode(episode, streamOfFacts, events, order);
 
 				if (enclosingMethods.size() == 0) {
 					Logger.log("Pattern%d does not occur in the reppositories used for validation!", patternID);

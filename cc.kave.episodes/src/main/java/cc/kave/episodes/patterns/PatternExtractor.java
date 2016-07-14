@@ -26,12 +26,14 @@ import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.episodes.model.Episode;
+import cc.recommenders.datastructures.Tuple;
 
 public class PatternExtractor {
 
-	public Set<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events) {
+	public Set<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
+			boolean orderRelations) throws Exception {
 		Set<IMethodName> enclosingMethods = Sets.newLinkedHashSet();
-		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream);
+		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
 
 		for (List<Fact> method : episodeOccurrences) {
 			IMethodName methodName = getEnclosingMethod(method, events);
@@ -42,7 +44,7 @@ public class PatternExtractor {
 		return enclosingMethods;
 	}
 
-	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream) {
+	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream, boolean ordering) {
 		List<List<Fact>> methodsOccurrences = new LinkedList<>();
 		Set<Fact> episodeFacts = episode.getEvents();
 
@@ -51,26 +53,40 @@ public class PatternExtractor {
 				methodsOccurrences.add(method);
 			}
 		}
+		if (ordering) {
+			return getMethodWithOrderings(episode, methodsOccurrences);
+		}
 		return methodsOccurrences;
 	}
-	
+
 	private List<List<Fact>> getMethodWithOrderings(Episode episode, List<List<Fact>> allMethods) {
 		List<List<Fact>> methodsWithOrdering = new LinkedList<>();
-		Set<Fact> relations = episode.getFacts();
+		Set<Fact> relations = episode.getRelations();
+		boolean validOrder = true;
+
 		for (List<Fact> method : allMethods) {
-			
+			for (Fact r : relations) {
+				Tuple<Fact, Fact> tuple = r.getRelationFacts();
+				if (method.indexOf(tuple.getFirst()) > method.indexOf(tuple.getSecond())) {
+					validOrder = false;
+					break;
+				}
+			}
+			if (validOrder) {
+				methodsWithOrdering.add(method);
+			}
 		}
 		return methodsWithOrdering;
 	}
 
-	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) {
+	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) throws Exception {
 		List<Event> methodEvents = toEvents(method, events);
 		for (Event e : methodEvents) {
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
 				return e.getMethod();
 			}
 		}
-		return null;
+		throw new Exception("Method does not have enclosing method!");
 	}
 
 	private List<Event> toEvents(List<Fact> method, List<Event> events) {

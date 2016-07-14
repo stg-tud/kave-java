@@ -16,6 +16,7 @@
 package cc.kave.episodes.patterns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -100,24 +101,41 @@ public class PatternExtractorTest {
 	}
 	
 	@Test
-	public void invocations() {
+	public void invocations() throws Exception {
 		Episode episode = new Episode();
 		episode.addFact(new Fact(4));
 		episode.addFact(new Fact(5));
 		episode.addFact(new Fact(6));
 		
-		Set<IMethodName> expected = Sets.newLinkedHashSet();
-		expected.add(m(1, 31));
-		expected.add(m(4, 33));
-		expected.add(m(5, 34));
+		Set<IMethodName> expectedNoOrder = Sets.newLinkedHashSet();
+		expectedNoOrder.add(m(1, 31));
+		expectedNoOrder.add(m(4, 33));
+		expectedNoOrder.add(m(5, 34));
 		
-		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events);
+		Set<IMethodName> actualsNoOrder = sut.getMethodsFromCode(episode, stream, events, false);
 		
-		assertEquals(expected, actuals);
+		assertEquals(expectedNoOrder, actualsNoOrder);
 	}
 	
 	@Test
-	public void firstDeclaration() {
+	public void invocationsWithOrderRelations() throws Exception {
+		Episode episode = new Episode();
+		episode.addFact(new Fact(4));
+		episode.addFact(new Fact(5));
+		episode.addFact(new Fact(6));
+		episode.addFact(new Fact("4>5"));
+		episode.addFact(new Fact("4>6"));
+		episode.addFact(new Fact("5>6"));
+		
+		Set<IMethodName> expectedWithOrder = Sets.newHashSet(m(1, 31));
+		
+		Set<IMethodName> actualsWithOrder = sut.getMethodsFromCode(episode, stream, events, true);
+		
+		assertEquals(expectedWithOrder, actualsWithOrder);
+	}
+	
+	@Test
+	public void firstDeclaration() throws Exception {
 		Episode episode = new Episode();
 		episode.addFact(new Fact(1));
 		episode.addFact(new Fact(4));
@@ -128,9 +146,22 @@ public class PatternExtractorTest {
 		expected.add(m(2, 32));
 		expected.add(m(5, 34));
 		
-		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events);
+		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events, false);
 		
 		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void noOccurrences() throws Exception {
+		Episode episode = new Episode();
+		episode.addFact(new Fact(4));
+		episode.addFact(new Fact(5));
+		episode.addFact(new Fact(6));
+		episode.addFact(new Fact(11));
+		
+		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		
+		assertTrue(actuals.isEmpty());;
 	}
 	
 	private IMethodName m(int typeNum, int methodNum) {
