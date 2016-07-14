@@ -29,7 +29,7 @@ import cc.kave.episodes.model.Episode;
 
 public class PatternExtractor {
 
-	public Set<IMethodName> getMethods(Episode episode, List<List<Fact>> stream, List<Event> events) {
+	public Set<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events) {
 		Set<IMethodName> enclosingMethods = Sets.newLinkedHashSet();
 		Set<Fact> episodeFacts = episode.getEvents();
 
@@ -43,7 +43,7 @@ public class PatternExtractor {
 		}
 		return enclosingMethods;
 	}
-
+	
 	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) {
 		List<Event> methodEvents = toEvents(method, events);
 		for (Event e : methodEvents) { 

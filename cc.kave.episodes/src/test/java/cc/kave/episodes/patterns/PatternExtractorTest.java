@@ -111,7 +111,7 @@ public class PatternExtractorTest {
 		expected.add(m(4, 33));
 		expected.add(m(5, 34));
 		
-		Set<IMethodName> actuals = sut.getMethods(episode, stream, events);
+		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events);
 		
 		assertEquals(expected, actuals);
 	}
@@ -128,7 +128,7 @@ public class PatternExtractorTest {
 		expected.add(m(2, 32));
 		expected.add(m(5, 34));
 		
-		Set<IMethodName> actuals = sut.getMethods(episode, stream, events);
+		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events);
 		
 		assertEquals(expected, actuals);
 	}
