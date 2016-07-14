@@ -31,22 +31,41 @@ public class PatternExtractor {
 
 	public Set<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events) {
 		Set<IMethodName> enclosingMethods = Sets.newLinkedHashSet();
-		Set<Fact> episodeFacts = episode.getEvents();
+		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream);
 
-		for (List<Fact> method : stream) {
-			if (method.containsAll(episodeFacts)) {
-				IMethodName methodName = getEnclosingMethod(method, events);
-				if (methodName != null) {
-					enclosingMethods.add(methodName);
-				}
+		for (List<Fact> method : episodeOccurrences) {
+			IMethodName methodName = getEnclosingMethod(method, events);
+			if (methodName != null) {
+				enclosingMethods.add(methodName);
 			}
 		}
 		return enclosingMethods;
 	}
+
+	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream) {
+		List<List<Fact>> methodsOccurrences = new LinkedList<>();
+		Set<Fact> episodeFacts = episode.getEvents();
+
+		for (List<Fact> method : stream) {
+			if (method.containsAll(episodeFacts)) {
+				methodsOccurrences.add(method);
+			}
+		}
+		return methodsOccurrences;
+	}
 	
+	private List<List<Fact>> getMethodWithOrderings(Episode episode, List<List<Fact>> allMethods) {
+		List<List<Fact>> methodsWithOrdering = new LinkedList<>();
+		Set<Fact> relations = episode.getFacts();
+		for (List<Fact> method : allMethods) {
+			
+		}
+		return methodsWithOrdering;
+	}
+
 	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) {
 		List<Event> methodEvents = toEvents(method, events);
-		for (Event e : methodEvents) { 
+		for (Event e : methodEvents) {
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
 				return e.getMethod();
 			}

@@ -57,6 +57,17 @@ public class Episode {
 		}
 		return events;
 	}
+	
+	public Set<Fact> getRelations() {
+		Set<Fact> relations = Sets.newHashSet();
+		
+		for (Fact fact : this.facts) {
+			if (fact.isRelation()) {
+				relations.add(fact);
+			}
+		}
+		return relations;
+	}
 
 	public void setFrequency(int freq) {
 		assertTrue(freq >= 0, "Frequency cannot be a negative value!");

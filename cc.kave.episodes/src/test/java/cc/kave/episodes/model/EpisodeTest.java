@@ -74,6 +74,7 @@ public class EpisodeTest {
 		assertEquals(0, sut.getNumFacts());
 		assertEquals(0, sut.getNumEvents());
 		assertEquals(Sets.newHashSet(), sut.getEvents());
+		assertEquals(Sets.newHashSet(), sut.getRelations());
 		assertEquals(Sets.newHashSet(), sut.getFacts());
 	}
 
@@ -89,6 +90,7 @@ public class EpisodeTest {
 		assertTrue(sut.getBidirectMeasure() == 0.5);
 		assertEquals(facts, sut.getFacts());
 		assertEquals(facts, sut.getEvents());
+		assertEquals(Sets.newHashSet(), sut.getRelations());
 		assertEquals(1, sut.getNumEvents());
 		assertEquals(1, sut.getNumFacts());
 	}
@@ -99,9 +101,11 @@ public class EpisodeTest {
 		
 		Set<Fact> facts = Sets.newHashSet(new Fact("f"), new Fact("g"), new Fact("f>g"));
 		Set<Fact> events = Sets.newHashSet(new Fact("f"), new Fact("g"));
+		Set<Fact> relations = Sets.newHashSet(new Fact("f>g"));
 		
 		assertEquals(facts, sut.getFacts());
 		assertEquals(events, sut.getEvents());
+		assertEquals(relations, sut.getRelations());
 		assertEquals(sut.getNumEvents(), 2);
 		assertEquals(sut.getNumFacts(), 3);
 	}
@@ -156,6 +160,7 @@ public class EpisodeTest {
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
 		assertEquals(a.getEvents(), b.getEvents());
+		assertEquals(a.getRelations(), b.getRelations());
 	}
 	
 	@Test
@@ -228,6 +233,7 @@ public class EpisodeTest {
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());
 		assertNotEquals(a.getEvents(), b.getEvents());
+		assertNotEquals(a.getRelations(), b.getRelations());
 	}
 
 	@Test
@@ -252,6 +258,7 @@ public class EpisodeTest {
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());
 		assertEquals(a.getEvents(), b.getEvents());
+		assertNotEquals(a.getRelations(), b.getRelations());
 	}
 
 	@Test

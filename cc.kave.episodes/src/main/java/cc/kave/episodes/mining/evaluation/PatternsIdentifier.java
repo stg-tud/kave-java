@@ -59,6 +59,7 @@ public class PatternsIdentifier {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		int patternID = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode episode : entry.getValue()) {
@@ -76,8 +77,10 @@ public class PatternsIdentifier {
 							break;
 						}
 					}
-					throw new Exception("The problematic episode is " + episode.getFacts().toString());
+					throw new Exception(
+							"The problematic episode is pattern" + patternID + ": " + episode.getFacts().toString());
 				}
+				patternID++;
 			}
 		}
 		Logger.log("All patterns are identified with a sufficient number of times from the training source code!");
@@ -89,17 +92,20 @@ public class PatternsIdentifier {
 		List<List<Fact>> streamOfFacts = eventsToFacts(streamOfEvents, events);
 
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		int patternID = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode episode : entry.getValue()) {
 				Set<IMethodName> enclosingMethods = extractor.getMethodsFromCode(episode, streamOfFacts, events);
-				
+
 				if (enclosingMethods.size() == 0) {
-					throw new Exception("Episode " + episode.toString() + " does not occur in any other repository!");
+					Logger.log("Pattern%d does not occur in the reppositories used for validation!", patternID);
+					throw new Exception("The pattern is: " + episode.toString());
 				}
+				patternID++;
 			}
 		}
-		Logger.log("All patterns are identified to be used in other source code repositories!");
+		Logger.log("All patterns are identified to be used in the repositories used for validation!");
 	}
 
 	private List<List<Fact>> eventsToFacts(List<Event> stream, List<Event> events) {

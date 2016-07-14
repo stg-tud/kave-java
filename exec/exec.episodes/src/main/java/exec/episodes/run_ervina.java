@@ -49,15 +49,15 @@ public class run_ervina {
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
 //		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
+		
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
+		
 		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).identifyInCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		
-//		load(EpisodesPostprocessor.class).postprocess(NUMBREPOS, FREQTHRESH, 0.5);
-		
-//		load(EpisodeParser.class).parse(NUMBREPOS);
+//		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+//		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
+		
 //		load(FrameworksData.class).getFrameworksDistribution();
 //		load(StreamFrequencies.class).frequencies();
 //		load(Preprocessing.class).generate();
