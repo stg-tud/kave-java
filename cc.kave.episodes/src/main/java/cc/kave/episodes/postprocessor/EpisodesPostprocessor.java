@@ -69,13 +69,6 @@ public class EpisodesPostprocessor {
 					}
 				}
 			}
-//			Set<Fact> someFacts = Sets.newHashSet();
-//			if (entry.getKey() == 3) {
-//				someFacts.add(new Fact("492"));
-//				someFacts.add(new Fact("493"));
-//				someFacts.add(new Fact("494"));
-//				Logger.log("Selected episodes is %s: ", filtered.get(someFacts));
-//			}
 			Set<Episode> repEpisodes = getfilteredEp(filtered);
 			patterns.put(entry.getKey(), repEpisodes);
 		}
