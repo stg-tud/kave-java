@@ -32,7 +32,7 @@ import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 
 public class EventStreamGenerator {
-	
+
 	private List<Event> events = Lists.newLinkedList();
 
 	public EventStreamGenerator() {
@@ -48,7 +48,7 @@ public class EventStreamGenerator {
 
 	private class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
-//		private IMethodName currentCtx;
+		// private IMethodName currentCtx;
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
@@ -56,7 +56,7 @@ public class EventStreamGenerator {
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
-//			currentCtx = MethodName.UNKNOWN_NAME;
+			// currentCtx = MethodName.UNKNOWN_NAME;
 			firstCtx = MethodName.UNKNOWN_NAME;
 			superCtx = MethodName.UNKNOWN_NAME;
 			elementCtx = MethodName.UNKNOWN_NAME;
@@ -65,16 +65,16 @@ public class EventStreamGenerator {
 				if (h.getElement().equals(name)) {
 					if (h.getFirst() != null) {
 						firstCtx = h.getFirst();
-					} 
+					}
 					if (h.getSuper() != null) {
 						superCtx = h.getSuper();
 					}
 					elementCtx = h.getElement();
-//					if (h.getFirst() != null) {
-//						currentCtx = h.getFirst();
-//					} else if (h.getSuper() != null) {
-//						currentCtx = h.getSuper();
-//					}
+					// if (h.getFirst() != null) {
+					// currentCtx = h.getFirst();
+					// } else if (h.getSuper() != null) {
+					// currentCtx = h.getSuper();
+					// }
 				}
 			}
 			return super.visit(decl, context);
@@ -112,14 +112,14 @@ public class EventStreamGenerator {
 		}
 
 		private void addEnclosingMethodIfAvailable() {
-//			Asserts.assertNotNull(currentCtx);
-//			events.add(Events.newContext(currentCtx));
-//			currentCtx = null;
+			// Asserts.assertNotNull(currentCtx);
+			// events.add(Events.newContext(currentCtx));
+			// currentCtx = null;
 
-//			if (currentCtx != null) {
-//				events.add(Events.newContext(currentCtx));
-//				currentCtx = null;
-//			}
+			// if (currentCtx != null) {
+			// events.add(Events.newContext(currentCtx));
+			// currentCtx = null;
+			// }
 			if (firstCtx != null) {
 				events.add(Events.newFirstContext(firstCtx));
 				firstCtx = null;
@@ -131,8 +131,10 @@ public class EventStreamGenerator {
 				}
 				superCtx = null;
 			}
-			events.add(Events.newContext(elementCtx));
-			elementCtx = null;
+			if (elementCtx != null) {
+				events.add(Events.newContext(elementCtx));
+				elementCtx = null;
+			}
 		}
 	}
 }

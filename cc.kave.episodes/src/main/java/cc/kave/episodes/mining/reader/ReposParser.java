@@ -65,6 +65,7 @@ public class ReposParser {
 		this.eventsFolder = folder;
 		this.reader = reader;
 	}
+	
 	public List<Event> learningStream(int numberOfRepos) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 		StringBuilder repositories = new StringBuilder();
@@ -73,19 +74,14 @@ public class ReposParser {
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
-			if (repoName.equalsIgnoreCase("")) {
+			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
+				repoID++;
+				if (repoID > numberOfRepos) {
+					break;
+				}
 				repoName = getRepoName(zip);
 				repositories.append(repoName + "\n");
-				repoID++;
-			} else if (!zip.startsWith(repoName)) {
-				repoName = getRepoName(zip);
-				repositories.append(repoName + "\n");
-				repoID++;
-			}
-
-			if (repoID > numberOfRepos) {
-				break;
-			}
+			} 
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 
 			while (ra.hasNext()) {

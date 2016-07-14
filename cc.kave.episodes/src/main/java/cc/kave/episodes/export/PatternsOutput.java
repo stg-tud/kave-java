@@ -76,12 +76,14 @@ public class PatternsOutput {
 		
 		for (List<Fact> method : stream) {
 			int counter = 0;
+			int methodID = 0;
 			int firstCounter = 0;
 			int superCounter = 0;
 			int enclCounter = 0;
 			int invCounter = 0;
 			Set<IMethodName> enclosingMethods = Sets.newLinkedHashSet();
 			for (Fact fact : method) {
+				methodID++;
 				Event event = events.get(fact.getFactID());
 				if (event.getKind() == EventKind.FIRST_DECLARATION) {
 					firstCounter++;
@@ -97,15 +99,25 @@ public class PatternsOutput {
 					invCounter++;
 				}
 			}
+			if (firstCounter > 1) {
+				throw new Exception("There are methods with more than one first method declaration!");
+			}
+			if (superCounter > 1) {
+				throw new Exception("There are methods with more than one super method declaration!");
+			}
+			if (enclCounter > 1) {
+				throw new Exception("There are methods with more than one enclosing methods!");
+			}
+			Logger.log("Processed method %d", methodID);
 //			Logger.log("Number of enclosing methods is %d", enclosingMethods.size());
 //			Logger.log("Number of method invocations is %d", invCounter);
-			if (enclosingMethods.size() > 2) {
-				counter++;
-				for (IMethodName name : enclosingMethods) {
-					Logger.log("Method name: %s", name);
-				}
-				throw new Exception("Number of enclosing method is higher than 1!");
-			}
+//			if (enclosingMethods.size() > 2) {
+//				counter++;
+//				for (IMethodName name : enclosingMethods) {
+//					Logger.log("Method name: %s", name);
+//				}
+//				throw new Exception("Number of enclosing method is higher than 1!");
+//			}
 			
 		}
 //

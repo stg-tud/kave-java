@@ -134,7 +134,30 @@ public class ReposParserTest {
 		Context context3 = new Context();
 		context3.setSST(sst3);
 		data.put(REPO3, context3);
+		
+		SST sst2 = new SST();
+		MethodDeclaration md4 = new MethodDeclaration();
+		md4.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
+		md4.getBody().add(new DoLoop());
 
+		InvocationExpression ie3 = new InvocationExpression();
+		IMethodName methodName3 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		ie3.setMethodName(methodName3);
+
+		InvocationExpression ie4 = new InvocationExpression();
+		methodName3 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		ie4.setMethodName(methodName3);
+
+		md4.getBody().add(wrap(ie3));
+		md4.getBody().add(wrap(ie4));
+		md4.getBody().add(new ExpressionStatement());
+
+		sst2.getMethods().add(md4);
+		Context context2 = new Context();
+		context2.setSST(sst2);
+
+		data.put(REPO2, context2);
+		
 		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
 			@Override
 			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
@@ -214,29 +237,6 @@ public class ReposParserTest {
 
 	@Test
 	public void readThreeArchives() throws IOException {
-		SST sst = new SST();
-		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
-		md3.getBody().add(new DoLoop());
-
-		InvocationExpression ie3 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
-		ie3.setMethodName(methodName);
-
-		InvocationExpression ie4 = new InvocationExpression();
-		methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
-		ie4.setMethodName(methodName);
-
-		md3.getBody().add(wrap(ie3));
-		md3.getBody().add(wrap(ie4));
-		md3.getBody().add(new ExpressionStatement());
-
-		sst.getMethods().add(md3);
-		Context context = new Context();
-		context.setSST(sst);
-
-		data.put(REPO2, context);
-
 		List<Event> actualEvents = sut.learningStream(NUMBEROFREPOS);
 		List<Event> exoectedEvents = getExpectedEvents();
 		
@@ -272,6 +272,7 @@ public class ReposParserTest {
 		IMethodName methodDecl1 = MethodName.newMethodName(md1);
 		Event e1 = Events.newFirstContext(methodDecl1);
 		events.add(e1);
+		events.add(Events.newContext(methodDecl1));
 		
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
 		IMethodName methodInv1 = MethodName.newMethodName(inv1);
@@ -284,10 +285,8 @@ public class ReposParserTest {
 		events.add(e3);
 		events.add(e3);
 		
-		String md2 = "[?] [?].???()";
-		IMethodName methodDecl2 = MethodName.newMethodName(md2);
-		Event e4 = Events.newFirstContext(methodDecl2);
-		events.add(e4);
+		events.add(e1);
+		events.add(Events.newContext(methodDecl1));
 		
 		String inv3 = "[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
 		IMethodName methodInv3 = MethodName.newMethodName(inv3);
