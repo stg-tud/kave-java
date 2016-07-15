@@ -30,18 +30,20 @@ import cc.recommenders.datastructures.Tuple;
 
 public class PatternExtractor {
 
-	public Set<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
+	public Tuple<Set<IMethodName>, Integer> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
 			boolean orderRelations) throws Exception {
-		Set<IMethodName> enclosingMethods = Sets.newLinkedHashSet();
+		Set<IMethodName> enclosingMethods = Sets.newHashSet();
+		int counter = 0;
 		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
 
 		for (List<Fact> method : episodeOccurrences) {
 			IMethodName methodName = getEnclosingMethod(method, events);
 			if (methodName != null) {
 				enclosingMethods.add(methodName);
+				counter++;
 			}
 		}
-		return enclosingMethods;
+		return Tuple.newTuple(enclosingMethods, counter);
 	}
 
 	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream, boolean ordering) {
@@ -53,7 +55,7 @@ public class PatternExtractor {
 				methodsOccurrences.add(method);
 			}
 		}
-		if (ordering) {
+		if (ordering) { 
 			return getMethodWithOrderings(episode, methodsOccurrences);
 		}
 		return methodsOccurrences;

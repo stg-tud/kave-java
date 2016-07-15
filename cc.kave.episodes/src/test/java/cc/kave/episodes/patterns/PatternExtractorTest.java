@@ -35,7 +35,7 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.patterns.PatternExtractor;
+import cc.recommenders.datastructures.Tuple;
 
 public class PatternExtractorTest {
 
@@ -70,7 +70,7 @@ public class PatternExtractorTest {
 		stream.add(method);
 		
 		method = new LinkedList<Fact>();
-		method.add(new Fact(8));	//EM3
+		method.add(new Fact(3));	
 		method.add(new Fact(5));	
 		method.add(new Fact(4));
 		method.add(new Fact(6));
@@ -78,9 +78,9 @@ public class PatternExtractorTest {
 		
 		method = new LinkedList<Fact>();
 		method.add(new Fact(1));
-		method.add(new Fact(9));	//EM4
+		method.add(new Fact(8));	//EM4
 		method.add(new Fact(5));
-		method.add(new Fact(10));	//I4
+		method.add(new Fact(9));	//I4
 		method.add(new Fact(4));
 		method.add(new Fact(6));
 		stream.add(method);
@@ -93,7 +93,6 @@ public class PatternExtractorTest {
 		events.add(Events.newInvocation(m(1, 2)));
 		events.add(Events.newInvocation(m(1, 3)));
 		events.add(Events.newContext(m(2, 32)));
-		events.add(Events.newContext(m(4, 33)));
 		events.add(Events.newContext(m(5, 34)));
 		events.add(Events.newInvocation(m(5, 4)));
 		
@@ -107,14 +106,16 @@ public class PatternExtractorTest {
 		episode.addFact(new Fact(5));
 		episode.addFact(new Fact(6));
 		
-		Set<IMethodName> expectedNoOrder = Sets.newLinkedHashSet();
-		expectedNoOrder.add(m(1, 31));
-		expectedNoOrder.add(m(4, 33));
-		expectedNoOrder.add(m(5, 34));
+		Set<IMethodName> methodNames = Sets.newLinkedHashSet();
+		methodNames.add(m(1, 31));
+		methodNames.add(m(5, 34));
 		
-		Set<IMethodName> actualsNoOrder = sut.getMethodsFromCode(episode, stream, events, false);
+		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodNames, 3);
 		
-		assertEquals(expectedNoOrder, actualsNoOrder);
+		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		
+		assertEquals(expected.getFirst(), actuals.getFirst());
+		assertEquals(expected.getSecond(), actuals.getSecond());
 	}
 	
 	@Test
@@ -127,11 +128,13 @@ public class PatternExtractorTest {
 		episode.addFact(new Fact("4>6"));
 		episode.addFact(new Fact("5>6"));
 		
-		Set<IMethodName> expectedWithOrder = Sets.newHashSet(m(1, 31));
+		Set<IMethodName> methodsName = Sets.newHashSet(m(1, 31));
+		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodsName, 1);
 		
-		Set<IMethodName> actualsWithOrder = sut.getMethodsFromCode(episode, stream, events, true);
+		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, true);
 		
-		assertEquals(expectedWithOrder, actualsWithOrder);
+		assertEquals(expected.getFirst(), actuals.getFirst());
+		assertEquals(expected.getSecond(), actuals.getSecond());
 	}
 	
 	@Test
@@ -141,14 +144,17 @@ public class PatternExtractorTest {
 		episode.addFact(new Fact(4));
 		episode.addFact(new Fact(6));
 		
-		Set<IMethodName> expected = Sets.newLinkedHashSet();
-		expected.add(m(1, 31));
-		expected.add(m(2, 32));
-		expected.add(m(5, 34));
+		Set<IMethodName> methodNames = Sets.newLinkedHashSet();
+		methodNames.add(m(1, 31));
+		methodNames.add(m(2, 32));
+		methodNames.add(m(5, 34));
 		
-		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodNames, 3);
 		
-		assertEquals(expected, actuals);
+		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		
+		assertEquals(expected.getFirst(), actuals.getFirst());
+		assertEquals(expected.getSecond(), actuals.getSecond());
 	}
 	
 	@Test
@@ -159,9 +165,10 @@ public class PatternExtractorTest {
 		episode.addFact(new Fact(6));
 		episode.addFact(new Fact(11));
 		
-		Set<IMethodName> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
 		
-		assertTrue(actuals.isEmpty());;
+		assertTrue(actuals.getFirst().isEmpty());
+		assertTrue(actuals.getSecond() == 0);
 	}
 	
 	private IMethodName m(int typeNum, int methodNum) {
