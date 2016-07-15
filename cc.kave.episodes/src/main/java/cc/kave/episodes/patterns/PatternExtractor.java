@@ -17,6 +17,7 @@ package cc.kave.episodes.patterns;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -30,8 +31,8 @@ import cc.recommenders.datastructures.Tuple;
 
 public class PatternExtractor {
 
-	public Tuple<Set<IMethodName>, Integer> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
-			boolean orderRelations) throws Exception {
+	public Tuple<Set<IMethodName>, Integer> getMethodsFromCode(Episode episode, List<List<Fact>> stream,
+			List<Event> events, boolean orderRelations) throws Exception {
 		Set<IMethodName> enclosingMethods = Sets.newHashSet();
 		int counter = 0;
 		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
@@ -46,6 +47,42 @@ public class PatternExtractor {
 		return Tuple.newTuple(enclosingMethods, counter);
 	}
 
+//	public Map<Episode, List<IMethodName>> getMethodsFromCodeTest(Map<Integer, Set<Episode>> processedPatterns,
+//			List<List<Fact>> stream, List<Event> events, boolean orderRelations) throws Exception {
+//		Set<Episode> patterns = getPatternsAsSetTest(processedPatterns);
+//		for (List<Fact> method : stream) {
+//			for (Episode episode : patterns) {
+//				Set<Fact> episodeEvents = episode.getEvents();
+//				
+//			}
+//		}
+//		
+//		
+//		Set<IMethodName> enclosingMethods = Sets.newHashSet();
+//		int counter = 0;
+//		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
+//
+//		for (List<Fact> method : episodeOccurrences) {
+//			IMethodName methodName = getEnclosingMethod(method, events);
+//			if (methodName != null) {
+//				enclosingMethods.add(methodName);
+//				counter++;
+//			}
+//		}
+//		return Tuple.newTuple(enclosingMethods, counter);
+//	}
+
+	private Set<Episode> getPatternsAsSetTest(Map<Integer, Set<Episode>> processedPatterns) {
+		Set<Episode> patterns = Sets.newHashSet();
+		for (Map.Entry<Integer, Set<Episode>> entry : processedPatterns.entrySet()) {
+			if (entry.getKey() == 1) {
+				continue;
+			}
+			patterns.addAll(entry.getValue());
+		}
+		return patterns;
+	}
+
 	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream, boolean ordering) {
 		List<List<Fact>> methodsOccurrences = new LinkedList<>();
 		Set<Fact> episodeFacts = episode.getEvents();
@@ -55,7 +92,7 @@ public class PatternExtractor {
 				methodsOccurrences.add(method);
 			}
 		}
-		if (ordering) { 
+		if (ordering) {
 			return getMethodWithOrderings(episode, methodsOccurrences);
 		}
 		return methodsOccurrences;
