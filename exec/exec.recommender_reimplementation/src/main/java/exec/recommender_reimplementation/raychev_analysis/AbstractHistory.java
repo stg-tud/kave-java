@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import cc.kave.commons.utils.ToStringUtils;
 
 public class AbstractHistory {
@@ -73,16 +74,28 @@ public class AbstractHistory {
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		if(!(obj instanceof AbstractHistory)) return false;
+		AbstractHistory other = (AbstractHistory) obj;
+		return EqualsBuilder.reflectionEquals(abstractHistory, other.abstractHistory) &&
+				EqualsBuilder.reflectionEquals(historySet, other.historySet);
+//		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 	
 	@Override
 	public String toString() {
 		return ToStringUtils.toString(this);
 	}
+	
+	public void addInteraction(Interaction interaction) {
+		abstractHistory.add(interaction);
+
+		for (ConcreteHistory concreteHistory : historySet) {
+			concreteHistory.add(interaction);
+		}
+	}
 
 	public void mergeAbstractHistory(AbstractHistory other) {
-		if(abstractHistory.equals(other)) return;
+		if(abstractHistory.equals(other.abstractHistory)) return;
 		
 		mergeAbstractHistory(other.getAbstractHistory());
 		mergeHistorySet(other.getHistorySet());
@@ -93,6 +106,7 @@ public class AbstractHistory {
 	}
 
 	private void mergeAbstractHistory(List<Interaction> otherAbstractHistory) {
+		if(abstractHistory.size() > otherAbstractHistory.size()) return;
 		// findPrefix
 		int i = 0;
 		Interaction interaction = abstractHistory.get(i);

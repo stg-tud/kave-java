@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
@@ -65,7 +66,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	private EnclosingNodeHelper enclosingNodes;
 
 	private TypeCollector typeCollector;
-	
+
 	private Map<Set<AbstractLocation>, Set<ConcreteHistory>> returnConcreteHistories;
 
 	public RaychevAnalysisVisitor(PointsToContext pointsToContext) {
@@ -78,18 +79,18 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	}
 
 	@Override
-	public Object visit(IMethodDeclaration stmt,
-			HistoryMap historyMap) {
+	public Object visit(IMethodDeclaration stmt, HistoryMap historyMap) {
 		super.visit(stmt, historyMap);
-		
-		// add concreteHistories which stopped on return statements to historyMap
+
+		// add concreteHistories which stopped on return statements to
+		// historyMap
 		for (Entry<Set<AbstractLocation>, Set<ConcreteHistory>> entry : returnConcreteHistories.entrySet()) {
-			if(historyMap.containsKey(entry.getKey())) {
+			if (historyMap.containsKey(entry.getKey())) {
 				historyMap.get(entry.getKey()).getHistorySet().addAll(entry.getValue());
 			}
 		}
 		returnConcreteHistories.clear();
-		
+
 		return null;
 	}
 
@@ -103,27 +104,31 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 			}
 			addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
 		}
-		
+
 		// Handle Property Get
 		IPropertyReference propertyReference = expressionContainsPropertyReference(assignment.getExpression());
-		if(propertyReference != null) {
-			Set<AbstractLocation> propertyAbstractLocations = findAbstractLocationsForReference(propertyReference,assignment);
-			AbstractHistory propertyAbstractHistory = getOrCreateAbstractHistory(propertyAbstractLocations, historyMap);
-			Interaction propertyInteraction = new Interaction(createPropertyMethodName(propertyReference), 0, InteractionType.PROPERTY_GET);
-			addInteractionToAbstractHistory(propertyAbstractHistory, propertyInteraction);
+		if (propertyReference != null) {
+			Set<AbstractLocation> propertyAbstractLocations = findAbstractLocationsForReference(propertyReference,
+					assignment);
+			AbstractHistory propertyGetAbstractHistory = historyMap
+					.getOrCreateAbstractHistory(propertyAbstractLocations);
+			Interaction propertyInteraction = new Interaction(createPropertyMethodName(propertyReference), 0,
+					InteractionType.PROPERTY_GET);
+			propertyGetAbstractHistory.addInteraction(propertyInteraction);
 		}
-		
-		// Handle Property Set 
+
+		// Handle Property Set
 		IAssignableReference reference = assignment.getReference();
-		if(reference instanceof IPropertyReference) {
+		if (reference instanceof IPropertyReference) {
 			Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
-			AbstractHistory abstractHistory = getOrCreateAbstractHistory(abstractLocations, historyMap);
-			
-			Interaction interaction = new Interaction(createPropertyMethodName((IPropertyReference) reference), 0, InteractionType.PROPERTY_SET);
-			
-			addInteractionToAbstractHistory(abstractHistory, interaction);
+			AbstractHistory propertySetAbstractHistory = historyMap.getOrCreateAbstractHistory(abstractLocations);
+
+			Interaction interaction = new Interaction(createPropertyMethodName((IPropertyReference) reference), 0,
+					InteractionType.PROPERTY_SET);
+
+			propertySetAbstractHistory.addInteraction(interaction);
 		}
-		
+
 		return super.visit(assignment, historyMap);
 	}
 
@@ -131,18 +136,11 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	public Object visit(IIfElseBlock block, HistoryMap historyMap) {
 		block.getCondition().accept(this, historyMap);
 
-		if(block.getElse().isEmpty()) {
-			HistoryMap cloneThenBranch = historyMap.clone();
-			visitStatements(block.getThen(), cloneThenBranch);
-			historyMap.mergeInto(cloneThenBranch);
-		}
-		else {
-			HistoryMap cloneElseBranch = historyMap.clone();
-			visitStatements(block.getThen(), historyMap);
-			visitStatements(block.getElse(), cloneElseBranch);
-			historyMap.mergeInto(cloneElseBranch);
-		}
-		
+		HistoryMap cloneElseBranch = historyMap.clone();
+		visitStatements(block.getThen(), historyMap);
+		visitStatements(block.getElse(), cloneElseBranch);
+		historyMap.mergeInto(cloneElseBranch);
+
 		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
@@ -150,7 +148,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	@Override
 	public Object visit(ITryBlock block, HistoryMap historyMap) {
 		visitStatements(block.getBody(), historyMap);
-		
+
 		List<HistoryMap> tempListAbstractHistories = new ArrayList<>();
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
@@ -158,7 +156,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 			visitStatements(catchBlock.getBody(), cloneCatchBlock);
 			tempListAbstractHistories.add(cloneCatchBlock);
 		}
-		
+
 		for (HistoryMap map : tempListAbstractHistories) {
 			historyMap.mergeInto(map);
 		}
@@ -176,13 +174,13 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		loopedNodes.addAll(block.getBody());
 		loopedNodes.add(block.getCondition());
 
-		// do loop always runs at least one time 
+		// do loop always runs at least one time
 		loopedNodes.forEach(node -> node.accept(this, historyMap));
-		
+
 		// adds one loop iteration for concrete histories
 		HistoryMap cloneLoopTwoIterations = historyMap.clone();
 		loopedNodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
-				
+
 		historyMap.mergeInto(cloneLoopTwoIterations);
 
 		historyMap.checkForAbstractHistoryThreshold();
@@ -197,7 +195,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 
 		List<ISSTNode> loopedNodes = Lists.newArrayList(block.getBody());
 		loopNodesTwoIterations(loopedNodes, historyMap);
-		
+
 		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
@@ -205,24 +203,17 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	@Override
 	public Object visit(IForLoop block, HistoryMap historyMap) {
 		visitStatements(block.getInit(), historyMap);
-		
+		block.getCondition().accept(this, historyMap);
+
 		List<ISSTNode> loopedNodes = new ArrayList<>();
 
-		HistoryMap cloneFailedCondition = historyMap.clone();
-		loopedNodes.add(block.getCondition());	
-		loopNodesOneIteration(loopedNodes, cloneFailedCondition);
-
-		HistoryMap cloneLoopTwoIterations = cloneFailedCondition.clone();
 		loopedNodes.addAll(block.getBody());
 		loopedNodes.addAll(block.getStep());
-		loopedNodes.add(block.getCondition());	
-		loopNodesTwoIterations(loopedNodes, cloneLoopTwoIterations);
-	
-		historyMap.mergeInto(cloneFailedCondition);
-		historyMap.mergeInto(cloneLoopTwoIterations);
-		
+		loopedNodes.add(block.getCondition());
+		loopNodesTwoIterations(loopedNodes, historyMap);
+
 		historyMap.checkForAbstractHistoryThreshold();
-		
+
 		return null;
 	}
 
@@ -250,24 +241,16 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 
 		return super.visit(invocation, historyMap);
 	}
-	
+
 	@Override
 	public Object visit(IReturnStatement stmt, HistoryMap historyMap) {
 		stmt.getExpression().accept(this, historyMap);
-		
+
 		for (Entry<Set<AbstractLocation>, AbstractHistory> entry : historyMap.entrySet()) {
-			returnConcreteHistories.put(entry.getKey(), entry.getValue().getHistorySet());
+			returnConcreteHistories.put(entry.getKey(), Sets.newHashSet(entry.getValue().getHistorySet()));
 			entry.getValue().getHistorySet().clear();
 		}
 		return null;
-	}
-
-	private void addInteractionToAbstractHistory(AbstractHistory abstractHistory, Interaction interaction) {
-		abstractHistory.getAbstractHistory().add(interaction);
-
-		for (ConcreteHistory concreteHistory : abstractHistory.getHistorySet()) {
-			concreteHistory.add(interaction);
-		}
 	}
 
 	private void addInteractionForParameter(ISimpleExpression expression, IInvocationExpression invocation,
@@ -276,37 +259,36 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		if (abstractLocations != null) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), parameterPosition,
 					InteractionType.METHOD_CALL);
-			addInteractionToAbstractHistory(getOrCreateAbstractHistory(abstractLocations, historyMap), interaction);
+			historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
 		}
 	}
 
-	private void addInteractionForReceiver(IInvocationExpression invocation,
-			HistoryMap historyMap) {
+	private void addInteractionForReceiver(IInvocationExpression invocation, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationForInvocation(invocation);
 		if (!abstractLocations.isEmpty()) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), 0, InteractionType.METHOD_CALL);
-			addInteractionToAbstractHistory(getOrCreateAbstractHistory(abstractLocations, historyMap), interaction);
+			historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
 		}
 	}
 
-	private void addInteractionForReturn(IAssignment assignment, HistoryMap historyMap,
-			IMethodName methodName) {
+	private void addInteractionForReturn(IAssignment assignment, HistoryMap historyMap, IMethodName methodName) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
-		AbstractHistory abstractHistory = getOrCreateAbstractHistory(abstractLocations, historyMap);
-		
+		AbstractHistory abstractHistory = historyMap.getOrCreateAbstractHistory(abstractLocations);
+
 		Interaction interaction = new Interaction(methodName, Interaction.RETURN, InteractionType.METHOD_CALL);
-		addInteractionToAbstractHistory(abstractHistory, interaction);
+		abstractHistory.addInteraction(interaction);
 	}
 
 	private IMethodName createPropertyMethodName(IPropertyReference reference) {
 		IPropertyName propertyName = reference.getPropertyName();
-		return MethodName.newMethodName(String.format("[%1$s] [%2$s].%3$s()", propertyName.getValueType(), propertyName.getDeclaringType(), propertyName.getName()));
+		return MethodName.newMethodName(String.format("[%1$s] [%2$s].%3$s()", propertyName.getValueType(),
+				propertyName.getDeclaringType(), propertyName.getName()));
 	}
 
 	private IPropertyReference expressionContainsPropertyReference(IAssignableExpression expression) {
-		if(expression instanceof IReferenceExpression) {
+		if (expression instanceof IReferenceExpression) {
 			IReferenceExpression refExpr = (IReferenceExpression) expression;
-			if(refExpr.getReference() instanceof IPropertyReference) {
+			if (refExpr.getReference() instanceof IPropertyReference) {
 				return (IPropertyReference) refExpr.getReference();
 			}
 		}
@@ -319,41 +301,23 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		historyMap.put(abstractLocations, abstractHistory);
 		abstractHistory.getHistorySet().add(new ConcreteHistory());
 	}
-	
-	private void loopNodesOneIteration(List<ISSTNode> nodes, HistoryMap historyMap) {
-		HistoryMap cloneLoopOneIteration = historyMap.clone();
-		nodes.forEach(node -> node.accept(this, cloneLoopOneIteration));
-					
-		historyMap.mergeInto(cloneLoopOneIteration);
-	}
-	
+
 	private void loopNodesTwoIterations(List<ISSTNode> nodes, HistoryMap historyMap) {
 
 		HistoryMap cloneLoopOneIteration = historyMap.clone();
 		nodes.forEach(node -> node.accept(this, cloneLoopOneIteration));
-		
+
 		HistoryMap cloneLoopTwoIterations = cloneLoopOneIteration.clone();
 		nodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
-				
+
 		historyMap.mergeInto(cloneLoopOneIteration);
 		historyMap.mergeInto(cloneLoopTwoIterations);
-	}
-
-	private AbstractHistory getOrCreateAbstractHistory(Set<AbstractLocation> abstractLocations,
-			HistoryMap historyMap) {
-		if (historyMap.containsKey(abstractLocations))
-			return historyMap.get(abstractLocations);
-
-		AbstractHistory abstractHistory = new AbstractHistory();
-		historyMap.put(abstractLocations, abstractHistory);
-		abstractHistory.getHistorySet().add(new ConcreteHistory());
-		return abstractHistory;
 	}
 
 	private Set<AbstractLocation> findAbstractLocationsForAssignment(IAssignment assignment) {
 		return findAbstractLocationsForReference(assignment.getReference(), assignment);
 	}
-	
+
 	private Set<AbstractLocation> findAbstractLocationsForReference(IReference reference, IStatement statement) {
 		PointsToQuery query = queryBuilder.newQuery(reference, statement);
 		Set<AbstractLocation> abstractLocations = pointsToAnalysis.query(query);
@@ -375,6 +339,5 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		}
 		return null;
 	}
-
 
 }

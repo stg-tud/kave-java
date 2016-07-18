@@ -70,6 +70,16 @@ public class HistoryMap extends HashMap<Set<AbstractLocation>, AbstractHistory>{
 		}
 	}
 	
+	public AbstractHistory getOrCreateAbstractHistory(Set<AbstractLocation> abstractLocations) {
+		if (containsKey(abstractLocations))
+			return get(abstractLocations);
+
+		AbstractHistory abstractHistory = new AbstractHistory();
+		put(abstractLocations, abstractHistory);
+		abstractHistory.getHistorySet().add(new ConcreteHistory());
+		return abstractHistory;
+	}
+	
 	@Override
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this);
@@ -82,6 +92,6 @@ public class HistoryMap extends HashMap<Set<AbstractLocation>, AbstractHistory>{
 	
 	@Override
 	public String toString() {
-		return ToStringUtils.toString(this);
+		return ToStringUtils.toString(values());
 	}
 }
