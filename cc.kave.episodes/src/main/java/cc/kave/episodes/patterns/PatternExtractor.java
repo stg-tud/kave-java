@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
@@ -47,32 +48,43 @@ public class PatternExtractor {
 		return Tuple.newTuple(enclosingMethods, counter);
 	}
 
-//	public Map<Episode, List<IMethodName>> getMethodsFromCodeTest(Map<Integer, Set<Episode>> processedPatterns,
-//			List<List<Fact>> stream, List<Event> events, boolean orderRelations) throws Exception {
-//		Set<Episode> patterns = getPatternsAsSetTest(processedPatterns);
-//		for (List<Fact> method : stream) {
-//			for (Episode episode : patterns) {
-//				Set<Fact> episodeEvents = episode.getEvents();
-//				
-//			}
-//		}
-//		
-//		
-//		Set<IMethodName> enclosingMethods = Sets.newHashSet();
-//		int counter = 0;
-//		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
-//
-//		for (List<Fact> method : episodeOccurrences) {
-//			IMethodName methodName = getEnclosingMethod(method, events);
-//			if (methodName != null) {
-//				enclosingMethods.add(methodName);
-//				counter++;
-//			}
-//		}
-//		return Tuple.newTuple(enclosingMethods, counter);
-//	}
+	public Map<Episode, List<IMethodName>> getMethodsFromCodeTest(Map<Integer, Set<Episode>> processedPatterns,
+			List<List<Fact>> stream, List<Event> events, boolean orderRelations) throws Exception {
+		Map<Episode, List<IMethodName>> results = Maps.newHashMap();
+		Set<Episode> patterns = getPatternsAsSet(processedPatterns);
 
-	private Set<Episode> getPatternsAsSetTest(Map<Integer, Set<Episode>> processedPatterns) {
+		for (List<Fact> method : stream) {
+			IMethodName enclosingMethod = getEnclosingMethod(method, events);
+
+			for (Episode episode : patterns) {
+				if (method.containsAll(episode.getEvents())) {
+					if (orderRelations) {
+						if (respectOrderings(method, episode)) {
+							
+						}
+					} else {
+						if (results.containsKey(episode)) {
+							results.get(episode).add(enclosingMethod);
+						}
+					}
+				}
+			}
+		}
+		return results;
+	}
+
+	private boolean respectOrderings(List<Fact> method, Episode episode) {
+		Set<Fact> relations = episode.getRelations();
+		for (Fact r : relations) {
+			Tuple<Fact, Fact> tuple = r.getRelationFacts();
+			if (method.indexOf(tuple.getFirst()) > method.indexOf(tuple.getSecond())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private Set<Episode> getPatternsAsSet(Map<Integer, Set<Episode>> processedPatterns) {
 		Set<Episode> patterns = Sets.newHashSet();
 		for (Map.Entry<Integer, Set<Episode>> entry : processedPatterns.entrySet()) {
 			if (entry.getKey() == 1) {
