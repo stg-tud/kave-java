@@ -374,8 +374,7 @@ public class RaychevAnalysisVisitorTest extends PBNAnalysisBaseTest {
 		assertThat(historyMap, Matchers.hasValue(abstractHistory));
 	}
 
-	@SuppressWarnings("unused")
-	private void assertConcreteHistoryContainsInteraction(ConcreteHistory concreteHistory, IMethodName methodName,
+	protected void assertConcreteHistoryContainsInteraction(ConcreteHistory concreteHistory, IMethodName methodName,
 			int position) {
 		assertThat(concreteHistory.getHistory(), Matchers.contains(//
 				new Interaction(methodName, position, InteractionType.METHOD_CALL)));
