@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-public class HistoryMapTest extends RaychevAnalysisVisitorTest {
+public class HistoryMapTest extends RaychevAnalysisBaseTest {
 
 	@Test
 	public void mergesTwoHistoryMaps() {

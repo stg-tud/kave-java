@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class AbstractHistoryTest extends RaychevAnalysisVisitorTest {
+public class AbstractHistoryTest extends RaychevAnalysisBaseTest {
 
 	@Test
 	public void addsInteractionToAllConcreteHistories() {
