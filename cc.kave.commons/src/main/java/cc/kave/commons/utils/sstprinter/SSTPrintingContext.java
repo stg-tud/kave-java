@@ -70,7 +70,7 @@ public class SSTPrintingContext {
 	}
 
 	public void setIndentationLevel(int indentationLevel) {
-		this.indentationLevel = indentationLevel;
+		indentationLevel = indentationLevel;
 	}
 
 	public ITypeShape getTypeShape() {

@@ -16,7 +16,6 @@
 package exec.recommender_reimplementation.java_printer;
 
 import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.impl.SST;
 
 public class JavaPrintingUtils {
 	

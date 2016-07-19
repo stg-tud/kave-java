@@ -240,7 +240,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		return null;
 	}
 
-	protected Void appendPropertyAccessor(SSTPrintingContext context, List<IStatement> body, String keyword) {
+	private Void appendPropertyAccessor(SSTPrintingContext context, List<IStatement> body, String keyword) {
 		if (!body.isEmpty()) {
 			context.indentation().text(keyword);
 			context.statementBlock(body, this, true);

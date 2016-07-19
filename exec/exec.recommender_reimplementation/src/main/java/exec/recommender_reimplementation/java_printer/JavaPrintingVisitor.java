@@ -66,12 +66,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (context.typeShape != null
 				&& context.typeShape.getTypeHierarchy().hasSupertypes()) {
 
-			context.text(" extends ");
 
 			ITypeHierarchy extends1 = context.typeShape.getTypeHierarchy()
 					.getExtends();
 			if (context.typeShape.getTypeHierarchy().hasSuperclass()
 					&& extends1 != null) {
+				context.text(" extends ");
 				context.type(extends1.getElement());
 			}
 
@@ -137,29 +137,17 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 						.space().text("get" + stmt.getName().getName())
 						.text("()");
 
-				context.newLine().indentation();
-
-				context.text("{").newLine();
-				context.indentationLevel++;
-				appendPropertyAccessor(context, stmt.getGet(), "");
-				context.indentationLevel--;
-				context.text("}").newLine();
+				appendPropertyAccessor(context, stmt.getGet());
 
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().type(stmt.getName().getValueType())
+				context.indentation().text("void")
 						.space().text("set" + stmt.getName().getName())
 						.text("(").type(stmt.getName().getValueType()).space()
 						.text("value").text(")");
 
-				context.newLine().indentation();
-
-				context.text("{").newLine();
-				context.indentationLevel++;
-				appendPropertyAccessor(context, stmt.getSet(), "");
-				context.indentationLevel--;
-				context.text("}").newLine();
+				appendPropertyAccessor(context, stmt.getSet());
 
 			}
 		} else // Short Version: add methods for getter and setter + backing
@@ -167,13 +155,13 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		{
 			String backingFieldName = "$property_" + stmt.getName().getName();
 			context.indentation().type(stmt.getName().getValueType()).space()
-					.text(backingFieldName);
+					.text(backingFieldName).text(";");
 
 			context.newLine();
 
 			if (stmt.getName().hasGetter()) {
 				context.indentation().type(stmt.getName().getValueType())
-						.space().text("get" + stmt.getName().getName());
+						.space().text("get" + stmt.getName().getName()).text("()");
 
 				context.newLine().indentation();
 
@@ -181,16 +169,20 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				context.indentationLevel++;
 
 				context.indentation().text("return").space()
-						.text(backingFieldName);
+						.text(backingFieldName)
+						.text(";")
+						.newLine();
 
 				context.indentationLevel--;
-				context.text("}").newLine();
+				context.indentation().text("}").newLine();
 
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().type(stmt.getName().getValueType())
-						.space().text("set" + stmt.getName().getName());
+				context.indentation().text("void")
+				.space().text("set" + stmt.getName().getName())						
+				.text("(").type(stmt.getName().getValueType()).space()
+				.text("value").text(")");
 
 				context.newLine().indentation();
 
@@ -198,13 +190,20 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				context.indentationLevel++;
 
 				context.indentation().text(backingFieldName).text(" = ")
-						.text("value");
+						.text("value").text(";").newLine();
 
 				context.indentationLevel--;
-				context.text("}").newLine();
+				context.indentation().text("}").newLine();
 
 			}
 		}
+		return null;
+	}
+	
+	private Void appendPropertyAccessor(SSTPrintingContext context, List<IStatement> body) {
+		context.statementBlock(body, this, true);
+		
+		context.newLine();
 		return null;
 	}
 
@@ -282,10 +281,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		context.statementBlock(statementListWithLoopHeader, this, true);
 
 		context.newLine().indentation().keyword("while").space().text("(");
-		context.indentationLevel++;
 		condition.accept(this, context);
-		context.indentationLevel--;
-		context.newLine().indentation().text(")");
+		context.text(");");
 		return null;
 	}
 
@@ -300,10 +297,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		}
 
 		context.indentation().keyword("while").space().text("(");
-		context.indentationLevel++;
 		condition.accept(this, context);
-		context.indentationLevel--;
-		context.newLine().indentation().text(")");
+		context.text(")");
 
 		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
 				.getBody());
@@ -334,18 +329,13 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			ILoopHeaderBlockExpression loopHeaderBlock,
 			SSTPrintingContext context) {
 		for (IStatement statement : loopHeaderBlock.getBody()) {
-			context.indentationLevel++;
-
 			if (statement instanceof IReturnStatement) {
 				IReturnStatement returnStatement = (IReturnStatement) statement;
-				context.newLine();
 				return returnStatement.getExpression();
 			}
 
-			context.newLine();
 			statement.accept(this, context);
-
-			context.indentationLevel--;
+			context.newLine();
 		}
 		return null;
 	}
@@ -410,9 +400,9 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (expr.getOperator() == CastOperator.SafeCast) {
 			// handles safe cast by using ?-operator
 			context.text(expr.getReference().getIdentifier())
-					.text(" instanceof ").text(expr.getTargetType().getName())
+					.text(" instanceof ").type(expr.getTargetType())
 					.space().text("?").space()
-					.text("(" + expr.getTargetType().getName() + ") ")
+					.text("(").type(expr.getTargetType()).text(") ")
 					.text(expr.getReference().getIdentifier()).text(" : ")
 					.text("null");
 		} else {
