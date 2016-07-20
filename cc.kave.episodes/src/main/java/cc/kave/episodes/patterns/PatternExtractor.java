@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -29,46 +30,35 @@ import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Logger;
 
 public class PatternExtractor {
 
-	public Tuple<Set<IMethodName>, Integer> getMethodsFromCode(Episode episode, List<List<Fact>> stream,
-			List<Event> events, boolean orderRelations) throws Exception {
-		Set<IMethodName> enclosingMethods = Sets.newHashSet();
-		int counter = 0;
-		List<List<Fact>> episodeOccurrences = getMethodsOccurrences(episode, stream, orderRelations);
-
-		for (List<Fact> method : episodeOccurrences) {
-			IMethodName methodName = getEnclosingMethod(method, events);
-			if (methodName != null) {
-				enclosingMethods.add(methodName);
-				counter++;
-			}
-		}
-		return Tuple.newTuple(enclosingMethods, counter);
-	}
-
-	public Map<Episode, List<IMethodName>> getMethodsFromCodeTest(Map<Integer, Set<Episode>> processedPatterns,
+	public Map<Episode, List<IMethodName>> getMethodsFromCode(Map<Integer, Set<Episode>> processedPatterns,
 			List<List<Fact>> stream, List<Event> events, boolean orderRelations) throws Exception {
 		Map<Episode, List<IMethodName>> results = Maps.newHashMap();
 		Set<Episode> patterns = getPatternsAsSet(processedPatterns);
+		int numbMethods = 0;
 
 		for (List<Fact> method : stream) {
-			IMethodName enclosingMethod = getEnclosingMethod(method, events);
-
+			if (method.size() < 3) {
+				continue;
+			}
 			for (Episode episode : patterns) {
 				if (method.containsAll(episode.getEvents())) {
-					if (orderRelations) {
-						if (respectOrderings(method, episode)) {
-							
-						}
-					} else {
+					IMethodName enclosingMethod = getEnclosingMethod(method, events);
+					
+					if (!orderRelations || respectOrderings(method, episode)) {
 						if (results.containsKey(episode)) {
 							results.get(episode).add(enclosingMethod);
+						} else {
+							results.put(episode, Lists.newArrayList(enclosingMethod));
 						}
 					}
 				}
 			}
+			numbMethods++;
+			Logger.log("Percentage of stream processed is %d/%d", numbMethods, stream.size());
 		}
 		return results;
 	}
@@ -93,41 +83,6 @@ public class PatternExtractor {
 			patterns.addAll(entry.getValue());
 		}
 		return patterns;
-	}
-
-	private List<List<Fact>> getMethodsOccurrences(Episode episode, List<List<Fact>> stream, boolean ordering) {
-		List<List<Fact>> methodsOccurrences = new LinkedList<>();
-		Set<Fact> episodeFacts = episode.getEvents();
-
-		for (List<Fact> method : stream) {
-			if (method.containsAll(episodeFacts)) {
-				methodsOccurrences.add(method);
-			}
-		}
-		if (ordering) {
-			return getMethodWithOrderings(episode, methodsOccurrences);
-		}
-		return methodsOccurrences;
-	}
-
-	private List<List<Fact>> getMethodWithOrderings(Episode episode, List<List<Fact>> allMethods) {
-		List<List<Fact>> methodsWithOrdering = new LinkedList<>();
-		Set<Fact> relations = episode.getRelations();
-		boolean validOrder = true;
-
-		for (List<Fact> method : allMethods) {
-			for (Fact r : relations) {
-				Tuple<Fact, Fact> tuple = r.getRelationFacts();
-				if (method.indexOf(tuple.getFirst()) > method.indexOf(tuple.getSecond())) {
-					validOrder = false;
-					break;
-				}
-			}
-			if (validOrder) {
-				methodsWithOrdering.add(method);
-			}
-		}
-		return methodsWithOrdering;
 	}
 
 	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) throws Exception {

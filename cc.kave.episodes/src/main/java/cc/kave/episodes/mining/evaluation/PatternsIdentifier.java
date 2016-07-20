@@ -32,7 +32,6 @@ import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.patterns.PatternExtractor;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
-import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 public class PatternsIdentifier {
@@ -65,38 +64,40 @@ public class PatternsIdentifier {
 		int incomplete = 0;
 		int notThere = 0;
 
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			for (Episode episode : entry.getValue()) {
-				Tuple<Set<IMethodName>, Integer> enclosingMethods = extractor.getMethodsFromCode(episode, stream, events, order);
-				int numberEnclosingMethods = enclosingMethods.getSecond();
-				Logger.log("Episode is identified in %d methods, while the frequency is %d!", numberEnclosingMethods,
-						frequency);
-				if (numberEnclosingMethods == 0) {
-					notThere++;
-				}
-				if (numberEnclosingMethods < frequency) {
-					incomplete++;
-//					int counter = 0;
-//
-//					for (IMethodName methodName : enclosingMethods) {
-//						Logger.log("%s", methodName.getDeclaringType().getFullName());
-//						counter++;
-//						if (counter == OUTPUT) {
-//							break;
-//						}
-//					}
-//					throw new Exception(
-//							"The problematic episode is pattern" + patternID + ": " + episode.getFacts().toString());
-				} else {
-					complete++;
-				}
-				patternID++;
-				Logger.log("Nummber of patterns that are not found in the training data is %d!", notThere);
-				Logger.log("Number of patterns that are found an insufficient number of times is %d", incomplete);
-				Logger.log("Number of patterns that are found sufficient number of times is %d\n", complete);
+		Map<Episode, List<IMethodName>> enclosingMethods = extractor.getMethodsFromCode(patterns, stream, events,
+				order);
+		for (Map.Entry<Episode, List<IMethodName>> entry : enclosingMethods.entrySet()) {
+			int numberEnclosingMethods = entry.getValue().size();
+			Logger.log("Episode is identified in %d methods, while the frequency is %d!", numberEnclosingMethods,
+					frequency);
+			if (numberEnclosingMethods == 0) {
+				notThere++;
 			}
+			if (numberEnclosingMethods < frequency) {
+				incomplete++;
+				// int counter = 0;
+				//
+				// for (IMethodName methodName : enclosingMethods) {
+				// Logger.log("%s",
+				// methodName.getDeclaringType().getFullName());
+				// counter++;
+				// if (counter == OUTPUT) {
+				// break;
+				// }
+				// }
+				// throw new Exception(
+				// "The problematic episode is pattern" + patternID + ": " +
+				// episode.getFacts().toString());
+			} else {
+				complete++;
+			}
+			patternID++;
+			Logger.log("Nummber of patterns that are not found in the training data is %d!", notThere);
+			Logger.log("Number of patterns that are found an insufficient number of times is %d", incomplete);
+			Logger.log("Number of patterns that are found sufficient number of times is %d\n", complete);
 		}
-//		Logger.log("All patterns are identified with a sufficient number of times from the training source code!");
+		// Logger.log("All patterns are identified with a sufficient number of
+		// times from the training source code!");
 	}
 
 	public void validationCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
@@ -106,17 +107,15 @@ public class PatternsIdentifier {
 
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		int patternID = 0;
+		Map<Episode, List<IMethodName>> enclosingMethods = extractor.getMethodsFromCode(patterns, streamOfFacts, events,
+				order);
 
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			for (Episode episode : entry.getValue()) {
-				Tuple<Set<IMethodName>, Integer> enclosingMethods = extractor.getMethodsFromCode(episode, streamOfFacts, events, order);
-
-				if (enclosingMethods.getSecond() == 0) {
-					Logger.log("Pattern%d does not occur in the reppositories used for validation!", patternID);
-					throw new Exception("The pattern is: " + episode.toString());
-				}
-				patternID++;
+		for (Map.Entry<Episode, List<IMethodName>> entry : enclosingMethods.entrySet()) {
+			if (entry.getValue().size() == 0) {
+				Logger.log("Pattern%d does not occur in the reppositories used for validation!", patternID);
+				throw new Exception("The pattern is: " + entry.getKey().toString());
 			}
+			patternID++;
 		}
 		Logger.log("All patterns are identified to be used in the repositories used for validation!");
 	}

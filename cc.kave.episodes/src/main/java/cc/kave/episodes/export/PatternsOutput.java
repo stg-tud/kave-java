@@ -22,20 +22,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.recommenders.io.Logger;
 
 public class PatternsOutput {
 
@@ -64,25 +61,25 @@ public class PatternsOutput {
 	}
 
 	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
-		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
+//		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
 		List<Event> events = mappingParser.parse(numbRepos);
-//		Logger.log("Number of unique event is %d", events.size());
-		int graphNumber = 0;
-
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			if (entry.getKey() == 1) {
-				continue;
-			}
-			Set<Episode> closedEpisodes = transClosure.remTransClosure(entry.getValue());
-
-			for (Episode episode : closedEpisodes) {
-				File filePath = getPath(numbRepos, freqThresh, bidirectThresh, graphNumber);
-
-				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
-				graphWriter.write(graph, getGraphPaths(filePath, graphNumber));
-				graphNumber++;
-			}
-		}
+		Logger.log("Number of unique event is %d", events.size());
+//		int graphNumber = 0;
+//
+//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+//			if (entry.getKey() == 1) {
+//				continue;
+//			}
+//			Set<Episode> closedEpisodes = transClosure.remTransClosure(entry.getValue());
+//
+//			for (Episode episode : closedEpisodes) {
+//				File filePath = getPath(numbRepos, freqThresh, bidirectThresh, graphNumber);
+//
+//				DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(episode, events);
+//				graphWriter.write(graph, getGraphPaths(filePath, graphNumber));
+//				graphNumber++;
+//			}
+//		}
 	}
 
 	private File getPath(int numbRepos, int freqThresh, double bidirectThresh, int graphNum) {

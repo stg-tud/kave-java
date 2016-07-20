@@ -20,11 +20,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
@@ -35,56 +40,74 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.episodes.model.Episode;
-import cc.recommenders.datastructures.Tuple;
 
 public class PatternExtractorTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	private List<List<Fact>> stream = new LinkedList<>();
 	private List<Event> events = new LinkedList<>();
-	
+
+	Map<Episode, List<IMethodName>> expected = Maps.newLinkedHashMap();
+	Map<Integer, Set<Episode>> allEpisodes;
+	Set<Episode> episodes;
+	Episode episode0;
+	Episode episode1;
+	Episode episode2;
+	Episode episode3;
+	Episode episode4;
+	Episode episode5;
+
 	private PatternExtractor sut;
-	
-	@Before 
+
+	@Before
 	public void setup() {
-		
+
 		List<Fact> method = new LinkedList<Fact>();
- 		method.add(new Fact(1));	//FM
-		method.add(new Fact(2));	//SM
-		method.add(new Fact(3));	//EM1
-		method.add(new Fact(4));	//I1
-		method.add(new Fact(5));	//I2
-		method.add(new Fact(6));	//I3
+		method.add(new Fact(1)); // FM
+		method.add(new Fact(2)); // SM
+		method.add(new Fact(3)); // EM1
+		method.add(new Fact(4)); // I1
+		method.add(new Fact(5)); // I2
+		method.add(new Fact(6)); // I3
 		stream.add(method);
-		
+
 		method = new LinkedList<Fact>();
 		method.add(new Fact(1));
-		method.add(new Fact(7));	//EM2
-		method.add(new Fact(6));	
-		method.add(new Fact(4));	
+		method.add(new Fact(7)); // EM2
+		method.add(new Fact(6));
+		method.add(new Fact(4));
 		stream.add(method);
-		
+
 		method = new LinkedList<Fact>();
 		method.add(new Fact(2));
 		method.add(new Fact(3));
-		method.add(new Fact(6));	
+		method.add(new Fact(6));
 		stream.add(method);
-		
+
 		method = new LinkedList<Fact>();
-		method.add(new Fact(3));	
-		method.add(new Fact(5));	
+		method.add(new Fact(3));
+		method.add(new Fact(5));
+		method.add(new Fact(4));
+		method.add(new Fact(6));
+		stream.add(method);
+
+		method = new LinkedList<Fact>();
+		method.add(new Fact(1));
+		method.add(new Fact(8)); // EM4
+		method.add(new Fact(5));
+		method.add(new Fact(9)); // I4
 		method.add(new Fact(4));
 		method.add(new Fact(6));
 		stream.add(method);
 		
 		method = new LinkedList<Fact>();
 		method.add(new Fact(1));
-		method.add(new Fact(8));	//EM4
-		method.add(new Fact(5));
-		method.add(new Fact(9));	//I4
-		method.add(new Fact(4));
-		method.add(new Fact(6));
+		method.add(new Fact(10));
+		method.add(new Fact(9));
 		stream.add(method);
-		
+
 		events.add(Events.newDummyEvent());
 		events.add(Events.newFirstContext(m(1, 11)));
 		events.add(Events.newSuperContext(m(1, 21)));
@@ -95,82 +118,97 @@ public class PatternExtractorTest {
 		events.add(Events.newContext(m(2, 32)));
 		events.add(Events.newContext(m(5, 34)));
 		events.add(Events.newInvocation(m(5, 4)));
+		events.add(Events.newInvocation(m(6, 5)));
+
+		allEpisodes = Maps.newLinkedHashMap();
+		episodes = Sets.newLinkedHashSet();
+	
+		episode0 = new Episode();
+		episode0.addFact(new Fact(3));
 		
+		episode1 = new Episode();
+		episode1.addStringsOfFacts("4", "5", "6");
+		
+		episode2 = new Episode();
+		episode2.addStringsOfFacts("4", "5", "6", "4>5", "4>6", "5>6");
+		
+		episode3 = new Episode();
+		episode3.addStringsOfFacts("1", "4", "6");
+		
+		episode4 = new Episode();
+		episode4.addStringsOfFacts("4", "5", "6", "11");
+		
+		episode5 = new Episode();
+		episode5.addStringsOfFacts("10", "9");
+
 		sut = new PatternExtractor();
 	}
-	
+
 	@Test
 	public void invocations() throws Exception {
-		Episode episode = new Episode();
-		episode.addFact(new Fact(4));
-		episode.addFact(new Fact(5));
-		episode.addFact(new Fact(6));
+		allEpisodes.put(3, Sets.newHashSet(episode1));
 		
-		Set<IMethodName> methodNames = Sets.newLinkedHashSet();
-		methodNames.add(m(1, 31));
-		methodNames.add(m(5, 34));
-		
-		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodNames, 3);
-		
-		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
-		
-		assertEquals(expected.getFirst(), actuals.getFirst());
-		assertEquals(expected.getSecond(), actuals.getSecond());
+		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+
+		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+
+		assertEquals(expected, actuals);
 	}
-	
+
 	@Test
 	public void invocationsWithOrderRelations() throws Exception {
-		Episode episode = new Episode();
-		episode.addFact(new Fact(4));
-		episode.addFact(new Fact(5));
-		episode.addFact(new Fact(6));
-		episode.addFact(new Fact("4>5"));
-		episode.addFact(new Fact("4>6"));
-		episode.addFact(new Fact("5>6"));
+		allEpisodes.put(3, Sets.newHashSet(episode1, episode2));
 		
-		Set<IMethodName> methodsName = Sets.newHashSet(m(1, 31));
-		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodsName, 1);
-		
-		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, true);
-		
-		assertEquals(expected.getFirst(), actuals.getFirst());
-		assertEquals(expected.getSecond(), actuals.getSecond());
+		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.put(episode2, Lists.newArrayList(m(1, 31)));
+
+		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, true);
+
+		assertEquals(expected, actuals);
 	}
-	
+
 	@Test
 	public void firstDeclaration() throws Exception {
-		Episode episode = new Episode();
-		episode.addFact(new Fact(1));
-		episode.addFact(new Fact(4));
-		episode.addFact(new Fact(6));
+		allEpisodes.put(3, Sets.newHashSet(episode1, episode2, episode3));
 		
-		Set<IMethodName> methodNames = Sets.newLinkedHashSet();
-		methodNames.add(m(1, 31));
-		methodNames.add(m(2, 32));
-		methodNames.add(m(5, 34));
+		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.put(episode2, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.put(episode3, Lists.newArrayList(m(1, 31), m(2, 32), m(5, 34)));
+
+		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+
+		assertEquals(expected, actuals);
+	}
+
+	@Test
+	public void noOccurrences() throws Exception {
+		allEpisodes.put(1, Sets.newHashSet(episode0));
+		allEpisodes.put(3, Sets.newHashSet(episode1, episode2, episode3));
+		allEpisodes.put(4, Sets.newHashSet(episode4));
 		
-		Tuple<Set<IMethodName>, Integer> expected = Tuple.newTuple(methodNames, 3);
-		
-		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
-		
-		assertEquals(expected.getFirst(), actuals.getFirst());
-		assertEquals(expected.getSecond(), actuals.getSecond());
+		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.put(episode2, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.put(episode3, Lists.newArrayList(m(1, 31), m(2, 32), m(5, 34)));
+
+		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+
+		assertEquals(expected, actuals);
 	}
 	
 	@Test
-	public void noOccurrences() throws Exception {
-		Episode episode = new Episode();
-		episode.addFact(new Fact(4));
-		episode.addFact(new Fact(5));
-		episode.addFact(new Fact(6));
-		episode.addFact(new Fact(11));
+	public void noEnclosingMethos() throws Exception {
+		thrown.expect(Exception.class);
+		thrown.expectMessage("Method does not have enclosing method!");
 		
-		Tuple<Set<IMethodName>, Integer> actuals = sut.getMethodsFromCode(episode, stream, events, false);
+		allEpisodes.put(1, Sets.newHashSet(episode0));
+		allEpisodes.put(2, Sets.newHashSet(episode5));
 		
-		assertTrue(actuals.getFirst().isEmpty());
-		assertTrue(actuals.getSecond() == 0);
+		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+
+		assertTrue(actuals.isEmpty());
+		assertEquals(expected, actuals);
 	}
-	
+
 	private IMethodName m(int typeNum, int methodNum) {
 		return MethodName.newMethodName(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
 	}
