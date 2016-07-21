@@ -17,12 +17,7 @@ package cc.kave.episodes.patterns;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -30,35 +25,24 @@ import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 public class PatternExtractor {
 
-	public Map<Episode, List<IMethodName>> getMethodsFromCode(Map<Integer, Set<Episode>> processedPatterns,
-			List<List<Fact>> stream, List<Event> events, boolean orderRelations) throws Exception {
-		Map<Episode, List<IMethodName>> results = Maps.newHashMap();
-		Set<Episode> patterns = getPatternsAsSet(processedPatterns);
-		int numbMethods = 0;
+	public List<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
+			boolean orderRelations) throws Exception {
+		List<IMethodName> results = new LinkedList<>();
 
 		for (List<Fact> method : stream) {
 			if (method.size() < 3) {
 				continue;
 			}
-			for (Episode episode : patterns) {
-				if (method.containsAll(episode.getEvents())) {
-					IMethodName enclosingMethod = getEnclosingMethod(method, events);
-					
-					if (!orderRelations || respectOrderings(method, episode)) {
-						if (results.containsKey(episode)) {
-							results.get(episode).add(enclosingMethod);
-						} else {
-							results.put(episode, Lists.newArrayList(enclosingMethod));
-						}
-					}
+			if (method.containsAll(episode.getEvents())) {
+				IMethodName enclosingMethod = getEnclosingMethod(method, events);
+
+				if (!orderRelations || respectOrderings(method, episode)) {
+					results.add(enclosingMethod);
 				}
 			}
-			numbMethods++;
-			Logger.log("Percentage of stream processed is %d/%d", numbMethods, stream.size());
 		}
 		return results;
 	}
@@ -72,17 +56,6 @@ public class PatternExtractor {
 			}
 		}
 		return true;
-	}
-
-	private Set<Episode> getPatternsAsSet(Map<Integer, Set<Episode>> processedPatterns) {
-		Set<Episode> patterns = Sets.newHashSet();
-		for (Map.Entry<Integer, Set<Episode>> entry : processedPatterns.entrySet()) {
-			if (entry.getKey() == 1) {
-				continue;
-			}
-			patterns.addAll(entry.getValue());
-		}
-		return patterns;
 	}
 
 	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) throws Exception {

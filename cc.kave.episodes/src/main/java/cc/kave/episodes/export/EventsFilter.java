@@ -15,11 +15,16 @@
  */
 package cc.kave.episodes.export;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 
@@ -34,29 +39,43 @@ public class EventsFilter {
 	private static boolean firstMethod = true;
 
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {
-
+		List<Event> streamWithoutDublicates = removeMethodDublicates(stream);
 		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
 		EventStream es = new EventStream();
 
-		for (Event e : stream) {
-			if (e.getKind() != EventKind.INVOCATION) {
+		for (Event e : streamWithoutDublicates) {
+			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.METHOD_DECLARATION)) {
 				es.addEvent(e);
 			} else if (occurrences.get(e) >= freqThresh) {
 				es.addEvent(e);
 			}
-			// if (e.getKind() == EventKind.METHOD_DECLARATION) {
-			// if (occurrences.get(e) < freqThresh) {
-			// es.addEvent(Events.newUnknownEvent());
-			// } else {
-			// es.addEvent(e);
-			// }
-			// continue;
-			// }
-			// if (occurrences.get(e) >= freqThresh) {
-			// es.addEvent(e);
-			// }
 		}
 		return es;
+	}
+
+	private static List<Event> removeMethodDublicates(List<Event> stream) {
+		List<Event> results = new LinkedList<Event>();
+		List<Event> method = new LinkedList<Event>();
+		Set<IMethodName> observedMethods = Sets.newLinkedHashSet();
+		IMethodName currentMethod = null;
+
+		for (Event event : stream) {
+			if ((event.getKind() == EventKind.FIRST_DECLARATION) && (currentMethod != null)) {
+				if (!observedMethods.contains(currentMethod)) {
+					results.addAll(method);
+					observedMethods.add(currentMethod);
+				}
+				method = new LinkedList<Event>();
+				currentMethod = null;
+			} else if (event.getKind() == EventKind.METHOD_DECLARATION) {
+					currentMethod = event.getMethod();
+				}
+			method.add(event);
+		}
+		if ((currentMethod != null) && (!observedMethods.contains(currentMethod))) {
+			results.addAll(method);
+		}
+		return results;
 	}
 
 	public static String filterPartition(List<Event> partition, Map<Event, Integer> stream) {

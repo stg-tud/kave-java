@@ -44,32 +44,37 @@ public class EventsFilterTest {
 
 	@Before
 	public void setup() {
-		events = Lists.newArrayList(firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(0), inv(2), firstCtx(3), superCtx(4), inv(3));
-//		partitionEvents1 = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4), inv(3), inv(2));
+		events = Lists.newArrayList(firstCtx(1), enclosingCtx(6), inv(2), inv(3), firstCtx(0), superCtx(2),
+				enclosingCtx(7), inv(5), inv(0), inv(2), firstCtx(1), enclosingCtx(6), inv(2), inv(3), firstCtx(3), superCtx(4),
+				enclosingCtx(8), inv(3));
+		// partitionEvents1 = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4),
+		// inv(3), inv(2));
 
 		expectedStream = new EventStream();
 		expectedStream.addEvent(firstCtx(1)); // 1
-		expectedStream.addEvent(inv(2)); // 2
-		expectedStream.addEvent(inv(3)); // 3
+		expectedStream.addEvent(enclosingCtx(6)); //2
+		expectedStream.addEvent(inv(2)); // 3
+		expectedStream.addEvent(inv(3)); // 4
 		expectedStream.addEvent(firstCtx(0));
-		expectedStream.addEvent(superCtx(2)); // 4
-		expectedStream.addEvent(inv(2));
-		expectedStream.addEvent(firstCtx(3)); // 5
-		expectedStream.addEvent(superCtx(4));// 6
-		expectedStream.addEvent(inv(3));
+		expectedStream.addEvent(enclosingCtx(7)); //5
+		expectedStream.addEvent(inv(2)); //3
+		expectedStream.addEvent(firstCtx(3)); // 6
+		expectedStream.addEvent(enclosingCtx(8)); //7
+		expectedStream.addEvent(inv(3)); //4
 
-//		expectedPartition1 += "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n5,1.005\n6,1.006\n3,1.007\n";
+		// expectedPartition1 +=
+		// "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n5,1.005\n6,1.006\n3,1.007\n";
 	}
 
 	@Test
 	public void filterStream() {
 		EventStream actuals = EventsFilter.filterStream(events, REMFREQS);
 
-		assertTrue(expectedStream.equals(actuals));
 		assertEquals(expectedStream.getStream(), actuals.getStream());
 		assertEquals(expectedStream.getMapping(), actuals.getMapping());
 		assertEquals(expectedStream.getStreamLength(), actuals.getStreamLength());
 		assertEquals(expectedStream.getNumberEvents(), actuals.getNumberEvents());
+		assertTrue(expectedStream.equals(actuals));
 	}
 
 	@Ignore
@@ -87,9 +92,13 @@ public class EventsFilterTest {
 	private static Event firstCtx(int i) {
 		return Events.newFirstContext(m(i));
 	}
-	
+
 	private static Event superCtx(int i) {
 		return Events.newSuperContext(m(i));
+	}
+
+	private static Event enclosingCtx(int i) {
+		return Events.newContext(m(i));
 	}
 
 	private static IMethodName m(int i) {

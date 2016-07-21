@@ -20,17 +20,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
@@ -49,9 +43,7 @@ public class PatternExtractorTest {
 	private List<List<Fact>> stream = new LinkedList<>();
 	private List<Event> events = new LinkedList<>();
 
-	Map<Episode, List<IMethodName>> expected = Maps.newLinkedHashMap();
-	Map<Integer, Set<Episode>> allEpisodes;
-	Set<Episode> episodes;
+	List<IMethodName> expected = new LinkedList<IMethodName>();
 	Episode episode0;
 	Episode episode1;
 	Episode episode2;
@@ -120,9 +112,6 @@ public class PatternExtractorTest {
 		events.add(Events.newInvocation(m(5, 4)));
 		events.add(Events.newInvocation(m(6, 5)));
 
-		allEpisodes = Maps.newLinkedHashMap();
-		episodes = Sets.newLinkedHashSet();
-	
 		episode0 = new Episode();
 		episode0.addFact(new Fact(3));
 		
@@ -146,51 +135,39 @@ public class PatternExtractorTest {
 
 	@Test
 	public void invocations() throws Exception {
-		allEpisodes.put(3, Sets.newHashSet(episode1));
-		
-		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
+		expected.add(m(1, 31));
+		expected.add(m(1, 31));
+		expected.add(m(5, 34));
 
-		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+		List<IMethodName> actuals = sut.getMethodsFromCode(episode1, stream, events, false);
 
 		assertEquals(expected, actuals);
 	}
 
 	@Test
 	public void invocationsWithOrderRelations() throws Exception {
-		allEpisodes.put(3, Sets.newHashSet(episode1, episode2));
-		
-		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
-		expected.put(episode2, Lists.newArrayList(m(1, 31)));
+		expected.add(m(1, 31));
 
-		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, true);
+		List<IMethodName> actuals = sut.getMethodsFromCode(episode2, stream, events, true);
 
 		assertEquals(expected, actuals);
 	}
 
 	@Test
 	public void firstDeclaration() throws Exception {
-		allEpisodes.put(3, Sets.newHashSet(episode1, episode2, episode3));
-		
-		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
-		expected.put(episode2, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
-		expected.put(episode3, Lists.newArrayList(m(1, 31), m(2, 32), m(5, 34)));
+		expected.add(m(1, 31));
+		expected.add(m(2, 32));
+		expected.add(m(5, 34));
 
-		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+		List<IMethodName> actuals = sut.getMethodsFromCode(episode3, stream, events, false);
 
 		assertEquals(expected, actuals);
 	}
 
 	@Test
 	public void noOccurrences() throws Exception {
-		allEpisodes.put(1, Sets.newHashSet(episode0));
-		allEpisodes.put(3, Sets.newHashSet(episode1, episode2, episode3));
-		allEpisodes.put(4, Sets.newHashSet(episode4));
-		
-		expected.put(episode1, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
-		expected.put(episode2, Lists.newArrayList(m(1, 31), m(1, 31), m(5, 34)));
-		expected.put(episode3, Lists.newArrayList(m(1, 31), m(2, 32), m(5, 34)));
 
-		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+		List<IMethodName> actuals = sut.getMethodsFromCode(episode4, stream, events, false);
 
 		assertEquals(expected, actuals);
 	}
@@ -200,10 +177,7 @@ public class PatternExtractorTest {
 		thrown.expect(Exception.class);
 		thrown.expectMessage("Method does not have enclosing method!");
 		
-		allEpisodes.put(1, Sets.newHashSet(episode0));
-		allEpisodes.put(2, Sets.newHashSet(episode5));
-		
-		Map<Episode, List<IMethodName>> actuals = sut.getMethodsFromCode(allEpisodes, stream, events, false);
+		List<IMethodName> actuals = sut.getMethodsFromCode(episode5, stream, events, false);
 
 		assertTrue(actuals.isEmpty());
 		assertEquals(expected, actuals);

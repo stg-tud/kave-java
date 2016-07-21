@@ -24,7 +24,7 @@ import java.util.Properties;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
+import cc.kave.episodes.repositories.Preprocessing;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
@@ -49,13 +49,13 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-//		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
+		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
 		
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
 		
 //		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH, ORDERINGINFORMATION);
+//		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH, ORDERINGINFORMATION);
 //		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH, ORDERINGINFORMATION);
 
 		
