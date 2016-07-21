@@ -91,5 +91,57 @@ public class AbstractHistoryTest extends RaychevAnalysisBaseTest {
 		assertEquals(abstractHistory, clone);
 		assertFalse(abstractHistory == clone);
 	}
+	
+	@Test
+	public void mutableItemsInSet() {
+		Set<AbstractHistory> someSet = Sets
+				.newHashSet(
+						createAbstractHistory(callInDefaultContextAsReceiver("m1")),
+						createAbstractHistory(callInDefaultContextAsParameter(
+								"m1", 1)));
 
+		for (AbstractHistory history : someSet) {
+			history.addInteraction(callInDefaultContextAsReceiver("m2"));
+		}
+
+		Set<AbstractHistory> expected = Sets.newHashSet(
+				createAbstractHistory(callInDefaultContextAsReceiver("m1"),
+						callInDefaultContextAsReceiver("m2")),
+				createAbstractHistory(callInDefaultContextAsParameter("m1", 1),
+						callInDefaultContextAsReceiver("m2")));
+
+		assertEquals(expected, someSet);
+	}
+
+	@Test
+	public void mutableItemsInList() {
+		List<AbstractHistory> someSet = Lists.newArrayList(
+				createAbstractHistory(callAtPosition(
+						method(objectType, DefaultClassContext, "m1"), 0)),
+				createAbstractHistory(callAtPosition(
+						method(objectType, DefaultClassContext, "m1"), 1)));
+
+		for (AbstractHistory history : someSet) {
+			history.addInteraction(callAtPosition(
+					method(objectType, DefaultClassContext, "m2"), 0));
+		}
+
+		List<AbstractHistory> expected = Lists.newArrayList(
+				createAbstractHistory(
+						callAtPosition(
+								method(objectType, DefaultClassContext, "m1"),
+								0),
+						callAtPosition(
+								method(objectType, DefaultClassContext, "m2"),
+								0)),
+				createAbstractHistory(
+						callAtPosition(
+								method(objectType, DefaultClassContext, "m1"),
+								1),
+						callAtPosition(
+								method(objectType, DefaultClassContext, "m2"),
+								0)));
+
+		assertEquals(expected, someSet);
+	}
 }

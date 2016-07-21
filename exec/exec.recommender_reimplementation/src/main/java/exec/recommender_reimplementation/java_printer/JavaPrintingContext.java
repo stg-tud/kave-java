@@ -49,7 +49,6 @@ public class JavaPrintingContext extends SSTPrintingContext {
 	
 	@Override
 	public SSTPrintingContext unknownMarker() {
-		// TODO think about compilable unknown handling
 		return super.unknownMarker();
 	}
 	

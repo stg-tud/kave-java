@@ -44,6 +44,7 @@ import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
+import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
@@ -409,6 +410,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			context.text("(" + expr.getTargetType().getName() + ") ");
 			context.text(expr.getReference().getIdentifier());
 		}
+		return null;
+	}
+	
+	@Override
+	public Void visit(IUnknownStatement unknownStmt, SSTPrintingContext context) {
+		// ignores UnknownStatement
 		return null;
 	}
 
