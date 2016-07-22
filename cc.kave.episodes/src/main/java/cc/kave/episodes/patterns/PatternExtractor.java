@@ -17,7 +17,10 @@ package cc.kave.episodes.patterns;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -31,12 +34,14 @@ public class PatternExtractor {
 	public List<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
 			boolean orderRelations) throws Exception {
 		List<IMethodName> results = new LinkedList<>();
+		EnclosingMethods methods = new EnclosingMethods();
 
 		for (List<Fact> method : stream) {
 			if (method.size() < 3) {
 				continue;
 			}
 			if (method.containsAll(episode.getEvents())) {
+				int numberOfOccurrences = getOccurrences(episode, method);
 				IMethodName enclosingMethod = getEnclosingMethod(method, events);
 
 				if (!orderRelations || respectOrderings(method, episode)) {
@@ -45,6 +50,16 @@ public class PatternExtractor {
 			}
 		}
 		return results;
+	}
+	
+	private int getOccurrences(Episode episode, List<Fact> method) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public class EnclosingMethods {
+		Map<IMethodName, Integer> methodSet = Maps.newLinkedHashMap();
+		Map<IMethodName, Integer> methodOrder = Maps.newLinkedHashMap();
 	}
 
 	private boolean respectOrderings(List<Fact> method, Episode episode) {
