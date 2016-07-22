@@ -34,7 +34,7 @@ public class PatternExtractor {
 	public List<IMethodName> getMethodsFromCode(Episode episode, List<List<Fact>> stream, List<Event> events,
 			boolean orderRelations) throws Exception {
 		List<IMethodName> results = new LinkedList<>();
-		EnclosingMethods methods = new EnclosingMethods();
+		EnclosingMethods methodSet = new EnclosingMethods();
 
 		for (List<Fact> method : stream) {
 			if (method.size() < 3) {
