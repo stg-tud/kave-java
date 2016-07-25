@@ -17,6 +17,8 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Assert;
 
+import com.google.common.base.Strings;
+
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -55,7 +57,7 @@ public class JavaPrintingVisitorBaseTest {
 	
 	protected void assertPrint(ISSTNode sst, String... expectedLines) {
 		testPrintingWithoutIndentation(sst, expectedLines);
-
+		
 		// Expressions and references can't be indented
 		if (!(sst instanceof IExpression || sst instanceof IReference)) {
 			testPrintingWithIndentation(sst, expectedLines);
@@ -71,7 +73,7 @@ public class JavaPrintingVisitorBaseTest {
 	private void testPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
 		String[] indentedLines = new String[expectedLines.length];
 		for (int i = 0; i < expectedLines.length; i++) {
-			indentedLines[i] = (expectedLines[i] != "" || expectedLines[i] != null) ? expectedLines[i]
+			indentedLines[i] = Strings.isNullOrEmpty(expectedLines[i]) ? expectedLines[i]
 					: "    " + expectedLines[i];
 		}
 		JavaPrintingContext context = new JavaPrintingContext();

@@ -19,6 +19,8 @@ import static cc.kave.commons.utils.StringUtils.isNullOrEmpty;
 
 import org.junit.Assert;
 
+import com.google.common.base.Strings;
+
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -44,7 +46,6 @@ public class SSTPrintingVisitorBaseTest {
 
 	protected void assertPrint(ISSTNode sst, String... expectedLines) {
 		testPrintingWithoutIndentation(sst, expectedLines);
-		testPrintingWithHighlightingProducesValidXaml(sst);
 
 		// Expressions and references can't be indented
 		if (!(sst instanceof IExpression || sst instanceof IReference)) {
@@ -56,16 +57,6 @@ public class SSTPrintingVisitorBaseTest {
 		SSTPrintingContext context = new SSTPrintingContext();
 		context.setIndentationLevel(0);
 		assertPrintWithCustomContext(sst, context, expectedLines);
-	}
-
-	private void testPrintingWithHighlightingProducesValidXaml(ISSTNode sst) {
-		// var context = new XamlSSTPrintingContext();
-		SSTPrintingContext context = new SSTPrintingContext();
-		sst.accept(_sut, context);
-		String actual = context.toString();
-
-		// throws and fails test if markup is invalid
-		// XamlUtils.CreateDataTemplateFromXaml(actual);
 	}
 
 	private void testPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
