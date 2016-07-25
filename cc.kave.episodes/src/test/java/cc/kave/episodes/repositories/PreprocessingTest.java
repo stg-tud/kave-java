@@ -76,26 +76,31 @@ public class PreprocessingTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		events = Lists.newArrayList(firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(2), firstCtx(1), superCtx(0), inv(3));
+		events = Lists.newArrayList(firstCtx(1), enclosingCtx(6), inv(2), inv(3), firstCtx(0), superCtx(2),
+				enclosingCtx(7), inv(5), inv(2), firstCtx(1), superCtx(0), enclosingCtx(8), inv(3));
 		stream = new EventStream();
 		stream.addEvent(firstCtx(1));
+		stream.addEvent(enclosingCtx(6));
 		stream.addEvent(inv(2));
 		stream.addEvent(inv(3));
 		stream.addEvent(firstCtx(0));
-		stream.addEvent(superCtx(2));
+		stream.addEvent(enclosingCtx(7));
 		stream.addEvent(inv(2));
 		stream.addEvent(firstCtx(1));
-		stream.addEvent(superCtx(0));
+		stream.addEvent(enclosingCtx(8));
 		stream.addEvent(inv(3));
 
 		frequencies = Maps.newHashMap();
 		frequencies.put(firstCtx(1), 2);
+		frequencies.put(enclosingCtx(6), 1);
 		frequencies.put(inv(2), 2);
 		frequencies.put(inv(3), 2);
 		frequencies.put(firstCtx(0), 1);
 		frequencies.put(superCtx(2), 1);
+		frequencies.put(enclosingCtx(7), 1);
 		frequencies.put(inv(5), 1);
 		frequencies.put(superCtx(0), 1);
+		frequencies.put(enclosingCtx(8), 1);
 
 		sut = new Preprocessing(rootFolder.getRoot(), repos);
 
@@ -147,22 +152,25 @@ public class PreprocessingTest {
 	@Test
 	public void contentTest() throws IOException {
 		sut.generate(NUMBREPOS, FREQTHRESH);
-//			1			2		3						4				2			1						3
-//		firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5), inv(2), firstCtx(1), superCtx(0), inv(3)
+		// 1 2 3 4 2 1 3
+		// firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5),
+		// inv(2), firstCtx(1), superCtx(0), inv(3)
 
 		verify(repos).learningStream(anyInt());
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
 
-		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n1,1.005\n3,1.006\n";
+		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.003\n5,0.504\n3,0.505\n1,1.006\n6,1.007\n4,1.008\n";
 
 		List<Event> expectedMapping = Lists.newLinkedList();
-		expectedMapping.add(Events.newDummyEvent());
+		expectedMapping.add(dummy());
 		expectedMapping.add(firstCtx(1));
+		expectedMapping.add(enclosingCtx(6));
 		expectedMapping.add(inv(2));
 		expectedMapping.add(inv(3));
-		expectedMapping.add(superCtx(2));
+		expectedMapping.add(enclosingCtx(7));
+		expectedMapping.add(enclosingCtx(8));
 
 		String actualStream = FileUtils.readFileToString(streamFile);
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
@@ -188,9 +196,17 @@ public class PreprocessingTest {
 	private static Event firstCtx(int i) {
 		return Events.newFirstContext(m(i));
 	}
-	
+
 	private static Event superCtx(int i) {
 		return Events.newSuperContext(m(i));
+	}
+
+	private static Event enclosingCtx(int i) {
+		return Events.newContext(m(i));
+	}
+	
+	private static Event dummy() {
+		return Events.newDummyEvent();
 	}
 
 	private static IMethodName m(int i) {
