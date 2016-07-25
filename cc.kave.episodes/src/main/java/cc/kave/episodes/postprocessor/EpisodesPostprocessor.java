@@ -37,7 +37,7 @@ public class EpisodesPostprocessor {
 	}
 	
 	public Map<Integer, Set<Episode>> postprocess(int numbRepos, int freqThresh, double bidirectThresh) {
-		Map<Integer, Set<Episode>> patterns = Maps.newHashMap();
+		Map<Integer, Set<Episode>> patterns = Maps.newLinkedHashMap();
 		
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
 		Logger.log("Finished parsing the episodes!");

@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
@@ -80,34 +82,53 @@ public class PatternsIdentifier {
 		}
 	}
 
-	// public void validationCode(int numbRepos, int frequency, double entropy,
-	// boolean order) throws Exception {
-	// List<Event> streamOfEvents = repos.validationStream(numbRepos);
-	// List<Event> events = mappingParser.parse(numbRepos);
-	// List<List<Fact>> streamOfFacts = eventsToFacts(streamOfEvents, events);
-	// int found = 0;
-	// int notFound = 0;
-	//
-	// Map<Integer, Set<Episode>> patterns =
-	// episodeProcessor.postprocess(numbRepos, frequency, entropy);
-	// for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-	// if (entry.getKey() < 2) {
-	// continue;
-	// }
-	// for (Episode episode : entry.getValue()) {
-	// List<IMethodName> enclosingMethods =
-	// extractor.getMethodsFromCode(episode, streamOfFacts, events,
-	// order);
-	// if (enclosingMethods.size() == 0) {
-	// notFound++;
-	// } else {
-	// found++;
-	// }
-	// Logger.log("Patterns not found in the validation repositories are: %d",
-	// notFound);
-	// Logger.log("Patterns found in the validation repositories are: %d",
-	// found);
-	// }
-	// }
-	// }
+	public void validationCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
+		List<Event> streamOfEvents = repos.validationStream(numbRepos);
+		List<Event> events = mappingParser.parse(numbRepos);
+		List<List<Fact>> streamOfFacts = eventsToFacts(streamOfEvents, events);
+		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		StringBuilder sb = new StringBuilder();
+		int patternID = 0;
+
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			if (entry.getKey() < 2) {
+				continue;
+			}
+			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
+			sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+			for (Episode episode : entry.getValue()) {
+				Set<Fact> episodeFacts = episode.getEvents();
+				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
+
+				for (List<Fact> method : streamOfFacts) {
+					if (method.containsAll(episodeFacts)) {
+						methodsNoOrderRelation.addMethod(episode, method, events);
+						methodsOrderRelation.addMethod(episode, method, events);
+					}
+				}
+				sb.append(patternID + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
+						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
+				patternID++;
+			}
+			sb.append("\n");
+		}
+	}
+
+	private List<List<Fact>> eventsToFacts(List<Event> stream, List<Event> events) {
+		List<List<Fact>> result = new LinkedList<>();
+		List<Fact> method = new LinkedList<Fact>();
+
+		for (Event event : stream) {
+			if (event.getKind() == EventKind.FIRST_DECLARATION) {
+				if (!method.isEmpty()) {
+					result.add(method);
+					method = new LinkedList<Fact>();
+				}
+			}
+			int factID = events.indexOf(event);
+			method.add(new Fact(factID));
+		}
+		return result;
+	}
 }

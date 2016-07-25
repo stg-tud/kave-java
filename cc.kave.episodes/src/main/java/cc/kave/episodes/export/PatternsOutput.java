@@ -61,7 +61,7 @@ public class PatternsOutput {
 	}
 
 	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
-//		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
+		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
 		List<Event> events = mappingParser.parse(numbRepos);
 		Logger.log("Number of unique event is %d", events.size());
 //		int graphNumber = 0;
