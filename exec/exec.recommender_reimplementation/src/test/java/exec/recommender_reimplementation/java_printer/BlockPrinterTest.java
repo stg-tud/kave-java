@@ -17,115 +17,90 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
-import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
-import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
-import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.model.ssts.statements.IAssignment;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
-public class BlockPrinterTest extends JavaPrintingVisitorBaseTest{
-	
+public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
+
 	@Test
 	public void testForEachLoop() {
-		ForEachLoop sst = new ForEachLoop();
-		sst.setDeclaration(SSTUtil.declare("e", TypeName.newTypeName("T,P")));
-		sst.setLoopedReference(SSTUtil.variableReference("elements"));
-		sst.getBody().add(new ContinueStatement());
-
-		assertPrint(sst, "for (T e : elements)", "{", "    continue;", "}");
+		assertPrint(forEachLoop("e", "elements", new ContinueStatement()),
+				"for (? e : elements)", "{", "    continue;", "}");
 	}
-	
+
 	@Test
 	public void testUsingBlock() {
-		UsingBlock sst = new UsingBlock();
-		sst.setReference(SSTUtil.variableReference("variable"));
-		sst.getBody().add(new BreakStatement());
-
-		assertPrint(sst, "try (variable)", "{", "    break;", "}");
+		assertPrint(usingBlock(varRef("variable"), new BreakStatement()),
+				"try (variable)", "{", "    break;", "}");
 	}
-	
+
 	@Test
 	public void testLockBlock() {
-		LockBlock sst = new LockBlock();
-		sst.setReference(SSTUtil.variableReference("variable"));
-		sst.getBody().add(new ContinueStatement());
-
-		assertPrint(sst, "synchronized (variable)", "{", "    continue;", "}");
+		assertPrint(lockBlock("variable", new ContinueStatement()),
+				"synchronized (variable)", "{", "    continue;", "}");
 	}
-	
+
 	@Test
 	public void testSimpleWhileLoop() {
-		WhileLoop sst = new WhileLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		ReturnStatement returnStatement = new ReturnStatement();
-		returnStatement.setExpression(constant("true"));
-		loopHeader.getBody().add(returnStatement);
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-
-		assertPrint(sst, "while (true)", "{", "    continue;", "    break;",
-				"}");
+		assertPrint(
+				whileLoop(loopHeader(returnStatement(constant("true"))),
+						new ContinueStatement(), new BreakStatement()),
+				"while (true)", "{", "    continue;", "    break;", "}");
 	}
-	
+
 	@Test
 	public void testComplexWhileLoop() {
-		WhileLoop sst = new WhileLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		IVariableDeclaration varDecl = SSTUtil.declareVar("var", TypeName.newTypeName("SomeType, SomeAssembly"));
-		IAssignment assignment = SSTUtil.assignmentToLocal("var", SSTUtil.nullExpr());
-		ReturnStatement returnStatement = new ReturnStatement();
-		IReferenceExpression referenceExpression = SSTUtil.referenceExprToVariable("var");
-		returnStatement.setExpression(referenceExpression);
-		loopHeader.setBody(Lists.newArrayList(varDecl, assignment, returnStatement));
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-
-		assertPrint(sst, "SomeType var;", "var = null;", "while (var)", "{", "    continue;", "    break;", "    var = null;",
-				"}");
+		assertPrint(
+				whileLoop(
+						loopHeader(
+								declareVar("var", TypeName
+										.newTypeName("SomeType, SomeAssembly")),
+								assignmentToLocal("var", nullExpr()),
+								returnStatement(referenceExprToVariable("var"))),
+						new ContinueStatement(), new BreakStatement()),
+				"SomeType var;", "var = null;", "while (var)", "{",
+				"    continue;", "    break;", "    var = null;", "}");
 	}
-	
+
 	@Test
 	public void testSimpleDoLoop() {
-		DoLoop sst = new DoLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		ReturnStatement returnStatement = new ReturnStatement();
-		returnStatement.setExpression(constant("true"));
-		loopHeader.getBody().add(returnStatement);
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-		assertPrint(sst, "do", "{", "    continue;", "    break;", "}", "while (true);");
+		assertPrint(
+				doLoop(loopHeader(returnStatement(referenceExprToVariable("true"))),
+						new ContinueStatement(), new BreakStatement()), "do",
+				"{", "    continue;", "    break;", "}", "while (true);");
+	}
+
+	@Test
+	public void testComplexDoLoop() {
+		assertPrint(
+				doLoop(loopHeader(
+						declareVar("var",
+								TypeName.newTypeName("SomeType, SomeAssembly")),
+						assignmentToLocal("var", nullExpr()),
+						returnStatement(referenceExprToVariable("var"))),
+						new ContinueStatement(), new BreakStatement()),
+				"SomeType var;", "var = null;", "do", "{", "    continue;",
+				"    break;", "    var = null;", "}", "while (var);");
 	}
 	
 	@Test
-	public void testComplexDoLoop() {
-		DoLoop sst = new DoLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		IVariableDeclaration varDecl = SSTUtil.declareVar("var", TypeName.newTypeName("SomeType, SomeAssembly"));
-		IAssignment assignment = SSTUtil.assignmentToLocal("var", SSTUtil.nullExpr());
-		ReturnStatement returnStatement = new ReturnStatement();
-		IReferenceExpression referenceExpression = SSTUtil.referenceExprToVariable("var");
-		returnStatement.setExpression(referenceExpression);
-		loopHeader.setBody(Lists.newArrayList(varDecl, assignment, returnStatement));
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-
-		assertPrint(sst, "SomeType var;", "var = null;", "do", "{", "    continue;", "    break;", "    var = null;",
-				"}", "while (var);");
+	public void testForLoop() {
+		assertPrint(forLoop("var", loopHeader(
+				declare(varRef("condition")),
+				assign(varRef("condition"), binExpr(BinaryOperator.Equal, referenceExprToVariable("var"), constant("2"))),
+				returnStatement(referenceExprToVariable("condition"))) , new ContinueStatement()), 
+				"? var;", 
+				"var = 0;", 
+				"? condition;",
+				"condition = var == 2;",
+				"for (;condition;)", "{", 
+				"    continue;",
+				"    var = 2;",
+				"    condition = var == 2;",
+				"}");
 	}
 
 }

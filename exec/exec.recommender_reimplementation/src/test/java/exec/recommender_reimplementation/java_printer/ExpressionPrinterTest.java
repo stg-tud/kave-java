@@ -17,6 +17,8 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
@@ -25,15 +27,13 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-
 public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest{
 	
 	@Test
 	public void lambdaExpression() {
 		LambdaExpression sst = new LambdaExpression();
 		sst.setName(LambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
+		sst.setBody(Lists.newArrayList(new ContinueStatement(), new BreakStatement()));
 
 		assertPrint(sst, "(C p1, C p2) ->", "{", "    continue;", "    break;", "}");
 	}

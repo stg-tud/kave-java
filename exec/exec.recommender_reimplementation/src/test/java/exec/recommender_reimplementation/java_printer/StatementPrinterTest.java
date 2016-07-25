@@ -17,55 +17,35 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
-import cc.kave.commons.model.ssts.impl.references.PropertyReference;
-import cc.kave.commons.model.ssts.impl.statements.Assignment;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 
-public class StatementPrinterTest extends JavaPrintingVisitorBaseTest{
+public class StatementPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void testAssignment() {
-		IAssignment sst = SSTUtil.assignmentToLocal("var", constant("true"));
+		IAssignment sst = assignmentToLocal("var", constant("true"));
 		assertPrint(sst, "var = true;");
 	}
-	
+
 	@Test
 	public void testPropertySet() {
-		IPropertyName propertyName = PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P");
-
-		PropertyReference propertyReference = new PropertyReference();
-		propertyReference.setPropertyName(propertyName);
-		
-		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(varRef("var"));
-		
-		Assignment assignment = new Assignment();
-		assignment.setReference(propertyReference);
-		assignment.setExpression(refExpr);
-
-		assertPrint(assignment, "setP(var);");		
+		assertPrint(
+				assign(propertyReference(varRef("this"),
+						"get set [PropertyType,P] [DeclaringType,P].P"),
+						referenceExprToVariable("var")), //
+				"setP(var);");
 	}
-	
+
 	@Test
 	public void testPropertyGet() {
-		IPropertyName propertyName = PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P");
-
-		PropertyReference propertyReference = new PropertyReference();
-		propertyReference.setPropertyName(propertyName);
-
-		ReferenceExpression refExpr = new ReferenceExpression();
-		refExpr.setReference(propertyReference);
-		Assignment assignment = new Assignment();
-		assignment.setExpression(refExpr);
-		assignment.setReference(varRef("var"));
-		
-		assertPrint(assignment, "var = getP();");
+		assertPrint(
+				assign(varRef("var"),
+						refExpr(propertyReference(varRef("this"),
+								"get set [PropertyType,P] [DeclaringType,P].P"))), //
+				"var = getP();");
 	}
-	
+
 	@Test
 	public void testGotoStatement() {
 		GotoStatement sst = new GotoStatement();

@@ -97,7 +97,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	public void PropertyDeclaration_GetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
 		sst.setName(PropertyName.newPropertyName("get [PropertyType,P] [DeclaringType,P].P"));
-
+		
 		assertPrint(sst, "PropertyType $property_P;", "PropertyType getP()", "{", "    return $property_P;", "}", "");
 	}
 
@@ -114,7 +114,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	public void PropertyDeclaration() {
 		PropertyDeclaration sst = new PropertyDeclaration();
 		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-
+		
 		assertPrint(sst, "PropertyType $property_P;", "PropertyType getP()", "{", "    return $property_P;", "}",
 				"void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
 	}

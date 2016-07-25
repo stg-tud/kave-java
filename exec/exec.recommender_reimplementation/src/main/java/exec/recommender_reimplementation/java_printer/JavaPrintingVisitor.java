@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
+import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
@@ -31,11 +31,13 @@ import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -66,7 +68,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		context.space().type(sst.getEnclosingType());
 		if (context.typeShape != null
 				&& context.typeShape.getTypeHierarchy().hasSupertypes()) {
-
 
 			ITypeHierarchy extends1 = context.typeShape.getTypeHierarchy()
 					.getExtends();
@@ -115,14 +116,16 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext context) {
-		// TODO could implement delegates as interfaces with one method
+		// could implement delegates as interfaces with one method
+		// but for now ignored
 		return null;
 	}
 
 	@Override
 	public Void visit(IEventDeclaration stmt, SSTPrintingContext context) {
-		// TODO how to handle events -> construct does not exist in java; hard
+		// construct does not exist in java; hard
 		// to implement in general case
+		// ignored
 		return null;
 	}
 
@@ -143,9 +146,9 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().text("void")
-						.space().text("set" + stmt.getName().getName())
-						.text("(").type(stmt.getName().getValueType()).space()
+				context.indentation().text("void").space()
+						.text("set" + stmt.getName().getName()).text("(")
+						.type(stmt.getName().getValueType()).space()
 						.text("value").text(")");
 
 				appendPropertyAccessor(context, stmt.getSet());
@@ -162,7 +165,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 			if (stmt.getName().hasGetter()) {
 				context.indentation().type(stmt.getName().getValueType())
-						.space().text("get" + stmt.getName().getName()).text("()");
+						.space().text("get" + stmt.getName().getName())
+						.text("()");
 
 				context.newLine().indentation();
 
@@ -170,9 +174,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				context.indentationLevel++;
 
 				context.indentation().text("return").space()
-						.text(backingFieldName)
-						.text(";")
-						.newLine();
+						.text(backingFieldName).text(";").newLine();
 
 				context.indentationLevel--;
 				context.indentation().text("}").newLine();
@@ -180,10 +182,10 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().text("void")
-				.space().text("set" + stmt.getName().getName())						
-				.text("(").type(stmt.getName().getValueType()).space()
-				.text("value").text(")");
+				context.indentation().text("void").space()
+						.text("set" + stmt.getName().getName()).text("(")
+						.type(stmt.getName().getValueType()).space()
+						.text("value").text(")");
 
 				context.newLine().indentation();
 
@@ -200,13 +202,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		}
 		return null;
 	}
-	
-	private Void appendPropertyAccessor(SSTPrintingContext context, List<IStatement> body) {
-		context.statementBlock(body, this, true);
-		
-		context.newLine();
-		return null;
-	}
 
 	@Override
 	public Void visit(IAssignment assignment, SSTPrintingContext context) {
@@ -217,7 +212,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			context.indentation();
 			assignment.getReference().accept(this, context);
 			context.text(" = ");
-			context.indentation().text("get")
+			context.text("get")
 					.text(propertyReferenceGet.getPropertyName().getName())
 					.text("(").text(")").text(";");
 		} else {
@@ -242,17 +237,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	private IPropertyReference expressionContainsPropertyReference(
-			IAssignableExpression expression) {
-		if (expression instanceof IReferenceExpression) {
-			IReferenceExpression refExpr = (IReferenceExpression) expression;
-			if (refExpr.getReference() instanceof IPropertyReference) {
-				return (IPropertyReference) refExpr.getReference();
-			}
-		}
-		return null;
-	}
-
 	@Override
 	public Void visit(IGotoStatement stmt, SSTPrintingContext context) {
 		// unused in java
@@ -273,17 +257,43 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
 				.getBody());
-		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
-			statementListWithLoopHeader
-					.addAll(getLoopHeaderBlockWithoutDeclaration((ILoopHeaderBlockExpression) block
-							.getCondition()));
-		}
+		statementListWithLoopHeader
+				.addAll(getLoopHeaderBlockWithoutDeclaration(block
+						.getCondition()));
 
 		context.statementBlock(statementListWithLoopHeader, this, true);
 
 		context.newLine().indentation().keyword("while").space().text("(");
 		condition.accept(this, context);
 		context.text(");");
+		return null;
+	}
+
+	@Override
+	public Void visit(IForLoop block, SSTPrintingContext context) {
+		statementBlockWithoutIndent(block, context);	
+		
+		ISimpleExpression condition;
+		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
+			condition = appendLoopHeaderBlock(
+					(ILoopHeaderBlockExpression) block.getCondition(), context);
+		} else {
+			condition = (ISimpleExpression) block.getCondition();
+		}
+
+		context.indentation().keyword("for").space().text("(").text(";");
+		condition.accept(this, context);
+		context.text(";").text(")");
+
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
+				.getBody());
+		statementListWithLoopHeader.addAll(block.getStep());
+		statementListWithLoopHeader
+				.addAll(getLoopHeaderBlockWithoutDeclaration(block
+						.getCondition()));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
+
 		return null;
 	}
 
@@ -303,41 +313,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
 				.getBody());
-		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
-			statementListWithLoopHeader
-					.addAll(getLoopHeaderBlockWithoutDeclaration((ILoopHeaderBlockExpression) block
-							.getCondition()));
-		}
+		statementListWithLoopHeader
+				.addAll(getLoopHeaderBlockWithoutDeclaration(block
+						.getCondition()));
 
 		context.statementBlock(statementListWithLoopHeader, this, true);
 
-		return null;
-	}
-
-	private List<IStatement> getLoopHeaderBlockWithoutDeclaration(
-			ILoopHeaderBlockExpression loopHeaderBlock) {
-		List<IStatement> blockList = Lists.newArrayList();
-		for (IStatement statement : loopHeaderBlock.getBody()) {
-			if (statement instanceof IVariableDeclaration
-					|| statement instanceof IReturnStatement)
-				continue;
-			blockList.add(statement);
-		}
-		return blockList;
-	}
-
-	private ISimpleExpression appendLoopHeaderBlock(
-			ILoopHeaderBlockExpression loopHeaderBlock,
-			SSTPrintingContext context) {
-		for (IStatement statement : loopHeaderBlock.getBody()) {
-			if (statement instanceof IReturnStatement) {
-				IReturnStatement returnStatement = (IReturnStatement) statement;
-				return returnStatement.getExpression();
-			}
-
-			statement.accept(this, context);
-			context.newLine();
-		}
 		return null;
 	}
 
@@ -363,19 +344,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IComposedExpression expr, SSTPrintingContext context) {
-		// TODO: how to handle composed expressions?
-		context.text("(");
-
-		for (IReference reference : expr.getReferences()) {
-			reference.accept(this, context);
-
-			if (!reference.equals(expr.getReferences().get(
-					expr.getReferences().size() - 1))) {
-				context.text(", ");
-			}
-		}
-
-		context.text(")");
+		// ignored
 		return null;
 	}
 
@@ -391,7 +360,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	public Void visit(IPropertyReference propertyRef, SSTPrintingContext context) {
 		context.text(propertyRef.getReference().getIdentifier());
 		context.text(".");
-		// TODO: temporary property solution by using field
+		// converts property reference to reference to created backing field
 		context.text("$Property_" + propertyRef.getPropertyName().getName());
 		return null;
 	}
@@ -401,23 +370,79 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (expr.getOperator() == CastOperator.SafeCast) {
 			// handles safe cast by using ?-operator
 			context.text(expr.getReference().getIdentifier())
-					.text(" instanceof ").type(expr.getTargetType())
-					.space().text("?").space()
-					.text("(").type(expr.getTargetType()).text(") ")
-					.text(expr.getReference().getIdentifier()).text(" : ")
-					.text("null");
+					.text(" instanceof ").type(expr.getTargetType()).space()
+					.text("?").space().text("(").type(expr.getTargetType())
+					.text(") ").text(expr.getReference().getIdentifier())
+					.text(" : ").text("null");
 		} else {
 			context.text("(" + expr.getTargetType().getName() + ") ");
 			context.text(expr.getReference().getIdentifier());
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IUnknownStatement unknownStmt, SSTPrintingContext context) {
 		// ignores UnknownStatement
 		return null;
 	}
 
-	// TODO how to handle IIndexAccessExpression and IIndexAccessReference
+	private Void appendPropertyAccessor(SSTPrintingContext context,
+			List<IStatement> body) {
+		context.statementBlock(body, this, true);
+	
+		context.newLine();
+		return null;
+	}
+
+	protected ISimpleExpression appendLoopHeaderBlock(
+			ILoopHeaderBlockExpression loopHeaderBlock,
+			SSTPrintingContext context) {
+		for (IStatement statement : loopHeaderBlock.getBody()) {
+			if (statement instanceof IReturnStatement) {
+				IReturnStatement returnStatement = (IReturnStatement) statement;
+				return returnStatement.getExpression();
+			}
+	
+			statement.accept(this, context);
+			context.newLine();
+		}
+		return null;
+	}
+
+	private IPropertyReference expressionContainsPropertyReference(
+			IAssignableExpression expression) {
+		if (expression instanceof IReferenceExpression) {
+			IReferenceExpression refExpr = (IReferenceExpression) expression;
+			if (refExpr.getReference() instanceof IPropertyReference) {
+				return (IPropertyReference) refExpr.getReference();
+			}
+		}
+		return null;
+	}
+
+	protected List<IStatement> getLoopHeaderBlockWithoutDeclaration(
+			ILoopHeaderExpression loopHeader) {
+		List<IStatement> blockList = Lists.newArrayList();
+		if (loopHeader instanceof ILoopHeaderBlockExpression) {
+			ILoopHeaderBlockExpression loopHeaderBlock = (ILoopHeaderBlockExpression) loopHeader;
+			for (IStatement statement : loopHeaderBlock.getBody()) {
+				if (statement instanceof IVariableDeclaration
+						|| statement instanceof IReturnStatement)
+					continue;
+				blockList.add(statement);
+			}
+		}
+		return blockList;
+	}
+
+	protected void statementBlockWithoutIndent(IForLoop block,
+			SSTPrintingContext context) {
+		for (IStatement statement : block.getInit()) {
+			statement.accept(this, context);
+			context.newLine();
+		}
+	}
+	
+	// TODO: IndexAccessExpression no type information on variable reference
 }
