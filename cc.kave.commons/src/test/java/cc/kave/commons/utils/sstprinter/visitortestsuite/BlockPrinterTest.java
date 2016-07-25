@@ -15,16 +15,29 @@
  */
 package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assignmentToLocal;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.doLoop;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.forLoop;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.loopHeader;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.nullExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.referenceExprToVariable;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
+
 import org.junit.Test;
 
-import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
-import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
-import cc.kave.commons.model.ssts.impl.blocks.ForLoop;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
@@ -32,11 +45,8 @@ import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UsingBlock;
-import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
-import cc.kave.commons.model.ssts.impl.expressions.loopheader.LoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 
 public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
@@ -44,7 +54,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testForEachLoop() {
 		ForEachLoop sst = new ForEachLoop();
-		sst.setDeclaration(SSTUtil.declare("e", Names.newType("T,P")));
+		sst.setDeclaration(SSTUtil.declare("e", TypeName.newTypeName("T,P")));
 		sst.setLoopedReference(SSTUtil.variableReference("elements"));
 		sst.getBody().add(new ContinueStatement());
 
@@ -94,7 +104,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
 		sst.getFinally().add(new ContinueStatement());
@@ -110,7 +120,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
@@ -139,7 +149,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 		ThrowStatement s = new ThrowStatement();
 		s.setReference(varRef("ExceptionType"));
 		CatchBlock catch1 = new CatchBlock();
-		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.setParameter(ParameterName.newParameterName("[ExceptionType,P] e"));
 		catch1.setKind(CatchBlockKind.Unnamed);
 		catch1.getBody().add(new BreakStatement());
 		sst.getCatchBlocks().add(catch1);
@@ -201,48 +211,63 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void testWhileLoop() {
-		WhileLoop sst = new WhileLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		ReturnStatement returnStatement = new ReturnStatement();
-		returnStatement.setExpression(constant("true"));
-		loopHeader.getBody().add(returnStatement);
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
+	public void testSimpleWhileLoop() {
+		assertPrint(
+				whileLoop(loopHeader(returnStatement(constant("true"))),
+						new ContinueStatement(), new BreakStatement()),
+				"while (true)", "{", "    continue;", "    break;", "}");
+	}
 
-		assertPrint(sst, "while (", "    {", "        return true;", "    }", ")", "{", "    continue;", "    break;",
+	@Test
+	public void testComplexWhileLoop() {
+		assertPrint(
+				whileLoop(
+						loopHeader(
+								declareVar("var", TypeName
+										.newTypeName("SomeType, SomeAssembly")),
+								assignmentToLocal("var", nullExpr()),
+								returnStatement(referenceExprToVariable("var"))),
+						new ContinueStatement(), new BreakStatement()),
+				"SomeType var;", "var = null;", "while (var)", "{",
+				"    continue;", "    break;", "    var = null;", "}");
+	}
+
+	@Test
+	public void testSimpleDoLoop() {
+		assertPrint(
+				doLoop(loopHeader(returnStatement(referenceExprToVariable("true"))),
+						new ContinueStatement(), new BreakStatement()), "do",
+				"{", "    continue;", "    break;", "}", "while (true);");
+	}
+
+	@Test
+	public void testComplexDoLoop() {
+		assertPrint(
+				doLoop(loopHeader(
+						declareVar("var",
+								TypeName.newTypeName("SomeType, SomeAssembly")),
+						assignmentToLocal("var", nullExpr()),
+						returnStatement(referenceExprToVariable("var"))),
+						new ContinueStatement(), new BreakStatement()),
+				"SomeType var;", "var = null;", "do", "{", "    continue;",
+				"    break;", "    var = null;", "}", "while (var);");
+	}
+	
+	@Test
+	public void testForLoop() {
+		assertPrint(forLoop("var", loopHeader(
+				declare(varRef("condition")),
+				assign(varRef("condition"), binExpr(BinaryOperator.Equal, referenceExprToVariable("var"), constant("2"))),
+				returnStatement(referenceExprToVariable("condition"))) , new ContinueStatement()), 
+				"? var;", 
+				"var = 0;", 
+				"? condition;",
+				"condition = var == 2;",
+				"for (;condition;)", "{", 
+				"    continue;",
+				"    var = 2;",
+				"    condition = var == 2;",
 				"}");
 	}
 
-	@Test
-	public void testDoLoop() {
-		DoLoop sst = new DoLoop();
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		ReturnStatement returnStatement = new ReturnStatement();
-		returnStatement.setExpression(constant("true"));
-		loopHeader.getBody().add(returnStatement);
-		sst.setCondition(loopHeader);
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-		assertPrint(sst, "do", "{", "    continue;", "    break;", "}", "while (", "    {", "        return true;",
-				"    }", ")");
-	}
-
-	@Test
-	public void testForLoop() {
-		ForLoop sst = new ForLoop();
-		sst.getInit().add(SSTUtil.declare("i", Names.newType("T,P")));
-		sst.getInit().add(SSTUtil.assignmentToLocal("i", constant("0")));
-		sst.getBody().add(new ContinueStatement());
-		sst.getBody().add(new BreakStatement());
-		LoopHeaderBlockExpression loopHeader = new LoopHeaderBlockExpression();
-		ReturnStatement returnStatement = new ReturnStatement();
-		returnStatement.setExpression(constant("true"));
-		loopHeader.getBody().add(returnStatement);
-		sst.setCondition(loopHeader);
-
-		assertPrint(sst, "for (", "    {", "        T i;", "        i = 0;", "    };", "    {", "        return true;",
-				"    }; { }", ")", "{", "    continue;", "    break;", "}");
-	}
 }

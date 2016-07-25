@@ -18,36 +18,25 @@ package exec.recommender_reimplementation.java_printer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.blocks.IDoLoop;
-import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
-import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
-import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
-import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
-import cc.kave.commons.model.ssts.expressions.loopheader.ILoopHeaderBlockExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IGotoStatement;
-import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
@@ -244,85 +233,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	}
 
 	@Override
-	public Void visit(IDoLoop block, SSTPrintingContext context) {
-		ISimpleExpression condition;
-		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
-			condition = appendLoopHeaderBlock(
-					(ILoopHeaderBlockExpression) block.getCondition(), context);
-		} else {
-			condition = (ISimpleExpression) block.getCondition();
-		}
-
-		context.indentation().keyword("do");
-
-		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
-				.getBody());
-		statementListWithLoopHeader
-				.addAll(getLoopHeaderBlockWithoutDeclaration(block
-						.getCondition()));
-
-		context.statementBlock(statementListWithLoopHeader, this, true);
-
-		context.newLine().indentation().keyword("while").space().text("(");
-		condition.accept(this, context);
-		context.text(");");
-		return null;
-	}
-
-	@Override
-	public Void visit(IForLoop block, SSTPrintingContext context) {
-		statementBlockWithoutIndent(block, context);	
-		
-		ISimpleExpression condition;
-		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
-			condition = appendLoopHeaderBlock(
-					(ILoopHeaderBlockExpression) block.getCondition(), context);
-		} else {
-			condition = (ISimpleExpression) block.getCondition();
-		}
-
-		context.indentation().keyword("for").space().text("(").text(";");
-		condition.accept(this, context);
-		context.text(";").text(")");
-
-		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
-				.getBody());
-		statementListWithLoopHeader.addAll(block.getStep());
-		statementListWithLoopHeader
-				.addAll(getLoopHeaderBlockWithoutDeclaration(block
-						.getCondition()));
-
-		context.statementBlock(statementListWithLoopHeader, this, true);
-
-		return null;
-	}
-
-	@Override
-	public Void visit(IWhileLoop block, SSTPrintingContext context) {
-		ISimpleExpression condition;
-		if (block.getCondition() instanceof ILoopHeaderBlockExpression) {
-			condition = appendLoopHeaderBlock(
-					(ILoopHeaderBlockExpression) block.getCondition(), context);
-		} else {
-			condition = (ISimpleExpression) block.getCondition();
-		}
-
-		context.indentation().keyword("while").space().text("(");
-		condition.accept(this, context);
-		context.text(")");
-
-		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(block
-				.getBody());
-		statementListWithLoopHeader
-				.addAll(getLoopHeaderBlockWithoutDeclaration(block
-						.getCondition()));
-
-		context.statementBlock(statementListWithLoopHeader, this, true);
-
-		return null;
-	}
-
-	@Override
 	public Void visit(IUncheckedBlock block, SSTPrintingContext context) {
 		// ignores unchecked keyword
 		context.indentation().statementBlock(block.getBody(), this, true);
@@ -395,21 +305,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	protected ISimpleExpression appendLoopHeaderBlock(
-			ILoopHeaderBlockExpression loopHeaderBlock,
-			SSTPrintingContext context) {
-		for (IStatement statement : loopHeaderBlock.getBody()) {
-			if (statement instanceof IReturnStatement) {
-				IReturnStatement returnStatement = (IReturnStatement) statement;
-				return returnStatement.getExpression();
-			}
-	
-			statement.accept(this, context);
-			context.newLine();
-		}
-		return null;
-	}
-
 	private IPropertyReference expressionContainsPropertyReference(
 			IAssignableExpression expression) {
 		if (expression instanceof IReferenceExpression) {
@@ -421,28 +316,5 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	protected List<IStatement> getLoopHeaderBlockWithoutDeclaration(
-			ILoopHeaderExpression loopHeader) {
-		List<IStatement> blockList = Lists.newArrayList();
-		if (loopHeader instanceof ILoopHeaderBlockExpression) {
-			ILoopHeaderBlockExpression loopHeaderBlock = (ILoopHeaderBlockExpression) loopHeader;
-			for (IStatement statement : loopHeaderBlock.getBody()) {
-				if (statement instanceof IVariableDeclaration
-						|| statement instanceof IReturnStatement)
-					continue;
-				blockList.add(statement);
-			}
-		}
-		return blockList;
-	}
-
-	protected void statementBlockWithoutIndent(IForLoop block,
-			SSTPrintingContext context) {
-		for (IStatement statement : block.getInit()) {
-			statement.accept(this, context);
-			context.newLine();
-		}
-	}
-	
 	// TODO: IndexAccessExpression no type information on variable reference
 }

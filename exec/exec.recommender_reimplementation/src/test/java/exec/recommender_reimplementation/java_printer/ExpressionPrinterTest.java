@@ -25,6 +25,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest{
@@ -52,5 +53,12 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest{
 		sst.setReference(SSTUtil.variableReference("x"));
 		sst.setTargetType(TypeName.newTypeName("SomeType, SomeAssembly"));
 		assertPrint(sst, "x instanceof SomeType ? (SomeType) x : null");
+	}
+	
+	@Test
+	public void testTypeCheckExpression() {
+		TypeCheckExpression sst = new TypeCheckExpression();
+		sst.setReference(varRef("x"));
+		assertPrint(sst, "x instanceof ?");
 	}
 }

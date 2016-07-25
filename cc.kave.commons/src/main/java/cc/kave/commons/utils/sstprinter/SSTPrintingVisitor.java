@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -44,6 +47,7 @@ import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -325,15 +329,18 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IDoLoop block, SSTPrintingContext context) {
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
+
 		context.indentation().keyword("do");
 
-		context.statementBlock(block.getBody(), this, true);
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(Iterables.concat(block.getBody(),
+				getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
 
 		context.newLine().indentation().keyword("while").space().text("(");
-		context.indentationLevel++;
-		block.getCondition().accept(this, context);
-		context.indentationLevel--;
-		context.newLine().indentation().text(")");
+		condition.accept(this, context);
+		context.text(");");
 		return null;
 	}
 
@@ -351,21 +358,19 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IForLoop block, SSTPrintingContext context) {
-		context.indentation().keyword("for").space().text("(");
+		statementBlockWithoutIndent(block, context);
 
-		context.indentationLevel++;
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
 
-		context.statementBlock(block.getInit(), this, true);
-		context.text(";");
-		block.getCondition().accept(this, context);
-		context.text(";");
-		context.statementBlock(block.getStep(), this, true);
+		context.indentation().keyword("for").space().text("(").text(";");
+		condition.accept(this, context);
+		context.text(";").text(")");
 
-		context.indentationLevel--;
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(Iterables.concat(block.getBody(),
+				block.getStep(), getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
 
-		context.newLine().indentation().text(")");
+		context.statementBlock(statementListWithLoopHeader, this, true);
 
-		context.statementBlock(block.getBody(), this, true);
 		return null;
 	}
 
@@ -410,8 +415,8 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		}
 
 		if (!block.getDefaultSection().isEmpty()) {
-			context.newLine().indentation().keyword("default").text(":").statementBlock(block.getDefaultSection(), this,
-					false);
+			context.newLine().indentation().keyword("default").text(":")
+					.statementBlock(block.getDefaultSection(), this, false);
 		}
 
 		context.newLine();
@@ -468,13 +473,17 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IWhileLoop block, SSTPrintingContext context) {
-		context.indentation().keyword("while").space().text("(");
-		context.indentationLevel++;
-		block.getCondition().accept(this, context);
-		context.indentationLevel--;
-		context.newLine().indentation().text(")");
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
 
-		context.statementBlock(block.getBody(), this, true);
+		context.indentation().keyword("while").space().text("(");
+		condition.accept(this, context);
+		context.text(")");
+
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(Iterables.concat(block.getBody(),
+				getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
+
 		return null;
 	}
 
@@ -670,7 +679,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 	@Override
 	public Void visit(ITypeCheckExpression expr, SSTPrintingContext context) {
 		context.text(expr.getReference().getIdentifier());
-		context.text(" instanceof ");
+		context.text(" ").keyword("is").text(" ");
 		context.text(expr.getType().getName());
 		return null;
 	}
@@ -813,4 +822,50 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
+
+	protected ISimpleExpression appendLoopHeaderBlock(ILoopHeaderBlockExpression loopHeaderBlock,
+			SSTPrintingContext context) {
+		for (IStatement statement : loopHeaderBlock.getBody()) {
+			if (statement instanceof IReturnStatement) {
+				IReturnStatement returnStatement = (IReturnStatement) statement;
+				return returnStatement.getExpression();
+			}
+
+			statement.accept(this, context);
+			context.newLine();
+		}
+		return null;
+	}
+
+	protected List<IStatement> getLoopHeaderBlockWithoutDeclaration(ILoopHeaderExpression loopHeader) {
+		List<IStatement> blockList = Lists.newArrayList();
+		if (loopHeader instanceof ILoopHeaderBlockExpression) {
+			ILoopHeaderBlockExpression loopHeaderBlock = (ILoopHeaderBlockExpression) loopHeader;
+			for (IStatement statement : loopHeaderBlock.getBody()) {
+				if (statement instanceof IVariableDeclaration || statement instanceof IReturnStatement)
+					continue;
+				blockList.add(statement);
+			}
+		}
+		return blockList;
+	}
+
+	protected ISimpleExpression getSimpleConditionOrAppendLoopBlock(ILoopHeaderExpression loopHeader,
+			SSTPrintingContext context) {
+		ISimpleExpression condition;
+		if (loopHeader instanceof ILoopHeaderBlockExpression) {
+			condition = appendLoopHeaderBlock((ILoopHeaderBlockExpression) loopHeader, context);
+		} else {
+			condition = (ISimpleExpression) loopHeader;
+		}
+		return condition;
+	}
+
+	protected void statementBlockWithoutIndent(IForLoop block, SSTPrintingContext context) {
+		for (IStatement statement : block.getInit()) {
+			statement.accept(this, context);
+			context.newLine();
+		}
+	}
+
 }

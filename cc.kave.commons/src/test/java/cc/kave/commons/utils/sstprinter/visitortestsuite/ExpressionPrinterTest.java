@@ -265,7 +265,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testTypeCheckExpression() {
 		TypeCheckExpression sst = new TypeCheckExpression();
 		sst.setReference(varRef("x"));
-		assertPrint(sst, "x instanceof ?");
+		assertPrint(sst, "x is ?");
 	}
 
 	@Test

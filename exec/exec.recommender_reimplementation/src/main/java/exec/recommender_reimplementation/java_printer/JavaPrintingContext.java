@@ -31,6 +31,7 @@ public class JavaPrintingContext extends SSTPrintingContext {
 			.put("using", "try")
 			.put("in", ":")
 			.put("foreach", "for")
+			.put("is", "instanceof")
 			.build();
 	
 	
