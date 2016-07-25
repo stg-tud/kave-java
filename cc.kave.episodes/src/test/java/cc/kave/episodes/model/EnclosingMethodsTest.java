@@ -62,7 +62,7 @@ public class EnclosingMethodsTest {
 	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getOccurrences());
-		assertEquals(Sets.newLinkedHashSet(), sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(Sets.newLinkedHashSet(), sut.getMethodNames(5));
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class EnclosingMethodsTest {
 		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
 
 		assertEquals(1, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class EnclosingMethodsTest {
 		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
 
 		assertEquals(2, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class EnclosingMethodsTest {
 				Events.newContext(m(3, 2)).getMethod());
 
 		assertEquals(3, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class EnclosingMethodsTest {
 		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
 
 		assertEquals(1, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -165,7 +165,7 @@ public class EnclosingMethodsTest {
 				Events.newContext(m(3, 2)).getMethod());
 
 		assertEquals(3, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class EnclosingMethodsTest {
 		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
 
 		assertEquals(2, sut.getOccurrences());
-		assertEquals(expected, sut.getMethodNamesNotRespectOrder(5));
+		assertEquals(expected, sut.getMethodNames(5));
 	}
 
 	@Test
@@ -196,7 +196,7 @@ public class EnclosingMethodsTest {
 		EnclosingMethods b = new EnclosingMethods();
 
 		assertEquals(a, b);
-		assertEquals(a.getMethodNamesNotRespectOrder(5), b.getMethodNamesNotRespectOrder(5));
+		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
 		assertEquals(a.getOccurrences(), b.getOccurrences());
 	}
 
@@ -216,7 +216,7 @@ public class EnclosingMethodsTest {
 		b.addMethod(episode, method, events, false);
 
 		assertEquals(a, b);
-		assertEquals(a.getMethodNamesNotRespectOrder(5), b.getMethodNamesNotRespectOrder(5));
+		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
 		assertEquals(a.getOccurrences(), b.getOccurrences());
 	}
 
@@ -238,7 +238,7 @@ public class EnclosingMethodsTest {
 		b.addMethod(episode, method2, events, false);
 
 		assertEquals(a.getOccurrences(), b.getOccurrences());
-		assertNotEquals(a.getMethodNamesNotRespectOrder(5), b.getMethodNamesNotRespectOrder(5));
+		assertNotEquals(a.getMethodNames(5), b.getMethodNames(5));
 		assertNotEquals(a, b);
 	}
 
@@ -260,7 +260,7 @@ public class EnclosingMethodsTest {
 		b.addMethod(episode, method2, events, false);
 
 		assertNotEquals(a.getOccurrences(), b.getOccurrences());
-		assertEquals(a.getMethodNamesNotRespectOrder(5), b.getMethodNamesNotRespectOrder(5));
+		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
 		assertNotEquals(a, b);
 	}
 

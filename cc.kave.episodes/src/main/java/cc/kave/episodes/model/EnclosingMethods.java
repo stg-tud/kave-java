@@ -35,41 +35,38 @@ import cc.recommenders.datastructures.Tuple;
 
 public class EnclosingMethods {
 
-	private Map<IMethodName, Integer> methodSet = Maps.newLinkedHashMap();
-	private Map<IMethodName, Integer> methodOrder = Maps.newLinkedHashMap();
+	private Map<IMethodName, Integer> methods = Maps.newLinkedHashMap();
 
 	public void addMethod(Episode episode, List<Fact> method, List<Event> events, boolean order) throws Exception {
-		IMethodName enclosingMethod = getEnclosingMethod(method, events);
-		int counterSet = 0;
-		int counterOrder = 0;
+		int counter = 0;
 
-		counterSet = getSetCounter(episode, method);
-		counterOrder = getOrderCounter(episode, method);
-		
-		if (counterSet > 0) {
-			methodSet.put(enclosingMethod, counterSet);
+		if (order) {
+			counter = getOrderCounter(episode, method);
+		} else {
+			counter = getSetCounter(episode, method);
 		}
-		if (counterOrder > 0) {
-			methodOrder.put(enclosingMethod, counterOrder);
+		if (counter > 0) {
+			IMethodName enclosingMethod = getEnclosingMethod(method, events);
+			methods.put(enclosingMethod, counter);
 		}
 	}
-
-	public Set<IMethodName> getMethodNamesNotRespectOrder(int numberOfMethods) {
+	
+	public Set<IMethodName> getMethodNames(int numberOfMethods) {
 		Set<IMethodName> someMethods = Sets.newLinkedHashSet();
-
-		for (Map.Entry<IMethodName, Integer> entry : methodSet.entrySet()) {
+		
+		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
 			someMethods.add(entry.getKey());
 			if (someMethods.size() == numberOfMethods) {
 				break;
 			}
 		}
 		return someMethods;
-	}
-
+	} 
+	
 	public int getOccurrences() {
 		int counter = 0;
-
-		for (Map.Entry<IMethodName, Integer> entry : methodSet.entrySet()) {
+		
+		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
 			counter += entry.getValue();
 		}
 		return counter;
@@ -90,7 +87,7 @@ public class EnclosingMethods {
 		Set<Fact> episodeRelations = episode.getRelations();
 		int previousCounter = Integer.MAX_VALUE;
 		int counter = 0;
-
+		
 		if (episodeRelations.size() == 0) {
 			return getSetCounter(episode, method);
 		}
@@ -164,7 +161,7 @@ public class EnclosingMethods {
 		}
 		return minimum;
 	}
-
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -181,7 +178,7 @@ public class EnclosingMethods {
 	}
 
 	public boolean equals(EnclosingMethods enclMethods) {
-		if (!this.methodSet.equals(enclMethods.methodSet)) {
+		if (!this.methods.equals(enclMethods.methods)) {
 			return false;
 		}
 		return true;
