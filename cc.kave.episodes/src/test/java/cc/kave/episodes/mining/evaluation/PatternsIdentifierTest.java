@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -42,6 +43,7 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.mining.reader.StreamParser;
@@ -66,6 +68,8 @@ public class PatternsIdentifierTest {
 	private MappingParser mappingParser;
 	@Mock
 	private EpisodesPostprocessor processor;
+	@Mock
+	private MaximalEpisodes maxEpisodes;
 	@Mock
 	private ReposParser repos;
 
@@ -106,11 +110,12 @@ public class PatternsIdentifierTest {
 		events = Lists.newArrayList(dummy(), firstCtx(1), enclosingCtx(2), inv(3), inv(4), firstCtx(5), superCtx(6),
 				enclosingCtx(7), enclosingCtx(8), enclosingCtx(9));
 		
-		sut = new PatternsIdentifier(streamParser, processor, mappingParser, repos);
+		sut = new PatternsIdentifier(streamParser, processor, mappingParser, maxEpisodes, repos);
 		
 		when(streamParser.parseStream(anyInt())).thenReturn(stream);
 		when(mappingParser.parse(anyInt())).thenReturn(events);
 		when(processor.postprocess(anyInt(), anyInt(), anyDouble())).thenReturn(patterns);
+		when(maxEpisodes.getMaximalEpisodes(any(Map.class))).thenReturn(patterns);
 	}
 	
 	@After
@@ -125,6 +130,7 @@ public class PatternsIdentifierTest {
 		verify(streamParser).parseStream(anyInt());
 		verify(mappingParser).parse(anyInt());
 		verify(processor).postprocess(anyInt(), anyInt(), anyDouble());
+		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));
 	}
 	
 	@Test

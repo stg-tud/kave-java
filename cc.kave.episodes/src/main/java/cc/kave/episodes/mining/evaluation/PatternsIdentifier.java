@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.mining.reader.StreamParser;
@@ -36,22 +37,25 @@ public class PatternsIdentifier {
 	private StreamParser streamParser;
 	private MappingParser mappingParser;
 	private EpisodesPostprocessor episodeProcessor;
+	private MaximalEpisodes maxEpisodes;
 
 	private ReposParser repos;
 
 	@Inject
 	public PatternsIdentifier(StreamParser streamParser, EpisodesPostprocessor episodes, MappingParser mappingParser,
-			ReposParser repos) {
+			MaximalEpisodes maxEpisodes, ReposParser repos) {
 		this.streamParser = streamParser;
 		this.mappingParser = mappingParser;
 		this.episodeProcessor = episodes;
+		this.maxEpisodes = maxEpisodes;
 		this.repos = repos;
 	}
 
 	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
-		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
