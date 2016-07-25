@@ -48,7 +48,7 @@ public class PatternsIdentifier {
 		this.repos = repos;
 	}
 
-	public void trainingCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
+	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
@@ -59,13 +59,13 @@ public class PatternsIdentifier {
 			}
 			for (Episode episode : entry.getValue()) {
 				Set<Fact> episodeFacts = episode.getEvents();
-				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods();
-				EnclosingMethods methodsOrderRelation = new EnclosingMethods();
+				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
 				for (List<Fact> method : stream) {
 					if (method.containsAll(episodeFacts)) {
-						methodsNoOrderRelation.addMethod(episode, method, events, false);
-						methodsOrderRelation.addMethod(episode, method, events, true);
+						methodsNoOrderRelation.addMethod(episode, method, events);
+						methodsOrderRelation.addMethod(episode, method, events);
 					}
 				}
 				if (methodsOrderRelation.getOccurrences() < frequency) {

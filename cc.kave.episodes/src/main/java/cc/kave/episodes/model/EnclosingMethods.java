@@ -26,6 +26,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -34,10 +35,16 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.recommenders.datastructures.Tuple;
 
 public class EnclosingMethods {
-
+	
+	private boolean order;
 	private Map<IMethodName, Integer> methods = Maps.newLinkedHashMap();
+	
+	@Inject
+	public EnclosingMethods(boolean order) {
+		this.order = order;
+	}
 
-	public void addMethod(Episode episode, List<Fact> method, List<Event> events, boolean order) throws Exception {
+	public void addMethod(Episode episode, List<Fact> method, List<Event> events) throws Exception {
 		int counter = 0;
 
 		if (order) {
