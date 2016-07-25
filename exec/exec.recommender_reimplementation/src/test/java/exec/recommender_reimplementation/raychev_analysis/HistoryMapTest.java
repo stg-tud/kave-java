@@ -69,7 +69,9 @@ public class HistoryMapTest extends RaychevAnalysisBaseTest {
 	
 	@Test
 	public void createsNewAbstractHistoryWhenItDoesNotExist() {
-		assertEquals(new AbstractHistory(), historyMap.getOrCreateAbstractHistory(Sets.newHashSet(new AbstractLocation())));
+		AbstractHistory expected = new AbstractHistory();
+		expected.getHistorySet().add(new ConcreteHistory());
+		assertEquals(expected, historyMap.getOrCreateAbstractHistory(Sets.newHashSet(new AbstractLocation())));
 	}
 
 	@Test

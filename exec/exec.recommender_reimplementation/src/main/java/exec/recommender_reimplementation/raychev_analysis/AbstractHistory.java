@@ -74,11 +74,7 @@ public class AbstractHistory {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof AbstractHistory)) return false;
-		AbstractHistory other = (AbstractHistory) obj;
-		return EqualsBuilder.reflectionEquals(abstractHistory, other.abstractHistory) &&
-				EqualsBuilder.reflectionEquals(historySet, other.historySet);
-//		return EqualsBuilder.reflectionEquals(this, obj);
+		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 	
 	@Override
@@ -89,8 +85,11 @@ public class AbstractHistory {
 	public void addInteraction(Interaction interaction) {
 		abstractHistory.add(interaction);
 
-		for (ConcreteHistory concreteHistory : historySet) {
+		Set<ConcreteHistory> clonedHistory = new HashSet<>(historySet);
+		historySet.clear();
+		for (ConcreteHistory concreteHistory : clonedHistory) {
 			concreteHistory.add(interaction);
+			historySet.add(concreteHistory);
 		}
 	}
 

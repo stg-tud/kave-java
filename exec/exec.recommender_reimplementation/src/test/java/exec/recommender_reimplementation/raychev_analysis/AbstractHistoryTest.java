@@ -1,6 +1,9 @@
 package exec.recommender_reimplementation.raychev_analysis;
 
 import static org.junit.Assert.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -65,7 +68,7 @@ public class AbstractHistoryTest extends RaychevAnalysisBaseTest {
 				callInDefaultContextAsReceiver("m3")), //
 				Sets.newHashSet(
 						createConcreteHistory(//
-								callInDefaultContextAsReceiver("m1"), callInDefaultContextAsReceiver("m3")),
+								callInDefaultContextAsReceiver("m1")),
 						createConcreteHistory(//
 								callInDefaultContextAsReceiver("m1"), callInDefaultContextAsReceiver("m3")),
 						createConcreteHistory(callInDefaultContextAsReceiver("m1"),

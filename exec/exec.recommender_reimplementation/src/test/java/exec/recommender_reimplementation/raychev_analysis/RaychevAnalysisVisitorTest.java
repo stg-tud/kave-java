@@ -22,12 +22,6 @@ import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidT
 import static exec.recommender_reimplementation.raychev_analysis.Interaction.RETURN;
 import static org.junit.Assert.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
