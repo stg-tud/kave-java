@@ -121,13 +121,17 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	@Override
 	public Void visit(IPropertyDeclaration stmt, SSTPrintingContext context) {
 		boolean hasBody = !stmt.getGet().isEmpty() || !stmt.getSet().isEmpty();
-
+		String propertyName = stmt.getName().getName();
+		if(propertyName.endsWith("()")) {
+			propertyName = propertyName.replace("()", "");
+		}
+		
 		if (hasBody) { // Long version: add methods for getter and setter; no
 						// backing field
 
 			if (stmt.getName().hasGetter()) {
 				context.indentation().type(stmt.getName().getValueType())
-						.space().text("get" + stmt.getName().getName())
+						.space().text("get" + propertyName)
 						.text("()");
 
 				appendPropertyAccessor(context, stmt.getGet());
@@ -136,7 +140,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 			if (stmt.getName().hasSetter()) {
 				context.indentation().text("void").space()
-						.text("set" + stmt.getName().getName()).text("(")
+						.text("set" + propertyName).text("(")
 						.type(stmt.getName().getValueType()).space()
 						.text("value").text(")");
 
@@ -146,7 +150,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		} else // Short Version: add methods for getter and setter + backing
 				// field
 		{
-			String backingFieldName = "$property_" + stmt.getName().getName();
+
+			String backingFieldName = "$property_" + propertyName;
 			context.indentation().type(stmt.getName().getValueType()).space()
 					.text(backingFieldName).text(";");
 
@@ -154,7 +159,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 			if (stmt.getName().hasGetter()) {
 				context.indentation().type(stmt.getName().getValueType())
-						.space().text("get" + stmt.getName().getName())
+						.space().text("get" + propertyName)
 						.text("()");
 
 				context.newLine().indentation();
@@ -172,7 +177,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 			if (stmt.getName().hasSetter()) {
 				context.indentation().text("void").space()
-						.text("set" + stmt.getName().getName()).text("(")
+						.text("set" + propertyName).text("(")
 						.type(stmt.getName().getValueType()).space()
 						.text("value").text(")");
 
@@ -198,19 +203,27 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		IPropertyReference propertyReferenceGet = expressionContainsPropertyReference(assignment
 				.getExpression());
 		if (propertyReferenceGet != null) {
+			String propertyName = propertyReferenceGet.getPropertyName().getName();
+			if(propertyName.endsWith("()")) {
+				propertyName = propertyName.replace("()", "");
+			}
 			context.indentation();
 			assignment.getReference().accept(this, context);
 			context.text(" = ");
 			context.text("get")
-					.text(propertyReferenceGet.getPropertyName().getName())
+					.text(propertyName)
 					.text("(").text(")").text(";");
 		} else {
 			// Handle Property Set
 			IAssignableReference reference = assignment.getReference();
 			if (reference instanceof IPropertyReference) {
 				IPropertyReference propertyReferenceSet = (IPropertyReference) reference;
+				String propertyName = propertyReferenceSet.getPropertyName().getName();
+				if(propertyName.endsWith("()")) {
+					propertyName = propertyName.replace("()", "");
+				}
 				context.indentation().text("set")
-						.text(propertyReferenceSet.getPropertyName().getName())
+						.text(propertyName)
 						.text("(");
 				assignment.getExpression().accept(this, context);
 				context.text(")").text(";");
@@ -271,7 +284,11 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		context.text(propertyRef.getReference().getIdentifier());
 		context.text(".");
 		// converts property reference to reference to created backing field
-		context.text("$Property_" + propertyRef.getPropertyName().getName());
+		String propertyName = propertyRef.getPropertyName().getName();
+		if(propertyName.endsWith("()")) {
+			propertyName = propertyName.replace("()", "");
+		}
+		context.text("$property_" + propertyName);
 		return null;
 	}
 
