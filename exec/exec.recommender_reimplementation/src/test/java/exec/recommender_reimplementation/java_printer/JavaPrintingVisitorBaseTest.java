@@ -27,13 +27,13 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 
 public class JavaPrintingVisitorBaseTest {
-	private JavaPrintingVisitor _sut = new JavaPrintingVisitor();
+	protected JavaPrintingVisitor sut = new JavaPrintingVisitor();
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String expected) {
 		JavaPrintingContext context = new JavaPrintingContext();
 		context.setTypeShape(typeShape);
 		int indentationLevel = context.indentationLevel;
-		sst.accept(_sut, context);
+		sst.accept(sut, context);
 		String actual = context.toString();
 		Assert.assertEquals(expected, actual);
 		Assert.assertEquals(indentationLevel, context.indentationLevel);
@@ -41,7 +41,7 @@ public class JavaPrintingVisitorBaseTest {
 	
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String expected) {
 		int indentationLevel = context.indentationLevel;
-		sst.accept(_sut, context);
+		sst.accept(sut, context);
 		String actual = context.toString();
 		Assert.assertEquals(expected, actual);
 		Assert.assertEquals(indentationLevel, context.indentationLevel);

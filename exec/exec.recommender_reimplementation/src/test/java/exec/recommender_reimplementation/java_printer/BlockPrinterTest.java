@@ -17,9 +17,7 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.TypeName;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
