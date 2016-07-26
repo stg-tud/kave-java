@@ -15,12 +15,18 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
@@ -36,6 +42,8 @@ import cc.recommenders.io.Logger;
 
 public class PatternsIdentifier {
 
+	private File patternsFolder;
+
 	private StreamParser streamParser;
 	private MappingParser mappingParser;
 	private EpisodesPostprocessor episodeProcessor;
@@ -44,8 +52,11 @@ public class PatternsIdentifier {
 	private ReposParser repos;
 
 	@Inject
-	public PatternsIdentifier(StreamParser streamParser, EpisodesPostprocessor episodes, MappingParser mappingParser,
-			MaximalEpisodes maxEpisodes, ReposParser repos) {
+	public PatternsIdentifier(@Named("patterns") File folder, StreamParser streamParser, EpisodesPostprocessor episodes,
+			MappingParser mappingParser, MaximalEpisodes maxEpisodes, ReposParser repos) {
+		assertTrue(folder.exists(), "Patterns folder does not exist");
+		assertTrue(folder.isDirectory(), "Patterns folder is not a folder, but a file");
+		this.patternsFolder = folder;
 		this.streamParser = streamParser;
 		this.mappingParser = mappingParser;
 		this.episodeProcessor = episodes;
@@ -82,11 +93,13 @@ public class PatternsIdentifier {
 		}
 	}
 
-	public void validationCode(int numbRepos, int frequency, double entropy, boolean order) throws Exception {
-		List<Event> streamOfEvents = repos.validationStream(numbRepos);
-		List<Event> events = mappingParser.parse(numbRepos);
-		List<List<Fact>> streamOfFacts = eventsToFacts(streamOfEvents, events);
+	public void validationCode(int numbRepos, int frequency, double entropy) throws Exception {
+		List<Event> trainEvents = mappingParser.parse(numbRepos);
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+
+		List<Event> stream = repos.validationStream(numbRepos);
+		List<Event> allEvents = getAllEvents(stream, trainEvents);
+		List<List<Fact>> streamMethods = streamOfMethods(stream, allEvents);
 		StringBuilder sb = new StringBuilder();
 		int patternID = 0;
 
@@ -97,14 +110,13 @@ public class PatternsIdentifier {
 			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
 			sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
 			for (Episode episode : entry.getValue()) {
-				Set<Fact> episodeFacts = episode.getEvents();
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
-				for (List<Fact> method : streamOfFacts) {
-					if (method.containsAll(episodeFacts)) {
-						methodsNoOrderRelation.addMethod(episode, method, events);
-						methodsOrderRelation.addMethod(episode, method, events);
+				for (List<Fact> method : streamMethods) {
+					if (method.containsAll(episode.getEvents())) {
+						methodsNoOrderRelation.addMethod(episode, method, allEvents);
+						methodsOrderRelation.addMethod(episode, method, allEvents);
 					}
 				}
 				sb.append(patternID + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
@@ -112,10 +124,21 @@ public class PatternsIdentifier {
 				patternID++;
 			}
 			sb.append("\n");
+			Logger.log("\nProcessed %d-node patterns!", entry.getKey());
 		}
+		FileUtils.writeStringToFile(getValidationPath(numbRepos, frequency, entropy), sb.toString());
 	}
 
-	private List<List<Fact>> eventsToFacts(List<Event> stream, List<Event> events) {
+	private List<Event> getAllEvents(List<Event> stream, List<Event> events) {
+		for (Event e : stream) {
+			if (!events.contains(e)) {
+				events.add(e);
+			}
+		}
+		return events;
+	}
+
+	private List<List<Fact>> streamOfMethods(List<Event> stream, List<Event> events) {
 		List<List<Fact>> result = new LinkedList<>();
 		List<Fact> method = new LinkedList<Fact>();
 
@@ -126,9 +149,22 @@ public class PatternsIdentifier {
 					method = new LinkedList<Fact>();
 				}
 			}
-			int factID = events.indexOf(event);
-			method.add(new Fact(factID));
+			int index = events.indexOf(event);
+			method.add(new Fact(index));
+		}
+		if (!method.isEmpty()) {
+			result.add(method);
 		}
 		return result;
+	}
+
+	private File getValidationPath(int numbRepos, int freqThresh, double bidirectThresh) {
+		File folderPath = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
+				+ "/Bidirect" + bidirectThresh + "/");
+		if (!folderPath.isDirectory()) {
+			folderPath.mkdirs();
+		}
+		File fileName = new File(folderPath.getAbsolutePath() + "/patternsValidation.txt");
+		return fileName;
 	}
 }
