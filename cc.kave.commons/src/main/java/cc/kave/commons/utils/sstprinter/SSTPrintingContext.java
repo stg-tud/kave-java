@@ -186,8 +186,10 @@ public class SSTPrintingContext {
 	/// <param name="typeName">The type name to append.</param>
 	/// <returns>The context after appending.</returns>
 	public SSTPrintingContext typeNameOnly(ITypeName typeName) {
-		if (typeName != null)
+		if (typeName != null) {
+			if(typeName.isVoidType()) return text("void");
 			return text(typeName.getName());
+		}
 		return this;
 	}
 
