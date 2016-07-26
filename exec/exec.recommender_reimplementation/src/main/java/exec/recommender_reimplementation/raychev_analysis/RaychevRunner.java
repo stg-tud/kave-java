@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -34,31 +35,58 @@ import com.google.common.collect.Lists;
 import exec.recommender_reimplementation.ContextReader;
 
 public class RaychevRunner {
-	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Small Testset");
+	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
 
-	
+	@SuppressWarnings("unchecked")
 	public static void sentenceBuilder() throws IOException {
-		List<Context> contextList = Lists.newLinkedList();
+		Queue<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = ContextReader.GetContexts(FOLDERPATH);
+			contextList = (Queue<Context>) ContextReader.GetContexts(FOLDERPATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		StringBuilder sb = new StringBuilder();
 		
-		for (Context context : contextList) {
-			Set<ConcreteHistory> extractedHistories = extractHistories(context);
-			sb.append(getHistoryAsString(extractedHistories));
-			sb.append("\n");
+		while (!contextList.isEmpty()) {
+			Context context = contextList.poll();
+			try{
+				Set<ConcreteHistory> extractedHistories = extractHistories(context);
+				sb.append(getHistoryAsString(extractedHistories));
+				sb.append("\n");
+			}
+			catch(Exception e) {
+				continue;
+			}
 		}
 		
 		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\train_all"), sb.toString());
 	}
 	
+	public static void queryBuilder() {
+		List<Context> contextList = Lists.newLinkedList();
+		try {
+			contextList = ContextReader.GetContexts(Paths.get(FOLDERPATH.toString() + "\\Queries"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		for (Context context : contextList) {
+			try{
+				String javaCode = QueryExtractor.createJavaCodeForQuery(context);
+				if(!javaCode.isEmpty()){
+					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\" + context.getSST().getEnclosingType().getName() + ".java"), javaCode);
+				}
+			}
+			catch(Exception e) {
+				continue;
+			}
+		}
+	}
+	
 	public static void main(String[] args) throws IOException {
 		sentenceBuilder();
-
+		queryBuilder();
 	}
 
 }
