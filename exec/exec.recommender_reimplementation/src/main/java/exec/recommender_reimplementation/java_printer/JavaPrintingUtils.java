@@ -15,9 +15,36 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import cc.kave.commons.model.names.INamespaceName;
+import cc.kave.commons.model.names.csharp.NamespaceName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
+	
+	public static void formatAsImportList(Iterator<INamespaceName> namespaces, SSTPrintingContext context) {
+		List<String> filteredNamespaceStrings = new ArrayList<>();
+		while (namespaces.hasNext()) {
+			INamespaceName name = namespaces.next();
+			if (!name.equals(NamespaceName.UNKNOWN_NAME)) {
+				String s = name.getIdentifier().trim();
+				if (!s.isEmpty()) {
+					filteredNamespaceStrings.add(s);
+				}
+			}
+		}
+		filteredNamespaceStrings.sort(null);
+		for (String n : filteredNamespaceStrings) {
+			context.keyword("import").space().text(n).text(";");
+
+			if (!n.equals(filteredNamespaceStrings.get(filteredNamespaceStrings.size() - 1))) {
+				context.newLine();
+			}
+		}
+	}
 	
 	public static String printJava(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
@@ -25,4 +52,11 @@ public class JavaPrintingUtils {
 		return context.toString();
 	}
 	
+	public static String printRaychevJava(ISST sst) {
+		JavaPrintingContext context = new JavaPrintingContext();
+		sst.accept(new RaychevQueryPrinter(), context);
+		JavaPrintingContext importContext = new JavaPrintingContext();
+		formatAsImportList(context.getSeenNamespaces(), importContext);
+		return importContext.toString() + "\n" + context.toString();
+	}
 }

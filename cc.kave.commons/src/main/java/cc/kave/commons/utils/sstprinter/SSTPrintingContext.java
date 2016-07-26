@@ -204,6 +204,7 @@ public class SSTPrintingContext {
 	/// <param name="typeName">The type name to append.</param>
 	/// <returns>The context after appending.</returns>
 	public SSTPrintingContext type(ITypeName typeName) {
+        _seenNamespaces.add(typeName.getNamespace());
 
 		typeNameOnly(typeName);
 

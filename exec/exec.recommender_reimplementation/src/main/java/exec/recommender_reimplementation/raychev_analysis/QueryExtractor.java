@@ -15,11 +15,10 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.printRaychevJava;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
-import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
-import exec.recommender_reimplementation.java_printer.RaychevQueryPrinter;
 import exec.recommender_reimplementation.java_printer.RaychevQueryPrinter.InvalidJavaCodeException;
 
 public class QueryExtractor {
@@ -30,17 +29,11 @@ public class QueryExtractor {
 	
 	public static String createJavaCodeForQuery(Context context) {
 		ISST sst = context.getSST();
-
-		JavaPrintingContext printingContext = new JavaPrintingContext();
-		RaychevQueryPrinter printer = new RaychevQueryPrinter();
-
+		
 		try {
-			sst.accept(printer, printingContext);
-
+			return printRaychevJava(sst);
 		} catch (InvalidJavaCodeException e) {
 			return "";
 		}
-		
-		return printingContext.toString();
 	}
 }
