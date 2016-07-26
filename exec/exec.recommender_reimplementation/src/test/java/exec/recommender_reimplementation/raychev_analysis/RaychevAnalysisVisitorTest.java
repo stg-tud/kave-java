@@ -60,7 +60,7 @@ public class RaychevAnalysisVisitorTest extends RaychevAnalysisBaseTest {
 		extractHistories();
 
 		AbstractHistory abstractHistory = createAbstractHistory(//
-		callAtPosition(method(voidType, stringType, ".ctor"), RETURN));
+		callAtPosition(method(voidType, stringType, ".ctor"), 0));
 
 		assertHistories(abstractHistory);
 	}

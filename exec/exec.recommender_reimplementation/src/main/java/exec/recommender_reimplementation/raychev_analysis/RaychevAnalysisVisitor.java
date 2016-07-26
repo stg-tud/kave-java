@@ -15,6 +15,9 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static exec.recommender_reimplementation.raychev_analysis.Interaction.RETURN;
+import static exec.recommender_reimplementation.raychev_analysis.InteractionType.METHOD_CALL;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,9 +103,11 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		if (expression instanceof IInvocationExpression) {
 			IInvocationExpression invocation = (IInvocationExpression) expression;
 			if (invocation.getMethodName().isConstructor()) {
-				handleObjectAllocation(assignment, historyMap);
+				handleObjectAllocation(assignment, invocation, historyMap);
 			}
-			addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+			else{
+				addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+			}
 		}
 
 		// Handle Property Get
@@ -252,13 +257,18 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		}
 		return null;
 	}
+	
+	private void addInteractionForAbstractLocations(Set<AbstractLocation> abstractLocations, IMethodName methodName, HistoryMap historyMap, int position) {
+		Interaction interaction = new Interaction(methodName, position, METHOD_CALL);
+		historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
+	}
 
 	private void addInteractionForParameter(ISimpleExpression expression, IInvocationExpression invocation,
 			int parameterPosition, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = tryFindAbstractLocationsForSimpleExpression(expression);
 		if (abstractLocations != null) {
 			Interaction interaction = new Interaction(invocation.getMethodName(), parameterPosition,
-					InteractionType.METHOD_CALL);
+					METHOD_CALL);
 			historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
 		}
 	}
@@ -266,7 +276,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 	private void addInteractionForReceiver(IInvocationExpression invocation, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationForInvocation(invocation);
 		if (!abstractLocations.isEmpty()) {
-			Interaction interaction = new Interaction(invocation.getMethodName(), 0, InteractionType.METHOD_CALL);
+			Interaction interaction = new Interaction(invocation.getMethodName(), 0, METHOD_CALL);
 			historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
 		}
 	}
@@ -275,7 +285,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 		AbstractHistory abstractHistory = historyMap.getOrCreateAbstractHistory(abstractLocations);
 
-		Interaction interaction = new Interaction(methodName, Interaction.RETURN, InteractionType.METHOD_CALL);
+		Interaction interaction = new Interaction(methodName, RETURN, METHOD_CALL);
 		abstractHistory.addInteraction(interaction);
 	}
 
@@ -295,11 +305,12 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		return null;
 	}
 
-	private void handleObjectAllocation(IAssignment assignment, HistoryMap historyMap) {
+	private void handleObjectAllocation(IAssignment assignment, IInvocationExpression invocation, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = findAbstractLocationsForAssignment(assignment);
 		AbstractHistory abstractHistory = new AbstractHistory();
 		historyMap.put(abstractLocations, abstractHistory);
 		abstractHistory.getHistorySet().add(new ConcreteHistory());
+		addInteractionForAbstractLocations(abstractLocations, invocation.getMethodName() , historyMap, 0);
 	}
 
 	private void loopNodesTwoIterations(List<ISSTNode> nodes, HistoryMap historyMap) {
