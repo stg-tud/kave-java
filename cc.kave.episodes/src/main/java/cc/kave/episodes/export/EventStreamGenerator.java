@@ -30,6 +30,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.utils.TypeErasure;
 
 public class EventStreamGenerator {
 
@@ -84,7 +85,7 @@ public class EventStreamGenerator {
 		public Void visit(IInvocationExpression inv, ITypeShape context) {
 			if (shouldInclude(inv.getMethodName())) {
 				addEnclosingMethodIfAvailable();
-				events.add(Events.newInvocation(inv.getMethodName()));
+				events.add(Events.newInvocation(TypeErasure.of(inv.getMethodName())));
 			}
 			return null;
 		}
@@ -121,18 +122,18 @@ public class EventStreamGenerator {
 			// currentCtx = null;
 			// }
 			if (firstCtx != null) {
-				events.add(Events.newFirstContext(firstCtx));
+				events.add(Events.newFirstContext(TypeErasure.of(firstCtx)));
 				firstCtx = null;
 			}
 			if (superCtx != null) {
-				Event superEvent = Events.newSuperContext(superCtx);
+				Event superEvent = Events.newSuperContext(TypeErasure.of(superCtx));
 				if (!superEvent.getMethod().equals(MethodName.UNKNOWN_NAME)) {
 					events.add(superEvent);
 				}
 				superCtx = null;
 			}
 			if (elementCtx != null) {
-				events.add(Events.newContext(elementCtx));
+				events.add(Events.newContext(TypeErasure.of(elementCtx)));
 				elementCtx = null;
 			}
 		}

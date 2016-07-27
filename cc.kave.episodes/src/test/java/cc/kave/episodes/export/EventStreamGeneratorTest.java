@@ -64,8 +64,24 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(unknown()), //
-				Events.newContext(m(1, 1)),
-				Events.newInvocation(m(2, 3)));
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
+
+	}
+
+	@Test
+	public void handlesGenerics() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+
+		ctx.setSST(sst(1, methodDeclGenericBound(1, 2, 3, //
+				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream(Events.newFirstContext(mGenericFree(21, 22)), //
+				Events.newSuperContext(mGenericFree(11, 12)), //
+				Events.newContext(mGenericFree(1, 2)), Events.newInvocation(mGenericFree(2, 3)));
 
 	}
 
@@ -81,9 +97,8 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(unknown()), //
-					Events.newSuperContext(m(3, 1)), //
-					Events.newContext(m(1, 1)),
-					Events.newInvocation(m(2, 3)));
+				Events.newSuperContext(m(3, 1)), //
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
 
 	}
 
@@ -100,8 +115,7 @@ public class EventStreamGeneratorTest {
 
 		assertStream(Events.newFirstContext(m(4, 1)), //
 				Events.newSuperContext(m(3, 1)), //
-				Events.newContext(m(1, 1)),
-				Events.newInvocation(m(2, 3)));
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
 
 	}
 
@@ -131,8 +145,7 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(unknown()), //
-				Events.newContext(m(1, 1)),
-				Events.newInvocation(m(2, 3)));
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
 	}
 
 	@Test
@@ -165,11 +178,9 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx);
 
 		assertStream(Events.newFirstContext(m(11, 1)), //
-				Events.newContext(m(1, 1)),
-				Events.newInvocation(m(2, 3)), //
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)), //
 				Events.newFirstContext(m(12, 2)), //
-				Events.newContext(m(1, 2)),
-				Events.newInvocation(m(3, 4)) //
+				Events.newContext(m(1, 2)), Events.newInvocation(m(3, 4)) //
 		);
 	}
 
@@ -191,11 +202,9 @@ public class EventStreamGeneratorTest {
 		sut.add(ctx2);
 
 		assertStream(Events.newFirstContext(m(11, 1)), //
-				Events.newContext(m(1, 1)),
-				Events.newInvocation(m(2, 3)), //
+				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)), //
 				Events.newFirstContext(m(12, 1)), //
-				Events.newContext(m(2, 1)),
-				Events.newInvocation(m(3, 4))//
+				Events.newContext(m(2, 1)), Events.newInvocation(m(3, 4))//
 		);
 	}
 
@@ -250,5 +259,37 @@ public class EventStreamGeneratorTest {
 
 	private ITypeName t(int typeNum) {
 		return TypeName.newTypeName(String.format("T%d,P", typeNum));
+	}
+
+	private IMethodDeclaration methodDeclGenericBound(int typeNum, int methodNum, int typeParamNum,
+			IStatement... stmtArr) {
+		MethodDeclaration decl = new MethodDeclaration();
+		decl.setName(mGenericBound(typeNum, methodNum, typeParamNum));
+		decl.setBody(Lists.newArrayList(stmtArr));
+		return decl;
+	}
+
+	private IMethodDeclaration methodDeclGenericFree(int typeNum, int methodNum, IStatement... stmtArr) {
+		MethodDeclaration decl = new MethodDeclaration();
+		decl.setName(mGenericFree(typeNum, methodNum));
+		decl.setBody(Lists.newArrayList(stmtArr));
+		return decl;
+	}
+
+	private IMethodName mGenericBound(int typeNum, int methodNum, int typeParamNum) {
+		return MethodName.newMethodName(String.format("[R,P] [%s].m%d`1[[T -> %s]]()",
+				tGenericBound(typeNum, typeParamNum), methodNum, t(typeParamNum)));
+	}
+
+	private IMethodName mGenericFree(int typeNum, int methodNum) {
+		return MethodName.newMethodName(String.format("[R,P] [%s].m%d`1[[T]]()", tGenericFree(typeNum), methodNum));
+	}
+
+	private ITypeName tGenericFree(int typeNum) {
+		return TypeName.newTypeName(String.format("T%d`1[[T]],P", typeNum));
+	}
+
+	private ITypeName tGenericBound(int typeNum, int typeParamNum) {
+		return TypeName.newTypeName(String.format("T%d`1[[T -> %s]],P", typeNum, t(typeParamNum)));
 	}
 }
