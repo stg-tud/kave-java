@@ -38,7 +38,7 @@ public class StreamStatistics {
 		return min;
 	}
 
-	public Map<Event, Integer> getFrequences(List<Event> stream) {
+	public Map<Event, Integer> getFrequencies(List<Event> stream) {
 		Map<Event, Integer> occurrences = Maps.newHashMap();
 		
 		for (Event e : stream) {

@@ -41,6 +41,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
+import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.export.EventsFilter;
 import cc.kave.episodes.mining.reader.ReposParser;
@@ -61,10 +62,36 @@ public class Preprocessing {
 
 	public void generate(int numbRepos, int freqThresh) throws ZipException, IOException {
 		List<Event> allEvents = repos.learningStream(numbRepos);
+
+//		System.out.println();
+//		System.out.println("before stream creation:");
 		EventStream stream = EventsFilter.filterStream(allEvents, freqThresh);
+
+//		System.out.println();
+//		System.out.println("before writing:");
+
+//		debugStream(stream.getMapping().keySet());
+
 		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath);
+
+//		System.out.println("after reading:");
+//		List<Event> mapping = new MappingParser(eventsFolder).parse(1);
+//		debugStream(mapping);
+
 	}
-	
+
+	private void debugStream(Iterable<Event> keySet) {
+		int i = 0;
+		for (Event e : keySet) {
+			if (i > 1230 && i < 1240) {
+				if (e.getKind() == EventKind.METHOD_DECLARATION) {
+					System.out.printf("%d -> %s\n", i, e.getMethod());
+				}
+			}
+			i++;
+		}
+	}
+
 	private FilePaths getPath(int numbRepos) {
 		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numbRepos + "Repos");
 		if (!pathName.isDirectory()) {

@@ -54,7 +54,7 @@ public class FrameworksDistribution {
 	public void getDistribution(int numbRepos) throws IOException {
 
 		List<Event> allEvents = repos.learningStream(numbRepos);
-		Map<Event, Integer> eventsFreqs = statistics.getFrequences(allEvents);
+		Map<Event, Integer> eventsFreqs = statistics.getFrequencies(allEvents);
 		Frameworks distribution = getEventsAndTypes(eventsFreqs);
 		storeFrameworks(distribution, numbRepos);
 	}

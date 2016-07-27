@@ -40,7 +40,7 @@ public class EventsFilter {
 
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {
 		List<Event> streamWithoutDublicates = removeMethodDublicates(stream);
-		Map<Event, Integer> occurrences = statistics.getFrequences(stream);
+		Map<Event, Integer> occurrences = statistics.getFrequencies(stream);
 		EventStream es = new EventStream();
 
 		for (Event e : streamWithoutDublicates) {

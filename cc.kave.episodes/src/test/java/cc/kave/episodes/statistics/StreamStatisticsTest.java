@@ -58,7 +58,7 @@ public class StreamStatisticsTest {
 	
 	@Test
 	public void aggregationTest() {
-		Map<Event, Integer> actuals = sut.getFrequences(events);
+		Map<Event, Integer> actuals = sut.getFrequencies(events);
 		
 		assertEquals(occurrences, actuals);
 	}

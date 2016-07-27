@@ -24,6 +24,7 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
@@ -36,11 +37,13 @@ public class EventStreamGenerator {
 
 	private List<Event> events = Lists.newLinkedList();
 
-	public EventStreamGenerator() {
-	}
-
 	public void add(Context ctx) {
-		ctx.getSST().accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+		ISST sst = ctx.getSST();
+		if (sst.isPartialClass()) {
+			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+//			System.out.println(ctx.getSST().getEnclosingType() + "-> " + ctx.getSST().getPartialClassIdentifier());
+		}
+//		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
@@ -54,8 +57,15 @@ public class EventStreamGenerator {
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
 
+//		private IMethodName debug = MethodName.newMethodName(
+//				"[System.Void, mscorlib, 4.0.0.0] [ACAT.Lib.Core.PanelManagement.MenuPanelBase, Core].InitializeComponent()");
+
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
+
+//			if (debug.equals(decl.getName())) {
+//				System.out.println();
+//			}
 
 			// currentCtx = MethodName.UNKNOWN_NAME;
 			firstCtx = MethodName.UNKNOWN_NAME;

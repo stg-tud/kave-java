@@ -70,7 +70,7 @@ public class StreamFrequencies {
 			ra.close();
 		}
 		List<Event> es = generator.getEventStream();
-		Map<Event, Integer> freqs = statistics.getFrequences(es);
+		Map<Event, Integer> freqs = statistics.getFrequencies(es);
 		getOutlierEvent(freqs);
 		
 //		Map<Integer, Integer> distr = statistics.getFreqDistr(freqs);

@@ -61,33 +61,47 @@ public class EventStream {
 	}
 
 	public void addEvent(Event event) {
-		Integer idx = this.mappingData.get(event);
 
-		if (event.getKind() == EventKind.FIRST_DECLARATION && !(this.isFirstMethod)) {
-			this.time += TIMEOUT;
-		}
-		if (event.getKind() == EventKind.METHOD_DECLARATION) {
-			if (idx == null) {
-				idx = getNumberEvents();
-				this.mappingData.put(event, idx);
-			}
-		}
-		
-		if (idx == null && !(event.getMethod().equals(MethodName.UNKNOWN_NAME))) {
-			idx = getNumberEvents();
-			this.mappingData.put(event, idx);
-		}
-		this.isFirstMethod = false;
+		possiblyIncreaseTimout(event);
 
-		if (idx != null) {
-			this.sb.append(idx);
-			this.sb.append(',');
-			this.sb.append(String.format("%.3f", this.time));
-			this.sb.append('\n');
-
-			this.time += DELTA;
-			this.streamLength++;
+		if (event.getMethod().equals(MethodName.UNKNOWN_NAME)) {
+			return;
 		}
+
+		int idx = ensureEventExistsAndGetId(event);
+
+//		if (idx >= 1230 && idx < 1240) {
+//			System.out.printf("%d => (%s) %s", idx, event.getKind(), event.getMethod());
+//		}
+
+		addEventIdToStream(idx);
+	}
+
+	private void addEventIdToStream(int idx) {
+		sb.append(idx);
+		sb.append(',');
+		sb.append(String.format("%.3f", time));
+		sb.append('\n');
+
+		time += DELTA;
+		streamLength++;
+	}
+
+	private int ensureEventExistsAndGetId(Event event) {
+		if (mappingData.containsKey(event)) {
+			return mappingData.get(event);
+		} else {
+			int idx = getNumberEvents();
+			mappingData.put(event, idx);
+			return idx;
+		}
+	}
+
+	private void possiblyIncreaseTimout(Event event) {
+		if (event.getKind() == EventKind.FIRST_DECLARATION && !isFirstMethod) {
+			time += TIMEOUT;
+		}
+		isFirstMethod = false;
 	}
 
 	@Override

@@ -102,7 +102,7 @@ public class FrameworksDistributionTest {
 		frequencies.put(ei3, 2);
 		frequencies.put(ed2, 1);
 		
-		when(statistics.getFrequences(any(List.class))).thenReturn(frequencies);
+		when(statistics.getFrequencies(any(List.class))).thenReturn(frequencies);
 
 		Logger.setPrinting(false);
 	}
@@ -114,7 +114,7 @@ public class FrameworksDistributionTest {
 		sut = new FrameworksDistribution(new File("does not exist"), repos, statistics);
 		
 		verify(repos).learningStream(eq(NUMOFREPOS));
-		verify(statistics).getFrequences(eq(events));
+		verify(statistics).getFrequencies(eq(events));
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class FrameworksDistributionTest {
 		sut = new FrameworksDistribution(file, repos, statistics);
 		
 		verify(repos).learningStream(eq(NUMOFREPOS));
-		verify(statistics).getFrequences(eq(events));
+		verify(statistics).getFrequencies(eq(events));
 	}
 	
 	@Test
@@ -133,7 +133,7 @@ public class FrameworksDistributionTest {
 		sut.getDistribution(NUMOFREPOS);
 		
 		verify(repos).learningStream(eq(NUMOFREPOS));
-		verify(statistics).getFrequences(eq(events));
+		verify(statistics).getFrequencies(eq(events));
 		
 		assertTrue(new File(getEventsFile()).exists());
 		assertTrue(new File(getTypesFile()).exists());
@@ -144,7 +144,7 @@ public class FrameworksDistributionTest {
 		sut.getDistribution(NUMOFREPOS);
 		
 		verify(repos).learningStream(eq(NUMOFREPOS));
-		verify(statistics).getFrequences(eq(events));
+		verify(statistics).getFrequencies(eq(events));
 		
 		StringBuilder expEvents = new StringBuilder();
 		expEvents.append("mscorlib, 4.0.0.0\t2\t4\n");
