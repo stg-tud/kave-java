@@ -39,7 +39,7 @@ public class EventStreamGenerator {
 
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
-		if (sst.isPartialClass()) {
+		if (!sst.isPartialClass()) {
 			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
 //			System.out.println(ctx.getSST().getEnclosingType() + "-> " + ctx.getSST().getPartialClassIdentifier());
 		}
