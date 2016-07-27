@@ -161,7 +161,7 @@ public class PreprocessingTest {
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
 
-		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.003\n5,0.504\n3,0.505\n1,1.006\n6,1.007\n4,1.008\n";
+		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.003\n5,1.004\n3,1.005\n1,2.006\n6,2.007\n4,2.008\n";
 
 		List<Event> expectedMapping = Lists.newLinkedList();
 		expectedMapping.add(dummy());

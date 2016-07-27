@@ -105,30 +105,36 @@ public class EventStreamTest {
 	
 	@Test
 	public void addMultipleEvents() {
-		sut.addEvent(firstCtx(1));
-		sut.addEvent(superCtx(2));
-		sut.addEvent(inv(2));
-		sut.addEvent(inv(3));
+		sut.addEvent(firstCtx(1));		//1
+		sut.addEvent(superCtx(2));		//2
+		sut.addEvent(enclosingCtx(31));	//3
+		sut.addEvent(inv(2));			//4
+		sut.addEvent(inv(3));			//5
 		sut.addEvent(firstCtx(0));
-		sut.addEvent(inv(2));
+		sut.addEvent(enclosingCtx(32));	//6
+		sut.addEvent(inv(2));			//4
 		
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
-		expectedMap.put(firstCtx(1), 1);
-		expectedMap.put(superCtx(2), 2);
-		expectedMap.put(inv(2), 3);
-		expectedMap.put(inv(3), 4);
+		expectedMap.put(firstCtx(1), 1);		
+		expectedMap.put(superCtx(2), 2);		
+		expectedMap.put(enclosingCtx(31), 3);	
+		expectedMap.put(inv(2), 4);				
+		expectedMap.put(inv(3), 5);				
+		expectedMap.put(enclosingCtx(32), 6);
 		
 		StringBuilder expectedSb = new StringBuilder();
 		expectedSb.append("1,0.000\n");
 		expectedSb.append("2,0.001\n");
 		expectedSb.append("3,0.002\n");
 		expectedSb.append("4,0.003\n");
-		expectedSb.append("3,0.504\n");
+		expectedSb.append("5,0.004\n");
+		expectedSb.append("6,1.005\n");
+		expectedSb.append("4,1.006\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(5, sut.getNumberEvents());
-		assertEquals(5, sut.getStreamLength());
+		assertEquals(7, sut.getNumberEvents());
+		assertEquals(7, sut.getStreamLength());
 		assertEquals(expectedSb.toString(), sut.getStream());
 	}
 	
@@ -220,6 +226,10 @@ public class EventStreamTest {
 	
 	private static Event superCtx(int i) {
 		return Events.newSuperContext(m(i));
+	}
+	
+	private static Event enclosingCtx(int i) {
+		return Events.newContext(m(i));
 	}
 	
 	private static IMethodName m(int i) {

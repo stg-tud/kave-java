@@ -69,27 +69,46 @@ public class PatternsIdentifier {
 		List<Event> events = mappingParser.parse(numbRepos);
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
-
+		
+//		int largeMethods = 0;
+//		for (List<Fact> method : stream) {
+//			if (method.size() > 1000) {
+//				Logger.log("Size of method is: %d", method.size());
+//				largeMethods++;
+//			}
+//		}
+//		Logger.log("Number of large methods is: %d", largeMethods);
+		
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
 				continue;
 			}
 			for (Episode episode : entry.getValue()) {
 				Set<Fact> episodeFacts = episode.getEvents();
-				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
+				int largeMethods = 0;
 				for (List<Fact> method : stream) {
+					if (method.size() < 3) {
+						continue;
+					}
+					if (method.size() > 500) {
+						largeMethods++;
+					}
 					if (method.containsAll(episodeFacts)) {
-						methodsNoOrderRelation.addMethod(episode, method, events);
 						methodsOrderRelation.addMethod(episode, method, events);
 					}
 				}
-				if (methodsOrderRelation.getOccurrences() < frequency) {
-					throw new Exception("Episode is not found sufficient number of times on the training stream!");
-				}
+				Logger.log("Number of large methods: %d", largeMethods);
+				break;
+//				if (methodsOrderRelation.getOccurrences() != episode.getFrequency()) {
+//					Logger.log("Episode: %s", episode.toString());
+//					Logger.log("Frequency = %d, occurrence = %d", episode.getFrequency(), methodsOrderRelation.getOccurrences());
+//					throw new Exception("Episode is not found sufficient number of times on the training stream!");
+//				}
 			}
 			Logger.log("Processed %d-node patterns!", entry.getKey());
+			break;
 		}
 	}
 

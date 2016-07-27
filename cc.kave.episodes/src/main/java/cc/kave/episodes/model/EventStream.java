@@ -31,7 +31,7 @@ import cc.kave.commons.model.names.csharp.MethodName;
 
 public class EventStream {
 	public static final double DELTA = 0.001;
-	public static final double TIMEOUT = 0.5;
+	public static final double TIMEOUT = 1.0;
 
 	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();

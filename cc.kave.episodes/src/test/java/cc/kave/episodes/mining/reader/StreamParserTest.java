@@ -63,9 +63,9 @@ public class StreamParserTest {
 		stream.add("3,0.002");
 		stream.add("4,0.003");
 		stream.add("5,0.004");
-		stream.add("6,0.505");
-		stream.add("7,1.006");
-		stream.add("8,1.007");
+		stream.add("6,1.005");
+		stream.add("7,2.006");
+		stream.add("8,2.007");
 		
 		sut = new StreamParser(rootFolder.getRoot(), reader);
 		
