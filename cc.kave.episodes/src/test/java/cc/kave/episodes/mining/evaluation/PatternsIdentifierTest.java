@@ -256,12 +256,12 @@ public class PatternsIdentifierTest {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("Patterns of size: 2-events\n");
-		sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-		sb.append("0\t2\t2\t1\n");
-		sb.append("1\t2\t2\t2\n\n");
+		sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+		sb.append("[3, 4, 3>4]\t2\t2\t1\n");
+		sb.append("[3, 5, 5>3]\t2\t2\t2\n\n");
 		sb.append("Patterns of size: 3-events\n");
-		sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-		sb.append("2\t2\t0\t0\n\n");
+		sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+		sb.append("[3, 4, 5, 3>4]\t2\t0\t0\n\n");
 		
 		assertEquals(sb.toString(), actuals);
 	}

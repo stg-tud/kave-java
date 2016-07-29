@@ -160,7 +160,7 @@ public class PatternsIdentifier {
 						methodsOrderRelation.addMethod(episode, method, listEvents);
 					}
 				}
-				sb.append(episode.toString() + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
+				sb.append(episode.getFacts().toString() + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
 						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
 			}
 			sb.append("\n");
