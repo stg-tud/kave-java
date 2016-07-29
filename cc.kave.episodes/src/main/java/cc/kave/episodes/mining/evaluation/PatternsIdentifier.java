@@ -143,14 +143,13 @@ public class PatternsIdentifier {
 		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
 		List<Event> listEvents = mapToList(mapEvents);
 		StringBuilder sb = new StringBuilder();
-		int patternID = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
 				continue;
 			}
 			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
-			sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
 			for (Episode episode : entry.getValue()) {
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
@@ -161,9 +160,8 @@ public class PatternsIdentifier {
 						methodsOrderRelation.addMethod(episode, method, listEvents);
 					}
 				}
-				sb.append(patternID + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
+				sb.append(episode.toString() + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
 						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
-				patternID++;
 			}
 			sb.append("\n");
 			Logger.log("\nProcessed %d-node patterns!", entry.getKey());

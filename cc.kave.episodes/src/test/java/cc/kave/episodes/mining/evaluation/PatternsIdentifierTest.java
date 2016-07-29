@@ -81,10 +81,10 @@ public class PatternsIdentifierTest {
 	@Mock
 	private ReposParser repos;
 
-	Map<Integer, Set<Episode>> patterns;
-	List<List<Fact>> stream;
-	List<Event> events;
-	List<Event> validationStream;
+	private Map<Integer, Set<Episode>> patterns;
+	private List<List<Fact>> stream;
+	private List<Event> events;
+	private List<Event> validationStream;
 
 	private PatternsIdentifier sut;
 
