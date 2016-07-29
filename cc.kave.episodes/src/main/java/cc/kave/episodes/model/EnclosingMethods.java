@@ -92,12 +92,9 @@ public class EnclosingMethods {
 	private int getOrderCounter(Episode episode, List<Fact> method) {
 		Map<Fact, Set<Integer>> eventIndices = getEventIndices(episode, method);
 		Set<Fact> episodeRelations = episode.getRelations();
-		int previousCounter = Integer.MAX_VALUE;
+		int previousCounter = getSetCounter(episode, method);
 		int counter = 0;
 		
-		if (episodeRelations.size() == 0) {
-			return getSetCounter(episode, method);
-		}
 		for (Fact relation : episodeRelations) {
 			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
 			Set<Integer> firstEventIdices = eventIndices.get(tuple.getFirst());

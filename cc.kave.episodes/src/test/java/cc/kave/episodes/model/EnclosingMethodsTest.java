@@ -193,6 +193,29 @@ public class EnclosingMethodsTest {
 	}
 
 	@Test
+	public void orderWithPartialRelation() throws Exception {
+		Episode episode = new Episode();
+		episode.addStringsOfFacts("2", "3", "4", "2>3");
+
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(4), new Fact(2), new Fact(3),
+				new Fact(3), new Fact(2), new Fact(4), new Fact(3));
+		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4), new Fact(2), new Fact(3), new Fact(2),
+				new Fact(3));
+
+		List<Event> events = Lists.newArrayList(Events.newDummyEvent(), Events.newContext(m(3, 1)),
+				Events.newInvocation(m(4, 1)), Events.newInvocation(m(4, 2)), Events.newContext(m(3, 2)),
+				Events.newInvocation(m(4, 3)));
+
+		sut1.addMethod(episode, method1, events);
+		sut1.addMethod(episode, method2, events);
+
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(), Events.newContext(m(3, 2)).getMethod());
+
+		assertEquals(3, sut1.getOccurrences());
+		assertEquals(expected, sut1.getMethodNames(5));
+	}
+
+	@Test
 	public void equalityDefault() {
 		EnclosingMethods a = new EnclosingMethods(false);
 		EnclosingMethods b = new EnclosingMethods(false);

@@ -25,8 +25,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -72,13 +70,23 @@ public class PatternsIdentifier {
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
-		// int largestMethod = 0;
-		// for (List<Fact> method : stream) {
-		// if (method.size() > largestMethod) {
-		// largestMethod = method.size();
-		// }
-		// }
-		// Logger.log("Size of the largest method is: %d", largestMethod);
+//		int largestMethod = 0;
+//		List<Fact> keepMaethod = new LinkedList<Fact>();
+//		for (List<Fact> method : stream) {
+//			if (method.size() > largestMethod) {
+//				largestMethod = method.size();
+//				keepMaethod = method;
+//			}
+//		}
+//		String methodName = "";
+//		for (Fact fact : keepMaethod) {
+//			Event event = events.get(fact.getFactID());
+//			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+//				methodName = event.getMethod().getDeclaringType().getFullName() + "." + event.getMethod().getName();
+//			}
+//		}
+//		Logger.log("Size of the largest method is: %d", largestMethod);
+//		Logger.log("Method name is: %s", methodName);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
@@ -110,7 +118,6 @@ public class PatternsIdentifier {
 				}
 			}
 			Logger.log("Processed %d-node patterns!", entry.getKey());
-			break;
 		}
 	}
 
