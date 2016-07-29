@@ -117,7 +117,7 @@ public class PatternsIdentifierTest {
 		stream.add(method);
 
 		events = Lists.newArrayList(dummy(), firstCtx(1), enclosingCtx(2), inv(3), inv(4), firstCtx(5), superCtx(6),
-				enclosingCtx(7), enclosingCtx(8), enclosingCtx(9));
+				enclosingCtx(7), enclosingCtx(8), enclosingCtx(9), inv(5));
 
 		validationStream = Lists.newArrayList(firstCtx(1), enclosingCtx(2), inv(3), inv(4), firstCtx(5), superCtx(6),
 				enclosingCtx(7), inv(3), firstCtx(0), enclosingCtx(8), inv(4), inv(3), firstCtx(5), enclosingCtx(9),
@@ -245,6 +245,11 @@ public class PatternsIdentifierTest {
 		episodes.add(ep);
 		patterns.put(2, episodes);
 		
+		ep = new Episode();
+		ep.addStringsOfFacts("3", "4", "5", "3>4");
+		ep.setFrequency(2);
+		patterns.put(3, Sets.newHashSet(ep));
+		
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
 		
 		String actuals = FileUtils.readFileToString(getFilePath(NUMBREPOS, FREQUENCY, ENTROPY));
@@ -254,6 +259,9 @@ public class PatternsIdentifierTest {
 		sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
 		sb.append("0\t2\t2\t1\n");
 		sb.append("1\t2\t2\t2\n\n");
+		sb.append("Patterns of size: 3-events\n");
+		sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+		sb.append("2\t2\t0\t0\n\n");
 		
 		assertEquals(sb.toString(), actuals);
 	}

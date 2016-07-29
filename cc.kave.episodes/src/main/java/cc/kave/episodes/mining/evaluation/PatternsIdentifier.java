@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -70,23 +71,7 @@ public class PatternsIdentifier {
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
-//		int largestMethod = 0;
-//		List<Fact> keepMaethod = new LinkedList<Fact>();
-//		for (List<Fact> method : stream) {
-//			if (method.size() > largestMethod) {
-//				largestMethod = method.size();
-//				keepMaethod = method;
-//			}
-//		}
-//		String methodName = "";
-//		for (Fact fact : keepMaethod) {
-//			Event event = events.get(fact.getFactID());
-//			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-//				methodName = event.getMethod().getDeclaringType().getFullName() + "." + event.getMethod().getName();
-//			}
-//		}
-//		Logger.log("Size of the largest method is: %d", largestMethod);
-//		Logger.log("Method name is: %s", methodName);
+//		checkMethodSize(stream, events);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
@@ -121,6 +106,26 @@ public class PatternsIdentifier {
 		}
 	}
 
+	private void checkMethodSize(List<List<Fact>> stream, List<Event> events) {
+		int largestMethod = 0;
+		List<Fact> keepMaethod = new LinkedList<Fact>();
+		for (List<Fact> method : stream) {
+			if (method.size() > largestMethod) {
+				largestMethod = method.size();
+				keepMaethod = method;
+			}
+		}
+		String methodName = "";
+		for (Fact fact : keepMaethod) {
+			Event event = events.get(fact.getFactID());
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+				methodName = event.getMethod().getDeclaringType().getFullName() + "." + event.getMethod().getName();
+			}
+		}
+		Logger.log("Size of the largest method is: %d", largestMethod);
+		Logger.log("Method name is: %s", methodName);
+	}
+
 	private Episode createDebuggingEpisode() {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("50", "14", "50>14");
@@ -134,60 +139,64 @@ public class PatternsIdentifier {
 		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 
 		List<Event> stream = repos.validationStream(numbRepos);
-		Logger.log("Length of training mapping: %d", trainEvents.size());
-		Logger.log("Length of validation stream: %d", stream.size());
-		Logger.log("Getting all events ...");
-		List<Event> allEvents = getAllEvents(stream, trainEvents);
-		Logger.log("Length of complete mapper: %d", allEvents.size());
-		Logger.log("Converting the validation stream to a list of methods ...");
-		List<List<Fact>> streamMethods = streamOfMethods(stream, allEvents);
+		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream, trainEvents);
+		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
+		List<Event> listEvents = mapToList(mapEvents);
 		StringBuilder sb = new StringBuilder();
 		int patternID = 0;
 
-//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-		for (int i = 5; i > 1; i--) {
-//			if (entry.getKey() < 2) {
-//			if (i < 2) {
-//				continue;
-//			}
-//			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
-			sb.append("Patterns of size: " + i + "-events\n");
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			if (entry.getKey() < 2) {
+				continue;
+			}
+			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
 			sb.append("PatternID\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-//			for (Episode episode : entry.getValue()) {
-			for (Episode episode : patterns.get(i)) {
+			for (Episode episode : entry.getValue()) {
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
 				for (List<Fact> method : streamMethods) {
 					if (method.containsAll(episode.getEvents())) {
-						methodsNoOrderRelation.addMethod(episode, method, allEvents);
-						methodsOrderRelation.addMethod(episode, method, allEvents);
+						methodsNoOrderRelation.addMethod(episode, method, listEvents);
+						methodsOrderRelation.addMethod(episode, method, listEvents);
 					}
 				}
 				sb.append(patternID + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
 						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
-				Logger.log("%d\t%d\t%d\t%d\n", patternID, episode.getFrequency(),
-						methodsNoOrderRelation.getOccurrences(), methodsOrderRelation.getOccurrences());
 				patternID++;
 			}
 			sb.append("\n");
-//			Logger.log("\nProcessed %d-node patterns!", entry.getKey());
-			Logger.log("\nProcessed %d-node patterns!", i);
+			Logger.log("\nProcessed %d-node patterns!", entry.getKey());
 		}
 		FileUtils.writeStringToFile(getValidationPath(numbRepos, frequency, entropy), sb.toString());
 	}
 
-	private List<Event> getAllEvents(List<Event> stream, List<Event> events) {
-//		Map<Event, Integer> completeEvents = Maps.newLinkedHashMap();
-		for (Event e : stream) {
-			if (!events.contains(e)) {
-				events.add(e);
-			}
+	private List<Event> mapToList(Map<Event, Integer> events) {
+		List<Event> result = new LinkedList<Event>();
+		
+		for (Map.Entry<Event, Integer> entry : events.entrySet()) {
+			result.add(entry.getKey());
 		}
-		return events;
+		return result;
 	}
 
-	private List<List<Fact>> streamOfMethods(List<Event> stream, List<Event> events) {
+	private Map<Event, Integer> mergeTrainingValidationEvents(List<Event> stream, List<Event> events) {
+		Map<Event, Integer> completeEvents = Maps.newLinkedHashMap();
+		int index = 0;
+		for (Event event : events) {
+			completeEvents.put(event, index);
+			index++;
+		}
+		for (Event event : stream) {
+			if (!completeEvents.containsKey(event)) {
+				completeEvents.put(event, index);
+				index++;
+			}
+		}
+		return completeEvents;
+	}
+	
+	private List<List<Fact>> streamOfMethods(List<Event> stream, Map<Event, Integer> events) {
 		List<List<Fact>> result = new LinkedList<>();
 		List<Fact> method = new LinkedList<Fact>();
 
@@ -198,7 +207,7 @@ public class PatternsIdentifier {
 					method = new LinkedList<Fact>();
 				}
 			}
-			int index = events.indexOf(event);
+			int index = events.get(event);
 			method.add(new Fact(index));
 		}
 		if (!method.isEmpty()) {
