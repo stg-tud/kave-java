@@ -30,6 +30,7 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.kave.commons.utils.TypeErasure;
 
 public class HistoryExtractor {
 
@@ -79,7 +80,7 @@ public class HistoryExtractor {
 		IMethodName methodName = interaction.getMethodName();
 		int position = interaction.getPosition();
 		StringBuilder sb = new StringBuilder();
-		sb.append(methodName.getDeclaringType().getFullName());
+		sb.append(getDeclaringType(methodName));
 		sb.append(".");
 		sb.append(getNameForInteractionType(interaction.getInteractionType(),
 				methodName));
@@ -91,6 +92,10 @@ public class HistoryExtractor {
 		sb.append(getPositionString(methodName, position));
 
 		return sb.toString();
+	}
+
+	public static String getDeclaringType(IMethodName methodName) {
+		return TypeErasure.of(methodName.getDeclaringType()).getFullName().replace(" ", "");
 	}
 
 	private static String getPositionString(IMethodName methodName, int position) {

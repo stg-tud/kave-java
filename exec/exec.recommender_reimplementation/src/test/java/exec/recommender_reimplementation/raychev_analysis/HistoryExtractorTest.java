@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 
@@ -53,7 +54,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 								method(voidType, type("SmsManager"), "sendTextMessage",
 										parameter(type("Message"), "message")), 0)),
 				createConcreteHistory(//
-						callAtPosition(method(intType, DefaultClassContext, "length"), Interaction.RETURN)),
+				callAtPosition(method(intType, DefaultClassContext, "length"), Interaction.RETURN)),
 				createConcreteHistory(
 						//
 						callAtPosition(method(type("SmsManager"), DefaultClassContext, "getDefault"),
@@ -86,7 +87,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 										parameter(type("ArrayList"), "msgList")), 1)));
 		assertEquals(expectedHistories, actualConcreteHistories);
 	}
-	
+
 	@Test
 	public void printSentencesTest() {
 		Set<ConcreteHistory> histories = Sets.newHashSet(
@@ -98,7 +99,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 								method(voidType, type("SmsManager"), "sendTextMessage",
 										parameter(type("Message"), "message")), 0)),
 				createConcreteHistory(//
-						callAtPosition(method(intType, DefaultClassContext, "length"), Interaction.RETURN)),
+				callAtPosition(method(intType, DefaultClassContext, "length"), Interaction.RETURN)),
 				createConcreteHistory(
 						//
 						callAtPosition(method(type("SmsManager"), DefaultClassContext, "getDefault"),
@@ -129,25 +130,47 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 						callAtPosition(
 								method(voidType, type("SmsManager"), "sendMultipartTextMessage",
 										parameter(type("ArrayList"), "msgList")), 1)));
-			
-		List<String> expectedStrings = Lists.newArrayList(
-		"TDecl.getDefault()S:R SmsManager.sendTextMessage(M)v:0/2",
-		"TDecl.length()i:R",
-		"TDecl.getDefault()S:R SmsManager.divideMsg(M)A:0/2 SmsManager.sendMultipartTextMessage(A)v:0/2",
-		"TDecl.length()i:0/1 SmsManager.divideMsg(M)A:1/2",
-		"TDecl.length()i:0/1 SmsManager.sendTextMessage(M)v:1/2",
-		"SmsManager.divideMsg(M)A:R SmsManager.sendMultipartTextMessage(A)v:1/2");
-				
+
+		List<String> expectedStrings = Lists.newArrayList("TDecl.getDefault()S:R SmsManager.sendTextMessage(M)v:0/2",
+				"TDecl.length()i:R",
+				"TDecl.getDefault()S:R SmsManager.divideMsg(M)A:0/2 SmsManager.sendMultipartTextMessage(A)v:0/2",
+				"TDecl.length()i:0/1 SmsManager.divideMsg(M)A:1/2",
+				"TDecl.length()i:0/1 SmsManager.sendTextMessage(M)v:1/2",
+				"SmsManager.divideMsg(M)A:R SmsManager.sendMultipartTextMessage(A)v:1/2");
+
 		assertSentencesString(expectedStrings, HistoryExtractor.getHistoryAsString(histories));
 	}
 
-	private void assertSentencesString(List<String> expectedStrings,
-			String historyString) {
+	@Test
+	public void handlesGenerics() {
+		Set<ConcreteHistory> histories = Sets
+				.newHashSet(createConcreteHistory(
+						//
+						callAtPosition(
+								method(voidType,
+										TypeName.newTypeName("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]], P1"),
+										"m1"), 0),
+						callAtPosition(
+								method(voidType, TypeName.newTypeName("System.Nullable`1[[T -> Int32, P1]], P1"), "m2"),
+								0),
+						callAtPosition(
+								method(voidType,
+										TypeName.newTypeName("d:System.Converter`2[[TInput],[TOutput -> i:System.Collections.Generic.IEnumerable`1[[T]], mscorlib, 2.0.0.0]], P1"),
+										"m3"), 0)));
+
+		List<String> expectedStrings = Lists
+				.newArrayList("System.Collections.Dictionary`2[[TKey],[TValue]].m1()v:0/1 System.Nullable`1[[T]].m2()v:0/1 System.Converter`2[[TInput],[TOutput]].m3()v:0/1");
+
+		assertSentencesString(expectedStrings, HistoryExtractor.getHistoryAsString(histories));
+	}
+
+	private void assertSentencesString(List<String> expectedStrings, String historyString) {
 		List<String> actual = Arrays.asList(historyString.split("\n"));
 		assertEquals("Different Sizes", expectedStrings.size(), actual.size());
 		for (String expectedString : expectedStrings) {
-			assertTrue("String missing: " + expectedString + " but was: \n" + historyString, actual.contains(expectedString));
+			assertTrue("String missing: " + expectedString + " but was: \n" + historyString,
+					actual.contains(expectedString));
 		}
 	}
-	
+
 }
