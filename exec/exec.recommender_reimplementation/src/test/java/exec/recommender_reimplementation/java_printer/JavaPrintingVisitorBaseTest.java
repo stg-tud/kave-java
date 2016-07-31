@@ -25,9 +25,10 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpressio
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
 
 public class JavaPrintingVisitorBaseTest {
-	protected JavaPrintingVisitor sut = new JavaPrintingVisitor();
+	protected SSTPrintingVisitor sut;
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String expected) {
 		JavaPrintingContext context = new JavaPrintingContext();
@@ -38,7 +39,7 @@ public class JavaPrintingVisitorBaseTest {
 		Assert.assertEquals(expected, actual);
 		Assert.assertEquals(indentationLevel, context.indentationLevel);
 	}
-	
+
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String expected) {
 		int indentationLevel = context.indentationLevel;
 		sst.accept(sut, context);
@@ -48,16 +49,18 @@ public class JavaPrintingVisitorBaseTest {
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String... expectedLines) {
+		sut = new JavaPrintingVisitor(sst);
 		assertPrintWithCustomContext(sst, typeShape, String.join("\n", expectedLines));
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String... expectedLines) {
+		sut = new JavaPrintingVisitor(sst);
 		assertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
 	}
-	
+
 	protected void assertPrint(ISSTNode sst, String... expectedLines) {
 		testPrintingWithoutIndentation(sst, expectedLines);
-		
+
 		// Expressions and references can't be indented
 		if (!(sst instanceof IExpression || sst instanceof IReference)) {
 			testPrintingWithIndentation(sst, expectedLines);
@@ -73,8 +76,7 @@ public class JavaPrintingVisitorBaseTest {
 	private void testPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
 		String[] indentedLines = new String[expectedLines.length];
 		for (int i = 0; i < expectedLines.length; i++) {
-			indentedLines[i] = Strings.isNullOrEmpty(expectedLines[i]) ? expectedLines[i]
-					: "    " + expectedLines[i];
+			indentedLines[i] = Strings.isNullOrEmpty(expectedLines[i]) ? expectedLines[i] : "    " + expectedLines[i];
 		}
 		JavaPrintingContext context = new JavaPrintingContext();
 		context.setIndentationLevel(1);

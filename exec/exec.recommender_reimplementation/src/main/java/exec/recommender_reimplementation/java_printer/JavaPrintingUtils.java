@@ -48,13 +48,13 @@ public class JavaPrintingUtils {
 	
 	public static String printJava(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new JavaPrintingVisitor(), context);
+		sst.accept(new JavaPrintingVisitor(sst), context);
 		return context.toString();
 	}
 	
 	public static String printRaychevJava(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new RaychevQueryPrinter(), context);
+		sst.accept(new RaychevQueryPrinter(sst), context);
 		JavaPrintingContext importContext = new JavaPrintingContext();
 		formatAsImportList(context.getSeenNamespaces(), importContext);
 		return importContext.toString() + "\n" + context.toString();

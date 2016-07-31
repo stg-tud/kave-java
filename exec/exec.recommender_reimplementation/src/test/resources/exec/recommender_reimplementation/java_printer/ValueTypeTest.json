@@ -1,0 +1,269 @@
+{
+        "$type": "KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons",
+        "TypeShape": {
+            "$type": "KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons",
+            "TypeHierarchy": {
+                "$type": "KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons",
+                "Element": "CSharp.TypeName:ConsoleApplication2.ValueTypeTest, ConsoleApplication2",
+                "Implements": []
+            },
+            "MethodHierarchies": [
+                {
+                    "$type": "KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
+                    "Element": "CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [ConsoleApplication2.ValueTypeTest, ConsoleApplication2].M1()"
+                }
+            ]
+        },
+        "SST": {
+            "$type": "[SST:SST]",
+            "EnclosingType": "CSharp.TypeName:ConsoleApplication2.ValueTypeTest, ConsoleApplication2",
+            "PartialClassIdentifier": "",
+            "Fields": [],
+            "Properties": [],
+            "Methods": [
+                {
+                    "$type": "[SST:Declarations.MethodDeclaration]",
+                    "Name": "CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [ConsoleApplication2.ValueTypeTest, ConsoleApplication2].M1()",
+                    "IsEntryPoint": false,
+                    "Body": [
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "a"
+                            },
+                            "Type": "CSharp.StructTypeName:System.SByte, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "a"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "b"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Byte, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "b"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "c"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Int16, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "c"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "d"
+                            },
+                            "Type": "CSharp.StructTypeName:System.UInt16, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "d"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "e"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Int32, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "e"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "f"
+                            },
+                            "Type": "CSharp.StructTypeName:System.UInt32, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "f"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+							}
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "g"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Int64, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "g"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "h"
+                            },
+                            "Type": "CSharp.StructTypeName:System.UInt64, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "h"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "i"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Single, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "i"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "j"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Double, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "j"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "k"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Boolean, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "k"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "l"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Char, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "l"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        },
+                        {
+                            "$type": "[SST:Statements.VariableDeclaration]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "m"
+                            },
+                            "Type": "CSharp.StructTypeName:System.Decimal, mscorlib, 4.0.0.0"
+                        },
+                        {
+                            "$type": "[SST:Statements.Assignment]",
+                            "Reference": {
+                                "$type": "[SST:References.VariableReference]",
+                                "Identifier": "m"
+                            },
+                            "Expression": {
+                                "$type": "[SST:Expressions.Simple.UnknownExpression]"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "Events": [],
+            "Delegates": []
+        }
+    }

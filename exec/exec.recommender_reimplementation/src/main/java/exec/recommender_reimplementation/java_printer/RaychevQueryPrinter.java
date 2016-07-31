@@ -15,16 +15,20 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import com.google.common.base.Strings;
-
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
+import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
+import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class RaychevQueryPrinter extends JavaPrintingVisitor {
+
+	public RaychevQueryPrinter(ISSTNode sst) {
+		super(sst);
+	}
 
 	@SuppressWarnings("serial")
 	public class InvalidJavaCodeException extends RuntimeException {
@@ -42,6 +46,11 @@ public class RaychevQueryPrinter extends JavaPrintingVisitor {
 
 	@Override
 	public Void visit(IComposedExpression expr, SSTPrintingContext context) {
+		throw new InvalidJavaCodeException();
+	}
+	
+	@Override
+	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
 		throw new InvalidJavaCodeException();
 	}
 

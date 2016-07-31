@@ -17,7 +17,6 @@ package exec.recommender_reimplementation.java_printer;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.completionExpr;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
@@ -26,13 +25,8 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpressi
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import exec.recommender_reimplementation.java_printer.RaychevQueryPrinter.InvalidJavaCodeException;
 
-public class RaychevQueryPrinterTest extends JavaPrintingVisitorBaseTest{
+public class RaychevQueryPrinterTest extends RaychevPrintingVisitorBaseTest{
 
-	@Before
-	public void setup() {
-		sut = new RaychevQueryPrinter();
-	}
-	
 	@Test
 	public void addsHoleMethodOnCompletionExpression() {
 		assertPrint(completionExpr("variable"), "UNK.Must1(variable)");
