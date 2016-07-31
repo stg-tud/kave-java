@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 
 import com.google.common.collect.Lists;
@@ -45,24 +46,23 @@ public class RaychevRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
-		
+
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
-			try{
+			try {
 				Set<ConcreteHistory> extractedHistories = extractHistories(context);
 				sb.append(getHistoryAsString(extractedHistories));
 				sb.append("\n");
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				continue;
 			}
 		}
-		
+
 		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\train_all"), sb.toString());
 	}
-	
+
 	public static void queryBuilder() {
 		List<Context> contextList = Lists.newLinkedList();
 		try {
@@ -70,23 +70,45 @@ public class RaychevRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		for (Context context : contextList) {
-			try{
+			try {
 				String javaCode = QueryExtractor.createJavaCodeForQuery(context);
-				if(!javaCode.isEmpty()){
-					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\" + context.getSST().getEnclosingType().getName() + ".java"), javaCode);
+				if (!javaCode.isEmpty()) {
+					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\"
+							+ context.getSST().getEnclosingType().getName() + ".java"), javaCode);
 				}
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				continue;
 			}
 		}
 	}
-	
+
+	private static void queryFromCompletionEvents() {
+		List<CompletionEvent> completionEventList = Lists.newLinkedList();
+		try {
+			completionEventList = ContextReader.GetCompletionEvents(Paths.get(FOLDERPATH.toString() + "\\Queries"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (CompletionEvent completionEvent: completionEventList) {
+			try {
+				String javaCode = QueryExtractor.createJavaCodeForQuery(completionEvent);
+				if (!javaCode.isEmpty()) {
+					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\"
+							+ completionEvent.getContext().getSST().getEnclosingType().getName() + ".java"), javaCode);
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+	}
+
 	public static void main(String[] args) throws IOException {
 		sentenceBuilder();
 		queryBuilder();
+		queryFromCompletionEvents();
 	}
 
 }

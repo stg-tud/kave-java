@@ -3,7 +3,6 @@ package exec.recommender_reimplementation.raychev_analysis;
 import static org.junit.Assert.*;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
