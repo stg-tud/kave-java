@@ -21,6 +21,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingContext extends SSTPrintingContext {
@@ -34,7 +35,7 @@ public class JavaPrintingContext extends SSTPrintingContext {
 			.put("is", "instanceof")
 			.build();
 	
-	
+
 	@Override
 	public SSTPrintingContext cursorPosition() {
 		// ignore cursor position
@@ -46,6 +47,18 @@ public class JavaPrintingContext extends SSTPrintingContext {
 		if(C_SHARP_TO_JAVA_KEYWORD_MAPPING.containsKey(keyword))
 			return text(C_SHARP_TO_JAVA_KEYWORD_MAPPING.get(keyword));
 		return text(keyword);
+	}
+	
+	@Override
+	public SSTPrintingContext typeNameOnly(ITypeName typeName) {
+		if (typeName != null) {
+			if(typeName.isVoidType()) return text("void");
+			if(typeName.isValueType()) {
+				return text(JavaNameUtils.getTypeAliasFromFullTypeName(typeName.getFullName()));
+			}
+			return text(typeName.getName());
+		}
+		return this;
 	}
 	
 	@Override
