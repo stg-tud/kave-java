@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -335,8 +336,15 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (node instanceof IReturnStatement) {
 			// TODO: add test for default value in return statement
 			IReturnStatement returnStatement = (IReturnStatement) node;
-			IMethodDeclaration methodDeclaration = findMethodDeclaration(returnStatement);
-			return getDefaultValueForType(methodDeclaration.getName().getReturnType());
+			IMemberDeclaration memberDeclaration = findMemberDeclaration(returnStatement);
+			if(memberDeclaration instanceof IMethodDeclaration) {
+				IMethodDeclaration methodDeclaration = (IMethodDeclaration) memberDeclaration;
+				return getDefaultValueForType(methodDeclaration.getName().getReturnType());
+			}
+			if(memberDeclaration instanceof IPropertyDeclaration) {
+				IPropertyDeclaration propertyDeclaration = (IPropertyDeclaration) memberDeclaration;
+				return getDefaultValueForType(propertyDeclaration.getName().getValueType());
+			}
 		}
 		// case Assignment -> check for type of variable reference
 		if (node instanceof IAssignment) {
@@ -384,13 +392,13 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return "null";
 	}
 
-	private IMethodDeclaration findMethodDeclaration(ISSTNode sstNode) {
-		ISSTNode parent;
-		do {
-			parent = sstNodeHierarchy.getParent(sstNode);
-		} while (!(parent instanceof IMethodDeclaration));
+	private IMemberDeclaration findMemberDeclaration(ISSTNode sstNode) {
+		ISSTNode parent = sstNodeHierarchy.getParent(sstNode);
+		while (!(parent instanceof IMemberDeclaration)) {
+			parent = sstNodeHierarchy.getParent(parent);
+		} 
 
-		return (IMethodDeclaration) parent;
+		return (IMemberDeclaration) parent;
 	}
 
 	@Override
