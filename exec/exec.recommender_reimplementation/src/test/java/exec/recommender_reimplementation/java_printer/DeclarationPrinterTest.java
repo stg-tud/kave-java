@@ -18,9 +18,11 @@ package exec.recommender_reimplementation.java_printer;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -151,4 +153,89 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(sst, "PropertyType getP() { }",
 				"void setP(PropertyType value)", "{", "    break;",  "}", "");	
 	}
+	
+	@Test
+	public void MethodDeclaration_EmptyMethod() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+
+		assertPrint(sst, "ReturnType M(ParameterType p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_Static() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+
+		assertPrint(sst, "static ReturnType M(ParameterType p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_ParameterModifiers_PassedByReference() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName
+				.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
+
+		assertPrint(sst, "ReturnType M(Int32 p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_ParameterModifiers_Output() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(out [ParameterType,P] p)"));
+
+		assertPrint(sst, "ReturnType M(ParameterType p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_ParameterModifiers_Params() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(params [ParameterType[],P] p)"));
+
+		assertPrint(sst, "ReturnType M(ParameterType[]... p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_ParameterModifiers_Optional() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(opt [ParameterType,P] p)"));
+
+		assertPrint(sst, "ReturnType M(ParameterType p) { }");
+	}
+
+	@Test
+	public void MethodDeclaration_WithBody() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.getBody().add(new ContinueStatement());
+		sst.getBody().add(new BreakStatement());
+
+		assertPrint(sst, "ReturnType M(ParameterType p)", "{", "    continue;", "    break;", "}");
+	}
+
+	@Test
+	public void MethodDeclaration_Generic() {
+
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
+
+		assertPrint(sst, "<?> ReturnType M(? p) { }");
+	}
+	
+	@Test
+	public void MethodDeclaration_Constructor() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
+		
+		assertPrint(sst, "DeclaringType() { }");
+	}
+	
+	@Test
+	public void MethodDeclaration_ConstructorWithParameters() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
+		
+		assertPrint(sst, "DeclaringType(ParameterType p) { }");
+	}
+
 }

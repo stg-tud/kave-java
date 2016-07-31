@@ -192,9 +192,13 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 			context.keyword("static").space();
 		}
 
-		context.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
-		if (stmt.getName().hasTypeParameters()) {
-			context.typeParameters(stmt.getName().getTypeParameters());
+		if (stmt.getName().isConstructor()) {
+			context.text(stmt.getName().getDeclaringType().getName());
+		} else {
+			context.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
+			if (stmt.getName().hasTypeParameters()) {
+				context.typeParameters(stmt.getName().getTypeParameters());
+			}
 		}
 
 		context.parameterList(stmt.getName().getParameters());

@@ -353,6 +353,22 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 
 		assertPrint(sst, "ReturnType M<T>(T p) { }");
 	}
+	
+	@Test
+	public void MethodDeclaration_Constructor() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
+		
+		assertPrint(sst, "DeclaringType() { }");
+	}
+	
+	@Test
+	public void MethodDeclaration_ConstructorWithParameters() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
+		
+		assertPrint(sst, "DeclaringType(ParameterType p) { }");
+	}
 
 	@Test
 	public void VariableDeclaration() {

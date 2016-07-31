@@ -24,6 +24,7 @@ import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
@@ -115,6 +116,30 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		// construct does not exist in java; hard
 		// to implement in general case
 		// ignored
+		return null;
+	}
+	
+	@Override
+	public Void visit(IMethodDeclaration stmt, SSTPrintingContext context) {
+		context.indentation();
+
+		if (stmt.getName().isStatic()) {
+			context.keyword("static").space();
+		}
+
+		if(stmt.getName().isConstructor()) {
+			context.text(stmt.getName().getDeclaringType().getName());
+		}
+		else{
+			if (stmt.getName().hasTypeParameters()) {
+				context.typeParameters(stmt.getName().getTypeParameters()).space();
+			}
+			context.type(stmt.getName().getReturnType()).space().text(stmt.getName().getName());
+		}
+
+		context.parameterList(stmt.getName().getParameters());
+
+		context.statementBlock(stmt.getBody(), this, true);
 		return null;
 	}
 
