@@ -606,33 +606,61 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IEventReference eventRef, SSTPrintingContext context) {
-		context.text(eventRef.getReference().getIdentifier());
-		context.text(".");
-		context.text(eventRef.getEventName().getName());
+        if (eventRef.getEventName().isStatic())
+        {
+            context.type(eventRef.getEventName().getDeclaringType());
+        }
+        else
+        {
+            context.text(eventRef.getReference().getIdentifier());
+        }
+        
+        context.text(".").text(eventRef.getEventName().getName());
 		return null;
 	}
 
 	@Override
 	public Void visit(IFieldReference fieldRef, SSTPrintingContext context) {
-		context.text(fieldRef.getReference().getIdentifier());
-		context.text(".");
-		context.text(fieldRef.getFieldName().getName());
+        if (fieldRef.getFieldName().isStatic())
+        {
+            context.type(fieldRef.getFieldName().getDeclaringType());
+        }
+        else
+        {
+            context.text(fieldRef.getReference().getIdentifier());
+        }
+        
+        context.text(".").text(fieldRef.getFieldName().getName());
 		return null;
 	}
 
 	@Override
 	public Void visit(IMethodReference methodRef, SSTPrintingContext context) {
-		context.text(methodRef.getReference().getIdentifier());
-		context.text(".");
-		context.text(methodRef.getMethodName().getName());
+        if (methodRef.getMethodName().isStatic())
+        {
+            context.type(methodRef.getMethodName().getDeclaringType());
+        }
+        else
+        {
+            context.text(methodRef.getReference().getIdentifier());
+        }
+        
+        context.text(".").text(methodRef.getMethodName().getName());
 		return null;
 	}
 
 	@Override
 	public Void visit(IPropertyReference propertyRef, SSTPrintingContext context) {
-		context.text(propertyRef.getReference().getIdentifier());
-		context.text(".");
-		context.text(propertyRef.getPropertyName().getName());
+        if (propertyRef.getPropertyName().isStatic())
+        {
+            context.type(propertyRef.getPropertyName().getDeclaringType());
+        }
+        else
+        {
+            context.text(propertyRef.getReference().getIdentifier());
+        }
+		
+		context.text(".").text(propertyRef.getPropertyName().getName());
 		return null;
 	}
 
