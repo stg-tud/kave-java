@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.JavaNameUtils.getTypeAliasFromFullTypeName;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,13 +46,24 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 	@Override
 	public Void visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		if(type.isValueType() || type.getFullName().equals("System.String")) return super.visit(stmt, context);
+		if(isJavaValueType(type)) return super.visit(stmt, context);
 		seenClasses.add(type);
 		if(!phantomSSTs.containsKey(type)) {
 			SST sst = createNewSST(type);
 			phantomSSTs.put(type, sst);
 		}
 		return super.visit(stmt, context);
+	}
+
+	private boolean isJavaValueType(ITypeName type) {
+		if(type.getFullName().equals("System.String")) {
+			return true;
+		}
+		String aliasType = getTypeAliasFromFullTypeName(type.getFullName());
+		if(!aliasType.equals(type.getFullName())) {
+			return true;
+		}
+		return false;
 	}
 
 	private SST createNewSST(ITypeName type) {
