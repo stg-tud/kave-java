@@ -15,10 +15,21 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import cc.kave.commons.model.names.IFieldName;
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
@@ -81,6 +92,29 @@ public class JavaPrintingVisitorBaseTest {
 		JavaPrintingContext context = new JavaPrintingContext();
 		context.setIndentationLevel(1);
 		assertPrintWithCustomContext(sst, context, indentedLines);
+	}
+	
+	protected IFieldName field(ITypeName valType, ITypeName declType, String fieldName) {
+		String field = String.format("[%1$s] [%2$s].%3$s", valType, declType, fieldName);
+		return FieldName.newFieldName(field);
+	}
+	
+	protected static IMethodName method(ITypeName returnType, ITypeName declType, String simpleName,
+			IParameterName... parameters) {
+		String parameterStr = Joiner.on(", ").join(
+				Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
+		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType, declType, simpleName,
+				parameterStr);
+		return MethodName.newMethodName(methodIdentifier);
+	}
+
+	protected IParameterName parameter(ITypeName valType, String paramName) {
+		String param = String.format("[%1$s] %2$s", valType, paramName);
+		return ParameterName.newParameterName(param);
+	}
+
+	protected ITypeName type(String simpleName) {
+		return TypeName.newTypeName(simpleName + ",P1");
 	}
 
 	protected ConstantValueExpression constant(String value) {

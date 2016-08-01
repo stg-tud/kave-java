@@ -18,7 +18,9 @@ package exec.recommender_reimplementation.java_printer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import cc.kave.commons.model.names.INamespaceName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.NamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
@@ -58,5 +60,33 @@ public class JavaPrintingUtils {
 		JavaPrintingContext importContext = new JavaPrintingContext();
 		formatAsImportList(context.getSeenNamespaces(), importContext);
 		return importContext.toString() + "\n" + context.toString();
+	}
+	
+	public static String getDefaultValueForType(ITypeName returnType) {
+		if (returnType.isValueType()) {
+			String type = returnType.getFullName();
+			String translatedType = JavaNameUtils.getTypeAliasFromFullTypeName(type);
+			switch (translatedType) {
+			case "boolean":
+				return "false";
+			case "byte":
+				return "0";
+			case "short":
+				return "0";
+			case "int":
+				return "0";
+			case "long":
+				return "0";
+			case "double":
+				return "0.0d";
+			case "float":
+				return "0.0f";
+			case "char":
+				return "'.'";
+			default:
+				break;
+			}
+		}
+		return "null";
 	}
 }

@@ -38,6 +38,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -56,6 +57,7 @@ import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getDefaultValueForType;
 
 public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
@@ -233,7 +235,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	@Override
 	public Void visit(IAssignment assignment, SSTPrintingContext context) {
 		// Handle Property Get
-		IPropertyReference propertyReferenceGet = expressionContainsPropertyReference(assignment.getExpression());
+		IPropertyReference propertyReferenceGet = tryGetPropertyReferenceFromExpression(assignment.getExpression());
 		if (propertyReferenceGet != null) {
 			String propertyName = propertyReferenceGet.getPropertyName().getName();
 			if (propertyName.endsWith("()")) {
@@ -307,100 +309,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	protected String getDefaultValueForNode(ISSTNode node) {
-		// case Assignable Expression -> check for type in parent assignment;
-		// parent no assignment -> null
-		// TODO: add test for Assignable Expression default value
-		if (node instanceof IAssignableExpression) {
-			IAssignableExpression assignableExpression = (IAssignableExpression) node;
-			ISSTNode parentStatement = sstNodeHierarchy.getParent(assignableExpression);
-			if (parentStatement instanceof IAssignment) {
-				IAssignment parentAssignment = (IAssignment) parentStatement;
-				IAssignableReference assignableReference = parentAssignment.getReference();
-				if (assignableReference instanceof IVariableReference) {
-					return getDefaultValueForVariableReference((IVariableReference) parentAssignment.getReference());
-				}
-			}
-		}
-		// case ICaseBlock -> 0
-		// TODO: add test for default value in CaseBlock
-		if (node instanceof ICaseBlock) {
-			return "0";
-		}
-		// case IfElseBlock -> false
-		// TODO: add test for default value in IfElseBlock condition
-		if (node instanceof IIfElseBlock) {
-			return "false";
-		}
-		// case ReturnStatement -> check for return type in method declaration
-		if (node instanceof IReturnStatement) {
-			// TODO: add test for default value in return statement
-			IReturnStatement returnStatement = (IReturnStatement) node;
-			IMemberDeclaration memberDeclaration = findMemberDeclaration(returnStatement);
-			if(memberDeclaration instanceof IMethodDeclaration) {
-				IMethodDeclaration methodDeclaration = (IMethodDeclaration) memberDeclaration;
-				return getDefaultValueForType(methodDeclaration.getName().getReturnType());
-			}
-			if(memberDeclaration instanceof IPropertyDeclaration) {
-				IPropertyDeclaration propertyDeclaration = (IPropertyDeclaration) memberDeclaration;
-				return getDefaultValueForType(propertyDeclaration.getName().getValueType());
-			}
-		}
-		// case Assignment -> check for type of variable reference
-		if (node instanceof IAssignment) {
-			IAssignment assignment = (IAssignment) node;
-			IAssignableReference assignableReference = assignment.getReference();
-			if (assignableReference instanceof IVariableReference) {
-				return getDefaultValueForVariableReference((IVariableReference) assignment.getReference());
-			}
-		}
-		return "null";
-	}
-
-	private String getDefaultValueForType(ITypeName returnType) {
-		if (returnType.isValueType()) {
-			String type = returnType.getFullName();
-			String translatedType = JavaNameUtils.getTypeAliasFromFullTypeName(type);
-			switch (translatedType) {
-			case "boolean":
-				return "false";
-			case "byte":
-				return "0";
-			case "short":
-				return "0";
-			case "int":
-				return "0";
-			case "long":
-				return "0";
-			case "double":
-				return "0.0d";
-			case "float":
-				return "0.0f";
-			case "char":
-				return "'.'";
-			default:
-				break;
-			}
-		}
-		return "null";
-	}
-
-	private String getDefaultValueForVariableReference(IVariableReference reference) {
-		if (variableTypeMap.containsKey(reference)) {
-			return getDefaultValueForType(variableTypeMap.get(reference));
-		}
-		return "null";
-	}
-
-	private IMemberDeclaration findMemberDeclaration(ISSTNode sstNode) {
-		ISSTNode parent = sstNodeHierarchy.getParent(sstNode);
-		while (!(parent instanceof IMemberDeclaration)) {
-			parent = sstNodeHierarchy.getParent(parent);
-		} 
-
-		return (IMemberDeclaration) parent;
-	}
-
 	@Override
 	public Void visit(ICompletionExpression entity, SSTPrintingContext context) {
 		// ignore completion expressions
@@ -449,6 +357,34 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	}
 
 	@Override
+	public Void visit(IIndexAccessExpression expr, SSTPrintingContext context) {
+		if (variableTypeMap.containsKey(expr.getReference())) {
+			ITypeName containerType = variableTypeMap.get(expr.getReference());
+			context.text(expr.getReference().getIdentifier());
+			if (containerType.isArrayType()) {
+				context.text("[");
+				printIndices(expr, context);
+				context.text("]");
+			}
+			else {
+				context.text(".").text("get").text("(");
+				printIndices(expr, context);
+				context.text(")");
+			}
+		}
+		// if type not found expression is ignored
+		return null;
+	}
+
+	private void printIndices(IIndexAccessExpression expr, SSTPrintingContext context) {
+		for (int i = 0; i < expr.getIndices().size(); i++) {
+			expr.getIndices().get(i).accept(this, context);
+			if (i < expr.getIndices().size() - 1)
+				context.text(",");
+		}
+	}
+
+	@Override
 	public Void visit(IUnknownExpression unknownExpr, SSTPrintingContext context) {
 		context.text(getDefaultValueForNode(sstNodeHierarchy.getParent(unknownExpr)));
 		return null;
@@ -477,7 +413,81 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	private IPropertyReference expressionContainsPropertyReference(IAssignableExpression expression) {
+	private IMemberDeclaration findMemberDeclaration(ISSTNode sstNode) {
+		ISSTNode parent = sstNodeHierarchy.getParent(sstNode);
+		while (!(parent instanceof IMemberDeclaration)) {
+			parent = sstNodeHierarchy.getParent(parent);
+		}
+
+		return (IMemberDeclaration) parent;
+	}
+
+	protected String getDefaultValueForNode(ISSTNode node) {
+		// TODO: add test for Assignable Expression default value
+		if (node instanceof IAssignableExpression) {
+			return getDefaultValueForAssignableExpression((IAssignableExpression) node);
+		}
+
+		// TODO: add test for default value in CaseBlock
+		if (node instanceof ICaseBlock) {
+			return "0";
+		}
+
+		// TODO: add test for default value in IfElseBlock condition
+		if (node instanceof IIfElseBlock) {
+			return "false";
+		}
+		if (node instanceof IReturnStatement) {
+			return getDefaultValueForReturnStatement((IReturnStatement) node);
+		}
+
+		if (node instanceof IAssignment) {
+			return getDefaultValueForAssignment((IAssignment) node);
+		}
+		return "null";
+	}
+
+	protected String getDefaultValueForAssignableExpression(IAssignableExpression assignableExpression) {
+		ISSTNode parentStatement = sstNodeHierarchy.getParent(assignableExpression);
+		if (parentStatement instanceof IAssignment) {
+			return getDefaultValueForAssignment((IAssignment) parentStatement);
+		}
+		return "null";
+	}
+
+	protected String getDefaultValueForAssignment(IAssignment assignment) {
+		IAssignableReference assignableReference = assignment.getReference();
+		if (assignableReference instanceof IVariableReference) {
+			return getDefaultValueForVariableReference((IVariableReference) assignment.getReference());
+		}
+
+		return "null";
+	}
+
+	protected String getDefaultValueForReturnStatement(IReturnStatement returnStatement) {
+		// TODO: add test for default value in return statement
+		IMemberDeclaration memberDeclaration = findMemberDeclaration(returnStatement);
+
+		if (memberDeclaration instanceof IMethodDeclaration) {
+			IMethodDeclaration methodDeclaration = (IMethodDeclaration) memberDeclaration;
+			return getDefaultValueForType(methodDeclaration.getName().getReturnType());
+		}
+		if (memberDeclaration instanceof IPropertyDeclaration) {
+			IPropertyDeclaration propertyDeclaration = (IPropertyDeclaration) memberDeclaration;
+			return getDefaultValueForType(propertyDeclaration.getName().getValueType());
+		}
+
+		return "null";
+	}
+
+	protected String getDefaultValueForVariableReference(IVariableReference reference) {
+		if (variableTypeMap.containsKey(reference)) {
+			return getDefaultValueForType(variableTypeMap.get(reference));
+		}
+		return "null";
+	}
+
+	protected IPropertyReference tryGetPropertyReferenceFromExpression(IAssignableExpression expression) {
 		if (expression instanceof IReferenceExpression) {
 			IReferenceExpression refExpr = (IReferenceExpression) expression;
 			if (refExpr.getReference() instanceof IPropertyReference) {
