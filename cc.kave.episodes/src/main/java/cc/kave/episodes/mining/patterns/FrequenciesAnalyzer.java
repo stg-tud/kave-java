@@ -45,7 +45,7 @@ public class FrequenciesAnalyzer {
 		this.postprocessor = processor;
 	}
 	
-	public void analyzeSuperEpisodes(int numbRepos, int frequency, int entropy) throws IOException {
+	public void analyzeSuperEpisodes(int numbRepos, int frequency, double entropy) throws IOException {
 		Map<Integer, Set<Episode>> patterns = postprocessor.postprocess(numbRepos, frequency, entropy);
 		StringBuilder sb = new StringBuilder();
 		
@@ -58,10 +58,12 @@ public class FrequenciesAnalyzer {
 			for (Episode episode : entry.getValue()) {
 				Set<Episode> superEpisodes = getSuperEpisodes(episode, patterns.get(entry.getKey() + 1));
 				if (superEpisodes.size() > 0) {
-					sb.append(episode.toString() + "\t" + episode.getFrequency() + "\n");
+					sb.append(episode.getFacts().toString() + "\t" + episode.getFrequency() + "\n");
 					for (Episode sep : superEpisodes) {
-						sb.append(sep.toString() + "\t" + sep.getFrequency() + "\n");
+						sb.append(sep.getFacts().toString() + "\t" + sep.getFrequency() + "\n");
 					}
+				} else {
+					continue;
 				}
 				sb.append("\n");
 			}

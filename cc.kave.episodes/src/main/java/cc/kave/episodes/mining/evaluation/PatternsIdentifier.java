@@ -199,8 +199,8 @@ public class PatternsIdentifier {
 
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(ep, events);
 			graphWriter.write(graph, getGraphPaths(filePath, pId));
+			pId++;
 		}
-
 	}
 
 	private List<Event> mapToList(Map<Event, Integer> events) {
