@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -36,6 +37,8 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 	private Set<ITypeName> seenClasses;
 	private Map<ITypeName, SST> phantomSSTs;
 
+	private ITypeName className;
+	
 	public PhantomClassVisitor() {
 		seenClasses = new HashSet<>();
 		phantomSSTs = new HashMap<>();
@@ -44,9 +47,15 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 	// TODO: test phantom class visitor
 	
 	@Override
+	public Void visit(ISST sst, Void context) {
+		className = sst.getEnclosingType();
+		return super.visit(sst, context);
+	}
+	
+	@Override
 	public Void visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		if(isJavaValueType(type)) return super.visit(stmt, context);
+		if(isJavaValueType(type) || type.equals(className)) return super.visit(stmt, context);
 		seenClasses.add(type);
 		if(!phantomSSTs.containsKey(type)) {
 			SST sst = createNewSST(type);
@@ -74,8 +83,9 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 
 	@Override
 	public Void visit(IInvocationExpression invocation, Void context) {
-		if(invocation.getReference().getIdentifier().equals("this")) return super.visit(invocation, context);
 		ITypeName type = invocation.getMethodName().getDeclaringType();
+		if(invocation.getReference().getIdentifier().equals("this") ||
+				type.equals(className)) return super.visit(invocation, context);
 		if(phantomSSTs.containsKey(type)) {
 			SST sst = phantomSSTs.get(type);
 			addMethodDeclarationToSST(invocation, sst);
@@ -92,7 +102,7 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 
 	@Override
 	public Void visit(IPropertyReference propertyRef, Void context) {
-		if(!propertyRef.getReference().getIdentifier().equals("this")) {
+		if(!propertyRef.getReference().getIdentifier().equals("this") && !propertyRef.getPropertyName().getDeclaringType().equals(className)) {
 			ITypeName type = propertyRef.getPropertyName().getDeclaringType();
 			seenClasses.add(type);
 			if(phantomSSTs.containsKey(type)) {
