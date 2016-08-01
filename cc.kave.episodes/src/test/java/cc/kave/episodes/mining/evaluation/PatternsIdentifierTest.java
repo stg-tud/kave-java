@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +33,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,6 +54,9 @@ import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ReposParser;
@@ -80,7 +87,13 @@ public class PatternsIdentifierTest {
 	private MaximalEpisodes maxEpisodes;
 	@Mock
 	private ReposParser repos;
-
+	@Mock
+	private TransitivelyClosedEpisodes transClosure;
+	@Mock
+	private EpisodeToGraphConverter episodeGraphConverter;
+	@Mock
+	private EpisodeAsGraphWriter graphWriter;
+	
 	private Map<Integer, Set<Episode>> patterns;
 	private List<List<Fact>> stream;
 	private List<Event> events;
@@ -122,8 +135,9 @@ public class PatternsIdentifierTest {
 		validationStream = Lists.newArrayList(firstCtx(1), enclosingCtx(2), inv(3), inv(4), firstCtx(5), superCtx(6),
 				enclosingCtx(7), inv(3), firstCtx(0), enclosingCtx(8), inv(4), inv(3), firstCtx(5), enclosingCtx(9),
 				inv(3));
-
-		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos);
+		
+		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos,
+				transClosure, episodeGraphConverter, graphWriter);
 
 		when(streamParser.parseStream(anyInt())).thenReturn(stream);
 		when(mappingParser.parse(anyInt())).thenReturn(events);
@@ -142,7 +156,7 @@ public class PatternsIdentifierTest {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
 		sut = new PatternsIdentifier(new File("does not exist"), streamParser, processor, mappingParser, maxEpisodes,
-				repos);
+				repos, transClosure, episodeGraphConverter, graphWriter);
 	}
 
 	@Test
@@ -150,7 +164,8 @@ public class PatternsIdentifierTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder is not a folder, but a file");
-		sut = new PatternsIdentifier(file, streamParser, processor, mappingParser, maxEpisodes, repos);
+		sut = new PatternsIdentifier(file, streamParser, processor, mappingParser, maxEpisodes, repos, transClosure,
+				episodeGraphConverter, graphWriter);
 	}
 
 	@Test
@@ -162,7 +177,7 @@ public class PatternsIdentifierTest {
 		verify(processor).postprocess(anyInt(), anyInt(), anyDouble());
 		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));
 	}
-	
+
 	@Test
 	public void mocksAreCalledInValidation() throws Exception {
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
@@ -202,66 +217,65 @@ public class PatternsIdentifierTest {
 
 		assertLogContains(0, "Processed 2-node patterns!");
 	}
-	
+
 	@Test
 	public void loggerIsCalledInValidation() throws Exception {
 		Set<Episode> episodes = Sets.newLinkedHashSet();
-		Episode ep = new Episode();
-		ep.addStringsOfFacts("3", "4");
-		ep.setFrequency(2);
+		Episode ep = createEpisode(2, "3", "4");
 		episodes.add(ep);
 
-		ep = new Episode();
-		ep.addStringsOfFacts("5", "3", "5>3");
-		ep.setFrequency(2);
+		ep = createEpisode(2, "5", "3", "5>3");
 		episodes.add(ep);
 		patterns.put(2, episodes);
 
+		when(transClosure.remTransClosure(any(Set.class)))
+				.thenReturn(Sets.newHashSet(createEpisode(2, "3", "4"), createEpisode(2, "5", "3", "5>3")));
+		when(episodeGraphConverter.convert(any(Episode.class), any(List.class)))
+				.thenReturn(any(DefaultDirectedGraph.class));
+
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
+		
+		verify(transClosure).remTransClosure(any(Set.class));
+		verify(episodeGraphConverter, times(2)).convert(any(Episode.class), any(List.class));
+		verify(graphWriter, times(2)).write(any(DefaultDirectedGraph.class), any(String.class));
 
 		assertLogContains(0, "Processed 2-node patterns!");
 	}
-	
+
 	@Test
 	public void fileIsCreated() throws Exception {
 		File fileName = getFilePath(NUMBREPOS, FREQUENCY, ENTROPY);
-		
+
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
-		
+
 		assertTrue(fileName.exists());
 	}
-	
+
 	@Test
 	public void checkFileContent() throws Exception {
 		Set<Episode> episodes = Sets.newLinkedHashSet();
-		Episode ep = new Episode();
-		ep.addStringsOfFacts("3", "4", "3>4");
-		ep.setFrequency(2);
+		Episode ep = createEpisode(2, "3", "4", "3>4");
 		episodes.add(ep);
 
-		ep = new Episode();
-		ep.addStringsOfFacts("5", "3", "5>3");
-		ep.setFrequency(2);
+		ep = createEpisode(2, "5", "3", "5>3");
 		episodes.add(ep);
 		patterns.put(2, episodes);
-		
-		ep = new Episode();
-		ep.addStringsOfFacts("3", "4", "5", "3>4");
-		ep.setFrequency(2);
+
+		ep = createEpisode(2, "3", "4", "5", "3>4");
 		patterns.put(3, Sets.newHashSet(ep));
-		
+
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
-		
+
 		String actuals = FileUtils.readFileToString(getFilePath(NUMBREPOS, FREQUENCY, ENTROPY));
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("Patterns of size: 2-events\n");
 		sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-		sb.append("[3, 4, 3>4]\t2\t2\t1\n");
-		sb.append("[3, 5, 5>3]\t2\t2\t2\n\n");
+		sb.append("0\t2\t2\t1\n");
+		sb.append("1\t2\t2\t2\n\n");
 		sb.append("Patterns of size: 3-events\n");
 		sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-		sb.append("[3, 4, 5, 3>4]\t2\t0\t0\n\n");
+		sb.append("2\t2\t0\t0\n\n");
 		
 		assertEquals(sb.toString(), actuals);
 	}
@@ -293,10 +307,23 @@ public class PatternsIdentifierTest {
 			return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
 		}
 	}
-	
+
+	private Episode createEpisode(int freq, String... strings) {
+		Episode episode = new Episode();
+		episode.addStringsOfFacts(strings);
+		episode.setFrequency(freq);
+		return episode;
+	}
+
 	private File getFilePath(int numbRepos, int freqThresh, double bidirectThresh) {
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
 				+ "/Bidirect" + bidirectThresh + "/patternsValidation.txt");
+		return fileName;
+	}
+	
+	private File getGraphPath(int numbRepos, int freqThresh, double entropy, int pId) {
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
+				+ "/Bidirect" + entropy + "/pattern" + pId + ".dot");
 		return fileName;
 	}
 }

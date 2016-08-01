@@ -18,12 +18,15 @@ package cc.kave.episodes.mining.evaluation;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -32,6 +35,9 @@ import com.google.inject.name.Named;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ReposParser;
@@ -50,11 +56,17 @@ public class PatternsIdentifier {
 	private EpisodesPostprocessor episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 
+	private TransitivelyClosedEpisodes transClosure;
+	private EpisodeToGraphConverter episodeGraphConverter;
+	private EpisodeAsGraphWriter graphWriter;
+
 	private ReposParser repos;
 
 	@Inject
 	public PatternsIdentifier(@Named("patterns") File folder, StreamParser streamParser, EpisodesPostprocessor episodes,
-			MappingParser mappingParser, MaximalEpisodes maxEpisodes, ReposParser repos) {
+			MappingParser mappingParser, MaximalEpisodes maxEpisodes, ReposParser repos,
+			TransitivelyClosedEpisodes transClosure, EpisodeToGraphConverter episodeGraphConverter,
+			EpisodeAsGraphWriter graphWriter) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns folder is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -63,15 +75,19 @@ public class PatternsIdentifier {
 		this.episodeProcessor = episodes;
 		this.maxEpisodes = maxEpisodes;
 		this.repos = repos;
+		this.transClosure = transClosure;
+		this.episodeGraphConverter = episodeGraphConverter;
+		this.graphWriter = graphWriter;
 	}
 
 	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
+		// Logger.log("Number of events: %d", events.size());
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
-//		checkMethodSize(stream, events);
+		// checkMethodSize(stream, events);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
@@ -104,6 +120,7 @@ public class PatternsIdentifier {
 			}
 			Logger.log("Processed %d-node patterns!", entry.getKey());
 		}
+		Logger.log("All patterns are identified in the training data!");
 	}
 
 	private void checkMethodSize(List<List<Fact>> stream, List<Event> events) {
@@ -143,13 +160,15 @@ public class PatternsIdentifier {
 		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
 		List<Event> listEvents = mapToList(mapEvents);
 		StringBuilder sb = new StringBuilder();
+		int patternId = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			if (entry.getKey() < 2) {
+			if ((entry.getKey() < 2) || (entry.getValue().size() == 0)) {
 				continue;
 			}
 			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
 			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+			patternsWriter(entry.getValue(), trainEvents, numbRepos, frequency, entropy, patternId);
 			for (Episode episode : entry.getValue()) {
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
@@ -160,18 +179,33 @@ public class PatternsIdentifier {
 						methodsOrderRelation.addMethod(episode, method, listEvents);
 					}
 				}
-				sb.append(episode.getFacts().toString() + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
-						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
+				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+						+ methodsNoOrderRelation.getOccurrences() + "\t" + methodsOrderRelation.getOccurrences()
+						+ "\n");
+				patternId++;
 			}
 			sb.append("\n");
 			Logger.log("\nProcessed %d-node patterns!", entry.getKey());
 		}
-		FileUtils.writeStringToFile(getValidationPath(numbRepos, frequency, entropy), sb.toString());
+		FileUtils.writeStringToFile(getValidationPath(getPath(numbRepos, frequency, entropy)), sb.toString());
+	}
+
+	private void patternsWriter(Set<Episode> episodes, List<Event> events, int numbRepos, int frequency, double entropy,
+			int pId) throws IOException {
+		Set<Episode> closedEpisodes = transClosure.remTransClosure(episodes);
+
+		for (Episode ep : closedEpisodes) {
+			File filePath = getPath(numbRepos, frequency, entropy);
+
+			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(ep, events);
+			graphWriter.write(graph, getGraphPaths(filePath, pId));
+		}
+
 	}
 
 	private List<Event> mapToList(Map<Event, Integer> events) {
 		List<Event> result = new LinkedList<Event>();
-		
+
 		for (Map.Entry<Event, Integer> entry : events.entrySet()) {
 			result.add(entry.getKey());
 		}
@@ -193,7 +227,7 @@ public class PatternsIdentifier {
 		}
 		return completeEvents;
 	}
-	
+
 	private List<List<Fact>> streamOfMethods(List<Event> stream, Map<Event, Integer> events) {
 		List<List<Fact>> result = new LinkedList<>();
 		List<Fact> method = new LinkedList<Fact>();
@@ -214,12 +248,21 @@ public class PatternsIdentifier {
 		return result;
 	}
 
-	private File getValidationPath(int numbRepos, int freqThresh, double bidirectThresh) {
+	private File getPath(int numbRepos, int freqThresh, double bidirectThresh) {
 		File folderPath = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
 				+ "/Bidirect" + bidirectThresh + "/");
 		if (!folderPath.isDirectory()) {
 			folderPath.mkdirs();
 		}
+		return folderPath;
+	}
+
+	private String getGraphPaths(File folderPath, int patternNumber) {
+		String graphPath = folderPath + "/pattern" + patternNumber + ".dot";
+		return graphPath;
+	}
+
+	private File getValidationPath(File folderPath) {
 		File fileName = new File(folderPath.getAbsolutePath() + "/patternsValidation.txt");
 		return fileName;
 	}
