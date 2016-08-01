@@ -18,15 +18,15 @@ package exec.recommender_reimplementation.java_printer;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
+import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
-public class RaychevQueryPrinter extends JavaPrintingVisitor {
+public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 
-	public RaychevQueryPrinter(ISSTNode sst) {
+	public RaychevQueryPrintingVisitor(ISSTNode sst) {
 		super(sst);
 	}
 
@@ -45,12 +45,12 @@ public class RaychevQueryPrinter extends JavaPrintingVisitor {
 	}
 
 	@Override
-	public Void visit(IComposedExpression expr, SSTPrintingContext context) {
+	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
 		throw new InvalidJavaCodeException();
 	}
 	
 	@Override
-	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
+	public Void visit(IUnknownReference unknownRef, SSTPrintingContext context) {
 		throw new InvalidJavaCodeException();
 	}
 

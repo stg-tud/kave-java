@@ -15,8 +15,6 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.printRaychevJava;
-
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
@@ -25,32 +23,33 @@ import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.IName;
 import cc.kave.commons.model.ssts.ISST;
-import exec.recommender_reimplementation.java_printer.RaychevQueryPrinter.InvalidJavaCodeException;
+import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor.InvalidJavaCodeException;
+import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;
 
 public class QueryExtractor {
 
-	public static String createJavaCodeForQuery(CompletionEvent completionEvent) {
+	public String createJavaCodeForQuery(CompletionEvent completionEvent) {
 		if (isValidCompletionEvent(completionEvent)) {
 			return createJavaCodeForQuery(completionEvent.getContext());
 		}
 		return "";
 	}
 
-	private static boolean isValidCompletionEvent(CompletionEvent completionEvent) {
+	private boolean isValidCompletionEvent(CompletionEvent completionEvent) {
 		return completionEvent.terminatedState == TerminationState.Applied && !completionEvent.selections.isEmpty()
 				&& IsNonStaticSelection(Iterables.getLast(completionEvent.selections).getProposal());
 	}
 
-	private static boolean IsNonStaticSelection(IProposal proposal) {
+	private boolean IsNonStaticSelection(IProposal proposal) {
 		IName name = proposal.getName();
 		return !name.getIdentifier().contains("static");
 	}
 
-	public static String createJavaCodeForQuery(Context context) {
+	public String createJavaCodeForQuery(Context context) {
 		ISST sst = context.getSST();
 
 		try {
-			return printRaychevJava(sst);
+			return new RaychevQueryPrinter().print(sst);
 		} catch (InvalidJavaCodeException e) {
 			return "";
 		}

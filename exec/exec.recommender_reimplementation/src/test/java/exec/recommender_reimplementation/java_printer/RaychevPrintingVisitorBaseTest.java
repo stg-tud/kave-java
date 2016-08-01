@@ -21,12 +21,12 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 public class RaychevPrintingVisitorBaseTest extends JavaPrintingVisitorBaseTest {
 	
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String... expectedLines) {
-		sut = new RaychevQueryPrinter(sst);
+		sut = new RaychevQueryPrintingVisitor(sst);
 		assertPrintWithCustomContext(sst, typeShape, String.join("\n", expectedLines));
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String... expectedLines) {
-		sut = new RaychevQueryPrinter(sst);
+		sut = new RaychevQueryPrintingVisitor(sst);
 		assertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
 	}
 }

@@ -22,10 +22,9 @@ import org.junit.Test;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
-import exec.recommender_reimplementation.java_printer.RaychevQueryPrinter.InvalidJavaCodeException;
+import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor.InvalidJavaCodeException;
 
-public class RaychevQueryPrinterTest extends RaychevPrintingVisitorBaseTest{
+public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseTest{
 
 	@Test
 	public void addsHoleMethodOnCompletionExpression() {
@@ -50,11 +49,6 @@ public class RaychevQueryPrinterTest extends RaychevPrintingVisitorBaseTest{
 	@Test(expected = InvalidJavaCodeException.class)
 	public void exceptionOnEventDeclaration() {
 		assertPrint(new EventDeclaration(), "");
-	}
-	
-	@Test(expected = InvalidJavaCodeException.class)
-	public void exceptionOnComposedExpression() {
-		assertPrint(new ComposedExpression(), "");
 	}
 
 }

@@ -18,11 +18,11 @@ package exec.recommender_reimplementation.java_printer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.NamespaceName;
-import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
@@ -48,18 +48,20 @@ public class JavaPrintingUtils {
 		}
 	}
 	
-	public static String printJava(ISST sst) {
-		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new JavaPrintingVisitor(sst), context);
-		return context.toString();
-	}
-	
-	public static String printRaychevJava(ISST sst) {
-		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new RaychevQueryPrinter(sst), context);
-		JavaPrintingContext importContext = new JavaPrintingContext();
-		formatAsImportList(context.getSeenNamespaces(), importContext);
-		return importContext.toString() + "\n" + context.toString();
+	public static String appendImportListToString(Set<ITypeName> classes, String code) {
+		// TODO: test appendImportList
+		StringBuilder sb = new StringBuilder();
+		Iterator<ITypeName> classesIterator = classes.iterator();
+		while (classesIterator.hasNext()) {
+			ITypeName classType = classesIterator.next();
+			sb.append("import").append(" ").append(classType.getFullName()).append(";");
+
+			if (classesIterator.hasNext()) {
+				sb.append("\n");
+			}
+		}
+		
+		return String.join("\n", sb.toString(),code);
 	}
 	
 	public static String getDefaultValueForType(ITypeName returnType) {

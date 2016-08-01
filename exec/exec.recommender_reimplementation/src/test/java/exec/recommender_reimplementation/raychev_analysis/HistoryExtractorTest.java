@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -18,6 +19,13 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 
 public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 
+	HistoryExtractor sut;
+	
+	@Before
+	public void setup() {
+		sut = new HistoryExtractor();
+	}
+	
 	@Test
 	public void IntegrationTest() {
 		IfElseBlock ifElseBlock = new IfElseBlock();
@@ -42,7 +50,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 				varDecl("length", intType),
 				assign("length", invoke("message", method(intType, DefaultClassContext, "length"))), ifElseBlock);
 
-		Set<ConcreteHistory> actualConcreteHistories = HistoryExtractor.extractHistories(context);
+		Set<ConcreteHistory> actualConcreteHistories = sut.extractHistories(context);
 
 		Set<ConcreteHistory> expectedHistories = Sets.newHashSet(
 				createConcreteHistory(
@@ -137,7 +145,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 				"TDecl.length()i:0/1 SmsManager.sendTextMessage(M)v:1/2",
 				"SmsManager.divideMsg(M)A:R SmsManager.sendMultipartTextMessage(A)v:1/2");
 
-		assertSentencesString(expectedStrings, HistoryExtractor.getHistoryAsString(histories));
+		assertSentencesString(expectedStrings, sut.getHistoryAsString(histories));
 	}
 
 	@Test
@@ -160,7 +168,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 		List<String> expectedStrings = Lists
 				.newArrayList("System.Collections.Dictionary`2[[TKey],[TValue]].m1()v:0/1 System.Nullable`1[[T]].m2()v:0/1 System.Converter`2[[TInput],[TOutput]].m3()v:0/1");
 
-		assertSentencesString(expectedStrings, HistoryExtractor.getHistoryAsString(histories));
+		assertSentencesString(expectedStrings, sut.getHistoryAsString(histories));
 	}
 
 	private void assertSentencesString(List<String> expectedStrings, String historyString) {

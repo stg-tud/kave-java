@@ -34,7 +34,7 @@ import cc.kave.commons.utils.TypeErasure;
 
 public class HistoryExtractor {
 
-	public static Set<ConcreteHistory> extractHistories(Context context) {
+	public Set<ConcreteHistory> extractHistories(Context context) {
 		PointsToContext pointsToContext = performPointsToAnalysis(context);
 
 		ISST sst = context.getSST();
@@ -55,13 +55,13 @@ public class HistoryExtractor {
 		return concreteHistorySet;
 	}
 
-	public static PointsToContext performPointsToAnalysis(Context context) {
+	public PointsToContext performPointsToAnalysis(Context context) {
 		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(
 				FieldSensitivity.FULL);
 		return pointsToAnalysis.compute(context);
 	}
 
-	public static String getHistoryAsString(Set<ConcreteHistory> concreteHistories) {
+	public String getHistoryAsString(Set<ConcreteHistory> concreteHistories) {
 		StringBuilder sb = new StringBuilder();
 		for (ConcreteHistory concreteHistory : concreteHistories) {
 			for (Iterator<Interaction> iterator = concreteHistory.getHistory()
@@ -76,7 +76,7 @@ public class HistoryExtractor {
 		return sb.toString();
 	}
 
-	public static String buildInteractionString(Interaction interaction) {
+	public String buildInteractionString(Interaction interaction) {
 		IMethodName methodName = interaction.getMethodName();
 		int position = interaction.getPosition();
 		StringBuilder sb = new StringBuilder();
@@ -94,11 +94,11 @@ public class HistoryExtractor {
 		return sb.toString();
 	}
 
-	public static String getDeclaringType(IMethodName methodName) {
+	public String getDeclaringType(IMethodName methodName) {
 		return TypeErasure.of(methodName.getDeclaringType()).getFullName().replace(" ", "");
 	}
 
-	private static String getPositionString(IMethodName methodName, int position) {
+	private String getPositionString(IMethodName methodName, int position) {
 		if (position == Interaction.RETURN)
 			return "R";
 		int numberOfParameters = methodName.isStatic() ? methodName
@@ -106,7 +106,7 @@ public class HistoryExtractor {
 		return String.format("%1$s/%2$s", position, numberOfParameters);
 	}
 
-	private static char getReturnString(IMethodName methodName) {
+	private char getReturnString(IMethodName methodName) {
 		ITypeName returnType = methodName.getReturnType();
 		if (returnType.isVoidType())
 			return 'v';
@@ -116,7 +116,7 @@ public class HistoryExtractor {
 		return firstChar;
 	}
 
-	private static String getParameterString(IMethodName methodName) {
+	private String getParameterString(IMethodName methodName) {
 		List<IParameterName> parameters = methodName.getParameters();
 		StringBuilder sb = new StringBuilder();
 		for (IParameterName parameterName : parameters) {
@@ -128,7 +128,7 @@ public class HistoryExtractor {
 		return sb.toString();
 	}
 
-	private static String getNameForInteractionType(
+	private String getNameForInteractionType(
 			InteractionType interactionType, IMethodName methodName) {
 		String name = "";
 		switch (interactionType) {

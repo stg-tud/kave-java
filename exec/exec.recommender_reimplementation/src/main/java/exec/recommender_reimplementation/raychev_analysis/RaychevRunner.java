@@ -15,9 +15,6 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import static exec.recommender_reimplementation.raychev_analysis.HistoryExtractor.extractHistories;
-import static exec.recommender_reimplementation.raychev_analysis.HistoryExtractor.getHistoryAsString;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,10 +27,12 @@ import org.apache.commons.io.FileUtils;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.ISST;
 
 import com.google.common.collect.Lists;
 
 import exec.recommender_reimplementation.ContextReader;
+import exec.recommender_reimplementation.java_printer.PhantomClassGenerator;
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
@@ -48,12 +47,12 @@ public class RaychevRunner {
 		}
 
 		StringBuilder sb = new StringBuilder();
-
+		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
 			try {
-				Set<ConcreteHistory> extractedHistories = extractHistories(context);
-				sb.append(getHistoryAsString(extractedHistories));
+				Set<ConcreteHistory> extractedHistories = historyExtractor.extractHistories(context);
+				sb.append(historyExtractor.getHistoryAsString(extractedHistories));
 				sb.append("\n");
 			} catch (Exception e) {
 				continue;
@@ -71,12 +70,12 @@ public class RaychevRunner {
 			e.printStackTrace();
 		}
 
+		QueryExtractor queryExtractor = new QueryExtractor();
 		for (Context context : contextList) {
 			try {
-				String javaCode = QueryExtractor.createJavaCodeForQuery(context);
+				String javaCode = queryExtractor.createJavaCodeForQuery(context);
 				if (!javaCode.isEmpty()) {
-					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\"
-							+ context.getSST().getEnclosingType().getName() + ".java"), javaCode);
+					writeJavaFile(javaCode, context.getSST());
 				}
 			} catch (Exception e) {
 				continue;
@@ -92,17 +91,25 @@ public class RaychevRunner {
 			e.printStackTrace();
 		}
 
+		QueryExtractor queryExtractor = new QueryExtractor();
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
-				String javaCode = QueryExtractor.createJavaCodeForQuery(completionEvent);
+				String javaCode = queryExtractor.createJavaCodeForQuery(completionEvent);
 				if (!javaCode.isEmpty()) {
-					FileUtils.writeStringToFile(new File(FOLDERPATH + "\\"
-							+ completionEvent.getContext().getSST().getEnclosingType().getName() + ".java"), javaCode);
+					ISST sst = completionEvent.getContext().getSST();
+					writeJavaFile(javaCode, sst);
 				}
 			} catch (Exception e) {
 				continue;
 			}
 		}
+	}
+
+	private static void writeJavaFile(String javaCode, ISST sst) throws IOException {
+		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\Queries" + "\\"
+				+ sst.getEnclosingType().getName() + ".java"), javaCode);
+		PhantomClassGenerator phantomClassGenerator = new PhantomClassGenerator(FOLDERPATH.toString()); 
+		phantomClassGenerator.generatePhantomClassesForSST(sst);
 	}
 
 	public static void main(String[] args) throws IOException {
