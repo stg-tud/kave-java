@@ -91,6 +91,17 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 
 		assertPrint(sst, "this.M(1)");
 	}
+	
+	@Test
+	public void invocationExpression_MultipleParameters() {
+		InvocationExpression sst = new InvocationExpression();
+		sst.setReference(varRef("this"));
+		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T1,P] p1, [T2,P] p2])"));
+		sst.getParameters().add(constant("1"));
+		sst.getParameters().add(constant("2"));
+
+		assertPrint(sst, "this.M(1,2)");
+	}
 
 	@Test
 	public void invocationExpression_NullValue() {

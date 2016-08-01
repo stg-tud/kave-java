@@ -549,13 +549,12 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		}
 
 		context.text("(");
-		boolean isFirst = true;
 		for (ISimpleExpression parameter : expr.getParameters()) {
-			if (!isFirst) {
-				context.text(", ");
-				isFirst = false;
-			}
 			parameter.accept(this, context);
+			
+			if (!parameter.equals(expr.getParameters().get(expr.getParameters().size() - 1))) {
+				context.text(",");
+			}
 		}
 		context.text(")");
 
