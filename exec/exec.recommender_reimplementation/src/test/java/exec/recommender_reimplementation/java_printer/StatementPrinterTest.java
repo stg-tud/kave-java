@@ -17,8 +17,14 @@ package exec.recommender_reimplementation.java_printer;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
+import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 
 public class StatementPrinterTest extends JavaPrintingVisitorBaseTest {
@@ -52,5 +58,19 @@ public class StatementPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.setLabel("L");
 
 		assertPrint(sst, "");
+	}
+	
+	@Test
+	public void testEmptyReturnStatementInMethodDeclaration() {
+		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Boolean"), type("Class1, P1"), "m1"), true, new ReturnStatement());
+		assertPrint(methodDecl, "boolean m1()", "{", "    return false;", "}");
+	}
+	
+	@Test
+	public void testEmptyReturnStatementInPropertyDeclaration() {
+		PropertyDeclaration propertyDecl = new PropertyDeclaration();
+		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Int32,P] [DeclaringType,P].P"));
+		propertyDecl.setGet(Lists.newArrayList(new ReturnStatement()));
+		assertPrint(propertyDecl, "int getP()", "{", "    return 0;", "}", "");
 	}
 }

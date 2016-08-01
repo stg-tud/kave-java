@@ -25,7 +25,6 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
-import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
@@ -278,8 +277,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	@Override
 	public Void visit(IUncheckedBlock block, SSTPrintingContext context) {
 		// ignores unchecked keyword
-		context.indentation().statementBlock(block.getBody(), this, true);
-
+		statementBlockWithoutIndent(block.getBody(), context);
 		return null;
 	}
 
@@ -303,7 +301,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				context.stringLiteral(value);
 			}
 		} else {
-			// TODO: add test for default value in constant value
 			context.text(getDefaultValueForNode(sstNodeHierarchy.getParent(expr)));
 		}
 		return null;
@@ -317,7 +314,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IComposedExpression expr, SSTPrintingContext context) {
-		// TODO: add test for default value in composedexpression
 		context.text(getDefaultValueForNode(sstNodeHierarchy.getParent(expr)));
 		return null;
 	}
@@ -423,20 +419,14 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	}
 
 	protected String getDefaultValueForNode(ISSTNode node) {
-		// TODO: add test for Assignable Expression default value
 		if (node instanceof IAssignableExpression) {
 			return getDefaultValueForAssignableExpression((IAssignableExpression) node);
 		}
 
-		// TODO: add test for default value in CaseBlock
-		if (node instanceof ICaseBlock) {
-			return "0";
-		}
-
-		// TODO: add test for default value in IfElseBlock condition
 		if (node instanceof IIfElseBlock) {
 			return "false";
 		}
+		
 		if (node instanceof IReturnStatement) {
 			return getDefaultValueForReturnStatement((IReturnStatement) node);
 		}
@@ -465,7 +455,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	}
 
 	protected String getDefaultValueForReturnStatement(IReturnStatement returnStatement) {
-		// TODO: add test for default value in return statement
 		IMemberDeclaration memberDeclaration = findMemberDeclaration(returnStatement);
 
 		if (memberDeclaration instanceof IMethodDeclaration) {
@@ -497,5 +486,4 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
-	// TODO: IndexAccessExpression no type information on variable reference
 }

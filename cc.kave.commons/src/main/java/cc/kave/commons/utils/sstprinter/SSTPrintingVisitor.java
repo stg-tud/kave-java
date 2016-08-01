@@ -362,7 +362,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IForLoop block, SSTPrintingContext context) {
-		statementBlockWithoutIndent(block, context);
+		statementBlockWithoutIndent(block.getInit(), context);
 
 		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
 
@@ -865,8 +865,8 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		return condition;
 	}
 
-	protected void statementBlockWithoutIndent(IForLoop block, SSTPrintingContext context) {
-		for (IStatement statement : block.getInit()) {
+	protected void statementBlockWithoutIndent(List<IStatement> statements, SSTPrintingContext context) {
+		for (IStatement statement : statements) {
 			statement.accept(this, context);
 			context.newLine();
 		}
