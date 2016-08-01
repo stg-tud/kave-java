@@ -33,8 +33,8 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 	private static final int NUMBREPOS = 10;
-	private static final int FREQTHRESH = 35;
-	private static final double BIDIRECTTHRESH = 0.85;
+	private static final int FREQTHRESH = 20;
+	private static final double BIDIRECTTHRESH = 0.7;
 
 	private static Injector injector;
 
@@ -56,8 +56,8 @@ public class run_ervina {
 		
 //		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 //		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+//		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
 		
 //		load(FrameworksData.class).getFrameworksDistribution();
