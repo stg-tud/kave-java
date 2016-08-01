@@ -53,10 +53,13 @@ public class JavaPrintingContext extends SSTPrintingContext {
 	public SSTPrintingContext typeNameOnly(ITypeName typeName) {
 		if (typeName != null) {
 			if(typeName.isVoidType()) return text("void");
-			if(typeName.isValueType()) {
-				return text(JavaNameUtils.getTypeAliasFromFullTypeName(typeName.getFullName()));
+			String typeAliasFromFullTypeName = JavaNameUtils.getTypeAliasFromFullTypeName(typeName.getFullName());
+			if(typeAliasFromFullTypeName.equals(typeName.getFullName())) {
+				return text(typeName.getName());
 			}
-			return text(typeName.getName());
+			else {
+				return text(typeAliasFromFullTypeName);
+			}
 		}
 		return this;
 	}
