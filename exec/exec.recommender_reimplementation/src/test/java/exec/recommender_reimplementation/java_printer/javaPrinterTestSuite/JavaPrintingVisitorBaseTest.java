@@ -21,6 +21,7 @@ import org.junit.Assert;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
@@ -33,6 +34,7 @@ import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -158,9 +160,10 @@ public class JavaPrintingVisitorBaseTest {
 		return propertyDecl;
 	}
 	
-	protected IMethodDeclaration methodDecl(IMethodName methodName) {
+	protected IMethodDeclaration methodDecl(IMethodName methodName, IStatement... statements) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
 		methodDecl.setName(methodName);
+		methodDecl.setBody(Lists.newArrayList(statements));
 		return methodDecl;
 	}
 

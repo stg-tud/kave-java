@@ -15,19 +15,23 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static exec.recommender_reimplementation.java_printer.JavaNameUtils.getTypeAliasFromFullTypeName;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -99,8 +103,26 @@ public class PhantomClassVisitor extends TraversingVisitor<Void, Void> {
 
 	private void addMethodDeclarationToSST(IInvocationExpression invocation, SST sst) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
-		methodDecl.setName(invocation.getMethodName());
+		IMethodName methodName = invocation.getMethodName();
+		methodDecl.setName(methodName);
+		if(!methodName.getReturnType().isVoidType()) {
+			addReturnStatement(methodDecl, methodName);
+		}
+		
 		sst.getMethods().add(methodDecl);
+	}
+
+	private void addReturnStatement(MethodDeclaration methodDecl, IMethodName methodName) {
+		ReturnStatement returnStatement = new ReturnStatement();
+		ITypeName returnType = methodName.getReturnType();
+		if(isJavaValueType(methodName.getReturnType())) {
+			String defaultValue = JavaPrintingUtils.getDefaultValueForType(returnType);
+			returnStatement.setExpression(constant(defaultValue));
+		}
+		else{
+			returnStatement.setExpression(constant("null"));
+		}
+		methodDecl.getBody().add(returnStatement);
 	}
 
 	private void addPropertyDeclarationToSST(IPropertyReference propertyRef, SST sst) {

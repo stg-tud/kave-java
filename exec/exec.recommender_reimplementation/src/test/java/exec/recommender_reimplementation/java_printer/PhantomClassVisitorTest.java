@@ -93,9 +93,9 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	}
 
 	@Test
-	public void addsMethodDeclarationOnInvocation() {
+	public void addsMethodDeclarationOnInvocation_NoReturnType() {
 		SST sst = new SST();
-		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(type("int"), type("T1"), "m1")));
+		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(type("void"), type("T1"), "m1")));
 		sst.getMethods().add(methodDecl);
 
 		sst.accept(sut, null);
@@ -105,6 +105,42 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		expectedSST.setEnclosingType(type("T1"));
 		expectedSST.getMethods().add(methodDecl(method(type("int"), type("T1"), "m1")));
 
+		expected.put(type("T1"), expectedSST);
+
+		assertEquals(expected, sut.getPhantomSSTs());
+	}
+	
+	@Test
+	public void addsMethodDeclarationOnInvocation_ReferenceType() {
+		SST sst = new SST();
+		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(type("SomeType"), type("T1"), "m1")));
+		sst.getMethods().add(methodDecl);
+
+		sst.accept(sut, null);
+
+		Map<ITypeName, SST> expected = Maps.newHashMap();
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(type("T1"));
+		expectedSST.getMethods().add(methodDecl(method(type("SomeType"), type("T1"), "m1"), returnStatement(constant("null"))));
+		
+		expected.put(type("T1"), expectedSST);
+
+		assertEquals(expected, sut.getPhantomSSTs());
+	}
+	
+	@Test
+	public void addsMethodDeclarationOnInvocation_ValueType() {
+		SST sst = new SST();
+		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(type("System.Int32"), type("T1"), "m1")));
+		sst.getMethods().add(methodDecl);
+
+		sst.accept(sut, null);
+
+		Map<ITypeName, SST> expected = Maps.newHashMap();
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(type("T1"));
+		expectedSST.getMethods().add(methodDecl(method(type("System.Int32"), type("T1"), "m1"), returnStatement(constant("0"))));
+		
 		expected.put(type("T1"), expectedSST);
 
 		assertEquals(expected, sut.getPhantomSSTs());
