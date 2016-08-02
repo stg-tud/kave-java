@@ -17,6 +17,9 @@ package cc.kave.episodes.similarityMetrics;
 
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.evaluation.ProposalHelper;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
@@ -35,11 +38,15 @@ public class ProposalsSorter {
 		return proposals;
 	}
 
-	private double getMetric(Metrics metric, Episode query, Episode p) throws Exception {
+	private double getMetric(Metrics metric, Episode query, Episode episode) throws Exception {
 		if (metric == Metrics.F1_FACTS) {
-			return calcF1Facts(query, p);
+			return calcF1Facts(query, episode);
 		} else if (metric == Metrics.F1_EVENTS) {
-			return calcF1Events(query, p);
+			return calcF1Events(query, episode);
+		} else if (metric == Metrics.MAPO) {
+			return calcMapo(query, episode);
+		} else if (metric == Metrics.LEVENSTEIN) {
+			return calcLevenstein(query, episode);
 		} else {
 			throw new Exception("This metric is not available!");
 		}
@@ -55,5 +62,69 @@ public class ProposalsSorter {
 		Measure m = Measure.newMeasure(query.getEvents(), episode.getEvents());
 		double f1 = m.getF1();
 		return f1;
+	}
+	
+	private double calcMapo(Episode query, Episode episode) {
+		Set<Fact> conjunction = getConjunctionFacts(query, episode);
+		Set<Fact> disjunction = getDisjunctionFacts(query, episode);
+		
+		return fract(conjunction.size(), disjunction.size());
+	}
+	
+	private double calcLevenstein(Episode query, Episode episode) {
+		int deletions = getDeletions(query, episode);
+		int additions = getAdditions(query, episode);
+		return -1 * (deletions + additions);
+	}
+	
+	private int getAdditions(Episode query, Episode episode) {
+		int adds = 0;
+		Set<Fact> queryFacts = query.getFacts();
+		
+		for (Fact fact : episode.getFacts()) {
+			if (!queryFacts.contains(fact)) {
+				adds++;
+			}
+		}
+		return adds;
+	}
+
+	private int getDeletions(Episode query, Episode episode) {
+		int diffs = 0;
+		Set<Fact> episodeFacts = episode.getFacts();
+		
+		for (Fact fact : query.getFacts()) {
+			if (!episodeFacts.contains(fact)) {
+				diffs++;
+			}
+		}
+		return diffs;
+	}
+
+	private Set<Fact> getDisjunctionFacts(Episode query, Episode episode) {
+		Set<Fact> disjunction = Sets.newHashSet();
+		Set<Fact> queryFacts = query.getFacts();
+		Set<Fact> episodeFacts = episode.getFacts();
+		
+		disjunction.addAll(queryFacts);
+		disjunction.addAll(episodeFacts);
+		return disjunction;
+	}
+
+	private Set<Fact> getConjunctionFacts(Episode query, Episode episode) {
+		Set<Fact> conjuction = Sets.newHashSet();
+		Set<Fact> queryFacts = query.getFacts();
+		Set<Fact> episodeFacts = episode.getFacts();
+		
+		for (Fact fact : episodeFacts) {
+			if (queryFacts.contains(fact)) {
+				conjuction.add(fact);
+			}
+		}
+		return conjuction;
+	}
+
+	private Double fract(double numerator, double denominator) {
+		return numerator / denominator;
 	}
 }

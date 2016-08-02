@@ -16,10 +16,12 @@
 package cc.kave.episodes.mining.evaluation;
 
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
@@ -66,6 +68,17 @@ public class ProposalHelper {
 				} else {
 					return valueOrdering;
 				}
+			}
+		});
+		return res;
+	}
+	
+	public static TreeSet<Tuple<Integer, Set<Fact>>> createFactsSortedSet() {
+		final TreeSet<Tuple<Integer, Set<Fact>>> res = Sets.newTreeSet(new Comparator<Tuple<Integer, Set<Fact>>>() {
+			@Override
+			public int compare(final Tuple<Integer, Set<Fact>> o1, final Tuple<Integer, Set<Fact>> o2) {
+				int valueOrdering = Double.compare(o2.getFirst(), o1.getFirst());
+				return valueOrdering;
 			}
 		});
 		return res;

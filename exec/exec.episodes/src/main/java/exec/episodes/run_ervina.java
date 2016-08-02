@@ -25,16 +25,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
-import cc.kave.episodes.mining.patterns.FrequenciesAnalyzer;
+import cc.kave.episodes.repositories.Preprocessing;
 import cc.recommenders.io.Logger;
 
 public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	private static final int NUMBREPOS = 10;
-	private static final int FREQTHRESH = 20;
-	private static final double BIDIRECTTHRESH = 0.7;
+	private static final int NUMBREPOS = 20;
+	private static final int FREQTHRESH = 45;
+	private static final double BIDIRECTTHRESH = 0.9;
 
 	private static Injector injector;
 

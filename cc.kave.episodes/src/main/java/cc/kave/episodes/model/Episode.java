@@ -31,7 +31,7 @@ import cc.kave.commons.model.episodes.Fact;
 
 public class Episode {
 
-	private Set<Fact> facts = Sets.newHashSet();
+	private Set<Fact> facts = Sets.newLinkedHashSet();
 	private int frequency;
 	private double bidirectMeasure;
 

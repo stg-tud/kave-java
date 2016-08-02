@@ -1,0 +1,169 @@
+/**
+ * Copyright 2016 Technische Universität Darmstadt
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package cc.kave.episodes.similarityMetrics;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Iterator;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.google.common.collect.Sets;
+
+import cc.kave.episodes.model.Episode;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.exceptions.AssertionException;
+
+public class ProposalsSorterTest {
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	private Episode query;
+	private Set<Episode> patterns;
+
+	private ProposalsSorter sut;
+
+	@Before
+	public void setup() {
+		query = new Episode();
+		patterns = Sets.newHashSet();
+		sut = new ProposalsSorter();
+	}
+	
+	@Test
+	public void throwMessage() throws Exception {
+		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
+		patterns = Sets.newHashSet(p1, p2, p3);
+		
+		thrown.expect(Exception.class);
+		thrown.expectMessage("This metric is not available!");
+		sut.sort(query, patterns, Metrics.UNDEFINED);
+	}
+
+	@Test
+	public void example11() throws Exception {
+		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
+
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
+		patterns = Sets.newHashSet(p1, p2, p3);
+
+		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
+		expected.add(Tuple.newTuple(p1, fract(12, 13)));
+		expected.add(Tuple.newTuple(p3, fract(6, 7)));
+		expected.add(Tuple.newTuple(p2, fract(3, 4)));
+
+		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.F1_FACTS);
+
+		assertProposals(expected, actuals);
+	}
+
+	@Test
+	public void example21() throws Exception {
+		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
+
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
+		patterns = Sets.newHashSet(p1, p2, p3);
+
+		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
+		expected.add(Tuple.newTuple(p3, fract(6, 7)));
+		expected.add(Tuple.newTuple(p1, fract(6, 7)));
+		expected.add(Tuple.newTuple(p2, fract(3, 4)));
+
+		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.F1_EVENTS);
+
+		assertProposals(expected, actuals);
+	}
+	
+	@Test
+	public void example31() throws Exception {
+		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
+
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
+		patterns = Sets.newHashSet(p1, p2, p3);
+
+		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
+		expected.add(Tuple.newTuple(p1, fract(6, 7)));
+		expected.add(Tuple.newTuple(p3, fract(6, 8)));
+		expected.add(Tuple.newTuple(p2, fract(6, 10)));
+
+		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.MAPO);
+
+		assertEquals(expected, actuals);
+		assertProposals(expected, actuals);
+	}
+	
+	@Test
+	public void example41() throws Exception {
+		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
+
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
+		patterns = Sets.newHashSet(p1, p2, p3);
+
+		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
+		expected.add(Tuple.newTuple(p1, fract(-1, 1)));
+		expected.add(Tuple.newTuple(p3, fract(-2, 1)));
+		expected.add(Tuple.newTuple(p2, fract(-4, 1)));
+
+		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.LEVENSTEIN);
+
+		assertEquals(expected, actuals);
+		assertProposals(expected, actuals);
+	}
+
+	private Episode createEpisode(String... strings) {
+		Episode episode = new Episode();
+		episode.addStringsOfFacts(strings);
+		return episode;
+	}
+
+	private Double fract(double numerator, double denominator) {
+		return numerator / denominator;
+	}
+
+	private void assertProposals(Set<Tuple<Episode, Double>> expected, Set<Tuple<Episode, Double>> actuals) {
+		if (expected.isEmpty() && actuals.isEmpty()) {
+			assertTrue(true);
+		}
+		if (expected.size() != actuals.size()) {
+			fail();
+		}
+		Iterator<Tuple<Episode, Double>> itE = expected.iterator();
+		Iterator<Tuple<Episode, Double>> itA = actuals.iterator();
+		while (itE.hasNext()) {
+			Tuple<Episode, Double> expect = itE.next();
+			Tuple<Episode, Double> actual = itA.next();
+			assertEquals(expect, actual);
+		}
+	}
+}
