@@ -49,7 +49,6 @@ public class JavaPrintingUtils {
 	}
 	
 	public static String appendImportListToString(Set<ITypeName> classes, String code) {
-		// TODO: test appendImportList
 		StringBuilder sb = new StringBuilder();
 		Iterator<ITypeName> classesIterator = classes.iterator();
 		while (classesIterator.hasNext()) {
