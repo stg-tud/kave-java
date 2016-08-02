@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation.java_printer;
+package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
 import java.util.Arrays;
 
@@ -25,6 +25,7 @@ import com.google.common.base.Strings;
 import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
@@ -32,11 +33,21 @@ import cc.kave.commons.model.names.csharp.ParameterName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
+import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
+import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
 
 public class JavaPrintingVisitorBaseTest {
 	protected SSTPrintingVisitor sut;
@@ -121,6 +132,31 @@ public class JavaPrintingVisitorBaseTest {
 		ConstantValueExpression expr = new ConstantValueExpression();
 		expr.setValue(value);
 		return expr;
+	}
+	
+	protected IFieldReference fieldRef(String identifier, IFieldName fieldName) {
+		FieldReference fieldReference = new FieldReference();
+		fieldReference.setFieldName(fieldName);
+		fieldReference.setReference(varRef(identifier));
+		return fieldReference;
+	}
+	
+	protected IFieldDeclaration fieldDecl(IFieldName fieldName) {
+		FieldDeclaration fieldDecl = new FieldDeclaration();
+		fieldDecl.setName(fieldName);
+		return fieldDecl;
+	}
+	
+	protected IPropertyDeclaration propertyDecl(IPropertyName propertyName) {
+		PropertyDeclaration propertyDecl = new PropertyDeclaration();
+		propertyDecl.setName(propertyName);
+		return propertyDecl;
+	}
+	
+	protected IMethodDeclaration methodDecl(IMethodName methodName) {
+		MethodDeclaration methodDecl = new MethodDeclaration();
+		methodDecl.setName(methodName);
+		return methodDecl;
 	}
 
 	protected VariableReference varRef(String identifier) {

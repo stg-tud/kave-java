@@ -17,6 +17,7 @@ package exec.recommender_reimplementation.java_printer;
 
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
 
 public class RaychevPrintingVisitorBaseTest extends JavaPrintingVisitorBaseTest {
 	
