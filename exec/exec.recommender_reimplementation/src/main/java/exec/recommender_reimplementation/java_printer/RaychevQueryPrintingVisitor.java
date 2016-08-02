@@ -49,10 +49,10 @@ public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 		throw new InvalidJavaCodeException();
 	}
 	
-	@Override
-	public Void visit(IUnknownReference unknownRef, SSTPrintingContext context) {
-		throw new InvalidJavaCodeException();
-	}
+//	@Override
+//	public Void visit(IUnknownReference unknownRef, SSTPrintingContext context) {
+//		throw new InvalidJavaCodeException();
+//	}
 
 	@Override
 	public Void visit(ICompletionExpression entity, SSTPrintingContext context) {

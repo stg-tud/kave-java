@@ -108,7 +108,7 @@ public class RaychevRunner {
 	private static void writeJavaFile(String javaCode, ISST sst) throws IOException {
 		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\Queries" + "\\"
 				+ sst.getEnclosingType().getName() + ".java"), javaCode);
-		PhantomClassGenerator phantomClassGenerator = new PhantomClassGenerator(FOLDERPATH.toString()); 
+		PhantomClassGenerator phantomClassGenerator = new PhantomClassGenerator(FOLDERPATH.toString()+ "\\Queries"); 
 		phantomClassGenerator.generatePhantomClassesForSST(sst);
 	}
 

@@ -79,9 +79,11 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		
 		if (sst.getEnclosingType().isInterfaceType()) {
 			context.keyword("interface");
-		} else if (sst.getEnclosingType().isEnumType()) {
-			context.keyword("enum");
-		} else {
+		} 
+//		else if (sst.getEnclosingType().isEnumType()) {
+//			context.keyword("enum");
+//		} 
+		else {
 			context.keyword("class");
 		}
 
@@ -356,7 +358,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 			// Double.TryParse(expr.Value, out parsed
 			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")
-					|| value.matches("[0-9]+\\.[0-9]+")) {
+					|| value.matches("[0-9]+\\.[0-9]+") || value.equals("null")) {
 				context.keyword(value);
 			} else {
 				context.stringLiteral(value);
