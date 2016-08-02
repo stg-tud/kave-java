@@ -169,15 +169,23 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 						// backing field
 
 			if (stmt.getName().hasGetter()) {
-				context.indentation().type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
+				context.indentation();
+
+				addStaticModifierForProperty(stmt, context);
+
+				context.type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
 
 				appendPropertyAccessor(context, stmt.getGet());
 
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().text("void").space().text("set" + propertyName).text("(")
-						.type(stmt.getName().getValueType()).space().text("value").text(")");
+				context.indentation();
+
+				addStaticModifierForProperty(stmt, context);
+
+				context.text("void").space().text("set" + propertyName).text("(").type(stmt.getName().getValueType())
+						.space().text("value").text(")");
 
 				appendPropertyAccessor(context, stmt.getSet());
 
@@ -185,14 +193,21 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		} else // Short Version: add methods for getter and setter + backing
 				// field
 		{
-
 			String backingFieldName = "$property_" + propertyName;
-			context.indentation().type(stmt.getName().getValueType()).space().text(backingFieldName).text(";");
+			context.indentation();
+
+			addStaticModifierForProperty(stmt, context);
+
+			context.type(stmt.getName().getValueType()).space().text(backingFieldName).text(";");
 
 			context.newLine();
 
 			if (stmt.getName().hasGetter()) {
-				context.indentation().type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
+				context.indentation();
+
+				addStaticModifierForProperty(stmt, context);
+
+				context.type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
 
 				context.newLine().indentation();
 
@@ -207,8 +222,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			}
 
 			if (stmt.getName().hasSetter()) {
-				context.indentation().text("void").space().text("set" + propertyName).text("(")
-						.type(stmt.getName().getValueType()).space().text("value").text(")");
+				context.indentation();
+
+				addStaticModifierForProperty(stmt, context);
+
+				context.text("void").space().text("set" + propertyName).text("(").type(stmt.getName().getValueType())
+						.space().text("value").text(")");
 
 				context.newLine().indentation();
 
@@ -223,6 +242,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			}
 		}
 		return null;
+	}
+
+	private void addStaticModifierForProperty(IPropertyDeclaration stmt, SSTPrintingContext context) {
+		if (stmt.getName().isStatic()) {
+			context.keyword("static").space();
+		}
 	}
 
 	@Override
@@ -243,6 +268,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			context.indentation();
 			assignment.getReference().accept(this, context);
 			context.text(" = ");
+			addPropertyReferenceOrStaticType(propertyReferenceGet, context);
+			context.text(".");
 			context.text("get").text(propertyName).text("(").text(")").text(";");
 		} else {
 			// Handle Property Set
@@ -253,7 +280,9 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				if (propertyName.endsWith("()")) {
 					propertyName = propertyName.replace("()", "");
 				}
-				context.indentation().text("set").text(propertyName).text("(");
+				context.indentation();
+				addPropertyReferenceOrStaticType(propertyReferenceSet, context);
+				context.text(".").text("set").text(propertyName).text("(");
 				assignment.getExpression().accept(this, context);
 				context.text(")").text(";");
 			} else {
@@ -327,7 +356,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IPropertyReference propertyRef, SSTPrintingContext context) {
-		context.text(propertyRef.getReference().getIdentifier());
+		addPropertyReferenceOrStaticType(propertyRef, context);
 		context.text(".");
 		// converts property reference to reference to created backing field
 		String propertyName = propertyRef.getPropertyName().getName();
@@ -336,6 +365,14 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		}
 		context.text("$property_" + propertyName);
 		return null;
+	}
+
+	private void addPropertyReferenceOrStaticType(IPropertyReference propertyRef, SSTPrintingContext context) {
+		if (propertyRef.getPropertyName().isStatic()) {
+			context.type(propertyRef.getPropertyName().getDeclaringType());
+		} else {
+			context.text(propertyRef.getReference().getIdentifier());
+		}
 	}
 
 	@Override
@@ -361,8 +398,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				context.text("[");
 				printIndices(expr, context);
 				context.text("]");
-			}
-			else {
+			} else {
 				context.text(".").text("get").text("(");
 				printIndices(expr, context);
 				context.text(")");
@@ -426,7 +462,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (node instanceof IIfElseBlock) {
 			return "false";
 		}
-		
+
 		if (node instanceof IReturnStatement) {
 			return getDefaultValueForReturnStatement((IReturnStatement) node);
 		}

@@ -120,6 +120,15 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(sst, "PropertyType $property_P;", "PropertyType getP()", "{", "    return $property_P;", "}",
 				"void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
 	}
+	
+	@Test
+	public void PropertyDeclaration_static() {
+		PropertyDeclaration sst = new PropertyDeclaration();
+		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
+		
+		assertPrint(sst, "static PropertyType $property_P;", "static PropertyType getP()", "{", "    return $property_P;", "}",
+				"static void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
+	}
 
 	@Test
 	public void PropertyDeclaration_WithBodies() {
@@ -132,6 +141,19 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "PropertyType getP()", "{", "    continue;", "    break;", "}",
 				"void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
+	}
+	
+	@Test
+	public void PropertyDeclaration_WithBodies_static() {
+		PropertyDeclaration sst = new PropertyDeclaration();
+		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.getGet().add(new ContinueStatement());
+		sst.getGet().add(new BreakStatement());
+		sst.getSet().add(new BreakStatement());
+		sst.getSet().add(new ContinueStatement());
+
+		assertPrint(sst, "static PropertyType getP()", "{", "    continue;", "    break;", "}",
+				"static void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
 	}
 
 	@Test

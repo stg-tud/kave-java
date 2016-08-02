@@ -40,7 +40,7 @@ public class StatementPrinterTest extends JavaPrintingVisitorBaseTest {
 				assign(propertyReference(varRef("this"),
 						"get set [PropertyType,P] [DeclaringType,P].P"),
 						referenceExprToVariable("var")), //
-				"setP(var);");
+				"this.setP(var);");
 	}
 
 	@Test
@@ -49,7 +49,25 @@ public class StatementPrinterTest extends JavaPrintingVisitorBaseTest {
 				assign(varRef("var"),
 						refExpr(propertyReference(varRef("this"),
 								"get set [PropertyType,P] [DeclaringType,P].P"))), //
-				"var = getP();");
+				"var = this.getP();");
+	}
+	
+	@Test
+	public void testPropertySet_Static() {
+		assertPrint(
+				assign(propertyReference(varRef("this"),
+						"static get set [PropertyType,P] [DeclaringType,P].P"),
+						referenceExprToVariable("var")), //
+				"DeclaringType.setP(var);");
+	}
+
+	@Test
+	public void testPropertyGet_Static() {
+		assertPrint(
+				assign(varRef("var"),
+						refExpr(propertyReference(varRef("this"),
+								"static get set [PropertyType,P] [DeclaringType,P].P"))), //
+				"var = DeclaringType.getP();");
 	}
 
 	@Test
