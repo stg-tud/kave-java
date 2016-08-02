@@ -71,13 +71,18 @@ public class JavaPrintingVisitorBaseTest {
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String... expectedLines) {
-		sut = new JavaPrintingVisitor(sst);
+		sut = new JavaPrintingVisitor(sst,false);
 		assertPrintWithCustomContext(sst, typeShape, String.join("\n", expectedLines));
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String... expectedLines) {
-		sut = new JavaPrintingVisitor(sst);
+		sut = new JavaPrintingVisitor(sst,false);
 		assertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
+	}
+	
+	protected void assertPrintWithPublicModifier(ISSTNode sst, String... expectedLines) {
+		sut = new JavaPrintingVisitor(sst,true);
+		assertPrintWithCustomContext(sst, new JavaPrintingContext(), String.join("\n", expectedLines));
 	}
 
 	protected void assertPrint(ISSTNode sst, String... expectedLines) {

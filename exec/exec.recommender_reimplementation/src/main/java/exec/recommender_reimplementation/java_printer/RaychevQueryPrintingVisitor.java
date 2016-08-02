@@ -26,8 +26,8 @@ import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 
-	public RaychevQueryPrintingVisitor(ISSTNode sst) {
-		super(sst);
+	public RaychevQueryPrintingVisitor(ISSTNode sst, boolean setPublicModifier) {
+		super(sst,setPublicModifier);
 	}
 
 	@SuppressWarnings("serial")

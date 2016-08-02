@@ -30,6 +30,7 @@ import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IUnsafeBlock;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -62,8 +63,10 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	protected SSTNodeHierarchy sstNodeHierarchy;
 	protected Map<IVariableReference, ITypeName> variableTypeMap;
+	private boolean setPublicModifier;
 
-	public JavaPrintingVisitor(ISSTNode sst) {
+	public JavaPrintingVisitor(ISSTNode sst, boolean setPublicModifier) {
+		this.setPublicModifier = setPublicModifier;
 		sstNodeHierarchy = new SSTNodeHierarchy(sst);
 		variableTypeMap = Maps.newHashMap();
 	}
@@ -72,6 +75,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	public Void visit(ISST sst, SSTPrintingContext context) {
 		context.indentation();
 
+		addPublicModifier(context);
+		
 		if (sst.getEnclosingType().isInterfaceType()) {
 			context.keyword("interface");
 		} else if (sst.getEnclosingType().isEnumType()) {
@@ -119,6 +124,13 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return null;
 	}
 
+	private void addPublicModifier(SSTPrintingContext context) {
+		if(setPublicModifier) {
+			context.text("public").space();
+		}
+		
+	}
+
 	@Override
 	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext context) {
 		// could implement delegates as interfaces with one method
@@ -138,6 +150,8 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	public Void visit(IMethodDeclaration stmt, SSTPrintingContext context) {
 		context.indentation();
 
+		addPublicModifier(context);
+
 		if (stmt.getName().isStatic()) {
 			context.keyword("static").space();
 		}
@@ -156,6 +170,19 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		context.statementBlock(stmt.getBody(), this, true);
 		return null;
 	}
+	
+	@Override
+	public Void visit(IFieldDeclaration stmt, SSTPrintingContext context) {
+		context.indentation();
+
+		addPublicModifier(context);
+		if (stmt.getName().isStatic()) {
+			context.keyword("static").space();
+		}
+
+		context.type(stmt.getName().getValueType()).space().text(stmt.getName().getName()).text(";");
+		return null;
+	}
 
 	@Override
 	public Void visit(IPropertyDeclaration stmt, SSTPrintingContext context) {
@@ -171,6 +198,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			if (stmt.getName().hasGetter()) {
 				context.indentation();
 
+				addPublicModifier(context);
 				addStaticModifierForProperty(stmt, context);
 
 				context.type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
@@ -182,6 +210,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			if (stmt.getName().hasSetter()) {
 				context.indentation();
 
+				addPublicModifier(context);
 				addStaticModifierForProperty(stmt, context);
 
 				context.text("void").space().text("set" + propertyName).text("(").type(stmt.getName().getValueType())
@@ -196,6 +225,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			String backingFieldName = "$property_" + propertyName;
 			context.indentation();
 
+			addPublicModifier(context);
 			addStaticModifierForProperty(stmt, context);
 
 			context.type(stmt.getName().getValueType()).space().text(backingFieldName).text(";");
@@ -205,6 +235,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			if (stmt.getName().hasGetter()) {
 				context.indentation();
 
+				addPublicModifier(context);
 				addStaticModifierForProperty(stmt, context);
 
 				context.type(stmt.getName().getValueType()).space().text("get" + propertyName).text("()");
@@ -224,6 +255,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			if (stmt.getName().hasSetter()) {
 				context.indentation();
 
+				addPublicModifier(context);
 				addStaticModifierForProperty(stmt, context);
 
 				context.text("void").space().text("set" + propertyName).text("(").type(stmt.getName().getValueType())

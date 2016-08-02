@@ -26,7 +26,7 @@ public class PhantomClassPrinter implements IJavaPrinter {
 	@Override
 	public String print(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new JavaPrintingVisitor(sst), context);
+		sst.accept(new JavaPrintingVisitor(sst,false), context);
 		PhantomClassVisitor phantomClassVisitor = new PhantomClassVisitor();
 		sst.accept(phantomClassVisitor, null);
 		return appendImportListToString(phantomClassVisitor.getSeenClasses(), context.toString());

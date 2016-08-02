@@ -26,7 +26,7 @@ public class RaychevQueryPrinter implements IJavaPrinter {
 	@Override
 	public String print(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new RaychevQueryPrintingVisitor(sst), context);
+		sst.accept(new RaychevQueryPrintingVisitor(sst,false), context);
 		if (!context.toString().isEmpty()) {
 			PhantomClassVisitor phantomClassVisitor = new PhantomClassVisitor();
 			sst.accept(phantomClassVisitor, null);

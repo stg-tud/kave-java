@@ -22,12 +22,12 @@ import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaP
 public class RaychevPrintingVisitorBaseTest extends JavaPrintingVisitorBaseTest {
 	
 	protected void assertPrintWithCustomContext(ISSTNode sst, ITypeShape typeShape, String... expectedLines) {
-		sut = new RaychevQueryPrintingVisitor(sst);
+		sut = new RaychevQueryPrintingVisitor(sst,false);
 		assertPrintWithCustomContext(sst, typeShape, String.join("\n", expectedLines));
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String... expectedLines) {
-		sut = new RaychevQueryPrintingVisitor(sst);
+		sut = new RaychevQueryPrintingVisitor(sst,false);
 		assertPrintWithCustomContext(sst, context, String.join("\n", expectedLines));
 	}
 }

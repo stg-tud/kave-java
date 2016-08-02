@@ -24,7 +24,7 @@ public class StandardJavaPrinter implements IJavaPrinter {
 	@Override
 	public String print(ISST sst) {
 			JavaPrintingContext context = new JavaPrintingContext();
-			sst.accept(new JavaPrintingVisitor(sst), context);
+			sst.accept(new JavaPrintingVisitor(sst,false), context);
 			return context.toString();
 	}
 

@@ -35,7 +35,7 @@ public class ValueTypeTest {
 		Context c = getTestSST();
 		JavaPrintingContext context = new JavaPrintingContext();
 		ISST sst = c.getSST();
-		sst.accept(new JavaPrintingVisitor(sst), context);
+		sst.accept(new JavaPrintingVisitor(sst,false), context);
 		String expected = String.join("\n", "class ValueTypeTest", "{", "    void M1()", "    {", "        byte a;", "        a = 0;",
 				"        byte b;", "        b = 0;", "        short c;", "        c = 0;", "        short d;", "        d = 0;", "        int e;", "        e = 0;",
 				"        int f;", "        f = 0;", "        long g;", "        g = 0;", "        long h;", "        h = 0;", "        float i;", "        i = 0.0f;",

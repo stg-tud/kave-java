@@ -18,10 +18,12 @@ package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 import org.junit.Test;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
@@ -94,7 +96,17 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrintWithCustomContext(sst, typeShape, "class TestClass extends SuperClass", "{", "}");
 	}
+	
+	@Test
+	public void SSTDeclaration_PublicModifier() {
+		ITypeName thisType = TypeName.newTypeName("TestClass,P");
 
+		SST sst = new SST();
+		sst.setEnclosingType(thisType);
+
+		assertPrintWithPublicModifier(sst, "public class TestClass", "{", "}");
+	}
+	
 	@Test
 	public void PropertyDeclaration_GetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
@@ -122,12 +134,21 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 	
 	@Test
-	public void PropertyDeclaration_static() {
+	public void PropertyDeclaration_Static() {
 		PropertyDeclaration sst = new PropertyDeclaration();
 		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
 		
 		assertPrint(sst, "static PropertyType $property_P;", "static PropertyType getP()", "{", "    return $property_P;", "}",
 				"static void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
+	}
+	
+	@Test
+	public void PropertyDeclaration_PublicModifier() {
+		PropertyDeclaration sst = new PropertyDeclaration();
+		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		
+		assertPrintWithPublicModifier(sst, "public PropertyType $property_P;", "public PropertyType getP()", "{", "    return $property_P;", "}",
+				"public void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
 	}
 
 	@Test
@@ -144,7 +165,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 	
 	@Test
-	public void PropertyDeclaration_WithBodies_static() {
+	public void PropertyDeclaration_WithBodies_Static() {
 		PropertyDeclaration sst = new PropertyDeclaration();
 		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.getGet().add(new ContinueStatement());
@@ -154,6 +175,19 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "static PropertyType getP()", "{", "    continue;", "    break;", "}",
 				"static void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
+	}
+	
+	@Test
+	public void PropertyDeclaration_WithBodies_PublicModifier() {
+		PropertyDeclaration sst = new PropertyDeclaration();
+		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.getGet().add(new ContinueStatement());
+		sst.getGet().add(new BreakStatement());
+		sst.getSet().add(new BreakStatement());
+		sst.getSet().add(new ContinueStatement());
+
+		assertPrintWithPublicModifier(sst, "public PropertyType getP()", "{", "    continue;", "    break;", "}",
+				"public void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
 	}
 
 	@Test
@@ -177,6 +211,38 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 	
 	@Test
+	public void FieldDeclaration() {
+		FieldDeclaration sst = new FieldDeclaration();
+		sst.setName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+
+		assertPrint(sst, "FieldType F;");
+	}
+
+	@Test
+	public void FieldDeclaration_Static() {
+		FieldDeclaration sst = new FieldDeclaration();
+		sst.setName(FieldName.newFieldName("static [FieldType,P] [DeclaringType,P].F"));
+
+		assertPrint(sst, "static FieldType F;");
+	}
+	
+	@Test
+	public void FieldDeclaration_PublicModifier() {
+		FieldDeclaration sst = new FieldDeclaration();
+		sst.setName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+
+		assertPrintWithPublicModifier(sst, "public FieldType F;");
+	}
+
+	@Test
+	public void FieldDeclaration_Array() {
+		FieldDeclaration sst = new FieldDeclaration();
+		sst.setName(FieldName.newFieldName("[d:[V, A] [N.TD, A].()[]] [DT, A]._delegatesField"));
+
+		assertPrint(sst, "TD[] _delegatesField;");
+	}
+	
+	@Test
 	public void MethodDeclaration_EmptyMethod() {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
@@ -190,6 +256,14 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.setName(MethodName.newMethodName("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "static ReturnType M(ParameterType p) { }");
+	}
+	
+	@Test
+	public void MethodDeclaration_PublicModifier() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+
+		assertPrintWithPublicModifier(sst, "public ReturnType M(ParameterType p) { }");
 	}
 
 	@Test
