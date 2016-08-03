@@ -111,13 +111,7 @@ public class Episode {
 	}
 	
 	public int getNumEvents() {
-		int numberEvents = 0;
-		for (Fact fact : facts) {
-			if (!fact.isRelation()) {
-				numberEvents++;
-			}
-		}
-		return numberEvents;
+		return getEvents().size();
 	}
 	
 	@Override

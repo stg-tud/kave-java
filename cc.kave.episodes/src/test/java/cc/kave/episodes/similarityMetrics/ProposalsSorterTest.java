@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -31,7 +32,6 @@ import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
 public class ProposalsSorterTest {
 
@@ -121,6 +121,7 @@ public class ProposalsSorterTest {
 		assertProposals(expected, actuals);
 	}
 	
+	@Ignore
 	@Test
 	public void example41() throws Exception {
 		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
@@ -139,6 +140,36 @@ public class ProposalsSorterTest {
 
 		assertEquals(expected, actuals);
 		assertProposals(expected, actuals);
+	}
+	
+	@Test
+	public void example42() throws Exception {
+		query = createEpisode("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>3", "2>4", "3>4");
+		//same
+		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
+		//additions
+		Episode p2 = createEpisode("1", "2", "3", "5", "4", "1>2", "1>3", "1>5", "1>4", "2>4", "3>4", "5>4");
+		Episode p3 = createEpisode("5", "1", "2", "3", "4", "5>1", "5>2", "5>3", "5>4", "1>2", "1>3", "1>4", "2>4", "3>4");
+		Episode p4 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "1>4", "1>5", "2>4", "2>5", "3>4", "3>5", "4>5");
+		//substitutions
+		Episode p5 = createEpisode("1", "2", "5", "4", "1>2", "1>5", "1>4", "2>4", "5>4");
+		Episode p6 = createEpisode("5", "2", "3", "4", "5>2", "5>3", "5>4", "2>4", "3>4");
+		Episode p7 = createEpisode("1", "2", "3", "5", "1>2", "1>3", "1>5", "2>5", "3>5");
+		//deletions
+		patterns = Sets.newHashSet(p1, p2, p3, p4, p5, p6, p7);
+		
+		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
+		expected.add(Tuple.newTuple(p1, 0.0));
+		expected.add(Tuple.newTuple(p2, -1.0));
+		expected.add(Tuple.newTuple(p3, -1.0));
+		expected.add(Tuple.newTuple(p4, -1.0));
+		expected.add(Tuple.newTuple(p5, -1.0));
+		expected.add(Tuple.newTuple(p6, -1.0));
+		expected.add(Tuple.newTuple(p7, -1.0));
+		
+		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.LEVENSTEIN);
+		
+		assertEquals(expected, actuals);
 	}
 
 	private Episode createEpisode(String... strings) {
