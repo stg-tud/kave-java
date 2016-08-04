@@ -213,7 +213,7 @@ public class PreprocessingTest {
 		if (i == 0) {
 			return MethodName.UNKNOWN_NAME;
 		} else {
-			return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+			return MethodName.newMethodName("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
 	}
 }

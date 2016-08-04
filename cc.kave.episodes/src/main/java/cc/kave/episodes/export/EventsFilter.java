@@ -24,7 +24,9 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.csharp.AssemblyVersion;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
 
@@ -44,9 +46,18 @@ public class EventsFilter {
 		EventStream es = new EventStream();
 
 		for (Event e : streamWithoutDublicates) {
+			IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
+			
 			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.METHOD_DECLARATION)) {
 				es.addEvent(e);
-			} else if (occurrences.get(e) >= freqThresh) {
+				continue;
+			}
+			if (AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
+				continue;
+			} else {
+				e.getMethod().toString();
+			}
+			if (occurrences.get(e) >= freqThresh) {
 				es.addEvent(e);
 			}
 		}
