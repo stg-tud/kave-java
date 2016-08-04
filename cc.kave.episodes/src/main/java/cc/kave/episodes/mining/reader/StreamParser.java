@@ -53,7 +53,7 @@ public class StreamParser {
 			double timestamp = Double.parseDouble(eventTime[1]);
 			if (timer == -1) {
 				timer = timestamp;
-			} else if ((timestamp - timer) >= 1.0) {
+			} else if ((timestamp - timer) >= 0.5) {
 				stream.add(method);
 				method = new LinkedList<Fact>();
 			} 
