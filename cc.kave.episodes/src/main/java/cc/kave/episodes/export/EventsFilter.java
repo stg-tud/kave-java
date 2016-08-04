@@ -34,7 +34,7 @@ public class EventsFilter {
 	// private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
 
 	private static final double DELTA = 0.001;
-	private static final double TIMEOUT = 1.0;
+	private static final double TIMEOUT = 0.5;
 	private static double time = 0.0;
 	private static boolean firstMethod = true;
 

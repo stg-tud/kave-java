@@ -129,8 +129,8 @@ public class EventStreamTest {
 		expectedSb.append("3,0.002\n");
 		expectedSb.append("4,0.003\n");
 		expectedSb.append("5,0.004\n");
-		expectedSb.append("6,1.005\n");
-		expectedSb.append("4,1.006\n");
+		expectedSb.append("6,0.505\n");
+		expectedSb.append("4,0.506\n");
 		
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(7, sut.getNumberEvents());

@@ -71,8 +71,7 @@ public class TransitivelyClosedEpisodesTest {
 	}
 
 	private Episode newEpisode(int freq, int numberElements, String... strings) {
-		Episode episode = new Episode() {
-		};
+		Episode episode = new Episode();
 		episode.addStringsOfFacts(strings);
 		return episode;
 	}

@@ -75,7 +75,7 @@ public class Episode {
 	}
 
 	public void setBidirectMeasure(double bidirect) {
-		assertTrue(bidirect > 0.0 && bidirect <= 1.0, "Bidirectional measure should be a probability value!");
+		assertTrue(bidirect >= 0.0 && bidirect <= 1.0, "Bidirectional measure should be a probability value!");
 		this.bidirectMeasure = bidirect;
 	}
 

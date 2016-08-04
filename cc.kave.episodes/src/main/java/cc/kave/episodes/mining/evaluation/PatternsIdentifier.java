@@ -128,7 +128,10 @@ public class PatternsIdentifier {
 		int bigMethods = 0;
 		List<Fact> keepMethod = new LinkedList<Fact>();
 		for (List<Fact> method : stream) {
-			if (method.size() > 400) {
+//			if (method.size() >= 446) {
+//				continue;
+//			}
+			if (method.size() > 500) {
 				bigMethods++;
 			}
 			if (method.size() > largestMethod) {
