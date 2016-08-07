@@ -40,7 +40,7 @@ public class JavaPrintingUtilsTest extends JavaPrintingVisitorBaseTest {
 				"import Assembly.Assembly2.Class3;"
 		};
 		
-		String[] actuals = JavaPrintingUtils.appendImportListToString(classesList, "").split("\n");
+		String[] actuals = JavaPrintingUtils.appendImportListToString(classesList, new StringBuilder()).toString().split("\n");
 		
 		assertThat(actuals, Matchers.arrayContainingInAnyOrder(expecteds));		
 	}

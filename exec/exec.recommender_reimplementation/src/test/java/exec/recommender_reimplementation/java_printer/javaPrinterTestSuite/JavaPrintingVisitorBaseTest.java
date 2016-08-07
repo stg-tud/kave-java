@@ -15,6 +15,9 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
+
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -38,6 +41,7 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
@@ -171,5 +175,20 @@ public class JavaPrintingVisitorBaseTest {
 		VariableReference ref = new VariableReference();
 		ref.setIdentifier(identifier);
 		return ref;
+	}
+	
+	protected SST defaultSST(ITypeName enclosingType, IStatement... statements) {
+		SST sst = new SST();
+		sst.setEnclosingType(enclosingType);
+		IMethodDeclaration methodDecl = declareMethod(statements);
+		sst.getMethods().add(methodDecl);
+		return sst;
+	}
+	
+	protected SST defaultSST(IStatement... statements) {
+		SST sst = new SST();
+		IMethodDeclaration methodDecl = declareMethod(statements);
+		sst.getMethods().add(methodDecl);
+		return sst;
 	}
 }

@@ -36,6 +36,7 @@ public class JavaNameUtils {
 			.put("System.Float", "float")
 			.put("System.Decimal","double")
 			.put("System.Char", "char")
+			.put("System.Object", "Object")
 			.build();
 	
     public static String getTypeAliasFromFullTypeName(String typeName)

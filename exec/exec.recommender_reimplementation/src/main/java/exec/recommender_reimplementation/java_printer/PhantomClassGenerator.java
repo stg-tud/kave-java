@@ -15,12 +15,11 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -28,58 +27,14 @@ import cc.kave.commons.model.ssts.impl.SST;
 
 public class PhantomClassGenerator {
 
-	private String rootPath;
-
-	public PhantomClassGenerator(String rootPath) {
-		this.rootPath = rootPath;
-	}
-
-	public void generatePhantomClassesForSST(ISST sst) throws IOException {
-		PhantomClassVisitor phantomClassVisitor = new PhantomClassVisitor();
-		sst.accept(phantomClassVisitor, null);
-		Map<ITypeName, SST> phantomSSTs = phantomClassVisitor.getPhantomSSTs();
-		for (Entry<ITypeName, SST> entry : phantomSSTs.entrySet()) {
-			ITypeName type = entry.getKey();
-			String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
-			String javaCode = printPhantomClass(entry.getValue());
-			javaCode = appendPackageDeclaration(getPackageName(type), javaCode);
-			FileUtils.writeStringToFile(new File(nestedFolderPath + "\\" + type.getName() + ".java"), javaCode);
+	public Set<ISST> convert(Set<ISST> ssts) {
+		Map<ITypeName, SST> phantomClasses = Maps.newHashMap();
+		
+		for (ISST sst : ssts) {
+			sst.accept(new PhantomClassVisitor(), phantomClasses);
 		}
+
+		return Sets.newHashSet(phantomClasses.values());
 	}
 
-	private String createPackageSubFoldersAndReturnNestedFolderPath(ITypeName type) {
-		String nestedFolderPath = rootPath;
-		String[] packages = type.getFullName().split("\\.");
-		for (int i = 0; i < packages.length - 1; i++) {
-			String packageName = packages[i];
-			nestedFolderPath += "\\" + packageName;
-		}
-		new File(nestedFolderPath).mkdirs();
-		return nestedFolderPath;
-	}
-
-	private String appendPackageDeclaration(String fullPackageName, String javaCode) {
-		javaCode = String.join("\n", "package " + fullPackageName, javaCode);
-		return javaCode;
-	}
-
-	private String printPhantomClass(ISST sst) {
-		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new JavaPrintingVisitor(sst, true), context);
-		return context.toString();
-	}
-
-	private String getPackageName(ITypeName type) {
-		String[] packages = type.getFullName().split("\\.");
-		String fullPackageName = "";
-		for (int i = 0; i < packages.length - 1; i++) {
-			String packageName = packages[i];
-			if (i < packages.length - 2) {
-				fullPackageName += packageName + ".";
-			} else {
-				fullPackageName += packageName + ";";
-			}
-		}
-		return fullPackageName;
-	}
 }

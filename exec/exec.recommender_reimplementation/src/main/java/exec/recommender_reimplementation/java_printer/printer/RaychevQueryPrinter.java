@@ -16,9 +16,10 @@
 package exec.recommender_reimplementation.java_printer.printer;
 
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
+
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
-import exec.recommender_reimplementation.java_printer.PhantomClassVisitor;
 import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor;
 
 public class RaychevQueryPrinter implements IJavaPrinter {
@@ -26,17 +27,18 @@ public class RaychevQueryPrinter implements IJavaPrinter {
 	@Override
 	public String print(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new RaychevQueryPrintingVisitor(sst,false), context);
+		StringBuilder sb = new StringBuilder();
+		sst.accept(new RaychevQueryPrintingVisitor(sst, false), context);
 		if (!context.toString().isEmpty()) {
-			PhantomClassVisitor phantomClassVisitor = new PhantomClassVisitor();
-			sst.accept(phantomClassVisitor, null);
-			return appendPackageDeclaration(appendImportListToString(phantomClassVisitor.getSeenClasses(), context.toString()));
+			appendPackageDeclaration(sb);
+			appendImportListToString(getUsedTypes(sst), sb);
+			sb.append(context.toString());
+			return sb.toString();
 		}
 		return "";
 	}
-	
-	private String appendPackageDeclaration(String javaCode) {
-		javaCode = String.join("\n", "package com.example.fill;", javaCode);
-		return javaCode;
+
+	private StringBuilder appendPackageDeclaration(StringBuilder sb) {
+		return sb.append("package com.example.fill; \n");
 	}
 }

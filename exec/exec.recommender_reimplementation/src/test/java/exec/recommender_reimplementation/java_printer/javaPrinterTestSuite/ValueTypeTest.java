@@ -42,7 +42,6 @@ public class ValueTypeTest {
 				"        double j;", "        j = 0.0d;", "        boolean k;", "        k = false;", "        char l;", "        l = '.';", "        double m;",
 				"        m = 0.0d;", "    }", "}");
 		String actual = context.toString();
-		System.out.print(actual);
 		assertEquals(expected, actual);
 	}
 	

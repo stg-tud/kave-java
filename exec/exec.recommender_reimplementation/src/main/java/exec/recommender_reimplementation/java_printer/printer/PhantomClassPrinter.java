@@ -16,20 +16,22 @@
 package exec.recommender_reimplementation.java_printer.printer;
 
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
+
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
-import exec.recommender_reimplementation.java_printer.PhantomClassVisitor;
 
 public class PhantomClassPrinter implements IJavaPrinter {
 
 	@Override
 	public String print(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
-		sst.accept(new JavaPrintingVisitor(sst,false), context);
-		PhantomClassVisitor phantomClassVisitor = new PhantomClassVisitor();
-		sst.accept(phantomClassVisitor, null);
-		return appendImportListToString(phantomClassVisitor.getSeenClasses(), context.toString());
+		StringBuilder sb = new StringBuilder();
+		sst.accept(new JavaPrintingVisitor(sst, false), context);
+		appendImportListToString(getUsedTypes(sst), sb);
+		sb.append(context.toString());
+		return sb.toString();
 	}
 
 }

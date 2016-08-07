@@ -20,9 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.NamespaceName;
+import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
@@ -48,8 +50,7 @@ public class JavaPrintingUtils {
 		}
 	}
 	
-	public static String appendImportListToString(Set<ITypeName> classes, String code) {
-		StringBuilder sb = new StringBuilder();
+	public static StringBuilder appendImportListToString(Set<ITypeName> classes, StringBuilder sb) {
 		Iterator<ITypeName> classesIterator = classes.iterator();
 		while (classesIterator.hasNext()) {
 			ITypeName classType = classesIterator.next();
@@ -60,7 +61,19 @@ public class JavaPrintingUtils {
 			}
 		}
 		
-		return String.join("\n", sb.toString(),code);
+		return sb.append("\n");
+	}
+	
+	public static Set<ITypeName> getUsedTypes(ISST sst) {
+		UsedTypesVisitor usedTypesVisitor = new UsedTypesVisitor();
+		sst.accept(usedTypesVisitor, null);
+		return usedTypesVisitor.getUsedTypes();
+	}
+	
+	public static Set<IAssemblyName> getUsedAssemblies(ISST sst) {
+		UsedTypesVisitor usedTypesVisitor = new UsedTypesVisitor();
+		sst.accept(usedTypesVisitor, null);
+		return usedTypesVisitor.getAssemblies();
 	}
 	
 	public static String getDefaultValueForType(ITypeName returnType) {

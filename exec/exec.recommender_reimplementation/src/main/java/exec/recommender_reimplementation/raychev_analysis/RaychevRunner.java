@@ -30,9 +30,10 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import exec.recommender_reimplementation.ContextReader;
-import exec.recommender_reimplementation.java_printer.PhantomClassGenerator;
+import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
@@ -71,16 +72,19 @@ public class RaychevRunner {
 		}
 
 		QueryExtractor queryExtractor = new QueryExtractor();
+		Set<ISST> ssts = Sets.newHashSet();
 		for (Context context : contextList) {
 			try {
 				String javaCode = queryExtractor.createJavaCodeForQuery(context);
 				if (!javaCode.isEmpty()) {
 					writeJavaFile(javaCode, context.getSST());
+					ssts.add(context.getSST());
 				}
 			} catch (Exception e) {
 				continue;
 			}
 		}
+		writeClassPaths(ssts);
 	}
 
 	private static void queryFromCompletionEvents() {
@@ -92,30 +96,40 @@ public class RaychevRunner {
 		}
 
 		QueryExtractor queryExtractor = new QueryExtractor();
+		Set<ISST> ssts = Sets.newHashSet();
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
 				String javaCode = queryExtractor.createJavaCodeForQuery(completionEvent);
 				if (!javaCode.isEmpty()) {
 					ISST sst = completionEvent.getContext().getSST();
 					writeJavaFile(javaCode, sst);
+					ssts.add(sst);
 				}
 			} catch (Exception e) {
 				continue;
 			}
 		}
+		writeClassPaths(ssts);
 	}
 
 	private static void writeJavaFile(String javaCode, ISST sst) throws IOException {
 		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\Queries" + "\\"
 				+ sst.getEnclosingType().getName() + ".java"), javaCode);
-		PhantomClassGenerator phantomClassGenerator = new PhantomClassGenerator(FOLDERPATH.toString()+ "\\Queries"); 
-		phantomClassGenerator.generatePhantomClassesForSST(sst);
+	}
+	
+	private static void writeClassPaths(Set<ISST> ssts) {
+		JavaClassPathGenerator phantomClassGenerator = new JavaClassPathGenerator(FOLDERPATH.toString()+ "\\Queries"); 
+		try {
+			phantomClassGenerator.generate(ssts);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
-		sentenceBuilder();
+//		sentenceBuilder();
 		queryBuilder();
-		queryFromCompletionEvents();
+//		queryFromCompletionEvents();
 	}
 
 }
