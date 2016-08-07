@@ -16,6 +16,7 @@
 package exec.recommender_reimplementation.java_printer;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
 import static org.junit.Assert.*;
 
 import java.util.Map;
@@ -95,7 +96,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	@Test
 	public void addsMethodDeclarationOnInvocation_NoReturnType() {
 		SST sst = new SST();
-		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(type("void"), type("T1"), "m1")));
+		IMethodDeclaration methodDecl = declareMethod(invocationStatement(method(voidType, type("T1"), "m1")));
 		sst.getMethods().add(methodDecl);
 
 		sst.accept(sut, null);
@@ -103,7 +104,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		Map<ITypeName, SST> expected = Maps.newHashMap();
 		SST expectedSST = new SST();
 		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getMethods().add(methodDecl(method(type("int"), type("T1"), "m1")));
+		expectedSST.getMethods().add(methodDecl(method(voidType, type("T1"), "m1")));
 
 		expected.put(type("T1"), expectedSST);
 

@@ -50,5 +50,4 @@ public class ValueTypeTest {
 		InputStream resource = getClass().getResourceAsStream("./ValueTypeTest.json");
 		return JsonUtils.fromJson(resource, Context.class);
 	}
-
 }

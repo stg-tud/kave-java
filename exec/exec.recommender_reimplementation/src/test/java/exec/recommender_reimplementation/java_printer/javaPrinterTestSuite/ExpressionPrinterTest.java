@@ -109,8 +109,8 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void constantValueExpression_NullLiteralIsUsedAsString() {
-		assertPrint(constant("null"), "\"null\"");
+	public void constantValueExpression_NullLiteral() {
+		assertPrint(constant("null"), "null");
 	}
 
 	@Test
