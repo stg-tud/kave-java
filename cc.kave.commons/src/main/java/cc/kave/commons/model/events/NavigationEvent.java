@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.events;
 
-import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.naming.IName;
 
 public class NavigationEvent extends IDEEvent {
 	public IName Target;

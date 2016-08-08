@@ -20,8 +20,8 @@ import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.ToStringUtils;
 
 public class TypeHierarchy implements ITypeHierarchy {
@@ -33,12 +33,12 @@ public class TypeHierarchy implements ITypeHierarchy {
 	private Set<ITypeHierarchy> _implements;
 
 	public TypeHierarchy() {
-		this.element = TypeName.UNKNOWN_NAME;
+		this.element = Names.getUnknownType();
 		this._implements = new HashSet<>();
 	}
 
 	public TypeHierarchy(String elementQualifiedName) {
-		this.element = TypeName.newTypeName(elementQualifiedName);
+		this.element = Names.newType(elementQualifiedName);
 	}
 
 	public void setExtends(ITypeHierarchy _extends) {

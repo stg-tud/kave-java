@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.references;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -32,7 +32,7 @@ public class FieldReference implements IFieldReference {
 
 	public FieldReference() {
 		this.reference = new VariableReference();
-		this.fieldName = FieldName.UNKNOWN_NAME;
+		this.fieldName = Names.getUnknownField();
 	}
 
 	@Override

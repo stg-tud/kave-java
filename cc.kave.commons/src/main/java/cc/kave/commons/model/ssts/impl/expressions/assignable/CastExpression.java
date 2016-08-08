@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -35,7 +35,7 @@ public class CastExpression implements ICastExpression {
 
 	public CastExpression() {
 		this.reference = new VariableReference();
-		this.targetType = TypeName.UNKNOWN_NAME;
+		this.targetType = Names.getUnknownType();
 		this.operator = CastOperator.Unknown;
 	}
 

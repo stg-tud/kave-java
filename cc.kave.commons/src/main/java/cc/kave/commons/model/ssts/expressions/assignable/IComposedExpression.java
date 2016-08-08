@@ -26,5 +26,4 @@ public interface IComposedExpression extends IAssignableExpression {
 
 	@Nonnull
 	List<IVariableReference> getReferences();
-
 }

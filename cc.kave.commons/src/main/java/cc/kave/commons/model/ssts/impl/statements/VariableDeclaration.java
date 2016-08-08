@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.statements;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -33,7 +33,7 @@ public class VariableDeclaration implements IVariableDeclaration {
 
 	public VariableDeclaration() {
 		this.reference = new VariableReference();
-		this.type = TypeName.UNKNOWN_NAME;
+		this.type = Names.getUnknownType();
 	}
 
 	@Override

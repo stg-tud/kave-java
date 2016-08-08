@@ -18,8 +18,8 @@ package cc.kave.commons.model.ssts.impl.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -31,7 +31,7 @@ public class CatchBlock implements ICatchBlock {
 	private List<IStatement> body;
 
 	public CatchBlock() {
-		this.parameter = ParameterName.UNKNOWN_NAME;
+		this.parameter = Names.getUnknownParameter();
 		this.body = new ArrayList<>();
 		this.kind = CatchBlockKind.Default;
 	}

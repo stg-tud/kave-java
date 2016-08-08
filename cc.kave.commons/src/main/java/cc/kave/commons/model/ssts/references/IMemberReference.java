@@ -23,5 +23,4 @@ public interface IMemberReference extends IReference {
 
 	@Nonnull
 	IVariableReference getReference();
-
 }

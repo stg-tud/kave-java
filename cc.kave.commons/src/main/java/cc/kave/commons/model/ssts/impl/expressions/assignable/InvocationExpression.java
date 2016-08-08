@@ -18,8 +18,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -36,7 +36,7 @@ public class InvocationExpression implements IInvocationExpression {
 
 	public InvocationExpression() {
 		this.reference = new VariableReference();
-		this.methodName = MethodName.UNKNOWN_NAME;
+		this.methodName = Names.getUnknownMethod();
 		this.parameters = new ArrayList<>();
 	}
 

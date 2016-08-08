@@ -21,20 +21,18 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class TypeErasure {
 	public static ITypeName of(ITypeName type) {
-		return TypeName.newTypeName(of(type.getIdentifier()));
+		return Names.newType(of(type.getIdentifier()));
 	}
 
 	public static IMethodName of(IMethodName method) {
-		return MethodName.newMethodName(of(method.getIdentifier()));
+		return Names.newMethod(of(method.getIdentifier()));
 	}
 
 	public static String of(String id) {
@@ -119,7 +117,7 @@ public class TypeErasure {
 
 			int lengthOfSubstring = endOfParam - startOfParam;
 			String paramSubstring = identifierWithParameters.substring(startOfParam, lengthOfSubstring);
-			parameters.add(ParameterName.newParameterName(paramSubstring.trim()));
+			parameters.add(Names.newParameter(paramSubstring.trim()));
 		}
 
 		return parameters;

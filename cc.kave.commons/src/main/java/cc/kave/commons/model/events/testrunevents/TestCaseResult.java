@@ -18,7 +18,7 @@ package cc.kave.commons.model.events.testrunevents;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class TestCaseResult {
 	public IMethodName TestMethod;

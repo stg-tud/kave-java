@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.references;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -32,7 +32,7 @@ public class EventReference implements IEventReference {
 
 	public EventReference() {
 		this.reference = new VariableReference();
-		this.eventName = EventName.UNKNOWN_NAME;
+		this.eventName = Names.getUnknownEvent();
 	}
 
 	@Override

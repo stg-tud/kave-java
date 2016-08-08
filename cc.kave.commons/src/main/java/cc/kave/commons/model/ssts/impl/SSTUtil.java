@@ -23,10 +23,9 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -115,7 +114,7 @@ public class SSTUtil {
 		variable.setType(type);
 		return variable;
 	}
-	
+
 	public static IVariableDeclaration declare(IVariableReference varRef) {
 		VariableDeclaration variable = new VariableDeclaration();
 		variable.setReference(varRef);
@@ -246,7 +245,7 @@ public class SSTUtil {
 			method.getBody().add(s);
 		return method;
 	}
-	
+
 	public static IMethodDeclaration declareMethod(IStatement... statements) {
 		MethodDeclaration method = new MethodDeclaration();
 		for (IStatement s : statements)
@@ -268,15 +267,16 @@ public class SSTUtil {
 		forLoop.setCondition(condition);
 		return forLoop;
 	}
-	
-	public static IfElseBlock ifElseBlock(ISimpleExpression condition, List<IStatement> thenPart, List<IStatement> elsePart) {
+
+	public static IfElseBlock ifElseBlock(ISimpleExpression condition, List<IStatement> thenPart,
+			List<IStatement> elsePart) {
 		IfElseBlock ifElseBlock = new IfElseBlock();
 		ifElseBlock.setCondition(condition);
 		ifElseBlock.setThen(thenPart);
 		ifElseBlock.setElse(elsePart);
 		return ifElseBlock;
 	}
-	
+
 	public static IIfElseBlock simpleIf(List<IStatement> elseStatements, ISimpleExpression condition,
 			IStatement... body) {
 		return ifElseBlock(condition, Lists.newArrayList(body), elseStatements);
@@ -316,14 +316,14 @@ public class SSTUtil {
 	public static ISwitchBlock switchBlock(String identifier, ICaseBlock... caseBlocks) {
 		return switchBlock(variableReference(identifier), Lists.newArrayList(caseBlocks), new ArrayList<IStatement>());
 	}
-	
+
 	public static ICaseBlock caseBlock(ISimpleExpression label, IStatement... body) {
 		CaseBlock caseBlock = new CaseBlock();
 		caseBlock.setLabel(label);
 		caseBlock.setBody(Lists.newArrayList(body));
 		return caseBlock;
 	}
-	
+
 	public static ICaseBlock caseBlock(String label, IStatement... body) {
 		return caseBlock(constant(label), body);
 	}
@@ -423,21 +423,21 @@ public class SSTUtil {
 
 	public static IFieldReference fieldReference(String varId, String fieldId) {
 		FieldReference ref = new FieldReference();
-		ref.setFieldName(FieldName.newFieldName(fieldId));
+		ref.setFieldName(Names.newField(fieldId));
 		ref.setReference(variableReference(varId));
 		return ref;
 	}
-	
+
 	public static IFieldReference fieldReference(IVariableReference varRef, String fieldId) {
 		FieldReference fielRef = new FieldReference();
-		fielRef.setFieldName(FieldName.newFieldName(fieldId));
+		fielRef.setFieldName(Names.newField(fieldId));
 		fielRef.setReference(varRef);
 		return fielRef;
 	}
-	
+
 	public static IPropertyReference propertyReference(IVariableReference varRef, String propertyId) {
 		PropertyReference propertyRef = new PropertyReference();
-		propertyRef.setPropertyName(PropertyName.newPropertyName(propertyId));
+		propertyRef.setPropertyName(Names.newProperty(propertyId));
 		propertyRef.setReference(varRef);
 		return propertyRef;
 	}
@@ -524,14 +524,14 @@ public class SSTUtil {
 		Set<IFieldDeclaration> fields = new HashSet<>();
 		for (String name : fieldNames) {
 			FieldDeclaration fieldDeclaration = new FieldDeclaration();
-			fieldDeclaration.setName(FieldName.newFieldName(name));
+			fieldDeclaration.setName(Names.newField(name));
 			fields.add(fieldDeclaration);
 		}
 		return fields;
 	}
-	
+
 	// ----------------------- binary expressions -----------------------------
-	
+
 	public static IBinaryExpression binExpr(BinaryOperator op, ISimpleExpression lhs, ISimpleExpression rhs) {
 		BinaryExpression binaryExpression = new BinaryExpression();
 		binaryExpression.setOperator(op);
@@ -551,13 +551,13 @@ public class SSTUtil {
 	public static IBinaryExpression and(ISimpleExpression lhs, ISimpleExpression rhs) {
 		return binExpr(BinaryOperator.And, lhs, rhs);
 	}
-	
+
 	public static IBinaryExpression and(IVariableReference lhs, IVariableReference rhs) {
 		return and(refExpr(lhs), refExpr(rhs));
 	}
 
 	// ------------------------ unary expressions -----------------------------
-	
+
 	public static IUnaryExpression unaryExpr(UnaryOperator op, ISimpleExpression exp) {
 		UnaryExpression unaryExpression = new UnaryExpression();
 		unaryExpression.setOperator(op);
@@ -568,7 +568,7 @@ public class SSTUtil {
 	public static IUnaryExpression not(ISimpleExpression expr) {
 		return unaryExpr(UnaryOperator.Not, expr);
 	}
-	
+
 	public static IUnaryExpression not(IVariableReference ref) {
 		return not(refExpr(ref));
 	}

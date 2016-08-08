@@ -20,10 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeParameterName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.commons.model.typeshapes.ITypeShape;
@@ -212,18 +212,23 @@ public class SSTPrintingContext {
 		return this;
 	}
 
-	public SSTPrintingContext typeParameters(List<ITypeName> typeParameters) {
+	public SSTPrintingContext typeParameters(List<ITypeParameterName> tpns) {
 		leftAngleBracket();
 
-		for (ITypeName p : typeParameters) {
-			if (p.isUnknownType() || (p.getTypeParameterType() != null && p.getTypeParameterType().isUnknownType())) {
-				typeParameterShortName(TypeName.UNKNOWN_NAME.getIdentifier());
-			} else {
-				type(p.getTypeParameterType());
-			}
+		boolean isFirst = true;
+		for (ITypeParameterName tpn : tpns) {
 
-			if (!p.equals(typeParameters.get(typeParameters.size() - 1))) {
+			if (!isFirst) {
 				_sb.append(", ");
+			}
+			isFirst = false;
+
+			if (tpn.isUnknown()) {
+				typeParameterShortName("?");
+			} else if (tpn.isBound()) {
+				type(tpn.getTypeParameterType());
+			} else {
+				_sb.append(tpn.getTypeParameterShortName());
 			}
 		}
 

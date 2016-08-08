@@ -20,8 +20,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -35,7 +35,7 @@ public class PropertyDeclaration implements IPropertyDeclaration {
 	private List<IStatement> set;
 
 	public PropertyDeclaration() {
-		this.name = PropertyName.UNKNOWN_NAME;
+		this.name = Names.getUnknownProperty();
 		this.get = new ArrayList<>();
 		this.set = new ArrayList<>();
 	}

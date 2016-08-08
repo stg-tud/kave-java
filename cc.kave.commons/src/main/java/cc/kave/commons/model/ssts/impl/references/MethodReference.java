@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.references;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -32,7 +32,7 @@ public class MethodReference implements IMethodReference {
 
 	public MethodReference() {
 		this.reference = new VariableReference();
-		this.methodName = MethodName.UNKNOWN_NAME;
+		this.methodName = Names.getUnknownMethod();
 	}
 
 	@Override

@@ -26,9 +26,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -46,7 +46,7 @@ import cc.kave.commons.model.ssts.references.IVariableReference;
 
 public class InliningContext {
 
-	public static final ITypeName GOT_RESULT_TYPE = TypeName.newTypeName("Boolean");
+	public static final ITypeName GOT_RESULT_TYPE = Names.newType("p:bool");
 	public static final String RESULT_NAME = "$result_";
 	public static final String RESULT_FLAG = "$gotNoResult_";
 	public static final String CONDITION_VAR = "$returnCondition_";

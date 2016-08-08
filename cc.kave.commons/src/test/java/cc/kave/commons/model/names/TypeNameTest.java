@@ -415,7 +415,7 @@ public class TypeNameTest {
 		assertEquals("MyType", parameterizedTypeName.getName());
 		assertTrue(parameterizedTypeName.isGenericEntity());
 		assertTrue(parameterizedTypeName.hasTypeParameters());
-		assertFalse(parameterizedTypeName.isArrayType());
+		assertFalse(parameterizedTypeName.isArray());
 		assertEquals(2, parameterizedTypeName.getTypeParameters().size());
 		assertEquals(stringIdentifier, parameterizedTypeName.getTypeParameters().get(0).getIdentifier());
 		assertEquals(intIdentifier, parameterizedTypeName.getTypeParameters().get(1).getIdentifier());

@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.references;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -32,7 +32,7 @@ public class PropertyReference implements IPropertyReference {
 
 	public PropertyReference() {
 		this.reference = new VariableReference();
-		this.propertyName = PropertyName.UNKNOWN_NAME;
+		this.propertyName = Names.getUnknownProperty();
 	}
 
 	@Override

@@ -17,12 +17,11 @@ package cc.kave.commons.model.ssts.declarations;
 
 import javax.annotation.Nonnull;
 
-import cc.kave.commons.model.names.IDelegateTypeName;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 
 public interface IDelegateDeclaration extends IMemberDeclaration {
 
 	@Nonnull
 	IDelegateTypeName getName();
-
 }

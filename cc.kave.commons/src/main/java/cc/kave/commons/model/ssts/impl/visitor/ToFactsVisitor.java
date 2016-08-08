@@ -35,9 +35,9 @@ public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Voi
 	}
 
 	private Fact toFact(Event e) {
-		 if(!events.contains(e)){
-			 events.add(e);
-		 }
+		if (!events.contains(e)) {
+			events.add(e);
+		}
 		return new Fact(events.indexOf(e));
 	}
 
@@ -60,8 +60,8 @@ public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Voi
 		e.setMethod(expr.getMethodName());
 
 		Fact newFact = toFact(e);
-		
-		//remove double order in queries (a b a)
+
+		// remove double order in queries (a b a)
 		Set<Fact> oldFacts = Sets.newHashSet();
 		if (facts.contains(newFact)) {
 			for (Fact fact : facts) {

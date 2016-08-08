@@ -17,7 +17,7 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 
 import java.util.ArrayList;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;

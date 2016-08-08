@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
@@ -46,7 +46,7 @@ public class SST implements ISST {
 
 	public SST() {
 		this.partialClassIdentifier = "";
-		this.enclosingType = TypeName.UNKNOWN_NAME;
+		this.enclosingType = Names.getUnknownType();
 		this.fields = new HashSet<IFieldDeclaration>();
 		this.properties = new HashSet<IPropertyDeclaration>();
 		this.methods = new HashSet<IMethodDeclaration>();

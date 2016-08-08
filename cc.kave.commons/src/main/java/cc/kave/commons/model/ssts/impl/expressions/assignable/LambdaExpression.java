@@ -18,8 +18,8 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.csharp.LambdaName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -32,7 +32,7 @@ public class LambdaExpression implements ILambdaExpression {
 
 	public LambdaExpression() {
 		this.body = new ArrayList<>();
-		this.name = LambdaName.UNKNOWN_NAME;
+		this.name = Names.getUnknownLambda();
 	}
 
 	@Override

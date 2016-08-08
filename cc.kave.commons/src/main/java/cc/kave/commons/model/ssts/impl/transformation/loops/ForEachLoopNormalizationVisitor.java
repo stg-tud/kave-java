@@ -30,8 +30,8 @@ import static cc.kave.commons.model.ssts.impl.transformation.loops.IteratorUtil.
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -69,7 +69,7 @@ public class ForEachLoopNormalizationVisitor extends AbstractStatementNormalizat
 
 		// create condition
 		IVariableReference hasNext = variableReference("hasNext");
-		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), TypeName.newTypeName("System.Boolean"));
+		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), Names.newType("System.Boolean"));
 		ILoopHeaderExpression condition = loopHeader(hasNextDec, assign(hasNext, hasNext(iterator)),
 				returnStatement(refExpr(hasNext)));
 

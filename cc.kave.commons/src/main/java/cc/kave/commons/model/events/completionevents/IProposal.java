@@ -18,7 +18,7 @@ package cc.kave.commons.model.events.completionevents;
 
 import javax.annotation.Nullable;
 
-import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.naming.IName;
 
 public interface IProposal {
 	@Nullable

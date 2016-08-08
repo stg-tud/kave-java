@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
@@ -93,12 +93,10 @@ public class BooleanDeclarationUtil {
 	}
 
 	public static IVariableDeclaration booleanDeclaration(String identifier) {
-		// TODO check typename
-		return declare(identifier, TypeName.newTypeName("System.Boolean"));
+		return declare(identifier, Names.newType("p:bool"));
 	}
 
 	public static IVariableDeclaration booleanDeclaration(IVariableReference ref) {
 		return booleanDeclaration(ref.getIdentifier());
 	}
-
 }

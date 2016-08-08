@@ -20,8 +20,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
@@ -35,7 +35,7 @@ public class MethodDeclaration implements IMethodDeclaration {
 	private List<IStatement> body;
 
 	public MethodDeclaration() {
-		name = MethodName.UNKNOWN_NAME;
+		name = Names.getUnknownMethod();
 		body = new ArrayList<>();
 	}
 

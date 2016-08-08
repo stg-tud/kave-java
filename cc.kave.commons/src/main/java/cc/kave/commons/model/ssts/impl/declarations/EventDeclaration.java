@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.declarations;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -29,7 +29,7 @@ public class EventDeclaration implements IEventDeclaration {
 	private IEventName name;
 
 	public EventDeclaration() {
-		this.name = EventName.UNKNOWN_NAME;
+		this.name = Names.getUnknownEvent();
 	}
 
 	@Override

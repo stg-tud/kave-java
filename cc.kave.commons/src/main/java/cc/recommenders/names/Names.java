@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.naming.IName;
 
 /**
  * 

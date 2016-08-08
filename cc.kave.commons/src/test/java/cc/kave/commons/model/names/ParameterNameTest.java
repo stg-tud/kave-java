@@ -80,7 +80,7 @@ public class ParameterNameTest {
 	public void shouldNoBeParameterArray() {
 		IParameterName parameterName = ParameterName.newParameterName("[T[], P, 1.3.2.4] name");
 
-		assertTrue(parameterName.getValueType().isArrayType());
+		assertTrue(parameterName.getValueType().isArray());
 		assertFalse(parameterName.isParameterArray());
 	}
 

@@ -17,8 +17,6 @@ package cc.kave.commons.model.ssts.impl.visitor.inlining.util;
 
 import java.util.Set;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -52,10 +50,8 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractThrowingNodeVisitor;
-import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -367,20 +363,20 @@ public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableR
 		stmt.getExpression().accept(this, context);
 		return null;
 	}
-	
+
 	@Override
-	public Void visit(IBinaryExpression expr, Set<IVariableReference> context){
+	public Void visit(IBinaryExpression expr, Set<IVariableReference> context) {
 		expr.getLeftOperand().accept(this, context);
 		expr.getRightOperand().accept(this, context);
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(IUnaryExpression expr, Set<IVariableReference> context) {
 		expr.getOperand().accept(this, context);
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(ICastExpression expr, Set<IVariableReference> context) {
 		expr.getReference().accept(this, context);
@@ -389,13 +385,13 @@ public class NameScopeVisitor extends AbstractThrowingNodeVisitor<Set<IVariableR
 
 	@Override
 	public Void visit(IIndexAccessExpression expr, Set<IVariableReference> context) {
-		for(ISimpleExpression e : expr.getIndices()){
+		for (ISimpleExpression e : expr.getIndices()) {
 			e.accept(this, context);
 		}
 		expr.getReference().accept(this, context);
 		return null;
 	}
-	
+
 	public Void visit(IIndexAccessReference indexAccessRef, Set<IVariableReference> context) {
 		indexAccessRef.getExpression().accept(this, context);
 		return null;

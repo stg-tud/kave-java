@@ -25,20 +25,9 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.csharp.AliasName;
-import cc.kave.commons.model.names.csharp.AssemblyName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.LocalVariableName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.Name;
-import cc.kave.commons.model.names.csharp.NamespaceName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.names.resharper.LiveTemplateName;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.impl.v0.others.ReSharperLiveTemplateName;
 
 public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerializer<IName> {
 
@@ -50,36 +39,35 @@ public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerial
 		final String identifier = nameInfo[1];
 		switch (discriminator) {
 		case "CSharp.AliasName":
-			return AliasName.newAliasName(identifier);
+			return Names.newAlias(identifier);
 		case "CSharp.AssemblyName":
-			return AssemblyName.newAssemblyName(identifier);
+			return Names.newAssembly(identifier);
 		case "CSharp.EventName":
-			return EventName.newEventName(identifier);
+			return Names.newEvent(identifier);
 		case "CSharp.FieldName":
-			return FieldName.newFieldName(identifier);
+			return Names.newField(identifier);
 		case "CSharp.LambdaName":
-			return LambdaName.newLambdaName(identifier);
+			return Names.newLambda(identifier);
 		case "CSharp.LocalVariableName":
-			return LocalVariableName.newLocalVariableName(identifier);
+			return Names.newLocalVariable(identifier);
 		case "CSharp.MethodName":
-			return MethodName.newMethodName(identifier);
+			return Names.newMethod(identifier);
 		case "CSharp.Name":
-			return Name.newName(identifier);
+			return Names.newGeneral(identifier);
 		case "CSharp.NamespaceName":
-			return NamespaceName.newNamespaceName(identifier);
+			return Names.newNamespace(identifier);
 		case "CSharp.ParameterName":
-			return ParameterName.newParameterName(identifier);
+			return Names.newParameter(identifier);
 		case "CSharp.PropertyName":
-			return PropertyName.newPropertyName(identifier);
+			return Names.newProperty(identifier);
 		case "CSharp.TypeName":
-			return TypeName.newTypeName(identifier);
-		/* resharper name */
+			return Names.newType(identifier);
 		case "ReSharper.LiveTemplateName":
-			return LiveTemplateName.newLiveTemplateName(identifier);
+			return Names.newLiveTemplateName(identifier);
 		default:
 			if ((discriminator.startsWith("CSharp.") && discriminator.endsWith("TypeName"))
 					|| discriminator.equals("CSharp.TypeParameterName")) {
-				return TypeName.newTypeName(identifier);
+				return Names.newType(identifier);
 			}
 			throw new JsonParseException("Not a valid serialized name: '" + json + "'");
 		}
@@ -87,7 +75,7 @@ public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerial
 
 	@Override
 	public JsonElement serialize(IName src, Type typeOfSrc, JsonSerializationContext context) {
-		return new JsonPrimitive((src.getClass() != LiveTemplateName.class ? "CSharp." : "ReSharper.")
+		return new JsonPrimitive((src.getClass() != ReSharperLiveTemplateName.class ? "CSharp." : "ReSharper.")
 				+ src.getClass().getSimpleName().replaceFirst("Cs", "") + ":" + src.getIdentifier());
 	}
 

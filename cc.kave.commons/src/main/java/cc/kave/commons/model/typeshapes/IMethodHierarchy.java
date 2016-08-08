@@ -18,7 +18,7 @@ package cc.kave.commons.model.typeshapes;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public interface IMethodHierarchy {
 	/// <summary>

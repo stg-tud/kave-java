@@ -72,7 +72,7 @@ public class ArrayTypeNameTest {
 		for (String identifier : shouldBeArrayTypeCases()) {
 			ITypeName arrayTypeName = TypeName.newTypeName(identifier);
 
-			assertTrue(arrayTypeName.isArrayType());
+			assertTrue(arrayTypeName.isArray());
 		}
 	}
 
@@ -142,7 +142,7 @@ public class ArrayTypeNameTest {
 	public void shouldNotBeArrayType() {
 		ITypeName uut = TypeName.newTypeName("ValueType, As, 2.5.1.6");
 
-		assertFalse(uut.isArrayType());
+		assertFalse(uut.isArray());
 	}
 
 	@Test

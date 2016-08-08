@@ -19,7 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 
@@ -32,5 +32,4 @@ public interface IMethodDeclaration extends IMemberDeclaration {
 
 	@Nonnull
 	List<IStatement> getBody();
-
 }

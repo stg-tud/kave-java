@@ -17,8 +17,8 @@ package cc.kave.commons.model.ssts.impl.declarations;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IDelegateTypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
@@ -29,7 +29,7 @@ public class DelegateDeclaration implements IDelegateDeclaration {
 	private IDelegateTypeName name;
 
 	public DelegateDeclaration() {
-		this.name = DelegateTypeName.UNKNOWN_NAME;
+		this.name = Names.getUnknownDelegateType();
 	}
 
 	@Override

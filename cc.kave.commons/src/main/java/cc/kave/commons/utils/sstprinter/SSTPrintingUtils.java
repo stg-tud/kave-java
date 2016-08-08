@@ -19,15 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.csharp.NamespaceName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 
 public class SSTPrintingUtils {
 	public static void formatAsUsingList(Set<INamespaceName> namespaces, SSTPrintingContext context) {
 		List<String> filteredNamespaceStrings = new ArrayList();
 		for (INamespaceName name : namespaces) {
-			if (!name.equals(NamespaceName.UNKNOWN_NAME)) {
+			if (!name.equals(Names.getUnknownNamespace())) {
 				String s = name.getIdentifier().trim();
 				if (!s.isEmpty()) {
 					filteredNamespaceStrings.add(s);

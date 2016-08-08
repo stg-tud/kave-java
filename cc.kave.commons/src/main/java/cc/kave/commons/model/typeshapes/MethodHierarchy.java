@@ -19,8 +19,8 @@ import javax.annotation.Nonnull;
 
 import com.google.gson.annotations.SerializedName;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class MethodHierarchy implements IMethodHierarchy {
 
@@ -30,7 +30,7 @@ public class MethodHierarchy implements IMethodHierarchy {
 	private IMethodName first;
 
 	public MethodHierarchy() {
-		element = MethodName.UNKNOWN_NAME;
+		element = Names.getUnknownMethod();
 	}
 
 	public MethodHierarchy(@Nonnull IMethodName m) {

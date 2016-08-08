@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.episodes;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class Events {
 	public static Event newContext(IMethodName ctx) {

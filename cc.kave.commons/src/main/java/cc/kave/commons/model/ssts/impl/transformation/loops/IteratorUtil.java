@@ -22,9 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -59,7 +58,7 @@ public class IteratorUtil {
 	public static ITypeName iteratorType(ITypeName paramType, boolean java) {
 		String name = java ? ITER_TYPE : java2CSharp.get(ITER_TYPE);
 		String bundle = java ? BUNDLE : java2CSharp.get(BUNDLE);
-		return TypeName.newTypeName(name + "`1[[T -> " + paramType.getFullName() + "]], " + bundle);
+		return Names.newType(name + "`1[[T -> " + paramType.getFullName() + "]], " + bundle);
 	}
 
 	// ----------------------- iterator invocation ----------------------------
@@ -103,7 +102,7 @@ public class IteratorUtil {
 	private static IInvocationExpression invocation(IVariableReference ref, String javaMethodName, boolean java) {
 		String methodName = java ? javaMethodName : java2CSharp.get(javaMethodName);
 		InvocationExpression iteratorInvocation = new InvocationExpression();
-		iteratorInvocation.setMethodName(MethodName.newMethodName(methodName));
+		iteratorInvocation.setMethodName(Names.newMethod(methodName));
 		iteratorInvocation.setReference(ref);
 		return iteratorInvocation;
 	}

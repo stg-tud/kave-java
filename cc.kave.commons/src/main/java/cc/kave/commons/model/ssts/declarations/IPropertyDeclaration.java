@@ -19,7 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 
