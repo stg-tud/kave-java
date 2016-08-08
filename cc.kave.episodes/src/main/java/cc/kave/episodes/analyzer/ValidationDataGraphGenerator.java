@@ -74,17 +74,15 @@ public class ValidationDataGraphGenerator {
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
 		
-		Logger.log("Removing transitivity closures");
-		Set<Episode> simplifiedValData = transitivityClosure.remTransClosure(validationData);
-		
 		String directory = createDirectoryStructure();
 
 		int graphIndex = 0;
 
-		for (Episode e : simplifiedValData) {
+		for (Episode e : validationData) {
+			Episode simplEpisode = transitivityClosure.remTransClosure(e);
 			Logger.log("Writting episode number %s.\n", graphIndex);
-			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(e, eventMapping);
-			List<String> types = getAPIType(e, eventMapping);
+			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(simplEpisode, eventMapping);
+			List<String> types = getAPIType(simplEpisode, eventMapping);
 			for (String t : types) {
 				writer.write(graph, getFilePath(directory, t, graphIndex));
 			}

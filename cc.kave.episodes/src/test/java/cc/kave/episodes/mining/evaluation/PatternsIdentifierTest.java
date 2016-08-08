@@ -91,7 +91,7 @@ public class PatternsIdentifierTest {
 	private EpisodeToGraphConverter episodeGraphConverter;
 	@Mock
 	private EpisodeAsGraphWriter graphWriter;
-	
+
 	private Map<Integer, Set<Episode>> patterns;
 	private List<List<Fact>> stream;
 	private List<Event> events;
@@ -133,7 +133,7 @@ public class PatternsIdentifierTest {
 		validationStream = Lists.newArrayList(firstCtx(1), enclosingCtx(2), inv(3), inv(4), firstCtx(5), superCtx(6),
 				enclosingCtx(7), inv(3), firstCtx(0), enclosingCtx(8), inv(4), inv(3), firstCtx(5), enclosingCtx(9),
 				inv(3));
-		
+
 		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos,
 				transClosure, episodeGraphConverter, graphWriter);
 
@@ -226,14 +226,13 @@ public class PatternsIdentifierTest {
 		episodes.add(ep);
 		patterns.put(2, episodes);
 
-		when(transClosure.remTransClosure(any(Set.class)))
-				.thenReturn(Sets.newHashSet(createEpisode(2, "3", "4"), createEpisode(2, "5", "3", "5>3")));
+		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(createEpisode(2, "5", "3", "5>3"));
 		when(episodeGraphConverter.convert(any(Episode.class), any(List.class)))
 				.thenReturn(any(DefaultDirectedGraph.class));
 
 		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
-		
-		verify(transClosure).remTransClosure(any(Set.class));
+
+		verify(transClosure, times(2)).remTransClosure(any(Episode.class));
 		verify(episodeGraphConverter, times(2)).convert(any(Episode.class), any(List.class));
 		verify(graphWriter, times(2)).write(any(DefaultDirectedGraph.class), any(String.class));
 
@@ -274,7 +273,7 @@ public class PatternsIdentifierTest {
 		sb.append("Patterns of size: 3-events\n");
 		sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
 		sb.append("2\t2\t0\t0\n\n");
-		
+
 		assertEquals(sb.toString(), actuals);
 	}
 
@@ -318,7 +317,7 @@ public class PatternsIdentifierTest {
 				+ "/Bidirect" + bidirectThresh + "/patternsValidation.txt");
 		return fileName;
 	}
-	
+
 	private File getGraphPath(int numbRepos, int freqThresh, double entropy, int pId) {
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
 				+ "/Bidirect" + entropy + "/pattern" + pId + ".dot");

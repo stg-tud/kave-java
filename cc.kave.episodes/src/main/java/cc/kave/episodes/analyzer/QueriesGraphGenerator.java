@@ -25,7 +25,6 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -92,8 +91,7 @@ public class QueriesGraphGenerator {
 				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
 				
 				Logger.log("Removing transitivity closures");
-				Set<Episode> simpEpisode = transitivityClosure.remTransClosure(Sets.newHashSet(e));
-				Episode ep = wrap(simpEpisode);
+				Episode ep = transitivityClosure.remTransClosure(e);
 				
 				Logger.log("Writting episode number %s.\n", episodeID);
 				DirectedGraph<Fact, DefaultEdge> epGraph = episodeGraphConverter.convert(ep, eventMapping);
@@ -101,9 +99,9 @@ public class QueriesGraphGenerator {
 				
 				if (!queries.isEmpty()) {
 					for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
-						Set<Episode> simQueries = transitivityClosure.remTransClosure(entry.getValue());
-						for (Episode query : simQueries) {
-							DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(query, eventMapping);
+						for (Episode query : entry.getValue()) {
+							Episode simQuery = transitivityClosure.remTransClosure(query);
+							DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(simQuery, eventMapping);
 							writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
 							queryID++;
 						}
@@ -112,13 +110,6 @@ public class QueriesGraphGenerator {
 				episodeID++;
 			}
 		}
-	}
-
-	private Episode wrap(Set<Episode> simpEpisode) {
-		for (Episode episode : simpEpisode) {
-			return episode;
-		} 
-		return null;
 	}
 
 	private String getQueryPath(String directory, int episodeID, int queryID) {

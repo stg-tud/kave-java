@@ -29,7 +29,6 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -88,7 +87,7 @@ public class PatternsIdentifier {
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
-//		 checkMethodSize(stream, events);
+		// checkMethodSize(stream, events);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
@@ -129,9 +128,9 @@ public class PatternsIdentifier {
 		int bigMethods = 0;
 		List<Fact> keepMethod = new LinkedList<Fact>();
 		for (List<Fact> method : stream) {
-//			if (method.size() >= 446) {
-//				continue;
-//			}
+			// if (method.size() >= 446) {
+			// continue;
+			// }
 			if (method.size() > 500) {
 				bigMethods++;
 			}
@@ -187,11 +186,9 @@ public class PatternsIdentifier {
 						methodsOrderRelation.addMethod(episode, method, listEvents);
 					}
 				}
-				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
-						+ methodsNoOrderRelation.getOccurrences() + "\t" + methodsOrderRelation.getOccurrences()
-						+ "\n");
-				Logger.log("Writting pattern %d", patternId);
-				patternsWriter(Sets.newHashSet(episode), trainEvents, numbRepos, frequency, entropy, patternId);
+				sb.append(patternId + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
+						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
+				patternsWriter(episode, trainEvents, numbRepos, frequency, entropy, patternId);
 				patternId++;
 			}
 			sb.append("\n");
@@ -200,17 +197,14 @@ public class PatternsIdentifier {
 		FileUtils.writeStringToFile(getValidationPath(getPath(numbRepos, frequency, entropy)), sb.toString());
 	}
 
-	private void patternsWriter(Set<Episode> episodes, List<Event> events, int numbRepos, int frequency, double entropy,
+	private void patternsWriter(Episode episode, List<Event> events, int numbRepos, int frequency, double entropy,
 			int pId) throws IOException {
-		Set<Episode> closedEpisodes = transClosure.remTransClosure(episodes);
+		Episode closedEpisodes = transClosure.remTransClosure(episode);
 
-		for (Episode ep : closedEpisodes) {
-			File filePath = getPath(numbRepos, frequency, entropy);
+		File filePath = getPath(numbRepos, frequency, entropy);
 
-			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(ep, events);
-			graphWriter.write(graph, getGraphPaths(filePath, pId));
-			pId++;
-		}
+		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(closedEpisodes, events);
+		graphWriter.write(graph, getGraphPaths(filePath, pId));
 	}
 
 	private List<Event> mapToList(Map<Event, Integer> events) {

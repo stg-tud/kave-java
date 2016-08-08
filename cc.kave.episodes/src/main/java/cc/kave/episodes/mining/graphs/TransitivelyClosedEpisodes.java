@@ -15,13 +15,8 @@
  */
 package cc.kave.episodes.mining.graphs;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
@@ -29,25 +24,18 @@ import cc.recommenders.datastructures.Tuple;
 
 public class TransitivelyClosedEpisodes {
 
-	public Set<Episode> remTransClosure(Set<Episode> allEpisodes) {
-		
-		assertTrue(!allEpisodes.isEmpty(), "The list of learned episodes is empty!");
-
-		Set<Episode> updatedEpisodes = Sets.newHashSet();
-		for (Episode episode : allEpisodes) {
-			if (episode.getNumFacts() != episode.getNumEvents()) {
-				Episode newEpisode = reduceRelations(episode);
-					updatedEpisodes.add(newEpisode);
-				} else {
-					updatedEpisodes.add(episode);
-				}
-			}
-		return updatedEpisodes;
+	public Episode remTransClosure(Episode episode) {
+		if (episode.getNumFacts() != episode.getNumEvents()) {
+			return reduceRelations(episode);
+		} else {
+			return episode;
+		}
 	}
 
 	private Episode reduceRelations(Episode episode) {
 		List<List<Fact>> allPaths = new LinkedList<List<Fact>>();
-		Episode episodeResult = new Episode(){};
+		Episode episodeResult = new Episode() {
+		};
 		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
 				addFactPath(fact, allPaths);
@@ -63,7 +51,7 @@ public class TransitivelyClosedEpisodes {
 		episodeResult.addListOfFacts(finalRelations);
 		episodeResult.setFrequency(episode.getFrequency());
 		episodeResult.setBidirectMeasure(episode.getBidirectMeasure());
-		
+
 		return episodeResult;
 	}
 

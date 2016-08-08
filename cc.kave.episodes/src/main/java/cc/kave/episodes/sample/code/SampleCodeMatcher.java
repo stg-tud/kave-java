@@ -26,7 +26,6 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -36,8 +35,8 @@ import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.FileReader;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
 
 public class SampleCodeMatcher {
@@ -66,16 +65,15 @@ public class SampleCodeMatcher {
 		List<Event> mapper = mapParser.parse(numbRepos);
 		
 		int nodeLevel = allEpisodes.size() - 1;
-		Set<Episode> closedEpisodes = transitivity.remTransClosure(allEpisodes.get(nodeLevel));
-		
 		int graphID = 0;
 		
-		for (Episode ep : closedEpisodes) {
-			for (Fact fact : ep.getFacts()) {
+		for (Episode ep : allEpisodes.get(nodeLevel)) {
+			Episode closedEpisode = transitivity.remTransClosure(ep);
+			for (Fact fact : closedEpisode.getFacts()) {
 				int factID = fact.getFactID();
 				Event event = mapper.get(factID);
 				if (event.getMethod().getDeclaringType().getFullName().contains(type)) {
-					DirectedGraph<Fact, DefaultEdge> graph = graphConverter.convert(ep, mapper);
+					DirectedGraph<Fact, DefaultEdge> graph = graphConverter.convert(closedEpisode, mapper);
 					String fileName = "graph" + graphID + ".txt";
 					graphWriter.write(graph, fileName);
 					graphID++;
