@@ -29,6 +29,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -84,43 +85,43 @@ public class PatternsIdentifier {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
 		// Logger.log("Number of events: %d", events.size());
-//		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
-//		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
+		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 
-		 checkMethodSize(stream, events);
+//		 checkMethodSize(stream, events);
 
-//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-//			if (entry.getKey() < 2) {
-//				continue;
-//			}
-//			// Episode debug = createDebuggingEpisode();
-//			for (Episode episode : entry.getValue()) {
-//				Set<Fact> episodeFacts = episode.getEvents();
-//				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
-//
-//				for (List<Fact> method : stream) {
-//					if (method.size() < 3) {
-//						continue;
-//					}
-//					if (method.containsAll(episodeFacts)) {
-//						methodsOrderRelation.addMethod(episode, method, events);
-//						// if (episode.equals(debug)) {
-//						// Logger.log("Method: %s\noccurrence: %d",
-//						// method.toString(),
-//						// methodsOrderRelation.getOccurrences());
-//						// }
-//					}
-//				}
-//				if (methodsOrderRelation.getOccurrences() < episode.getFrequency()) {
-//					Logger.log("Episode: %s", episode.toString());
-//					Logger.log("Frequency = %d, occurrence = %d", episode.getFrequency(),
-//							methodsOrderRelation.getOccurrences());
-//					throw new Exception("Episode is not found sufficient number of times on the training stream!");
-//				}
-//			}
-//			Logger.log("Processed %d-node patterns!", entry.getKey());
-//		}
-//		Logger.log("All patterns are identified in the training data!");
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			if (entry.getKey() < 2) {
+				continue;
+			}
+			// Episode debug = createDebuggingEpisode();
+			for (Episode episode : entry.getValue()) {
+				Set<Fact> episodeFacts = episode.getEvents();
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
+
+				for (List<Fact> method : stream) {
+					if (method.size() < 3) {
+						continue;
+					}
+					if (method.containsAll(episodeFacts)) {
+						methodsOrderRelation.addMethod(episode, method, events);
+						// if (episode.equals(debug)) {
+						// Logger.log("Method: %s\noccurrence: %d",
+						// method.toString(),
+						// methodsOrderRelation.getOccurrences());
+						// }
+					}
+				}
+				if (methodsOrderRelation.getOccurrences() < episode.getFrequency()) {
+					Logger.log("Episode: %s", episode.toString());
+					Logger.log("Frequency = %d, occurrence = %d", episode.getFrequency(),
+							methodsOrderRelation.getOccurrences());
+					throw new Exception("Episode is not found sufficient number of times on the training stream!");
+				}
+			}
+			Logger.log("Processed %d-node patterns!", entry.getKey());
+		}
+		Logger.log("All patterns are identified in the training data!");
 	}
 
 	private void checkMethodSize(List<List<Fact>> stream, List<Event> events) {
@@ -176,7 +177,6 @@ public class PatternsIdentifier {
 			}
 			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
 			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-			patternsWriter(entry.getValue(), trainEvents, numbRepos, frequency, entropy, patternId);
 			for (Episode episode : entry.getValue()) {
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
@@ -190,6 +190,8 @@ public class PatternsIdentifier {
 				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
 						+ methodsNoOrderRelation.getOccurrences() + "\t" + methodsOrderRelation.getOccurrences()
 						+ "\n");
+				Logger.log("Writting pattern %d", patternId);
+				patternsWriter(Sets.newHashSet(episode), trainEvents, numbRepos, frequency, entropy, patternId);
 				patternId++;
 			}
 			sb.append("\n");
