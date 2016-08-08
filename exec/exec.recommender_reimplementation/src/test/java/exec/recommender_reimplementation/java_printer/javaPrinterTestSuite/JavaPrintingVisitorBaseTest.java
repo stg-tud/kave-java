@@ -15,7 +15,6 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 
 import java.util.Arrays;
