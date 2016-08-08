@@ -156,6 +156,7 @@ public class ProposalsSorterTest {
 		Episode p6 = createEpisode("5", "2", "3", "4", "5>2", "5>3", "5>4", "2>4", "3>4");
 		Episode p7 = createEpisode("1", "2", "3", "5", "1>2", "1>3", "1>5", "2>5", "3>5");
 		//deletions
+		Episode p8 = createEpisode("1", "2", "3", "1>2", "1>3");
 		patterns = Sets.newHashSet(p1, p2, p3, p4, p5, p6, p7);
 		
 		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
