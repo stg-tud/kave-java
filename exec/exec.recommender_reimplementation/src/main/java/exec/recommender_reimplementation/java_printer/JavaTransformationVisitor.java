@@ -22,6 +22,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationExpression;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static exec.recommender_reimplementation.java_printer.JavaNameUtils.transformDelegateTypeInMethodName;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -195,6 +196,7 @@ public class JavaTransformationVisitor extends TraversingIdentityVisitor<Void> {
 	@Override
 	public ISSTNode visit(IInvocationExpression entity, Void context) {
 		InvocationExpression invoke = (InvocationExpression) entity;
+		invoke.setMethodName(transformDelegateTypeInMethodName(entity.getMethodName()));
 		List<ISimpleExpression> parameters = invoke.getParameters();
 		List<ISimpleExpression> parametersClone = new ArrayList<>(parameters);
 		for (ISimpleExpression simpleExpression : parametersClone) {
@@ -449,6 +451,7 @@ public class JavaTransformationVisitor extends TraversingIdentityVisitor<Void> {
 		}
 		return false;
 	}
+
 
 	@Override
 	protected void visitStatements(List<IStatement> statements, Void context) {

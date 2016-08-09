@@ -15,9 +15,15 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
-import static org.junit.Assert.*;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationStatement;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.propertyReference;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -68,6 +74,26 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	}
 
 	@Test
+	public void handleGenericsForFieldDeclarations() {
+		SST sst = defaultSST(assign(varRef("someVariable"),
+				refExpr(fieldRef("other",
+						field(type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"),
+								type("T1"), "f1")))));
+
+		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
+
+		Map<ITypeName, SST> expected = Maps.newHashMap();
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(type("T1"));
+		expectedSST.getFields()
+				.add(fieldDecl(field(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "f1")));
+
+		expected.put(type("T1"), expectedSST);
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
 	public void addsPropertyDeclarationOnPropertyReference() {
 		SST sst = defaultSST(assign(varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
@@ -79,6 +105,25 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		expectedSST.setEnclosingType(type("T1"));
 		expectedSST.getProperties().add(
 				propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [T1,P1].P")));
+
+		expected.put(type("T1"), expectedSST);
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void handleGenericsForPropertyDeclaration() {
+		SST sst = defaultSST(assign(varRef("someVariable"), refExpr(propertyReference(varRef("other"),
+				"get set [System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]],P] [T1,P1].P"))));
+
+		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
+
+		Map<ITypeName, SST> expected = Maps.newHashMap();
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(type("T1"));
+		expectedSST.getProperties()
+				.add(propertyDecl(PropertyName
+						.newPropertyName("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P")));
 
 		expected.put(type("T1"), expectedSST);
 
@@ -213,6 +258,33 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
 
 		assertTrue(actual.isEmpty());
+	}
+
+	@Test
+	public void handlesGenericsForMethods() {
+		SST sst = defaultSST(
+				invocationStatement("super", method(voidType,
+						type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"), "m1")),
+				invocationStatement("super",
+						method(type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"),
+								type("T1"), "m2")));
+
+		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
+
+		Map<ITypeName, SST> expected = Maps.newHashMap();
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(type("System.Collections.Dictionary`2[[TKey],[TValue]]"));
+		expectedSST.getMethods()
+				.add(methodDecl(method(voidType, type("System.Collections.Dictionary`2[[TKey],[TValue]]"), "m1")));
+		SST expectedSST2 = new SST();
+		expectedSST2.setEnclosingType(type("T1"));
+		expectedSST2.getMethods()
+				.add(methodDecl(method(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "m2"),
+						returnStatement(constant("null"))));
+		expected.put(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), expectedSST);
+		expected.put(type("T1"), expectedSST2);
+
+		assertEquals(expected, actual);
 	}
 
 	private Map<ITypeName, SST> generatePhantomClasses(SST sst) {

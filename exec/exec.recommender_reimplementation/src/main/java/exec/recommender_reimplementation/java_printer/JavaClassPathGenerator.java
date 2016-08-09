@@ -37,15 +37,24 @@ public class JavaClassPathGenerator {
 		Set<ISST> convertedSSTs = classGenerator.convert(ssts);
 		for (ISST sst : convertedSSTs) {
 			ITypeName type = sst.getEnclosingType();
-			if(type.isUnknown()) continue;
+			if (type.isDelegateType()) {
+				System.err.println("DelegateType " + type);
+				continue;
+			}
 			String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
 			String javaCode = printPhantomClass(sst);
 			javaCode = appendPackageDeclaration(getPackageName(type), javaCode);
 			File file = new File(nestedFolderPath + "\\" + type.getName() + ".java");
 			if(file.exists()) {
-				throw new RuntimeException("ClassPath file already exists");
+				throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
 			}
-			FileUtils.writeStringToFile(file, javaCode);
+			try {
+				FileUtils.writeStringToFile(file, javaCode);
+			}
+			catch (IOException exception) {
+				System.err.println("File Name not valid	" + file.getAbsolutePath());
+				continue;
+			}
 		}
 	}
 

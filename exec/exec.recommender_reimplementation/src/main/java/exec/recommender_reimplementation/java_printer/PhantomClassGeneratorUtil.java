@@ -22,6 +22,8 @@ import java.util.Map;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
@@ -30,34 +32,34 @@ import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
+import cc.kave.commons.utils.TypeErasure;
 
 public class PhantomClassGeneratorUtil {
-	
+
 	public static void addFieldDeclarationToSST(IFieldReference fieldRef, SST sst) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setName(fieldRef.getFieldName());
+		fieldDecl.setName(FieldName.newFieldName(TypeErasure.of(fieldRef.getFieldName().getIdentifier())));
 		sst.getFields().add(fieldDecl);
 	}
 
 	public static void addMethodDeclarationToSST(IInvocationExpression invocation, SST sst) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
-		IMethodName methodName = invocation.getMethodName();
+		IMethodName methodName = TypeErasure.of(invocation.getMethodName());
 		methodDecl.setName(methodName);
-		if(!methodName.getReturnType().isVoidType()) {
+		if (!methodName.getReturnType().isVoidType()) {
 			addReturnStatement(methodDecl, methodName);
 		}
-		
+
 		sst.getMethods().add(methodDecl);
 	}
 
 	public static void addReturnStatement(MethodDeclaration methodDecl, IMethodName methodName) {
 		ReturnStatement returnStatement = new ReturnStatement();
 		ITypeName returnType = methodName.getReturnType();
-		if(isJavaValueType(methodName.getReturnType())) {
+		if (isJavaValueType(methodName.getReturnType())) {
 			String defaultValue = JavaPrintingUtils.getDefaultValueForType(returnType);
 			returnStatement.setExpression(constant(defaultValue));
-		}
-		else{
+		} else {
 			returnStatement.setExpression(constant("null"));
 		}
 		methodDecl.getBody().add(returnStatement);
@@ -65,23 +67,26 @@ public class PhantomClassGeneratorUtil {
 
 	public static void addPropertyDeclarationToSST(IPropertyReference propertyRef, SST sst) {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(propertyRef.getPropertyName());
+		propertyDecl
+				.setName(PropertyName.newPropertyName(TypeErasure.of(propertyRef.getPropertyName().getIdentifier())));
 		sst.getProperties().add(propertyDecl);
 	}
 
 	public static SST createNewSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst = new SST();
-		sst.setEnclosingType(type);
-		context.put(type, sst);
+		ITypeName typeWithoutGenerics = TypeErasure.of(type);
+		sst.setEnclosingType(typeWithoutGenerics);
+		context.put(typeWithoutGenerics, sst);
 		return sst;
 	}
 
 	public static SST getOrCreateSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst;
-		if (context.containsKey(type)) {
-			sst = context.get(type);
+		ITypeName typeWithoutGenerics = TypeErasure.of(type);
+		if (context.containsKey(typeWithoutGenerics)) {
+			sst = context.get(typeWithoutGenerics);
 		} else {
-			sst = createNewSST(type, context);
+			sst = createNewSST(typeWithoutGenerics, context);
 		}
 		return sst;
 	}

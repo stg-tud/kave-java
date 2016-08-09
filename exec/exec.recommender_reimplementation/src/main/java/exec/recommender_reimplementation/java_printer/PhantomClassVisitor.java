@@ -15,8 +15,15 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.*;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addFieldDeclarationToSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addMethodDeclarationToSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addPropertyDeclarationToSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.createNewSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isJavaValueType;
+
 import java.util.Map;
+
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.names.ITypeName;
@@ -30,7 +37,6 @@ import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
 public class PhantomClassVisitor extends TraversingVisitor<Map<ITypeName, SST>, Void> {
-
 		
 	private ITypeName className;
 	private Map<IVariableReference,ITypeName> referenceToTypeMap;
@@ -72,7 +78,9 @@ public class PhantomClassVisitor extends TraversingVisitor<Map<ITypeName, SST>, 
 	private void handleReceiverType(IInvocationExpression invocation, Map<ITypeName, SST> context) {
 		if(referenceToTypeMap.containsKey(invocation.getReference())) {
 			ITypeName receiverType = referenceToTypeMap.get(invocation.getReference());
-			addMethodDeclarationToSST(invocation, getOrCreateSST(receiverType, context));
+			if (!receiverType.isDelegateType()) {
+				addMethodDeclarationToSST(invocation, getOrCreateSST(receiverType, context));
+			}
 		}
 	}
 

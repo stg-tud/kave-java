@@ -34,6 +34,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
@@ -47,6 +48,7 @@ import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
@@ -98,6 +100,20 @@ public class JavaTransformationTest extends JavaTransformationBaseTest {
 				Lists.newArrayList(declareVar("x", listType), assign(varRef("y"), indexAccessExpression)),
 				declareVar("x", listType),
 				assign(varRef("y"), invocation("x", method(null, listType, "get"), constant("1"))));
+	}
+
+	@Test
+	public void transformsDelegateMethods() {
+		InvocationExpression delegateInvoke = new InvocationExpression();
+		delegateInvoke.setMethodName(MethodName.newMethodName(
+				"[System.Void, mscorlib, 4.0.0.0] [d:[System.Void, mscorlib, 4.0.0.0] [P1.DelegateTest+Del, P1].([System.String, mscorlib, 4.0.0.0] message)].Invoke([System.String, mscorlib, 4.0.0.0] message)"));
+
+		InvocationExpression expected = new InvocationExpression();
+		expected.setMethodName(MethodName
+				.newMethodName(
+						"[System.Void, mscorlib, 4.0.0.0] [P1.DelegateTest, P1].Delegate$Invoke([System.String, mscorlib, 4.0.0.0] message)"));
+
+		assertNode(delegateInvoke, expected);
 	}
 
 	@Test
@@ -291,7 +307,8 @@ public class JavaTransformationTest extends JavaTransformationBaseTest {
 
 	@Test
 	public void testPropertyGet() {
-		assertAroundMethodDeclaration(Lists.newArrayList(assign(varRef("var"),
+		assertAroundMethodDeclaration(
+				Lists.newArrayList(assign(varRef("var"),
 						refExpr(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P")))), //
 				assign(varRef("var"),
 						invocation("this", method(type("PropertyType"), type("DeclaringType"), "get$P"))));

@@ -17,7 +17,12 @@ package exec.recommender_reimplementation.java_printer;
 
 import java.util.Map;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.MethodName;
 
 public class JavaNameUtils {
 	public static final Map<String,String> C_SHARP_TO_JAVA_VALUE_TYPE_MAPPING =
@@ -47,4 +52,19 @@ public class JavaNameUtils {
         }
         return typeName;
     }
+
+	public static IMethodName transformDelegateTypeInMethodName(IMethodName methodName) {
+		if (methodName.getDeclaringType().isDelegateType()) {
+			String parameterStr = Joiner.on(", ")
+					.join(methodName.getParameters().stream().map(p -> p.getIdentifier()).toArray());
+			String methodIdentifier = String.format("[%1$s] [%2$s].Delegate$%3$s(%4$s)", methodName.getReturnType(),
+					methodName.getDeclaringType().getName(), "Invoke", parameterStr);
+			return MethodName.newMethodName(methodIdentifier);
+		}
+		return methodName;
+	}
+
+	public static ITypeName transformDelegateTypeName(ITypeName delegateType) {
+		return delegateType.getDeclaringType();
+	}
 }

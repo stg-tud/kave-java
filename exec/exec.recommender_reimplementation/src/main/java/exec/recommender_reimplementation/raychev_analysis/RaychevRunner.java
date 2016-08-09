@@ -15,8 +15,11 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -46,26 +49,29 @@ public class RaychevRunner {
 			e.printStackTrace();
 		}
 
-		StringBuilder sb = new StringBuilder();
 		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
-			try {
-				Set<ConcreteHistory> extractedHistories = historyExtractor.extractHistories(context);
-				sb.append(historyExtractor.getHistoryAsString(extractedHistories));
-				sb.append("\n");
-			} catch (Exception e) {
-				continue;
+			try (FileWriter fw = new FileWriter(FOLDERPATH + "\\train_all", true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					PrintWriter out = new PrintWriter(bw)) {
+				try {
+					Set<ConcreteHistory> extractedHistories = historyExtractor.extractHistories(context);
+					out.println(historyExtractor.getHistoryAsString(extractedHistories));
+				} catch (Exception e) {
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
-		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\train_all"), sb.toString());
 	}
 
 	public static void queryBuilder() {
 		List<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = ContextReader.GetContexts(Paths.get(FOLDERPATH.toString() + "\\Queries"));
+			contextList = ContextReader.GetContexts(Paths.get(FOLDERPATH.toString() + "\\jimradford"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -76,11 +82,15 @@ public class RaychevRunner {
 			try {
 				String javaCode = queryExtractor.createJavaCodeForQuery(context);
 				if (!javaCode.isEmpty()) {
-					writeJavaFile(javaCode, context.getSST());
-					ssts.add(context.getSST());
+					ISST sst = context.getSST();
+					if (!sst.getEnclosingType().isUnknown()) {
+						writeJavaFile(javaCode, sst);
+						ssts.add(sst);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				continue;
 			}
 		}
 		writeClassPaths(ssts);
@@ -101,8 +111,10 @@ public class RaychevRunner {
 				String javaCode = queryExtractor.createJavaCodeForQuery(completionEvent);
 				if (!javaCode.isEmpty()) {
 					ISST sst = completionEvent.getContext().getSST();
-					writeJavaFile(javaCode, sst);
-					ssts.add(sst);
+					if (!sst.getEnclosingType().isUnknown()) {
+						writeJavaFile(javaCode, sst);
+						ssts.add(sst);
+					}
 				}
 			} catch (Exception e) {
 				continue;
@@ -117,16 +129,16 @@ public class RaychevRunner {
 	}
 	
 	private static void writeClassPaths(Set<ISST> ssts) {
-		JavaClassPathGenerator phantomClassGenerator = new JavaClassPathGenerator(FOLDERPATH.toString()+ "\\Queries"); 
+		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(FOLDERPATH.toString()+ "\\Queries"); 
 		try {
-			phantomClassGenerator.generate(ssts);
+			classPathGenerator.generate(ssts);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main(String[] args) throws IOException {
-		sentenceBuilder();
+		// sentenceBuilder();
 		queryBuilder();
 //		queryFromCompletionEvents();
 	}
