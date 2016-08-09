@@ -15,6 +15,8 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types;
 
+import cc.kave.commons.model.naming.types.ITypeName;
+
 public class TypeUtils {
 
 	public static boolean isUnknownTypeIdentifier(String identifier) {
@@ -22,4 +24,8 @@ public class TypeUtils {
 		return false;
 	}
 
+	public static ITypeName createTypeName(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -22,6 +22,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyVersion;
@@ -29,8 +30,13 @@ import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
 import cc.kave.commons.model.naming.types.IPredefinedTypeName;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.exceptions.ValidationException;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
+@RunWith(JUnitParamsRunner.class)
 public class PredefinedTypeNameTest {
+
+	@SuppressWarnings("unused")
 	private static String[][] predefinedTypeSource() {
 		return new String[][] { //
 				new String[] { "sbyte", "System.SByte", "p:sbyte" }, //
@@ -53,40 +59,33 @@ public class PredefinedTypeNameTest {
 
 	private PredefinedTypeName sut;
 
-	public void ShouldParseShortName_Params() {
-		for (String[] tc : predefinedTypeSource()) {
-			ShouldParseShortName(tc[0], tc[1], tc[2]);
-			ShouldParseFullName(tc[0], tc[1], tc[2]);
-			ShouldParseNamespace(tc[0], tc[1], tc[2]);
-			ShouldParseAssembly(tc[0], tc[1], tc[2]);
-			ShouldRecognizeIdentifier(tc[0], tc[1], tc[2]);
-			DefaultValues(tc[0], tc[1], tc[2]);
-			ArrayHandling(tc[0], tc[1], tc[2]);
-		}
-	}
-
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldParseShortName(String shortName, String fullName, String id) {
 		assertEquals(shortName, new PredefinedTypeName(id).getName());
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldParseFullName(String shortName, String fullName, String id) {
 		assertEquals(fullName, new PredefinedTypeName(id).getFullName());
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldParseNamespace(String shortName, String fullName, String id) {
 		assertEquals(new NamespaceName("System"), new PredefinedTypeName(id).getNamespace());
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldParseAssembly(String shortName, String fullName, String id) {
 		assertEquals(new AssemblyName(String.format("mscorlib, %s", new AssemblyVersion().getIdentifier())),
 				new PredefinedTypeName(id).getAssembly());
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldReturnFullType(String shortName, String fullName, String id) {
 		sut = new PredefinedTypeName(id);
 
@@ -101,7 +100,8 @@ public class PredefinedTypeNameTest {
 		new PredefinedTypeName("p:int[]").getFullType();
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ShouldRecognizeIdentifier(String shortName, String fullName, String id) {
 		assertTrue(PredefinedTypeName.IsPredefinedTypeNameIdentifier(id));
 		assertFalse(ArrayTypeName.isArrayTypeNameIdentifier(id));
@@ -117,7 +117,8 @@ public class PredefinedTypeNameTest {
 		new PredefinedTypeName(invalidId);
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void DefaultValues(String shortName, String fullName, String id) {
 		IPredefinedTypeName sut = new PredefinedTypeName(id);
 
@@ -144,7 +145,8 @@ public class PredefinedTypeNameTest {
 		AssertIsTrueIf(sut.isVoidType(), shortName, "void");
 	}
 
-	// TODO NameUpdate: use parameter runner
+	@Test
+	@Parameters(method = "predefinedTypeSource")
 	public void ArrayHandling(String shortName, String fullName, String id) {
 		if ("void".equals(shortName)) {
 			return;
@@ -241,21 +243,12 @@ public class PredefinedTypeNameTest {
 
 	@Test(expected = ValidationException.class)
 	public void ShouldRejectVoidArrays() {
-		// ReSharper disable once ObjectCreationAsStatement
 		new PredefinedTypeName("p:void[]");
 	}
 
-	// TODO NameUpdate: use parameter runner
-	@Test
-	public void ShouldRejectInvalidNames() {
-		for (String invalidId : new String[] { "p:int[", "p:int]", "p:int][" }) {
-			boolean wasThrown = false;
-			try {
-				new PredefinedTypeName(invalidId);
-			} catch (ValidationException e) {
-				wasThrown = true;
-			}
-			assertTrue(wasThrown);
-		}
+	@Test(expected = ValidationException.class)
+	@Parameters({ "p:int[", "p:int]", "p:int][" })
+	public void ShouldRejectInvalidNames(String invalidId) {
+		new PredefinedTypeName(invalidId);
 	}
 }
