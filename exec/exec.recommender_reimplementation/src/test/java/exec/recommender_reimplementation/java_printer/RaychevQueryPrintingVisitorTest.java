@@ -19,10 +19,8 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.completionExpr;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
-import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
-import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor.InvalidJavaCodeException;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
 public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseTest{
 
@@ -30,25 +28,15 @@ public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseT
 	public void addsHoleMethodOnCompletionExpression() {
 		assertPrint(completionExpr("variable"), "UNK.Must1(variable)");
 	}
-	
+
 	@Test(expected = InvalidJavaCodeException.class)
 	public void exceptionWhenCompletionExpressionHasNoValidVariableReference() {
 		assertPrint(new CompletionExpression(), "");
 	}
-	
+
 	@Test(expected = InvalidJavaCodeException.class)
 	public void exceptionWhenCompletionExpressionHasEmptyVariableReference() {
 		assertPrint(completionExpr(""), "");
-	}
-	
-	@Test(expected = InvalidJavaCodeException.class)
-	public void exceptionOnDelegateDeclaration() {
-		assertPrint(new DelegateDeclaration(), "");
-	}
-	
-	@Test(expected = InvalidJavaCodeException.class)
-	public void exceptionOnEventDeclaration() {
-		assertPrint(new EventDeclaration(), "");
 	}
 
 }

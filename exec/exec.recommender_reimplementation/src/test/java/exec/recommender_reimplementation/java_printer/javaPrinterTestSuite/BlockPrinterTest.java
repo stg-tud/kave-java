@@ -15,10 +15,12 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.forEachLoop;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.lockBlock;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.usingBlock;
+
 import org.junit.Test;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
-import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -43,15 +45,6 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 				"synchronized (variable)", "{", "    continue;", "}");
 	}
 	
-	@Test
-	public void testEmptyConditionInIfElseBlock() {
-		IfElseBlock sst = new IfElseBlock();
-		sst.getThen().add(new ContinueStatement());
-		sst.getElse().add(new BreakStatement());
-
-		assertPrint(sst, "if (false)", "{", "    continue;", "}", "else", "{", "    break;", "}");
-	}
-
 	@Test
 	public void testUncheckedBlock() {
 		UncheckedBlock sst = new UncheckedBlock();

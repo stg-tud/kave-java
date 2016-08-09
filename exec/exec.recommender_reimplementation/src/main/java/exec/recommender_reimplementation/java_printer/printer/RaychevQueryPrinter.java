@@ -18,21 +18,25 @@ package exec.recommender_reimplementation.java_printer.printer;
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
 
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
 import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor;
 
-public class RaychevQueryPrinter implements IJavaPrinter {
+public class RaychevQueryPrinter extends JavaPrinter {
 
 	@Override
-	public String print(ISST sst) {
-		JavaPrintingContext context = new JavaPrintingContext();
+	public String print(Context context) {
+		ISST sst = transform(context);
+		JavaPrintingContext printingContext = getPrintingContext(context);
+
 		StringBuilder sb = new StringBuilder();
-		sst.accept(new RaychevQueryPrintingVisitor(sst, false), context);
-		if (!context.toString().isEmpty()) {
+		sst.accept(new RaychevQueryPrintingVisitor(context.getSST(), false), printingContext);
+
+		if (!printingContext.toString().isEmpty()) {
 			appendPackageDeclaration(sb);
 			appendImportListToString(getUsedTypes(sst), sb);
-			sb.append(context.toString());
+			sb.append(printingContext.toString());
 			return sb.toString();
 		}
 		return "";

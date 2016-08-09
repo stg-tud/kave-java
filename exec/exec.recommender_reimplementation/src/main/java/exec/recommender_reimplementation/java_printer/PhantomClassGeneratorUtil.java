@@ -87,9 +87,9 @@ public class PhantomClassGeneratorUtil {
 	}
 
 	public static boolean isJavaValueType(ITypeName type) {
-		if (type.getFullName().equals("System.String")) {
-			return true;
-		}
+		// if (type.getFullName().equals("System.String")) {
+		// return true;
+		// }
 		String aliasType = getTypeAliasFromFullTypeName(type.getFullName());
 		if (!aliasType.equals(type.getFullName())) {
 			return true;

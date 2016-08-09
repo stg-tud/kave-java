@@ -355,4 +355,5 @@ public class TraversingIdentityVisitor<TContext> extends TraversingVisitor<TCont
 		super.visit(indexAccessRef, context);
 		return indexAccessRef;
 	}
+
 }

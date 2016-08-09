@@ -15,12 +15,8 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
-import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
-import cc.kave.commons.model.ssts.references.IUnknownReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
@@ -30,25 +26,6 @@ public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 		super(sst,setPublicModifier);
 	}
 
-	@SuppressWarnings("serial")
-	public class InvalidJavaCodeException extends RuntimeException {
-	}
-
-	@Override
-	public Void visit(IDelegateDeclaration stmt, SSTPrintingContext context) {
-		throw new InvalidJavaCodeException();
-	}
-
-	@Override
-	public Void visit(IEventDeclaration stmt, SSTPrintingContext context) {
-		throw new InvalidJavaCodeException();
-	}
-
-	@Override
-	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
-		throw new InvalidJavaCodeException();
-	}
-	
 //	@Override
 //	public Void visit(IUnknownReference unknownRef, SSTPrintingContext context) {
 //		throw new InvalidJavaCodeException();

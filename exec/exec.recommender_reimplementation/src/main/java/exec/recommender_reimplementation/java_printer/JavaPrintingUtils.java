@@ -54,6 +54,8 @@ public class JavaPrintingUtils {
 		Iterator<ITypeName> classesIterator = classes.iterator();
 		while (classesIterator.hasNext()) {
 			ITypeName classType = classesIterator.next();
+			if (classType.isUnknown())
+				continue;
 			sb.append("import").append(" ").append(classType.getFullName()).append(";");
 
 			if (classesIterator.hasNext()) {

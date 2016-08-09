@@ -22,8 +22,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.ssts.ISST;
-import exec.recommender_reimplementation.java_printer.RaychevQueryPrintingVisitor.InvalidJavaCodeException;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;
 
 public class QueryExtractor {
@@ -46,11 +45,10 @@ public class QueryExtractor {
 	}
 
 	public String createJavaCodeForQuery(Context context) {
-		ISST sst = context.getSST();
-
 		try {
-			return new RaychevQueryPrinter().print(sst);
+			return new RaychevQueryPrinter().print(context);
 		} catch (InvalidJavaCodeException e) {
+			e.printStackTrace();
 			return "";
 		}
 	}

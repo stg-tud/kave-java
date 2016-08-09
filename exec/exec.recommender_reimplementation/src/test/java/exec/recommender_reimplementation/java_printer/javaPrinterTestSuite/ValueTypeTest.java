@@ -15,7 +15,7 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 
@@ -26,6 +26,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.utils.json.JsonUtils;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
+import exec.recommender_reimplementation.java_printer.JavaTransformationVisitor;
 
 public class ValueTypeTest {
 
@@ -35,6 +36,8 @@ public class ValueTypeTest {
 		Context c = getTestSST();
 		JavaPrintingContext context = new JavaPrintingContext();
 		ISST sst = c.getSST();
+		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
+		sst = transformationVisitor.transform(sst, ISST.class);
 		sst.accept(new JavaPrintingVisitor(sst,false), context);
 		String expected = String.join("\n", "class ValueTypeTest", "{", "    void M1()", "    {", "        byte a;", "        a = 0;",
 				"        byte b;", "        b = 0;", "        short c;", "        c = 0;", "        short d;", "        d = 0;", "        int e;", "        e = 0;",

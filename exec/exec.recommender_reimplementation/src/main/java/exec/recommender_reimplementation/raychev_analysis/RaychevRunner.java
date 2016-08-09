@@ -25,13 +25,12 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
-import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.ssts.ISST;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.ContextReader;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 
@@ -81,7 +80,7 @@ public class RaychevRunner {
 					ssts.add(context.getSST());
 				}
 			} catch (Exception e) {
-				continue;
+				e.printStackTrace();
 			}
 		}
 		writeClassPaths(ssts);
@@ -127,7 +126,7 @@ public class RaychevRunner {
 	}
 
 	public static void main(String[] args) throws IOException {
-//		sentenceBuilder();
+		sentenceBuilder();
 		queryBuilder();
 //		queryFromCompletionEvents();
 	}

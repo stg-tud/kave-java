@@ -17,19 +17,25 @@ package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
 public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
@@ -96,7 +102,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrintWithCustomContext(sst, typeShape, "class TestClass extends SuperClass", "{", "}");
 	}
-	
+
 	@Test
 	public void SSTDeclaration_PublicModifier() {
 		ITypeName thisType = TypeName.newTypeName("TestClass,P");
@@ -106,110 +112,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrintWithPublicModifier(sst, "public class TestClass", "{", "}");
 	}
-	
-	@Test
-	public void PropertyDeclaration_GetterOnly() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get [PropertyType,P] [DeclaringType,P].P"));
-		
-		assertPrint(sst, "PropertyType $property_P;", "PropertyType getP()", "{", "    return $property_P;", "}", "");
-	}
 
-	@Test
-	public void PropertyDeclaration_SetterOnly() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("set [PropertyType,P] [DeclaringType,P].P"));
-
-		assertPrint(sst, "PropertyType $property_P;", "void setP(PropertyType value)", "{", "    $property_P = value;",
-				"}", "");
-	}
-
-	@Test
-	public void PropertyDeclaration() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		
-		assertPrint(sst, "PropertyType $property_P;", "PropertyType getP()", "{", "    return $property_P;", "}",
-				"void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
-	}
-	
-	@Test
-	public void PropertyDeclaration_Static() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
-		
-		assertPrint(sst, "static PropertyType $property_P;", "static PropertyType getP()", "{", "    return $property_P;", "}",
-				"static void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
-	}
-	
-	@Test
-	public void PropertyDeclaration_PublicModifier() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		
-		assertPrintWithPublicModifier(sst, "public PropertyType $property_P;", "public PropertyType getP()", "{", "    return $property_P;", "}",
-				"public void setP(PropertyType value)", "{", "    $property_P = value;", "}", "");
-	}
-
-	@Test
-	public void PropertyDeclaration_WithBodies() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.getGet().add(new ContinueStatement());
-		sst.getGet().add(new BreakStatement());
-		sst.getSet().add(new BreakStatement());
-		sst.getSet().add(new ContinueStatement());
-
-		assertPrint(sst, "PropertyType getP()", "{", "    continue;", "    break;", "}",
-				"void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
-	}
-	
-	@Test
-	public void PropertyDeclaration_WithBodies_Static() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.getGet().add(new ContinueStatement());
-		sst.getGet().add(new BreakStatement());
-		sst.getSet().add(new BreakStatement());
-		sst.getSet().add(new ContinueStatement());
-
-		assertPrint(sst, "static PropertyType getP()", "{", "    continue;", "    break;", "}",
-				"static void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
-	}
-	
-	@Test
-	public void PropertyDeclaration_WithBodies_PublicModifier() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.getGet().add(new ContinueStatement());
-		sst.getGet().add(new BreakStatement());
-		sst.getSet().add(new BreakStatement());
-		sst.getSet().add(new ContinueStatement());
-
-		assertPrintWithPublicModifier(sst, "public PropertyType getP()", "{", "    continue;", "    break;", "}",
-				"public void setP(PropertyType value)", "{", "    break;", "    continue;", "}", "");
-	}
-
-	@Test
-	public void PropertyDeclaration_WithOnlyGetterBody() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.getGet().add(new BreakStatement());
-
-		assertPrint(sst, "PropertyType getP()", "{", "    break;", "}",
-				"void setP(PropertyType value) { }", "");	
-	}
-
-	@Test
-	public void PropertyDeclaration_WithOnlySetterBody() {
-		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
-		sst.getSet().add(new BreakStatement());
-
-		assertPrint(sst, "PropertyType getP() { }",
-				"void setP(PropertyType value)", "{", "    break;",  "}", "");	
-	}
-	
 	@Test
 	public void FieldDeclaration() {
 		FieldDeclaration sst = new FieldDeclaration();
@@ -225,7 +128,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "static FieldType F;");
 	}
-	
+
 	@Test
 	public void FieldDeclaration_PublicModifier() {
 		FieldDeclaration sst = new FieldDeclaration();
@@ -241,7 +144,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "TD[] _delegatesField;");
 	}
-	
+
 	@Test
 	public void MethodDeclaration_EmptyMethod() {
 		MethodDeclaration sst = new MethodDeclaration();
@@ -257,7 +160,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "static ReturnType M(ParameterType p) { }");
 	}
-	
+
 	@Test
 	public void MethodDeclaration_PublicModifier() {
 		MethodDeclaration sst = new MethodDeclaration();
@@ -269,8 +172,8 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_PassedByReference() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName
-				.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
+		sst.setName(
+				MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
 
 		assertPrint(sst, "ReturnType M(int p) { }");
 	}
@@ -317,21 +220,78 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 		assertPrint(sst, "<?> ReturnType M(? p) { }");
 	}
-	
+
 	@Test
 	public void MethodDeclaration_Constructor() {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(MethodName.newMethodName("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
-		
+
 		assertPrint(sst, "DeclaringType() { }");
 	}
-	
+
 	@Test
 	public void MethodDeclaration_ConstructorWithParameters() {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(MethodName.newMethodName("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
-		
+
 		assertPrint(sst, "DeclaringType(ParameterType p) { }");
 	}
 
+	@Test
+	public void addsOverrideTag() {
+		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+		ITypeName superType = TypeName.newTypeName("SuperClass,P");
+
+		IMethodDeclaration methodDecl = methodDecl(method(type("T1"), thisType, "m1"));
+		TypeShape typeShape = new TypeShape();
+		MethodHierarchy methodHierarchy = new MethodHierarchy();
+		methodHierarchy.setElement(method(type("T1"), thisType, "m1"));
+		methodHierarchy.setSuper(method(type("T1"), superType, "m1"));
+		typeShape.setMethodHierarchies(Sets.newHashSet(methodHierarchy));
+
+		assertPrintWithCustomContext(methodDecl, typeShape,
+				"@Override", "T1 m1() { }");
+	}
+
+	@Test
+	public void ignoresObjectOverrides() {
+		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+		ITypeName superType = TypeName.newTypeName("System.Object,P");
+
+		IMethodDeclaration methodDecl = methodDecl(method(type("T1"), thisType, "m1"));
+		TypeShape typeShape = new TypeShape();
+		MethodHierarchy methodHierarchy = new MethodHierarchy();
+		methodHierarchy.setElement(method(type("T1"), thisType, "m1"));
+		methodHierarchy.setSuper(method(type("T1"), superType, "m1"));
+		typeShape.setMethodHierarchies(Sets.newHashSet(methodHierarchy));
+
+		assertPrintWithCustomContext(methodDecl, typeShape, "T1 m1() { }");
+	}
+
+	@Test
+	public void printEnum() {
+		ITypeName thisType = TypeName.newTypeName("e:TestClass,P");
+		
+		SST sst = new SST();
+		sst.setEnclosingType(thisType);
+		sst.setFields(Sets.newHashSet(
+				fieldDecl(field(thisType, thisType, "VAL1"))));
+
+		assertPrint(sst, "enum TestClass", "{", "    VAL1", "}");
+	}
+
+	@Test(expected = InvalidJavaCodeException.class)
+	public void exceptionOnDelegateDeclaration() {
+		assertPrint(new DelegateDeclaration(), "");
+	}
+
+	@Test(expected = InvalidJavaCodeException.class)
+	public void exceptionOnEventDeclaration() {
+		assertPrint(new EventDeclaration(), "");
+	}
+
+	@Test(expected = InvalidJavaCodeException.class)
+	public void exceptionOnPropertyDeclaration() {
+		assertPrint(new PropertyDeclaration(), "");
+	}
 }

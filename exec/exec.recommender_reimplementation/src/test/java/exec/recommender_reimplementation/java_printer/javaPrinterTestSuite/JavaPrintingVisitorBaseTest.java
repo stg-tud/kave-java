@@ -61,6 +61,9 @@ public class JavaPrintingVisitorBaseTest {
 		JavaPrintingContext context = new JavaPrintingContext();
 		context.setTypeShape(typeShape);
 		int indentationLevel = context.indentationLevel;
+		if (sut == null) {
+			sut = new JavaPrintingVisitor(sst, false);
+		}
 		sst.accept(sut, context);
 		String actual = context.toString();
 		Assert.assertEquals(expected, actual);
@@ -69,6 +72,9 @@ public class JavaPrintingVisitorBaseTest {
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String expected) {
 		int indentationLevel = context.indentationLevel;
+		if (sut == null) {
+			sut = new JavaPrintingVisitor(sst, false);
+		}
 		sst.accept(sut, context);
 		String actual = context.toString();
 		Assert.assertEquals(expected, actual);

@@ -15,25 +15,17 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.*;
-
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.csharp.LambdaName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
@@ -78,25 +70,6 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(sst, "x instanceof ?");
 	}
 
-	@Test
-	public void testIndexAccessExpressionArray() {
-		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
-		indexAccessExpression.setIndices(Lists.newArrayList(constant("1"), constant("2")));
-		indexAccessExpression.setReference(varRef("x"));
-
-		IMethodDeclaration methodDecl = declareMethod(declareVar("x", type("String[]")), expr(indexAccessExpression));
-		assertPrint(methodDecl, "? ???()", "{", "    String[] x;", "    x[1,2];", "}");
-	}
-
-	@Test
-	public void testIndexAccessExpressionList() {
-		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
-		indexAccessExpression.setIndices(Lists.newArrayList(constant("1")));
-		indexAccessExpression.setReference(varRef("x"));
-
-		IMethodDeclaration methodDecl = declareMethod(declareVar("x", type("List")), expr(indexAccessExpression));
-		assertPrint(methodDecl, "? ???()", "{", "    List x;", "    x.get(1);", "}");
-	}
 
 	@Test
 	public void constantValueExpression_WithoutValue() {
@@ -109,7 +82,7 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void constantValueExpression_NullLiteral() {
+	public void constantValueExpression_NullKeyword() {
 		assertPrint(constant("null"), "null");
 	}
 
@@ -124,6 +97,21 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
+	public void constantValueExpression_WithFloatModifier() {
+		assertPrint(constant("0.123f"), "0.123f");
+	}
+
+	@Test
+	public void constantValueExpression_WithDouble() {
+		assertPrint(constant("0.123d"), "0.123d");
+	}
+
+	@Test
+	public void constantValueExpression_WithDecimal() {
+		assertPrint(constant("0.123m"), "0.123m");
+	}
+
+	@Test
 	public void constantValueExpression_WithBoolTrue() {
 		assertPrint(constant("true"), "true");
 	}
@@ -133,29 +121,6 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(constant("false"), "false");
 	}
 
-	@Test
-	public void constantValueExpression_Null() {
-		IMethodDeclaration methodDecl = declareMethod(declareVar("x", type("s:System.Int32")),
-				assign(variableReference("x"), new ConstantValueExpression()));
-		assertPrint(methodDecl, "? ???()", "{", "    int x;", "    x = 0;", "}");
-	}
 
-	@Test
-	public void composedExpression() {
-		IMethodDeclaration methodDecl = declareMethod(declareVar("x", type("s:System.Int32")),
-				assign(variableReference("x"), new ComposedExpression()));
-
-		assertPrint(methodDecl, "? ???()", "{", "    int x;", "    x = 0;", "}");
-	}
-
-	@Test
-	public void unknownExpressionNestedIntoBinaryExpression() {
-		IMethodDeclaration methodDecl = declareMethod(
-				declareVar("x", type("s:System.Int32")),
-				assign(variableReference("x"),
-						binExpr(BinaryOperator.Plus, new UnknownExpression(), new UnknownExpression())));
-
-		assertPrint(methodDecl, "? ???()", "{", "    int x;", "    x = 0 + 0;", "}");
-	}
 		
 }

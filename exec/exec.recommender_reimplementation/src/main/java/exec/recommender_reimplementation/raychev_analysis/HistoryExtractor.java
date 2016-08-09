@@ -31,6 +31,7 @@ import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.TypeErasure;
+import exec.recommender_reimplementation.java_printer.JavaTransformationVisitor;
 
 public class HistoryExtractor {
 
@@ -38,6 +39,8 @@ public class HistoryExtractor {
 		PointsToContext pointsToContext = performPointsToAnalysis(context);
 
 		ISST sst = context.getSST();
+		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
+		sst = transformationVisitor.transform(sst, ISST.class);
 
 		Set<ConcreteHistory> concreteHistorySet = new HashSet<>();
 
