@@ -17,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -425,5 +425,4 @@ public class TraversingVisitor<TContext, TReturn> implements ISSTNodeVisitor<TCo
 		indexAccessRef.getExpression().accept(this, context);
 		return null;
 	}
-
 }

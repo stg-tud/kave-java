@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 
@@ -21,5 +21,4 @@ public interface LocationIdentifierFactory {
 	LocationIdentifier create(IMemberReference memberRef);
 
 	LocationIdentifier create(IIndexAccessReference indexAccessRef, ITypeName baseType);
-
 }

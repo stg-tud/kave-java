@@ -15,26 +15,16 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types.organization;
 
-import java.util.Map;
-
-import com.google.common.collect.MapMaker;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class NamespaceName extends BaseName implements INamespaceName {
-	private static final Map<String, NamespaceName> nameRegistry = new MapMaker().weakValues().makeMap();
 
 	public static final String GLOBAL_NAMESPACE_IDENTIFIER = "";
-	public static final INamespaceName a = NamespaceName.newNamespaceName(GLOBAL_NAMESPACE_IDENTIFIER);
-	public static final INamespaceName UNKNOWN_NAME = newNamespaceName(UNKNOWN_NAME_IDENTIFIER);
 
-	public static INamespaceName newNamespaceName(String identifier) {
-		if (!nameRegistry.containsKey(identifier)) {
-			nameRegistry.put(identifier, new NamespaceName(identifier));
-		}
-		return nameRegistry.get(identifier);
+	private NamespaceName() {
+		super(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	private NamespaceName(String identifier) {
@@ -49,9 +39,9 @@ public class NamespaceName extends BaseName implements INamespaceName {
 
 		int i = identifier.lastIndexOf(".");
 		if (i == -1) {
-			return NamespaceName.newNamespaceName(GLOBAL_NAMESPACE_IDENTIFIER);
+			return Names.newNamespace(GLOBAL_NAMESPACE_IDENTIFIER);
 		} else {
-			return NamespaceName.newNamespaceName(identifier.substring(0, i));
+			return Names.newNamespace(identifier.substring(0, i));
 		}
 	}
 
@@ -66,7 +56,7 @@ public class NamespaceName extends BaseName implements INamespaceName {
 	}
 
 	public static INamespaceName getGlobalNamespace() {
-		return NamespaceName.newNamespaceName(GLOBAL_NAMESPACE_IDENTIFIER);
+		return Names.newNamespace(GLOBAL_NAMESPACE_IDENTIFIER);
 	}
 
 	public static INamespaceName getUnknownName() {

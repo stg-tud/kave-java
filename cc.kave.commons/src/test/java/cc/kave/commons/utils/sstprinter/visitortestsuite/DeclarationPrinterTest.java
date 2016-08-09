@@ -17,13 +17,8 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
@@ -42,17 +37,17 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void SSTDeclaration_EmptyClass() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("TestClass,TestProject"));
+		sst.setEnclosingType(Names.newType("TestClass,TestProject"));
 
 		assertPrint(sst, "class TestClass", "{", "}");
 	}
 
 	@Test
 	public void SSTDeclaration_WithSupertypes() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
-		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
-		ITypeName interface2 = TypeName.newTypeName("i:IDoesSomethingElse,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
+		ITypeName interface1 = Names.newType("i:IDoesSomething,P");
+		ITypeName interface2 = Names.newType("i:IDoesSomethingElse,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -78,8 +73,8 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithSupertypes_OnlyInterface() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName interface1 = Names.newType("i:IDoesSomething,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -98,8 +93,8 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithSupertypes_OnlySuperclass() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -119,26 +114,26 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void SSTDeclaration_FullClass() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("TestClass,P"));
+		sst.setEnclosingType(Names.newType("TestClass,P"));
 		DelegateDeclaration delegate = new DelegateDeclaration();
-		delegate.setName(DelegateTypeName.newDelegateTypeName("d:[T,P][TestDelegate,P].()"));
+		delegate.setName(Names.newType("d:[T,P][TestDelegate,P].()").asDelegateTypeName());
 		sst.getDelegates().add(delegate);
 		EventDeclaration event = new EventDeclaration();
-		event.setName(EventName.newEventName("[EventType,P] [TestClass,P].SomethingHappened"));
+		event.setName(Names.newEvent("[EventType,P] [TestClass,P].SomethingHappened"));
 		sst.getEvents().add(event);
 		FieldDeclaration field1 = new FieldDeclaration();
 		FieldDeclaration field2 = new FieldDeclaration();
-		field1.setName(FieldName.newFieldName("[FieldType,P] [TestClass,P].SomeField"));
-		field2.setName(FieldName.newFieldName("[FieldType,P] [TestClass,P].AnotherField"));
+		field1.setName(Names.newField("[FieldType,P] [TestClass,P].SomeField"));
+		field2.setName(Names.newField("[FieldType,P] [TestClass,P].AnotherField"));
 		sst.getFields().add(field1);
 		sst.getFields().add(field2);
 		PropertyDeclaration property = new PropertyDeclaration();
-		property.setName(PropertyName.newPropertyName("get set [PropertyType,P] [TestClass,P].SomeProperty"));
+		property.setName(Names.newProperty("get set [PropertyType,P] [TestClass,P].SomeProperty"));
 		sst.getProperties().add(property);
 		MethodDeclaration method1 = new MethodDeclaration();
 		MethodDeclaration method2 = new MethodDeclaration();
-		method1.setName(MethodName.newMethodName("[ReturnType,P] [TestClass,P].M([ParameterType,P] p)"));
-		method2.setName(MethodName.newMethodName("[ReturnType,P] [TestClass,P].M2()"));
+		method1.setName(Names.newMethod("[ReturnType,P] [TestClass,P].M([ParameterType,P] p)"));
+		method2.setName(Names.newMethod("[ReturnType,P] [TestClass,P].M2()"));
 		method2.getBody().add(new BreakStatement());
 		sst.getMethods().add(method1);
 		sst.getMethods().add(method2);
@@ -152,7 +147,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void SSTDeclaration_Interface() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("i:SomeInterface,P"));
+		sst.setEnclosingType(Names.newType("i:SomeInterface,P"));
 
 		assertPrint(sst, "interface SomeInterface", "{", "}");
 	}
@@ -160,7 +155,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void SSTDeclaration_Struct() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("s:SomeStruct,P"));
+		sst.setEnclosingType(Names.newType("s:SomeStruct,P"));
 
 		assertPrint(sst, "struct SomeStruct", "{", "}");
 	}
@@ -168,7 +163,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void SSTDeclaration_Enum() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("e:SomeEnum,P"));
+		sst.setEnclosingType(Names.newType("e:SomeEnum,P"));
 
 		assertPrint(sst, "enum SomeEnum", "{", "}");
 	}
@@ -176,7 +171,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void DelegateDeclaration_Parameterless() {
 		DelegateDeclaration sst = new DelegateDeclaration();
-		sst.setName(DelegateTypeName.newDelegateTypeName("d:[R, P] [Some.DelegateType, P].()"));
+		sst.setName(Names.newType("d:[R, P] [Some.DelegateType, P].()").asDelegateTypeName());
 
 		assertPrint(sst, "delegate DelegateType();");
 	}
@@ -184,7 +179,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void DelegateDeclaration_WithParameters() {
 		DelegateDeclaration sst = new DelegateDeclaration();
-		sst.setName(DelegateTypeName.newDelegateTypeName("d:[R, P] [Some.DelegateType, P].([C, P] p1, [D, P] p2)"));
+		sst.setName(Names.newType("d:[R, P] [Some.DelegateType, P].([C, P] p1, [D, P] p2)").asDelegateTypeName());
 
 		assertPrint(sst, "delegate DelegateType(C p1, D p2);");
 	}
@@ -192,7 +187,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void DelegateDeclaration_Generic() {
 		DelegateDeclaration sst = new DelegateDeclaration();
-		sst.setName(DelegateTypeName.newDelegateTypeName("d:[R, P] [Some.DelegateType`1[[T -> T]], P].([T] p1)"));
+		sst.setName(Names.newType("d:[R, P] [Some.DelegateType`1[[T -> T]], P].([T] p1)").asDelegateTypeName());
 
 		assertPrint(sst, "delegate DelegateType<?>(? p1);");
 	}
@@ -200,7 +195,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void EventDeclaration() {
 		EventDeclaration sst = new EventDeclaration();
-		sst.setName(EventName.newEventName("[EventType,P] [DeclaringType,P].E"));
+		sst.setName(Names.newEvent("[EventType,P] [DeclaringType,P].E"));
 
 		assertPrint(sst, "event EventType E;");
 	}
@@ -208,7 +203,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void EventDeclaration_GenericEventArgsType() {
 		EventDeclaration sst = new EventDeclaration();
-		sst.setName(EventName.newEventName("[EventType`1[[T -> EventArgsType,P]],P] [DeclaringType,P].E"));
+		sst.setName(Names.newEvent("[EventType`1[[T -> EventArgsType,P]],P] [DeclaringType,P].E"));
 
 		assertPrint(sst, "event EventType<EventArgsType> E;");
 	}
@@ -216,7 +211,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+		sst.setName(Names.newField("[FieldType,P] [DeclaringType,P].F"));
 
 		assertPrint(sst, "FieldType F;");
 	}
@@ -224,7 +219,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration_Static() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("static [FieldType,P] [DeclaringType,P].F"));
+		sst.setName(Names.newField("static [FieldType,P] [DeclaringType,P].F"));
 
 		assertPrint(sst, "static FieldType F;");
 	}
@@ -232,7 +227,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration_Array() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("[d:[V, A] [N.TD, A].()[]] [DT, A]._delegatesField"));
+		sst.setName(Names.newField("[d:[V, A] [N.TD, A].()[]] [DT, A]._delegatesField"));
 
 		assertPrint(sst, "TD[] _delegatesField;");
 	}
@@ -240,7 +235,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_GetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get [PropertyType,P] [DeclaringType,P].P"));
 
 		assertPrint(sst, "PropertyType P { get; }");
 	}
@@ -248,7 +243,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_SetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("set [PropertyType,P] [DeclaringType,P].P"));
 
 		assertPrint(sst, "PropertyType P { set; }");
 	}
@@ -256,7 +251,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
 
 		assertPrint(sst, "PropertyType P { get; set; }");
 	}
@@ -264,7 +259,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithBodies() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.getGet().add(new ContinueStatement());
 		sst.getGet().add(new BreakStatement());
 		sst.getSet().add(new BreakStatement());
@@ -277,7 +272,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlyGetterBody() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.getGet().add(new BreakStatement());
 
 		assertPrint(sst, "PropertyType P", "{", "    get", "    {", "        break;", "    }", "    set;", "}");
@@ -286,7 +281,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlySetterBody() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(PropertyName.newPropertyName("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
 		sst.getSet().add(new BreakStatement());
 
 		assertPrint(sst, "PropertyType P", "{", "    get;", "    set", "    {", "        break;", "    }", "}");
@@ -295,7 +290,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_EmptyMethod() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(ParameterType p) { }");
 	}
@@ -303,7 +298,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_Static() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "static ReturnType M(ParameterType p) { }");
 	}
@@ -311,8 +306,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_PassedByReference() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName
-				.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
 
 		assertPrint(sst, "ReturnType M(ref Int32 p) { }");
 	}
@@ -320,7 +314,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Output() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(out [ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(out [ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(out ParameterType p) { }");
 	}
@@ -328,7 +322,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Params() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(params [ParameterType[],P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(params [ParameterType[],P] p)"));
 
 		assertPrint(sst, "ReturnType M(params ParameterType[] p) { }");
 	}
@@ -336,7 +330,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Optional() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(opt [ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(opt [ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(opt ParameterType p) { }");
 	}
@@ -344,7 +338,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_WithBody() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
@@ -355,14 +349,14 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void MethodDeclaration_Generic() {
 
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
+		sst.setName(Names.newMethod("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
 
 		assertPrint(sst, "ReturnType M<?>(? p) { }");
 	}
 
 	@Test
 	public void VariableDeclaration() {
-		IVariableDeclaration sst = SSTUtil.declare("var", TypeName.newTypeName("T,P"));
+		IVariableDeclaration sst = SSTUtil.declare("var", Names.newType("T,P"));
 
 		assertPrint(sst, "T var;");
 	}

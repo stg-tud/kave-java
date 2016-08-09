@@ -25,8 +25,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -39,7 +39,7 @@ public class PropertyDeclarationTest {
 	public void testDefaultValues() {
 		PropertyDeclaration sut = new PropertyDeclaration();
 
-		assertThat(PropertyName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(Names.getUnknownProperty(), equalTo(sut.getName()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getGet()));
 		assertThat(new ArrayList<IStatement>(), equalTo(sut.getSet()));
 		assertThat(0, not(equalTo(sut.hashCode())));
@@ -120,7 +120,7 @@ public class PropertyDeclarationTest {
 	}
 
 	private IPropertyName someProperty() {
-		return PropertyName.newPropertyName("[T1,P1] [T2,P2].Property");
+		return Names.newProperty("[T1,P1] [T2,P2].Property");
 	}
 
 	@Test

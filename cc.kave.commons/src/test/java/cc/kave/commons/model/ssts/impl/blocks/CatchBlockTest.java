@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
@@ -34,7 +34,7 @@ public class CatchBlockTest extends SSTBaseTest {
 	public void testDefaultValues() {
 		CatchBlock sut = new CatchBlock();
 
-		assertThat(ParameterName.UNKNOWN_NAME, equalTo(sut.getParameter()));
+		assertThat(Names.getUnknownParameter(), equalTo(sut.getParameter()));
 		assertThat(Lists.newArrayList(), equalTo(sut.getBody()));
 		assertThat(CatchBlockKind.Default, equalTo(sut.getKind()));
 		assertThat(0, not(equalTo(sut.hashCode())));

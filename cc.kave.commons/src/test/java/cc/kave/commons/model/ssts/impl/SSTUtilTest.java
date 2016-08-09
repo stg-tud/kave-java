@@ -20,11 +20,11 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import com.google.common.collect.Lists;
+
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.blocks.LockBlock;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
@@ -36,14 +36,12 @@ import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 
-import com.google.common.collect.Lists;
-
 public class SSTUtilTest {
 	@Test
 	public void testDeclare() {
-		VariableDeclaration actual = (VariableDeclaration) SSTUtil.declare("a", TypeName.UNKNOWN_NAME);
+		VariableDeclaration actual = (VariableDeclaration) SSTUtil.declare("a", Names.getUnknownType());
 		VariableDeclaration expected = new VariableDeclaration();
-		expected.setType(TypeName.UNKNOWN_NAME);
+		expected.setType(Names.getUnknownType());
 		expected.setReference(ref("a"));
 
 		assertThat(expected, equalTo(actual));
@@ -93,8 +91,8 @@ public class SSTUtilTest {
 
 	@Test
 	public void testSettingValues() {
-		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression("a1", getMethod("A2"), Lists
-				.newArrayList(refs("a3")).iterator());
+		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression("a1", getMethod("A2"),
+				Lists.newArrayList(refs("a3")).iterator());
 		VariableReference varRef = new VariableReference();
 		varRef.setIdentifier("a1");
 
@@ -105,8 +103,8 @@ public class SSTUtilTest {
 
 	@Test
 	public void testInvocationExpressionStatic() {
-		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression(getStaticMethod("B2"), Lists
-				.newArrayList(refs("c2")).iterator());
+		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression(getStaticMethod("B2"),
+				Lists.newArrayList(refs("c2")).iterator());
 
 		assertThat(new VariableReference(), equalTo(a.getReference()));
 		assertThat(getStaticMethod("B2"), equalTo(a.getMethodName()));
@@ -115,8 +113,8 @@ public class SSTUtilTest {
 
 	@Test
 	public void testInvocationExpressionNonStatic() {
-		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression("a1", getMethod("B1"), Lists
-				.newArrayList(refs("c1")).iterator());
+		InvocationExpression a = (InvocationExpression) SSTUtil.invocationExpression("a1", getMethod("B1"),
+				Lists.newArrayList(refs("c1")).iterator());
 		assertThat(SSTUtil.variableReference("a1"), equalTo(a.getReference()));
 		assertThat(getMethod("B1"), equalTo(a.getMethodName()));
 		assertThat(Lists.newArrayList(refs("c1")), equalTo(a.getParameters()));
@@ -124,8 +122,8 @@ public class SSTUtilTest {
 
 	@Test
 	public void testInvocationStatementStatic() {
-		ExpressionStatement actual = (ExpressionStatement) SSTUtil.invocationStatement(getStaticMethod("B2"), Lists
-				.newArrayList(refs("c2")).iterator());
+		ExpressionStatement actual = (ExpressionStatement) SSTUtil.invocationStatement(getStaticMethod("B2"),
+				Lists.newArrayList(refs("c2")).iterator());
 		ExpressionStatement expected = new ExpressionStatement();
 		InvocationExpression expr = new InvocationExpression();
 		expr.setMethodName(getStaticMethod("B2"));
@@ -137,8 +135,8 @@ public class SSTUtilTest {
 
 	@Test
 	public void testInvocationStatementNonStatic() {
-		ExpressionStatement actual = (ExpressionStatement) SSTUtil.invocationStatement("a", getMethod("B2"), Lists
-				.newArrayList(refs("c2")).iterator());
+		ExpressionStatement actual = (ExpressionStatement) SSTUtil.invocationStatement("a", getMethod("B2"),
+				Lists.newArrayList(refs("c2")).iterator());
 		ExpressionStatement expected = new ExpressionStatement();
 		InvocationExpression expr = new InvocationExpression();
 		VariableReference varRef = new VariableReference();
@@ -181,14 +179,13 @@ public class SSTUtilTest {
 	}
 
 	private static IMethodName getMethod(String simpleName) {
-		String methodName = "[System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]." + simpleName + "()";
-		return MethodName.newMethodName(methodName);
+		String methodName = "[p:string] [p:string]." + simpleName + "()";
+		return Names.newMethod(methodName);
 	}
 
 	private static IMethodName getStaticMethod(String simpleName) {
-		String methodName = "static [System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]" + simpleName
-				+ "()";
-		return MethodName.newMethodName(methodName);
+		String methodName = "static [p:string] [p:string]" + simpleName + "()";
+		return Names.newMethod(methodName);
 	}
 
 	private static ISimpleExpression varRefExpr(String id) {

@@ -15,7 +15,7 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
@@ -39,8 +39,7 @@ public class SimpleExpressionReader extends FailSafeNodeVisitor<ConstraintGraphB
 	private final ConstraintGraphBuilder builder;
 	private final PropertyAsFieldPredicate treatPropertyAsField;
 
-	public SimpleExpressionReader(ConstraintGraphBuilder builder,
-			PropertyAsFieldPredicate treatPropertyAsField) {
+	public SimpleExpressionReader(ConstraintGraphBuilder builder, PropertyAsFieldPredicate treatPropertyAsField) {
 		this.builder = builder;
 		this.treatPropertyAsField = treatPropertyAsField;
 	}
@@ -136,5 +135,4 @@ public class SimpleExpressionReader extends FailSafeNodeVisitor<ConstraintGraphB
 
 		return temp;
 	}
-
 }

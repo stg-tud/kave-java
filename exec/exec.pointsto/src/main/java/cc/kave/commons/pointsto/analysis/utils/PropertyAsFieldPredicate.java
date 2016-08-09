@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.utils;
 
 import java.util.function.Predicate;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
 
@@ -37,5 +37,4 @@ public class PropertyAsFieldPredicate implements Predicate<IPropertyName> {
 		IPropertyDeclaration propertyDecl = declarationMapper.get(property);
 		return propertyDecl == null || languageOptions.isAutoImplementedProperty(propertyDecl);
 	}
-
 }

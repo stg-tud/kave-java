@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 import cc.kave.commons.pointsto.analysis.names.DistinctMemberName;
 import cc.kave.commons.pointsto.analysis.names.DistinctMemberNameFactory;
@@ -104,8 +104,10 @@ public final class DeclarationLambdaStore {
 			variables.add(parameterVar);
 
 			if (parameter.isOutput() && (isMethodWithoutDefinition || parameter.getValueType().isStructType())) {
-				// methods without a definition require an object for their out-parameters; struct out-parameters are
-				// allocated even for methods which have a definition as they already have a location on method entry
+				// methods without a definition require an object for their
+				// out-parameters; struct out-parameters are
+				// allocated even for methods which have a definition as they
+				// already have a location on method entry
 				// (although they remain uninitialized)
 				allocator.allocateOutParameter(method, parameter, parameterVar);
 			}
@@ -138,5 +140,4 @@ public final class DeclarationLambdaStore {
 		List<SetVariable> variables = Arrays.asList(thisVar, setParameterVar, returnVar);
 		return LambdaTerm.newPropertyLambda(variables);
 	}
-
 }

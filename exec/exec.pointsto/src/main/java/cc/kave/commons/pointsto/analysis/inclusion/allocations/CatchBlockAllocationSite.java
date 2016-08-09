@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 
 public class CatchBlockAllocationSite implements AllocationSite {
@@ -47,5 +47,4 @@ public class CatchBlockAllocationSite implements AllocationSite {
 		CatchBlockAllocationSite other = (CatchBlockAllocationSite) obj;
 		return catchBlock == other.catchBlock; // reference equality
 	}
-
 }

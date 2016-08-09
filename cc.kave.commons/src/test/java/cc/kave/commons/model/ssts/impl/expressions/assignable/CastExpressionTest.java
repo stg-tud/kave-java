@@ -18,7 +18,7 @@ package cc.kave.commons.model.ssts.impl.expressions.assignable;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
@@ -30,7 +30,7 @@ public class CastExpressionTest extends SSTBaseTest {
 	public void testDefaultValues() {
 		CastExpression sut = new CastExpression();
 		Assert.assertEquals(new VariableReference(), sut.getReference());
-		Assert.assertEquals(TypeName.UNKNOWN_NAME, sut.getTargetType());
+		Assert.assertEquals(Names.getUnknownType(), sut.getTargetType());
 		Assert.assertEquals(CastOperator.Unknown, sut.getOperator());
 		Assert.assertNotEquals(0, sut.hashCode());
 		Assert.assertNotEquals(1, sut.hashCode());
@@ -40,11 +40,11 @@ public class CastExpressionTest extends SSTBaseTest {
 
 	public void testSettingValues() {
 		CastExpression sut = new CastExpression();
-		sut.setTargetType(TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0"));
+		sut.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
 		sut.setReference(someVarRef());
 		sut.setOperator(CastOperator.SafeCast);
 
-		Assert.assertEquals(TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0"), sut.getTargetType());
+		Assert.assertEquals(Names.newType("System.Int32, mscorlib, 4.0.0.0"), sut.getTargetType());
 		Assert.assertEquals(someVarRef(), sut.getReference());
 		Assert.assertEquals(CastOperator.SafeCast, sut.getOperator());
 	}
@@ -62,11 +62,11 @@ public class CastExpressionTest extends SSTBaseTest {
 
 	public void testEquality_ReallyTheSame() {
 		CastExpression a = new CastExpression();
-		a.setTargetType(TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0"));
+		a.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
 		a.setReference(someVarRef());
 		a.setOperator(CastOperator.SafeCast);
 		CastExpression b = new CastExpression();
-		b.setTargetType(TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0"));
+		b.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
 		b.setReference(someVarRef());
 		b.setOperator(CastOperator.SafeCast);
 		Assert.assertEquals(a, b);
@@ -76,7 +76,7 @@ public class CastExpressionTest extends SSTBaseTest {
 	@Test
 	public void testEquality_DifferentTargetType() {
 		CastExpression a = new CastExpression();
-		a.setTargetType(TypeName.newTypeName("System.Int32, mscorlib, 4.0.0.0"));
+		a.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
 		CastExpression b = new CastExpression();
 
 		Assert.assertNotEquals(a, b);

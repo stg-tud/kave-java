@@ -29,9 +29,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EditStreakGenerationRunner {
 

@@ -24,7 +24,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.references.IMemberReference;
@@ -100,5 +100,4 @@ public class DistinctReferenceContextCollector extends DistinctReferenceVisitorC
 			LOGGER.error(SKIPPING_REF_MSG, ex.getMessage());
 		}
 	}
-
 }

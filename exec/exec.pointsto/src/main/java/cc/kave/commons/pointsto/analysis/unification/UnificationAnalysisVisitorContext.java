@@ -33,11 +33,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -187,11 +187,13 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 	}
 
 	/**
-	 * Reruns the unification until all lazily added locations have propagated and no more changes are detected.
+	 * Reruns the unification until all lazily added locations have propagated
+	 * and no more changes are detected.
 	 * 
-	 * {@link LocationIdentifier} are added lazily to {@link ExtendedReferenceLocation} instances. If a location is
-	 * added to an already unified {@link ExtendedReferenceLocation}, the unification has to be applied again to ensure
-	 * correctness of the result.
+	 * {@link LocationIdentifier} are added lazily to
+	 * {@link ExtendedReferenceLocation} instances. If a location is added to an
+	 * already unified {@link ExtendedReferenceLocation}, the unification has to
+	 * be applied again to ensure correctness of the result.
 	 */
 	private void finalizePendingUnifications() {
 		Deque<Pair<ReferenceLocation, ReferenceLocation>> worklist = new ArrayDeque<>();
@@ -443,7 +445,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 	private void unify(ReferenceLocation refLoc1, ReferenceLocation refLoc2) {
 		mergeIdentifiers(refLoc1, refLoc2);
-		// copy set to list for iteration to avoid concurrent modification exceptions
+		// copy set to list for iteration to avoid concurrent modification
+		// exceptions
 		List<LocationIdentifier> commonIdentifiers = new ArrayList<>(refLoc1.getIdentifiers());
 
 		for (LocationIdentifier identifier : commonIdentifiers) {
@@ -469,7 +472,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 			unify(fun1Parameters.get(i), fun2Parameters.get(i));
 		}
 
-		// function locations have a different number of parameters: copy over the additional ones
+		// function locations have a different number of parameters: copy over
+		// the additional ones
 		if (minParametersSize != maxParametersSize) {
 			List<ReferenceLocation> minParameters = (fun1Parameters.size() == minParametersSize) ? fun1Parameters
 					: fun2Parameters;
@@ -773,7 +777,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		if (derefLocation instanceof FunctionLocation) {
 			return (FunctionLocation) derefLocation;
 		} else {
-			// location got initialized by readDereference or writeDereference to an ExtendedRefernceLocation as we
+			// location got initialized by readDereference or writeDereference
+			// to an ExtendedRefernceLocation as we
 			// cannot simply extract the method name at that stage
 			FunctionLocation functionLocation = funLocCreator.apply(derefLocation.getSetRepresentative());
 			// swap locations
@@ -1018,7 +1023,8 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 
 			ReferenceLocation destLocation = getOrCreateLocation(memberRef.getBaseReference());
 			LocationIdentifier destIdentifier = identifierFactory.create(memberRef.getReference());
-			// we live in a type safe environment (src must be a delegate type as well if the member is one)
+			// we live in a type safe environment (src must be a delegate type
+			// as well if the member is one)
 			LocationIdentifier srcIdentifier = getIdentifierForSimpleRefLoc(memberRef.getType());
 			Location destDerefLocation = writeDereference(destLocation, srcLocation, destIdentifier, srcIdentifier);
 
@@ -1148,5 +1154,4 @@ public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorC
 		ReferenceLocation destLocation = destRef.accept(destLocationVisitor, this);
 		alias(destLocation, returnLocation);
 	}
-
 }

@@ -17,7 +17,7 @@ package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -108,7 +108,7 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void testExpressionStatement() {
 		InvocationExpression invocation = new InvocationExpression();
 		invocation.setReference(SSTUtil.variableReference("this"));
-		invocation.setMethodName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		invocation.setMethodName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		invocation.getParameters().add(constant("1"));
 
 		ExpressionStatement sst = new ExpressionStatement();
@@ -122,18 +122,18 @@ public class StatementPrinterTest extends SSTPrintingVisitorBaseTest {
 		UnknownStatement sst = new UnknownStatement();
 		assertPrint(sst, "???;");
 	}
-	
+
 	@Test
-	public void testAddEventSubscriptionStatement(){
+	public void testAddEventSubscriptionStatement() {
 		EventSubscriptionStatement sst = new EventSubscriptionStatement();
 		sst.setOperation(EventSubscriptionOperation.Add);
 		sst.setExpression(constant("2"));
 		sst.setReference(varRef("a"));
 		assertPrint(sst, "a += 2");
 	}
-	
+
 	@Test
-	public void testRemoveEventSubscriptionStatement(){
+	public void testRemoveEventSubscriptionStatement() {
 		EventSubscriptionStatement sst = new EventSubscriptionStatement();
 		sst.setOperation(EventSubscriptionOperation.Remove);
 		sst.setExpression(constant("2"));

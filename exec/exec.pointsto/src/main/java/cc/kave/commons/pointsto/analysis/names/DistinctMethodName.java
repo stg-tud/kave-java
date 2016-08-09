@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.analysis.names;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 
 public class DistinctMethodName extends DistinctMemberName {
 
@@ -24,7 +24,8 @@ public class DistinctMethodName extends DistinctMemberName {
 	public DistinctMethodName(IMethodName method) {
 		super(method.getValueType(), method.getDeclaringType(), method.getName());
 
-		// in c# both generic parameter types and parameter modifiers (in, out) serve to distinguish different method
+		// in c# both generic parameter types and parameter modifiers (in, out)
+		// serve to distinguish different method
 		// overloads
 		parameters = method.getParameters();
 	}
@@ -53,5 +54,4 @@ public class DistinctMethodName extends DistinctMemberName {
 			return false;
 		return true;
 	}
-
 }

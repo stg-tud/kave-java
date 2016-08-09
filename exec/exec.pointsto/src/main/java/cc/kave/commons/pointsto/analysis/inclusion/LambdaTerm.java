@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.recommenders.assertions.Asserts;
 
 public class LambdaTerm implements ConstructedTerm {
@@ -83,5 +83,4 @@ public class LambdaTerm implements ConstructedTerm {
 	public Variance getArgumentVariance(int index) {
 		return variances[index];
 	}
-
 }

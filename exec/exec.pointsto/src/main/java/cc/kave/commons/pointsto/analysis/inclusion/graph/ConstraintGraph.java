@@ -28,9 +28,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.analysis.inclusion.Allocator;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstraintResolver;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
@@ -139,8 +139,10 @@ public class ConstraintGraph {
 
 			for (SetVariable entity : volatileEntities) {
 				if (computeLeastSolution(entity, new HashSet<>()).isEmpty()) {
-					RefTerm obj = new RefTerm(new UniqueAllocationSite(TypeName.UNKNOWN_NAME), declLambdaStore.getVariableFactory().createObjectVariable());
-					worklist.addAll(constraintResolver.addConstraint(obj, entity, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
+					RefTerm obj = new RefTerm(new UniqueAllocationSite(Names.getUnknownType()),
+							declLambdaStore.getVariableFactory().createObjectVariable());
+					worklist.addAll(constraintResolver.addConstraint(obj, entity, InclusionAnnotation.EMPTY,
+							ContextAnnotation.EMPTY));
 				}
 			}
 		} while (!worklist.isEmpty());
@@ -175,7 +177,8 @@ public class ConstraintGraph {
 							&& succEdge.getInclusionAnnotation() instanceof InvocationAnnotation) {
 						processInvocation(preEdge, succEdge, changedNodes);
 					} else if (bothConstructedTerms && preEdgeTarget.getClass() != succEdgeTarget.getClass()) {
-						// prevent adding a constraint between RefTerm and LambdaTerm
+						// prevent adding a constraint between RefTerm and
+						// LambdaTerm
 						continue;
 					} else {
 						InclusionAnnotation newInclAnnotation = concat(preEdge.getInclusionAnnotation(),
@@ -195,7 +198,8 @@ public class ConstraintGraph {
 	private void processInvocation(ConstraintEdge objectEdge, ConstraintEdge invocationEdge,
 			Set<ConstraintNode> changedNodes) {
 		ConstructedTerm object = (ConstructedTerm) objectEdge.getTarget().getSetExpression();
-		// object can be either a RefTerm (default) or in rare cases a LambdaTerm (if a normal method is invoked on a
+		// object can be either a RefTerm (default) or in rare cases a
+		// LambdaTerm (if a normal method is invoked on a
 		// delegate)
 
 		InvocationAnnotation invocationAnnotation = (InvocationAnnotation) invocationEdge.getInclusionAnnotation();
@@ -204,7 +208,7 @@ public class ConstraintGraph {
 		if (object instanceof RefTerm) {
 			// virtual call resolution
 			ITypeName dynamicType = ((RefTerm) object).getAllocationSite().getType();
-			if (!invocationAnnotation.isDynamicallyDispatched() || dynamicType == null || dynamicType.isUnknownType()) {
+			if (!invocationAnnotation.isDynamicallyDispatched() || dynamicType == null || dynamicType.isUnknown()) {
 				targetMember = staticMember;
 			} else {
 				targetMember = languageOptions.resolveVirtual(staticMember, dynamicType);
@@ -344,5 +348,4 @@ public class ConstraintGraph {
 			return new ContextAnnotation(left, right);
 		}
 	}
-
 }

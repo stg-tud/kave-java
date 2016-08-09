@@ -24,7 +24,7 @@ public class PropertyName extends MemberName implements IPropertyName {
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(UNKNOWN_NAME);
+		return UNKNOWN_NAME_IDENTIFIER.equals(getIdentifier());
 	}
 
 	private PropertyName(String identifier) {

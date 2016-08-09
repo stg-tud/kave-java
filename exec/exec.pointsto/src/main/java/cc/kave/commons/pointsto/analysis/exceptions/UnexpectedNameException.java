@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.exceptions;
 
-import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.naming.IName;
 
 public class UnexpectedNameException extends RuntimeException {
 

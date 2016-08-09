@@ -12,9 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis.types;
 
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -95,7 +95,8 @@ public class TypeCollectorVisitor extends TraversingVisitor<TypeCollectorVisitor
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			context.enterScope();
 
-			// only default catch blocks have a usable parameter, the other kinds do not bind the caught exception to a
+			// only default catch blocks have a usable parameter, the other
+			// kinds do not bind the caught exception to a
 			// usable name
 			if (catchBlock.getKind() == CatchBlockKind.Default) {
 				context.declareParameter(catchBlock.getParameter());

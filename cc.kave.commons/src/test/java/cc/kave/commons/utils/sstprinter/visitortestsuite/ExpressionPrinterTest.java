@@ -19,9 +19,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
@@ -88,7 +86,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void invocationExpression_ConstantValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
-		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(Names.newMethod("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(constant("1"));
 
 		assertPrint(sst, "this.M(1)");
@@ -98,7 +96,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void invocationExpression_NullValue() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("this"));
-		sst.setMethodName(MethodName.newMethodName("[R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(Names.newMethod("[R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
 		assertPrint(sst, "this.M(null)");
@@ -108,7 +106,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void invocationExpression_Static() {
 		InvocationExpression sst = new InvocationExpression();
 		sst.setReference(varRef("should be ignored anyways"));
-		sst.setMethodName(MethodName.newMethodName("static [R,P] [D,P].M([T,P] p)"));
+		sst.setMethodName(Names.newMethod("static [R,P] [D,P].M([T,P] p)"));
 		sst.getParameters().add(new NullExpression());
 
 		assertPrint(sst, "D.M(null)");
@@ -187,14 +185,14 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void completionExpression_OnTypeReference() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(TypeName.newTypeName("T,P"));
+		sst.setTypeReference(Names.newType("T,P"));
 		assertPrint(sst, "T.$");
 	}
 
 	@Test
 	public void completionExpression_OnTypeReferenceWithToken() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(TypeName.newTypeName("T,P"));
+		sst.setTypeReference(Names.newType("T,P"));
 		sst.setToken("t");
 		assertPrint(sst, "T.t$");
 	}
@@ -202,21 +200,21 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void completionExpression_OnTypeReference_GenericType() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(TypeName.newTypeName("T`1[[G -> A,P]],P"));
+		sst.setTypeReference(Names.newType("T`1[[G -> A,P]],P"));
 		assertPrint(sst, "T<A>.$");
 	}
 
 	@Test
 	public void completionExpression_OnTypeReference_UnresolvedGenericType() {
 		CompletionExpression sst = new CompletionExpression();
-		sst.setTypeReference(TypeName.newTypeName("T`1[[G]],P"));
+		sst.setTypeReference(Names.newType("T`1[[G]],P"));
 		assertPrint(sst, "T<?>.$");
 	}
 
 	@Test
 	public void lambdaExpression() {
 		LambdaExpression sst = new LambdaExpression();
-		sst.setName(LambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
+		sst.setName(Names.newLambda("[T,P]([C, A] p1, [C, B] p2)"));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
@@ -246,7 +244,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setReference(SSTUtil.variableReference("x"));
 		assertPrint(sst, "(?) x");
 	}
-	
+
 	@Test
 	public void testCastExpressionSafe() {
 		CastExpression sst = new CastExpression();
@@ -254,7 +252,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setReference(SSTUtil.variableReference("x"));
 		assertPrint(sst, "x as ?");
 	}
-	
+
 	@Test
 	public void testIndexAccessExpression() {
 		IndexAccessExpression sst = new IndexAccessExpression();
@@ -262,21 +260,21 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.setReference(varRef("x"));
 		assertPrint(sst, "x[1,2]");
 	}
-	
+
 	@Test
 	public void testTypeCheckExpression() {
 		TypeCheckExpression sst = new TypeCheckExpression();
 		sst.setReference(varRef("x"));
 		assertPrint(sst, "x instanceof ?");
 	}
-	
+
 	@Test
 	public void testDefaultUnaryExpression() {
 		UnaryExpression sst = new UnaryExpression();
 		sst.setOperand(constant("2"));
 		assertPrint(sst, "?2");
 	}
-	
+
 	@Test
 	public void testPostDecrementUnaryExpression() {
 		// TODO: Test ALL Operators

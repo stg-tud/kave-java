@@ -15,15 +15,14 @@
  */
 package cc.kave.commons.utils;
 
-import static cc.kave.commons.model.names.csharp.MethodName.newMethodName;
-import static cc.kave.commons.model.names.csharp.TypeName.newTypeName;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class TypeErasureTest {
 
@@ -100,16 +99,16 @@ public class TypeErasureTest {
 
 	@Test
 	public void type_happyPath() {
-		ITypeName inp = newTypeName("T`1[[G->T2,P]],P");
-		ITypeName exp = newTypeName("T`1[[G]],P");
+		ITypeName inp = Names.newType("T`1[[G->T2,P]],P");
+		ITypeName exp = Names.newType("T`1[[G]],P");
 		ITypeName act = TypeErasure.of(inp);
 		assertEquals(exp, act);
 	}
 
 	@Test
 	public void method_happyPath() {
-		IMethodName inp = newMethodName("[T,P] [T,P].M`1[[G1 -> T,P]]()");
-		IMethodName exp = newMethodName("[T,P] [T,P].M`1[[G1]]()");
+		IMethodName inp = Names.newMethod("[T,P] [T,P].M`1[[G1 -> T,P]]()");
+		IMethodName exp = Names.newMethod("[T,P] [T,P].M`1[[G1]]()");
 		IMethodName act = TypeErasure.of(inp);
 		assertEquals(exp, act);
 	}

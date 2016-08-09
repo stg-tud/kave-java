@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;

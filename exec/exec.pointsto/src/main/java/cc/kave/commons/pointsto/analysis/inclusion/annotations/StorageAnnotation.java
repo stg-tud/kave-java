@@ -12,12 +12,11 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.annotations;
 
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 
 public class StorageAnnotation extends MemberAnnotation {
 
 	public StorageAnnotation(IMemberName member) {
 		super(member);
 	}
-
 }

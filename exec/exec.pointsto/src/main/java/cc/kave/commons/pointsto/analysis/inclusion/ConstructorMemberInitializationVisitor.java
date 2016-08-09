@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 
 import java.util.Set;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IMemberReference;

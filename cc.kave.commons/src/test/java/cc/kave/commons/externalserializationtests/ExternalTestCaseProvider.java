@@ -15,8 +15,9 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import javax.annotation.Nonnull;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class ExternalTestCaseProvider {
 	private static final String settingsFile = "settings.ini";
@@ -75,8 +76,8 @@ public class ExternalTestCaseProvider {
 			}
 
 			String input = new String(Files.readAllBytes(file.toPath()));
-			testCases.add(new TestCase[]{new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix), serializedType, input,
-					expectedCompact, expectedFormatted)});
+			testCases.add(new TestCase[] { new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix),
+					serializedType, input, expectedCompact, expectedFormatted) });
 		}
 
 		return testCases;

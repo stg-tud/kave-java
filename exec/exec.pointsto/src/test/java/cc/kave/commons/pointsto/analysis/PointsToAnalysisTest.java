@@ -30,10 +30,9 @@ import org.junit.runners.Parameterized.Parameters;
 import com.google.common.collect.ImmutableSet;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -51,11 +50,10 @@ public class PointsToAnalysisTest extends TestBuilder {
 		return AnalysesProvider.ANALYSES_AS_PARAMETERS;
 	}
 
-	private static final ITypeName TEST_DELEGATE_TYPE = TypeName.newTypeName(
-			"d:[TResult] [System.Func`2[[T -> System.String, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)");
+	private static final ITypeName TEST_DELEGATE_TYPE = Names
+			.newType("d:[TResult] [System.Func`2[[T -> p:string],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)");
 
-	private static final IMethodName TEST_TO_STRING_METHOD = MethodName
-			.newMethodName("[System.String, mscorlib] [System.Object, mscorlib].ToString()");
+	private static final IMethodName TEST_TO_STRING_METHOD = Names.newMethod("[p:string] [p:object].ToString()");
 
 	private final PointsToAnalysisFactory analysisFactory;
 
@@ -168,5 +166,4 @@ public class PointsToAnalysisTest extends TestBuilder {
 				enclosingMethod.getName());
 		assertEquals(1, analysis.query(query).size());
 	}
-
 }

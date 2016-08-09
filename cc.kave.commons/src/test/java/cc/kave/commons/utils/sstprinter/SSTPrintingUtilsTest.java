@@ -21,22 +21,21 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.csharp.NamespaceName;
-import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class SSTPrintingUtilsTest {
 
 	@Test
 	public void testUsingListFormattedCorrectly() {
 		Set<INamespaceName> namespaces = new HashSet<>();
-		namespaces.add(NamespaceName.newNamespaceName("Z"));
-		namespaces.add(NamespaceName.newNamespaceName("System"));
-		namespaces.add(NamespaceName.newNamespaceName("System"));
-		namespaces.add(NamespaceName.newNamespaceName("System.Collections.Generic"));
-		namespaces.add(NamespaceName.newNamespaceName("A"));
-		namespaces.add(NamespaceName.getGlobalNamespace());
+		namespaces.add(Names.newNamespace("Z"));
+		namespaces.add(Names.newNamespace("System"));
+		namespaces.add(Names.newNamespace("System"));
+		namespaces.add(Names.newNamespace("System.Collections.Generic"));
+		namespaces.add(Names.newNamespace("A"));
+		namespaces.add(Names.newNamespace("")); // global
 
 		SSTPrintingContext context = new SSTPrintingContext();
 		SSTPrintingUtils.formatAsUsingList(namespaces, context);
@@ -48,7 +47,7 @@ public class SSTPrintingUtilsTest {
 	@Test
 	public void testUnknownNameIsNotAddedToList() {
 		Set<INamespaceName> namespaces = new HashSet<>();
-		namespaces.add(NamespaceName.UNKNOWN_NAME);
+		namespaces.add(Names.getUnknownNamespace());
 		namespaces.add(NamespaceName.getGlobalNamespace());
 
 		SSTPrintingContext context = new SSTPrintingContext();
@@ -56,5 +55,4 @@ public class SSTPrintingUtilsTest {
 		String expected = "";
 		Assert.assertEquals(expected, context.toString());
 	}
-
 }

@@ -17,11 +17,11 @@ package cc.kave.commons.model.naming.impl.v0.codeelements;
 
 import java.util.List;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.ILambdaName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.csharp.CsNameUtils;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class LambdaName extends BaseName implements ILambdaName {
@@ -49,7 +49,6 @@ public class LambdaName extends BaseName implements ILambdaName {
 		int startIndexOfValueTypeIdentifier = identifier.indexOf('[') + 1;
 		int lastIndexOfValueTypeIdentifer = identifier.indexOf("]") + 1;
 		int lengthOfValueTypeIdentifier = lastIndexOfValueTypeIdentifer - startIndexOfValueTypeIdentifier;
-		return TypeName.newTypeName(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
+		return Names.newType(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
 	}
-
 }

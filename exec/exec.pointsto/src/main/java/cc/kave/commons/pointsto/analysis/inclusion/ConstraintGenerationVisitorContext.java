@@ -30,14 +30,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IDelegateTypeName;
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
@@ -117,7 +117,8 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		builder.allocate(thisDistRef.getReference(), thisAllocationSite);
 		contextThisVariable = builder.getVariable(thisDistRef.getReference());
 
-		// generate a super-entry for querying, should not be used by the analysis itself
+		// generate a super-entry for querying, should not be used by the
+		// analysis itself
 		DistinctKeywordReference superDistRef = new DistinctKeywordReference(languageOptions.getSuperName(),
 				languageOptions.getSuperType(context.getTypeShape().getTypeHierarchy()));
 		namesToReferences.enter();
@@ -161,8 +162,9 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		if (!builder.getAllocator().allocateDelegate(type, parameterVar)) {
 			EntryPointAllocationSite parameterAllocationSite = new EntryPointAllocationSite(method, parameter);
 			builder.allocate(parameterVar, parameterAllocationSite);
-			if (type.isArrayType()) {
-				builder.getAllocator().allocateArrayEntry(parameterAllocationSite, type, parameterVar);
+			if (type.isArray()) {
+				builder.getAllocator().allocateArrayEntry(parameterAllocationSite, type.asArrayTypeName(),
+						parameterVar);
 			} else if (type.equals(thisType)) {
 				for (IMemberName member : declMapper.getAssignableMembers()) {
 					SetVariable memberVar = builder.createTemporaryVariable();
@@ -175,8 +177,9 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 								parameterAllocationSite, member);
 						builder.allocate(memberVar, memberAllocationSite);
 
-						if (memberType.isArrayType()) {
-							builder.getAllocator().allocateArrayEntry(memberAllocationSite, memberType, memberVar);
+						if (memberType.isArray()) {
+							builder.getAllocator().allocateArrayEntry(memberAllocationSite,
+									memberType.asArrayTypeName(), memberVar);
 						}
 					}
 
@@ -189,7 +192,8 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 	}
 
 	private void initializeMissingMembers(Set<IMemberName> constructorInitializedMembers) {
-		// approximate the members which are directly initialized and initialize them
+		// approximate the members which are directly initialized and initialize
+		// them
 		Set<IMemberName> uninitializedMembers = new HashSet<>(declMapper.getAssignableMembers());
 		uninitializedMembers.removeAll(constructorInitializedMembers);
 		for (IMemberName member : uninitializedMembers) {
@@ -213,7 +217,7 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 				builder.allocate(temp, allocationSite);
 				builder.writeMember(memberRef, temp, member);
 
-				if (allocationSite.getType().isArrayType()) {
+				if (allocationSite.getType().isArray()) {
 					// provide one array entry
 					SetVariable arrayEntry = builder.createTemporaryVariable();
 					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(allocationSite));
@@ -329,10 +333,11 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 			}
 			AllocationSite allocationSite = new StmtAllocationSite(lastAssignment);
 			builder.allocate(tempDest, allocationSite);
-			if (allocationSite.getType().isArrayType()) {
-				ITypeName baseType = allocationSite.getType().getArrayBaseType();
+			if (allocationSite.getType().isArray()) {
+				ITypeName baseType = allocationSite.getType().asArrayTypeName().getArrayBaseType();
 				if (baseType.isStructType()) {
-					// elements in a struct array are allocated at allocation time of the array
+					// elements in a struct array are allocated at allocation
+					// time of the array
 					SetVariable arrayEntry = builder.createTemporaryVariable();
 					builder.allocate(arrayEntry, new ArrayEntryAllocationSite(allocationSite));
 					builder.writeArray(tempDest, arrayEntry);
@@ -340,9 +345,11 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 			}
 		}
 
-		// sometimes the context analysis screws up and a method is called with less arguments than it has formal
+		// sometimes the context analysis screws up and a method is called with
+		// less arguments than it has formal
 		// parameters
-		// unfortunately, we cannot assume that the positions of available arguments match the intended formal
+		// unfortunately, we cannot assume that the positions of available
+		// arguments match the intended formal
 		// parameters as arguments might be missing at any position
 		List<IParameterName> formalParameters = method.getParameters();
 		int parameterDiff = invocation.getParameters().size() - formalParameters.size()
@@ -379,5 +386,4 @@ public class ConstraintGenerationVisitorContext extends DistinctReferenceVisitor
 		super.declareParameter(parameter, catchBlock);
 		builder.allocate(variableReference(parameter.getName()), new CatchBlockAllocationSite(catchBlock));
 	}
-
 }

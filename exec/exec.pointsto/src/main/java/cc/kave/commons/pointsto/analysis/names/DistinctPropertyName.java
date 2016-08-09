@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.names;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 
 public class DistinctPropertyName extends DistinctMemberName {
 

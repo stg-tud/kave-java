@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 
 public class MemberLocationIdentifier implements LocationIdentifier {
 
@@ -50,5 +50,4 @@ public class MemberLocationIdentifier implements LocationIdentifier {
 			return false;
 		return true;
 	}
-
 }

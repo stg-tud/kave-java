@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
@@ -41,7 +41,7 @@ public class InvocationExpressionTest extends SSTBaseTest {
 		InvocationExpression sut = new InvocationExpression();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getMethodName()));
+		assertThat(Names.getUnknownMethod(), equalTo(sut.getMethodName()));
 		assertThat(new ArrayList<ISimpleExpression>(), equalTo(sut.getParameters()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));

@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 
 public class DistinctPropertyReference extends DistinctMemberReference {
@@ -54,5 +54,4 @@ public class DistinctPropertyReference extends DistinctMemberReference {
 		return MoreObjects.toStringHelper(DistinctPropertyReference.class).add("base", getBaseReference())
 				.add("name", getReference().getPropertyName().getName()).toString();
 	}
-
 }

@@ -19,16 +19,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReFieldName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import exec.validate_evaluation.utils.CoReNameUtils;
 
 public class CoReNameUtilsTest {
 
@@ -128,19 +125,19 @@ public class CoReNameUtilsTest {
 
 	private void assertTypeConversion() {
 		ICoReTypeName expected = CoReTypeName.get(core);
-		ICoReTypeName actual = CoReNameUtils.toCoReName(TypeName.newTypeName(kave));
+		ICoReTypeName actual = CoReNameUtils.toCoReName(Names.newType(kave));
 		assertEquals(expected, actual);
 	}
 
 	private void assertMethodConversion() {
 		ICoReMethodName expected = CoReMethodName.get(core);
-		ICoReMethodName actual = CoReNameUtils.toCoReName(MethodName.newMethodName(kave));
+		ICoReMethodName actual = CoReNameUtils.toCoReName(Names.newMethod(kave));
 		assertEquals(expected, actual);
 	}
 
 	private void assertFieldConversion() {
 		ICoReFieldName expected = CoReFieldName.get(core);
-		ICoReFieldName actual = CoReNameUtils.toCoReName(FieldName.newFieldName(kave));
+		ICoReFieldName actual = CoReNameUtils.toCoReName(Names.newField(kave));
 		assertEquals(expected, actual);
 	}
 

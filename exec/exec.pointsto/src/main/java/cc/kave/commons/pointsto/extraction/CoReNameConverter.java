@@ -14,19 +14,18 @@ package cc.kave.commons.pointsto.extraction;
 
 import java.util.stream.Collectors;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.pointsto.analysis.exceptions.MissingTypeNameException;
 import cc.kave.commons.pointsto.analysis.utils.LambdaNameHelper;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
-import cc.recommenders.names.ICoReName;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
+import cc.recommenders.names.ICoReName;
 
 public class CoReNameConverter {
 
@@ -53,13 +52,13 @@ public class CoReNameConverter {
 		if (sstType.isTypeParameter()) {
 			return OBJECT_NAME;
 		}
-		if (sstType.isArrayType()) {
-			return "[" + toName(sstType.getArrayBaseType());
+		if (sstType.isArray()) {
+			return "[" + toName(sstType.asArrayTypeName().getArrayBaseType());
 		}
 		if (sstType.isNestedType()) {
 			return toName(sstType.getDeclaringType()) + "$" + sstType.getName();
 		}
-		if (sstType.isUnknownType()) {
+		if (sstType.isUnknown()) {
 			return UNKNOWN_NAME;
 		}
 
@@ -111,7 +110,7 @@ public class CoReNameConverter {
 		if (isLambda) {
 			sstMethod = LANGUAGE_OPTIONS.removeLambda(sstMethod);
 		}
-		
+
 		StringBuilder builder = new StringBuilder();
 		ITypeName declaringType = sstMethod.getDeclaringType();
 		if (declaringType.getName().equals("")) {
@@ -129,7 +128,7 @@ public class CoReNameConverter {
 		} else {
 			builder.append('.');
 			// TODO replace with isUnknown once fixed
-			builder.append(MethodName.UNKNOWN_NAME.equals(sstMethod) ? "unknown" : sstMethod.getName());
+			builder.append(sstMethod.isUnknown() ? "unknown" : sstMethod.getName());
 			builder.append('(');
 			builder.append(sstMethod.getParameters().stream().map(parameter -> toName(parameter.getValueType()) + ";")
 					.collect(Collectors.joining()));

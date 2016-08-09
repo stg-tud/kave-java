@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.utils;
 
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
@@ -58,5 +58,4 @@ public class EnclosingNodeHelper {
 			throw new UnexpectedSSTNodeException(memberDecl);
 		}
 	}
-
 }

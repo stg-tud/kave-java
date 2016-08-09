@@ -16,9 +16,9 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IVariableReference;;
 
 public class DistinctMethodParameterReference implements DistinctReference {
@@ -87,5 +87,4 @@ public class DistinctMethodParameterReference implements DistinctReference {
 				.add("method", method.getDeclaringType().getName() + "." + method.getName())
 				.add("name", parameter.getName()).toString();
 	}
-
 }

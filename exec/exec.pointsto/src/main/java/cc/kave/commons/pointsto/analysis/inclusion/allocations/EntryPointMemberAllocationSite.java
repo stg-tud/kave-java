@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EntryPointMemberAllocationSite implements AllocationSite {
 
@@ -60,5 +60,4 @@ public class EntryPointMemberAllocationSite implements AllocationSite {
 			return false;
 		return true;
 	}
-
 }

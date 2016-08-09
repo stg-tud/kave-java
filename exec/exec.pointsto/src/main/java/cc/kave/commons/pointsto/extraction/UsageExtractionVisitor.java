@@ -17,9 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -90,13 +89,13 @@ public class UsageExtractionVisitor extends TraversingVisitor<UsageExtractionVis
 	public Void visit(IInvocationExpression entity, UsageExtractionVisitorContext context) {
 		IMethodName method = entity.getMethodName();
 
-		// TODO replace with isUnknown once fixed
-		if (method.getIdentifier().equals(MethodName.UNKNOWN_NAME.getIdentifier())) {
+		if (method.isUnknown()) {
 			LOGGER.debug("Skipping unknown method call");
 			return null;
 		}
 
-		// do not register call sites for non entry point (private) methods of the current class
+		// do not register call sites for non entry point (private) methods of
+		// the current class
 		if (!context.isNonEntryPointMethod(method)) {
 
 			// static methods and constructors do not have any receiver objects

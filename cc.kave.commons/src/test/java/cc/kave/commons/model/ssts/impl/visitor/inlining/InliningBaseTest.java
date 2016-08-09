@@ -22,14 +22,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -116,8 +111,8 @@ import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
 public class InliningBaseTest {
 
-	public static final ITypeName INTEGER = TypeName.newTypeName("Integer");
-	public static final ITypeName BOOLEAN = TypeName.newTypeName("Boolean");
+	public static final ITypeName INTEGER = Names.newType("p:int");
+	public static final ITypeName BOOLEAN = Names.newType("p:bool");
 	public static final String SIGNATURE = "[Integer] [?].";
 
 	protected IStatement returnVoid() {
@@ -165,7 +160,7 @@ public class InliningBaseTest {
 		invocation.setParameters(Lists.newArrayList(parameters));
 		if (reference != null)
 			invocation.setReference(reference);
-		invocation.setMethodName(MethodName.newMethodName(SIGNATURE + name + "()"));
+		invocation.setMethodName(Names.newMethod(SIGNATURE + name + "()"));
 		return invocation;
 	}
 
@@ -216,7 +211,7 @@ public class InliningBaseTest {
 
 	protected IMethodDeclaration declareMethod(String name, boolean entryPoint, IStatement... statements) {
 		MethodDeclaration method = new MethodDeclaration();
-		method.setName(MethodName.newMethodName(SIGNATURE + name + "()"));
+		method.setName(Names.newMethod(SIGNATURE + name + "()"));
 		method.setEntryPoint(entryPoint);
 		for (IStatement s : statements)
 			method.getBody().add(s);
@@ -383,7 +378,7 @@ public class InliningBaseTest {
 
 	protected IFieldReference refField(String identifier) {
 		FieldReference ref = new FieldReference();
-		ref.setFieldName(FieldName.newFieldName(identifier));
+		ref.setFieldName(Names.newField(identifier));
 		ref.setReference(ref(identifier));
 		return ref;
 	}
@@ -485,7 +480,7 @@ public class InliningBaseTest {
 		Set<IFieldDeclaration> fields = new HashSet<>();
 		for (String name : fieldNames) {
 			FieldDeclaration fieldDeclaration = new FieldDeclaration();
-			fieldDeclaration.setName(FieldName.newFieldName(name));
+			fieldDeclaration.setName(Names.newField(name));
 			fields.add(fieldDeclaration);
 		}
 		return fields;
@@ -499,23 +494,23 @@ public class InliningBaseTest {
 		SST sst = new SST();
 		if (fields == null) {
 			FieldDeclaration fieldDeclaration = new FieldDeclaration();
-			fieldDeclaration.setName(FieldName.newFieldName("[T4,P] [T5,P].F"));
+			fieldDeclaration.setName(Names.newField("[T4,P] [T5,P].F"));
 			sst.setFields(Sets.newHashSet(fieldDeclaration));
 		} else {
 			sst.setFields(fields);
 		}
 
 		PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
-		propertyDeclaration.setName(PropertyName.newPropertyName("[T10,P] [T11,P].P"));
+		propertyDeclaration.setName(Names.newProperty("[T10,P] [T11,P].P"));
 		propertyDeclaration.setGet(Lists.newArrayList(new ReturnStatement()));
 		propertyDeclaration.setSet(Lists.newArrayList(new Assignment()));
 
 		EventDeclaration eventDeclaration = new EventDeclaration();
-		eventDeclaration.setName(EventName.newEventName("[T2,P] [T3,P].E"));
+		eventDeclaration.setName(Names.newEvent("[T2,P] [T3,P].E"));
 
 		DelegateDeclaration delegateDeclaration = new DelegateDeclaration();
-		delegateDeclaration.setName(DelegateTypeName.newDelegateTypeName("d:[R,P] [T2,P].()"));
-		sst.setEnclosingType(TypeName.newTypeName("T,P"));
+		delegateDeclaration.setName(Names.newType("d:[R,P] [T2,P].()").asDelegateTypeName());
+		sst.setEnclosingType(Names.newType("T,P"));
 		sst.setDelegates(Sets.newHashSet(delegateDeclaration));
 		sst.setEvents(Sets.newHashSet(eventDeclaration));
 		sst.setProperties(Sets.newHashSet(propertyDeclaration));

@@ -24,9 +24,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.typeshapes.MethodHierarchy;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.testutils.model.names.TestNameFactory;
 
 public class MethodHierarchyTest {
@@ -34,7 +33,7 @@ public class MethodHierarchyTest {
 	@Test
 	public void testDefaultValues() {
 		MethodHierarchy sut = new MethodHierarchy();
-		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getElement()));
+		assertThat(Names.getUnknownMethod(), equalTo(sut.getElement()));
 		assertNull(sut.getSuper());
 		assertNull(sut.getFirst());
 		assertFalse(sut.isDeclaredInParentHierarchy());
@@ -118,6 +117,6 @@ public class MethodHierarchyTest {
 	}
 
 	private static IMethodName m(String s) {
-		return MethodName.newMethodName("[T1,P1] [T2,P2]." + s + "()");
+		return Names.newMethod("[T1,P1] [T2,P2]." + s + "()");
 	}
 }

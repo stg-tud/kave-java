@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -39,5 +39,4 @@ public class TypeLocationIdentifierFactory extends AbstractLocationIdentifierFac
 	protected LocationIdentifier create(IEventReference eventRef) {
 		return new TypeLocationIdentifier(eventRef.getEventName().getHandlerType());
 	}
-
 }

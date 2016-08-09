@@ -41,10 +41,6 @@ public class MethodName extends MemberName implements IMethodName {
 		super(identifier);
 	}
 
-	public static IMethodName newMethodName(String string, Object... args) {
-		return newMethodName(String.format(string, args));
-	}
-
 	@Override
 	public List<IParameterName> getParameters() {
 		return CsNameUtils.getParameterNames(identifier);

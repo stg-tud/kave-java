@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -164,7 +164,8 @@ public class PointsToUsageExtractor {
 			if (completionExpression.getVariableReference() == null) {
 				// the query builder cannot infer the type of references that
 				// are not part of the original SST
-				cc.kave.commons.model.names.ITypeName type = context.getTypeShape().getTypeHierarchy().getElement();
+				cc.kave.commons.model.naming.types.ITypeName type = context.getTypeShape().getTypeHierarchy()
+						.getElement();
 				ptQuery = new PointsToQuery(receiverVarRef, type, enclosingStatement, enclosingMethod.getName());
 			} else {
 				ptQuery = queryBuilder.newQuery(receiverVarRef, enclosingStatement, enclosingMethod.getName());
@@ -294,11 +295,11 @@ public class PointsToUsageExtractor {
 				if (firstMethod != null) {
 					newMethodContext = firstMethod;
 				} else if (methodContextRewritingStrategy == MethodContextReplacement.FIRST_OR_UNKNOWN) {
-					return CoReNameConverter.convert(MethodName.UNKNOWN_NAME);
+					return CoReNameConverter.convert(Names.getUnknownMethod());
 				} else if (superMethod != null) {
 					newMethodContext = superMethod;
 				} else if (methodContextRewritingStrategy == MethodContextReplacement.FIRST_OR_SUPER_OR_UNKNOWN) {
-					return CoReNameConverter.convert(MethodName.UNKNOWN_NAME);
+					return CoReNameConverter.convert(Names.getUnknownMethod());
 				} else {
 					// FIRST_OR_SUPER_OR_ELEMENT
 					return currentContext;

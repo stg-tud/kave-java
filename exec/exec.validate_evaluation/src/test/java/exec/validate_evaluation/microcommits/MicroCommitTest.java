@@ -23,8 +23,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.testutils.ToStringAssert;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
@@ -120,7 +119,7 @@ public class MicroCommitTest {
 	public void getType_nn() {
 		MicroCommit sut = MicroCommit.create(new NoUsage(), new NoUsage());
 		ICoReTypeName actual = sut.getType();
-		ICoReTypeName expected = CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME);
+		ICoReTypeName expected = CoReNameUtils.toCoReName(Names.getUnknownType());
 		assertEquals(expected, actual);
 	}
 
@@ -152,7 +151,7 @@ public class MicroCommitTest {
 	public void getMethodContext_nn() {
 		MicroCommit sut = MicroCommit.create(new NoUsage(), new NoUsage());
 		ICoReMethodName actual = sut.getMethodContext();
-		ICoReMethodName expected = CoReNameUtils.toCoReName(MethodName.UNKNOWN_NAME);
+		ICoReMethodName expected = CoReNameUtils.toCoReName(Names.getUnknownMethod());
 		assertEquals(expected, actual);
 	}
 

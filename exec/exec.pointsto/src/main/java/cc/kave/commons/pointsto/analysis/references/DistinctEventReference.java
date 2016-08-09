@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IEventReference;
 
 public class DistinctEventReference extends DistinctMemberReference {
@@ -54,5 +54,4 @@ public class DistinctEventReference extends DistinctMemberReference {
 		return MoreObjects.toStringHelper(DistinctEventReference.class).add("base", getBaseReference())
 				.add("name", getReference().getEventName().getName()).toString();
 	}
-
 }

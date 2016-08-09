@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReference;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;;
 
@@ -70,5 +70,4 @@ public class DistinctCatchBlockParameterReference implements DistinctReference {
 
 		return true;
 	}
-
 }

@@ -24,16 +24,12 @@ import java.util.stream.IntStream;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
@@ -92,15 +88,15 @@ public abstract class TestBuilder {
 	}
 
 	public ITypeName type(String id) {
-		return TypeName.newTypeName(id + ",Test");
+		return Names.newType(id + ",Test");
 	}
 
 	public ITypeName voidType() {
-		return TypeName.newTypeName("System.Void, mscorlib");
+		return Names.newType("p:void");
 	}
 
 	public ITypeName intType() {
-		return TypeName.newTypeName("System.Int32, mscorlib");
+		return Names.newType("p:int");
 	}
 
 	public IMethodName method(ITypeName declType, String name, ITypeName... parameters) {
@@ -115,22 +111,22 @@ public abstract class TestBuilder {
 
 	public IMethodName method(ITypeName retType, ITypeName declType, String name, ITypeName... parameters) {
 		String parameterIdentifiers = getParameterIdentifiers(Arrays.asList(parameters));
-		return MethodName.newMethodName("[" + retType.getIdentifier() + "] [" + declType.getIdentifier() + "]." + name
-				+ "(" + parameterIdentifiers + ")");
+		return Names.newMethod("[" + retType.getIdentifier() + "] [" + declType.getIdentifier() + "]." + name + "("
+				+ parameterIdentifiers + ")");
 	}
 
 	public IMethodName constructor(ITypeName declType, ITypeName... parameters) {
 		String parameterIdentifiers = getParameterIdentifiers(Arrays.asList(parameters));
-		return MethodName.newMethodName(
+		return Names.newMethod(
 				"[" + voidType() + "] [" + declType.getIdentifier() + "]..ctor(" + parameterIdentifiers + ")");
 	}
 
 	public IFieldName field(ITypeName type, ITypeName declType, int id) {
-		return FieldName.newFieldName("[" + type.getIdentifier() + "] [" + declType.getIdentifier() + "].f" + id);
+		return Names.newField("[" + type.getIdentifier() + "] [" + declType.getIdentifier() + "].f" + id);
 	}
 
 	public IPropertyName property(ITypeName type, ITypeName declType, int id) {
-		return PropertyName.newPropertyName(
+		return Names.newProperty(
 				"get set [" + type.getIdentifier() + "] [" + declType.getIdentifier() + "].p" + id + "()");
 	}
 
@@ -179,8 +175,8 @@ public abstract class TestBuilder {
 	public ILambdaExpression lambda(ITypeName returnType, List<ITypeName> parameterTypes, IStatement... stmts) {
 		LambdaExpression lambdaExpr = new LambdaExpression();
 		lambdaExpr.setBody(Arrays.asList(stmts));
-		ILambdaName lambdaName = LambdaName.newLambdaName(
-				"[" + returnType.getIdentifier() + "] (" + getParameterIdentifiers(parameterTypes) + ")");
+		ILambdaName lambdaName = Names
+				.newLambda("[" + returnType.getIdentifier() + "] (" + getParameterIdentifiers(parameterTypes) + ")");
 		lambdaExpr.setName(lambdaName);
 		return lambdaExpr;
 	}
@@ -238,5 +234,4 @@ public abstract class TestBuilder {
 		context.setTypeShape(typeShape);
 		return context;
 	}
-
 }

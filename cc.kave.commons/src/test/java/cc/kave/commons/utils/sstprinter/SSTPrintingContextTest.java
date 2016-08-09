@@ -21,20 +21,17 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
-import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
 
 public class SSTPrintingContextTest {
 
 	private static void AssertTypeFormat(String expected, String typeIdentifier) {
 		SSTPrintingContext sut = new SSTPrintingContext();
-		Assert.assertEquals(expected, sut.type(TypeName.newTypeName(typeIdentifier)).toString());
+		Assert.assertEquals(expected, sut.type(Names.newType(typeIdentifier)).toString());
 	}
 
 	@Test
@@ -129,7 +126,7 @@ public class SSTPrintingContextTest {
 	@Test
 	public void testParameterList_OneParameter() {
 		List<IParameterName> parameters = new ArrayList<>();
-		parameters.add(ParameterName.newParameterName("[A,P] p1"));
+		parameters.add(Names.newParameter("[A,P] p1"));
 		SSTPrintingContext sut = new SSTPrintingContext();
 		sut.parameterList(parameters);
 		Assert.assertEquals("(A p1)", sut.toString());
@@ -138,8 +135,8 @@ public class SSTPrintingContextTest {
 	@Test
 	public void testParameterList_MultipleParameters() {
 		List<IParameterName> parameters = new ArrayList<>();
-		parameters.add(ParameterName.newParameterName("[A,P] p1"));
-		parameters.add(ParameterName.newParameterName("[B,P] p2"));
+		parameters.add(Names.newParameter("[A,P] p1"));
+		parameters.add(Names.newParameter("[B,P] p2"));
 		SSTPrintingContext sut = new SSTPrintingContext();
 		sut.parameterList(parameters);
 		Assert.assertEquals("(A p1, B p2)", sut.toString());

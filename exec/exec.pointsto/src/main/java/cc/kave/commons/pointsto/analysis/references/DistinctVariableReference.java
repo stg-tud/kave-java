@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 
@@ -75,5 +75,4 @@ public class DistinctVariableReference implements DistinctReference {
 		return MoreObjects.toStringHelper(DistinctVariableReference.class)
 				.add("name", varDecl.getReference().getIdentifier()).add("type", varDecl.getType()).toString();
 	}
-
 }

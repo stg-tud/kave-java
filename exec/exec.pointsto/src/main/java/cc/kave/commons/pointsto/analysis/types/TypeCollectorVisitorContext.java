@@ -20,11 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -69,7 +69,8 @@ public class TypeCollectorVisitorContext {
 		declare(languageOptions.getSuperName(), languageOptions.getSuperType(typeHierarchy));
 
 		// collect the types of fields and properties
-		// note that these do not have to be added to the symbol table as FieldReference and PropertyReference contain
+		// note that these do not have to be added to the symbol table as
+		// FieldReference and PropertyReference contain
 		// the associated type
 		for (IFieldDeclaration fieldDecl : context.getSST().getFields()) {
 			IFieldName field = fieldDecl.getName();
@@ -122,7 +123,8 @@ public class TypeCollectorVisitorContext {
 			LOGGER.error("Cannot declare a missing variable");
 		} else {
 			ITypeName type = varDecl.getType();
-			// SST lack a compound statement to handle scoping brackets -> allow a variable to be declared multiple
+			// SST lack a compound statement to handle scoping brackets -> allow
+			// a variable to be declared multiple
 			// times
 			declare(varDecl.getReference().getIdentifier(), type, true);
 
@@ -134,7 +136,8 @@ public class TypeCollectorVisitorContext {
 		if (parameter.isUnknown()) {
 			LOGGER.error("Cannot declare an unknown parameter");
 		} else {
-			// allow a method parameter to be declared multiple times in order to guard against faulty user input
+			// allow a method parameter to be declared multiple times in order
+			// to guard against faulty user input
 			declare(parameter.getName(), parameter.getValueType(), true);
 		}
 	}
@@ -192,14 +195,13 @@ public class TypeCollectorVisitorContext {
 		if (type == null) {
 			LOGGER.error("Skipping an index access reference due to an undeclared base variable");
 		} else {
-			ITypeName baseType = TypeName.UNKNOWN_NAME;
-			if (type.isArrayType()) {
-				baseType = type.getArrayBaseType();
+			ITypeName baseType = Names.getUnknownType();
+			if (type.isArray()) {
+				baseType = type.asArrayTypeName().getArrayBaseType();
 			}
 
 			referenceTypes.put(reference, baseType);
 			allTypes.add(baseType);
 		}
 	}
-
 }

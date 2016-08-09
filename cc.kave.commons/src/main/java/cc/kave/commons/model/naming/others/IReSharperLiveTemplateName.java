@@ -15,7 +15,9 @@
  */
 package cc.kave.commons.model.naming.others;
 
-public interface IReSharperLiveTemplateName {
+import cc.kave.commons.model.naming.IName;
+
+public interface IReSharperLiveTemplateName extends IName {
 
 	String getName();
 

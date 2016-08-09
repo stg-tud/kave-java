@@ -266,7 +266,7 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 			ICompletionEvent event = eventEntry.getKey();
 			IProposal expectedProposal = event.getLastSelectedProposal();
 			ICoReMethodName expectedMethod = CoReNameConverter
-					.convert((cc.kave.commons.model.names.IMethodName) expectedProposal.getName());
+					.convert((cc.kave.commons.model.naming.codeelements.IMethodName) expectedProposal.getName());
 
 			for (Usage query : eventEntry.getValue()) {
 				double rr = measure.calculate(recommender, Query.createAsCopyFrom(query),
@@ -284,5 +284,4 @@ public class MRREvaluation extends AbstractCompletionEventEvaluation implements 
 			store.close();
 		}
 	}
-
 }

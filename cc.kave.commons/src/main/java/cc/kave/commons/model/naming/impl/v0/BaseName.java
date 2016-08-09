@@ -16,13 +16,10 @@
 package cc.kave.commons.model.naming.impl.v0;
 
 import cc.kave.commons.model.naming.IName;
-import cc.kave.commons.model.naming.Names;
 
 public abstract class BaseName implements IName {
 
 	protected static final String UNKNOWN_NAME_IDENTIFIER = "???";
-
-	public static final IName UNKNOWN_NAME = Names.newGeneral(UNKNOWN_NAME_IDENTIFIER);
 
 	protected String identifier;
 
@@ -42,7 +39,7 @@ public abstract class BaseName implements IName {
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(UNKNOWN_NAME);
+		return this.getIdentifier().equals(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	@Override

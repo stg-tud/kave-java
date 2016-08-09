@@ -25,16 +25,13 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.typeshapes.MethodHierarchy;
-import cc.kave.commons.model.typeshapes.TypeHierarchy;
-import cc.kave.commons.model.typeshapes.TypeShape;
+import cc.kave.commons.model.naming.Names;
 
 public class TypeShapeTest {
 
 	private static TypeHierarchy someTypeHierarchy() {
 		TypeHierarchy typeHierarchy = new TypeHierarchy();
-		typeHierarchy.setElement(TypeName.newTypeName("T,P"));
+		typeHierarchy.setElement(Names.newType("T,P"));
 		return typeHierarchy;
 	}
 

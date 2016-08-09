@@ -13,10 +13,11 @@
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 /**
- * Represents the {@link AllocationSite} of the receiver object used for invoking all entry points.
+ * Represents the {@link AllocationSite} of the receiver object used for
+ * invoking all entry points.
  */
 public class ContextAllocationSite implements AllocationSite {
 
@@ -55,5 +56,4 @@ public class ContextAllocationSite implements AllocationSite {
 			return false;
 		return true;
 	}
-
 }

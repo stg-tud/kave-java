@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class EventsTest {
 

@@ -35,8 +35,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
 import cc.kave.commons.model.ssts.impl.blocks.ForEachLoop;
@@ -66,8 +66,8 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 		loopedRef1 = dummyVar(1);
 		it0 = variableReference("$it_0");
 		it1 = variableReference("$it_1");
-		dec0 = declare("e0", TypeName.newTypeName("t0"));
-		dec1 = declare("e1", TypeName.newTypeName("t1"));
+		dec0 = declare("e0", Names.newType("t0"));
+		dec1 = declare("e1", Names.newType("t1"));
 	}
 
 	// |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|......|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
@@ -197,5 +197,4 @@ public class ForEachLoopNormalizationTest extends StatementNormalizationVisitorB
 		loopHeader.setBody(loopHeaderBody);
 		return loopHeader;
 	}
-
 }

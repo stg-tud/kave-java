@@ -16,7 +16,7 @@ import static cc.kave.commons.pointsto.analysis.utils.GenericNameUtils.eraseGene
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public abstract class DistinctMemberName {
 
@@ -83,5 +83,4 @@ public abstract class DistinctMemberName {
 	public String toString() {
 		return MoreObjects.toStringHelper(this).add("declaringType", declaringType).add("name", name).toString();
 	}
-
 }

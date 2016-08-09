@@ -16,9 +16,9 @@ import static cc.kave.commons.pointsto.analysis.utils.GenericNameUtils.eraseGene
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.visitors.ReferenceNormalizationVisitor;
@@ -60,7 +60,7 @@ public class PointsToQuery {
 	}
 
 	protected ITypeName normalizeType(ITypeName type) {
-		if (type == null || type.isUnknownType() || type.isTypeParameter()) {
+		if (type == null || type.isUnknown() || type.isTypeParameter()) {
 			return null;
 		} else {
 			return type;
@@ -70,7 +70,7 @@ public class PointsToQuery {
 	protected IMemberName normalizeMember(IMemberName member) {
 		if (member == null || member.isUnknown()) {
 			return null;
-		} else if (member.equals(MethodName.UNKNOWN_NAME)) {
+		} else if (member.equals(Names.getUnknownMethod())) {
 			// TODO remove once isUnknown is overridden in MethodName
 			return null;
 		} else {
@@ -126,5 +126,4 @@ public class PointsToQuery {
 			return false;
 		return true;
 	}
-
 }

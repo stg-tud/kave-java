@@ -16,9 +16,9 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 
@@ -105,5 +105,4 @@ public class DistinctPropertyParameterReference implements DistinctReference {
 		return MoreObjects.toStringHelper(DistinctPropertyParameterReference.class)
 				.add("name", reference.getIdentifier()).add("type", type).add("property", property).toString();
 	}
-
 }

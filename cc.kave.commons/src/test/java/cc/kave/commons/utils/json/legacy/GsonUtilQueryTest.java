@@ -16,7 +16,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import cc.kave.commons.utils.json.legacy.GsonUtil;
+import com.google.common.collect.Sets;
+
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
@@ -25,8 +26,6 @@ import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
-
-import com.google.common.collect.Sets;
 
 public class GsonUtilQueryTest {
 

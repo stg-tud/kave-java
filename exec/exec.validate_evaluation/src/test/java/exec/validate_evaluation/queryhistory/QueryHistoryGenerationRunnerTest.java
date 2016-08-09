@@ -40,9 +40,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.CoReMethodName;
@@ -210,7 +209,7 @@ public class QueryHistoryGenerationRunnerTest {
 		Context ctx = mock(Context.class);
 
 		EditStreak e = new EditStreak();
-		e.add(Snapshot.create(LocalDateTime.now(), ctx, MethodName.newMethodName("[T,P] [T,P].sel()")));
+		e.add(Snapshot.create(LocalDateTime.now(), ctx, Names.newMethod("[T,P] [T,P].sel()")));
 		in.put("a.zip", streaks(e));
 
 		Usage usage = new Query();
@@ -257,7 +256,7 @@ public class QueryHistoryGenerationRunnerTest {
 		for (int i = 0; i < num; i++) {
 			LocalDateTime date = LocalDateTime.now().plusSeconds(num);
 			Context context = context(num, i);
-			IMethodName sel = MethodName.newMethodName("[T,P] [T,P] m" + num + "()");
+			IMethodName sel = Names.newMethod("[T,P] [T,P] m" + num + "()");
 			Snapshot snapshot = Snapshot.create(date, context, sel);
 			e.add(snapshot);
 		}
@@ -266,10 +265,10 @@ public class QueryHistoryGenerationRunnerTest {
 
 	private static Context context(int num, int i) {
 		FieldDeclaration fd1 = new FieldDeclaration();
-		fd1.setName(FieldName.newFieldName("[T,P] [T,P].num" + num));
+		fd1.setName(Names.newField("[T,P] [T,P].num" + num));
 
 		FieldDeclaration fd2 = new FieldDeclaration();
-		fd2.setName(FieldName.newFieldName("[T,P] [T,P].i" + i));
+		fd2.setName(Names.newField("[T,P] [T,P].i" + i));
 
 		Context ctx = new Context();
 		ctx.getSST().getFields().add(fd1);

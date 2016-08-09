@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.unification.identifiers;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class TypeLocationIdentifier implements LocationIdentifier {
 
@@ -50,5 +50,4 @@ public class TypeLocationIdentifier implements LocationIdentifier {
 			return false;
 		return true;
 	}
-
 }

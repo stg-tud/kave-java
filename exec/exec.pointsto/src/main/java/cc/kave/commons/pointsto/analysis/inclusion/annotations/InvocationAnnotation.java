@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.annotations;
 
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 
 public class InvocationAnnotation extends MemberAnnotation {
 
@@ -52,5 +52,4 @@ public class InvocationAnnotation extends MemberAnnotation {
 			return false;
 		return true;
 	}
-
 }

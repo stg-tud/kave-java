@@ -15,9 +15,9 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.ILocalVariableName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class LocalVariableName extends BaseName implements ILocalVariableName {
@@ -28,7 +28,7 @@ public class LocalVariableName extends BaseName implements ILocalVariableName {
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(UNKNOWN_NAME);
+		return UNKNOWN_NAME_IDENTIFIER.equals(getIdentifier());
 	}
 
 	@Override
@@ -40,7 +40,6 @@ public class LocalVariableName extends BaseName implements ILocalVariableName {
 	@Override
 	public ITypeName getValueType() {
 		int lengthOfTypeIdentifier = identifier.lastIndexOf(']') - 1;
-		return TypeName.newTypeName(identifier.substring(1, lengthOfTypeIdentifier));
-
+		return Names.newType(identifier.substring(1, lengthOfTypeIdentifier));
 	}
 }

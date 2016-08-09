@@ -16,8 +16,8 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;;
 
@@ -86,5 +86,4 @@ public class DistinctLambdaParameterReference implements DistinctReference {
 		return MoreObjects.toStringHelper(DistinctLambdaParameterReference.class).add("name", parameter.getName())
 				.add("type", parameter.getValueType().getName()).toString();
 	}
-
 }

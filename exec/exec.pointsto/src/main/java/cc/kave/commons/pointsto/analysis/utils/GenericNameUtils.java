@@ -20,18 +20,15 @@ import java.util.regex.Pattern;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 
 public class GenericNameUtils {
@@ -58,8 +55,7 @@ public class GenericNameUtils {
 			return event;
 		}
 
-		return EventName
-				.newEventName(replaceTypes(event.getIdentifier(), event.getHandlerType(), event.getDeclaringType()));
+		return Names.newEvent(replaceTypes(event.getIdentifier(), event.getHandlerType(), event.getDeclaringType()));
 	}
 
 	public static IFieldName eraseGenericInstantiations(IFieldName field) {
@@ -67,8 +63,7 @@ public class GenericNameUtils {
 			return field;
 		}
 
-		return FieldName
-				.newFieldName(replaceTypes(field.getIdentifier(), field.getValueType(), field.getDeclaringType()));
+		return Names.newField(replaceTypes(field.getIdentifier(), field.getValueType(), field.getDeclaringType()));
 	}
 
 	public static IPropertyName eraseGenericInstantiations(IPropertyName property) {
@@ -76,7 +71,7 @@ public class GenericNameUtils {
 			return property;
 		}
 
-		return PropertyName.newPropertyName(
+		return Names.newProperty(
 				replaceTypes(property.getIdentifier(), property.getValueType(), property.getDeclaringType()));
 	}
 
@@ -91,7 +86,7 @@ public class GenericNameUtils {
 			parameterTypes.add(parameter.getValueType());
 		}
 
-		return MethodName.newMethodName(replaceTypes(method.getIdentifier(),
+		return Names.newMethod(replaceTypes(method.getIdentifier(),
 				Iterables.concat(Arrays.asList(method.getReturnType(), method.getDeclaringType()), parameterTypes)));
 	}
 
@@ -101,10 +96,11 @@ public class GenericNameUtils {
 			return type;
 		}
 
-		for (ITypeName typeParam : type.getTypeParameters()) {
+		for (ITypeParameterName typeParam : type.getTypeParameters()) {
 			String name = typeParam.getTypeParameterShortName();
 
-			// guard against a bug in TypeName.getTypeParameters producing invalid type parameters
+			// guard against a bug in TypeName.getTypeParameters producing
+			// invalid type parameters
 			if (Strings.isNullOrEmpty(name)) {
 				return type;
 			}
@@ -113,7 +109,7 @@ public class GenericNameUtils {
 					.quote(name + " " + INSTANTIATION_ARROW + " " + typeParam.getTypeParameterType().getIdentifier());
 			id = id.replaceAll(pattern, name);
 		}
-		return TypeName.newTypeName(id);
+		return Names.newType(id);
 	}
 
 	private static String replaceTypes(String id, ITypeName... types) {
@@ -130,5 +126,4 @@ public class GenericNameUtils {
 		}
 		return id;
 	}
-
 }

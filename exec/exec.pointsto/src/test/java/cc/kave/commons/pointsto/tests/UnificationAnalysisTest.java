@@ -33,14 +33,12 @@ import org.junit.Test;
 import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.ArrayTypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.impl.v0.types.ArrayTypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
@@ -70,18 +68,18 @@ public class UnificationAnalysisTest {
 	@Test
 	public void testVisitorContext() {
 		TestSSTBuilder builder = new TestSSTBuilder();
-		ITypeName testType = TypeName.newTypeName("Test.UnificationContextTest, Test");
+		ITypeName testType = Names.newType("Test.UnificationContextTest, Test");
 		UnificationAnalysisVisitorContext visitorContext = new UnificationAnalysisVisitorContext(
 				builder.createContext(builder.createEmptySST(testType)), new SteensgaardLocationIdentifierFactory());
 
-		IMethodName aCtor = MethodName.newMethodName("[?] [UnificationContextTest.A]..ctor()");
-		IMethodName bCtor = MethodName.newMethodName("[?] [UnificationContextTest.B]..ctor()");
-		IVariableDeclaration xDecl = declare("x", TypeName.UNKNOWN_NAME);
-		IVariableDeclaration zDecl = declare("z", TypeName.UNKNOWN_NAME);
-		IVariableDeclaration aDecl = declare("a", TypeName.UNKNOWN_NAME);
-		IVariableDeclaration bDecl = declare("b", TypeName.UNKNOWN_NAME);
-		IVariableDeclaration yDecl = declare("y", TypeName.UNKNOWN_NAME);
-		IVariableDeclaration cDecl = declare("c", TypeName.UNKNOWN_NAME);
+		IMethodName aCtor = Names.newMethod("[?] [UnificationContextTest.A]..ctor()");
+		IMethodName bCtor = Names.newMethod("[?] [UnificationContextTest.B]..ctor()");
+		IVariableDeclaration xDecl = declare("x", Names.getUnknownType());
+		IVariableDeclaration zDecl = declare("z", Names.getUnknownType());
+		IVariableDeclaration aDecl = declare("a", Names.getUnknownType());
+		IVariableDeclaration bDecl = declare("b", Names.getUnknownType());
+		IVariableDeclaration yDecl = declare("y", Names.getUnknownType());
+		IVariableDeclaration cDecl = declare("c", Names.getUnknownType());
 
 		visitorContext.declareVariable(xDecl);
 		IInvocationExpression invocation = invocationExpr(aCtor);
@@ -108,7 +106,7 @@ public class UnificationAnalysisTest {
 		assertEquals(2, new HashSet<>(referenceLocations.values()).size());
 
 		visitorContext.declareVariable(cDecl);
-		IFieldReference fieldRef = builder.buildFieldReference("y", FieldName.newFieldName("[?] [?].f"));
+		IFieldReference fieldRef = builder.buildFieldReference("y", Names.newField("[?] [?].f"));
 		visitorContext.setLastAssignment(assignmentToLocal("c", refExpr(fieldRef)));
 		visitorContext.readField(variableReference("c"), fieldRef);
 
@@ -139,7 +137,7 @@ public class UnificationAnalysisTest {
 		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		pointsToAnalysis.compute(context);
 
-		IFieldName sourceField = FieldName.newFieldName(
+		IFieldName sourceField = Names.newField(
 				"[" + builder.getStringType().getIdentifier() + "] [" + enclosingType.getIdentifier() + "].source");
 		Set<AbstractLocation> sourceFieldLocations = pointsToAnalysis
 				.query(new PointsToQuery(SSTBuilder.fieldReference(sourceField), builder.getStringType(), null, null));
@@ -224,10 +222,12 @@ public class UnificationAnalysisTest {
 				.query(new PointsToQuery(variableReference("x"), objectType, lambda.getBody().get(1), entry2Name));
 		assertThat(entry2ArgInvocationLocations, Matchers.is(lambdaParameterLocations));
 
-		// the parameter of 'foo' and the lambda get unified by the 'arg0' parameter of String.Format
+		// the parameter of 'foo' and the lambda get unified by the 'arg0'
+		// parameter of String.Format
 		assertThat(fooParameterLocations, Matchers.is(lambdaParameterLocations));
 
-		// check that the 'fun' variables of entry1 and entry2 do not refer to the same object
+		// check that the 'fun' variables of entry1 and entry2 do not refer to
+		// the same object
 		ITypeName delegateType = ((IVariableDeclaration) entry1Decl.getBody().get(0)).getType();
 		Set<AbstractLocation> entry1FunLocations = pointsToAnalysis.query(
 				new PointsToQuery(variableReference("fun"), delegateType, entry1InvokeFunAssignment, entry1Name));
@@ -279,6 +279,5 @@ public class UnificationAnalysisTest {
 		assertThat(consoleCallArgLocations, Matchers.not(consumeParameterLocations));
 		assertThat(consoleCallArgLocations, Matchers.is(name1Locations));
 		assertThat(consoleCallArgLocations, Matchers.is(name2Locations));
-
 	}
 }

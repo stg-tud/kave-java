@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class CompletionEventFilter implements Predicate<ICompletionEvent> {
 
@@ -38,5 +38,4 @@ public class CompletionEventFilter implements Predicate<ICompletionEvent> {
 
 		return true;
 	}
-
 }

@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.IReadingArchive;
@@ -134,14 +134,14 @@ public class EditStreakGenerationIoTest {
 	public void readEventsAreTypeErased() throws IOException {
 
 		SST inSST = new SST();
-		inSST.setEnclosingType(TypeName.newTypeName("T`1[[G1->T,P]],P"));
+		inSST.setEnclosingType(Names.newType("T`1[[G1->T,P]],P"));
 		Context inCtx = new Context();
 		inCtx.setSST(inSST);
 		CompletionEvent in = new CompletionEvent();
 		in.context = inCtx;
 
 		SST outSST = new SST();
-		outSST.setEnclosingType(TypeName.newTypeName("T`1[[G1]],P"));
+		outSST.setEnclosingType(Names.newType("T`1[[G1]],P"));
 		Context outCtx = new Context();
 		outCtx.setSST(outSST);
 		CompletionEvent out = new CompletionEvent();

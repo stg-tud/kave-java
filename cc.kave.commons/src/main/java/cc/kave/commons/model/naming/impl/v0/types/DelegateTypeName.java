@@ -17,9 +17,9 @@ package cc.kave.commons.model.naming.impl.v0.types;
 
 import java.util.List;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
-import cc.kave.commons.model.naming.impl.v0.codeelements.MethodName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
@@ -40,7 +40,7 @@ public class DelegateTypeName extends TypeName implements IDelegateTypeName {
 	}
 
 	private IMethodName getDelegateMethod() {
-		return MethodName.newMethodName(identifier.substring(2));
+		return Names.newMethod(identifier.substring(2));
 	}
 
 	public ITypeName getDelegateType() {

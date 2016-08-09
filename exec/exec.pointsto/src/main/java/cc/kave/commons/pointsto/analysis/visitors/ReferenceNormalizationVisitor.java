@@ -12,10 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis.visitors;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -72,8 +71,7 @@ public class ReferenceNormalizationVisitor extends FailSafeNodeVisitor<Void, IRe
 
 	@Override
 	public IReference visit(IMethodReference methodRef, Void context) {
-		// TODO replace with isUnknown once fixed
-		if (MethodName.UNKNOWN_NAME.equals(methodRef.getMethodName())) {
+		if (methodRef.getMethodName().isUnknown()) {
 			return null;
 		} else {
 			return methodRef;

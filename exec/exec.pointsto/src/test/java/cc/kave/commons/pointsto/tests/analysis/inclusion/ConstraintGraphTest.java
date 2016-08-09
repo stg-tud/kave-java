@@ -35,13 +35,11 @@ import org.junit.Test;
 
 import com.google.common.collect.Multimap;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.pointsto.analysis.inclusion.ConstructedTerm;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.StmtAllocationSite;
@@ -69,9 +67,8 @@ public class ConstraintGraphTest {
 		// r = p.f
 		// r.m()
 
-		final IFieldName field = FieldName
-				.newFieldName("[" + TypeName.UNKNOWN_NAME.getIdentifier() + "] [" + TEST_TYPE_IDENTIFIER + "].f");
-		final IMethodName method = MethodName.newMethodName("[System.Void, System] [" + TEST_TYPE_IDENTIFIER + "].m()");
+		final IFieldName field = Names.newField("[?] [" + TEST_TYPE_IDENTIFIER + "].f");
+		final IMethodName method = Names.newMethod("[p:void] [" + TEST_TYPE_IDENTIFIER + "].m()");
 
 		DeclarationMapper declMapper = mock(DeclarationMapper.class);
 		when(declMapper.get((IMemberName) field)).thenReturn(declareFields(field.getIdentifier()).iterator().next());
@@ -110,9 +107,8 @@ public class ConstraintGraphTest {
 				Matchers.is(ls.get(rDistRef)));
 		assertThat(ls.get(new DistinctVariableReference(pDecl)),
 				Matchers.not(ls.get(new DistinctVariableReference(qDecl))));
-		assertThat(
-				ls.get(new DistinctMethodParameterReference(
-						parameter("this", TypeName.newTypeName(TEST_TYPE_IDENTIFIER)), method)),
+		assertThat(ls.get(
+				new DistinctMethodParameterReference(parameter("this", Names.newType(TEST_TYPE_IDENTIFIER)), method)),
 				Matchers.is(ls.get(new DistinctVariableReference(rDecl))));
 	}
 
@@ -126,13 +122,11 @@ public class ConstraintGraphTest {
 		// a = b
 		// X z = a.n()
 
-		ITypeName aType = TypeName.newTypeName("A, Test");
-		ITypeName bType = TypeName.newTypeName("B, Test");
-		ITypeName xType = TypeName.newTypeName("X, Test");
-		IMethodName aNMethod = MethodName
-				.newMethodName("[" + xType.getIdentifier() + "] [" + aType.getIdentifier() + "].n()");
-		IMethodName bNMethod = MethodName
-				.newMethodName("[" + xType.getIdentifier() + "] [" + bType.getIdentifier() + "].n()");
+		ITypeName aType = Names.newType("A, Test");
+		ITypeName bType = Names.newType("B, Test");
+		ITypeName xType = Names.newType("X, Test");
+		IMethodName aNMethod = Names.newMethod("[" + xType.getIdentifier() + "] [" + aType.getIdentifier() + "].n()");
+		IMethodName bNMethod = Names.newMethod("[" + xType.getIdentifier() + "] [" + bType.getIdentifier() + "].n()");
 
 		DeclarationMapper declMapper = mock(DeclarationMapper.class);
 		when(declMapper.get(aNMethod)).thenReturn(declareMethod());

@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class Callpath implements Iterable<IMethodName> {
 
@@ -118,5 +118,4 @@ public class Callpath implements Iterable<IMethodName> {
 
 		return true;
 	}
-
 }

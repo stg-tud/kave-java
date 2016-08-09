@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
@@ -30,7 +30,7 @@ import cc.kave.commons.testutils.ToStringAssert;
 public class EventReferenceTest extends SSTBaseTest {
 
 	private static IEventName someEvent() {
-		return EventName.newEventName("[T1,P1] [T2,P2].E");
+		return Names.newEvent("[T1,P1] [T2,P2].E");
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class EventReferenceTest extends SSTBaseTest {
 		EventReference sut = new EventReference();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(EventName.UNKNOWN_NAME, equalTo(sut.getEventName()));
+		assertThat(Names.getUnknownEvent(), equalTo(sut.getEventName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}

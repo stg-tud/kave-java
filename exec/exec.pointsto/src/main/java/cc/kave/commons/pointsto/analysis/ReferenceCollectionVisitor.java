@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -59,5 +59,4 @@ public class ReferenceCollectionVisitor extends ScopingVisitor<ReferenceCollecti
 		context.addIndexAccessReference(indexAccessRef);
 		return super.visit(indexAccessRef, context);
 	}
-
 }

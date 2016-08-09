@@ -15,17 +15,19 @@
  */
 package cc.kave.commons.model.ssts.impl;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ReferenceExpression;
@@ -34,10 +36,6 @@ import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public abstract class SSTBaseTest {
 
@@ -58,7 +56,7 @@ public abstract class SSTBaseTest {
 
 	protected IVariableDeclaration someDeclaration(String type) {
 		VariableDeclaration decl = new VariableDeclaration();
-		decl.setType(TypeName.newTypeName(type + ",P1"));
+		decl.setType(Names.newType(type + ",P1"));
 		return decl;
 	}
 
@@ -85,7 +83,7 @@ public abstract class SSTBaseTest {
 
 	protected IMethodName getMethod(String simpleName) {
 		String methodName = "[T1, P1] [T2, P2]" + simpleName + "()";
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	protected List<ISimpleExpression> refExprs(String[] ids) {
@@ -101,10 +99,10 @@ public abstract class SSTBaseTest {
 	}
 
 	protected IParameterName someParameter() {
-		return ParameterName.newParameterName("[T,P] n");
+		return Names.newParameter("[T,P] n");
 	}
 
 	protected ILambdaName someLambdaName() {
-		return LambdaName.newLambdaName("[T,P] ([T2,P2] p)");
+		return Names.newLambda("[T,P] ([T2,P2] p)");
 	}
 }

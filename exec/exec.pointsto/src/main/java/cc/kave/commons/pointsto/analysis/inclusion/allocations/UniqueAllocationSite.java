@@ -12,11 +12,12 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 /**
- * A unique {@link AllocationSite} using instance equality. Should be phased out if object sensitivity is to be used as
- * contexts created by the analysis will not be reproducible during query time.
+ * A unique {@link AllocationSite} using instance equality. Should be phased out
+ * if object sensitivity is to be used as contexts created by the analysis will
+ * not be reproducible during query time.
  */
 public final class UniqueAllocationSite implements AllocationSite {
 
@@ -30,5 +31,4 @@ public final class UniqueAllocationSite implements AllocationSite {
 	public ITypeName getType() {
 		return type;
 	}
-
 }

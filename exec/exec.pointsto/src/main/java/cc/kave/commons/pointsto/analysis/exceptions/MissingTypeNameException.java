@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.exceptions;
 
 import java.util.Locale;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class MissingTypeNameException extends RuntimeException {
 

@@ -21,7 +21,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
@@ -51,6 +51,5 @@ public class TypeBasedAnalysisTest {
 
 		// querying for System.Void should not return any locations
 		assertTrue(pointerAnalysis.query(createQuery(builder.getVoidType())).isEmpty());
-
 	}
 }

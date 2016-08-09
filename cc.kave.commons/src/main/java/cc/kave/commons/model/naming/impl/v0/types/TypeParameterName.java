@@ -45,7 +45,7 @@ public class TypeParameterName extends BaseName implements ITypeParameterName, I
 	/// instantiate type-parameter names.
 	/// </summary>
 	public static ITypeName newTypeParameterName(String identifier) {
-		return TypeName.newTypeName(identifier);
+		return Names.newType(identifier);
 	}
 
 	static boolean isTypeParameterIdentifier(String identifier) {
@@ -178,7 +178,7 @@ public class TypeParameterName extends BaseName implements ITypeParameterName, I
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(UNKNOWN_NAME);
+		return "...".equals(getIdentifier());
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class TypeParameterName extends BaseName implements ITypeParameterName, I
 	public ITypeName getTypeParameterType() {
 		int startOfTypeName = getTypeParameterShortName().length() + ParameterNameTypeSeparater.length();
 		return startOfTypeName >= identifier.length() ? Names.getUnknownType()
-				: TypeName.newTypeName(identifier.substring(startOfTypeName));
+				: Names.newType(identifier.substring(startOfTypeName));
 
 	}
 

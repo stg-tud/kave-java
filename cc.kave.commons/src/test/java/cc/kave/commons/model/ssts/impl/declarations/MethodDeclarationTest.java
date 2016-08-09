@@ -25,8 +25,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
@@ -35,14 +35,14 @@ import cc.kave.commons.testutils.ToStringAssert;
 
 public class MethodDeclarationTest {
 
-	private IMethodName _mA = MethodName.newMethodName("[T1,P1] [T2,P2].A()");
-	private IMethodName _mB = MethodName.newMethodName("[T1,P1] [T2,P2].B()");
+	private IMethodName _mA = Names.newMethod("[T1,P1] [T2,P2].A()");
+	private IMethodName _mB = Names.newMethod("[T1,P1] [T2,P2].B()");
 
 	@Test
 	public void testDefaultValues() {
 		MethodDeclaration sut = new MethodDeclaration();
 
-		assertThat(MethodName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(Names.getUnknownMethod(), equalTo(sut.getName()));
 		assertThat(false, equalTo(sut.isEntryPoint()));
 		assertThat(new ArrayList<IMethodDeclaration>(), equalTo(sut.getBody()));
 		assertThat(0, not(equalTo(sut.hashCode())));

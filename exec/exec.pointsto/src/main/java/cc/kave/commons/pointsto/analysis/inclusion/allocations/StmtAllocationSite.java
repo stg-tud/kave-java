@@ -14,9 +14,9 @@ package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -50,7 +50,7 @@ public class StmtAllocationSite implements AllocationSite {
 		} else if (stmt instanceof IVariableDeclaration) {
 			return ((IVariableDeclaration) stmt).getType();
 		}
-		return TypeName.UNKNOWN_NAME;
+		return Names.getUnknownType();
 	}
 
 	@Override
@@ -91,5 +91,4 @@ public class StmtAllocationSite implements AllocationSite {
 	public String toString() {
 		return MoreObjects.toStringHelper(StmtAllocationSite.class).add("stmt", stmt).add("type", type).toString();
 	}
-
 }

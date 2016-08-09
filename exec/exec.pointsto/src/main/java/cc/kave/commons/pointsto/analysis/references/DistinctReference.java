@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.references;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 
 public interface DistinctReference {

@@ -15,26 +15,27 @@
  */
 package cc.kave.commons.utils.json;
 
-import org.junit.Assert;
-import org.junit.Test;
-import cc.kave.commons.model.names.resharper.LiveTemplateName;
-import cc.kave.commons.utils.json.JsonUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.others.IReSharperLiveTemplateName;
+
 public class LiveTemplateNameSerialization {
-	
-	
+
 	@Test
-	public void testLiveTemplateNameFromJson(){
+	public void testLiveTemplateNameFromJson() {
 		String json = "\"ReSharper.LiveTemplateName:test\"";
-		LiveTemplateName actual = JsonUtils.fromJson(json, LiveTemplateName.class);
-		LiveTemplateName expected = LiveTemplateName.newLiveTemplateName("test");
+		IReSharperLiveTemplateName actual = JsonUtils.fromJson(json, IReSharperLiveTemplateName.class);
+		IReSharperLiveTemplateName expected = Names.newLiveTemplateName("test");
 		Assert.assertThat(actual, equalTo(expected));
 	}
-	
+
 	@Test
-	public void testLiveTemplateNameToJson(){
-		LiveTemplateName name = LiveTemplateName.newLiveTemplateName("test");
+	public void testLiveTemplateNameToJson() {
+		IReSharperLiveTemplateName name = Names.newLiveTemplateName("test");
 		String actual = JsonUtils.toJson(name);
 		String expected = "\"ReSharper.LiveTemplateName:test\"";
 		Assert.assertThat(actual, equalTo(expected));

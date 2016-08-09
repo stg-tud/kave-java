@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
@@ -30,7 +30,7 @@ import cc.kave.commons.testutils.ToStringAssert;
 public class FieldReferenceTest extends SSTBaseTest {
 
 	private static IFieldName someField() {
-		return FieldName.newFieldName("[T1,P1] [T2,P2].E");
+		return Names.newField("[T1,P1] [T2,P2].E");
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class FieldReferenceTest extends SSTBaseTest {
 		FieldReference sut = new FieldReference();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(FieldName.UNKNOWN_NAME, equalTo(sut.getFieldName()));
+		assertThat(Names.getUnknownField(), equalTo(sut.getFieldName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}

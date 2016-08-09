@@ -17,10 +17,10 @@ package exec.validate_evaluation.utils;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
@@ -54,12 +54,12 @@ public class CoReNameUtils {
 
 	public static ICoReTypeName toCoReName(ITypeName t) {
 
-		if (t.isUnknownType()) {
+		if (t.isUnknown()) {
 			return CoReTypeName.get("LUnknown");
 		}
 
-		if (t.isArrayType()) {
-			return CoReTypeName.get("[" + toCoReName(t.getArrayBaseType()));
+		if (t.isArray()) {
+			return CoReTypeName.get("[" + toCoReName(t.asArrayTypeName().getArrayBaseType()));
 		}
 
 		if (t.isNestedType()) {

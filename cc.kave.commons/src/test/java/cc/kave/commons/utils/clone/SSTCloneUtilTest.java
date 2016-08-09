@@ -26,15 +26,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
@@ -110,7 +103,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void eventReference() {
 		EventReference original = new EventReference();
-		original.setEventName(EventName.newEventName("event"));
+		original.setEventName(Names.newEvent("event"));
 		original.setReference(someVarRef());
 		assertClone(original);
 	}
@@ -118,7 +111,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void fieldReference() {
 		FieldReference original = new FieldReference();
-		original.setFieldName(FieldName.newFieldName("field"));
+		original.setFieldName(Names.newField("field"));
 		original.setReference(someVarRef());
 		assertClone(original);
 	}
@@ -132,7 +125,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void propertyReference() {
 		PropertyReference original = new PropertyReference();
-		original.setPropertyName(PropertyName.newPropertyName("property"));
+		original.setPropertyName(Names.newProperty("property"));
 		original.setReference(someVarRef());
 		assertClone(original);
 	}
@@ -146,7 +139,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void methodReference() {
 		MethodReference original = new MethodReference();
-		original.setMethodName(MethodName.newMethodName("method"));
+		original.setMethodName(Names.newMethod("method"));
 		original.setReference(someVarRef());
 		assertClone(original);
 	}
@@ -205,7 +198,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void invocationExpression() {
 		InvocationExpression original = new InvocationExpression();
-		original.setMethodName(MethodName.newMethodName("m1"));
+		original.setMethodName(Names.newMethod("m1"));
 		original.setParameters(Lists.newArrayList(constant()));
 		original.setReference(someVarRef());
 		assertClone(original);
@@ -215,7 +208,7 @@ public class SSTCloneUtilTest {
 	public void lambdaExpression() {
 		LambdaExpression original = new LambdaExpression();
 		original.setBody(Lists.newArrayList(new ContinueStatement()));
-		original.setName(LambdaName.newLambdaName("l"));
+		original.setName(Names.newLambda("l"));
 		assertClone(original);
 	}
 
@@ -387,7 +380,7 @@ public class SSTCloneUtilTest {
 		CatchBlock catchBlock = new CatchBlock();
 		catchBlock.setBody(Lists.newArrayList(new ContinueStatement()));
 		catchBlock.setKind(CatchBlockKind.General);
-		catchBlock.setParameter(ParameterName.newParameterName("p"));
+		catchBlock.setParameter(Names.newParameter("p"));
 		original.setCatchBlocks(Lists.newArrayList(catchBlock));
 		assertClone(original);
 	}
@@ -422,7 +415,7 @@ public class SSTCloneUtilTest {
 	public void variableDeclaration() {
 		VariableDeclaration original = new VariableDeclaration();
 		original.setReference(someVarRef());
-		original.setType(TypeName.newTypeName("t"));
+		original.setType(Names.newType("t"));
 		assertClone(original);
 	}
 
@@ -462,28 +455,28 @@ public class SSTCloneUtilTest {
 		MethodDeclaration original = new MethodDeclaration();
 		original.setBody(Lists.newArrayList(new ContinueStatement()));
 		original.setEntryPoint(true);
-		original.setName(MethodName.newMethodName("m"));
+		original.setName(Names.newMethod("m"));
 		assertClone(original);
 	}
 
 	@Test
 	public void delegateDeclaration() {
 		DelegateDeclaration original = new DelegateDeclaration();
-		original.setName(DelegateTypeName.newDelegateTypeName("d:"));
+		original.setName(Names.newType("d:[?] [?].()").asDelegateTypeName());
 		assertClone(original);
 	}
 
 	@Test
 	public void eventDeclaration() {
 		EventDeclaration original = new EventDeclaration();
-		original.setName(EventName.newEventName("E"));
+		original.setName(Names.newEvent("E"));
 		assertClone(original);
 	}
 
 	@Test
 	public void fieldDeclaration() {
 		FieldDeclaration original = new FieldDeclaration();
-		original.setName(FieldName.newFieldName("F"));
+		original.setName(Names.newField("F"));
 		assertClone(original);
 	}
 
@@ -492,10 +485,10 @@ public class SSTCloneUtilTest {
 		PropertyDeclaration original = new PropertyDeclaration();
 		original.setGet(Lists.newArrayList(new ContinueStatement()));
 		original.setSet(Lists.newArrayList(new ContinueStatement()));
-		original.setName(PropertyName.newPropertyName("P"));
+		original.setName(Names.newProperty("P"));
 		assertClone(original);
 	}
-	
+
 	private static void assertClone(ISSTNode original) {
 		assertClone(original, SSTCloneUtil.clone(original, ISSTNode.class));
 	}
@@ -520,7 +513,7 @@ public class SSTCloneUtilTest {
 
 	private static ISST defaultSST() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("SST"));
+		sst.setEnclosingType(Names.newType("SST"));
 		sst.setPartialClassIdentifier("SST");
 		return sst;
 	}
@@ -538,7 +531,7 @@ public class SSTCloneUtilTest {
 	}
 
 	private static ITypeName someType() {
-		return TypeName.newTypeName("t");
+		return Names.newType("t");
 	}
 
 	private static IAssignableExpression someExpr() {
@@ -553,5 +546,4 @@ public class SSTCloneUtilTest {
 		var.setType(someType());
 		return var;
 	}
-
 }

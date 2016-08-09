@@ -23,7 +23,7 @@ import cc.kave.commons.model.naming.codeelements.ILocalVariableName;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.codeelements.IPropertyName;
-import cc.kave.commons.model.naming.impl.v0.codeelements.LambdaName;
+import cc.kave.commons.model.naming.others.IReSharperLiveTemplateName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
@@ -72,7 +72,7 @@ public class Names {
 		return null;
 	}
 
-	public static ITypeName newType(String string) {
+	public static ITypeName newType(String string, Object... args) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -122,7 +122,7 @@ public class Names {
 		return null;
 	}
 
-	public static IName newLocalVariable(String identifier) {
+	public static ILocalVariableName newLocalVariable(String identifier) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -137,7 +137,7 @@ public class Names {
 		return null;
 	}
 
-	public static IName newLiveTemplateName(String identifier) {
+	public static IReSharperLiveTemplateName newLiveTemplateName(String identifier) {
 		// TODO Auto-generated method stub
 		return null;
 	}

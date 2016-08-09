@@ -47,19 +47,17 @@ import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.Name;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner.EmptyOrSingleEditStreakRemovalFilter;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner.IRemovalFilter;
 
 public class EditStreakGenerationRunnerTest {
 
-	private static final IName anyName = Name.newName("abc");
+	private static final IName anyName = Names.newGeneral("abc");
 
 	private EditStreakGenerationIo io;
 	private EditStreakGenerationLogger log;
@@ -262,7 +260,7 @@ public class EditStreakGenerationRunnerTest {
 	@Test
 	public void noSnapshotsInUnknownType() {
 
-		Context ctx1 = context(TypeName.UNKNOWN_NAME);
+		Context ctx1 = context(Names.getUnknownType());
 		ICompletionEvent e1 = abort(date(1), ctx1, anyName);
 		addInput("a.zip", e1);
 
@@ -296,7 +294,7 @@ public class EditStreakGenerationRunnerTest {
 	}
 
 	private static IMethodName anyMethod(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		return Names.newMethod("[T,P] [T,P].m" + i + "()");
 	}
 
 	private Context context(ITypeName encType) {
@@ -352,7 +350,7 @@ public class EditStreakGenerationRunnerTest {
 	}
 
 	private ITypeName type(int i) {
-		return TypeName.newTypeName("T" + i + ",P");
+		return Names.newType("T%d, P", i);
 	}
 
 	private static LocalDateTime date(int deltaSecs) {

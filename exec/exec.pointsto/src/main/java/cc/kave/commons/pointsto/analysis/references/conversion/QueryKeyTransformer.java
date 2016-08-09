@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
@@ -60,7 +60,8 @@ public class QueryKeyTransformer
 	@Override
 	public List<PointsToQuery> visit(DistinctVariableReference varRef, DistinctReferenceContextCollector context) {
 		Collection<IMemberName> members = context.getMembers(varRef);
-		// if a declared variable is not used in a member, there will be no associated members or statements
+		// if a declared variable is not used in a member, there will be no
+		// associated members or statements
 		Asserts.assertLessOrEqual(members.size(), 1);
 		IMemberName member = members.isEmpty() ? null : members.iterator().next();
 
@@ -161,7 +162,8 @@ public class QueryKeyTransformer
 			}
 		}
 
-		// parameters are available regardless of statements that use them so that they can be queried by only looking
+		// parameters are available regardless of statements that use them so
+		// that they can be queried by only looking
 		// at the declaring method
 		queryKeys.add(new PointsToQuery(reference, type, null, member));
 
@@ -192,5 +194,4 @@ public class QueryKeyTransformer
 		PointsToQuery query = new PointsToQuery(eventRef.getReference(), eventRef.getType(), null, null);
 		return Arrays.asList(query);
 	}
-
 }

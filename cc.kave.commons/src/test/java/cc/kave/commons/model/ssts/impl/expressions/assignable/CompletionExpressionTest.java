@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
@@ -43,12 +43,12 @@ public class CompletionExpressionTest extends SSTBaseTest {
 	public void testSettingValues() {
 		CompletionExpression sut = new CompletionExpression();
 		sut.setObjectReference(someVarRef("i"));
-		sut.setTypeReference(TypeName.UNKNOWN_NAME);
+		sut.setTypeReference(Names.getUnknownType());
 		sut.setToken("t");
 
 		assertThat("t", equalTo(sut.getToken()));
 		assertThat(someVarRef("i"), equalTo(sut.getVariableReference()));
-		assertThat(TypeName.UNKNOWN_NAME, equalTo(sut.getTypeReference()));
+		assertThat(Names.getUnknownType(), equalTo(sut.getTypeReference()));
 	}
 
 	@Test
@@ -66,10 +66,10 @@ public class CompletionExpressionTest extends SSTBaseTest {
 		CompletionExpression b = new CompletionExpression();
 		a.setObjectReference(someVarRef("i"));
 		a.setToken("t");
-		a.setTypeReference(TypeName.UNKNOWN_NAME);
+		a.setTypeReference(Names.getUnknownType());
 		b.setObjectReference(someVarRef("i"));
 		b.setToken("t");
-		b.setTypeReference(TypeName.UNKNOWN_NAME);
+		b.setTypeReference(Names.getUnknownType());
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
@@ -101,8 +101,8 @@ public class CompletionExpressionTest extends SSTBaseTest {
 	public void testEqualityDifferentTypeReference() {
 		CompletionExpression a = new CompletionExpression();
 		CompletionExpression b = new CompletionExpression();
-		a.setTypeReference(TypeName.UNKNOWN_NAME);
-		b.setTypeReference(TypeName.newTypeName("System.Int32, mscore, 4.0.0.0"));
+		a.setTypeReference(Names.getUnknownType());
+		b.setTypeReference(Names.newType("System.Int32, mscore, 4.0.0.0"));
 
 		assertThat(a, not(equalTo(b)));
 		assertThat(a.hashCode(), not(equalTo(b.hashCode())));

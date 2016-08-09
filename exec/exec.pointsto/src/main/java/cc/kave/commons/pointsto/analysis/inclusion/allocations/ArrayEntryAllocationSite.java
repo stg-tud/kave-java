@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.recommenders.assertions.Asserts;
 
 public class ArrayEntryAllocationSite implements AllocationSite {
@@ -20,13 +20,13 @@ public class ArrayEntryAllocationSite implements AllocationSite {
 	private final AllocationSite arrayAllocationSite;
 
 	public ArrayEntryAllocationSite(AllocationSite arrayAllocationSite) {
-		Asserts.assertTrue(arrayAllocationSite.getType().isArrayType());
+		Asserts.assertTrue(arrayAllocationSite.getType().isArray());
 		this.arrayAllocationSite = arrayAllocationSite;
 	}
 
 	@Override
 	public ITypeName getType() {
-		return arrayAllocationSite.getType().getArrayBaseType();
+		return arrayAllocationSite.getType().asArrayTypeName().getArrayBaseType();
 	}
 
 	@Override
@@ -53,5 +53,4 @@ public class ArrayEntryAllocationSite implements AllocationSite {
 			return false;
 		return true;
 	}
-
 }

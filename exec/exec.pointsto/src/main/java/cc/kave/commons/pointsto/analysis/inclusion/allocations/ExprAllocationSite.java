@@ -14,15 +14,16 @@ package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 
 /**
- * Used to represent allocations due to expressions like {@link IConstantValueExpression}, {@link IUnaryExpression} and
+ * Used to represent allocations due to expressions like
+ * {@link IConstantValueExpression}, {@link IUnaryExpression} and
  * {@link IBinaryExpression}.
  */
 public class ExprAllocationSite implements AllocationSite {
@@ -39,7 +40,7 @@ public class ExprAllocationSite implements AllocationSite {
 
 	@Override
 	public ITypeName getType() {
-		return TypeName.UNKNOWN_NAME;
+		return Names.getUnknownType();
 	}
 
 	@Override
@@ -68,5 +69,4 @@ public class ExprAllocationSite implements AllocationSite {
 	public String toString() {
 		return MoreObjects.toStringHelper(ExprAllocationSite.class).add("expr", expr).toString();
 	}
-
 }

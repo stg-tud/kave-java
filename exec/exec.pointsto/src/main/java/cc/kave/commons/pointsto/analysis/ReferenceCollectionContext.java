@@ -17,10 +17,10 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -54,11 +54,11 @@ public class ReferenceCollectionContext implements ScopingVisitorContext {
 	public void addIndexAccessReference(IIndexAccessReference indexAccessRef) {
 		IVariableReference baseRef = indexAccessRef.getExpression().getReference();
 		ITypeName type = types.get(baseRef.getIdentifier());
-		if (type != null && type.isArrayType()) {
-			references.put(indexAccessRef, type.getArrayBaseType());
+		if (type != null && type.isArray()) {
+			references.put(indexAccessRef, type.asArrayTypeName().getArrayBaseType());
 		} else {
 			// cannot infer type if not a real array access
-			references.put(indexAccessRef, TypeName.UNKNOWN_NAME);
+			references.put(indexAccessRef, Names.getUnknownType());
 		}
 	}
 

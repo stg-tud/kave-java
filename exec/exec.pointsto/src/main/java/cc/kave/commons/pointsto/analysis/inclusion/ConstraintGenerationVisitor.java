@@ -15,10 +15,9 @@ package cc.kave.commons.pointsto.analysis.inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
@@ -114,8 +113,7 @@ public class ConstraintGenerationVisitor extends ScopingVisitor<ConstraintGenera
 	public Void visit(IInvocationExpression entity, ConstraintGenerationVisitorContext context) {
 		IMethodName method = entity.getMethodName();
 
-		// TODO replace with isUnknown once fixed
-		if (MethodName.UNKNOWN_NAME.equals(method)) {
+		if (method.isUnknown()) {
 			LOGGER.error("Ignoring an unknown method");
 			return null;
 		}
@@ -242,5 +240,4 @@ public class ConstraintGenerationVisitor extends ScopingVisitor<ConstraintGenera
 		}
 		return null;
 	}
-
 }

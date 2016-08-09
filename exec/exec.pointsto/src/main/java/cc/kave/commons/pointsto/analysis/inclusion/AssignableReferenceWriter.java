@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion;
 
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
@@ -80,6 +80,5 @@ public class AssignableReferenceWriter extends FailSafeNodeVisitor<SetVariable, 
 			this.builder = builder;
 			this.source = source;
 		}
-
 	}
 }

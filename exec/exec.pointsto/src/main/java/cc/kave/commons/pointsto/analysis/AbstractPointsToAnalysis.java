@@ -23,8 +23,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 
@@ -49,8 +49,8 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 	}
 
 	/**
-	 * Checks whether this {@link PointsToAnalysis} has already been bound to a {@link Context} and throws an
-	 * {@link IllegalStateException} accordingly.
+	 * Checks whether this {@link PointsToAnalysis} has already been bound to a
+	 * {@link Context} and throws an {@link IllegalStateException} accordingly.
 	 */
 	protected void checkContextBinding() {
 		if (!contextToLocations.isEmpty()) {
@@ -83,7 +83,8 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 			locations = contextToLocations.get(new PointsToQuery(reference, type, null, null));
 			if (locations.isEmpty()) {
 				if (query.getStmt() != null && reference != null) {
-					// statement + reference are unique enough for a last effort exhaustive search
+					// statement + reference are unique enough for a last effort
+					// exhaustive search
 					locations = query(reference, query.getStmt());
 					if (!locations.isEmpty()) {
 						return new HashSet<>(locations);
@@ -116,5 +117,4 @@ public abstract class AbstractPointsToAnalysis implements PointsToAnalysis {
 			return locations;
 		}
 	}
-
 }

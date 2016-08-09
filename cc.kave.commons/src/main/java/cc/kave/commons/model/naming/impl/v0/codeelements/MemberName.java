@@ -15,10 +15,10 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.naming.impl.csharp.CsNameUtils;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public abstract class MemberName extends BaseName implements IMemberName {
@@ -38,14 +38,14 @@ public abstract class MemberName extends BaseName implements IMemberName {
 		int endOfValueType = CsNameUtils.endOfNextTypeIdentifier(identifier, 0);
 		int startOfDeclaringType = CsNameUtils.startOfNextTypeIdentifier(identifier, endOfValueType) + 1;
 		int endOfDeclaringType = CsNameUtils.endOfNextTypeIdentifier(identifier, endOfValueType) - 1;
-		return TypeName.newTypeName(identifier.substring(startOfDeclaringType, endOfDeclaringType));
+		return Names.newType(identifier.substring(startOfDeclaringType, endOfDeclaringType));
 	}
 
 	@Override
 	public ITypeName getValueType() {
 		int start = identifier.indexOf("[");
 		int end = CsNameUtils.getClosingBracketIndex(identifier, start);
-		return TypeName.newTypeName(identifier.substring(start + 1, end - 1));
+		return Names.newType(identifier.substring(start + 1, end - 1));
 	}
 
 	@Override

@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
 
@@ -32,7 +32,7 @@ public class EventDeclarationTest {
 	public void testDefaultValues() {
 		EventDeclaration sut = new EventDeclaration();
 
-		assertThat(EventName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(Names.getUnknownEvent(), equalTo(sut.getName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}
@@ -87,7 +87,7 @@ public class EventDeclarationTest {
 	}
 
 	private IEventName someEvent() {
-		return EventName.newEventName("[T1,P1] [T2,P2].Event");
+		return Names.newEvent("[T1,P1] [T2,P2].Event");
 	}
 
 	@Test

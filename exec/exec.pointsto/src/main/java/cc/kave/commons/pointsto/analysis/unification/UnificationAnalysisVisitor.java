@@ -17,9 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -178,8 +177,7 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 
 			IAssignableReference destRef = context.getDestinationForExpr(entity);
 
-			// TODO replace with isUnknown once fixed
-			if (method.equals(MethodName.UNKNOWN_NAME)) {
+			if (method.isUnknown()) {
 				// assume that unknown methods return a newly allocated object
 				if (destRef != null) {
 					context.allocate(destRef);
@@ -195,7 +193,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 			}
 
 			if (languageOptions.isDelegateInvocation(method)) {
-				// TODO detect a bug where a delegate stored in a property of the class is invoked by using 'this' as
+				// TODO detect a bug where a delegate stored in a property of
+				// the class is invoked by using 'this' as
 				// the
 				// receiver
 				if (entity.getReference().getIdentifier().equals(languageOptions.getThisName())) {
@@ -217,7 +216,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 						method.getDeclaringType().getName(), method.getName(), parameters.size());
 			} else {
 				for (int i = 0; i < parameters.size(); ++i) {
-					// due to parameter arrays the number of actual parameters can be greater than the number for formal
+					// due to parameter arrays the number of actual parameters
+					// can be greater than the number for formal
 					// parameters
 					int formalParameterIndex = Math.min(i, numberOfFormalParameters - 1);
 					ReferenceLocation formalParameterLocation = parameterLocations.get(formalParameterIndex);
@@ -232,7 +232,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 							continue;
 						}
 
-						// parameter arrays are treated separately: write actual parameters into the array
+						// parameter arrays are treated separately: write actual
+						// parameters into the array
 						if (formalParameter.isParameterArray()) {
 							IIndexAccessReference indexAccessRef = SSTBuilder
 									.indexAccessReference(SSTBuilder.variableReference(formalParameter.getName()));
@@ -263,7 +264,8 @@ public class UnificationAnalysisVisitor extends ScopingVisitor<UnificationAnalys
 			}
 
 			if (!method.isStatic() && !entity.getReference().isMissing()) {
-				// ensure a location is created for the receiver: we might end up without one if the variable is not
+				// ensure a location is created for the receiver: we might end
+				// up without one if the variable is not
 				// used
 				// anywhere else
 				context.getLocation(entity.getReference());

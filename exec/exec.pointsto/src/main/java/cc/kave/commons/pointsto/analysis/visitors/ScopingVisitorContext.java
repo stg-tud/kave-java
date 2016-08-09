@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.visitors;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
@@ -34,5 +34,4 @@ public interface ScopingVisitorContext {
 	void declarePropertySetParameter(IPropertyDeclaration propertyDecl);
 
 	void declareVariable(IVariableDeclaration varDecl);
-
 }

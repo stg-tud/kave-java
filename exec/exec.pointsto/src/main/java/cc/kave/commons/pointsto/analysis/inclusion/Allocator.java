@@ -18,10 +18,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.IDelegateTypeName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.IArrayTypeName;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.AllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.ArrayEntryAllocationSite;
 import cc.kave.commons.pointsto.analysis.inclusion.allocations.OutParameterAllocationSite;
@@ -50,8 +51,8 @@ public class Allocator {
 			constraintResolver.addConstraint(paramObject, parameterVar, InclusionAnnotation.EMPTY,
 					ContextAnnotation.EMPTY);
 
-			if (type.isArrayType()) {
-				allocateArrayEntry(allocationSite, type, parameterVar);
+			if (type.isArray()) {
+				allocateArrayEntry(allocationSite, type.asArrayTypeName(), parameterVar);
 			}
 		}
 	}
@@ -61,8 +62,8 @@ public class Allocator {
 		RefTerm returnObject = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 		constraintResolver.addConstraint(returnObject, returnVar, InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY);
 
-		if (type.isArrayType()) {
-			allocateArrayEntry(allocationSite, type, returnVar);
+		if (type.isArray()) {
+			allocateArrayEntry(allocationSite, type.asArrayTypeName(), returnVar);
 		}
 	}
 
@@ -70,9 +71,10 @@ public class Allocator {
 		if (type.isDelegateType()) {
 			if (type.isTypeParameter()) {
 				try {
-					allocateDelegate((IDelegateTypeName) type.getTypeParameterType(), dest);
+					allocateDelegate((IDelegateTypeName) type.asTypeParameterName().getTypeParameterType(), dest);
 				} catch (RuntimeException ex) {
-					// there is a rare bug where a method parameter is erroneously thought to be a TypeParameterName
+					// there is a rare bug where a method parameter is
+					// erroneously thought to be a TypeParameterName
 					// although it ought to be a StructTypeName
 					LOGGER.error("Encountered TypeParameterName bug: {}", ex.getMessage());
 					return false;
@@ -99,7 +101,7 @@ public class Allocator {
 		return LambdaTerm.newMethodLambda(Arrays.asList(vars), parameters, returnType);
 	}
 
-	public void allocateArrayEntry(AllocationSite arrayAllocationSite, ITypeName arrayType, SetVariable dest) {
+	public void allocateArrayEntry(AllocationSite arrayAllocationSite, IArrayTypeName arrayType, SetVariable dest) {
 		// provide one initialized array entry
 		ITypeName baseType = arrayType.getArrayBaseType();
 		ConstructedTerm arrayEntry;

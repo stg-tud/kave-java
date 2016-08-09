@@ -20,9 +20,9 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -38,8 +38,8 @@ import cc.kave.commons.pointsto.analysis.AbstractLocation;
 import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
-import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
+import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
@@ -101,7 +101,7 @@ public class Examples {
 		// define new method declaration
 		MethodDeclaration md = new MethodDeclaration();
 		// set fully-qualified name of method
-		md.setName(MethodName.newMethodName("[ReturnType, MyProject] [DeclaringType, MyProject].methodName()"));
+		md.setName(Names.newMethod("[ReturnType, MyProject] [DeclaringType, MyProject].methodName()"));
 		// add a statement to its body, e.g. a return statement
 		md.getBody().add(new ReturnStatement());
 		// add the new declaration to the set of methods

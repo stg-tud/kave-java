@@ -30,12 +30,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -104,7 +104,7 @@ public class ConstraintGraphBuilder {
 		this.declLambdaStore = new DeclarationLambdaStore(this::getVariable, variableFactory, allocator, declMapper);
 		this.contextFactory = contextFactory;
 
-		staticObject = new RefTerm(new UniqueAllocationSite(TypeName.UNKNOWN_NAME), ConstructedTerm.BOTTOM);
+		staticObject = new RefTerm(new UniqueAllocationSite(Names.getUnknownType()), ConstructedTerm.BOTTOM);
 	}
 
 	public ContextFactory getContextFactory() {
@@ -176,8 +176,9 @@ public class ConstraintGraphBuilder {
 	}
 
 	/**
-	 * Ensures that a member reference appears in the least solution of the {@link ConstraintGraph} by reading them into
-	 * a variable associated to the {@link DistinctReference}.
+	 * Ensures that a member reference appears in the least solution of the
+	 * {@link ConstraintGraph} by reading them into a variable associated to the
+	 * {@link DistinctReference}.
 	 */
 	private void ensureStorageMemberHasVariable(IMemberReference memberRef, IMemberName member) {
 		DistinctReference distRef = referenceResolver.apply(memberRef);
@@ -232,7 +233,7 @@ public class ConstraintGraphBuilder {
 					memberNode.addPredecessor(
 							new ConstraintEdge(getNode(obj), InclusionAnnotation.EMPTY, ContextAnnotation.EMPTY));
 
-					if (type.isArrayType()) {
+					if (type.isArray()) {
 						// provide one entry for arrays
 						RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
 								variableFactory.createObjectVariable());
@@ -253,7 +254,7 @@ public class ConstraintGraphBuilder {
 					RefTerm obj = new RefTerm(allocationSite, variableFactory.createObjectVariable());
 					writeMemberRaw(recv, obj, member);
 
-					if (allocationSite.getType().isArrayType()) {
+					if (allocationSite.getType().isArray()) {
 						// provide one entry for arrays
 						RefTerm arrayEntry = new RefTerm(new ArrayEntryAllocationSite(allocationSite),
 								variableFactory.createObjectVariable());
@@ -487,7 +488,8 @@ public class ConstraintGraphBuilder {
 		ConstraintNode recvNode;
 		InvocationAnnotation inclusionAnnotation;
 		if (method.isConstructor()) {
-			// constructors use their destination as receiver and do not rely on dynamic dispatch
+			// constructors use their destination as receiver and do not rely on
+			// dynamic dispatch
 			recvNode = getNode(dest);
 			inclusionAnnotation = new InvocationAnnotation(method, false);
 		} else if (method.isExtensionMethod()) {
@@ -702,5 +704,4 @@ public class ConstraintGraphBuilder {
 		allocate(array, new UniqueAllocationSite(parameter.getValueType()));
 		return array;
 	}
-
 }

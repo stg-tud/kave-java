@@ -31,7 +31,7 @@ import org.junit.rules.TemporaryFolder;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SST;
 
 public class ContextIoTest {
@@ -76,7 +76,7 @@ public class ContextIoTest {
 
 	private static Context context(int ctxNum) {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("T%s,P", ctxNum));
+		sst.setEnclosingType(Names.newType("T%s,P", ctxNum));
 		Context ctx = new Context();
 		ctx.setSST(sst);
 		return ctx;

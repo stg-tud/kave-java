@@ -21,8 +21,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -54,9 +53,9 @@ public class TypeErasureVisitorTest {
 	public void enclosingTypeIsErased() {
 
 		SST in = new SST();
-		in.setEnclosingType(TypeName.newTypeName("T`1[[G->T,P]]"));
+		in.setEnclosingType(Names.newType("T`1[[G->T,P]]"));
 		SST expected = new SST();
-		expected.setEnclosingType(TypeName.newTypeName("T`1[[G]]"));
+		expected.setEnclosingType(Names.newType("T`1[[G]]"));
 
 		ISST actual = TypeErasureVisitor.erase(in);
 		assertEquals(expected, actual);
@@ -71,7 +70,7 @@ public class TypeErasureVisitorTest {
 		IPropertyDeclaration pd = mock(IPropertyDeclaration.class);
 
 		MethodDeclaration md = new MethodDeclaration();
-		md.setName(MethodName.newMethodName("[T,P] [T,P].M()"));
+		md.setName(Names.newMethod("[T,P] [T,P].M()"));
 
 		SST in = new SST();
 		in.getDelegates().add(dd);
@@ -94,13 +93,13 @@ public class TypeErasureVisitorTest {
 	@Test
 	public void methodNamesAreErased() {
 		MethodDeclaration mdIn = new MethodDeclaration();
-		mdIn.setName(MethodName.newMethodName("[T,P] [T,P].M`1[[G1->T,P]]()"));
+		mdIn.setName(Names.newMethod("[T,P] [T,P].M`1[[G1->T,P]]()"));
 		mdIn.setEntryPoint(true);
 		SST in = new SST();
 		in.getMethods().add(mdIn);
 
 		MethodDeclaration mdOut = new MethodDeclaration();
-		mdOut.setName(MethodName.newMethodName("[T,P] [T,P].M`1[[G1]]()"));
+		mdOut.setName(Names.newMethod("[T,P] [T,P].M`1[[G1]]()"));
 		mdOut.setEntryPoint(true);
 		SST expected = new SST();
 		expected.getMethods().add(mdOut);
@@ -131,13 +130,13 @@ public class TypeErasureVisitorTest {
 	public void typeHierarchyErasure() {
 
 		TypeHierarchy ext = new TypeHierarchy();
-		ext.setElement(TypeName.newTypeName("E`1[[G1->T,P]],P"));
+		ext.setElement(Names.newType("E`1[[G1->T,P]],P"));
 
 		TypeHierarchy impl = new TypeHierarchy();
-		impl.setElement(TypeName.newTypeName("I`1[[G1->T,P]],P"));
+		impl.setElement(Names.newType("I`1[[G1->T,P]],P"));
 
 		TypeHierarchy in = new TypeHierarchy();
-		in.setElement(TypeName.newTypeName("T`1[[G1->T,P]],P"));
+		in.setElement(Names.newType("T`1[[G1->T,P]],P"));
 		in.setExtends(ext);
 		in.getImplements().add(impl);
 
@@ -147,13 +146,13 @@ public class TypeErasureVisitorTest {
 		/* */
 
 		TypeHierarchy outExt = new TypeHierarchy();
-		outExt.setElement(TypeName.newTypeName("E`1[[G1]],P"));
+		outExt.setElement(Names.newType("E`1[[G1]],P"));
 
 		TypeHierarchy outImpl = new TypeHierarchy();
-		outImpl.setElement(TypeName.newTypeName("I`1[[G1]],P"));
+		outImpl.setElement(Names.newType("I`1[[G1]],P"));
 
 		TypeHierarchy out = new TypeHierarchy();
-		out.setElement(TypeName.newTypeName("T`1[[G1]],P"));
+		out.setElement(Names.newType("T`1[[G1]],P"));
 		out.setExtends(outExt);
 		out.getImplements().add(outImpl);
 
@@ -169,14 +168,14 @@ public class TypeErasureVisitorTest {
 	@Test
 	public void methodHierarchyErasure() {
 		MethodHierarchy in = new MethodHierarchy();
-		in.setElement(MethodName.newMethodName("[T,P] [T,P].E`1[[G1->T,P]]()"));
-		in.setSuper(MethodName.newMethodName("[T,P] [T,P].S`1[[G1->T,P]]()"));
-		in.setFirst(MethodName.newMethodName("[T,P] [T,P].F`1[[G1->T,P]]()"));
+		in.setElement(Names.newMethod("[T,P] [T,P].E`1[[G1->T,P]]()"));
+		in.setSuper(Names.newMethod("[T,P] [T,P].S`1[[G1->T,P]]()"));
+		in.setFirst(Names.newMethod("[T,P] [T,P].F`1[[G1->T,P]]()"));
 
 		MethodHierarchy out = new MethodHierarchy();
-		out.setElement(MethodName.newMethodName("[T,P] [T,P].E`1[[G1]]()"));
-		out.setSuper(MethodName.newMethodName("[T,P] [T,P].S`1[[G1]]()"));
-		out.setFirst(MethodName.newMethodName("[T,P] [T,P].F`1[[G1]]()"));
+		out.setElement(Names.newMethod("[T,P] [T,P].E`1[[G1]]()"));
+		out.setSuper(Names.newMethod("[T,P] [T,P].S`1[[G1]]()"));
+		out.setFirst(Names.newMethod("[T,P] [T,P].F`1[[G1]]()"));
 
 		IMethodHierarchy actual = TypeErasureVisitor.erase(in);
 		assertEquals(out, actual);
@@ -185,12 +184,12 @@ public class TypeErasureVisitorTest {
 	@Test
 	public void integrationInContext() {
 		SST sstIn = new SST();
-		sstIn.setEnclosingType(TypeName.newTypeName("T`1[[G->T,P]],P"));
+		sstIn.setEnclosingType(Names.newType("T`1[[G->T,P]],P"));
 
 		TypeHierarchy thIn = new TypeHierarchy();
-		thIn.setElement(TypeName.newTypeName("T`1[[G1->T,P]],P"));
+		thIn.setElement(Names.newType("T`1[[G1->T,P]],P"));
 		MethodHierarchy mhIn = new MethodHierarchy();
-		mhIn.setElement(MethodName.newMethodName("[T,P] [T,P].M`1[[G1->T,P]]()"));
+		mhIn.setElement(Names.newMethod("[T,P] [T,P].M`1[[G1->T,P]]()"));
 		TypeShape tsIn = new TypeShape();
 		tsIn.setTypeHierarchy(thIn);
 		tsIn.getMethodHierarchies().add(mhIn);
@@ -200,12 +199,12 @@ public class TypeErasureVisitorTest {
 		ctxIn.setTypeShape(tsIn);
 
 		SST sstOut = new SST();
-		sstOut.setEnclosingType(TypeName.newTypeName("T`1[[G]],P"));
+		sstOut.setEnclosingType(Names.newType("T`1[[G]],P"));
 
 		TypeHierarchy thOut = new TypeHierarchy();
-		thOut.setElement(TypeName.newTypeName("T`1[[G1]],P"));
+		thOut.setElement(Names.newType("T`1[[G1]],P"));
 		MethodHierarchy mhOut = new MethodHierarchy();
-		mhOut.setElement(MethodName.newMethodName("[T,P] [T,P].M`1[[G1]]()"));
+		mhOut.setElement(Names.newMethod("[T,P] [T,P].M`1[[G1]]()"));
 		TypeShape tsOut = new TypeShape();
 		tsOut.setTypeHierarchy(thOut);
 		tsOut.getMethodHierarchies().add(mhOut);

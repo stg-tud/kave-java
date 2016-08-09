@@ -29,8 +29,8 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -68,7 +68,7 @@ public class ToFactsVisitorTest {
 		assertFacts(f(0), f(1), f(2), f(0, 1), f(0, 2), f(1, 2));
 
 	}
-	
+
 	@Test
 	public void happyPath2() {
 		IStatement stmt1 = stmt(inv(1));
@@ -92,7 +92,7 @@ public class ToFactsVisitorTest {
 	}
 
 	private IInvocationExpression inv(int i) {
-		IMethodName m = MethodName.newMethodName(String.format("[T,P] [T,P].m%d()", i));
+		IMethodName m = Names.newMethod(String.format("[T,P] [T,P].m%d()", i));
 
 		InvocationExpression expr = new InvocationExpression();
 		expr.setMethodName(m);

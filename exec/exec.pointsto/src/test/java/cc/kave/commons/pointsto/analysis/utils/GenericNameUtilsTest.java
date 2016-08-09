@@ -12,32 +12,30 @@
  */
 package cc.kave.commons.pointsto.analysis.utils;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
-
-import static org.junit.Assert.assertEquals;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class GenericNameUtilsTest {
 
 	@Test
 	public void testMethods() {
 
-		IMethodName a = MethodName.newMethodName(
-				"[System.Void, mscorlib, 4.0.0.0] [SharpCompress.Archive.AbstractWritableArchive`2[[TEntry -> TEntry],[TVolume -> TVolume]], SharpCompress].RemoveEntry([TEntry] entry)");
+		IMethodName a = Names.newMethod(
+				"[p:void] [SharpCompress.Archive.AbstractWritableArchive`2[[TEntry -> TEntry],[TVolume -> TVolume]], SharpCompress].RemoveEntry([TEntry] entry)");
 		IMethodName aErased = GenericNameUtils.eraseGenericInstantiations(a);
 		assertEquals(
-				MethodName.newMethodName(
-						"[System.Void, mscorlib, 4.0.0.0] [SharpCompress.Archive.AbstractWritableArchive`2[[TEntry],[TVolume]], SharpCompress].RemoveEntry([TEntry] entry)"),
+				Names.newMethod(
+						"[p:void] [SharpCompress.Archive.AbstractWritableArchive`2[[TEntry],[TVolume]], SharpCompress].RemoveEntry([TEntry] entry)"),
 				aErased);
 
-		IMethodName b = MethodName.newMethodName(
-				"[System.Void, mscorlib, 4.0.0.0] [System.Collections.Generic.List`1[[T -> System.Collections.Generic.Dictionary`2[[TKey -> System.String, mscorlib, 4.0.0.0],[TValue -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0]..ctor()");
+		IMethodName b = Names.newMethod(
+				"[p:void] [System.Collections.Generic.List`1[[T -> System.Collections.Generic.Dictionary`2[[TKey -> p:string],[TValue -> p:string]], mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0]..ctor()");
 		IMethodName bErased = GenericNameUtils.eraseGenericInstantiations(b);
-		assertEquals(
-				MethodName.newMethodName(
-						"[System.Void, mscorlib, 4.0.0.0] [System.Collections.Generic.List`1[[T]], mscorlib, 4.0.0.0]..ctor()"),
+		assertEquals(Names.newMethod("[p:void] [System.Collections.Generic.List`1[[T]], mscorlib, 4.0.0.0]..ctor()"),
 				bErased);
 	}
 }

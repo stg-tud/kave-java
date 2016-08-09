@@ -20,100 +20,84 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IAliasName;
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.IDelegateTypeName;
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.ILambdaName;
-import cc.kave.commons.model.names.ILocalVariableName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.AliasName;
-import cc.kave.commons.model.names.csharp.AssemblyName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.LocalVariableName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.Name;
-import cc.kave.commons.model.names.csharp.NamespaceName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IAliasName;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.ILambdaName;
+import cc.kave.commons.model.naming.codeelements.ILocalVariableName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class CSharpNameDeserializationTest {
 	@Test
 	public void DeserializesToCsName() {
-		assertDeserialize("\"CSharp.Name:identifier\"", Name.newName("identifier"), IName.class);
+		assertDeserialize("\"CSharp.Name:identifier\"", Names.newGeneral("identifier"), IName.class);
 	}
 
 	@Test
 	public void DeserializesToAliasName() {
-		assertDeserialize("\"CSharp.AliasName:alias\"", AliasName.newAliasName("alias"), IAliasName.class);
+		assertDeserialize("\"CSharp.AliasName:alias\"", Names.newAlias("alias"), IAliasName.class);
 	}
 
 	@Test
 	public void DeserializesToAssemblyName() {
-		assertDeserialize("\"CSharp.AssemblyName:A, 1.2.3.4\"", AssemblyName.newAssemblyName("A, 1.2.3.4"),
-				IAssemblyName.class);
+		assertDeserialize("\"CSharp.AssemblyName:A, 1.2.3.4\"", Names.newAssembly("A, 1.2.3.4"), IAssemblyName.class);
 	}
 
 	@Test
 	public void DeserializesToEventName() {
-		assertDeserialize("\"CSharp.EventName:[HT] [DT].Event\"", EventName.newEventName("[HT] [DT].Event"),
-				IEventName.class);
+		assertDeserialize("\"CSharp.EventName:[HT] [DT].Event\"", Names.newEvent("[HT] [DT].Event"), IEventName.class);
 	}
 
 	@Test
 	public void DeserializesToFieldName() {
-		assertDeserialize("\"CSharp.FieldName:[VT] [DT]._field\"", FieldName.newFieldName("[VT] [DT]._field"),
+		assertDeserialize("\"CSharp.FieldName:[VT] [DT]._field\"", Names.newField("[VT] [DT]._field"),
 				IFieldName.class);
 	}
 
 	@Test
 	public void DeserializesToLambdaName() {
-		assertDeserialize("\"CSharp.LambdaName:[VT] ()\"", LambdaName.newLambdaName("[VT] ()"), ILambdaName.class);
+		assertDeserialize("\"CSharp.LambdaName:[VT] ()\"", Names.newLambda("[VT] ()"), ILambdaName.class);
 	}
 
 	@Test
 	public void DeserializesToLocalVariableName() {
-		assertDeserialize("\"CSharp.LocalVariableName:[VT] v\"", LocalVariableName.newLocalVariableName("[VT] v"),
+		assertDeserialize("\"CSharp.LocalVariableName:[VT] v\"", Names.newLocalVariable("[VT] v"),
 				ILocalVariableName.class);
 	}
 
 	@Test
 	public void DeserializesToMethodName() {
-		assertDeserialize("\"CSharp.MethodName:[RT] [DT].M()\"", MethodName.newMethodName("[RT] [DT].M()"),
-				IMethodName.class);
+		assertDeserialize("\"CSharp.MethodName:[RT] [DT].M()\"", Names.newMethod("[RT] [DT].M()"), IMethodName.class);
 	}
 
 	@Test
 	public void DeserializesToNamespaceName() {
-		assertDeserialize("\"CSharp.NamespaceName:A.B\"", NamespaceName.newNamespaceName("A.B"), INamespaceName.class);
+		assertDeserialize("\"CSharp.NamespaceName:A.B\"", Names.newNamespace("A.B"), INamespaceName.class);
 	}
 
 	@Test
 	public void DeserializesToParameterName() {
-		assertDeserialize("\"CSharp.ParameterName:[VT] parameter\"", ParameterName.newParameterName("[VT] parameter"),
+		assertDeserialize("\"CSharp.ParameterName:[VT] parameter\"", Names.newParameter("[VT] parameter"),
 				IParameterName.class);
 	}
 
 	@Test
 	public void DeserializesToPropertyName() {
-		assertDeserialize("\"CSharp.PropertyName:[VT] [DT].Property\"",
-				PropertyName.newPropertyName("[VT] [DT].Property"), IPropertyName.class);
+		assertDeserialize("\"CSharp.PropertyName:[VT] [DT].Property\"", Names.newProperty("[VT] [DT].Property"),
+				IPropertyName.class);
 	}
 
 	@Test
 	public void DeserializesToTypeName() {
-		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", TypeName.newTypeName("T,A,1.2.3.4"), ITypeName.class);
+		assertDeserialize("\"CSharp.TypeName:T,A,1.2.3.4\"", Names.newType("T,A,1.2.3.4"), ITypeName.class);
 		// assertDeserialize("\"CSharp.ArrayTypeName:T[],A,5.4.3.2\"",
 		// CsTypeName.newTypeName("T[],A,5.4.3.2"),
 		// TypeName.class);
@@ -122,7 +106,7 @@ public class CSharpNameDeserializationTest {
 	@Test
 	public void DeserializesToDelegateTypeName() {
 		assertDeserialize("\"CSharp.DelegateTypeName:d:T,A,1.2.3.4\"",
-				DelegateTypeName.newDelegateTypeName("d:T,A,1.2.3.4"), IDelegateTypeName.class);
+				Names.newType("d:T,A,1.2.3.4").asDelegateTypeName(), IDelegateTypeName.class);
 	}
 
 	private <T extends IName> void assertDeserialize(String json, T expectedInstance, Class<T> mostSpecificInterface) {

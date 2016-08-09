@@ -12,9 +12,9 @@
  */
 package cc.kave.commons.pointsto.analysis.names;
 
-import cc.kave.commons.model.names.IMemberName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedNameException;
 
 public class DistinctMemberNameFactory {

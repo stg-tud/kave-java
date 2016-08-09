@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
@@ -30,7 +30,7 @@ import cc.kave.commons.testutils.ToStringAssert;
 public class PropertyReferenceTest extends SSTBaseTest {
 
 	private static IPropertyName someProperty() {
-		return PropertyName.newPropertyName("[T1,P1] [T2,P2].P");
+		return Names.newProperty("[T1,P1] [T2,P2].P");
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class PropertyReferenceTest extends SSTBaseTest {
 		PropertyReference sut = new PropertyReference();
 
 		assertThat(new VariableReference(), equalTo(sut.getReference()));
-		assertThat(PropertyName.UNKNOWN_NAME, equalTo(sut.getPropertyName()));
+		assertThat(Names.getUnknownProperty(), equalTo(sut.getPropertyName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}

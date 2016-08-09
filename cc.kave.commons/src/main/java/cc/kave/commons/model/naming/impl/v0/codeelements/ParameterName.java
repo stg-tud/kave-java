@@ -18,7 +18,6 @@ package cc.kave.commons.model.naming.impl.v0.codeelements;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class ParameterName extends BaseName implements IParameterName {
@@ -43,7 +42,7 @@ public class ParameterName extends BaseName implements IParameterName {
 		int endOfValueTypeIdentifier = identifier.lastIndexOf(']') + 1;
 		int lengthOfValueTypeIdentifier = endOfValueTypeIdentifier - startOfValueTypeIdentifier
 				+ getModifiers().length();
-		return TypeName.newTypeName(identifier.substring(startOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
+		return Names.newType(identifier.substring(startOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
 	}
 
 	@Override

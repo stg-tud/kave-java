@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.references.conversion;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForEachLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
@@ -234,5 +234,4 @@ public class DistinctReferenceContextCollectorVisitor extends ScopingVisitor<Dis
 		context.useReference(varRef);
 		return null;
 	}
-
 }

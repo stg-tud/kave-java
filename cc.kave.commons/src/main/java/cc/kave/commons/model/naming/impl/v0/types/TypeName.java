@@ -31,9 +31,13 @@ import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class TypeName extends BaseTypeName implements ITypeName {
 
-	public static final ITypeName UNKNOWN_NAME = newTypeName("?");
+	private static final String UNKNOWN_TYPE_NAME_IDENTIFIER = "?";
 
-	protected TypeName(String identifier) {
+	public TypeName() {
+		this(UNKNOWN_TYPE_NAME_IDENTIFIER);
+	}
+
+	public TypeName(String identifier) {
 		super(identifier);
 	}
 
@@ -61,7 +65,7 @@ public class TypeName extends BaseTypeName implements ITypeName {
 		String id = getRawFullName();
 		int endIndexOfNamespaceIdentifier = id.lastIndexOf('.');
 		return endIndexOfNamespaceIdentifier < 0 ? NamespaceName.getGlobalNamespace()
-				: NamespaceName.newNamespaceName(id.substring(0, endIndexOfNamespaceIdentifier));
+				: Names.newNamespace(id.substring(0, endIndexOfNamespaceIdentifier));
 	}
 
 	@Override
@@ -77,7 +81,7 @@ public class TypeName extends BaseTypeName implements ITypeName {
 		}
 		int endOfDeclaringTypeName = fullName.lastIndexOf('+');
 		if (endOfDeclaringTypeName == -1) {
-			return UNKNOWN_NAME;
+			return null;
 		}
 
 		String declaringTypeName = fullName.substring(0, endOfDeclaringTypeName);
@@ -105,7 +109,7 @@ public class TypeName extends BaseTypeName implements ITypeName {
 			declaringTypeName = declaringTypeName.substring(0, declaringTypeName.length() - 3);
 			declaringTypeName += "]]";
 		}
-		return newTypeName(declaringTypeName + ", " + getAssembly());
+		return Names.newType(declaringTypeName + ", " + getAssembly());
 	}
 
 	private String takeUntilChar(String fullName, char[] stopChars) {
@@ -230,11 +234,7 @@ public class TypeName extends BaseTypeName implements ITypeName {
 
 	@Override
 	public boolean isUnknown() {
-		return this.equals(UNKNOWN_NAME);
-	}
-
-	public static ITypeName newTypeName(String string, Object... args) {
-		return newTypeName(String.format(string, args));
+		return UNKNOWN_TYPE_NAME_IDENTIFIER.equals(this.getIdentifier());
 	}
 
 	@Override

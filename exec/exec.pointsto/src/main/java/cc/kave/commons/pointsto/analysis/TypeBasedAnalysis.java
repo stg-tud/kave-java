@@ -20,11 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 
 /**
- * A {@link PointsToAnalysis} that assumes that all variables of a specific type point to one {@link AbstractLocation}.
+ * A {@link PointsToAnalysis} that assumes that all variables of a specific type
+ * point to one {@link AbstractLocation}.
  *
  */
 public class TypeBasedAnalysis extends AbstractPointsToAnalysis {
@@ -68,5 +69,4 @@ public class TypeBasedAnalysis extends AbstractPointsToAnalysis {
 		// lower query to used format
 		return super.query(new PointsToQuery(null, query.getType(), null, null));
 	}
-
 }

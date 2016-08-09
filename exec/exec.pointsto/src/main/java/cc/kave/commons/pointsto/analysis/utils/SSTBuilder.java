@@ -14,13 +14,13 @@ package cc.kave.commons.pointsto.analysis.utils;
 
 import java.util.Arrays;
 
-import cc.kave.commons.model.names.IEventName;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.ParameterName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IEventName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
@@ -117,7 +117,7 @@ public class SSTBuilder {
 	}
 
 	public static IParameterName parameter(String name, ITypeName type) {
-		return ParameterName.newParameterName("[" + type.getIdentifier() + "] " + name);
+		return Names.newParameter("[" + type.getIdentifier() + "] " + name);
 	}
 
 	public static IReferenceExpression referenceExpr(IReference reference) {

@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.inclusion.annotations;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IMemberName;
+import cc.kave.commons.model.naming.codeelements.IMemberName;
 
 public abstract class MemberAnnotation implements InclusionAnnotation {
 
@@ -58,5 +58,4 @@ public abstract class MemberAnnotation implements InclusionAnnotation {
 	public String toString() {
 		return MoreObjects.toStringHelper(this).add("member", member).toString();
 	}
-
 }

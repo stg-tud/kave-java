@@ -14,8 +14,8 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 
 public class DistinctFieldReference extends DistinctMemberReference {
@@ -54,5 +54,4 @@ public class DistinctFieldReference extends DistinctMemberReference {
 		return MoreObjects.toStringHelper(DistinctFieldReference.class).add("base", getBaseReference())
 				.add("name", getReference().getFieldName().getName()).toString();
 	}
-
 }

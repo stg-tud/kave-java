@@ -37,11 +37,10 @@ import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -205,7 +204,7 @@ public abstract class BaseIntegrationTest {
 	protected Query _q(ICoReMethodName ctx, ICoReTypeName type, ICoReMethodName... calls) {
 		Query q = new Query();
 		q.setType(type);
-		q.setClassContext(CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME));
+		q.setClassContext(CoReNameUtils.toCoReName(Names.getUnknownType()));
 		q.setMethodContext(ctx);
 		q.setDefinition(DefinitionSites.createDefinitionByConstant());
 		for (ICoReMethodName i : calls) {
@@ -220,7 +219,7 @@ public abstract class BaseIntegrationTest {
 
 	protected IMethodName m(int typeNum, int methodNum) {
 		String name = String.format("[T,P] [%s].m%d()", t(typeNum), methodNum);
-		return MethodName.newMethodName(name);
+		return Names.newMethod(name);
 	}
 
 	protected ICoReTypeName _t(int typeNum) {
@@ -229,7 +228,7 @@ public abstract class BaseIntegrationTest {
 
 	protected ITypeName t(int typeNum) {
 		String name = String.format("T%d,P", typeNum);
-		return TypeName.newTypeName(name);
+		return Names.newType(name);
 	}
 
 	/* utils for ssts */

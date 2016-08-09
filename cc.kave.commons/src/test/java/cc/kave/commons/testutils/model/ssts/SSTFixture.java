@@ -20,12 +20,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -104,27 +99,27 @@ public class SSTFixture {
 		setDeclarations();
 		MethodDeclaration method = new MethodDeclaration();
 		method.setEntryPoint(true);
-		method.setName(MethodName.newMethodName("[?] [?].m1()"));
+		method.setName(Names.newMethod("[?] [?].m1()"));
 		method.setBody(getAllISSTNodes());
 		sst.setMethods(Sets.newHashSet(method));
 	}
 
 	private void setDeclarations() {
 		FieldDeclaration fieldDeclaration = new FieldDeclaration();
-		fieldDeclaration.setName(FieldName.newFieldName("[T4,P] [T5,P].F"));
+		fieldDeclaration.setName(Names.newField("[T4,P] [T5,P].F"));
 
 		PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
-		propertyDeclaration.setName(PropertyName.newPropertyName("[T10,P] [T11,P].P"));
+		propertyDeclaration.setName(Names.newProperty("[T10,P] [T11,P].P"));
 		propertyDeclaration.setGet(Lists.newArrayList(new ReturnStatement()));
 		propertyDeclaration.setSet(Lists.newArrayList(new Assignment()));
 
 		EventDeclaration eventDeclaration = new EventDeclaration();
-		eventDeclaration.setName(EventName.newEventName("[T2,P] [T3,P].E"));
+		eventDeclaration.setName(Names.newEvent("[T2,P] [T3,P].E"));
 
 		DelegateDeclaration delegateDeclaration = new DelegateDeclaration();
-		delegateDeclaration.setName(DelegateTypeName.newDelegateTypeName("d:[R,P] [T2,P].()"));
+		delegateDeclaration.setName(Names.newType("d:[R,P] [T2,P].()").asDelegateTypeName());
 
-		sst.setEnclosingType(TypeName.newTypeName("T,P"));
+		sst.setEnclosingType(Names.newType("T,P"));
 		sst.setDelegates(Sets.newHashSet(delegateDeclaration));
 		sst.setEvents(Sets.newHashSet(eventDeclaration));
 		sst.setProperties(Sets.newHashSet(propertyDeclaration));
@@ -156,7 +151,7 @@ public class SSTFixture {
 				new UsingBlock(), //
 				new LockBlock(),
 
-		// assignable expressions
+				// assignable expressions
 				assExpr(new BinaryExpression()), //
 				assExpr(new UnaryExpression()), //
 				assExpr(new CastExpression()), //
@@ -168,16 +163,16 @@ public class SSTFixture {
 				assExpr(new InvocationExpression()), //
 				assExpr(new LambdaExpression()), //
 
-		// simple expressions
+				// simple expressions
 				assExpr(new ConstantValueExpression()), //
 				assExpr(new NullExpression()), //
 				assExpr(new ReferenceExpression()), //
 				assExpr(new UnknownExpression()), //
 
-		// loopheaderblock expression
+				// loopheaderblock expression
 				loopheaderExpr(new LoopHeaderBlockExpression()),
 
-		// references
+				// references
 				ref(new EventReference()), //
 				ref(new FieldReference()), //
 				ref(new IndexAccessReference()), //

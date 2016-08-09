@@ -21,8 +21,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.names.ICoReMethodName;
@@ -45,7 +44,7 @@ public class MicroCommit {
 
 	public ICoReTypeName getType() {
 		if (hasOnlyNoUsages()) {
-			return CoReNameUtils.toCoReName(TypeName.UNKNOWN_NAME);
+			return CoReNameUtils.toCoReName(Names.getUnknownType());
 		}
 		return getFirstNoUsage().getType();
 	}
@@ -56,7 +55,7 @@ public class MicroCommit {
 
 	public ICoReMethodName getMethodContext() {
 		if (hasOnlyNoUsages()) {
-			return CoReNameUtils.toCoReName(MethodName.UNKNOWN_NAME);
+			return CoReNameUtils.toCoReName(Names.getUnknownMethod());
 		}
 		return getFirstNoUsage().getMethodContext();
 	}

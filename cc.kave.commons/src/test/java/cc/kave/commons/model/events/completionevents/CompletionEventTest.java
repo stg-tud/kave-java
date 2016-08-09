@@ -21,8 +21,8 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IName;
-import cc.kave.commons.model.names.csharp.Name;
+import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.Names;
 
 public class CompletionEventTest {
 
@@ -35,11 +35,11 @@ public class CompletionEventTest {
 
 	@Test
 	public void GetLastSelectedProposal() {
-		IProposal pX = p(Name.newName("3"));
-		IProposal pY = p(Name.newName("4"));
+		IProposal pX = p(Names.newGeneral("3"));
+		IProposal pY = p(Names.newGeneral("4"));
 
-		IProposal p1 = p(Name.newName("1"));
-		IProposal p2 = p(Name.newName("2"));
+		IProposal p1 = p(Names.newGeneral("1"));
+		IProposal p2 = p(Names.newGeneral("2"));
 		ProposalSelection s1 = new ProposalSelection();
 		s1.Proposal = p1;
 		ProposalSelection s2 = new ProposalSelection();

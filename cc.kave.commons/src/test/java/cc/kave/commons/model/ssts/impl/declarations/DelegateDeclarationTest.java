@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IDelegateTypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
 
@@ -32,7 +32,7 @@ public class DelegateDeclarationTest {
 	public void testDefaultValues() {
 		DelegateDeclaration sut = new DelegateDeclaration();
 
-		assertThat(DelegateTypeName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(Names.getUnknownDelegateType(), equalTo(sut.getName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}
@@ -86,7 +86,7 @@ public class DelegateDeclarationTest {
 	}
 
 	private static IDelegateTypeName someDelegateType() {
-		return DelegateTypeName.newDelegateTypeName("d:[R,P] [SomeDelegateType,P].()");
+		return Names.newType("d:[R,P] [SomeDelegateType,P].()").asDelegateTypeName();
 	}
 
 	@Test

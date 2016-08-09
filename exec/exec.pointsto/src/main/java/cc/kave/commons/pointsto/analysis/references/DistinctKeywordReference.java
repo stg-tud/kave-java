@@ -16,7 +16,7 @@ import static cc.kave.commons.pointsto.analysis.utils.SSTBuilder.variableReferen
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IVariableReference;;
 
 public class DistinctKeywordReference implements DistinctReference {
@@ -80,5 +80,4 @@ public class DistinctKeywordReference implements DistinctReference {
 		return MoreObjects.toStringHelper(DistinctKeywordReference.class).add("keyword", keyword)
 				.add("type", type.getName()).toString();
 	}
-
 }

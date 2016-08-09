@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.csharp.FieldName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.testutils.ToStringAssert;
 
@@ -32,7 +32,7 @@ public class FieldDeclarationTest {
 	public void testDefaultValues() {
 		FieldDeclaration sut = new FieldDeclaration();
 
-		assertThat(FieldName.UNKNOWN_NAME, equalTo(sut.getName()));
+		assertThat(Names.getUnknownField(), equalTo(sut.getName()));
 		assertThat(0, not(equalTo(sut.hashCode())));
 		assertThat(1, not(equalTo(sut.hashCode())));
 	}
@@ -86,7 +86,7 @@ public class FieldDeclarationTest {
 	}
 
 	private IFieldName someField() {
-		return FieldName.newFieldName("[T1,P1] [T2,P2].Field");
+		return Names.newField("[T1,P1] [T2,P2].Field");
 	}
 
 	@Test
