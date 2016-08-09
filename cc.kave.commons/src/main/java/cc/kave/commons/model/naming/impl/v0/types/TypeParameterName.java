@@ -236,4 +236,9 @@ public class TypeParameterName extends BaseName implements ITypeParameterName, I
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public static boolean isTypeParameterNameIdentifier(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -22,7 +22,11 @@ import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
 
 public class AssemblyName extends BaseName implements IAssemblyName {
 
-	private AssemblyName(String identifier) {
+	public AssemblyName() {
+		super(UNKNOWN_NAME_IDENTIFIER);
+	}
+
+	public AssemblyName(String identifier) {
 		super(identifier);
 	}
 

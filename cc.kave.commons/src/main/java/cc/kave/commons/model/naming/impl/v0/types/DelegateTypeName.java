@@ -116,4 +116,9 @@ public class DelegateTypeName extends TypeName implements IDelegateTypeName {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public static boolean isDelegateTypeNameIdentifier(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

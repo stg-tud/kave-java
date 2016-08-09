@@ -197,4 +197,9 @@ public class ArrayTypeName extends TypeName implements IArrayTypeName {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public static boolean isArrayTypeNameIdentifier(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -13,26 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.naming.impl.v0.types;
+package cc.recommenders.exceptions;
 
-import cc.kave.commons.model.naming.types.IPredefinedTypeName;
-import cc.kave.commons.model.naming.types.ITypeName;
+public class ValidationException extends RuntimeException {
 
-public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeName {
+	private static final long serialVersionUID = 1L;
 
-	public PredefinedTypeName(String identifier) {
-		super(identifier);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public ITypeName getFullType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static boolean IsPredefinedTypeNameIdentifier(String invalidId) {
-		// TODO Auto-generated method stub
-		return false;
+	public ValidationException(String message) {
+		super(message);
 	}
 }

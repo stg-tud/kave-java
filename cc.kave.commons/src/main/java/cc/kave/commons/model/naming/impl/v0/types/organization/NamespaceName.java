@@ -23,11 +23,11 @@ public class NamespaceName extends BaseName implements INamespaceName {
 
 	public static final String GLOBAL_NAMESPACE_IDENTIFIER = "";
 
-	private NamespaceName() {
+	public NamespaceName() {
 		super(UNKNOWN_NAME_IDENTIFIER);
 	}
 
-	private NamespaceName(String identifier) {
+	public NamespaceName(String identifier) {
 		super(identifier);
 	}
 

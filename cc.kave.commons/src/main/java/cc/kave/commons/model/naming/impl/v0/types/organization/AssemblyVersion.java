@@ -24,7 +24,7 @@ public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 		super("");
 	}
 
-	private AssemblyVersion(String identifier) {
+	public AssemblyVersion(String identifier) {
 		super(identifier);
 	}
 
