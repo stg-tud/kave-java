@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation.java_printer;
+package exec.recommender_reimplementation.java_transformation;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,6 +49,7 @@ import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class JavaTransformationBaseTest {
 

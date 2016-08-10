@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation.java_printer;
+package exec.recommender_reimplementation.java_transformation;
 
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getDefaultValueForType;
 

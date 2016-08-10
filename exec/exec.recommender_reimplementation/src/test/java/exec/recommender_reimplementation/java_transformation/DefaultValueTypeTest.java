@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
+package exec.recommender_reimplementation.java_transformation;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,9 +26,9 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.utils.json.JsonUtils;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
-import exec.recommender_reimplementation.java_printer.JavaTransformationVisitor;
+import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
-public class ValueTypeTest {
+public class DefaultValueTypeTest {
 
 	// tests translating value types and UnknownExpression resolving
 	@Test

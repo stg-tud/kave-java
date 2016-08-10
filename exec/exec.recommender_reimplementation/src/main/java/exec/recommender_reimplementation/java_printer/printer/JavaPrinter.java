@@ -18,7 +18,7 @@ package exec.recommender_reimplementation.java_printer.printer;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
-import exec.recommender_reimplementation.java_printer.JavaTransformationVisitor;
+import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public abstract class JavaPrinter {
 
