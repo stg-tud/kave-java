@@ -26,7 +26,13 @@ import static cc.kave.commons.utils.StringUtils.TakeUntil;
 import static cc.kave.commons.utils.StringUtils.containsAny;
 import static cc.kave.commons.utils.StringUtils.containsIgnoreCase;
 import static cc.kave.commons.utils.StringUtils.f;
+import static cc.kave.commons.utils.StringUtils.insert;
+import static cc.kave.commons.utils.StringUtils.isNullOrEmpty;
+import static cc.kave.commons.utils.StringUtils.remove;
+import static cc.kave.commons.utils.StringUtils.repeat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.security.InvalidParameterException;
 
@@ -276,5 +282,106 @@ public class StringUtilsTest {
 		String actual = TakeUntil(strIn, 'x');
 		String expected = "abcd";
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void insert_happyPath() {
+		String strIn = "abc";
+		String actual = insert(strIn, 2, "X");
+		String expected = "abXc";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void insert_start() {
+		String strIn = "abc";
+		String actual = insert(strIn, 2, "X");
+		String expected = "abXc";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void insert_end() {
+		String strIn = "abc";
+		String actual = insert(strIn, 3, "X");
+		String expected = "abcX";
+		assertEquals(expected, actual);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void insert_tooLow() {
+		insert("abc", -1, "X");
+	}
+
+	@Test(expected = AssertionException.class)
+	public void insert_tooHigh() {
+		insert("abc", 4, "X");
+	}
+
+	@Test(expected = AssertionException.class)
+	public void insert_null() {
+		insert(null, 0, "X");
+	}
+
+	@Test(expected = AssertionException.class)
+	public void insert_nullAddition() {
+		insert("abc", 0, null);
+	}
+
+	@Test
+	public void isNullOrEmptyTest() {
+		assertTrue(isNullOrEmpty(null));
+		assertTrue(isNullOrEmpty(""));
+		assertFalse(isNullOrEmpty("x"));
+	}
+
+	@Test
+	public void remove_happyPath() {
+		assertEquals("ade", StringUtils.remove("abcde", 1, 2));
+	}
+
+	@Test
+	public void remove_happyPath2() {
+		assertEquals("bcde", StringUtils.remove("abcde", 0, 1));
+	}
+
+	@Test
+	public void remove_happyPath3() {
+		assertEquals("abcd", StringUtils.remove("abcde", 4, 1));
+	}
+
+	@Test(expected = AssertionException.class)
+	public void remove_null() {
+		remove(null, 1, 2);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void remove_indexTooLow() {
+		remove("abcde", -1, 2);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void remove_indexTooHigh() {
+		remove("abcde", 5, 2);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void remove_indexNegativeCount() {
+		remove("abcde", 1, -1);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void remove_countEndsOutOfString() {
+		remove("abcde", 4, 2);
+	}
+
+	@Test
+	public void repeat_happypath() {
+		assertEquals(".", repeat('.', 1));
+	}
+
+	@Test(expected = AssertionException.class)
+	public void repeat_negativeCount() {
+		repeat('.', -1);
 	}
 }

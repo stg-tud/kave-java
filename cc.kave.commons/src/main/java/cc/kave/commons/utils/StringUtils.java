@@ -154,4 +154,38 @@ public class StringUtils {
 		}
 		return sb.toString();
 	}
+
+	public static String insert(String original, int index, String addition) {
+		Asserts.assertFalse(original == null);
+		Asserts.assertFalse(addition == null);
+		Asserts.assertFalse(index < 0);
+		Asserts.assertFalse(index > original.length());
+		String start = original.substring(0, index);
+		String end = original.substring(index, original.length());
+		return start + addition + end;
+	}
+
+	public static boolean isNullOrEmpty(String str) {
+		return str == null || str.isEmpty();
+	}
+
+	public static String remove(String orig, int startIdx, int count) {
+		Asserts.assertFalse(orig == null);
+		Asserts.assertFalse(startIdx < 0);
+		Asserts.assertFalse(startIdx > orig.length());
+		Asserts.assertFalse(count < 0);
+		Asserts.assertFalse(startIdx + count > orig.length());
+		String start = orig.substring(0, startIdx);
+		String end = orig.substring(startIdx + count, orig.length());
+		return start + end;
+	}
+
+	public static String repeat(char c, int count) {
+		Asserts.assertTrue(count >= 0);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < count; i++) {
+			sb.append(c);
+		}
+		return sb.toString();
+	}
 }
