@@ -15,16 +15,13 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types.organization;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class NamespaceName extends BaseName implements INamespaceName {
 
-	public static final String GLOBAL_NAMESPACE_IDENTIFIER = "";
-
 	public NamespaceName() {
-		super(UNKNOWN_NAME_IDENTIFIER);
+		this(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	public NamespaceName(String identifier) {
@@ -32,34 +29,28 @@ public class NamespaceName extends BaseName implements INamespaceName {
 	}
 
 	@Override
+	public boolean isUnknown() {
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
+	}
+
 	public INamespaceName getParentNamespace() {
 		if (isGlobalNamespace()) {
 			return null;
 		}
-
-		int i = identifier.lastIndexOf(".");
-		if (i == -1) {
-			return Names.newNamespace(GLOBAL_NAMESPACE_IDENTIFIER);
-		} else {
-			return Names.newNamespace(identifier.substring(0, i));
+		if (isUnknown()) {
+			return new NamespaceName();
 		}
+		int lastSeperatorIndex = identifier.lastIndexOf('.');
+		return lastSeperatorIndex == -1 ? new NamespaceName("")
+				: new NamespaceName(identifier.substring(0, lastSeperatorIndex));
 	}
 
-	@Override
 	public String getName() {
-		return identifier.substring(identifier.lastIndexOf(".") + 1);
+		int lastSeperatorIndex = identifier.lastIndexOf('.');
+		return identifier.substring(lastSeperatorIndex + 1);
 	}
 
-	@Override
 	public boolean isGlobalNamespace() {
-		return identifier.equals(GLOBAL_NAMESPACE_IDENTIFIER);
-	}
-
-	public static INamespaceName getGlobalNamespace() {
-		return Names.newNamespace(GLOBAL_NAMESPACE_IDENTIFIER);
-	}
-
-	public static INamespaceName getUnknownName() {
-		return Names.newNamespace("xyz");
+		return "".equals(identifier);
 	}
 }
