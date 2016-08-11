@@ -15,6 +15,10 @@
  */
 package cc.kave.commons.utils;
 
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+import static cc.kave.commons.utils.StringUtils.FindNext;
+
 import java.util.List;
 import java.util.Map;
 
@@ -121,95 +125,6 @@ public class TypeErasure {
 		}
 
 		return parameters;
-	}
-
-	public static int FindNext(String str, int currentIndex, char... characters) {
-		for (int i = currentIndex; i < str.length(); i++) {
-			char c = str.charAt(i);
-			if (contains(characters, c)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private static boolean contains(char[] characters, char c) {
-		for (char c2 : characters) {
-			if (c2 == c) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static int FindPrevious(String str, int currentIndex, char character) {
-		for (int i = currentIndex; i >= 0; i--) {
-			if (str.charAt(i) == character) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static int FindCorrespondingOpenBracket(String str, int currentIndex) {
-		char open = str.charAt(currentIndex);
-		char close = GetCorresponding(open);
-
-		int depth = 0;
-		for (int i = currentIndex; i > 0; i--) {
-			depth = UpdateDepth(depth, open, close, str.charAt(i));
-			if (depth == 0) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private static int UpdateDepth(int depth, char open, char close, char current) {
-		if (current == open) {
-			return depth + 1;
-		}
-		if (current == close) {
-			return depth - 1;
-		}
-		return depth;
-	}
-
-	public static int FindCorrespondingCloseBracket(String str, int currentIndex) {
-		char open = str.charAt(currentIndex);
-		char close = GetCorresponding(open);
-
-		int depth = 0;
-		for (int i = currentIndex; i < str.length(); i++) {
-			depth = UpdateDepth(depth, open, close, str.charAt(i));
-			if (depth == 0) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static char GetCorresponding(char c) {
-		switch (c) {
-		case '(':
-			return ')';
-		case ')':
-			return '(';
-		case '{':
-			return '}';
-		case '}':
-			return '{';
-		case '[':
-			return ']';
-		case ']':
-			return '[';
-		case '<':
-			return '>';
-		case '>':
-			return '<';
-		default:
-			throw new RuntimeException(String.format("no supported bracket type: {0}", c));
-		}
 	}
 
 	/// <summary>
