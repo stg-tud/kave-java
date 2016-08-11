@@ -16,116 +16,60 @@
 
 package cc.kave.commons.model.naming.impl.v0.types;
 
-import java.util.regex.Matcher;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+import static cc.kave.commons.utils.StringUtils.FindNext;
+import static cc.kave.commons.utils.StringUtils.FindPrevious;
+import static cc.kave.commons.utils.StringUtils.f;
+import static cc.kave.commons.utils.StringUtils.insert;
+import static cc.kave.commons.utils.StringUtils.remove;
+import static cc.recommenders.assertions.Asserts.assertFalse;
+
 import java.util.regex.Pattern;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.IArrayTypeName;
-import cc.kave.commons.model.naming.types.IDelegateTypeName;
-import cc.kave.commons.model.naming.types.IPredefinedTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.model.naming.types.ITypeParameterName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
+import cc.recommenders.assertions.Asserts;
 
-public class ArrayTypeName extends TypeName implements IArrayTypeName {
+public class ArrayTypeName extends BaseTypeName implements IArrayTypeName {
 
-	private static final Pattern ArrayTypeNameSuffix = Pattern.compile(".*(\\[[,]*\\])([^()]*).*");
-
-	protected ArrayTypeName(String identifier) {
+	public ArrayTypeName(String identifier) {
 		super(identifier);
-	}
-
-	static ITypeName newCsArrayTypeName(String identifier) {
-		return new TypeName(identifier);
-	}
-
-	static boolean isArrayTypeIdentifier(String id) {
-		if (id.startsWith("d:")) {
-			int idx = id.lastIndexOf(')');
-			if (id.length() > (idx + 1) && id.charAt(idx + 1) == '[') {
-				return true;
-			}
-		} else {
-			int idx = id.indexOf('[');
-			if (idx == -1) {
-				return false;
-			}
-			while ((idx + 1) < id.length() && id.charAt(++idx) == ',') {
-			}
-			if (id.charAt(idx) == ']') {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static String deriveArrayTypeNameIdentifier(ITypeName baseType, int rank) {
-		if (baseType.isArray()) {
-			IArrayTypeName baseArr = baseType.asArrayTypeName();
-			baseType = baseArr.getArrayBaseType();
-			rank += getArrayRank(baseType);
-		}
-
-		String identifier = baseType.getIdentifier();
-		String arrayMarker = createArrayMarker(rank);
-
-		String derivedIdentifier;
-		if (baseType.isDelegateType()) {
-			derivedIdentifier = identifier + arrayMarker;
-		} else {
-			derivedIdentifier = insertMarkerAfterRawName(identifier, arrayMarker);
-		}
-		return derivedIdentifier;
-	}
-
-	private static String createArrayMarker(int rank) {
-		StringBuilder marker = new StringBuilder();
-
-		for (int i = 0; i < rank - 1; i++) {
-			marker.append(",");
-		}
-
-		return String.format("[%s]", marker.toString());
-
-	}
-
-	private static String insertMarkerAfterRawName(String identifier, String arrayMarker) {
-		int endOfRawName = identifier.indexOf('[');
-		if (endOfRawName < 0) {
-			endOfRawName = identifier.indexOf(',');
-		}
-		if (endOfRawName < 0) {
-			endOfRawName = identifier.length();
-		}
-
-		return new StringBuilder(identifier).insert(endOfRawName, arrayMarker).toString();
-	}
-
-	public static ITypeName from(ITypeName baseType, int rank) {
-		ITypeName typeName = Names.newType(deriveArrayTypeNameIdentifier(baseType, rank));
-		return (ArrayTypeName) typeName;
-	}
-
-	public static int getArrayRank(ITypeName arrayTypeName) {
-		Matcher matcher = ArrayTypeNameSuffix.matcher(arrayTypeName.getIdentifier());
-		if (!matcher.matches()) {
-			throw new RuntimeException("Invalid Signature Syntax: " + arrayTypeName.getIdentifier());
-		}
-		String group = matcher.group(1);
-		int count = 1;
-
-		for (int i = 0; i < group.length(); i++) {
-			if (group.charAt(i) == ',') {
-				count++;
-			}
-		}
-		return count;
+		assertFalse(TypeUtils.isUnknownTypeIdentifier(identifier));
 	}
 
 	@Override
-	public boolean isArray() {
-		return true;
+	public ITypeName getArrayBaseType() {
+		// can not be TypeParameter)
+
+		String id = getIdentifier();
+		String newId;
+
+		if (id.startsWith("d:")) // base is delegate
+		{
+			newId = id.substring(0, id.lastIndexOf(')') + 1);
+			return TypeUtils.createTypeName(newId);
+		}
+
+		int openArr = findArrayMarkerIndex(id);
+		assertFalse(openArr == -1);
+		int closeArr = FindCorrespondingCloseBracket(id, openArr);
+		assertFalse(closeArr == -1);
+
+		newId = remove(id, openArr, closeArr - openArr + 1);
+		return TypeUtils.createTypeName(newId);
+	}
+
+	@Override
+	public int getRank() {
+		return getArrayRank(this);
+	}
+
+	@Override
+	public String getName() {
+		return getArrayBaseType().getName() + createArrayMarker(getRank());
 	}
 
 	@Override
@@ -133,73 +77,143 @@ public class ArrayTypeName extends TypeName implements IArrayTypeName {
 		return getArrayBaseType().getFullName() + createArrayMarker(getRank());
 	}
 
-	public int getRank() {
-		return getArrayRank(this);
-
-	}
-
-	@Override
-	public ITypeName getArrayBaseType() {
-
-		String id = identifier;
-		int startIdx = -1;
-		int endIdx = -1;
-
-		int idx = id.startsWith("d:") ? id.lastIndexOf(')') + 1 : id.indexOf('[');
-
-		startIdx = idx;
-		while (id.charAt(++idx) == ',') {
-		}
-		endIdx = idx;
-
-		String newId = id.substring(0, startIdx) + id.substring(endIdx + 1);
-		return Names.newType(newId);
-
-	}
-
 	@Override
 	public INamespaceName getNamespace() {
-		// TODO Auto-generated method stub
-		return null;
+		return getArrayBaseType().getNamespace();
 	}
 
 	@Override
-	public IDelegateTypeName asDelegateTypeName() {
-		// TODO Auto-generated method stub
-		return null;
+	public IAssemblyName getAssembly() {
+		return getArrayBaseType().getAssembly();
 	}
 
 	@Override
-	public IArrayTypeName asArrayTypeName() {
-		return this;
-	}
-
-	@Override
-	public ITypeParameterName asTypeParameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isPredefined() {
-		// TODO Auto-generated method stub
+	public boolean isNestedType() {
 		return false;
 	}
 
 	@Override
-	public IPredefinedTypeName asPredefinedTypeName() {
-		// TODO Auto-generated method stub
+	public ITypeName getDeclaringType() {
 		return null;
 	}
 
-	@Override
-	public boolean isHashed() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	private static final Pattern UnknownArrayMatcher = Pattern.compile("^\\?\\[,*\\]$");
 
 	public static boolean isArrayTypeNameIdentifier(String id) {
-		// TODO Auto-generated method stub
-		return false;
+		if (TypeUtils.isUnknownTypeIdentifier(id)) {
+			return false;
+		}
+		if (UnknownArrayMatcher.matcher(id).matches()) {
+			return true;
+		}
+		if (id.startsWith("d:")) {
+			int idx = id.lastIndexOf(')');
+			return idx != -1 && FindNext(id, idx, '[') != -1;
+		}
+		if (TypeParameterName.isTypeParameterNameIdentifier(id)) {
+			return false;
+		}
+		if (id.startsWith("p:")) {
+			return false;
+		}
+
+		return findArrayMarkerIndex(id) != -1;
+	}
+
+	private static int getArrayRank(ITypeName typeName) {
+		String id = typeName.getIdentifier();
+		int arrOpen = findArrayMarkerIndex(id);
+		if (arrOpen == -1) {
+			return 0;
+		}
+		int arrClose = FindCorrespondingCloseBracket(id, arrOpen);
+		return arrClose - arrOpen;
+	}
+
+	private static int findArrayMarkerIndex(String id) {
+		int closeBracket = id.lastIndexOf(']');
+		if (closeBracket == -1) {
+			return -1;
+		}
+		int cur = closeBracket;
+
+		// regular (multi-dimensional) array
+		while (cur - 1 > 0 && id.charAt(--cur) == ',') {
+		}
+		if (id.charAt(cur) == '[') {
+			return cur;
+		}
+
+		// generic
+		int openGeneric = FindCorrespondingOpenBracket(id, closeBracket);
+		if (openGeneric == -1) {
+			return -1;
+		}
+		int tick = FindPrevious(id, openGeneric, '`');
+		if (tick == -1) {
+			return -1;
+		}
+		int openArr = FindNext(id, tick, '[');
+		if (openArr == openGeneric) {
+			return -1;
+		}
+		return openArr;
+	}
+
+	public static IArrayTypeName from(ITypeName baseType, int rank) {
+		Asserts.assertTrue(rank > 0, "rank smaller than 1");
+		rank = baseType.isArray() ? baseType.asArrayTypeName().getRank() + rank : rank;
+		baseType = baseType.isArray() ? baseType.asArrayTypeName().getArrayBaseType() : baseType;
+		String arrMarker = createArrayMarker(rank);
+
+		if (baseType.isTypeParameter()) {
+			if (baseType.asTypeParameterName().isBound()) {
+				ITypeName paramType = baseType.asTypeParameterName().getTypeParameterType();
+				return new TypeParameterName(f("%s%s -> %s", baseType.getName(), arrMarker, paramType.getIdentifier()));
+			}
+			return new TypeParameterName(f("%s%s", baseType.getName(), arrMarker));
+		}
+
+		if (baseType.isPredefined()) {
+			return new PredefinedTypeName(baseType.getIdentifier() + arrMarker);
+		}
+
+		if (baseType.isDelegateType() || baseType.isUnknown()) {
+			return new ArrayTypeName(baseType.getIdentifier() + arrMarker);
+		}
+
+		return new ArrayTypeName(insertMarkerAfterRawName(baseType, arrMarker));
+	}
+
+	private static String createArrayMarker(int rank) {
+		Asserts.assertTrue(rank > 0);
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < rank - 1; i++) {
+			sb.append(',');
+		}
+		return sb.append("]").toString();
+	}
+
+	private static String insertMarkerAfterRawName(ITypeName baseType, String arrayMarker) {
+		assertFalse(baseType.isArray());
+		assertFalse(baseType.isDelegateType());
+		assertFalse(baseType.isTypeParameter());
+		assertFalse(baseType.isPredefined());
+
+		String id = baseType.getIdentifier();
+		int arrIdx = -1;
+
+		if (baseType.hasTypeParameters()) {
+			int closeGeneric = id.lastIndexOf("]");
+			arrIdx = FindCorrespondingOpenBracket(id, closeGeneric);
+		} else {
+			String asmId = baseType.getAssembly().getIdentifier();
+			int beforeAssembly = id.length() - asmId.length();
+			int comma = FindPrevious(id, beforeAssembly, ',');
+			arrIdx = comma;
+		}
+
+		assertFalse(arrIdx == -1);
+		return insert(id, arrIdx, arrayMarker);
 	}
 }

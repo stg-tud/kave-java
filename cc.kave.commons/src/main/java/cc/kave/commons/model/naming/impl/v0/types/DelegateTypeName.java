@@ -17,59 +17,51 @@ package cc.kave.commons.model.naming.impl.v0.types;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.impl.v0.codeelements.MethodName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
-public class DelegateTypeName extends TypeName implements IDelegateTypeName {
+public class DelegateTypeName extends BaseTypeName implements IDelegateTypeName {
+
+	private static final String UnknownDelegateIdentifier = "d:[?] [?].()";
 
 	public DelegateTypeName() {
-		this("d:[?] [?].()");
+		this(UnknownDelegateIdentifier);
 	}
 
 	public DelegateTypeName(String identifier) {
 		super(identifier);
 	}
 
-	static boolean isDelegateTypeIdentifier(String identifier) {
-		return identifier.startsWith("d:");
+	@Override
+	public boolean isUnknown() {
+		return UnknownDelegateIdentifier.equals(getIdentifier());
+	}
+
+	@Override
+	public String getName() {
+		return getDelegateType().getName();
+	}
+
+	@Override
+	public String getFullName() {
+		return getDelegateType().getFullName();
 	}
 
 	private IMethodName getDelegateMethod() {
-		return Names.newMethod(identifier.substring(2));
+		return new MethodName(getIdentifier().substring(PrefixDelegate.length()));
 	}
 
+	@Override
 	public ITypeName getDelegateType() {
 		return getDelegateMethod().getDeclaringType();
-	}
-
-	@Override
-	public List<IParameterName> getParameters() {
-		return getDelegateMethod().getParameters();
-	}
-
-	@Override
-	public boolean hasParameters() {
-		return getDelegateMethod().hasParameters();
-	}
-
-	@Override
-	public ITypeName getReturnType() {
-		return getDelegateMethod().getReturnType();
-	}
-
-	@Override
-	public boolean isInterfaceType() {
-		return false;
-	}
-
-	@Override
-	public boolean isDelegateType() {
-		return true;
 	}
 
 	@Override
@@ -78,27 +70,8 @@ public class DelegateTypeName extends TypeName implements IDelegateTypeName {
 	}
 
 	@Override
-	public boolean isArray() {
-		return false;
-	}
-
-	public ITypeName deriveArrayTypeName(int rank) {
-		return ArrayTypeName.from(this, rank);
-	}
-
-	@Override
-	public boolean isTypeParameter() {
-		return false;
-	}
-
-	@Override
-	public IAssemblyName getAssembly() {
-		return getDelegateType().getAssembly();
-	}
-
-	@Override
-	public String getFullName() {
-		return getDelegateMethod().getDeclaringType().getFullName();
+	public ITypeName getDeclaringType() {
+		return getDelegateType().getDeclaringType();
 	}
 
 	@Override
@@ -107,18 +80,71 @@ public class DelegateTypeName extends TypeName implements IDelegateTypeName {
 	}
 
 	@Override
-	public ITypeName getDeclaringType() {
-		return getDelegateType().getDeclaringType();
+	public IAssemblyName getAssembly() {
+		return getDelegateType().getAssembly();
+	}
+
+	@Override
+	public boolean hasParameters() {
+		return getDelegateMethod().hasParameters();
 	}
 
 	@Override
 	public boolean isRecursive() {
-		// TODO Auto-generated method stub
+		if (getDelegateType().isUnknown()) {
+			return false;
+		}
+		boolean hasRecursiveReturn = getDelegateMethod().getReturnType().getIdentifier()
+				.contains(getDelegateType().getIdentifier());
+		return hasRecursiveReturn || hasRecursiveParam();
+	}
+
+	private boolean hasRecursiveParam() {
+		String delegateId = getDelegateType().getIdentifier();
+		for (IParameterName p : getDelegateMethod().getParameters()) {
+			if (p.getIdentifier().contains(delegateId)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
-	public static boolean isDelegateTypeNameIdentifier(String id) {
-		// TODO Auto-generated method stub
-		return false;
+	@Override
+	public List<IParameterName> getParameters() {
+		List<IParameterName> ps = Lists.newLinkedList();
+		for (IParameterName p : getDelegateMethod().getParameters()) {
+			boolean isRecursive = !p.getValueType().isUnknown()
+					&& p.getIdentifier().contains(getDelegateType().getIdentifier());
+			if (isRecursive) {
+				String id = p.getIdentifier().replace(getDelegateType().getIdentifier(), getIdentifier());
+				ps.add(Names.newParameter(id));
+			} else {
+				ps.add(p);
+			}
+		}
+		return ps;
+	}
+
+	@Override
+	public ITypeName getReturnType() {
+		ITypeName rt = getDelegateMethod().getReturnType();
+
+		// simple case
+		if (rt.isUnknown() || !rt.getIdentifier().contains(getDelegateType().getIdentifier())) {
+			return rt;
+		}
+
+		// recursive case
+		String nrtId = rt.getIdentifier().replace(getDelegateType().getIdentifier(), getIdentifier());
+		return TypeUtils.createTypeName(nrtId);
+	}
+
+	public static boolean isDelegateTypeNameIdentifier(String identifier) {
+		if (TypeUtils.isUnknownTypeIdentifier(identifier)) {
+			return false;
+		}
+		boolean startsWithD = identifier.startsWith(PrefixDelegate);
+		boolean isArrayTypeNameIdentifier = ArrayTypeName.isArrayTypeNameIdentifier(identifier);
+		return startsWithD && !isArrayTypeNameIdentifier;
 	}
 }

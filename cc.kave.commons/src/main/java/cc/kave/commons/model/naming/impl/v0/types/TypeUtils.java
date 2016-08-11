@@ -16,16 +16,36 @@
 package cc.kave.commons.model.naming.impl.v0.types;
 
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.StringUtils;
 
 public class TypeUtils {
 
-	public static boolean isUnknownTypeIdentifier(String identifier) {
-		// TODO Auto-generated method stub
-		return false;
+	private static final ITypeName UnknownTypeInstance = new TypeName();
+
+	public static ITypeName createTypeName(String identifier) {
+		if (isUnknownTypeIdentifier(identifier)) {
+			return UnknownTypeInstance;
+		}
+		if (PredefinedTypeName.isPredefinedTypeNameIdentifier(identifier)) {
+			return new PredefinedTypeName(identifier);
+		}
+		if (TypeParameterName.isTypeParameterNameIdentifier(identifier)) {
+			return new TypeParameterName(identifier);
+		}
+		if (ArrayTypeName.isArrayTypeNameIdentifier(identifier)) {
+			return new ArrayTypeName(identifier);
+		}
+		if (DelegateTypeName.isDelegateTypeNameIdentifier(identifier)) {
+			return new DelegateTypeName(identifier);
+		}
+		if (TypeName.isTypeNameIdentifier(identifier)) {
+			return new TypeName(identifier);
+		}
+
+		return UnknownTypeInstance;
 	}
 
-	public static ITypeName createTypeName(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public static boolean isUnknownTypeIdentifier(String identifier) {
+		return StringUtils.isNullOrEmpty(identifier) || BaseTypeName.UnknownTypeIdentifier.equals(identifier);
 	}
 }

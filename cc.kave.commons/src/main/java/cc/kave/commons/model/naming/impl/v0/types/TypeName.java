@@ -15,266 +15,208 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types;
 
-import java.util.ArrayList;
-import java.util.List;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+import static cc.kave.commons.utils.StringUtils.FindNext;
+import static cc.kave.commons.utils.StringUtils.FindPrevious;
+import static cc.kave.commons.utils.StringUtils.f;
 
-import cc.kave.commons.model.naming.Names;
-import cc.kave.commons.model.naming.impl.csharp.CsGenericNameUtils;
+import java.util.regex.Pattern;
+
+import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
-import cc.kave.commons.model.naming.types.IArrayTypeName;
-import cc.kave.commons.model.naming.types.IDelegateTypeName;
-import cc.kave.commons.model.naming.types.IPredefinedTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
+import cc.recommenders.exceptions.ValidationException;
 
-public class TypeName extends BaseTypeName implements ITypeName {
+public class TypeName extends BaseTypeName {
 
-	private static final String UNKNOWN_TYPE_NAME_IDENTIFIER = "?";
+	private static final String[] InvalidIds = { "System.Boolean, mscorlib,", "System.Decimal, mscorlib,",
+			"System.SByte, mscorlib,", "System.Byte, mscorlib,", "System.Int16, mscorlib,", "System.UInt16, mscorlib,",
+			"System.Int32, mscorlib,", "System.UInt32, mscorlib,", "System.Int64, mscorlib,",
+			"System.UInt64, mscorlib,", "System.Char, mscorlib,", "System.Single, mscorlib,",
+			"System.Double, mscorlib,",
+			// "System.String, mscorlib,",
+			// "System.Object, mscorlib,",
+			"System.Void, mscorlib" };
 
 	public TypeName() {
-		this(UNKNOWN_TYPE_NAME_IDENTIFIER);
+		this(UnknownTypeIdentifier);
 	}
 
-	public TypeName(String identifier) {
-		super(identifier);
-	}
+	public TypeName(String id) {
+		super(id);
 
-	@Override
-	public boolean hasTypeParameters() {
-		return getFullName().indexOf("[[") > -1;
-	}
+		if (isUnknown()) {
+			return;
+		}
 
-	@Override
-	public List<ITypeParameterName> getTypeParameters() {
-		return hasTypeParameters() ? CsGenericNameUtils.parseTypeParameters(getFullName())
-				: new ArrayList<ITypeParameterName>();
+		for (String prefix : InvalidIds) {
+			if (id.startsWith(prefix)) {
+				throw new ValidationException(f("rejecting a predefined type: '%s'", id));
+			}
+		}
+
+		boolean hasComma = id.contains(",") && id.lastIndexOf(',') > id.lastIndexOf(']');
+		if (!hasComma) {
+			throw new ValidationException(f("does not contain a correct assembly name: '%s'", id));
+		}
 	}
 
 	@Override
 	public IAssemblyName getAssembly() {
-		int endOfTypeName = getLengthOfTypeName(identifier);
-		String assemblyIdentifier = identifier.substring(endOfTypeName).trim();
-		assemblyIdentifier = assemblyIdentifier.replaceFirst(",", "").trim();
-		return Names.newAssembly(assemblyIdentifier);
+		if (isUnknown()) {
+			return new AssemblyName();
+		}
+		if (isDelegateType()) {
+			return getDeclaringType().getAssembly();
+		}
+		int endOfTypeName = GetLengthOfTypeName();
+		// TODO NameUpdate: did trim ',' too, and no +1
+		String assemblyIdentifier = identifier.substring(endOfTypeName + 1).trim();
+		return new AssemblyName(assemblyIdentifier);
+	}
+
+	protected int GetLengthOfTypeName() {
+		String id = identifier;
+		if (TypeUtils.isUnknownTypeIdentifier(id)) {
+			return id.length();
+		}
+
+		int lastComma = id.lastIndexOf(',');
+		int x = FindPrevious(id, lastComma - 1, ',', ']', '+');
+		if (x == -1) {
+			return lastComma;
+		}
+		return id.charAt(x) == ',' ? x : FindNext(id, x, ',');
 	}
 
 	@Override
 	public INamespaceName getNamespace() {
-		String id = getRawFullName();
+		if (isUnknown()) {
+			return new NamespaceName();
+		}
+		if (isDelegateType()) {
+			return getDeclaringType().getNamespace();
+		}
+
+		String id = RemoveTypeParameterListButKeepTicks(getFullName());
+
 		int endIndexOfNamespaceIdentifier = id.lastIndexOf('.');
 		return endIndexOfNamespaceIdentifier < 0 ? new NamespaceName("")
-				: Names.newNamespace(id.substring(0, endIndexOfNamespaceIdentifier));
+				: new NamespaceName(id.substring(0, endIndexOfNamespaceIdentifier));
 	}
 
-	@Override
-	public ITypeName getDeclaringType() {
-
-		if (!isNestedType()) {
-			return null;
-		}
-
-		String fullName = getFullName();
-		if (hasTypeParameters()) {
-			fullName = takeUntilChar(fullName, new char[] { '[', ',' });
-		}
-		int endOfDeclaringTypeName = fullName.lastIndexOf('+');
-		if (endOfDeclaringTypeName == -1) {
-			return null;
-		}
-
-		String declaringTypeName = fullName.substring(0, endOfDeclaringTypeName);
-		if (declaringTypeName.indexOf('`') > -1 && hasTypeParameters()) {
-			int startIndex = 0;
-			int numberOfParameters = 0;
-
-			while ((startIndex = declaringTypeName.indexOf('`', startIndex) + 1) > 0) {
-				int endIndex = declaringTypeName.indexOf('+', startIndex);
-				if (endIndex > -1) {
-					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex, endIndex));
-				} else {
-					numberOfParameters += Integer.parseInt(declaringTypeName.substring(startIndex));
-				}
-
-			}
-
-			List<ITypeParameterName> outerTypeParameters = getTypeParameters().subList(0, numberOfParameters);
-			declaringTypeName += "[[";
-
-			for (ITypeName typeName : outerTypeParameters) {
-				declaringTypeName += typeName.getIdentifier() + "],[";
-			}
-
-			declaringTypeName = declaringTypeName.substring(0, declaringTypeName.length() - 3);
-			declaringTypeName += "]]";
-		}
-		return Names.newType(declaringTypeName + ", " + getAssembly());
-	}
-
-	private String takeUntilChar(String fullName, char[] stopChars) {
-		int i = 0;
-		for (char c : getFullName().toCharArray()) {
-			for (int j = 0; j < stopChars.length; j++) {
-				if (stopChars[j] == c) {
-					return fullName.substring(0, i);
-				}
-			}
-			i++;
-		}
-
-		return fullName.substring(0, i);
-	}
+	private String _fullName;
 
 	@Override
 	public String getFullName() {
-		int length = getLengthOfTypeName(identifier);
-		return identifier.substring(0, length);
+		if (_fullName == null) {
+			int length = GetLengthOfTypeName();
+			_fullName = identifier.substring(0, length);
+			if (isEnumType() || isInterfaceType() || isStructType()) {
+				int startIdx = _fullName.indexOf(":") + 1;
+				_fullName = _fullName.substring(startIdx);
+			}
+		}
+		return _fullName;
 	}
 
-	protected static int getLengthOfTypeName(String identifier) {
-		if (TypeUtils.isUnknownTypeIdentifier(identifier)) {
-			return identifier.length();
+	private static String RemoveTypeParameterListButKeepTicks(String fullName) {
+		int startIdx = fullName.indexOf('[');
+		if (startIdx != -1) {
+			int endIdx = FindCorrespondingCloseBracket(fullName, startIdx);
+			String genericInfo = fullName.substring(startIdx, endIdx+1);
+			return fullName.replace(genericInfo, "");
 		}
-		int length = identifier.lastIndexOf(']') + 1;
-		if (length > 0) {
-			return length;
-		}
-		return identifier.indexOf(',');
+		return fullName;
 	}
 
 	@Override
 	public String getName() {
-		String rawFullName = getRawFullName();
+		String rawFullName = RemoveTypeParameterListButKeepTicks(getFullName());
 		int endOfOutTypeName = rawFullName.lastIndexOf('+');
-
 		if (endOfOutTypeName > -1) {
 			rawFullName = rawFullName.substring(endOfOutTypeName + 1);
 		}
-
 		int endOfTypeName = rawFullName.lastIndexOf('`');
-
 		if (endOfTypeName > -1) {
 			rawFullName = rawFullName.substring(0, endOfTypeName);
 		}
-
 		int startIndexOfSimpleName = rawFullName.lastIndexOf('.');
 		return rawFullName.substring(startIndexOfSimpleName + 1);
 	}
 
-	public String getRawFullName() {
-		String fullName = getFullName();
-		int indexOfGenericList = fullName.indexOf("[[");
-
-		if (indexOfGenericList < 0) {
-			indexOfGenericList = fullName.indexOf(", ");
+	@Override
+	public ITypeName getDeclaringType() {
+		int plus = FindPlus(identifier);
+		if (plus == -1) {
+			return null;
 		}
-		return indexOfGenericList < 0 ? fullName : fullName.substring(0, indexOfGenericList);
-	}
 
-	@Override
-	public boolean isVoidType() {
-		return false;
-	}
+		int start = identifier.startsWith(PrefixEnum) ? PrefixEnum.length()
+				: identifier.startsWith(PrefixInterface) ? PrefixInterface.length()
+						: identifier.startsWith(PrefixStruct) ? PrefixStruct.length() : 0;
 
-	@Override
-	public boolean isValueType() {
-		return isStructType() || isEnumType() || isVoidType();
-	}
+		String declTypeId = identifier.substring(start, plus - start);
 
-	@Override
-	public boolean isSimpleType() {
-		return false;
-	}
-
-	@Override
-	public boolean isEnumType() {
-		return false;
-	}
-
-	@Override
-	public boolean isStructType() {
-		return false;
-	}
-
-	@Override
-	public boolean isNullableType() {
-		return false;
-	}
-
-	@Override
-	public boolean isReferenceType() {
-		return isClassType() || isInterfaceType() || isArray() || isDelegateType();
-	}
-
-	@Override
-	public boolean isClassType() {
-		return !isValueType() && !isInterfaceType() && !isArray() && !isDelegateType() && !isUnknown();
-	}
-
-	@Override
-	public boolean isInterfaceType() {
-		return false;
-	}
-
-	@Override
-	public boolean isDelegateType() {
-		return false;
+		return new TypeName(f("{0}, {1}", declTypeId, getAssembly().getIdentifier()));
 	}
 
 	@Override
 	public boolean isNestedType() {
-		return getRawFullName().contains("+");
+		return FindPlus(identifier) != -1;
 	}
 
-	@Override
-	public boolean isTypeParameter() {
-		return false;
+	private int FindPlus(String id) {
+		int comma = id.length() - getAssembly().getIdentifier().length();
+		// unknown type
+		if (comma < 0) {
+			return -1;
+		}
+		int plus = FindPrevious(id, comma, '+', ']');
+		if (plus == -1) {
+			return -1;
+		}
+		// is generic
+		if (id.charAt(plus) == ']') {
+			int closeGeneric = FindCorrespondingOpenBracket(id, plus);
+			plus = FindPrevious(id, closeGeneric, '+');
+		}
+		return plus;
 	}
 
-	@Override
-	public boolean isUnknown() {
-		return UNKNOWN_TYPE_NAME_IDENTIFIER.equals(this.getIdentifier());
-	}
-
-	@Override
-	public IDelegateTypeName asDelegateTypeName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isArray() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public IArrayTypeName asArrayTypeName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ITypeParameterName asTypeParameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isPredefined() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public IPredefinedTypeName asPredefinedTypeName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private static final Pattern MissingTickForGenericsMatcher = Pattern.compile("[a-zA-Z]\\[\\[");
 
 	public static boolean isTypeNameIdentifier(String id) {
-		// TODO Auto-generated method stub
-		return false;
+		if (TypeUtils.isUnknownTypeIdentifier(id) || PredefinedTypeName.isPredefinedTypeNameIdentifier(id)
+				|| TypeParameterName.isTypeParameterNameIdentifier(id) || ArrayTypeName.isArrayTypeNameIdentifier(id)
+				|| DelegateTypeName.isDelegateTypeNameIdentifier(id)) {
+			return false;
+		}
+
+		// unbalanced brackets
+		for (String pair : new String[] { "[]", "()" }) {
+			if (Count(id, pair.charAt(0)) != Count(id, pair.charAt(1))) {
+				return false;
+			}
+		}
+
+		if (MissingTickForGenericsMatcher.matcher(id).matches()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private static int Count(String id, char needle) {
+		int count = 0;
+		for (int i = 0; i < id.length(); i++) {
+			if (id.charAt(i) == needle) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

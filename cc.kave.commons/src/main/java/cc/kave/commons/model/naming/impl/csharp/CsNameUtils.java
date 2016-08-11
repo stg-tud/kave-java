@@ -16,6 +16,10 @@
 
 package cc.kave.commons.model.naming.impl.csharp;
 
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+import static cc.kave.commons.utils.StringUtils.FindNext;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +93,7 @@ public class CsNameUtils {
 			return parameters;
 		}
 
-		int startOfParameters = findCorrespondingOpenBracket(identifier, endOfParameters);
+		int startOfParameters = FindCorrespondingOpenBracket(identifier, endOfParameters);
 		int current = startOfParameters;
 
 		boolean hasNoParams = startOfParameters == (endOfParameters - 1);
@@ -101,99 +105,17 @@ public class CsNameUtils {
 			int startOfParam = ++current;
 
 			if (identifier.charAt(current) != '[') {
-				current = findNext(identifier, current, '[');
+				current = FindNext(identifier, current, '[');
 			}
-			current = findCorrespondingCloseBracket(identifier, current);
-			current = findNext(identifier, current, ',', ')');
+			current = FindCorrespondingCloseBracket(identifier, current);
+			current = FindNext(identifier, current, ',', ')');
 			int endOfParam = current;
 
-			int lengthOfSubstring = endOfParam - startOfParam;
 			String paramSubstring = identifier.substring(startOfParam, endOfParam);
 			parameters.add(Names.newParameter(paramSubstring.trim()));
 		}
 
 		return parameters;
-	}
-
-	public static int findNext(String str, int currentIndex, char... characters) {
-		for (int i = currentIndex; i < str.length(); i++) {
-			for (int j = 0; j < characters.length; j++) {
-				if (characters[j] == (str.charAt(i))) {
-					return i;
-				}
-			}
-		}
-		return -1;
-	}
-
-	public static int findPrevious(String str, int currentIndex, char character) {
-		for (int i = currentIndex; i >= 0; i--) {
-			if (str.charAt(i) == character) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static int findCorrespondingOpenBracket(String str, int currentIndex) {
-		char open = str.charAt(currentIndex);
-		char close = getCorresponding(open);
-
-		int depth = 0;
-		for (int i = currentIndex; i > 0; i--) {
-			depth = updateDepth(depth, open, close, str.charAt(i));
-			if (depth == 0) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private static int updateDepth(int depth, char open, char close, char current) {
-		if (current == open) {
-			return depth + 1;
-		}
-		if (current == close) {
-			return depth - 1;
-		}
-		return depth;
-	}
-
-	public static int findCorrespondingCloseBracket(String str, int currentIndex) {
-		char open = str.charAt(currentIndex);
-		char close = getCorresponding(open);
-
-		int depth = 0;
-		for (int i = currentIndex; i < str.length(); i++) {
-			depth = updateDepth(depth, open, close, str.charAt(i));
-			if (depth == 0) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static char getCorresponding(char c) {
-		switch (c) {
-		case '(':
-			return ')';
-		case ')':
-			return '(';
-		case '{':
-			return '}';
-		case '}':
-			return '{';
-		case '[':
-			return ']';
-		case ']':
-			return '[';
-		case '<':
-			return '>';
-		case '>':
-			return '<';
-		default:
-			throw new IllegalArgumentException(String.format("no supported bracket type: %c", c));
-		}
 	}
 
 	/// <summary>

@@ -8,14 +8,21 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * distributed under the License instanceof distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
 package cc.kave.commons.model.naming.impl.v0.types;
 
+import static cc.kave.commons.model.naming.impl.v0.NameUtils.ParseTypeParameterList;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+import static cc.kave.commons.utils.StringUtils.FindPrevious;
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.IArrayTypeName;
@@ -28,158 +35,146 @@ import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public abstract class BaseTypeName extends BaseName implements ITypeName {
 
+	public static final String UnknownTypeIdentifier = "?";
+	public static final String PrefixEnum = "e:";
+	public static final String PrefixInterface = "i:";
+	public static final String PrefixStruct = "s:";
+	public static final String PrefixDelegate = "d:";
+
 	protected BaseTypeName(String identifier) {
 		super(identifier);
 	}
 
 	@Override
-	public boolean hasTypeParameters() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isUnknown() {
+		return UnknownTypeIdentifier.equals(identifier);
 	}
 
 	@Override
-	public List<ITypeParameterName> getTypeParameters() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract String getName();
 
 	@Override
-	public IAssemblyName getAssembly() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract String getFullName();
 
 	@Override
-	public INamespaceName getNamespace() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract IAssemblyName getAssembly();
 
 	@Override
-	public String getFullName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract INamespaceName getNamespace();
 
 	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract boolean isNestedType();
+
+	@Override
+	public abstract ITypeName getDeclaringType();
 
 	@Override
 	public boolean isVoidType() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isValueType() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isSimpleType() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isEnumType() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isStructType() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isNullableType() {
-		// TODO Auto-generated method stub
-		return false;
+		return identifier.startsWith("s:System.Nullable`1[[");
+	}
+
+	@Override
+	public boolean isValueType() {
+		return isStructType() || isEnumType();
 	}
 
 	@Override
 	public boolean isReferenceType() {
-		// TODO Auto-generated method stub
-		return false;
+		return isClassType() || isInterfaceType() || isArray() || isDelegateType();
 	}
 
 	@Override
 	public boolean isClassType() {
-		// TODO Auto-generated method stub
-		return false;
+		return !isValueType() && !isInterfaceType() && !isArray() && !isDelegateType() && !isUnknown();
+	}
+
+	@Override
+	public boolean isEnumType() {
+		return !isArray() && identifier.startsWith(PrefixEnum);
 	}
 
 	@Override
 	public boolean isInterfaceType() {
-		// TODO Auto-generated method stub
-		return false;
+		return !isArray() && identifier.startsWith(PrefixInterface);
 	}
 
 	@Override
-	public boolean isNestedType() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isStructType() {
+		return !isArray() && identifier.startsWith(PrefixStruct);
 	}
 
 	@Override
-	public ITypeName getDeclaringType() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean hasTypeParameters() {
+		return getTypeParameters().size() > 0;
+	}
+
+	private List<ITypeParameterName> _typeParameters;
+
+	@Override
+	public List<ITypeParameterName> getTypeParameters() {
+		if (_typeParameters == null) {
+			int close = FindPrevious(getFullName(), getFullName().length() - 1, '+', ']');
+			if (isArray() || isDelegateType() || close == -1 || getFullName().charAt(close) == '+') {
+				_typeParameters = Lists.newLinkedList();
+			} else {
+				int open = FindCorrespondingOpenBracket(getFullName(), close);
+				_typeParameters = ParseTypeParameterList(getFullName(), open, close);
+			}
+		}
+		return _typeParameters;
 	}
 
 	@Override
 	public boolean isDelegateType() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public IDelegateTypeName asDelegateTypeName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this instanceof IDelegateTypeName;
 	}
 
 	@Override
 	public boolean isArray() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public IArrayTypeName asArrayTypeName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this instanceof IArrayTypeName;
 	}
 
 	@Override
 	public boolean isTypeParameter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public ITypeParameterName asTypeParameterName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this instanceof ITypeParameterName;
 	}
 
 	@Override
 	public boolean isPredefined() {
-		// TODO Auto-generated method stub
-		return false;
+		return this instanceof IPredefinedTypeName;
+	}
+
+	@Override
+	public IDelegateTypeName asDelegateTypeName() {
+		assertTrue(this instanceof IDelegateTypeName);
+		return (IDelegateTypeName) this;
+	}
+
+	@Override
+	public IArrayTypeName asArrayTypeName() {
+		assertTrue(this instanceof IArrayTypeName);
+		return (IArrayTypeName) this;
+	}
+
+	@Override
+	public ITypeParameterName asTypeParameterName() {
+		assertTrue(this instanceof ITypeParameterName);
+		return (ITypeParameterName) this;
 	}
 
 	@Override
 	public IPredefinedTypeName asPredefinedTypeName() {
-		// TODO Auto-generated method stub
-		return null;
+		assertTrue(this instanceof IPredefinedTypeName);
+		return (IPredefinedTypeName) this;
 	}
-
 }

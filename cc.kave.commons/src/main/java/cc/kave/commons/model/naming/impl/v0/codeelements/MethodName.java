@@ -33,11 +33,11 @@ public class MethodName extends MemberName implements IMethodName {
 			.compile(".*\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\)).*");
 	// "\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$"
 
-	private MethodName() {
+	public MethodName() {
 		this("[?] [?].???()");
 	}
 
-	private MethodName(String identifier) {
+	public MethodName(String identifier) {
 		super(identifier);
 	}
 

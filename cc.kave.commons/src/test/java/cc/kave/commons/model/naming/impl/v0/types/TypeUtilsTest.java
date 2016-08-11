@@ -38,7 +38,7 @@ public class TypeUtilsTest {
 			assertFalse(ArrayTypeName.isArrayTypeNameIdentifier(id));
 			assertFalse(DelegateTypeName.isDelegateTypeNameIdentifier(id));
 			assertFalse(TypeParameterName.isTypeParameterNameIdentifier(id));
-			assertFalse(PredefinedTypeName.IsPredefinedTypeNameIdentifier(id));
+			assertFalse(PredefinedTypeName.isPredefinedTypeNameIdentifier(id));
 		}
 	}
 

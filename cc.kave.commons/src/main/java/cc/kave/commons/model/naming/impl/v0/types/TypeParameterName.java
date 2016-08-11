@@ -16,10 +16,16 @@
 
 package cc.kave.commons.model.naming.impl.v0.types;
 
-import java.util.List;
+import static cc.kave.commons.utils.StringUtils.f;
 
-import cc.kave.commons.model.naming.Names;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
+import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
 import cc.kave.commons.model.naming.types.IArrayTypeName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.IPredefinedTypeName;
@@ -27,218 +33,230 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
+import cc.kave.commons.utils.StringUtils;
+import cc.recommenders.assertions.Asserts;
+import cc.recommenders.exceptions.ValidationException;
 
 public class TypeParameterName extends BaseName implements ITypeParameterName, IArrayTypeName {
 
+	public static final String ParameterNameTypeSeparator = " -> ";
+
 	public TypeParameterName(String identifier) {
 		super(identifier);
-	}
-
-	/// <summary>
-	/// The separator between the parameter type's short name and its type.
-	/// </summary>
-	private final static String ParameterNameTypeSeparater = " -> ";
-
-	/// <summary>
-	/// Constructor for reflective recreation of names. See <see
-	/// cref="Get(string,string)" /> for details on how to
-	/// instantiate type-parameter names.
-	/// </summary>
-	public static ITypeName newTypeParameterName(String identifier) {
-		return Names.newType(identifier);
-	}
-
-	static boolean isTypeParameterIdentifier(String identifier) {
 		if (TypeUtils.isUnknownTypeIdentifier(identifier)) {
-			return false;
+			throw new ValidationException("must not be unknown");
 		}
-		return isFreeTypeParameterIdentifier(identifier) || isBoundTypeParameterIdentifier(identifier);
-	}
-
-	private static boolean isFreeTypeParameterIdentifier(String identifier) {
-		return !identifier.contains(",") && !identifier.contains("[");
-	}
-
-	private static boolean isBoundTypeParameterIdentifier(String identifier) {
-		// "T -> System.Void, mscorlib, ..." is a type parameter, because it
-		// contains the separator.
-		// "System.Nullable`1[[T -> System.Int32, mscorlib, 4.0.0.0]], ..." is
-		// not, because
-		// the separator is only in the type's parameter-type list, i.e., after
-		// the '`'.
-		int indexOfMapping = identifier.indexOf(ParameterNameTypeSeparater);
-		int endOfTypeName = identifier.indexOf('`');
-		return indexOfMapping >= 0 && (endOfTypeName == -1 || endOfTypeName > indexOfMapping);
-	}
-
-	@Override
-	public boolean hasTypeParameters() {
-		return getTypeParameterType().hasTypeParameters();
-	}
-
-	@Override
-	public List<ITypeParameterName> getTypeParameters() {
-		return getTypeParameterType().getTypeParameters();
-	}
-
-	@Override
-	public IAssemblyName getAssembly() {
-		return getTypeParameterType().getAssembly();
-	}
-
-	@Override
-	public INamespaceName getNamespace() {
-		return getTypeParameterType().getNamespace();
-	}
-
-	@Override
-	public ITypeName getDeclaringType() {
-		return getTypeParameterType().getDeclaringType();
-	}
-
-	@Override
-	public String getFullName() {
-		return getTypeParameterType().getFullName();
-	}
-
-	@Override
-	public String getName() {
-		return getTypeParameterType().getName();
-	}
-
-	@Override
-	public boolean isVoidType() {
-		return getTypeParameterType().isVoidType();
-	}
-
-	@Override
-	public boolean isValueType() {
-		return getTypeParameterType().isValueType();
-	}
-
-	@Override
-	public boolean isSimpleType() {
-		return getTypeParameterType().isSimpleType();
-	}
-
-	@Override
-	public boolean isEnumType() {
-		return getTypeParameterType().isEnumType();
-	}
-
-	@Override
-	public boolean isStructType() {
-		return getTypeParameterType().isStructType();
-	}
-
-	@Override
-	public boolean isNullableType() {
-		return getTypeParameterType().isNullableType();
-	}
-
-	@Override
-	public boolean isReferenceType() {
-		return getTypeParameterType().isReferenceType();
-	}
-
-	@Override
-	public boolean isClassType() {
-		return getTypeParameterType().isClassType();
-	}
-
-	@Override
-	public boolean isInterfaceType() {
-		return getTypeParameterType().isInterfaceType();
-	}
-
-	@Override
-	public boolean isDelegateType() {
-		return getTypeParameterType().isDelegateType();
-	}
-
-	@Override
-	public boolean isNestedType() {
-		return getTypeParameterType().isNestedType();
-	}
-
-	@Override
-	public boolean isArray() {
-		return getTypeParameterType().isArray();
-	}
-
-	@Override
-	public ITypeName getArrayBaseType() {
-		return getTypeParameterType().asArrayTypeName().getArrayBaseType();
-	}
-
-	@Override
-	public boolean isTypeParameter() {
-		return true;
 	}
 
 	@Override
 	public boolean isUnknown() {
-		return "...".equals(getIdentifier());
+		return false;
 	}
 
 	@Override
-	public String getTypeParameterShortName() {
-		int endOfTypeParameterName = identifier.indexOf(' ');
-		return endOfTypeParameterName == -1 ? identifier : identifier.substring(0, endOfTypeParameterName);
+	public boolean hasTypeParameters() {
+		return false;
 	}
 
 	@Override
-	public ITypeName getTypeParameterType() {
-		int startOfTypeName = getTypeParameterShortName().length() + ParameterNameTypeSeparater.length();
-		return startOfTypeName >= identifier.length() ? Names.getUnknownType()
-				: Names.newType(identifier.substring(startOfTypeName));
+	public List<ITypeParameterName> getTypeParameters() {
+		return Lists.newLinkedList();
+	}
 
+	@Override
+	public IAssemblyName getAssembly() {
+		return new AssemblyName();
+	}
+
+	@Override
+	public INamespaceName getNamespace() {
+		return new NamespaceName();
+	}
+
+	@Override
+	public ITypeName getDeclaringType() {
+		return null;
+	}
+
+	@Override
+	public String getFullName() {
+		return getTypeParameterShortName();
+	}
+
+	@Override
+	public String getName() {
+		return getTypeParameterShortName();
+	}
+
+	@Override
+	public boolean isVoidType() {
+		return false;
+	}
+
+	@Override
+	public boolean isValueType() {
+		return false;
+	}
+
+	@Override
+	public boolean isSimpleType() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnumType() {
+		return false;
+	}
+
+	@Override
+	public boolean isStructType() {
+		return false;
+	}
+
+	@Override
+	public boolean isNullableType() {
+		return false;
+	}
+
+	@Override
+	public boolean isReferenceType() {
+		return isArray();
+	}
+
+	@Override
+	public boolean isClassType() {
+		return false;
+	}
+
+	@Override
+	public boolean isInterfaceType() {
+		return false;
+	}
+
+	@Override
+	public boolean isDelegateType() {
+		return false;
+	}
+
+	@Override
+	public boolean isNestedType() {
+		return false;
+	}
+
+	@Override
+	public boolean isArray() {
+		return getTypeParameterShortName().contains("[") && getTypeParameterShortName().contains("]");
+	}
+
+	@Override
+	public boolean isTypeParameter() {
+		return !isArray();
 	}
 
 	@Override
 	public IDelegateTypeName asDelegateTypeName() {
-		// TODO Auto-generated method stub
+		Asserts.fail("impossible");
 		return null;
 	}
 
 	@Override
 	public IArrayTypeName asArrayTypeName() {
-		// TODO Auto-generated method stub
-		return null;
+		Asserts.assertTrue(isArray());
+		return this;
 	}
 
 	@Override
 	public ITypeParameterName asTypeParameterName() {
-		// TODO Auto-generated method stub
-		return null;
+		Asserts.assertTrue(isTypeParameter());
+		return this;
 	}
 
 	@Override
 	public boolean isPredefined() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public IPredefinedTypeName asPredefinedTypeName() {
-		// TODO Auto-generated method stub
+		Asserts.fail("impossible");
 		return null;
 	}
 
 	@Override
-	public int getRank() {
-		// TODO Auto-generated method stub
-		return 0;
+	public String getTypeParameterShortName() {
+		int endOfTypeParameterName = identifier.indexOf(ParameterNameTypeSeparator);
+		return endOfTypeParameterName == -1 ? identifier : identifier.substring(0, endOfTypeParameterName);
 	}
 
 	@Override
 	public boolean isBound() {
-		// TODO Auto-generated method stub
-		return false;
+		return identifier.contains(ParameterNameTypeSeparator);
 	}
 
-	public static boolean isTypeParameterNameIdentifier(String id) {
-		// TODO Auto-generated method stub
-		return false;
+	@Override
+	public ITypeName getTypeParameterType() {
+		int startOfTypeName = getTypeParameterShortName().length() + ParameterNameTypeSeparator.length();
+		return startOfTypeName >= identifier.length() ? new TypeName()
+				: TypeUtils.createTypeName(identifier.substring(startOfTypeName));
+	}
+
+	@Override
+	public int getRank() {
+		Asserts.assertTrue(isArray());
+		int start = getTypeParameterShortName().indexOf("[");
+		int end = getTypeParameterShortName().indexOf("]");
+		return end - start;
+	}
+
+	@Override
+	public ITypeName getArrayBaseType() {
+		Asserts.assertTrue(isArray());
+		String tpn = identifier.substring(0, getTypeParameterShortName().indexOf("["));
+		String rest = identifier.substring(getTypeParameterShortName().length());
+		return new TypeParameterName(f("%s%s", tpn, rest));
+	}
+
+	private static final Pattern FreeTypeParameterMatcher = Pattern
+			.compile("^[^ ,0-9\\[\\](){}<>-][^ ,\\[\\](){}<>-]*$");
+
+	public static boolean isTypeParameterNameIdentifier(String identifier) {
+		if (TypeUtils.isUnknownTypeIdentifier(identifier)) {
+			return false;
+		}
+		if (identifier.startsWith("?")) // e.g., unknown arrays
+		{
+			return false;
+		}
+		if (identifier.startsWith("p:")) {
+			return false;
+		}
+		int idxArrow = identifier.indexOf(ParameterNameTypeSeparator);
+		if (idxArrow != -1) {
+			String before = identifier.substring(0, idxArrow);
+			return isTypeParameterNameIdentifier(before);
+		}
+
+		return FreeTypeParameterMatcher.matcher(identifier).matches() || isTypeParameterArray(identifier);
+	}
+
+	private static boolean isTypeParameterArray(String id) {
+		id = id.trim();
+
+		int arrClose = id.lastIndexOf(']');
+		if (arrClose == -1) {
+			return false;
+		}
+		int cur = arrClose;
+		while (cur - 1 > 0 && id.charAt(--cur) == ',') {
+		}
+		if (id.charAt(cur) != '[') {
+			return false;
+		}
+
+		String before = id.substring(0, cur);
+		if (StringUtils.containsAny(before, " ", ",") || arrClose != id.length() - 1) {
+			return false;
+		}
+		return FreeTypeParameterMatcher.matcher(before.trim()).matches();
 	}
 }
