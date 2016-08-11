@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.recommenders.assertions.Asserts;
+import cc.recommenders.exceptions.ValidationException;
 
 public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 
@@ -33,8 +33,9 @@ public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 		super(identifier);
 
 		if (!isUnknown()) {
-			Asserts.assertTrue(_isValidVersionRegex.matcher(identifier).matches(),
-					String.format("invalid assembly version '%s'", identifier));
+			if (!_isValidVersionRegex.matcher(identifier).matches()) {
+				throw new ValidationException(String.format("invalid assembly version '%s'", identifier));
+			}
 		}
 	}
 

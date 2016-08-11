@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.exceptions.ValidationException;
 
 public class AssemblyVersionTest {
@@ -81,13 +80,13 @@ public class AssemblyVersionTest {
 		new AssemblyVersion(null);
 	}
 
-	@Test(expected = AssertionException.class)
+	@Test(expected = ValidationException.class)
 	public void ShouldRejectIdentifiersWithInsufficientNumberOfDots() {
 		// ReSharper disable once ObjectCreationAsStatement
 		new AssemblyVersion("1.2.3");
 	}
 
-	@Test(expected = AssertionException.class)
+	@Test(expected = ValidationException.class)
 	public void ShouldRejectIdentifiers_WithNonNumbers() {
 		// ReSharper disable once ObjectCreationAsStatement
 		new AssemblyVersion("1.2.3.a");

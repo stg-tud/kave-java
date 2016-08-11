@@ -15,47 +15,66 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types.organization;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
+import cc.recommenders.exceptions.ValidationException;
 
 public class AssemblyName extends BaseName implements IAssemblyName {
 
+	private IAssemblyVersion version;
+	private boolean isLocalProject;
+
 	public AssemblyName() {
-		super(UNKNOWN_NAME_IDENTIFIER);
+		this(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	public AssemblyName(String identifier) {
 		super(identifier);
+
+		version = new AssemblyVersion();
+
+		if (!isUnknown() && !identifier.contains(",")) {
+			isLocalProject = true;
+		}
+
+		String name = getName();
+		for (String c : new String[] { "(", ")", "[", "]", "{", "}", ",", ";", ":", " " }) {
+			if (name.contains(c)) {
+				throw new ValidationException(String.format("identifier must not contain the char '%s'", c));
+			}
+		}
+
+		String[] fragments = GetFragments();
+		version = fragments.length <= 1 ? new AssemblyVersion() : new AssemblyVersion(fragments[1]);
+	}
+
+	@Override
+	public boolean isUnknown() {
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
+	}
+
+	public String getName() {
+		return GetFragments()[0];
+	}
+
+	public boolean isLocalProject() {
+		return isLocalProject;
+	}
+
+	private String[] GetFragments() {
+		int split = identifier.lastIndexOf(",");
+		if (split == -1) {
+			return new String[] { identifier };
+		}
+		String name = identifier.substring(0, split).trim();
+		String version = identifier.substring(split + 1).trim();
+
+		return new String[] { name, version };
 	}
 
 	@Override
 	public IAssemblyVersion getVersion() {
-		if (isUnknown()) {
-			return new AssemblyVersion();
-		} else if (!identifier.contains(",")) {
-			return new AssemblyVersion();
-		} else {
-			return Names.newAssemblyVersion(identifier.substring(identifier.indexOf(",") + 2, identifier.length()));
-		}
-
-	}
-
-	@Override
-	public String getName() {
-		if (isUnknown()) {
-			return identifier;
-		} else if (!identifier.contains(",")) {
-			return identifier;
-		} else {
-			return identifier.substring(0, identifier.indexOf(",")).trim();
-		}
-	}
-
-	@Override
-	public boolean isLocalProject() {
-		// TODO Auto-generated method stub
-		return false;
+		return version;
 	}
 }
