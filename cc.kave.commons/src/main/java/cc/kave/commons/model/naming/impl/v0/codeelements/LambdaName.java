@@ -51,4 +51,10 @@ public class LambdaName extends BaseName implements ILambdaName {
 		int lengthOfValueTypeIdentifier = lastIndexOfValueTypeIdentifer - startIndexOfValueTypeIdentifier;
 		return Names.newType(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

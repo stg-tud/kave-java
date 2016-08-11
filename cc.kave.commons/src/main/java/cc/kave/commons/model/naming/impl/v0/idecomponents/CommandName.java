@@ -42,4 +42,10 @@ public class CommandName extends BaseName implements ICommandName {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

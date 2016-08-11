@@ -32,4 +32,10 @@ public class AliasName extends BaseName implements IAliasName {
 	private AliasName(String identifier) {
 		super(identifier);
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

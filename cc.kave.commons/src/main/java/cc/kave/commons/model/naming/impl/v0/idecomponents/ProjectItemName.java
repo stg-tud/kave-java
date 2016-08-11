@@ -36,4 +36,10 @@ public class ProjectItemName extends BaseName implements IProjectItemName {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

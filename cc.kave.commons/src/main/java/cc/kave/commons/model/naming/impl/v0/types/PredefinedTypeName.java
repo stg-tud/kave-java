@@ -35,4 +35,15 @@ public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeN
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public static boolean isPredefinedTypeNameIdentifier(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

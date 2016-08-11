@@ -36,4 +36,10 @@ public class DocumentName extends BaseName implements IDocumentName {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

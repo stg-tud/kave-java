@@ -92,4 +92,10 @@ public class MethodName extends MemberName implements IMethodName {
 	public boolean isExtensionMethod() {
 		return isStatic() && getParameters().size() > 0 && getParameters().get(0).isExtensionMethodParameter();
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

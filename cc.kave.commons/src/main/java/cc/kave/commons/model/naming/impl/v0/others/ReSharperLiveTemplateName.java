@@ -36,5 +36,11 @@ public class ReSharperLiveTemplateName extends BaseName implements IReSharperLiv
 		return null;
 	}
 
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	// TODO write utility methods
 }

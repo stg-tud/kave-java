@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
-import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
 public class SSTPrintingUtilsTest {
@@ -48,7 +47,7 @@ public class SSTPrintingUtilsTest {
 	public void testUnknownNameIsNotAddedToList() {
 		Set<INamespaceName> namespaces = new HashSet<>();
 		namespaces.add(Names.getUnknownNamespace());
-		namespaces.add(NamespaceName.getGlobalNamespace());
+		namespaces.add(Names.newNamespace(""));
 
 		SSTPrintingContext context = new SSTPrintingContext();
 		SSTPrintingUtils.formatAsUsingList(namespaces, context);

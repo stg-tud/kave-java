@@ -20,4 +20,10 @@ public class GeneralName extends BaseName {
 	protected GeneralName(String identifier) {
 		super(identifier);
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -36,4 +36,10 @@ public class CommandBarControlName extends BaseName implements ICommandBarContro
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

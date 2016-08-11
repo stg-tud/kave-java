@@ -36,4 +36,10 @@ public class WindowName extends BaseName implements IWindowName {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean isUnknown() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

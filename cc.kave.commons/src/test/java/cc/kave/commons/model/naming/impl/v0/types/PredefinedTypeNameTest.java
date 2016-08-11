@@ -13,21 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.naming.impl.v0.idecomponents;
+package cc.kave.commons.model.naming.impl.v0.types;
 
-import cc.kave.commons.model.naming.idecomponents.ISolutionName;
-import cc.kave.commons.model.naming.impl.v0.BaseName;
+/* Please note: the primary test source for type names should be the generated
+ * test suite. If you encounter a bug, please fix it on the C# side first, then
+ * regenerate the test suite to create a failing test, and only then fix the
+ * bug in the Java implementation of the names.
+ * 
+ * The sole purpose of this class is to test the "infrastructure", including
+ * Java specific checks, implementation details, instantiation checks, or alike.
+ */
+public class PredefinedTypeNameTest {
 
-public class SolutionName extends BaseName implements ISolutionName {
-
-	public SolutionName(String identifier) {
-		super(identifier);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

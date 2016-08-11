@@ -64,7 +64,7 @@ public class TypeName extends BaseTypeName implements ITypeName {
 	public INamespaceName getNamespace() {
 		String id = getRawFullName();
 		int endIndexOfNamespaceIdentifier = id.lastIndexOf('.');
-		return endIndexOfNamespaceIdentifier < 0 ? NamespaceName.getGlobalNamespace()
+		return endIndexOfNamespaceIdentifier < 0 ? new NamespaceName("")
 				: Names.newNamespace(id.substring(0, endIndexOfNamespaceIdentifier));
 	}
 
@@ -271,5 +271,10 @@ public class TypeName extends BaseTypeName implements ITypeName {
 	public IPredefinedTypeName asPredefinedTypeName() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static boolean isTypeNameIdentifier(String id) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
