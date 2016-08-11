@@ -16,6 +16,7 @@
 package cc.kave.commons.model.naming.impl.v0;
 
 import cc.kave.commons.model.naming.IName;
+import cc.recommenders.exceptions.ValidationException;
 
 public abstract class BaseName implements IName {
 
@@ -23,8 +24,11 @@ public abstract class BaseName implements IName {
 
 	protected String identifier;
 
-	protected BaseName(String identifier) {
-		this.identifier = identifier;
+	protected BaseName(String id) {
+		if (id == null) {
+			throw new ValidationException("identifier must not be null");
+		}
+		this.identifier = id;
 	}
 
 	@Override
@@ -34,16 +38,36 @@ public abstract class BaseName implements IName {
 
 	@Override
 	public boolean isHashed() {
-		return false;
+		return identifier.contains("==");
 	}
 
 	@Override
-	public boolean isUnknown() {
-		return this.getIdentifier().equals(UNKNOWN_NAME_IDENTIFIER);
+	public abstract boolean isUnknown();
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IName other = (IName) obj;
+		if (identifier == null) {
+			if (other.getIdentifier() != null)
+				return false;
+		} else if (!identifier.equals(other.getIdentifier()))
+			return false;
+		return true;
 	}
 
 	@Override
-	public final String toString() {
-		return identifier;
+	public int hashCode() {
+		return identifier.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s(%s)", getClass().getSimpleName(), getIdentifier());
 	}
 }

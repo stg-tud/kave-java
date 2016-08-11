@@ -15,37 +15,52 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types.organization;
 
+import java.util.regex.Pattern;
+
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
+import cc.recommenders.assertions.Asserts;
 
 public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 
+	Pattern _isValidVersionRegex = Pattern.compile("^-?\\d+\\.-?\\d+\\.-?\\d+\\.-?\\d+$");
+
 	public AssemblyVersion() {
-		super("");
+		this(UNKNOWN_NAME_IDENTIFIER);
 	}
 
 	public AssemblyVersion(String identifier) {
 		super(identifier);
+
+		if (!isUnknown()) {
+			Asserts.assertTrue(_isValidVersionRegex.matcher(identifier).matches(),
+					String.format("invalid assembly version '%s'", identifier));
+		}
+	}
+
+	@Override
+	public boolean isUnknown() {
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 
 	@Override
 	public int getMajor() {
-		return splitVersion()[0];
+		return isUnknown() ? -1 : splitVersion()[0];
 	}
 
 	@Override
 	public int getMinor() {
-		return splitVersion()[1];
+		return isUnknown() ? -1 : splitVersion()[1];
 	}
 
 	@Override
 	public int getBuild() {
-		return splitVersion()[2];
+		return isUnknown() ? -1 : splitVersion()[2];
 	}
 
 	@Override
 	public int getRevision() {
-		return splitVersion()[3];
+		return isUnknown() ? -1 : splitVersion()[3];
 	}
 
 	private int[] splitVersion() {
@@ -55,5 +70,25 @@ public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 			versions[i] = Integer.valueOf(split[i]);
 		}
 		return versions;
+	}
+
+	@Override
+	public int compareTo(IAssemblyVersion otherVersion) {
+		if (otherVersion == null) {
+			return Integer.MIN_VALUE;
+		}
+		int majorDiff = getMajor() - otherVersion.getMajor();
+		if (majorDiff != 0) {
+			return majorDiff;
+		}
+		int minorDiff = getMinor() - otherVersion.getMinor();
+		if (minorDiff != 0) {
+			return minorDiff;
+		}
+		int buildDiff = getBuild() - otherVersion.getBuild();
+		if (buildDiff != 0) {
+			return buildDiff;
+		}
+		return getRevision() - otherVersion.getRevision();
 	}
 }

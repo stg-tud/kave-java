@@ -17,7 +17,8 @@ package cc.kave.commons.model.naming.types.organization;
 
 import cc.kave.commons.model.naming.IName;
 
-public interface IAssemblyVersion extends IName {
+public interface IAssemblyVersion extends IName, Comparable<IAssemblyVersion> {
+
 	int getMajor();
 
 	int getMinor();
