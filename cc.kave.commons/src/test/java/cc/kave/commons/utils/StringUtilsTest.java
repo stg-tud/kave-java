@@ -210,6 +210,26 @@ public class StringUtilsTest {
 		assertEquals(4, actual);
 	}
 
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingCloseBracket_null() {
+		FindCorrespondingCloseBracket((String) null, 0);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingCloseBracket_indexTooLow() {
+		FindCorrespondingCloseBracket("x", -1);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingCloseBracket_indexTooHigh() {
+		FindCorrespondingCloseBracket("x", 1);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingCloseBracket_noBracket() {
+		FindCorrespondingCloseBracket("x", 0);
+	}
+
 	@Test
 	public void FindCorrespondingCloseBracket_Courly() {
 		int actual = FindCorrespondingCloseBracket("{{{}}}", 1);
@@ -250,6 +270,26 @@ public class StringUtilsTest {
 	public void FindCorrespondingOpenBracket_Pointy() {
 		int actual = FindCorrespondingOpenBracket("<<<>>>", 4);
 		assertEquals(1, actual);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingOpenBracket_null() {
+		FindCorrespondingOpenBracket((String) null, 0);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingOpenBracket_indexTooLow() {
+		FindCorrespondingOpenBracket("x", -1);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingOpenBracket_indexTooHigh() {
+		FindCorrespondingOpenBracket("x", 1);
+	}
+
+	@Test(expected = AssertionException.class)
+	public void FindCorrespondingOpenBracket_noBracket() {
+		FindCorrespondingOpenBracket("x", 0);
 	}
 
 	@Test

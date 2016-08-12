@@ -15,6 +15,11 @@
  */
 package cc.kave.commons.utils;
 
+import static cc.recommenders.assertions.Asserts.assertNotNull;
+import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.recommenders.assertions.Asserts.fail;
+import static java.util.Arrays.binarySearch;
+
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 
@@ -68,8 +73,9 @@ public class StringUtils {
 	}
 
 	private static void AssertIndexBoundaries(String str, int currentIndex) {
+		assertNotNull(str);
 		if (currentIndex < 0 || currentIndex >= str.length()) {
-			Asserts.fail(f("index '%d' is out of bounds for string '%s'", currentIndex, str));
+			fail(f("index '%d' is out of bounds for string '%s'", currentIndex, str));
 		}
 	}
 
@@ -84,7 +90,13 @@ public class StringUtils {
 		return -1;
 	}
 
+	private static final char[] openingBrackets = new char[] { '(', '<', '[', '{' };
+	private static final char[] closingBrackets = new char[] { ')', '>', ']', '}' };
+
 	public static int FindCorrespondingOpenBracket(String str, int currentIndex) {
+		AssertIndexBoundaries(str, currentIndex);
+		assertTrue(binarySearch(closingBrackets, str.charAt(currentIndex)) >= 0);
+
 		char open = str.charAt(currentIndex);
 		char close = GetCorresponding(open);
 
@@ -99,6 +111,9 @@ public class StringUtils {
 	}
 
 	public static int FindCorrespondingCloseBracket(String str, int currentIndex) {
+		AssertIndexBoundaries(str, currentIndex);
+		assertTrue(binarySearch(openingBrackets, str.charAt(currentIndex)) >= 0);
+
 		char open = str.charAt(currentIndex);
 		char close = GetCorresponding(open);
 
