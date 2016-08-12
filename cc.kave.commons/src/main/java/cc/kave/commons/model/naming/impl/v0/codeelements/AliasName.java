@@ -18,24 +18,17 @@ package cc.kave.commons.model.naming.impl.v0.codeelements;
 import cc.kave.commons.model.naming.codeelements.IAliasName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 
-/**
- * Aliases are defined by using statements, like "using alias = Some.Reference;"
- * . A special case is the alias "global" that represents the global namespace
- * by convention.
- */
 public class AliasName extends BaseName implements IAliasName {
 
-	private AliasName() {
+	public AliasName() {
 		this(UNKNOWN_NAME_IDENTIFIER);
 	}
 
-	private AliasName(String identifier) {
+	public AliasName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }

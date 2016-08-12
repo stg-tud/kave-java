@@ -15,66 +15,68 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class ParameterName extends BaseName implements IParameterName {
 
-	public final String passByReferenceModifier = "ref";
-	public final String outputModifier = "out";
-	public final String varArgsModifier = "params";
-	public final String optionalModifier = "opt";
-	public final String ExtensionMethodModifier = "this";
+	private static final String UNKNOWN_PARAMETER_NAME = "[?] ???";
 
-	private ParameterName(String identifier) {
+	public static final String PassByReferenceModifier = "ref";
+	public static final String OutputModifier = "out";
+	public static final String VarArgsModifier = "params";
+	public static final String OptionalModifier = "opt";
+	public static final String ExtensionMethodModifier = "this";
+
+	public ParameterName() {
+		this(UNKNOWN_PARAMETER_NAME);
+	}
+
+	public ParameterName(String identifier) {
 		super(identifier);
+		if (isParameterArray() && !getValueType().isArray()) {
+			throw new ValidationException("the params keyword requires array type");
+		}
 	}
 
-	public boolean isUnknown() {
-		return this.equals(Names.getUnknownParameter());
-	}
-
-	@Override
 	public ITypeName getValueType() {
 		int startOfValueTypeIdentifier = identifier.indexOf('[') + 1;
-		int endOfValueTypeIdentifier = identifier.lastIndexOf(']') + 1;
-		int lengthOfValueTypeIdentifier = endOfValueTypeIdentifier - startOfValueTypeIdentifier
-				+ getModifiers().length();
-		return Names.newType(identifier.substring(startOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
+		int endOfValueTypeIdentifier = identifier.lastIndexOf(']');
+		return TypeUtils.createTypeName(identifier.substring(startOfValueTypeIdentifier, endOfValueTypeIdentifier));
 	}
 
-	@Override
 	public String getName() {
-		return identifier.substring(identifier.lastIndexOf(" ") + 1);
+		return identifier.substring(identifier.lastIndexOf(' ') + 1);
 	}
 
-	@Override
 	public boolean isPassedByReference() {
-		return getValueType().isReferenceType() || getModifiers().contains(passByReferenceModifier);
+		return getValueType().isReferenceType() || Modifiers().contains(PassByReferenceModifier);
 	}
 
-	@Override
-	public boolean isOutput() {
-		return getModifiers().contains(outputModifier);
-	}
-
-	@Override
-	public boolean isParameterArray() {
-		return getModifiers().contains(varArgsModifier);
-	}
-
-	@Override
-	public boolean isOptional() {
-		return getModifiers().contains(optionalModifier);
-	}
-
-	private String getModifiers() {
+	private String Modifiers() {
 		return identifier.substring(0, identifier.indexOf('['));
 	}
 
+	public boolean isOutput() {
+		return Modifiers().contains(OutputModifier);
+	}
+
+	public boolean isParameterArray() {
+		return Modifiers().contains(VarArgsModifier);
+	}
+
+	public boolean isOptional() {
+		return Modifiers().contains(OptionalModifier);
+	}
+
 	public boolean isExtensionMethodParameter() {
-		return getModifiers().contains(ExtensionMethodModifier);
+		return Modifiers().contains(ExtensionMethodModifier);
+	}
+
+	public boolean isUnknown() {
+		return UNKNOWN_PARAMETER_NAME.equals(identifier);
 	}
 }

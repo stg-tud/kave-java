@@ -15,31 +15,34 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.ILocalVariableName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class LocalVariableName extends BaseName implements ILocalVariableName {
 
-	private LocalVariableName(String identifier) {
+	private static final String UnknownLocalVariableName = "[?] ???";
+
+	public LocalVariableName() {
+		this(UnknownLocalVariableName);
+	}
+
+	public LocalVariableName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
-	public boolean isUnknown() {
-		return UNKNOWN_NAME_IDENTIFIER.equals(getIdentifier());
-	}
-
-	@Override
 	public String getName() {
-		int indexOfName = identifier.lastIndexOf(']') + 2;
-		return identifier.substring(indexOfName);
+		int indexOfName = identifier.lastIndexOf(']') + 1;
+		return identifier.substring(indexOfName).trim();
 	}
 
-	@Override
 	public ITypeName getValueType() {
-		int lengthOfTypeIdentifier = identifier.lastIndexOf(']') - 1;
-		return Names.newType(identifier.substring(1, lengthOfTypeIdentifier));
+		int lengthOfTypeIdentifier = identifier.lastIndexOf(']');
+		return TypeUtils.createTypeName(identifier.substring(1, lengthOfTypeIdentifier));
+	}
+
+	public boolean isUnknown() {
+		return UnknownLocalVariableName.equals(identifier);
 	}
 }

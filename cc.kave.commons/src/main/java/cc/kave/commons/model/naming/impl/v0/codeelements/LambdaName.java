@@ -15,46 +15,61 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
+import static cc.kave.commons.model.naming.impl.v0.NameUtils.GetParameterNamesFromSignature;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+
 import java.util.List;
 
-import cc.kave.commons.model.naming.Names;
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.naming.codeelements.ILambdaName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
-import cc.kave.commons.model.naming.impl.csharp.CsNameUtils;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class LambdaName extends BaseName implements ILambdaName {
 
-	private LambdaName() {
+	public LambdaName() {
 		this(UNKNOWN_NAME_IDENTIFIER);
 	}
 
-	private LambdaName(String identifier) {
+	public LambdaName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
+	private List<IParameterName> _parameters;
+
 	public List<IParameterName> getParameters() {
-		return CsNameUtils.getParameterNames(identifier);
+		if (_parameters == null) {
+			if (isUnknown()) {
+				_parameters = Lists.newLinkedList();
+			} else {
+				int endOfParameters = identifier.lastIndexOf(')');
+				int startOfParameters = FindCorrespondingOpenBracket(identifier, endOfParameters);
+				_parameters = GetParameterNamesFromSignature(identifier, startOfParameters, endOfParameters);
+			}
+		}
+		return _parameters;
 	}
 
-	@Override
 	public boolean hasParameters() {
-		return CsNameUtils.hasParameters(identifier);
+		return getParameters().size() > 0;
 	}
 
-	@Override
 	public ITypeName getReturnType() {
+		if (isUnknown()) {
+			return new TypeName();
+		}
 		int startIndexOfValueTypeIdentifier = identifier.indexOf('[') + 1;
-		int lastIndexOfValueTypeIdentifer = identifier.indexOf("]") + 1;
+		int lastIndexOfValueTypeIdentifer = identifier.indexOf("]");
 		int lengthOfValueTypeIdentifier = lastIndexOfValueTypeIdentifer - startIndexOfValueTypeIdentifier;
-		return Names.newType(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
+		return TypeUtils
+				.createTypeName(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
 	}
 
-	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }

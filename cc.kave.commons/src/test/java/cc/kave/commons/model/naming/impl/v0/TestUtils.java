@@ -13,15 +13,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.naming.impl.v0.types;
+package cc.kave.commons.model.naming.impl.v0;
 
-/* Please note: the primary test source for type names should be the generated
- * test suite. If you encounter a bug, please fix it on the C# side first, then
- * regenerate the test suite to create a failing test, and only then fix the
- * bug in the Java implementation of the names.
- * 
- * The sole purpose of this class is to test the "infrastructure", including
- * Java specific checks, implementation details, instantiation checks, or alike.
- */
-public class ArrayTypeNameTest {
+import cc.kave.commons.testutils.ParameterData;
+
+public class TestUtils {
+
+	public static Object[][] provideTypes() {
+		ParameterData pd = new ParameterData();
+		// unknown
+		pd.add("?");
+		// regular
+		pd.add("T");
+		pd.add("T -> T,P");
+		pd.add("T,P");
+		pd.add("T[],P");
+		pd.add("d:[?] [n.C+D, P].()");
+		pd.add("T`1[[P -> T2,P]],P");
+		// arrays
+		pd.add("T[]");
+		pd.add("T[] -> T,P");
+		pd.add("T[],P");
+		pd.add("d:[?] [?].()[]");
+		// nested
+		pd.add("n.C+D`1[[T]], P");
+		pd.add("n.C`1[[T]]+D, P");
+		// predefined
+		pd.add("p:int");
+		return pd.toArray();
+	}
 }

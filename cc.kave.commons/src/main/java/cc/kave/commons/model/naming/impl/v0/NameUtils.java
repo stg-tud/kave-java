@@ -15,12 +15,16 @@
  */
 package cc.kave.commons.model.naming.impl.v0;
 
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
+import static cc.kave.commons.utils.StringUtils.FindNext;
 import static cc.kave.commons.utils.StringUtils.f;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.impl.v0.codeelements.ParameterName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeParameterName;
 import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.utils.StringUtils;
@@ -50,6 +54,47 @@ public class NameUtils {
 
 			cur = StringUtils.FindNext(id, closeParam, ',', ']');
 		}
+		return parameters;
+	}
+
+	/// <summary>
+	/// Parses contents of a "ParameterListHolder"... just pass the complete
+	/// identifier and the indices of the brackets
+	/// </summary>
+	public static List<IParameterName> GetParameterNamesFromSignature(String identifierWithParameters,
+			int idxOpeningBrace, int idxClosingBrace) {
+		// remove opening bracket
+		idxOpeningBrace++;
+
+		// strip leading whitespace
+		while (identifierWithParameters.charAt(idxOpeningBrace) == ' ') {
+			idxOpeningBrace++;
+		}
+
+		List<IParameterName> parameters = Lists.newLinkedList();
+		boolean hasNoParams = idxOpeningBrace == idxClosingBrace;
+		if (hasNoParams) {
+			return parameters;
+		}
+
+		int current = idxOpeningBrace;
+		while (current < idxClosingBrace) {
+			int startOfParam = current;
+
+			if (identifierWithParameters.charAt(current) != '[') {
+				current = FindNext(identifierWithParameters, current, '[');
+			}
+			current = FindCorrespondingCloseBracket(identifierWithParameters, current);
+			current = FindNext(identifierWithParameters, current, ',', ')');
+			int endOfParam = current;
+
+			String paramSubstring = identifierWithParameters.substring(startOfParam, endOfParam);
+			parameters.add(new ParameterName(paramSubstring.trim()));
+
+			// ignore comma
+			current++;
+		}
+
 		return parameters;
 	}
 }
