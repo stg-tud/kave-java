@@ -15,5 +15,7 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-public interface ISolutionName {
+import cc.kave.commons.model.naming.IName;
+
+public interface ISolutionName extends IName {
 }

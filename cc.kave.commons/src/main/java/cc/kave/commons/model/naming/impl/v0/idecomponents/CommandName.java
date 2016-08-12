@@ -15,37 +15,58 @@
  */
 package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
+import java.util.Arrays;
+
 import cc.kave.commons.model.naming.idecomponents.ICommandName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 
 public class CommandName extends BaseName implements ICommandName {
 
+	public CommandName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
 	public CommandName(String identifier) {
 		super(identifier);
-		// TODO Auto-generated constructor stub
+	}
+
+	private String[] _parts;
+
+	private String[] getParts() {
+		if (_parts == null) {
+			_parts = new String[3];
+
+			String[] parts = identifier.split(":");
+			if (parts.length >= 3) {
+				_parts[0] = parts[0];
+				_parts[1] = parts[1];
+				_parts[2] = String.join(":", Arrays.copyOfRange(parts, 2, parts.length));
+			} else {
+				_parts[0] = UNKNOWN_NAME_IDENTIFIER;
+				_parts[1] = "-1";
+				_parts[2] = identifier;
+			}
+		}
+		return _parts;
 	}
 
 	@Override
 	public String getGuid() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[0];
 	}
 
 	@Override
 	public int getId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return isUnknown() ? -1 : Integer.parseInt(getParts()[1]);
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[2];
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }

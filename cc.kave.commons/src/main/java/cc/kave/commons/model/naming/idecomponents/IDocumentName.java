@@ -15,7 +15,9 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-public interface IDocumentName {
+import cc.kave.commons.model.naming.IName;
+
+public interface IDocumentName extends IName {
 
 	String getLanguage();
 

@@ -15,7 +15,9 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-public interface ICommandName {
+import cc.kave.commons.model.naming.IName;
+
+public interface ICommandName extends IName {
 	String getGuid();
 
 	int getId();

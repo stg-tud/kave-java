@@ -141,7 +141,7 @@ public class StringUtils {
 		case '>':
 			return '<';
 		default:
-			throw new InvalidParameterException(String.format("no supported bracket type: {0}", c));
+			throw new InvalidParameterException(String.format("no supported bracket type: %c", c));
 		}
 	}
 

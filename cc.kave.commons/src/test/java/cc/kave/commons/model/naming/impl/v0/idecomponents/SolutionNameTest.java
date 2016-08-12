@@ -15,21 +15,31 @@
  */
 package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import cc.kave.commons.model.naming.idecomponents.ISolutionName;
-import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.recommenders.exceptions.ValidationException;
 
-public class SolutionName extends BaseName implements ISolutionName {
+public class SolutionNameTest {
 
-	public SolutionName() {
-		this("?");
+	@Test
+	public void DefaultValues() {
+		ISolutionName sut = new SolutionName();
+		assertTrue(sut.isUnknown());
 	}
 
-	public SolutionName(String identifier) {
-		super(identifier);
+	@Test
+	public void ShouldImplementIsUnknown() {
+		assertTrue(new SolutionName().isUnknown());
+		assertTrue(new SolutionName("?").isUnknown());
+		assertFalse(new SolutionName("...").isUnknown());
 	}
 
-	@Override
-	public boolean isUnknown() {
-		return "?".equals(identifier);
+	@Test(expected = ValidationException.class)
+	public void ShouldAvoidNullParameters() {
+		new SolutionName(null);
 	}
 }

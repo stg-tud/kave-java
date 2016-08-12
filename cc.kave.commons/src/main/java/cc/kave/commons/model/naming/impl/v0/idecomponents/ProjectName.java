@@ -17,29 +17,42 @@ package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
 import cc.kave.commons.model.naming.idecomponents.IProjectName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class ProjectName extends BaseName implements IProjectName {
 
+	public ProjectName() {
+		this("?");
+	}
+
 	public ProjectName(String identifier) {
 		super(identifier);
-		// TODO Auto-generated constructor stub
+		if (!isUnknown() && !identifier.contains(" ")) {
+			throw new ValidationException("mus contain space");
+		}
+	}
+
+	private String[] _parts;
+
+	private String[] getParts() {
+		if (_parts == null) {
+			_parts = identifier.split(" ", 2);
+		}
+		return _parts;
 	}
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[0];
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[1];
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return "?".equals(identifier);
 	}
 }

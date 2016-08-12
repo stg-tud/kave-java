@@ -15,31 +15,52 @@
  */
 package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
+import static cc.kave.commons.utils.StringUtils.f;
+
 import cc.kave.commons.model.naming.idecomponents.IDocumentName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class DocumentName extends BaseName implements IDocumentName {
 
+	public DocumentName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
 	public DocumentName(String identifier) {
 		super(identifier);
-		// TODO Auto-generated constructor stub
+		if (!UNKNOWN_NAME_IDENTIFIER.equals(identifier)) {
+			if (!identifier.contains(" ")) {
+				throw new ValidationException(f("document name is missing a space '%s'", identifier));
+			}
+		}
+	}
+
+	private String[] _parts;
+
+	private String[] getParts() {
+		if (_parts == null) {
+			if (identifier.startsWith("Plain Text ")) {
+				_parts = new String[] { "Plain Text", identifier.substring(11) };
+			} else {
+				_parts = identifier.split(" ", 2);
+			}
+		}
+		return _parts;
 	}
 
 	@Override
 	public String getLanguage() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[0];
 	}
 
 	@Override
 	public String getFileName() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : getParts()[1];
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }

@@ -15,12 +15,13 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
+import cc.kave.commons.model.naming.IName;
 import cc.recommenders.annotations.Nullable;
 
-public interface ICommandBarControlName {
+public interface ICommandBarControlName extends IName {
 
 	@Nullable
 	ICommandBarControlName getParent();
 
-	String Name();
+	String getName();
 }

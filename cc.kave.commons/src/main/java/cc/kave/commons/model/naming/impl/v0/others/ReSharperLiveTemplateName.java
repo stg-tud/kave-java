@@ -17,30 +17,37 @@ package cc.kave.commons.model.naming.impl.v0.others;
 
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.others.IReSharperLiveTemplateName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class ReSharperLiveTemplateName extends BaseName implements IReSharperLiveTemplateName {
 
-	protected ReSharperLiveTemplateName(String identifier) {
+	private static final String Separator = ":";
+
+	public ReSharperLiveTemplateName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
+	public ReSharperLiveTemplateName(String identifier) {
 		super(identifier);
+		if (!isUnknown() && !identifier.contains(Separator)) {
+			throw new ValidationException("must contain separator");
+		}
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		int endOfName = identifier.indexOf(Separator);
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : identifier.substring(0, endOfName);
 	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		int startOfDescription = identifier.indexOf(Separator) + 1;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : identifier.substring(startOfDescription);
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
-
-	// TODO write utility methods
 }

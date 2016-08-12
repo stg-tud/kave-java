@@ -78,7 +78,7 @@ public class TypeName extends BaseTypeName {
 		return new AssemblyName(assemblyIdentifier);
 	}
 
-	protected int GetLengthOfTypeName() {
+	private int GetLengthOfTypeName() {
 		String id = identifier;
 		if (TypeUtils.isUnknownTypeIdentifier(id)) {
 			return id.length();
@@ -127,7 +127,7 @@ public class TypeName extends BaseTypeName {
 		int startIdx = fullName.indexOf('[');
 		if (startIdx != -1) {
 			int endIdx = FindCorrespondingCloseBracket(fullName, startIdx);
-			String genericInfo = fullName.substring(startIdx, endIdx+1);
+			String genericInfo = fullName.substring(startIdx, endIdx + 1);
 			return fullName.replace(genericInfo, "");
 		}
 		return fullName;
@@ -161,7 +161,7 @@ public class TypeName extends BaseTypeName {
 
 		String declTypeId = identifier.substring(start, plus - start);
 
-		return new TypeName(f("{0}, {1}", declTypeId, getAssembly().getIdentifier()));
+		return new TypeName(f("%s, %s", declTypeId, getAssembly().getIdentifier()));
 	}
 
 	@Override

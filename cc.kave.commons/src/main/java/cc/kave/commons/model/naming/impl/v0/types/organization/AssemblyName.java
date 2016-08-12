@@ -54,10 +54,12 @@ public class AssemblyName extends BaseName implements IAssemblyName {
 		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 
+	@Override
 	public String getName() {
 		return GetFragments()[0];
 	}
 
+	@Override
 	public boolean isLocalProject() {
 		return isLocalProject;
 	}

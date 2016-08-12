@@ -33,6 +33,7 @@ public class NamespaceName extends BaseName implements INamespaceName {
 		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 
+	@Override
 	public INamespaceName getParentNamespace() {
 		if (isGlobalNamespace()) {
 			return null;
@@ -45,11 +46,13 @@ public class NamespaceName extends BaseName implements INamespaceName {
 				: new NamespaceName(identifier.substring(0, lastSeperatorIndex));
 	}
 
+	@Override
 	public String getName() {
 		int lastSeperatorIndex = identifier.lastIndexOf('.');
 		return identifier.substring(lastSeperatorIndex + 1);
 	}
 
+	@Override
 	public boolean isGlobalNamespace() {
 		return "".equals(identifier);
 	}

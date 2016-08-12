@@ -17,29 +17,38 @@ package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
 import cc.kave.commons.model.naming.idecomponents.ICommandBarControlName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class CommandBarControlName extends BaseName implements ICommandBarControlName {
 
+	public static final char HierarchySeperator = '|';
+
+	public CommandBarControlName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
 	public CommandBarControlName(String identifier) {
 		super(identifier);
-		// TODO Auto-generated constructor stub
+		if (identifier.contains("||")) {
+			throw new ValidationException("double separator");
+		}
 	}
 
 	@Override
 	public ICommandBarControlName getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		int endOfParentIdentifier = identifier.lastIndexOf(HierarchySeperator);
+		return endOfParentIdentifier < 0 ? null
+				: new CommandBarControlName(identifier.substring(0, endOfParentIdentifier));
 	}
 
 	@Override
-	public String Name() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getName() {
+		int startOfName = identifier.lastIndexOf(HierarchySeperator) + 1;
+		return identifier.substring(startOfName);
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }

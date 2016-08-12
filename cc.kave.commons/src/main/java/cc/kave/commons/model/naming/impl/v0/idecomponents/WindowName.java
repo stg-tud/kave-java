@@ -17,29 +17,34 @@ package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
 import cc.kave.commons.model.naming.idecomponents.IWindowName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
+import cc.recommenders.exceptions.ValidationException;
 
 public class WindowName extends BaseName implements IWindowName {
 
+	public WindowName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
 	public WindowName(String identifier) {
 		super(identifier);
-		// TODO Auto-generated constructor stub
+		if (!isUnknown() && !identifier.contains(" ")) {
+			throw new ValidationException("must contain space");
+		}
 	}
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : identifier.substring(0, identifier.indexOf(' '));
 	}
 
 	@Override
 	public String getCaption() {
-		// TODO Auto-generated method stub
-		return null;
+		int startOfWindowCaption = getType().length() + 1;
+		return isUnknown() ? UNKNOWN_NAME_IDENTIFIER : identifier.substring(startOfWindowCaption);
 	}
 
 	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }
