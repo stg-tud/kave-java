@@ -32,7 +32,7 @@ public class ParameterData {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i] instanceof String) {
 				String s = (String) args[i];
-				args[i] = s.replace(",", "\\,").replace("|", "\\|");
+				args[i] = s;// .replace(",", "\\,").replace("|", "\\|");
 			}
 		}
 		cases.add(Lists.newArrayList(args));

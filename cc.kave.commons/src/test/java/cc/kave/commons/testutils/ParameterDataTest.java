@@ -48,15 +48,15 @@ public class ParameterDataTest {
 	}
 
 	@Test
-	public void addStringWithSeparators() {
+	public void addStringDoesNotAddSeparators() {
 		sut.add("x,y|z");
-		assertArr(new Object[] { new Object[] { "x\\,y\\|z" } });
+		assertArr(new Object[] { new Object[] { "x,y|z" } });
 	}
 
 	@Test
-	public void addStringWithSeparatorsArr() {
+	public void addStringDoesNotAddSeparatorsArr() {
 		sut.add("x,y", "y|z");
-		assertArr(new Object[] { new Object[] { "x\\,y", "y\\|z" } });
+		assertArr(new Object[] { new Object[] { "x,y", "y|z" } });
 	}
 
 	private void assertArr(Object[] expecteds) {
