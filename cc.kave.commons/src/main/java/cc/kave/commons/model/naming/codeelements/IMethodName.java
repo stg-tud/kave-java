@@ -15,15 +15,11 @@
  */
 package cc.kave.commons.model.naming.codeelements;
 
-import java.util.List;
-
 import cc.kave.commons.model.naming.IGenericName;
+import cc.kave.commons.model.naming.IParameterizedName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
-public interface IMethodName extends IMemberName, IGenericName {
-	List<IParameterName> getParameters();
-
-	boolean hasParameters();
+public interface IMethodName extends IMemberName, IGenericName, IParameterizedName {
 
 	boolean isConstructor();
 

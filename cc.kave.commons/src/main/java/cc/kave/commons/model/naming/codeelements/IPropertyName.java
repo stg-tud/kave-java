@@ -15,8 +15,13 @@
  */
 package cc.kave.commons.model.naming.codeelements;
 
-public interface IPropertyName extends IMemberName {
+import cc.kave.commons.model.naming.IParameterizedName;
+
+public interface IPropertyName extends IMemberName, IParameterizedName {
+
 	boolean hasSetter();
 
 	boolean hasGetter();
+
+	boolean isIndexer();
 }

@@ -15,22 +15,24 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IEventName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EventName extends MemberName implements IEventName {
 
-	private EventName(String identifier) {
+	public EventName() {
+		this(UnknownMemberIdentifier);
+	}
+
+	public EventName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
-	public ITypeName getHandlerType() {
-		return getValueType();
+	public boolean isUnknown() {
+		return UnknownMemberIdentifier.equals(identifier);
 	}
 
-	public boolean isUnknown() {
-		return this.equals(Names.getUnknownEvent());
+	public ITypeName getHandlerType() {
+		return getValueType();
 	}
 }

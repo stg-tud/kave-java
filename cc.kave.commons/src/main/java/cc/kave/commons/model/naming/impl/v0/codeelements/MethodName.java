@@ -15,26 +15,23 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
-import cc.kave.commons.model.naming.impl.csharp.CsGenericNameUtils;
-import cc.kave.commons.model.naming.impl.csharp.CsNameUtils;
+import cc.kave.commons.model.naming.impl.v0.NameUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.ITypeParameterName;
+import cc.kave.commons.utils.StringUtils;
 
 public class MethodName extends MemberName implements IMethodName {
 
-	private static final Pattern signatureSyntax = Pattern
-			.compile(".*\\]\\.((([^(\\[]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\)).*");
-	// "\\]\\.((([^([]+)(?:`[0-9]+\\[[^(]+\\]){0,1})\\(.*\\))$"
+	private static final String UnknownMethodIdentifier = UnknownMemberIdentifier + "()";
 
 	public MethodName() {
-		this("[?] [?].???()");
+		this(UnknownMethodIdentifier);
 	}
 
 	public MethodName(String identifier) {
@@ -42,18 +39,73 @@ public class MethodName extends MemberName implements IMethodName {
 	}
 
 	@Override
+	public boolean isUnknown() {
+		return UnknownMethodIdentifier.equals(identifier);
+	}
+
+	private String _name;
+
+	@Override
+	public String getName() {
+		if (_name == null) {
+			if (isUnknown()) {
+				_name = UNKNOWN_NAME_IDENTIFIER;
+			} else {
+				int openR = identifier.indexOf('[');
+				int closeR = StringUtils.FindCorrespondingCloseBracket(identifier, openR);
+				int openD = StringUtils.FindNext(identifier, closeR, '[');
+				int closeD = StringUtils.FindCorrespondingCloseBracket(identifier, openD);
+				int startName = StringUtils.FindNext(identifier, closeD, '.') + 1;
+				int endName = StringUtils.FindNext(identifier, startName, '`', '(');
+				_name = identifier.substring(startName, endName);
+			}
+		}
+		return _name;
+	}
+
+	private List<ITypeParameterName> _typeParameters;
+
+	@Override
+	public List<ITypeParameterName> getTypeParameters() {
+		if (_typeParameters == null) {
+			if (getFullName().contains("`")) {
+				int start = getFullName().indexOf('[');
+				int end = getFullName().lastIndexOf(']');
+				_typeParameters = NameUtils.ParseTypeParameterList(getFullName(), start, end);
+			} else {
+				_typeParameters = Lists.newLinkedList();
+			}
+		}
+
+		return _typeParameters;
+	}
+
+	@Override
+	public boolean hasTypeParameters() {
+		return getTypeParameters().size() > 0;
+	}
+
+	private List<IParameterName> _parameters;
+
+	@Override
 	public List<IParameterName> getParameters() {
-		return CsNameUtils.getParameterNames(identifier);
+		if (_parameters == null) {
+			int endOfParameters = identifier.lastIndexOf(')');
+			int startOfParameters = StringUtils.FindCorrespondingOpenBracket(identifier, endOfParameters);
+			_parameters = NameUtils.GetParameterNamesFromSignature(identifier, startOfParameters, endOfParameters);
+		}
+
+		return _parameters;
 	}
 
 	@Override
 	public boolean hasParameters() {
-		return !identifier.contains("()");
+		return getParameters().size() > 0;
 	}
 
 	@Override
 	public boolean isConstructor() {
-		return false;
+		return getName().equals(".ctor") || getName().equals(".cctor");
 	}
 
 	@Override
@@ -61,41 +113,8 @@ public class MethodName extends MemberName implements IMethodName {
 		return getValueType();
 	}
 
-	public String getFullName() {
-		Matcher matcher = signatureSyntax.matcher(identifier);
-		if (!matcher.matches()) {
-			throw new RuntimeException("Invalid Signature Syntax: " + identifier);
-		}
-		return matcher.group(2);
-	}
-
-	public String getName() {
-		Matcher matcher = signatureSyntax.matcher(identifier);
-		if (!matcher.matches()) {
-			throw new RuntimeException("Invalid Signature Syntax: " + identifier);
-		}
-		return matcher.group(3);
-	}
-
-	@Override
-	public boolean hasTypeParameters() {
-		return getFullName().contains("[[");
-	}
-
-	@Override
-	public List<ITypeParameterName> getTypeParameters() {
-		return hasTypeParameters() ? CsGenericNameUtils.parseTypeParameters(getFullName())
-				: new ArrayList<ITypeParameterName>();
-	}
-
 	@Override
 	public boolean isExtensionMethod() {
-		return isStatic() && getParameters().size() > 0 && getParameters().get(0).isExtensionMethodParameter();
-	}
-
-	@Override
-	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return isStatic() && hasParameters() && getParameters().get(0).isExtensionMethodParameter();
 	}
 }

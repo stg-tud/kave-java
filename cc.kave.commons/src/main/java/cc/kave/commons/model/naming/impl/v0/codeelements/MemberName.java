@@ -16,51 +16,86 @@
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
 import cc.kave.commons.model.naming.codeelements.IMemberName;
-import cc.kave.commons.model.naming.impl.csharp.CsNameUtils;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.StringUtils;
 
 public abstract class MemberName extends BaseName implements IMemberName {
 
-	public final String STATIC_MODIFIER = "static";
+	protected static final String UnknownMemberIdentifier = "[?] [?].???";
+	public static final String StaticModifier = "static";
 
 	protected MemberName(String identifier) {
 		super(identifier);
 	}
 
-	public String getModifiers() {
+	protected String getModifiers() {
 		return identifier.substring(0, identifier.indexOf('['));
 	}
 
 	@Override
-	public ITypeName getDeclaringType() {
-		int endOfValueType = CsNameUtils.endOfNextTypeIdentifier(identifier, 0);
-		int startOfDeclaringType = CsNameUtils.startOfNextTypeIdentifier(identifier, endOfValueType) + 1;
-		int endOfDeclaringType = CsNameUtils.endOfNextTypeIdentifier(identifier, endOfValueType) - 1;
-		return TypeUtils.createTypeName(identifier.substring(startOfDeclaringType, endOfDeclaringType + 1));
-	}
-
-	@Override
-	public ITypeName getValueType() {
-		int start = identifier.indexOf("[");
-		int end = CsNameUtils.getClosingBracketIndex(identifier, start);
-		return TypeUtils.createTypeName(identifier.substring(start + 1, end - 1));
-	}
-
-	@Override
 	public boolean isStatic() {
-		return getModifiers().contains(STATIC_MODIFIER);
+		return getModifiers().contains(StaticModifier);
 	}
 
 	@Override
 	public String getName() {
-		return identifier.substring(identifier.lastIndexOf('.') + 1);
+		String nameWithBraces = identifier.substring(identifier.lastIndexOf('.') + 1);
+		int endIdx = nameWithBraces.indexOf('(');
+		return endIdx != -1 ? nameWithBraces.substring(0, endIdx) : nameWithBraces;
 	}
+
+	private String _fullName;
 
 	@Override
 	public String getFullName() {
-		// TODO Auto-generated method stub
-		return null;
+		if (_fullName == null) {
+			_fullName = getFullNameImpl();
+		}
+		return _fullName;
+	}
+
+	private String getFullNameImpl() {
+		String id = identifier;
+		int openR = id.indexOf("[");
+		int closeR = StringUtils.FindCorrespondingCloseBracket(id, openR);
+
+		int openD = StringUtils.FindNext(id, closeR, '[');
+		int closeD = StringUtils.FindCorrespondingCloseBracket(id, openD);
+
+		int dot = StringUtils.FindNext(id, closeD, '.');
+		int openP = StringUtils.FindNext(id, dot, '(', '`');
+		if (openP != -1 && id.charAt(openP) == '`') {
+			int openGen = StringUtils.FindNext(id, openP, '[');
+			int closeGen = StringUtils.FindCorrespondingCloseBracket(id, openGen);
+			openP = StringUtils.FindNext(id, closeGen, '(');
+		}
+
+		int start = dot + 1;
+		int end = openP == -1 ? id.length() : openP;
+		return id.substring(start, end).trim();
+	}
+
+	@Override
+	public ITypeName getValueType() {
+		int openValType = StringUtils.FindNext(identifier, 0, '[');
+		int closeValType = StringUtils.FindCorrespondingCloseBracket(identifier, openValType);
+		// ignore open bracket
+		openValType++;
+		String declTypeIdentifier = identifier.substring(openValType, closeValType);
+		return TypeUtils.createTypeName(declTypeIdentifier);
+	}
+
+	@Override
+	public ITypeName getDeclaringType() {
+		int openValType = StringUtils.FindNext(identifier, 0, '[');
+		int closeValType = StringUtils.FindCorrespondingCloseBracket(identifier, openValType);
+		int openDeclType = StringUtils.FindNext(identifier, closeValType, '[');
+		int closeDeclType = StringUtils.FindCorrespondingCloseBracket(identifier, openDeclType);
+		// ignore open bracket
+		openDeclType++;
+		String declTypeIdentifier = identifier.substring(openDeclType, closeDeclType);
+		return TypeUtils.createTypeName(declTypeIdentifier);
 	}
 }

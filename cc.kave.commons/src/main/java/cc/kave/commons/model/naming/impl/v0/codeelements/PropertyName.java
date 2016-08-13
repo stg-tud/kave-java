@@ -15,29 +15,61 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
+import static cc.kave.commons.model.naming.impl.v0.NameUtils.GetParameterNamesFromSignature;
+import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.codeelements.IPropertyName;
 
 public class PropertyName extends MemberName implements IPropertyName {
 
-	public final String SETTER_MODIFIER = "set";
-	public final String GETTER_MODIFIER = "get";
+	public static final String SetterModifier = "set";
+	public static final String GetterModifier = "get";
 
-	@Override
-	public boolean isUnknown() {
-		return UNKNOWN_NAME_IDENTIFIER.equals(getIdentifier());
+	public PropertyName() {
+		this(UnknownMemberIdentifier);
 	}
 
-	private PropertyName(String identifier) {
+	public PropertyName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
-	public boolean hasSetter() {
-		return getModifiers().contains(SETTER_MODIFIER);
+	public boolean isUnknown() {
+		return UnknownMemberIdentifier.equals(identifier);
 	}
 
-	@Override
+	public boolean hasSetter() {
+		return getModifiers().contains(SetterModifier);
+	}
+
 	public boolean hasGetter() {
-		return getModifiers().contains(GETTER_MODIFIER);
+		return getModifiers().contains(GetterModifier);
+	}
+
+	public boolean isIndexer() {
+		return hasParameters();
+	}
+
+	public boolean hasParameters() {
+		return getParameters().size() > 0;
+	}
+
+	private List<IParameterName> _parameters;
+
+	public List<IParameterName> getParameters() {
+		if (_parameters == null) {
+			if (isUnknown()) {
+				_parameters = Lists.newLinkedList();
+			} else {
+				int endOfParameters = identifier.lastIndexOf(')');
+				int startOfParameters = FindCorrespondingOpenBracket(identifier, endOfParameters);
+				_parameters = GetParameterNamesFromSignature(identifier, startOfParameters, endOfParameters);
+			}
+		}
+		return _parameters;
 	}
 }

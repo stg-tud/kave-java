@@ -15,21 +15,19 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IFieldName;
 
 public class FieldName extends MemberName implements IFieldName {
 
-	private FieldName() {
-		this("[?] [?].???");
+	public FieldName() {
+		this(UnknownMemberIdentifier);
 	}
 
-	private FieldName(String identifier) {
+	public FieldName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
 	public boolean isUnknown() {
-		return this.equals(Names.getUnknownField());
+		return UnknownMemberIdentifier.equals(identifier);
 	}
 }
