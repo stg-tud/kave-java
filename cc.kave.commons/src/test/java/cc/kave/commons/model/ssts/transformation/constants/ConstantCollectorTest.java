@@ -54,8 +54,8 @@ public class ConstantCollectorTest extends InliningBaseTest {
 		method = new MethodDeclaration();
 		body = new ArrayList<IStatement>();
 		fields = new HashSet<IFieldDeclaration>();
-		fieldA = "[T1,P1,1] [System.Int32,P2,1].fA";
-		fieldB = "[T1,P1,1] [System.Int32,P2,1].fB";
+		fieldA = "[T1,P1,1] [p:int].fA";
+		fieldB = "[T1,P1,1] [p:int].fB";
 		fieldC = "[T1,P1,1] [Some.RefType,P2,1].fC";
 		refA = refField(fieldA);
 		refB = refField(fieldB);
@@ -110,7 +110,7 @@ public class ConstantCollectorTest extends InliningBaseTest {
 		IStatement stmt = returnStatement(refExpr(refC), false);
 		body.add(stmt);
 		method.setBody(body);
-		
+
 		ISST sst = buildSST(fields, method);
 		Set<IFieldDeclaration> constants = sst.accept(collector, new HashSet<IFieldDeclaration>());
 		assertThat(constants, is(empty()));

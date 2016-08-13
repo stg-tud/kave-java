@@ -208,7 +208,7 @@ public class ExpressionPrinterTest extends SSTPrintingVisitorBaseTest {
 	public void completionExpression_OnTypeReference_UnresolvedGenericType() {
 		CompletionExpression sst = new CompletionExpression();
 		sst.setTypeReference(Names.newType("T`1[[G]],P"));
-		assertPrint(sst, "T<?>.$");
+		assertPrint(sst, "T<G>.$");
 	}
 
 	@Test

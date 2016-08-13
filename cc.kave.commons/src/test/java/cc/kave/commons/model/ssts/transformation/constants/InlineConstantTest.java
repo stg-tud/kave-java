@@ -40,7 +40,7 @@ public class InlineConstantTest extends InliningBaseTest {
 	@Before
 	public void setup() {
 		sut = new InlineConstantVisitor();
-		field = "[T1,P1,1] [System.Int32,P2,1].f";
+		field = "[T1,P1,1] [p:int].f";
 	}
 
 	@Test

@@ -116,7 +116,7 @@ public class Names {
 	}
 
 	public static IAliasName newAlias(String id) {
-		return new AliasName();
+		return new AliasName(id);
 	}
 
 	public static IAssemblyName newAssembly(String id) {

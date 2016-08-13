@@ -798,6 +798,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 	@Override
 	public Void visit(IEventSubscriptionStatement stmt, SSTPrintingContext context) {
+		context.indentation();
 		stmt.getReference().accept(this, context);
 		switch (stmt.getOperation()) {
 		case Add:

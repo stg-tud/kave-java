@@ -22,5 +22,4 @@ import cc.kave.commons.model.naming.IName;
  * "using alias = Some.Reference;".
  */
 public interface IAliasName extends IName {
-
 }

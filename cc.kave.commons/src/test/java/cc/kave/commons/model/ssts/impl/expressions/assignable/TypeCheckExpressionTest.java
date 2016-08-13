@@ -40,8 +40,8 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 	public void testSettingValues() {
 		TypeCheckExpression sut = new TypeCheckExpression();
 		sut.setReference(someVarRef());
-		sut.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
-		Assert.assertEquals(Names.newType("System.Int32, mscorlib, 4.0.0.0"), sut.getType());
+		sut.setType(Names.newType("p:int"));
+		Assert.assertEquals(Names.newType("p:int"), sut.getType());
 		Assert.assertEquals(someVarRef(), sut.getReference());
 	}
 
@@ -56,11 +56,11 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 	@Test
 	public void testEquality_ReallyTheSame() {
 		TypeCheckExpression a = new TypeCheckExpression();
-		a.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		a.setType(Names.newType("p:int"));
 		a.setReference(someVarRef());
 
 		TypeCheckExpression b = new TypeCheckExpression();
-		b.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		b.setType(Names.newType("p:int"));
 		b.setReference(someVarRef());
 
 		Assert.assertEquals(a, b);
@@ -70,11 +70,11 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 	@Test
 	public void testEquality_DifferentType() {
 		TypeCheckExpression a = new TypeCheckExpression();
-		a.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		a.setType(Names.newType("p:int"));
 		a.setReference(someVarRef());
 
 		TypeCheckExpression b = new TypeCheckExpression();
-		b.setType(Names.newType("System.String, mscorlib, 4.0.0.0"));
+		b.setType(Names.newType("p:string"));
 		b.setReference(someVarRef());
 
 		Assert.assertNotEquals(a, b);
@@ -84,11 +84,11 @@ public class TypeCheckExpressionTest extends SSTBaseTest {
 	@Test
 	public void testEquality_DifferentVarRef() {
 		TypeCheckExpression a = new TypeCheckExpression();
-		a.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		a.setType(Names.newType("p:int"));
 		a.setReference(someVarRef("i"));
 
 		TypeCheckExpression b = new TypeCheckExpression();
-		b.setType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		b.setType(Names.newType("p:int"));
 		b.setReference(someVarRef("j"));
 
 		Assert.assertNotEquals(a, b);

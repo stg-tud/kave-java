@@ -15,6 +15,8 @@
  */
 package cc.kave.commons.utils.sstprinter.visitortestsuite;
 
+import static cc.kave.commons.utils.StringUtils.isNullOrEmpty;
+
 import org.junit.Assert;
 
 import cc.kave.commons.model.ssts.IExpression;
@@ -69,8 +71,7 @@ public class SSTPrintingVisitorBaseTest {
 	private void testPrintingWithIndentation(ISSTNode sst, String... expectedLines) {
 		String[] indentedLines = new String[expectedLines.length];
 		for (int i = 0; i < expectedLines.length; i++) {
-			indentedLines[i] = (expectedLines[i] != "" || expectedLines[i] != null) ? expectedLines[i]
-					: "    " + expectedLines[i];
+			indentedLines[i] = isNullOrEmpty(expectedLines[i]) ? expectedLines[i] : "    " + expectedLines[i];
 		}
 		SSTPrintingContext context = new SSTPrintingContext();
 		context.setIndentationLevel(1);

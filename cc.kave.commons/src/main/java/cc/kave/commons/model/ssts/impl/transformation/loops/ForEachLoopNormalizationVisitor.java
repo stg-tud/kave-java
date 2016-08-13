@@ -69,7 +69,7 @@ public class ForEachLoopNormalizationVisitor extends AbstractStatementNormalizat
 
 		// create condition
 		IVariableReference hasNext = variableReference("hasNext");
-		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), Names.newType("System.Boolean"));
+		IVariableDeclaration hasNextDec = declare(hasNext.getIdentifier(), Names.newType("p:bool"));
 		ILoopHeaderExpression condition = loopHeader(hasNextDec, assign(hasNext, hasNext(iterator)),
 				returnStatement(refExpr(hasNext)));
 
@@ -102,5 +102,4 @@ public class ForEachLoopNormalizationVisitor extends AbstractStatementNormalizat
 	private IVariableDeclaration iteratorDeclaration(ITypeName paramType) {
 		return declareVar(iteratorVariableName(), iteratorType(paramType));
 	}
-
 }

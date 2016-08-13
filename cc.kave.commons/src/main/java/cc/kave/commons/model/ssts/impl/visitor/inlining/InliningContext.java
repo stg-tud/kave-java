@@ -75,8 +75,8 @@ public class InliningContext {
 		this.visitor = new NameScopeVisitor();
 		this.counter = 0;
 		this.inliningVisitor = new InliningVisitor();
-		this.inlinedMethods = new HashSet<>();
-		this.methods = new HashSet<>();
+		this.inlinedMethods = new LinkedHashSet<>();
+		this.methods = new LinkedHashSet<>();
 	}
 
 	public void addInlinedMethod(IMethodDeclaration method) {

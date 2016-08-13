@@ -40,11 +40,11 @@ public class CastExpressionTest extends SSTBaseTest {
 
 	public void testSettingValues() {
 		CastExpression sut = new CastExpression();
-		sut.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		sut.setTargetType(Names.newType("p:int"));
 		sut.setReference(someVarRef());
 		sut.setOperator(CastOperator.SafeCast);
 
-		Assert.assertEquals(Names.newType("System.Int32, mscorlib, 4.0.0.0"), sut.getTargetType());
+		Assert.assertEquals(Names.newType("p:int"), sut.getTargetType());
 		Assert.assertEquals(someVarRef(), sut.getReference());
 		Assert.assertEquals(CastOperator.SafeCast, sut.getOperator());
 	}
@@ -62,11 +62,11 @@ public class CastExpressionTest extends SSTBaseTest {
 
 	public void testEquality_ReallyTheSame() {
 		CastExpression a = new CastExpression();
-		a.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		a.setTargetType(Names.newType("p:int"));
 		a.setReference(someVarRef());
 		a.setOperator(CastOperator.SafeCast);
 		CastExpression b = new CastExpression();
-		b.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		b.setTargetType(Names.newType("p:int"));
 		b.setReference(someVarRef());
 		b.setOperator(CastOperator.SafeCast);
 		Assert.assertEquals(a, b);
@@ -76,7 +76,7 @@ public class CastExpressionTest extends SSTBaseTest {
 	@Test
 	public void testEquality_DifferentTargetType() {
 		CastExpression a = new CastExpression();
-		a.setTargetType(Names.newType("System.Int32, mscorlib, 4.0.0.0"));
+		a.setTargetType(Names.newType("p:int"));
 		CastExpression b = new CastExpression();
 
 		Assert.assertNotEquals(a, b);

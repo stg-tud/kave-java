@@ -704,7 +704,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 
 	@Test
 	public void testParamsMethodKeyWord() {
-		IMethodName name = Names.newMethod("[?] [?].m2(params [Integer] b)");
+		IMethodName name = Names.newMethod("[?] [?].m2(params [p:int[]] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -1055,7 +1055,6 @@ public class InliningVisitorTest extends InliningBaseTest {
 								returnVoid(), //
 								continueStmt())));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
-		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //
@@ -1336,7 +1335,6 @@ public class InliningVisitorTest extends InliningBaseTest {
 								returnVoid(), //
 								continueStmt())));
 		String resultFlag = InliningContext.RESULT_FLAG + "h1";
-		String condition = InliningContext.CONDITION_VAR;
 		ISST inlinedSST = buildSST(//
 				declareEntryPoint("ep1", //
 						declareVar(resultFlag, InliningContext.GOT_RESULT_TYPE), //

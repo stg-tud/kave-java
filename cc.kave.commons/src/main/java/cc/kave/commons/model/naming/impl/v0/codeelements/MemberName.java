@@ -77,18 +77,28 @@ public abstract class MemberName extends BaseName implements IMemberName {
 		return id.substring(start, end).trim();
 	}
 
+	private ITypeName valueType;
+
 	@Override
 	public ITypeName getValueType() {
+		if (valueType != null) {
+			return valueType;
+		}
 		int openValType = StringUtils.FindNext(identifier, 0, '[');
 		int closeValType = StringUtils.FindCorrespondingCloseBracket(identifier, openValType);
 		// ignore open bracket
 		openValType++;
 		String declTypeIdentifier = identifier.substring(openValType, closeValType);
-		return TypeUtils.createTypeName(declTypeIdentifier);
+		return valueType = TypeUtils.createTypeName(declTypeIdentifier);
 	}
+
+	private ITypeName declaringType;
 
 	@Override
 	public ITypeName getDeclaringType() {
+		if (declaringType != null) {
+			return declaringType;
+		}
 		int openValType = StringUtils.FindNext(identifier, 0, '[');
 		int closeValType = StringUtils.FindCorrespondingCloseBracket(identifier, openValType);
 		int openDeclType = StringUtils.FindNext(identifier, closeValType, '[');
@@ -96,6 +106,6 @@ public abstract class MemberName extends BaseName implements IMemberName {
 		// ignore open bracket
 		openDeclType++;
 		String declTypeIdentifier = identifier.substring(openDeclType, closeDeclType);
-		return TypeUtils.createTypeName(declTypeIdentifier);
+		return declaringType = TypeUtils.createTypeName(declTypeIdentifier);
 	}
 }

@@ -53,9 +53,9 @@ public class TypeErasureVisitorTest {
 	public void enclosingTypeIsErased() {
 
 		SST in = new SST();
-		in.setEnclosingType(Names.newType("T`1[[G->T,P]]"));
+		in.setEnclosingType(Names.newType("T`1[[G->T,P]], P"));
 		SST expected = new SST();
-		expected.setEnclosingType(Names.newType("T`1[[G]]"));
+		expected.setEnclosingType(Names.newType("T`1[[G]], P"));
 
 		ISST actual = TypeErasureVisitor.erase(in);
 		assertEquals(expected, actual);

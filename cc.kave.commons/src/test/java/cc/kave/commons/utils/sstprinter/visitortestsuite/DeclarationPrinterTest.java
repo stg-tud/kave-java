@@ -189,7 +189,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 		DelegateDeclaration sst = new DelegateDeclaration();
 		sst.setName(Names.newType("d:[R, P] [Some.DelegateType`1[[T -> T]], P].([T] p1)").asDelegateTypeName());
 
-		assertPrint(sst, "delegate DelegateType<?>(? p1);");
+		assertPrint(sst, "delegate DelegateType<T>(T p1);");
 	}
 
 	@Test
@@ -306,9 +306,9 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_PassedByReference() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(ref [p:int] p)"));
 
-		assertPrint(sst, "ReturnType M(ref Int32 p) { }");
+		assertPrint(sst, "ReturnType M(ref int p) { }");
 	}
 
 	@Test
@@ -351,7 +351,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(Names.newMethod("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
 
-		assertPrint(sst, "ReturnType M<?>(? p) { }");
+		assertPrint(sst, "ReturnType M<T>(T p) { }");
 	}
 
 	@Test

@@ -20,10 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.collect.Sets;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -71,15 +73,6 @@ import cc.kave.commons.model.events.visualstudio.SolutionEvent;
 import cc.kave.commons.model.events.visualstudio.UpdateEvent;
 import cc.kave.commons.model.events.visualstudio.WindowAction;
 import cc.kave.commons.model.events.visualstudio.WindowEvent;
-import cc.kave.commons.model.naming.IName;
-import cc.kave.commons.model.naming.codeelements.IAliasName;
-import cc.kave.commons.model.naming.codeelements.IEventName;
-import cc.kave.commons.model.naming.codeelements.IFieldName;
-import cc.kave.commons.model.naming.codeelements.ILambdaName;
-import cc.kave.commons.model.naming.codeelements.ILocalVariableName;
-import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.codeelements.IParameterName;
-import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.naming.impl.v0.GeneralName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.AliasName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.EventName;
@@ -89,17 +82,22 @@ import cc.kave.commons.model.naming.impl.v0.codeelements.LocalVariableName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.MethodName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.ParameterName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.PropertyName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.CommandBarControlName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.CommandName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.DocumentName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.ProjectItemName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.ProjectName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.SolutionName;
+import cc.kave.commons.model.naming.impl.v0.idecomponents.WindowName;
 import cc.kave.commons.model.naming.impl.v0.others.ReSharperLiveTemplateName;
 import cc.kave.commons.model.naming.impl.v0.types.ArrayTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.DelegateTypeName;
+import cc.kave.commons.model.naming.impl.v0.types.PredefinedTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeParameterName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
+import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyVersion;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
-import cc.kave.commons.model.naming.types.IDelegateTypeName;
-import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.model.naming.types.organization.IAssemblyName;
-import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -194,38 +192,7 @@ public abstract class JsonUtils {
 
 		GsonUtil.addTypeAdapters(gb);
 
-		// name interface types
-		registerName(gb, IAliasName.class);
-		registerName(gb, IAssemblyName.class);
-		registerName(gb, IEventName.class);
-		registerName(gb, IFieldName.class);
-		registerName(gb, ILambdaName.class);
-		registerName(gb, ILocalVariableName.class);
-		registerName(gb, IMethodName.class);
-		registerName(gb, IName.class);
-		registerName(gb, INamespaceName.class);
-		registerName(gb, IParameterName.class);
-		registerName(gb, IPropertyName.class);
-		registerName(gb, ITypeName.class);
-		registerName(gb, IDelegateTypeName.class);
-		// C# name types
-		registerName(gb, AliasName.class);
-		registerName(gb, AssemblyName.class);
-		registerName(gb, EventName.class);
-		registerName(gb, FieldName.class);
-		registerName(gb, LambdaName.class);
-		registerName(gb, LocalVariableName.class);
-		registerName(gb, MethodName.class);
-		registerName(gb, GeneralName.class);
-		registerName(gb, NamespaceName.class);
-		registerName(gb, ParameterName.class);
-		registerName(gb, PropertyName.class);
-		registerName(gb, TypeName.class);
-		registerName(gb, DelegateTypeName.class);
-		registerName(gb, TypeParameterName.class);
-		registerName(gb, ArrayTypeName.class);
-		// resharper names
-		registerName(gb, ReSharperLiveTemplateName.class);
+		registerNames(gb);
 
 		// events
 		registerHierarchy(gb, IIDEEvent.class,
@@ -300,6 +267,7 @@ public abstract class JsonUtils {
 		registerHierarchy(gb, IProposalSelection.class, ProposalSelection.class);
 
 		// enums
+		// registerEnum(gb, Trigger.class);
 		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
 		gb.registerTypeAdapter(LifecyclePhase.class, EnumDeSerializer.create(LifecyclePhase.values()));
 		gb.registerTypeAdapter(SolutionAction.class, EnumDeSerializer.create(SolutionAction.values()));
@@ -331,6 +299,57 @@ public abstract class JsonUtils {
 		gson = gb.create();
 	}
 
+	private static void registerNames(GsonBuilder gb) {
+
+		Class<?>[] names = new Class<?>[] {
+				/* ----- v0 ----- */
+				GeneralName.class,
+				// code elements
+				AliasName.class, EventName.class, FieldName.class, LambdaName.class, LocalVariableName.class,
+				MethodName.class, ParameterName.class, PropertyName.class,
+				// ide components
+				CommandBarControlName.class, CommandName.class, DocumentName.class, ProjectItemName.class,
+				ProjectName.class, SolutionName.class, WindowName.class,
+				// others
+				ReSharperLiveTemplateName.class,
+				// types
+				AssemblyName.class, AssemblyVersion.class, NamespaceName.class,
+				//
+				ArrayTypeName.class, DelegateTypeName.class, PredefinedTypeName.class, TypeName.class,
+				TypeParameterName.class
+				/* ----- v1 ----- */
+				// yet to come...
+		};
+
+		GsonNameDeserializer nameAdapter = new GsonNameDeserializer();
+
+		for (Class<?> concreteName : names) {
+			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName)) {
+				gb.registerTypeAdapter(nameType, nameAdapter);
+			}
+		}
+	}
+
+	private static <T extends Enum<T>> void registerEnum(GsonBuilder gb, Class<T> e) {
+		gb.registerTypeAdapter(e, EnumDeSerializer.create(e.getEnumConstants()));
+	}
+
+	private static Set<Class<?>> getAllTypesFromHierarchyExceptObject(Class<?> elem) {
+		Set<Class<?>> hierarchy = Sets.newHashSet();
+		if (elem == null || elem.equals(Object.class)) {
+			return hierarchy;
+		}
+
+		hierarchy.add(elem);
+
+		for (Class<?> i : elem.getInterfaces()) {
+			hierarchy.addAll(getAllTypesFromHierarchyExceptObject(i));
+		}
+		hierarchy.addAll(getAllTypesFromHierarchyExceptObject(elem.getSuperclass()));
+
+		return hierarchy;
+	}
+
 	@SafeVarargs
 	private static <T> void registerHierarchy(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
 		Asserts.assertTrue(subtypes.length > 0);
@@ -341,10 +360,6 @@ public abstract class JsonUtils {
 		}
 
 		gsonBuilder.registerTypeAdapterFactory(factory);
-	}
-
-	private static <T> void registerName(GsonBuilder gsonBuilder, Class<T> type) {
-		gsonBuilder.registerTypeAdapter(type, new GsonNameDeserializer());
 	}
 
 	public static <T> T fromJson(String json, Type targetType) {

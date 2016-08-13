@@ -18,6 +18,7 @@ package cc.kave.commons.model.naming.impl.v0.types;
 import static cc.kave.commons.model.naming.impl.v0.NameUtils.ParseTypeParameterList;
 import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
 import static cc.kave.commons.utils.StringUtils.FindPrevious;
+import static cc.recommenders.assertions.Asserts.assertFalse;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.List;
@@ -123,8 +124,9 @@ public abstract class BaseTypeName extends BaseName implements ITypeName {
 	@Override
 	public List<ITypeParameterName> getTypeParameters() {
 		if (_typeParameters == null) {
+			assertFalse(isDelegateType());
 			int close = FindPrevious(getFullName(), getFullName().length() - 1, '+', ']');
-			if (isArray() || isDelegateType() || close == -1 || getFullName().charAt(close) == '+') {
+			if (isArray() || close == -1 || getFullName().charAt(close) == '+') {
 				_typeParameters = Lists.newLinkedList();
 			} else {
 				int open = FindCorrespondingOpenBracket(getFullName(), close);

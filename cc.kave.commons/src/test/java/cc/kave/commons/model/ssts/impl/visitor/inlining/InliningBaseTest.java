@@ -113,7 +113,7 @@ public class InliningBaseTest {
 
 	public static final ITypeName INTEGER = Names.newType("p:int");
 	public static final ITypeName BOOLEAN = Names.newType("p:bool");
-	public static final String SIGNATURE = "[Integer] [?].";
+	public static final String SIGNATURE = "[p:int] [?].";
 
 	protected IStatement returnVoid() {
 		return returnStatement(new NullExpression(), true);

@@ -25,6 +25,7 @@ import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.MethodName;
 import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 
@@ -55,8 +56,13 @@ public class DelegateTypeName extends BaseTypeName implements IDelegateTypeName 
 		return getDelegateType().getFullName();
 	}
 
+	private IMethodName delegateMethod;
+
 	private IMethodName getDelegateMethod() {
-		return new MethodName(getIdentifier().substring(PrefixDelegate.length()));
+		if (delegateMethod == null) {
+			delegateMethod = new MethodName(getIdentifier().substring(PrefixDelegate.length()));
+		}
+		return delegateMethod;
 	}
 
 	@Override
@@ -123,6 +129,11 @@ public class DelegateTypeName extends BaseTypeName implements IDelegateTypeName 
 			}
 		}
 		return ps;
+	}
+
+	@Override
+	public List<ITypeParameterName> getTypeParameters() {
+		return getDelegateType().getTypeParameters();
 	}
 
 	@Override

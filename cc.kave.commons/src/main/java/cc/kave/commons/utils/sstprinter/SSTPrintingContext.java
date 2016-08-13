@@ -70,7 +70,7 @@ public class SSTPrintingContext {
 	}
 
 	public void setIndentationLevel(int indentationLevel) {
-		indentationLevel = indentationLevel;
+		this.indentationLevel = indentationLevel;
 	}
 
 	public ITypeShape getTypeShape() {
@@ -312,7 +312,6 @@ public class SSTPrintingContext {
 		return this;
 	}
 
-	// TODO: rename method and adapt all usages
 	public String toString() {
 		return _sb.toString();
 	}

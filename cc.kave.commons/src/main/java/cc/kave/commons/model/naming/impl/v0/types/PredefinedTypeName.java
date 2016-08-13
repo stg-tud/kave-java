@@ -55,7 +55,7 @@ public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeN
 		IdToFullName.put("p:char", "System.Char");
 		IdToFullName.put("p:float", "System.Single");
 		IdToFullName.put("p:double", "System.Double");
-		IdToFullName.put("p:boolean", "System.Boolean");
+		IdToFullName.put("p:bool", "System.Boolean");
 		IdToFullName.put("p:decimal", "System.Decimal");
 
 		IdToFullName.put("p:void", "System.Void");
@@ -71,7 +71,7 @@ public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeN
 		validate(ValidNameMatcher.matcher(identifier).matches(), f("invalid id '%s'", identifier));
 		validate(!isArray() || !getArrayBaseType().isVoidType(), "impossible to create void array");
 		String baseId = isArray() ? getArrayBaseType().getIdentifier() : getIdentifier();
-		validate(IdToFullName.containsKey(baseId), f("uknown id '%s'", identifier));
+		validate(IdToFullName.containsKey(baseId), f("unknown id '%s'", identifier));
 	}
 
 	// ReSharper disable once UnusedParameter.Local
