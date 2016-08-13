@@ -17,13 +17,15 @@ package cc.kave.commons.model.naming.impl.v0;
 
 public class GeneralName extends BaseName {
 
-	protected GeneralName(String identifier) {
+	public GeneralName() {
+		this(UNKNOWN_NAME_IDENTIFIER);
+	}
+
+	public GeneralName(String identifier) {
 		super(identifier);
 	}
 
-	@Override
 	public boolean isUnknown() {
-		// TODO Auto-generated method stub
-		return false;
+		return UNKNOWN_NAME_IDENTIFIER.equals(identifier);
 	}
 }
