@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
@@ -113,12 +112,6 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 		// ignores Catch Block because exception-handling is ignored in analysis
 		visit(block.getFinally(), context);
 		return null;
-	}
-
-	private void visit(List<IStatement> body, List<Usage> context) {
-		for (IStatement stmt : body) {
-			stmt.accept(this, context);
-		}
 	}
 
 	public void handleObjectInstance(IInvocationExpression expr, List<Usage> usages, int parameterIndex, ICoReTypeName parameterType) {

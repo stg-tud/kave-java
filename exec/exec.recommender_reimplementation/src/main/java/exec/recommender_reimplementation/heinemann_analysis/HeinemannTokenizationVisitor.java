@@ -74,7 +74,7 @@ public class HeinemannTokenizationVisitor extends TokenizationVisitor {
 		// and ignores method header
 		c.getTokenStream().clear();
 
-		visitStatements(decl.getBody(), c);
+		visit(decl.getBody(), c);
 		return null;
 	}
 

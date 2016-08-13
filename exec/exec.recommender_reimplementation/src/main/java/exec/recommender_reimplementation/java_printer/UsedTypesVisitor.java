@@ -26,12 +26,12 @@ import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
-public class UsedTypesVisitor extends TraversingVisitor<Void, Void> {
+public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> {
 	private ITypeName className;
 
 	private Set<ITypeName> usedTypes;

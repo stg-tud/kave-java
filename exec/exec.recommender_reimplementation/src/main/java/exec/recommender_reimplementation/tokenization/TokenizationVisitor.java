@@ -58,6 +58,7 @@ import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.INullExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;
@@ -78,9 +79,8 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
-import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
-public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, Object> {
+public class TokenizationVisitor extends AbstractTraversingNodeVisitor<TokenizationContext, Object> {
 
 	private ITypeShape typeShape;
 	
@@ -197,7 +197,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushParameters(decl.getName().getParameters())
 		.pushOpeningCurlyBracket();
 		
-		visitStatements(decl.getBody(), c);
+		visit(decl.getBody(), c);
 		
 		c.pushClosingCurlyBracket();
 		
@@ -223,7 +223,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 				c.pushOpeningCurlyBracket()
 				.pushKeyword("get");
 				
-				visitStatements(decl.getGet(), c);
+				visit(decl.getGet(), c);
 				
 				c.pushClosingCurlyBracket();
 			}
@@ -232,7 +232,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 				c.pushOpeningCurlyBracket()
 				.pushKeyword("set");
 				
-				visitStatements(decl.getSet(), c);
+				visit(decl.getSet(), c);
 				
 				c.pushClosingCurlyBracket();
 			}
@@ -352,7 +352,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IDoLoop block, TokenizationContext c) {
 		c.pushKeyword("do").pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket().pushOpeningBracket().pushKeyword("while");
 		block.getCondition().accept(this, c);
 		c.pushClosingBracket();
@@ -371,7 +371,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushClosingBracket();
 		
 		c.pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -380,15 +380,15 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IForLoop block, TokenizationContext c) {
 		c.pushKeyword("for").pushOpeningBracket();
-		visitStatements(block.getInit(), c);
+		visit(block.getInit(), c);
 		c.pushSemicolon();
 		block.getCondition().accept(this, c);
 		c.pushSemicolon();
-		visitStatements(block.getStep(), c);
+		visit(block.getStep(), c);
 		c.pushClosingBracket()
 		
 		.pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -399,12 +399,12 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushKeyword("if").pushOpeningBracket();
 		block.getCondition().accept(this, c);
 		c.pushClosingBracket().pushOpeningCurlyBracket();
-		visitStatements(block.getThen(), c);
+		visit(block.getThen(), c);
 		c.pushClosingCurlyBracket();
 		
 		if(!block.getElse().isEmpty()) {
 			c.pushKeyword("else").pushOpeningCurlyBracket();
-			visitStatements(block.getElse(), c);
+			visit(block.getElse(), c);
 			c.pushClosingCurlyBracket();
 		}
 				
@@ -418,7 +418,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushClosingBracket()
 		
 		.pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -436,12 +436,12 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 			c.pushKeyword("case");
 			caseBlock.getLabel().accept(this, c);
 			c.pushColon();
-			visitStatements(caseBlock.getBody(), c);
+			visit(caseBlock.getBody(), c);
 		}
 
 		if(!block.getDefaultSection().isEmpty()) {
 			c.pushKeyword("default").pushColon();
-			visitStatements(block.getDefaultSection(), c);
+			visit(block.getDefaultSection(), c);
 		}
 		
 		c.pushClosingCurlyBracket();
@@ -452,7 +452,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(ITryBlock block, TokenizationContext c) {
 		c.pushKeyword("try").pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
@@ -472,13 +472,13 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
             }
             
 			c.pushOpeningCurlyBracket();
-			visitStatements(catchBlock.getBody(), c);
+			visit(catchBlock.getBody(), c);
 			c.pushClosingCurlyBracket();
 		}
 		
 		if(!block.getFinally().isEmpty()) {
 			c.pushKeyword("finally").pushOpeningCurlyBracket();
-			visitStatements(block.getFinally(), c);
+			visit(block.getFinally(), c);
 			c.pushClosingCurlyBracket();
 		}
 		
@@ -488,7 +488,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(IUncheckedBlock block, TokenizationContext c) {
 		c.pushKeyword("unchecked").pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -509,7 +509,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushClosingBracket();
 		
 		c.pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -522,7 +522,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 		c.pushClosingBracket();
 		
 		c.pushOpeningCurlyBracket();
-		visitStatements(block.getBody(), c);
+		visit(block.getBody(), c);
 		c.pushClosingCurlyBracket();
 		
 		return null;
@@ -654,7 +654,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	public Object visit(ILambdaExpression expr, TokenizationContext c) {
 		c.pushParameters(expr.getName().getParameters()).pushOperator("=>");
 		c.pushOpeningCurlyBracket();
-		visitStatements(expr.getBody(), c);
+		visit(expr.getBody(), c);
 		c.pushClosingCurlyBracket();
 		return null;
 	}
@@ -662,7 +662,7 @@ public class TokenizationVisitor extends TraversingVisitor<TokenizationContext, 
 	@Override
 	public Object visit(ILoopHeaderBlockExpression expr, TokenizationContext c) {
 		c.pushOpeningCurlyBracket();
-		visitStatements(expr.getBody(), c);
+		visit(expr.getBody(), c);
 		c.pushClosingCurlyBracket();
 		return null;
 	}

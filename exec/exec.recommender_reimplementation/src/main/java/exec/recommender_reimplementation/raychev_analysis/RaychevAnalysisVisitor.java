@@ -45,6 +45,7 @@ import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
@@ -57,10 +58,9 @@ import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
-import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 
-public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object> {
+public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<HistoryMap, Object> {
 
 	private PointsToQueryBuilder queryBuilder;
 
@@ -142,8 +142,8 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		block.getCondition().accept(this, historyMap);
 
 		HistoryMap cloneElseBranch = historyMap.clone();
-		visitStatements(block.getThen(), historyMap);
-		visitStatements(block.getElse(), cloneElseBranch);
+		visit(block.getThen(), historyMap);
+		visit(block.getElse(), cloneElseBranch);
 		historyMap.mergeInto(cloneElseBranch);
 
 		historyMap.checkForAbstractHistoryThreshold();
@@ -152,13 +152,13 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 
 	@Override
 	public Object visit(ITryBlock block, HistoryMap historyMap) {
-		visitStatements(block.getBody(), historyMap);
+		visit(block.getBody(), historyMap);
 
 		List<HistoryMap> tempListAbstractHistories = new ArrayList<>();
 
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			HistoryMap cloneCatchBlock = historyMap.clone();
-			visitStatements(catchBlock.getBody(), cloneCatchBlock);
+			visit(catchBlock.getBody(), cloneCatchBlock);
 			tempListAbstractHistories.add(cloneCatchBlock);
 		}
 
@@ -167,7 +167,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 		}
 
 		// finally block runs always
-		visitStatements(block.getFinally(), historyMap);
+		visit(block.getFinally(), historyMap);
 
 		historyMap.checkForAbstractHistoryThreshold();
 		return null;
@@ -207,7 +207,7 @@ public class RaychevAnalysisVisitor extends TraversingVisitor<HistoryMap, Object
 
 	@Override
 	public Object visit(IForLoop block, HistoryMap historyMap) {
-		visitStatements(block.getInit(), historyMap);
+		visit(block.getInit(), historyMap);
 		block.getCondition().accept(this, historyMap);
 
 		List<ISSTNode> loopedNodes = new ArrayList<>();

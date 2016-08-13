@@ -39,6 +39,7 @@ import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
+	public static final Path QUERY_FOLDER_PATH = Paths.get(FOLDERPATH.toString() + "\\Queries");
 
 	@SuppressWarnings("unchecked")
 	public static void sentenceBuilder() throws IOException {
@@ -52,7 +53,7 @@ public class RaychevRunner {
 		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
-			try (FileWriter fw = new FileWriter(FOLDERPATH + "\\train_all", true);
+			try (FileWriter fw = new FileWriter(QUERY_FOLDER_PATH + "\\train_all", true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter out = new PrintWriter(bw)) {
 				try {
@@ -71,7 +72,7 @@ public class RaychevRunner {
 	public static void queryBuilder() {
 		List<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = ContextReader.GetContexts(Paths.get(FOLDERPATH.toString() + "\\jimradford"));
+			contextList = ContextReader.GetContexts(QUERY_FOLDER_PATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -99,7 +100,7 @@ public class RaychevRunner {
 	private static void queryFromCompletionEvents() {
 		List<CompletionEvent> completionEventList = Lists.newLinkedList();
 		try {
-			completionEventList = ContextReader.GetCompletionEvents(Paths.get(FOLDERPATH.toString() + "\\Queries"));
+			completionEventList = ContextReader.GetCompletionEvents(QUERY_FOLDER_PATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -124,12 +125,12 @@ public class RaychevRunner {
 	}
 
 	private static void writeJavaFile(String javaCode, ISST sst) throws IOException {
-		FileUtils.writeStringToFile(new File(FOLDERPATH + "\\Queries" + "\\"
+		FileUtils.writeStringToFile(new File(QUERY_FOLDER_PATH.toString() + "\\"
 				+ sst.getEnclosingType().getName() + ".java"), javaCode);
 	}
 	
 	private static void writeClassPaths(Set<ISST> ssts) {
-		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(FOLDERPATH.toString()+ "\\Queries"); 
+		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(QUERY_FOLDER_PATH.toString()); 
 		try {
 			classPathGenerator.generate(ssts);
 		} catch (IOException e) {
@@ -138,8 +139,8 @@ public class RaychevRunner {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// sentenceBuilder();
-		queryBuilder();
+		sentenceBuilder();
+//		queryBuilder();
 //		queryFromCompletionEvents();
 	}
 

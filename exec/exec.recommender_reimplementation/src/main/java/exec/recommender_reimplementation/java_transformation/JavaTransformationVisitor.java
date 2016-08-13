@@ -49,6 +49,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.visitor.IdentityVisitor;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
@@ -59,7 +60,7 @@ import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
-public class JavaTransformationVisitor extends TraversingIdentityVisitor<Void> {
+public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 
 	private static final List<Class<?>> statementTypesToDelete = Lists.newArrayList(IGotoStatement.class,
 			IUnsafeBlock.class, IUnknownStatement.class, IEventSubscriptionStatement.class);
@@ -109,7 +110,7 @@ public class JavaTransformationVisitor extends TraversingIdentityVisitor<Void> {
 	@Override
 	public ISSTNode visit(IMethodDeclaration methodDecl, Void context) {
 		List<IStatement> statements = methodDecl.getBody();
-		visitStatements(statements, context);
+		visit(statements, context);
 		return methodDecl;
 	}
 
@@ -244,7 +245,7 @@ public class JavaTransformationVisitor extends TraversingIdentityVisitor<Void> {
 	}
 
 	@Override
-	protected void visitStatements(List<IStatement> statements, Void context) {
+	protected void visit(List<IStatement> statements, Void context) {
 		List<IStatement> statementsClone = new ArrayList<>(statements);
 		for (IStatement stmt : statementsClone) {
 			if (isStatementToDelete(stmt)) {

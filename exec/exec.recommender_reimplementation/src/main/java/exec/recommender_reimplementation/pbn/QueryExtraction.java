@@ -15,22 +15,21 @@
  */
 package exec.recommender_reimplementation.pbn;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-
+import static com.google.common.base.MoreObjects.firstNonNull;
+import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
-import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.Query;
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class QueryExtraction {
 	
@@ -49,7 +48,7 @@ public class QueryExtraction {
 		return queryExtractionVisitor.getQuery();
 	}
 	
-	public class QueryExtractionVisitor extends TraversingVisitor<Object,Object> {
+	public class QueryExtractionVisitor extends AbstractTraversingNodeVisitor<Object,Object> {
 		private UsageContextHelper usageContextHelper;
 
 		private IMethodDeclaration currentEntryPoint;

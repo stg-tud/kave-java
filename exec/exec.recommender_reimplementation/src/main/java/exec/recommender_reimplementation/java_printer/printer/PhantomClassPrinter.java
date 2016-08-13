@@ -37,5 +37,4 @@ public class PhantomClassPrinter extends JavaPrinter {
 		sb.append(printingContext.toString());
 		return sb.toString();
 	}
-
 }
