@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation.java_transformation;
+package cc.kave.commons.model.ssts.impl.visitor;
 
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
@@ -66,9 +66,8 @@ import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
-import cc.kave.commons.pointsto.analysis.visitors.TraversingVisitor;
 
-public class TraversingIdentityVisitor<TContext> extends TraversingVisitor<TContext,ISSTNode> {
+public class IdentityVisitor<TContext> extends AbstractTraversingNodeVisitor<TContext,ISSTNode> {
 
 	@Override
 	public ISSTNode visit(ISST sst, TContext context) {
@@ -150,6 +149,7 @@ public class TraversingIdentityVisitor<TContext> extends TraversingVisitor<TCont
 
 	@Override
 	public ISSTNode visit(IThrowStatement stmt, TContext context) {
+		super.visit(stmt,context);
 		return stmt;
 	}
 

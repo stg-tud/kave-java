@@ -17,11 +17,8 @@ package cc.kave.commons.model.ssts.impl.visitor;
 
 import static org.mockito.Mockito.mock;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
@@ -85,10 +82,11 @@ import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 
-public class AbstractTraversingNodeVisitorTest {
+public abstract class AbstractNodeVisitorBaseTest<TContext, TReturn> {
 
-	private AbstractTraversingNodeVisitor<Integer, Void> sut;
+	protected ISSTNodeVisitor<TContext, TReturn> sut;
 
 	private IStatement stmt1;
 	private IStatement stmt2;
@@ -109,7 +107,7 @@ public class AbstractTraversingNodeVisitorTest {
 		expr3 = mock(ISimpleExpression.class);
 		varRef = mock(IVariableReference.class);
 
-		sut = new TestVisitor();
+		sut = getTestVisitor();
 	}
 
 	@Test
@@ -494,16 +492,7 @@ public class AbstractTraversingNodeVisitorTest {
 
 	// ######## test helper ###########################################
 
-	private void assertVisitor(ISSTNode node, ISSTNode... ns) {
-		Void res = node.accept(sut, 12);
+	protected abstract void assertVisitor(ISSTNode node, ISSTNode... ns);
 
-		Assert.assertNull(res);
-
-		for (ISSTNode n : ns) {
-			Mockito.verify(n).accept(sut, 12);
-		}
-	}
-
-	public static class TestVisitor extends AbstractTraversingNodeVisitor<Integer, Void> {
-	}
+	protected abstract ISSTNodeVisitor<TContext,TReturn> getTestVisitor();
 }
