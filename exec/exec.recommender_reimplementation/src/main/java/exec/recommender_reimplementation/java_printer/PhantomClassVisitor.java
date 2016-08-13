@@ -72,6 +72,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 			addMethodDeclarationToSST(invocation, getOrCreateSST(type, context));
 			handleReceiverType(invocation, context);
 		}
+		// TODO: add phantom classes for method parameter types
 		return super.visit(invocation, context);
 	}
 

@@ -28,117 +28,202 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.EventName;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
+import cc.kave.commons.model.ssts.impl.references.EventReference;
+import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
 
-public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest{
-	
+public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
+
 	@Test
 	public void addsTypeOnVariableDeclaration() {
 		SST sst = defaultSST(declare("someVariable", type("T1")));
-		
-		Set<ITypeName> actual = getUsedTypes(sst);
-		
-		assertUsedTypeSet(actual, type("T1"));
+
+		assertUsedTypesForSST(sst, type("T1"));
 	}
-	
+
 	@Test
 	public void addsFieldTypeOnFieldReference() {
-		SST sst = defaultSST(assign(varRef("someVariable"),
+		SST sst = defaultSST(assign(
+				varRef("someVariable"),
 				refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-		
-		assertUsedTypeSet(actual, type("T1"));
+		assertUsedTypesForSST(sst, type("int"), type("T1"));
 	}
 
 	@Test
 	public void addsPropertyTypeOnPropertyReference() {
-		SST sst = defaultSST(assign(varRef("someVariable"),
-				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
+		SST sst = defaultSST(assign(
+				varRef("someVariable"),
+				refExpr(propertyReference(varRef("other"),
+						"get set [PropertyType,P1] [T1,P1].P"))));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-		
-		assertUsedTypeSet(actual, type("T1"));
+		assertUsedTypesForSST(sst, type("PropertyType"), type("T1"));
 	}
 
-	
 	@Test
 	public void addsTypeOnInvocation_ReferenceType() {
-		SST sst = defaultSST(invocationStatement(method(type("SomeType"), type("T1"), "m1")));
+		SST sst = defaultSST(invocationStatement(method(type("SomeType"),
+				type("T1"), "m1")));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-		
-		assertUsedTypeSet(actual, type("T1"));
+		assertUsedTypesForSST(sst,type("SomeType"), type("T1"));
 	}
 
 	@Test
 	public void addsTypeOnInvocation_SuperType() {
-		SST sst = defaultSST(invocationStatement("super", method(voidType, type("SuperT1"), "m1")));
+		SST sst = defaultSST(invocationStatement("super",
+				method(type("SomeType"), type("SuperT1"), "m1")));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
+		assertUsedTypesForSST(sst, type("SomeType"), type("SuperT1"));
+	}
+
+	@Test
+	public void addsTypeOfMethodParametersOnInvocation() {
+		SST sst = defaultSST(invocationStatement(
+				"other",
+				method(type("SomeType"), type("T1"), "m1", parameter(type("T2"), "p1"),
+						parameter(type("T3"), "p2"))));
+
+		assertUsedTypesForSST(sst, type("SomeType"), type("T1"), type("T2"), type("T3"));
+	}
+
+	@Test
+	public void addsTypeOfMethodParameterWhenInvokingMethodInSameClass() {
+		SST sst = defaultSST(invocationStatement("this",
+				method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"))));
+
+		assertUsedTypesForSST(sst, type("T2"));
+	}
+
+	@Test
+	public void addsTypeOfCatchBlockParameter() {
+		CatchBlock catchBlock1 = new CatchBlock();
+		catchBlock1.setParameter(parameter(type("SomeException"), "e"));
+		CatchBlock catchBlock2 = new CatchBlock();
+		catchBlock2.setParameter(parameter(type("OtherException"), "e"));
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setCatchBlocks(Lists.newArrayList(catchBlock1, catchBlock2));
+		SST sst = defaultSST(tryBlock);
+		assertUsedTypesForSST(sst, type("SomeException"), type("OtherException"));
+	}
+
+	@Test
+	public void addsTypesOnMethodReference() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(type("T1"), type("T2"), "m1"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+		assertUsedTypesForSST(sst, type("T1"), type("T2"));
+	}
+
+	@Test
+	public void addsMethodParameterOnMethodReference() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(voidType, type("T1"), "m1",
+				parameter(type("T2"), "p1")));
+		methodRef.setReference(varRef("this"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
 		
-		assertUsedTypeSet(actual, type("SuperT1"));
+		assertUsedTypesForSST(sst, type("T2"));
 	}
 	
 	@Test
-	public void ignoresFieldInSameClass() {
-		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
-				refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
+	public void addsTypeOnEventReference() {
+		EventReference eventRef = new EventReference();
+		eventRef.setEventName(EventName.newEventName("[T1,P1] [T2,P1].e"));
+		eventRef.setReference(varRef("other"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(eventRef)));
+		
+		assertUsedTypesForSST(sst, type("T1"), type("T2"));
+	}
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-
-		assertTrue(actual.isEmpty());
+	@Test
+	public void ignoresDeclaringTypeOnEventReferenceInSameClass() {
+		EventReference eventRef = new EventReference();
+		eventRef.setEventName(EventName.newEventName("[T2,P1] [T1,P1].e"));
+		eventRef.setReference(varRef("this"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(eventRef)));
+		
+		assertUsedTypesForSST(sst, type("T2"));
 	}
 	
 	@Test
-	public void ignoresInvocationOnSameClass() {
-		SST sst = defaultSST(type("T1"), invocationStatement(method(type("int"), type("T1"), "m1")));
+	public void ignoresDeclaringTypeOnFieldInSameClass() {
+		SST sst = defaultSST(
+				type("T1"),
+				assign(varRef("someVariable"),
+						refExpr(fieldRef("other",
+								field(type("int"), type("T1"), "f1")))));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-
-		assertTrue(actual.isEmpty());
+		assertUsedTypesForSST(sst, type("int"));
 	}
 
 	@Test
-	public void ignoresPropertyInSameClass() {
-		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
-				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
+	public void ignoresDeclaringTypeInInvocationOnSameClass() {
+		SST sst = defaultSST(type("T1"),
+				invocationStatement(method(type("int"), type("T1"), "m1")));
+		
+		assertUsedTypesForSST(sst, type("int"));
+	}
 
-		Set<ITypeName> actual = getUsedTypes(sst);
+	@Test
+	public void ignoresDeclaringTypeOnMethodOnSameClass() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(voidType, type("T1"), "m1"));
+		methodRef.setReference(varRef("this"));
+		SST sst = defaultSST(assign(varRef("someType"), refExpr(methodRef)));
+		
+		assertUsedTypesEmpty(sst);
+	}
 
-		assertTrue(actual.isEmpty());
+	@Test
+	public void ignoresDeclaringTypeOnPropertyInSameClass() {
+		SST sst = defaultSST(
+				type("T1"),
+				assign(varRef("someVariable"),
+						refExpr(propertyReference(varRef("other"),
+								"get set [PropertyType,P1] [T1,P1].P"))));
+
+		assertUsedTypesForSST(sst, type("PropertyType"));
 	}
 
 	@Test
 	public void ignoresJavaValueTypesInVariableDeclaration() {
 		SST sst = defaultSST(declare("someVar", type("System.Int32")));
 
-		Set<ITypeName> actual = getUsedTypes(sst);
-
-		assertTrue(actual.isEmpty());
+		assertUsedTypesEmpty(sst);
 	}
-	
+
 	@Test
 	public void returnsAssemblies() {
-		SST sst = defaultSST(invocationStatement(method(type("SomeType"), type("T1"), "m1")));
-		
+		SST sst = defaultSST(invocationStatement(method(type("SomeType"),
+				type("T1"), "m1")));
+
 		UsedTypesVisitor usedTypesVisitor = new UsedTypesVisitor();
 		sst.accept(usedTypesVisitor, null);
-		
+
 		Set<IAssemblyName> expected = Sets.newHashSet(type("T1").getAssembly());
 		Set<IAssemblyName> actual = usedTypesVisitor.getAssemblies();
-		
+
 		assertEquals(expected, actual);
 	}
 
-	private void assertUsedTypeSet(Set<ITypeName> actual, ITypeName... types) {
+	private void assertUsedTypesEmpty(SST sst) {
+		Set<ITypeName> actual = getUsedTypes(sst);
+		assertTrue(actual.isEmpty());
+	}
+
+	private void assertUsedTypesForSST(SST sst, ITypeName... types) {
+		Set<ITypeName> actual = getUsedTypes(sst);
 		Set<ITypeName> expected = Sets.newHashSet(types);
-		assertEquals(expected, actual);		
+		assertEquals(expected, actual);
 	}
 
 	private Set<ITypeName> getUsedTypes(SST sst) {

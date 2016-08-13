@@ -23,11 +23,9 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.referenceExprToVariable;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static exec.recommender_reimplementation.java_transformation.PropertyTransformationHelper.VOID_TYPE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
@@ -37,13 +35,15 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
+import com.google.common.collect.Lists;
+
 public class PropertyTransformationTest extends JavaTransformationBaseTest {
 
 	@Test
 	public void transformReturnsNullWhenInputIsNull() {
 		sut = new JavaTransformationVisitor(new SST());
-		assertEquals(null, sut.transform(null));
-		assertEquals(null, sut.transform(null, SST.class));
+		assertNull(sut.transform(null));
+		assertNull(null, sut.transform(null, SST.class));
 	}
 
 	@Test
