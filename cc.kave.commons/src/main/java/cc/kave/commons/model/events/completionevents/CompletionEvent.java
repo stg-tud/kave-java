@@ -21,8 +21,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
+import cc.kave.commons.model.events.EventTrigger;
 import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.Trigger;
 
 public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
@@ -33,7 +33,7 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 
 	public List<IProposalSelection> selections;
 
-	public Trigger terminatedBy;
+	public EventTrigger terminatedBy;
 
 	public TerminationState terminatedState;
 
@@ -77,7 +77,7 @@ public class CompletionEvent extends IDEEvent implements ICompletionEvent {
 	}
 
 	@Override
-	public Trigger getTerminatedBy() {
+	public EventTrigger getTerminatedBy() {
 		return terminatedBy;
 	}
 

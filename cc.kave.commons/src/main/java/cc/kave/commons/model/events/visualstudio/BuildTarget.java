@@ -15,6 +15,9 @@
  */
 package cc.kave.commons.model.events.visualstudio;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -27,9 +30,9 @@ public class BuildTarget {
 
 	public String SolutionConfiguration;
 
-	public String StartedAt;
+	public ZonedDateTime StartedAt;
 
-	public String Duration;
+	public Duration Duration;
 
 	public boolean Successful;
 

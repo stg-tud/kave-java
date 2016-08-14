@@ -32,6 +32,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.commons.utils.StringUtils;
 import cc.kave.commons.utils.ToStringUtils;
 
 public class SST implements ISST {
@@ -152,7 +153,7 @@ public class SST implements ISST {
 		result = prime * result + ((events == null) ? 0 : events.hashCode());
 		result = prime * result + ((fields == null) ? 0 : fields.hashCode());
 		result = prime * result + ((methods == null) ? 0 : methods.hashCode());
-		result = prime * result + ((partialClassIdentifier == null) ? 0 : partialClassIdentifier.hashCode());
+		result = prime * result + (StringUtils.isNullOrEmpty(partialClassIdentifier) ? 0 : partialClassIdentifier.hashCode());
 		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}
@@ -191,8 +192,8 @@ public class SST implements ISST {
 				return false;
 		} else if (!methods.equals(other.methods))
 			return false;
-		if (partialClassIdentifier == null) {
-			if (other.partialClassIdentifier != null)
+		if (StringUtils.isNullOrEmpty(partialClassIdentifier)) {
+			if (!StringUtils.isNullOrEmpty(other.partialClassIdentifier))
 				return false;
 		} else if (!partialClassIdentifier.equals(other.partialClassIdentifier))
 			return false;

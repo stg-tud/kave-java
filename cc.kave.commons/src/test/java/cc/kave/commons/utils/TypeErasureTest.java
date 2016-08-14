@@ -70,8 +70,8 @@ public class TypeErasureTest {
 
 	@Test
 	public void strangeNestingSyntax_unbound() {
-		String inp = "T`1+U`1[[G1],[G2],P";
-		String out = "T`1+U`1[[G1],[G2],P";
+		String inp = "T`1+U`1[[G1],[G2]],P";
+		String out = "T`1+U`1[[G1],[G2]],P";
 		assertRepl(inp, out);
 	}
 

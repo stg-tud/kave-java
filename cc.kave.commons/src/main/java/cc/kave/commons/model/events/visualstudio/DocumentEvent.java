@@ -16,9 +16,10 @@
 package cc.kave.commons.model.events.visualstudio;
 
 import cc.kave.commons.model.events.IDEEvent;
+import cc.kave.commons.model.naming.idecomponents.IDocumentName;
 
 public class DocumentEvent extends IDEEvent {
-	public String Document;
+	public IDocumentName Document;
 
 	public DocumentAction Action;
 }

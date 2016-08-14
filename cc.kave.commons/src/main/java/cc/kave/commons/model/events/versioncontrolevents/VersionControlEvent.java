@@ -18,8 +18,9 @@ package cc.kave.commons.model.events.versioncontrolevents;
 import java.util.List;
 
 import cc.kave.commons.model.events.IDEEvent;
+import cc.kave.commons.model.naming.idecomponents.ISolutionName;
 
 public class VersionControlEvent extends IDEEvent {
 	public List<VersionControlAction> Actions;
-	public String Solution;
+	public ISolutionName Solution;
 }

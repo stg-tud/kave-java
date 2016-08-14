@@ -16,18 +16,18 @@
 
 package cc.kave.commons.model.events.completionevents;
 
-import javax.annotation.Nonnull;
+import java.time.Duration;
+
 import javax.annotation.Nullable;
 
 public interface IProposalSelection {
 
-	@Nonnull
 	IProposal getProposal();
 
 	@Nullable
-	String getSelectedAfter();
-	
+	Duration getSelectedAfter();
+
 	int getIndex();
-	
+
 	void setIndex(int index);
 }

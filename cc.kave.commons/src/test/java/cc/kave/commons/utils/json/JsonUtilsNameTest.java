@@ -54,6 +54,7 @@ import cc.kave.commons.testutils.ParameterData;
 import cc.kave.commons.utils.naming.NameSerialization;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.naming.TestCaseName;
 
 @RunWith(JUnitParamsRunner.class)
 public class JsonUtilsNameTest {
@@ -83,7 +84,8 @@ public class JsonUtilsNameTest {
 
 	@Test
 	@Parameters(method = "provideSerializationExamples")
-	public void deserialization(IName expected, Class<?> type) {
+	@TestCaseName("{2}")
+	public void deserialization(IName expected, Class<?> type, String tcn) {
 		String str = NameSerialization.serialize(expected);
 		String json = f("\"%s\"", str);
 		Object actual = JsonUtils.fromJson(json, type);
@@ -92,7 +94,8 @@ public class JsonUtilsNameTest {
 
 	@Test
 	@Parameters(method = "provideSerializationExamples")
-	public void serialization(IName n, Class<?> type) {
+	@TestCaseName("{2}")
+	public void serialization(IName n, Class<?> type, String tcn) {
 		String str = NameSerialization.serialize(n);
 		String expected = f("\"%s\"", str);
 		String actual = JsonUtils.toJson(n, type);
@@ -103,7 +106,8 @@ public class JsonUtilsNameTest {
 		ParameterData d = new ParameterData();
 		for (IName n : names) {
 			for (Class<?> c : getHierarchy(n.getClass())) {
-				d.add(n, c);
+				String testCaseName = f("%s as %s", n.getClass().getSimpleName(), c.getSimpleName());
+				d.add(n, c, testCaseName);
 			}
 		}
 		return d.toArray();

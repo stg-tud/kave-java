@@ -16,7 +16,7 @@
 
 package cc.kave.commons.model.events;
 
-public enum Trigger {
+public enum EventTrigger {
 	// keep order and mixed case to stay consistent to C#
 	Unknown, // default
 	Click, Shortcut, Typing, Automatic

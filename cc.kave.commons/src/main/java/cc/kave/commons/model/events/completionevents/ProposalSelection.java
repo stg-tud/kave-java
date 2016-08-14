@@ -16,18 +16,21 @@
 
 package cc.kave.commons.model.events.completionevents;
 
+import java.time.Duration;
+
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import javax.annotation.Nullable;
 
 public class ProposalSelection implements IProposalSelection {
 
 	public IProposal Proposal;
 
 	@Nullable
-	public String SelectedAfter;
+	public Duration SelectedAfter;
 	
 	public int index;
 
@@ -47,7 +50,7 @@ public class ProposalSelection implements IProposalSelection {
 	}
 
 	@Override
-	public String getSelectedAfter() {
+	public Duration getSelectedAfter() {
 		return SelectedAfter;
 	}
 

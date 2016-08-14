@@ -21,7 +21,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.model.events.Trigger;
+import cc.kave.commons.model.events.EventTrigger;
 
 public interface ICompletionEvent extends IIDEEvent {
 
@@ -38,7 +38,7 @@ public interface ICompletionEvent extends IIDEEvent {
 	public IProposal getLastSelectedProposal();
 
 	@Nonnull
-	public Trigger getTerminatedBy();
+	public EventTrigger getTerminatedBy();
 
 	@Nonnull
 	public TerminationState getTerminatedState();

@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-public interface IProjectName {
+public interface IProjectName extends IIDEComponentName {
 	String getType();
 
 	String getName();

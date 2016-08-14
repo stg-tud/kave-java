@@ -15,11 +15,13 @@
  */
 package cc.kave.commons.model.events.versioncontrolevents;
 
+import java.time.ZonedDateTime;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class VersionControlAction {
-	public String ExecutedAt;
+	public ZonedDateTime ExecutedAt;
 	public VersionControlActionType ActionType;
 
 	@Override

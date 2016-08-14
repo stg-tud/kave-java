@@ -46,7 +46,7 @@ public class SSTTest {
 		SST sut = new SST();
 
 		assertThat(Names.getUnknownType(), equalTo(sut.getEnclosingType()));
-		assertThat("", equalTo(sut.getPartialClassIdentifier()));
+		assertThat(null, equalTo(sut.getPartialClassIdentifier()));
 		assertThat(new HashSet<IDelegateDeclaration>(), equalTo(sut.getDelegates()));
 		assertThat(new HashSet<IEventDeclaration>(), equalTo(sut.getEvents()));
 		assertThat(new HashSet<IFieldDeclaration>(), equalTo(sut.getFields()));
@@ -86,6 +86,20 @@ public class SSTTest {
 
 		assertThat(a, equalTo(b));
 		assertThat(a.hashCode(), equalTo(b.hashCode()));
+	}
+
+	@Test
+	public void testEqualityOfLegacyPartialClassIdentifier() {
+		SST a = new SST();
+		a.setPartialClassIdentifier(null);
+		SST b = new SST();
+		a.setPartialClassIdentifier("");
+
+		assertThat(a, equalTo(b));
+		assertThat(a.hashCode(), equalTo(b.hashCode()));
+
+		assertThat(b, equalTo(a));
+		assertThat(b.hashCode(), equalTo(a.hashCode()));
 	}
 
 	@Test

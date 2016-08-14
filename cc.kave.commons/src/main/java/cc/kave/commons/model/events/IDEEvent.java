@@ -16,6 +16,7 @@
 
 package cc.kave.commons.model.events;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import javax.annotation.Nullable;
@@ -25,7 +26,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-// TODO use correct types instead of just "String"
+import cc.kave.commons.model.naming.idecomponents.IDocumentName;
+import cc.kave.commons.model.naming.idecomponents.IWindowName;
+
 public abstract class IDEEvent implements IIDEEvent {
 
 	public String IDESessionUUID;
@@ -42,16 +45,16 @@ public abstract class IDEEvent implements IIDEEvent {
 
 	@Override
 	public ZonedDateTime getTerminatedAt() {
-		throw new RuntimeException("not implemented yet");
+		return TriggeredAt.plus(Duration);
 	}
 
-	public Trigger TriggeredBy;
+	public EventTrigger TriggeredBy;
 
 	@Nullable
-	public String Duration;
+	public Duration Duration;
 
-	public String ActiveWindow;
-	public String ActiveDocument;
+	public IWindowName ActiveWindow;
+	public IDocumentName ActiveDocument;
 
 	@Override
 	public boolean equals(Object obj) {

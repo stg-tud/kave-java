@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -38,12 +39,12 @@ import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.events.ActivityEvent;
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.ErrorEvent;
+import cc.kave.commons.model.events.EventTrigger;
 import cc.kave.commons.model.events.InfoEvent;
 import cc.kave.commons.model.events.NavigationEvent;
 import cc.kave.commons.model.events.NavigationType;
 import cc.kave.commons.model.events.SystemEvent;
 import cc.kave.commons.model.events.SystemEventType;
-import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.Proposal;
@@ -197,8 +198,9 @@ public abstract class JsonUtils {
 		GsonBuilder gb = new GsonBuilder();
 
 		// add support for new Java 8 date/time framework
-		Converters.registerAll(gb);
 		gb.registerTypeHierarchyAdapter(LocalDateTime.class, new LocalDateTimeConverter());
+		Converters.registerAll(gb);
+		gb.registerTypeAdapter(Duration.class, new DurationConverter());
 
 		GsonUtil.addTypeAdapters(gb);
 
@@ -292,7 +294,7 @@ public abstract class JsonUtils {
 				WindowEvent.class,
 				// general
 				ActivityEvent.class, CommandEvent.class, ErrorEvent.class, InfoEvent.class, NavigationEvent.class,
-				NavigationType.class, SystemEvent.class, SystemEventType.class, Trigger.class };
+				NavigationType.class, SystemEvent.class, SystemEventType.class, EventTrigger.class };
 
 		Map<Class, Set<Class>> subclasses = Maps.newHashMap();
 
@@ -343,11 +345,20 @@ public abstract class JsonUtils {
 
 		GsonNameDeserializer nameAdapter = new GsonNameDeserializer();
 
+		Set<Class<?>> allNamesInHierarchy = Sets.newHashSet();
+
 		for (Class<?> concreteName : names) {
-			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName, false)) {
-				gb.registerTypeAdapter(nameType, nameAdapter);
+			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName, true)) {
+				// gb.registerTypeAdapter(nameType, nameAdapter);
+				allNamesInHierarchy.add(nameType);
 			}
 		}
+		System.out.println("#### registering: ####");
+		for (Class<?> concreteName : allNamesInHierarchy) {
+			System.out.println(concreteName);
+			gb.registerTypeAdapter(concreteName, nameAdapter);
+		}
+
 	}
 
 	private static <T extends Enum<T>> void registerEnum(GsonBuilder gb, Class<T> e) {
@@ -375,20 +386,11 @@ public abstract class JsonUtils {
 
 	@SafeVarargs
 	private static <T> void registerHierarchy(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
-
-		System.out.printf("<< %s >>\n", type.getSimpleName());
-		for (Class c : subtypes) {
-			System.out.printf("- %s\n", c.getSimpleName());
-		}
-		System.out.println();
-
 		Asserts.assertTrue(subtypes.length > 0);
-
 		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
 		for (int i = 0; i < subtypes.length; i++) {
 			factory = factory.registerSubtype(subtypes[i]);
 		}
-
 		gsonBuilder.registerTypeAdapterFactory(factory);
 	}
 

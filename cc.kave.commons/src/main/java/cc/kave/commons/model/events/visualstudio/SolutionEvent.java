@@ -16,8 +16,9 @@
 package cc.kave.commons.model.events.visualstudio;
 
 import cc.kave.commons.model.events.IDEEvent;
+import cc.kave.commons.model.naming.idecomponents.IIDEComponentName;
 
 public class SolutionEvent extends IDEEvent {
 	public SolutionAction Action;
-	public String Target;
+	public IIDEComponentName Target;
 }

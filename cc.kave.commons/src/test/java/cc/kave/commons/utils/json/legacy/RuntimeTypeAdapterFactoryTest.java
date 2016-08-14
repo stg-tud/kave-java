@@ -16,6 +16,8 @@
 
 package cc.kave.commons.utils.json.legacy;
 
+import org.junit.Ignore;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -156,7 +158,8 @@ public final class RuntimeTypeAdapterFactoryTest extends TestCase {
     }
   }
 
-  public void testSerializeCollidingTypeFieldName() {
+  @Ignore("disaled in kave adapted version of the RuntimeTypeAdapter")
+  public void t_estSerializeCollidingTypeFieldName() {
     TypeAdapterFactory billingAdapter = RuntimeTypeAdapterFactory.of(BillingInstrument.class, "cvv")
         .registerSubtype(CreditCard.class);
     Gson gson = new GsonBuilder()

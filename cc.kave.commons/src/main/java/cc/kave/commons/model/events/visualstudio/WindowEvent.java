@@ -16,8 +16,9 @@
 package cc.kave.commons.model.events.visualstudio;
 
 import cc.kave.commons.model.events.IDEEvent;
+import cc.kave.commons.model.naming.idecomponents.IWindowName;
 
 public class WindowEvent extends IDEEvent {
-	public String Window;
+	public IWindowName Window;
 	public WindowAction Action;
 }

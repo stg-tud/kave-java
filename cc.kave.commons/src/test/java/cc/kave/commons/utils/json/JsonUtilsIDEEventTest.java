@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.junit.Test;
@@ -58,8 +60,12 @@ import junitparams.naming.TestCaseName;
 @RunWith(JUnitParamsRunner.class)
 public class JsonUtilsIDEEventTest {
 
-	// TODO do nto change...
-	private String jsonIn = "[\n" + //
+	/*
+	 * this string is automatically generated, do not edit it manually! In case
+	 * you encounter a bug, fix it on C#, regenerate the string and only then
+	 * fix it on Java.
+	 */
+	private static final String jsonIn = "[\n" + //
 			"    {\n" + //
 			"        \"$type\": \"KaVE.Commons.Model.Events.CompletionEvents.CompletionEvent, KaVE.Commons\",\n" + //
 			"        \"Context2\": {\n" + //
@@ -101,6 +107,15 @@ public class JsonUtilsIDEEventTest {
 			"                },\n" + //
 			"                \"SelectedAfter\": \"00:00:01\",\n" + //
 			"                \"Index\": -1\n" + //
+			"            },\n" + //
+			"            {\n" + //
+			"                \"$type\": \"KaVE.Commons.Model.Events.CompletionEvents.ProposalSelection, KaVE.Commons\",\n"
+			+ //
+			"                \"Proposal\": {\n" + //
+			"                    \"$type\": \"KaVE.Commons.Model.Events.CompletionEvents.Proposal, KaVE.Commons\"\n" + //
+			"                },\n" + //
+			"                \"SelectedAfter\": \"429.04:05:06.0070008\",\n" + //
+			"                \"Index\": -1\n" + //
 			"            }\n" + //
 			"        ],\n" + //
 			"        \"TerminatedBy\": 2,\n" + //
@@ -108,7 +123,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"ProposalCount\": 3,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6421984+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.917521+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -127,7 +142,7 @@ public class JsonUtilsIDEEventTest {
 			"        ],\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6501399+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9267619+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -152,7 +167,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Comment\": \"c\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6518024+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9280584+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -164,14 +179,14 @@ public class JsonUtilsIDEEventTest {
 			"            {\n" + //
 			"                \"$type\": \"KaVE.Commons.Model.Events.VersionControlEvents.VersionControlAction, KaVE.Commons\",\n"
 			+ //
-			"                \"ExecutedAt\": \"2016-08-14T03:02:23.6529485+02:00\",\n" + //
+			"                \"ExecutedAt\": \"2016-08-14T16:56:15.9300888+02:00\",\n" + //
 			"                \"ActionType\": 4\n" + //
 			"            }\n" + //
 			"        ],\n" + //
 			"        \"Solution\": \"0Sln:s\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6540815+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9300888+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"Duration\": \"00:00:02\",\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
@@ -188,14 +203,14 @@ public class JsonUtilsIDEEventTest {
 			"                \"ProjectConfiguration\": \"pcfg\",\n" + //
 			"                \"Platform\": \"plt\",\n" + //
 			"                \"SolutionConfiguration\": \"scfg\",\n" + //
-			"                \"StartedAt\": \"2016-08-14T03:02:23.6550946+02:00\",\n" + //
+			"                \"StartedAt\": \"2016-08-14T16:56:15.9324111+02:00\",\n" + //
 			"                \"Duration\": \"00:00:12\",\n" + //
 			"                \"Successful\": true\n" + //
 			"            }\n" + //
 			"        ],\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6550946+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9324111+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -207,7 +222,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Action\": \"a\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6569209+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9354743+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -218,7 +233,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Action\": 0,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6569209+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9354743+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -250,7 +265,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"SizeOfChanges\": 2,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6579113+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9354743+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -260,7 +275,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Cancelled\": true,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6579113+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9354743+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -276,7 +291,7 @@ public class JsonUtilsIDEEventTest {
 			"        ],\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6590059+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9390492+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -286,7 +301,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"PluginVersion\": \"pv\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6599216+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9397642+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -297,7 +312,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Target\": \"0Doc:d d\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6599216+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9406912+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -308,7 +323,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"NewPluginVersion\": \"n\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6610352+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9416213+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -319,7 +334,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Action\": 3,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6610352+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9416213+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -328,7 +343,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"$type\": \"KaVE.Commons.Model.Events.ActivityEvent, KaVE.Commons\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6610352+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9426665+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -338,7 +353,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"CommandId\": \"cid\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6610352+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9426665+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -352,7 +367,7 @@ public class JsonUtilsIDEEventTest {
 			"        ],\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6622018+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9437073+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -362,7 +377,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Info\": \"info\",\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6629044+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9456456+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -374,7 +389,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"TypeOfNavigation\": 1,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6629044+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9462161+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //
@@ -384,7 +399,7 @@ public class JsonUtilsIDEEventTest {
 			"        \"Type\": 6,\n" + //
 			"        \"IDESessionUUID\": \"sid\",\n" + //
 			"        \"KaVEVersion\": \"vX\",\n" + //
-			"        \"TriggeredAt\": \"2016-08-14T03:02:23.6640509+02:00\",\n" + //
+			"        \"TriggeredAt\": \"2016-08-14T16:56:15.9467643+02:00\",\n" + //
 			"        \"TriggeredBy\": 3,\n" + //
 			"        \"ActiveWindow\": \"0Win:w w\",\n" + //
 			"        \"ActiveDocument\": \"0Doc:d d\"\n" + //

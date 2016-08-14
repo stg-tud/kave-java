@@ -15,9 +15,7 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-import cc.kave.commons.model.naming.IName;
-
-public interface IWindowName extends IName {
+public interface IWindowName extends IIDEComponentName {
 
 	String getType();
 

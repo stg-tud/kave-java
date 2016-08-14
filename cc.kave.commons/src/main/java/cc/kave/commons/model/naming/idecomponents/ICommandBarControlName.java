@@ -15,10 +15,9 @@
  */
 package cc.kave.commons.model.naming.idecomponents;
 
-import cc.kave.commons.model.naming.IName;
 import cc.recommenders.annotations.Nullable;
 
-public interface ICommandBarControlName extends IName {
+public interface ICommandBarControlName extends IIDEComponentName {
 
 	@Nullable
 	ICommandBarControlName getParent();

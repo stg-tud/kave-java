@@ -15,6 +15,8 @@
  */
 package cc.kave.commons.model.events.testrunevents;
 
+import java.time.Duration;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -23,7 +25,7 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 public class TestCaseResult {
 	public IMethodName TestMethod;
 	public String Parameters;
-	public String Duration;
+	public Duration Duration;
 	public TestResult Result;
 
 	@Override
