@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.typeshapes;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
@@ -30,11 +30,11 @@ public class TypeHierarchy implements ITypeHierarchy {
 	@SerializedName("Extends")
 	private ITypeHierarchy _extends;
 	@SerializedName("Implements")
-	private Set<ITypeHierarchy> _implements;
+	private LinkedHashSet<ITypeHierarchy> _implements;
 
 	public TypeHierarchy() {
 		this.element = Names.getUnknownType();
-		this._implements = new HashSet<>();
+		this._implements = new LinkedHashSet<>();
 	}
 
 	public TypeHierarchy(String elementQualifiedName) {
@@ -45,8 +45,9 @@ public class TypeHierarchy implements ITypeHierarchy {
 		this._extends = _extends;
 	}
 
-	public void setImplements(Set<ITypeHierarchy> _implements) {
-		this._implements = _implements;
+	public void setImplements(Set<ITypeHierarchy> th) {
+		this._implements.clear();
+		this._implements.addAll(th);
 	}
 
 	public void setElement(ITypeName element) {

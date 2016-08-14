@@ -24,5 +24,4 @@ package cc.kave.commons.model.naming.impl.v0.types;
  * Java specific checks, implementation details, instantiation checks, or alike.
  */
 public class DelegateTypeNameTest {
-
 }

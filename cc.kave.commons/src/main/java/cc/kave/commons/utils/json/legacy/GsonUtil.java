@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import cc.kave.commons.utils.json.LocalDateTimeConverter;
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import cc.recommenders.assertions.Throws;
 import cc.recommenders.names.CoReFieldName;
@@ -92,10 +90,6 @@ public class GsonUtil {
 		// builder.setPrettyPrinting();
 		// builder.setDateFormat("dd.MM.yyyy HH:mm:ss");
 		builder.registerTypeAdapter(Date.class, new ISO8601DateParser());
-
-		// add support for new Java 8 date/time framework
-		// Converters.registerAll(builder);
-		builder.registerTypeHierarchyAdapter(LocalDateTime.class, new LocalDateTimeConverter());
 
 		builder.registerTypeAdapter(Multimap.class, new MultimapTypeAdapter());
 		//

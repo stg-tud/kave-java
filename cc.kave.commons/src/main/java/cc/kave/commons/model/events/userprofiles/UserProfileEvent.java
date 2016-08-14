@@ -41,4 +41,6 @@ public class UserProfileEvent extends IDEEvent {
 	public Likert7Point ProgrammingGeneral;
 
 	public Likert7Point ProgrammingCSharp;
+	
+	public String Comment;
 }

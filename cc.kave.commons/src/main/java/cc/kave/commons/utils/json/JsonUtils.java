@@ -20,11 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -34,7 +38,6 @@ import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.events.ActivityEvent;
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.ErrorEvent;
-import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.InfoEvent;
 import cc.kave.commons.model.events.NavigationEvent;
 import cc.kave.commons.model.events.NavigationType;
@@ -43,12 +46,10 @@ import cc.kave.commons.model.events.SystemEventType;
 import cc.kave.commons.model.events.Trigger;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.kave.commons.model.events.completionevents.IProposal;
-import cc.kave.commons.model.events.completionevents.IProposalSelection;
 import cc.kave.commons.model.events.completionevents.Proposal;
 import cc.kave.commons.model.events.completionevents.ProposalSelection;
 import cc.kave.commons.model.events.completionevents.TerminationState;
+import cc.kave.commons.model.events.testrunevents.TestCaseResult;
 import cc.kave.commons.model.events.testrunevents.TestResult;
 import cc.kave.commons.model.events.testrunevents.TestRunEvent;
 import cc.kave.commons.model.events.userprofiles.Educations;
@@ -56,9 +57,11 @@ import cc.kave.commons.model.events.userprofiles.Likert7Point;
 import cc.kave.commons.model.events.userprofiles.Positions;
 import cc.kave.commons.model.events.userprofiles.UserProfileEvent;
 import cc.kave.commons.model.events.userprofiles.YesNoUnknown;
+import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import cc.kave.commons.model.events.visualstudio.BuildTarget;
 import cc.kave.commons.model.events.visualstudio.DebuggerEvent;
 import cc.kave.commons.model.events.visualstudio.DebuggerMode;
 import cc.kave.commons.model.events.visualstudio.DocumentAction;
@@ -173,9 +176,6 @@ import cc.kave.commons.model.ssts.references.IAssignableReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
-import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
@@ -186,25 +186,42 @@ import cc.recommenders.assertions.Throws;
 public abstract class JsonUtils {
 
 	private static Gson gson;
+	private static Gson gsonPretty;
 
 	static {
+		gson = createBuilder().create();
+		gsonPretty = createBuilder().setPrettyPrinting().create();
+	}
+
+	private static GsonBuilder createBuilder() {
 		GsonBuilder gb = new GsonBuilder();
+
+		// add support for new Java 8 date/time framework
+		Converters.registerAll(gb);
+		gb.registerTypeHierarchyAdapter(LocalDateTime.class, new LocalDateTimeConverter());
 
 		GsonUtil.addTypeAdapters(gb);
 
 		registerNames(gb);
+		registerSST(gb);
+		registerEvents(gb);
 
-		// events
-		registerHierarchy(gb, IIDEEvent.class,
-				// general
-				ActivityEvent.class, CommandEvent.class, ErrorEvent.class, InfoEvent.class, NavigationEvent.class,
-				SystemEvent.class,
-				// visual studio
-				BuildEvent.class, DebuggerEvent.class, DocumentEvent.class, EditEvent.class, FindEvent.class,
-				IDEStateEvent.class, InstallEvent.class, SolutionEvent.class, UpdateEvent.class, WindowEvent.class,
-				// complex events
-				CompletionEvent.class, TestRunEvent.class, UserProfileEvent.class, VersionControlEvent.class);
+		// enums
+		gb.registerTypeAdapter(EventKind.class, EnumDeSerializer.create(EventKind.values()));
+		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
+		gb.registerTypeAdapter(EventSubscriptionOperation.class,
+				EnumDeSerializer.create(EventSubscriptionOperation.values()));
+		gb.registerTypeAdapter(CastOperator.class, EnumDeSerializer.create(CastOperator.values()));
+		gb.registerTypeAdapter(BinaryOperator.class, EnumDeSerializer.create(BinaryOperator.values()));
+		gb.registerTypeAdapter(UnaryOperator.class, EnumDeSerializer.create(UnaryOperator.values()));
 
+		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
+		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
+
+		return gb;
+	}
+
+	private static void registerSST(GsonBuilder gb) {
 		// SST Model
 		registerHierarchy(gb, ISST.class, SST.class);
 		// Declarations
@@ -253,50 +270,53 @@ public abstract class JsonUtils {
 
 		registerHierarchy(gb, ICatchBlock.class, CatchBlock.class);
 		registerHierarchy(gb, ICaseBlock.class, CaseBlock.class);
+	}
 
-		// Context
-		registerHierarchy(gb, Context.class, Context.class);
-		registerHierarchy(gb, ITypeShape.class, TypeShape.class);
-		registerHierarchy(gb, IMethodHierarchy.class, MethodHierarchy.class);
-		registerHierarchy(gb, ITypeHierarchy.class, TypeHierarchy.class);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void registerEvents(GsonBuilder gb) {
 
-		// completion event
-		registerHierarchy(gb, ICompletionEvent.class, CompletionEvent.class);
-		registerHierarchy(gb, CompletionEvent.class, CompletionEvent.class);
-		registerHierarchy(gb, IProposal.class, Proposal.class);
-		registerHierarchy(gb, IProposalSelection.class, ProposalSelection.class);
+		Class<?>[] eventsAndRelatedTypes = new Class<?>[] {
+				// completion events
+				CompletionEvent.class, TerminationState.class, Proposal.class, ProposalSelection.class, Context.class,
+				TypeShape.class, MethodHierarchy.class, TypeHierarchy.class,
+				// test run events
+				TestRunEvent.class, TestResult.class, TestCaseResult.class,
+				// user profile event
+				UserProfileEvent.class, Educations.class, Likert7Point.class, Positions.class, YesNoUnknown.class,
+				// version control
+				VersionControlEvent.class, VersionControlAction.class, VersionControlActionType.class,
+				// visual studio
+				BuildEvent.class, BuildTarget.class, DebuggerEvent.class, DebuggerMode.class, DocumentEvent.class,
+				DocumentAction.class, EditEvent.class, FindEvent.class, IDEStateEvent.class, InstallEvent.class,
+				LifecyclePhase.class, SolutionAction.class, SolutionEvent.class, UpdateEvent.class, WindowAction.class,
+				WindowEvent.class,
+				// general
+				ActivityEvent.class, CommandEvent.class, ErrorEvent.class, InfoEvent.class, NavigationEvent.class,
+				NavigationType.class, SystemEvent.class, SystemEventType.class, Trigger.class };
 
-		// enums
-		// registerEnum(gb, Trigger.class);
-		gb.registerTypeAdapter(Trigger.class, EnumDeSerializer.create(Trigger.values()));
-		gb.registerTypeAdapter(LifecyclePhase.class, EnumDeSerializer.create(LifecyclePhase.values()));
-		gb.registerTypeAdapter(SolutionAction.class, EnumDeSerializer.create(SolutionAction.values()));
-		gb.registerTypeAdapter(VersionControlActionType.class,
-				EnumDeSerializer.create(VersionControlActionType.values()));
-		gb.registerTypeAdapter(DocumentAction.class, EnumDeSerializer.create(DocumentAction.values()));
-		gb.registerTypeAdapter(WindowAction.class, EnumDeSerializer.create(WindowAction.values()));
-		gb.registerTypeAdapter(NavigationType.class, EnumDeSerializer.create(NavigationType.values()));
-		gb.registerTypeAdapter(DebuggerMode.class, EnumDeSerializer.create(DebuggerMode.values()));
-		gb.registerTypeAdapter(Educations.class, EnumDeSerializer.create(Educations.values()));
-		gb.registerTypeAdapter(Positions.class, EnumDeSerializer.create(Positions.values()));
-		gb.registerTypeAdapter(YesNoUnknown.class, EnumDeSerializer.create(YesNoUnknown.values()));
-		gb.registerTypeAdapter(Likert7Point.class, EnumDeSerializer.create(Likert7Point.values()));
-		gb.registerTypeAdapter(SystemEventType.class, EnumDeSerializer.create(SystemEventType.values()));
-		gb.registerTypeAdapter(TestResult.class, EnumDeSerializer.create(TestResult.values()));
+		Map<Class, Set<Class>> subclasses = Maps.newHashMap();
 
-		gb.registerTypeAdapter(EventKind.class, EnumDeSerializer.create(EventKind.values()));
-		gb.registerTypeAdapter(TerminationState.class, EnumDeSerializer.create(TerminationState.values()));
-		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
-		gb.registerTypeAdapter(EventSubscriptionOperation.class,
-				EnumDeSerializer.create(EventSubscriptionOperation.values()));
-		gb.registerTypeAdapter(CastOperator.class, EnumDeSerializer.create(CastOperator.values()));
-		gb.registerTypeAdapter(BinaryOperator.class, EnumDeSerializer.create(BinaryOperator.values()));
-		gb.registerTypeAdapter(UnaryOperator.class, EnumDeSerializer.create(UnaryOperator.values()));
+		for (Class<?> elem : eventsAndRelatedTypes) {
+			if (elem.isEnum()) {
+				registerEnum(gb, (Class<Enum>) elem);
+			} else {
+				for (Class<?> c : getAllTypesFromHierarchyExceptObject(elem, false)) {
+					Set<Class> set = subclasses.get(c);
+					if (set == null) {
+						set = Sets.newHashSet();
+						subclasses.put(c, set);
+					}
+					set.add(elem);
+				}
+				registerHierarchy(gb, elem, new Class[] { elem });
+			}
+		}
 
-		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
-		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
-
-		gson = gb.create();
+		for (Class base : subclasses.keySet()) {
+			Set<Class> subs = subclasses.get(base);
+			Class[] arr = subs.toArray(new Class[0]);
+			registerHierarchy(gb, base, arr);
+		}
 	}
 
 	private static void registerNames(GsonBuilder gb) {
@@ -324,34 +344,44 @@ public abstract class JsonUtils {
 		GsonNameDeserializer nameAdapter = new GsonNameDeserializer();
 
 		for (Class<?> concreteName : names) {
-			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName)) {
+			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName, false)) {
 				gb.registerTypeAdapter(nameType, nameAdapter);
 			}
 		}
 	}
 
 	private static <T extends Enum<T>> void registerEnum(GsonBuilder gb, Class<T> e) {
-		gb.registerTypeAdapter(e, EnumDeSerializer.create(e.getEnumConstants()));
+		T[] constants = e.getEnumConstants();
+		gb.registerTypeAdapter(e, EnumDeSerializer.create(constants));
 	}
 
-	private static Set<Class<?>> getAllTypesFromHierarchyExceptObject(Class<?> elem) {
+	private static Set<Class<?>> getAllTypesFromHierarchyExceptObject(Class<?> elem, boolean includeElem) {
 		Set<Class<?>> hierarchy = Sets.newHashSet();
 		if (elem == null || elem.equals(Object.class)) {
 			return hierarchy;
 		}
 
-		hierarchy.add(elem);
+		if (includeElem) {
+			hierarchy.add(elem);
+		}
 
 		for (Class<?> i : elem.getInterfaces()) {
-			hierarchy.addAll(getAllTypesFromHierarchyExceptObject(i));
+			hierarchy.addAll(getAllTypesFromHierarchyExceptObject(i, true));
 		}
-		hierarchy.addAll(getAllTypesFromHierarchyExceptObject(elem.getSuperclass()));
+		hierarchy.addAll(getAllTypesFromHierarchyExceptObject(elem.getSuperclass(), true));
 
 		return hierarchy;
 	}
 
 	@SafeVarargs
 	private static <T> void registerHierarchy(GsonBuilder gsonBuilder, Class<T> type, Class<? extends T>... subtypes) {
+
+		System.out.printf("<< %s >>\n", type.getSimpleName());
+		for (Class c : subtypes) {
+			System.out.printf("- %s\n", c.getSimpleName());
+		}
+		System.out.println();
+
 		Asserts.assertTrue(subtypes.length > 0);
 
 		RuntimeTypeAdapterFactory<T> factory = RuntimeTypeAdapterFactory.of(type, "$type");
@@ -374,6 +404,11 @@ public abstract class JsonUtils {
 
 	public static <T> String toJson(Object obj) {
 		String json = gson.toJson(obj);
+		return TypeUtil.toCSharpTypeNames(json);
+	}
+
+	public static <T> String toJsonFormatted(Object obj) {
+		String json = gsonPretty.toJson(obj).replace("  ", "    ");
 		return TypeUtil.toCSharpTypeNames(json);
 	}
 

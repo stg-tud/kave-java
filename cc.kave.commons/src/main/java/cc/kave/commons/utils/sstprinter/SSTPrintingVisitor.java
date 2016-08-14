@@ -125,11 +125,11 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 
 		context.indentationLevel++;
 
-		appendMemberDeclarationGroup(context, sst.getDelegates().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(context, sst.getEvents().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(context, sst.getFields().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(context, sst.getProperties().stream().collect(Collectors.toSet()), 1, 2);
-		appendMemberDeclarationGroup(context, sst.getMethods().stream().collect(Collectors.toSet()), 2, 1);
+		appendMemberDeclarationGroup(context, sst.getDelegates(), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getEvents(), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getFields(), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getProperties(), 1, 2);
+		appendMemberDeclarationGroup(context, sst.getMethods(), 2, 1);
 
 		context.indentationLevel--;
 
@@ -137,12 +137,12 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		return null;
 	}
 
-	private Void appendMemberDeclarationGroup(SSTPrintingContext context, Set<IMemberDeclaration> nodeGroup,
-			int inBetweenNewLineCount, int trailingNewLineCount) {
+	private <T extends IMemberDeclaration> Void appendMemberDeclarationGroup(SSTPrintingContext context,
+			Set<T> nodeGroup, int inBetweenNewLineCount, int trailingNewLineCount) {
 
-		List<IMemberDeclaration> nodeList = nodeGroup.stream().collect(Collectors.toList());
+		List<T> nodeList = nodeGroup.stream().collect(Collectors.toList());
 		for (int i = 0; i < nodeList.size(); i++) {
-			IMemberDeclaration node = nodeList.get(i);
+			T node = nodeList.get(i);
 			node.accept(this, context);
 
 			int newLinesNeeded = (i < (nodeList.size() - 1) ? inBetweenNewLineCount : trailingNewLineCount);

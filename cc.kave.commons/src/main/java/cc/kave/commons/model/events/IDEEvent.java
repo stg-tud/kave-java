@@ -16,7 +16,7 @@
 
 package cc.kave.commons.model.events;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import javax.annotation.Nullable;
 
@@ -33,15 +33,15 @@ public abstract class IDEEvent implements IIDEEvent {
 	public String KaVEVersion;
 
 	@Nullable
-	public LocalDateTime TriggeredAt;
+	public ZonedDateTime TriggeredAt;
 
 	@Override
-	public LocalDateTime getTriggeredAt() {
+	public ZonedDateTime getTriggeredAt() {
 		return TriggeredAt;
 	}
 
 	@Override
-	public LocalDateTime getTerminatedAt() {
+	public ZonedDateTime getTerminatedAt() {
 		throw new RuntimeException("not implemented yet");
 	}
 

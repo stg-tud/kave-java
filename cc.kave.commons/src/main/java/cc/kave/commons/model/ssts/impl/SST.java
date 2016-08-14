@@ -16,7 +16,7 @@
 package cc.kave.commons.model.ssts.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,20 +38,21 @@ public class SST implements ISST {
 
 	private ITypeName enclosingType;
 	private String partialClassIdentifier;
-	private Set<IFieldDeclaration> fields;
-	private Set<IPropertyDeclaration> properties;
-	private Set<IMethodDeclaration> methods;
-	private Set<IEventDeclaration> events;
-	private Set<IDelegateDeclaration> delegates;
+
+	// keep linked sets to have order guarantees for tests
+	private final LinkedHashSet<IFieldDeclaration> fields;
+	private final LinkedHashSet<IPropertyDeclaration> properties;
+	private final LinkedHashSet<IMethodDeclaration> methods;
+	private final LinkedHashSet<IEventDeclaration> events;
+	private final LinkedHashSet<IDelegateDeclaration> delegates;
 
 	public SST() {
-		this.partialClassIdentifier = "";
 		this.enclosingType = Names.getUnknownType();
-		this.fields = new HashSet<IFieldDeclaration>();
-		this.properties = new HashSet<IPropertyDeclaration>();
-		this.methods = new HashSet<IMethodDeclaration>();
-		this.events = new HashSet<IEventDeclaration>();
-		this.delegates = new HashSet<IDelegateDeclaration>();
+		this.fields = new LinkedHashSet<IFieldDeclaration>();
+		this.properties = new LinkedHashSet<IPropertyDeclaration>();
+		this.methods = new LinkedHashSet<IMethodDeclaration>();
+		this.events = new LinkedHashSet<IEventDeclaration>();
+		this.delegates = new LinkedHashSet<IDelegateDeclaration>();
 	}
 
 	@Override
@@ -108,23 +109,28 @@ public class SST implements ISST {
 	}
 
 	public void setFields(Set<IFieldDeclaration> fields) {
-		this.fields = fields;
+		this.fields.clear();
+		this.fields.addAll(fields);
 	}
 
 	public void setProperties(Set<IPropertyDeclaration> properties) {
-		this.properties = properties;
+		this.properties.clear();
+		this.properties.addAll(properties);
 	}
 
 	public void setMethods(Set<IMethodDeclaration> methods) {
-		this.methods = methods;
+		this.methods.clear();
+		this.methods.addAll(methods);
 	}
 
 	public void setEvents(Set<IEventDeclaration> events) {
-		this.events = events;
+		this.events.clear();
+		this.events.addAll(events);
 	}
 
 	public void setDelegates(Set<IDelegateDeclaration> delegates) {
-		this.delegates = delegates;
+		this.delegates.clear();
+		this.delegates.addAll(delegates);
 	}
 
 	@Override

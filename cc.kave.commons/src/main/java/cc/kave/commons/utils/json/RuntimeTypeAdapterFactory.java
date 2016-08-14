@@ -231,7 +231,8 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory {
 			@Override
 			public R read(JsonReader in) throws IOException {
 				JsonElement jsonElement = Streams.parse(in);
-				JsonElement labelJsonElement = jsonElement.getAsJsonObject().remove(typeFieldName);
+				// (kave adaptation) was: ".remove(typeFiledName)"
+				JsonElement labelJsonElement = jsonElement.getAsJsonObject().get(typeFieldName);
 				if (labelJsonElement == null) {
 					throw new JsonParseException("cannot deserialize " + baseType
 							+ " because it does not define a field named " + typeFieldName);
@@ -263,10 +264,13 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory {
 							"cannot serialize " + srcType.getName() + "; did you forget to register a subtype?");
 				}
 				JsonObject jsonObject = delegate.toJsonTree(value).getAsJsonObject();
-				if (jsonObject.has(typeFieldName)) {
-					throw new JsonParseException("cannot serialize " + srcType.getName()
-							+ " because it already defines a field named " + typeFieldName);
-				}
+				// (kave adaptation) disabled check
+				// if (jsonObject.has(typeFieldName)) {
+				// throw new JsonParseException("cannot serialize " +
+				// srcType.getName()
+				// + " because it already defines a field named " +
+				// typeFieldName);
+				// }
 				JsonObject clone = new JsonObject();
 				clone.add(typeFieldName, new JsonPrimitive(label));
 				for (Map.Entry<String, JsonElement> e : jsonObject.entrySet()) {

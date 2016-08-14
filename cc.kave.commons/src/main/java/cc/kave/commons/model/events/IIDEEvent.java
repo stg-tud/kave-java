@@ -15,10 +15,10 @@
  */
 package cc.kave.commons.model.events;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public interface IIDEEvent {
-	LocalDateTime getTriggeredAt();
+	ZonedDateTime getTriggeredAt();
 
-	LocalDateTime getTerminatedAt();
+	ZonedDateTime getTerminatedAt();
 }

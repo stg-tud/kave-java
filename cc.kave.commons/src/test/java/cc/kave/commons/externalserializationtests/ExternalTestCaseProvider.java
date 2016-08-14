@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.google.common.collect.Lists;
+
 public class ExternalTestCaseProvider {
 	private static final String settingsFile = "settings.ini";
 	private static final String expectedCompactFile = "expected-compact.json";
@@ -26,6 +28,9 @@ public class ExternalTestCaseProvider {
 
 	@Nonnull
 	public static List<TestCase[]> getTestCases(Path baseDirectory) throws ClassNotFoundException, IOException {
+		if (!baseDirectory.toFile().exists()) {
+			return Lists.newLinkedList();
+		}
 		return recursiveGetTestCases(baseDirectory.toFile(), baseDirectory.toString());
 	}
 
