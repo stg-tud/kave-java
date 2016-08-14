@@ -102,24 +102,9 @@ import cc.kave.commons.model.naming.impl.v0.types.TypeParameterName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyVersion;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
-import cc.kave.commons.model.ssts.IMemberDeclaration;
-import cc.kave.commons.model.ssts.IReference;
-import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
-import cc.kave.commons.model.ssts.blocks.ICaseBlock;
-import cc.kave.commons.model.ssts.blocks.ICatchBlock;
-import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
-import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
-import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
-import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
-import cc.kave.commons.model.ssts.expressions.ILoopHeaderExpression;
-import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
-import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
@@ -173,10 +158,7 @@ import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 import cc.kave.commons.model.ssts.impl.statements.UnknownStatement;
 import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
-import cc.kave.commons.model.ssts.references.IAssignableReference;
-import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
@@ -205,17 +187,11 @@ public abstract class JsonUtils {
 		GsonUtil.addTypeAdapters(gb);
 
 		registerNames(gb);
-		registerSST(gb);
-		registerEvents(gb);
+		registerSSTHierarchy(gb);
+		registerEventHierarchy(gb);
 
 		// enums
-		gb.registerTypeAdapter(EventKind.class, EnumDeSerializer.create(EventKind.values()));
-		gb.registerTypeAdapter(CatchBlockKind.class, EnumDeSerializer.create(CatchBlockKind.values()));
-		gb.registerTypeAdapter(EventSubscriptionOperation.class,
-				EnumDeSerializer.create(EventSubscriptionOperation.values()));
-		gb.registerTypeAdapter(CastOperator.class, EnumDeSerializer.create(CastOperator.values()));
-		gb.registerTypeAdapter(BinaryOperator.class, EnumDeSerializer.create(BinaryOperator.values()));
-		gb.registerTypeAdapter(UnaryOperator.class, EnumDeSerializer.create(UnaryOperator.values()));
+		registerEnum(gb, EventKind.class);
 
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
@@ -223,59 +199,38 @@ public abstract class JsonUtils {
 		return gb;
 	}
 
-	private static void registerSST(GsonBuilder gb) {
-		// SST Model
-		registerHierarchy(gb, ISST.class, SST.class);
-		// Declarations
-		registerHierarchy(gb, IMemberDeclaration.class, IDelegateDeclaration.class, IEventDeclaration.class,
-				IFieldDeclaration.class, IMethodDeclaration.class, IPropertyDeclaration.class, IReference.class);
-		registerHierarchy(gb, IFieldDeclaration.class, FieldDeclaration.class);
-		registerHierarchy(gb, IDelegateDeclaration.class, DelegateDeclaration.class);
-		registerHierarchy(gb, IEventDeclaration.class, EventDeclaration.class);
-		registerHierarchy(gb, IPropertyDeclaration.class, PropertyDeclaration.class);
-		registerHierarchy(gb, IMethodDeclaration.class, MethodDeclaration.class);
-		registerHierarchy(gb, IVariableDeclaration.class, VariableDeclaration.class);
-		// References
-		registerHierarchy(gb, IReference.class, UnknownReference.class, EventReference.class, FieldReference.class,
-				IndexAccessReference.class, PropertyReference.class, MethodReference.class, VariableReference.class);
-		registerHierarchy(gb, IAssignableReference.class, EventReference.class, FieldReference.class,
-				IndexAccessReference.class, PropertyReference.class, UnknownReference.class, VariableReference.class);
-		registerHierarchy(gb, IVariableReference.class, VariableReference.class);
-		registerHierarchy(gb, IIndexAccessExpression.class, IndexAccessExpression.class);
+	private static void registerSSTHierarchy(GsonBuilder gb) {
 
-		// Expressions
-		registerHierarchy(gb, IAssignableExpression.class,
-				// assignable
-				BinaryExpression.class, CastExpression.class, CompletionExpression.class, ComposedExpression.class,
-				IfElseExpression.class, IndexAccessExpression.class, InvocationExpression.class, LambdaExpression.class,
-				TypeCheckExpression.class, UnaryExpression.class,
-				// simple
-				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
-				UnknownExpression.class);
-
-		registerHierarchy(gb, ISimpleExpression.class, ConstantValueExpression.class, NullExpression.class,
-				ReferenceExpression.class, UnknownExpression.class);
-
-		registerHierarchy(gb, ILoopHeaderExpression.class,
-				// loop header
+		Class<?>[] sstAndRelatedTypes = new Class<?>[] { SST.class,
+				// blocks
+				CaseBlock.class, CatchBlock.class, CatchBlockKind.class, DoLoop.class, ForEachLoop.class, ForLoop.class,
+				IfElseBlock.class, LockBlock.class, SwitchBlock.class, TryBlock.class, UncheckedBlock.class,
+				UnsafeBlock.class, UsingBlock.class, WhileLoop.class,
+				// declarations
+				DelegateDeclaration.class, EventDeclaration.class, FieldDeclaration.class, MethodDeclaration.class,
+				PropertyDeclaration.class,
+				// expressions
+				BinaryExpression.class, BinaryOperator.class, CastExpression.class, CastOperator.class,
+				CompletionExpression.class, ComposedExpression.class, IfElseExpression.class,
+				IndexAccessExpression.class, InvocationExpression.class, LambdaExpression.class,
+				TypeCheckExpression.class, UnaryExpression.class, UnaryOperator.class,
+				//
 				LoopHeaderBlockExpression.class,
-				// simple
-				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class,
-				UnknownExpression.class);
-
-		// Statements
-		registerHierarchy(gb, IStatement.class, Assignment.class, BreakStatement.class, ContinueStatement.class,
-				DoLoop.class, ExpressionStatement.class, ForEachLoop.class, ForLoop.class, GotoStatement.class,
-				IfElseBlock.class, LabelledStatement.class, LockBlock.class, ReturnStatement.class, SwitchBlock.class,
-				ThrowStatement.class, TryBlock.class, UncheckedBlock.class, UnknownStatement.class, UnsafeBlock.class,
-				UsingBlock.class, EventSubscriptionStatement.class, VariableDeclaration.class, WhileLoop.class);
-
-		registerHierarchy(gb, ICatchBlock.class, CatchBlock.class);
-		registerHierarchy(gb, ICaseBlock.class, CaseBlock.class);
+				//
+				ConstantValueExpression.class, NullExpression.class, ReferenceExpression.class, UnknownExpression.class,
+				// references
+				EventReference.class, FieldReference.class, IndexAccessReference.class, MethodReference.class,
+				PropertyReference.class, UnknownReference.class, VariableReference.class,
+				// statements
+				Assignment.class, BreakStatement.class, ContinueStatement.class, EventSubscriptionStatement.class,
+				EventSubscriptionOperation.class, ExpressionStatement.class, GotoStatement.class,
+				LabelledStatement.class, ReturnStatement.class, ThrowStatement.class, UnknownStatement.class,
+				VariableDeclaration.class //
+		};
+		identifyHierarchiesAndRegisterAll(gb, sstAndRelatedTypes);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static void registerEvents(GsonBuilder gb) {
+	private static void registerEventHierarchy(GsonBuilder gb) {
 
 		Class<?>[] eventsAndRelatedTypes = new Class<?>[] {
 				// completion events
@@ -296,26 +251,32 @@ public abstract class JsonUtils {
 				ActivityEvent.class, CommandEvent.class, ErrorEvent.class, InfoEvent.class, NavigationEvent.class,
 				NavigationType.class, SystemEvent.class, SystemEventType.class, EventTrigger.class };
 
-		Map<Class, Set<Class>> subclasses = Maps.newHashMap();
+		identifyHierarchiesAndRegisterAll(gb, eventsAndRelatedTypes);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void identifyHierarchiesAndRegisterAll(GsonBuilder gb, Class<?>[] eventsAndRelatedTypes) {
+		Map<Class, Set<Class>> baseToSubs = Maps.newHashMap();
 
 		for (Class<?> elem : eventsAndRelatedTypes) {
 			if (elem.isEnum()) {
 				registerEnum(gb, (Class<Enum>) elem);
-			} else {
-				for (Class<?> c : getAllTypesFromHierarchyExceptObject(elem, false)) {
-					Set<Class> set = subclasses.get(c);
-					if (set == null) {
-						set = Sets.newHashSet();
-						subclasses.put(c, set);
-					}
-					set.add(elem);
-				}
-				registerHierarchy(gb, elem, new Class[] { elem });
+				continue;
 			}
+
+			for (Class<?> base : getAllTypesFromHierarchyExceptObject(elem, false)) {
+				Set<Class> subs = baseToSubs.get(base);
+				if (subs == null) {
+					subs = Sets.newHashSet();
+					baseToSubs.put(base, subs);
+				}
+				subs.add(elem);
+			}
+			registerHierarchy(gb, elem, new Class[] { elem });
 		}
 
-		for (Class base : subclasses.keySet()) {
-			Set<Class> subs = subclasses.get(base);
+		for (Class base : baseToSubs.keySet()) {
+			Set<Class> subs = baseToSubs.get(base);
 			Class[] arr = subs.toArray(new Class[0]);
 			registerHierarchy(gb, base, arr);
 		}
@@ -349,16 +310,13 @@ public abstract class JsonUtils {
 
 		for (Class<?> concreteName : names) {
 			for (Class<?> nameType : getAllTypesFromHierarchyExceptObject(concreteName, true)) {
-				// gb.registerTypeAdapter(nameType, nameAdapter);
 				allNamesInHierarchy.add(nameType);
 			}
 		}
-		System.out.println("#### registering: ####");
-		for (Class<?> concreteName : allNamesInHierarchy) {
-			System.out.println(concreteName);
-			gb.registerTypeAdapter(concreteName, nameAdapter);
-		}
 
+		for (Class<?> name : allNamesInHierarchy) {
+			gb.registerTypeAdapter(name, nameAdapter);
+		}
 	}
 
 	private static <T extends Enum<T>> void registerEnum(GsonBuilder gb, Class<T> e) {
