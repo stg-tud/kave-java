@@ -16,6 +16,7 @@
 package exec.validate_evaluation.streaks;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -81,7 +82,7 @@ public class EditStreakGenerationRunner {
 	}
 
 	private void extractEdits(ICompletionEvent e) {
-		LocalDateTime date = e.getTriggeredAt();
+		ZonedDateTime date = e.getTriggeredAt();
 		Context ctx = e.getContext();
 
 		IMethodName selection = null;
@@ -103,7 +104,7 @@ public class EditStreakGenerationRunner {
 		return null;
 	}
 
-	private void register(LocalDateTime date, Context ctx, IMethodName selection) {
+	private void register(ZonedDateTime date, Context ctx, IMethodName selection) {
 		ITypeName encType = ctx.getSST().getEnclosingType();
 		if (!encType.isUnknown()) {
 			Snapshot se = Snapshot.create(date, ctx, selection);

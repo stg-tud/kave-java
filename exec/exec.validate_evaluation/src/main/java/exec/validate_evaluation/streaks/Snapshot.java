@@ -15,7 +15,7 @@
  */
 package exec.validate_evaluation.streaks;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -28,7 +28,7 @@ import cc.recommenders.assertions.Asserts;
 
 public class Snapshot {
 
-	private LocalDateTime date;
+	private ZonedDateTime date;
 	private Context context;
 	private IMethodName selection;
 
@@ -36,7 +36,7 @@ public class Snapshot {
 		// for de-/serialization only; use "create()" instead.
 	}
 
-	public LocalDateTime getDate() {
+	public ZonedDateTime getDate() {
 		return date;
 	}
 
@@ -52,7 +52,7 @@ public class Snapshot {
 		return selection != null;
 	}
 
-	public static Snapshot create(LocalDateTime date, Context context, IMethodName selection) {
+	public static Snapshot create(ZonedDateTime date, Context context, IMethodName selection) {
 		Asserts.assertNotNull(date);
 		Asserts.assertNotNull(context);
 

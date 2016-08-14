@@ -30,6 +30,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -313,15 +315,15 @@ public class EditStreakGenerationRunnerTest {
 		input.put(string, events);
 	}
 
-	private static ICompletionEvent apply(LocalDateTime triggeredAt, Context context, IName name) {
+	private static ICompletionEvent apply(ZonedDateTime triggeredAt, Context context, IName name) {
 		return completionEventWithSelection(triggeredAt, TerminationState.Applied, name, context);
 	}
 
-	private static ICompletionEvent abort(LocalDateTime triggeredAt, Context context, IName name) {
+	private static ICompletionEvent abort(ZonedDateTime triggeredAt, Context context, IName name) {
 		return completionEventWithSelection(triggeredAt, TerminationState.Cancelled, name, context);
 	}
 
-	private static ICompletionEvent completionEventWithSelection(LocalDateTime triggeredAt, TerminationState state,
+	private static ICompletionEvent completionEventWithSelection(ZonedDateTime triggeredAt, TerminationState state,
 			IName name, Context context) {
 		CompletionEvent e = completionEvent(context);
 
@@ -341,7 +343,7 @@ public class EditStreakGenerationRunnerTest {
 
 	private static CompletionEvent completionEvent(Context context) {
 		CompletionEvent e = new CompletionEvent();
-		e.TriggeredAt = LocalDateTime.now();
+		e.TriggeredAt = ZonedDateTime.now();
 
 		e.terminatedState = TerminationState.Unknown;
 		e.context = context;
@@ -353,7 +355,8 @@ public class EditStreakGenerationRunnerTest {
 		return Names.newType("T%d, P", i);
 	}
 
-	private static LocalDateTime date(int deltaSecs) {
-		return LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0).plusSeconds(deltaSecs);
+	private static ZonedDateTime date(int deltaSecs) {
+		LocalDateTime ldt = LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0).plusSeconds(deltaSecs);
+		return ZonedDateTime.of(ldt, ZoneId.of("ECT", ZoneId.SHORT_IDS));
 	}
 }

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -209,7 +209,7 @@ public class QueryHistoryGenerationRunnerTest {
 		Context ctx = mock(Context.class);
 
 		EditStreak e = new EditStreak();
-		e.add(Snapshot.create(LocalDateTime.now(), ctx, Names.newMethod("[T,P] [T,P].sel()")));
+		e.add(Snapshot.create(ZonedDateTime.now(), ctx, Names.newMethod("[T,P] [T,P].sel()")));
 		in.put("a.zip", streaks(e));
 
 		Usage usage = new Query();
@@ -254,7 +254,7 @@ public class QueryHistoryGenerationRunnerTest {
 	private static EditStreak streak(int num) {
 		EditStreak e = new EditStreak();
 		for (int i = 0; i < num; i++) {
-			LocalDateTime date = LocalDateTime.now().plusSeconds(num);
+			ZonedDateTime date = ZonedDateTime.now().plusSeconds(num);
 			Context context = context(num, i);
 			IMethodName sel = Names.newMethod("[T,P] [T,P] m" + num + "()");
 			Snapshot snapshot = Snapshot.create(date, context, sel);

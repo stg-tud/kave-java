@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -176,7 +176,7 @@ public abstract class BaseIntegrationTest {
 		sst.getMethods().add(md);
 
 		CompletionEvent ce = new CompletionEvent();
-		ce.TriggeredAt = LocalDateTime.now();
+		ce.TriggeredAt = ZonedDateTime.now();
 
 		ce.context = new Context();
 		ce.context.setSST(sst);

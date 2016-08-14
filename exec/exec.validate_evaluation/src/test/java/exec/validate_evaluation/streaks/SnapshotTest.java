@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.junit.Before;
@@ -34,13 +35,13 @@ import exec.validate_evaluation.utils.DateUtils;
 
 public class SnapshotTest {
 
-	private LocalDateTime d;
+	private ZonedDateTime d;
 	private Context q;
 	private IMethodName m;
 
 	@Before
 	public void setup() {
-		d = LocalDateTime.now();
+		d = ZonedDateTime.now();
 		q = mock(Context.class);
 		m = mock(IMethodName.class);
 	}
@@ -94,7 +95,7 @@ public class SnapshotTest {
 
 	@Test
 	public void equality_diffDate() {
-		LocalDateTime d2 = d.plusSeconds(1);
+		ZonedDateTime d2 = d.plusSeconds(1);
 
 		Snapshot a = Snapshot.create(d, q, m);
 		Snapshot b = Snapshot.create(d2, q, m);

@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -146,13 +148,17 @@ public class DemographicsCollectorTest {
 
 	private CompletionEvent someCompletionEvent(int num) {
 		CompletionEvent event = new CompletionEvent();
-		event.TriggeredAt = LocalDateTime.MIN.plusSeconds(num);
+		event.TriggeredAt = zoned(LocalDateTime.MIN.plusSeconds(num));
 		return event;
+	}
+
+	private ZonedDateTime zoned(LocalDateTime ldt) {
+		return ZonedDateTime.of(ldt, ZoneId.of("ECT", ZoneId.SHORT_IDS));
 	}
 
 	private CompletionEvent completionEventOn(int year, int month, int day) {
 		CompletionEvent lastEvent = someCompletionEvent(1);
-		lastEvent.TriggeredAt = LocalDateTime.of(year, month, day, 11, 17);
+		lastEvent.TriggeredAt = zoned(LocalDateTime.of(year, month, day, 11, 17));
 		return lastEvent;
 	}
 
