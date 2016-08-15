@@ -30,11 +30,10 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.Episode;
 
 public class EpisodeToGraphConverterTest {
@@ -78,11 +77,11 @@ public class EpisodeToGraphConverterTest {
 		ITypeName declType = type("T");
 		ITypeName retType = type("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	private static ITypeName type(String name) {
-		return TypeName.newTypeName("some.namespace." + name + ", P");
+		return Names.newType("some.namespace." + name + ", P");
 	}
 
 	@Test
@@ -118,7 +117,7 @@ public class EpisodeToGraphConverterTest {
 		labels += "2. " + kind2 + ": " + out2 + "\\l";
 		labels += "3. " + kind3 + ": " + out3 + "\\l";
 		labels += "4. " + kind4 + ": " + out4 + "\\l";
-		
+
 		labels += "Freq = " + episode.getFrequency() + ", bd = " + episode.getBidirectMeasure();
 
 		Fact labelNode = new Fact(labels);

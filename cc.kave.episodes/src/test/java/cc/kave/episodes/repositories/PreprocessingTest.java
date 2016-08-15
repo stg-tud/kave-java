@@ -42,8 +42,8 @@ import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.model.EventStream;
@@ -204,16 +204,16 @@ public class PreprocessingTest {
 	private static Event enclosingCtx(int i) {
 		return Events.newContext(m(i));
 	}
-	
+
 	private static Event dummy() {
 		return Events.newDummyEvent();
 	}
 
 	private static IMethodName m(int i) {
 		if (i == 0) {
-			return MethodName.UNKNOWN_NAME;
+			return Names.getUnknownMethod();
 		} else {
-			return MethodName.newMethodName("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
+			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
 	}
 }

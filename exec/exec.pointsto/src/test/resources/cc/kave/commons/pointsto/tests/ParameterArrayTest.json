@@ -12,11 +12,11 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Run()"
+        "Element":"CSharp.MethodName:[p:void] [Test.ParameterArrayTest, Test].Run()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)"
+        "Element":"CSharp.MethodName:[p:void] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)"
       }
     ]
   },
@@ -33,7 +33,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Run()",
+        "Name":"CSharp.MethodName:[p:void] [Test.ParameterArrayTest, Test].Run()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -42,7 +42,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"name1"
             },
-            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -60,7 +60,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"name2"
             },
-            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -80,7 +80,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"this"
               },
-              "MethodName":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
+              "MethodName":"CSharp.MethodName:[p:void] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -103,7 +103,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
+        "Name":"CSharp.MethodName:[p:void] [Test.ParameterArrayTest, Test].Consume(params [System.String[], mscorlib, 4.0.0.0] names)",
         "IsEntryPoint":false,
         "Body":[
           {
@@ -114,7 +114,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"name"
               },
-              "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+              "Type":"CSharp.TypeName:p:string"
             },
             "LoopedReference":{
               "$type":"[SST:References.VariableReference]",
@@ -129,7 +129,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":""
                   },
-                  "MethodName":"CSharp.MethodName:static [System.Void, mscorlib, 4.0.0.0] [System.Console, mscorlib, 4.0.0.0].WriteLine([System.String, mscorlib, 4.0.0.0] value)",
+                  "MethodName":"CSharp.MethodName:static [p:void] [System.Console, mscorlib, 4.0.0.0].WriteLine([p:string] value)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",

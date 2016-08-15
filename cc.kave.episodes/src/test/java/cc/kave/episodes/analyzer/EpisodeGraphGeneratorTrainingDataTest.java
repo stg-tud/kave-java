@@ -44,10 +44,9 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -130,12 +129,12 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	@Test
 	public void structureIsCreated() throws Exception {
 
-//		sut.generateGraphs(FREQ, BD);
+		// sut.generateGraphs(FREQ, BD);
 
 		assertTrue(folderStructure.exists());
 		assertTrue(folderStructure.isDirectory());
 
-//		verify(episodeParser).parse(eq(FREQ), eq(BD));
+		// verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse(REPOS);
 	}
 
@@ -143,9 +142,9 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	@Test
 	public void patternsStored() throws Exception {
 
-//		sut.generateGraphs(FREQ, BD);
+		// sut.generateGraphs(FREQ, BD);
 
-//		verify(episodeParser).parse(eq(FREQ), eq(BD));
+		// verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse(REPOS);
 
 		File fileName;
@@ -243,21 +242,21 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		ITypeName declType = typeGeneralAPI("T");
 		ITypeName retType = typeGeneralAPI("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	private static IMethodName methodSpecificAPI(String name) {
 		ITypeName declType = typeSpecificAPI("T");
 		ITypeName retType = typeSpecificAPI("R");
 		String methodName = String.format("[%s] [%s].%s()", retType, declType, name);
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	private static ITypeName typeGeneralAPI(String name) {
-		return TypeName.newTypeName("System.namespace." + name + ", P");
+		return Names.newType("System.namespace." + name + ", P");
 	}
 
 	private static ITypeName typeSpecificAPI(String name) {
-		return TypeName.newTypeName("some.namespace." + name + ", P");
+		return Names.newType("some.namespace." + name + ", P");
 	}
 }

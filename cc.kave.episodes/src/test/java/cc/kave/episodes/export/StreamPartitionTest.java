@@ -51,8 +51,8 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -101,7 +101,7 @@ public class StreamPartitionTest {
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
-		md.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
+		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
 		// InvocationExpression ie5 = new InvocationExpression();
 		// IMethodName methodName5 = MethodName.newMethodName("[System.Void,
 		// mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
@@ -111,13 +111,13 @@ public class StreamPartitionTest {
 		sst.getMethods().add(md);
 
 		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(MethodName.newMethodName("[T,P] [T3,P].M2()"));
+		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
 
 		InvocationExpression ie1 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie1.setMethodName(methodName);
 		InvocationExpression ie2 = new InvocationExpression();
-		IMethodName methodName2 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		IMethodName methodName2 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
 		ie2.setMethodName(methodName2);
 
 		md2.getBody().add(wrap(ie1));
@@ -185,17 +185,17 @@ public class StreamPartitionTest {
 	public void readTwoArchives() throws IOException {
 		SST sst = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
+		md3.setName(Names.newMethod("[T,P] [T2,P].M3()"));
 		md3.getBody().add(new DoLoop());
 
 		InvocationExpression ie3 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie3.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie3));
 
 		InvocationExpression ie4 = new InvocationExpression();
-		methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie4.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie4));
@@ -234,7 +234,7 @@ public class StreamPartitionTest {
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
 		String actualStream1 = FileUtils.readFileToString(partitionFile1);
 		String actualStream2 = FileUtils.readFileToString(partitionFile2);
-		
+
 		Map<String, Integer> expectedMapper = Maps.newLinkedHashMap();
 		expectedMapper.put("Github/usr1/repo1", 1);
 		expectedMapper.put("Github/usr1/repo2", 2);
@@ -244,7 +244,7 @@ public class StreamPartitionTest {
 		assertEquals(expectedPartition1, actualStream1);
 		assertEquals(expectedPartition2, actualStream2);
 		assertEquals(expectedMapper, actualMapper);
-		
+
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());
 		assertTrue(partitionFile1.exists());
@@ -282,18 +282,18 @@ public class StreamPartitionTest {
 	private List<Event> expectedMapping() {
 		List<Event> events = new LinkedList<Event>();
 		events.add(Events.newDummyEvent());
-		events.add(Events.newContext(MethodName.UNKNOWN_NAME));
-		
+		events.add(Events.newContext(Names.getUnknownMethod()));
+
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
-		IMethodName methodInv1 = MethodName.newMethodName(inv1);
+		IMethodName methodInv1 = Names.newMethod(inv1);
 		Event e2 = Events.newInvocation(methodInv1);
 		events.add(e2);
-		
+
 		String inv2 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
-		IMethodName methodInv2 = MethodName.newMethodName(inv2);
+		IMethodName methodInv2 = Names.newMethod(inv2);
 		Event e3 = Events.newInvocation(methodInv2);
 		events.add(e3);
-		
+
 		return events;
 	}
 }

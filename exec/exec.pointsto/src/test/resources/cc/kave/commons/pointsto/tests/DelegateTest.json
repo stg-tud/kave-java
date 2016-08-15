@@ -12,15 +12,15 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry1()"
+        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry1()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry2()"
+        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry2()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)"
+        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)"
       }
     ]
   },
@@ -37,7 +37,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry1()",
+        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry1()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -46,7 +46,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"fun"
             },
-            "Type":"CSharp.DelegateTypeName:d:[TResult] [System.Func`2[[T -> System.Object, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)"
+            "Type":"0T:d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -62,7 +62,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"this"
                 },
-                "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)"
+                "MethodName":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)"
               }
             }
           },
@@ -72,7 +72,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"arg"
             },
-            "Type":"CSharp.TypeName:System.Object, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:object"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -90,7 +90,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -104,7 +104,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"fun"
               },
-              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> System.Object, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
+              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -131,7 +131,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].entry2()",
+        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry2()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -140,7 +140,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"fun"
             },
-            "Type":"CSharp.DelegateTypeName:d:[TResult] [System.Func`2[[T -> System.Object, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)"
+            "Type":"0T:d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -150,7 +150,7 @@
             },
             "Expression":{
               "$type":"[SST:Expressions.Assignable.LambdaExpression]",
-              "Name":"CSharp.LambdaName:[System.String, mscorlib, 4.0.0.0] ([System.Object, mscorlib, 4.0.0.0] x)",
+              "Name":"CSharp.LambdaName:[p:string] ([p:object] x)",
               "Body":[
                 {
                   "$type":"[SST:Statements.VariableDeclaration]",
@@ -158,7 +158,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"$0"
                   },
-                  "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                  "Type":"CSharp.TypeName:p:string"
                 },
                 {
                   "$type":"[SST:Statements.Assignment]",
@@ -172,7 +172,7 @@
                       "$type":"[SST:References.VariableReference]",
                       "Identifier":""
                     },
-                    "MethodName":"CSharp.MethodName:static [System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Format([System.String, mscorlib, 4.0.0.0] format, [System.Object, mscorlib, 4.0.0.0] arg0)",
+                    "MethodName":"CSharp.MethodName:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
                     "Parameters":[
                       {
                         "$type":"[SST:Expressions.Simple.ConstantValueExpression]"
@@ -207,7 +207,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"arg"
             },
-            "Type":"CSharp.TypeName:System.Object, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:object"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -225,7 +225,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$1"
             },
-            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -239,7 +239,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"fun"
               },
-              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> System.Object, mscorlib, 4.0.0.0],[TResult -> System.String, mscorlib, 4.0.0.0]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
+              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -266,7 +266,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.DelegateTest, Test].foo([System.Object, mscorlib, 4.0.0.0] x)",
+        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)",
         "IsEntryPoint":false,
         "Body":[
           {
@@ -275,7 +275,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+            "Type":"CSharp.TypeName:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -289,7 +289,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":""
               },
-              "MethodName":"CSharp.MethodName:static [System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Format([System.String, mscorlib, 4.0.0.0] format, [System.Object, mscorlib, 4.0.0.0] arg0)",
+              "MethodName":"CSharp.MethodName:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ConstantValueExpression]"

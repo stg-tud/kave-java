@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.recommenders.datastructures.Tuple;
 
 public class EnclosingMethods {

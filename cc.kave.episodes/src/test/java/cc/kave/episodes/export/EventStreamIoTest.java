@@ -31,8 +31,8 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.EventStream;
 
 public class EventStreamIoTest {
@@ -41,7 +41,7 @@ public class EventStreamIoTest {
 	public TemporaryFolder tmp = new TemporaryFolder();
 
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+	private static final IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 	public static final int STREAMIDX = 8;
 
@@ -102,10 +102,10 @@ public class EventStreamIoTest {
 	}
 
 	private static Event unknown() {
-		return Events.newContext(MethodName.UNKNOWN_NAME);
+		return Events.newContext(Names.getUnknownMethod());
 	}
 
 	private static IMethodName m(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		return Names.newMethod("[T,P] [T,P].m" + i + "()");
 	}
 }

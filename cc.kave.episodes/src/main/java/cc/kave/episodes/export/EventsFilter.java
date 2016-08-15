@@ -24,12 +24,10 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.AssemblyVersion;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.statistics.StreamStatistics;
-import cc.recommenders.io.Logger;
 
 public class EventsFilter {
 
@@ -47,15 +45,17 @@ public class EventsFilter {
 		EventStream es = new EventStream();
 
 		for (Event e : streamWithoutDublicates) {
-//			Logger.log("Event: %s", e.getMethod().getIdentifier());
-			
+			// Logger.log("Event: %s", e.getMethod().getIdentifier());
+
 			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.METHOD_DECLARATION)) {
 				es.addEvent(e);
 				continue;
 			}
 			if (occurrences.get(e) >= freqThresh) {
 				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-				if (AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
+				// predefined types have always an unknown version, but come
+				// from mscorlib, so they should be included
+				if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
 					continue;
 				}
 				es.addEvent(e);
@@ -79,8 +79,8 @@ public class EventsFilter {
 				method = new LinkedList<Event>();
 				currentMethod = null;
 			} else if (event.getKind() == EventKind.METHOD_DECLARATION) {
-					currentMethod = event.getMethod();
-				}
+				currentMethod = event.getMethod();
+			}
 			method.add(event);
 		}
 		if ((currentMethod != null) && (!observedMethods.contains(currentMethod))) {

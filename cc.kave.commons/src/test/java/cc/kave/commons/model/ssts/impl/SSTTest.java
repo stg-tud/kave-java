@@ -17,6 +17,7 @@ package cc.kave.commons.model.ssts.impl;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -47,6 +48,7 @@ public class SSTTest {
 
 		assertThat(Names.getUnknownType(), equalTo(sut.getEnclosingType()));
 		assertThat(null, equalTo(sut.getPartialClassIdentifier()));
+		assertFalse(sut.isPartialClass());
 		assertThat(new HashSet<IDelegateDeclaration>(), equalTo(sut.getDelegates()));
 		assertThat(new HashSet<IEventDeclaration>(), equalTo(sut.getEvents()));
 		assertThat(new HashSet<IFieldDeclaration>(), equalTo(sut.getFields()));

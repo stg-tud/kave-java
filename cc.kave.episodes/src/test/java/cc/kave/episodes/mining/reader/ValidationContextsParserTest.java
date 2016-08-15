@@ -45,8 +45,8 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -72,7 +72,7 @@ public class ValidationContextsParserTest {
 	public void setup() throws IOException {
 		Logger.reset();
 		Logger.setCapturing(true);
-		
+
 		MockitoAnnotations.initMocks(this);
 		data = Maps.newHashMap();
 		ras = Maps.newHashMap();
@@ -98,18 +98,18 @@ public class ValidationContextsParserTest {
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
-		md.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
+		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
 		md.getBody().add(new ContinueStatement());
 		sst.getMethods().add(md);
 
 		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(MethodName.newMethodName("[T,P] [T3,P].M2()"));
+		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
 
 		InvocationExpression ie1 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie1.setMethodName(methodName);
 		InvocationExpression ie2 = new InvocationExpression();
-		IMethodName methodName2 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		IMethodName methodName2 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
 		ie2.setMethodName(methodName2);
 
 		md2.getBody().add(wrap(ie1));
@@ -153,17 +153,17 @@ public class ValidationContextsParserTest {
 	public void readTwoArchives() throws IOException {
 		SST sst = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
+		md3.setName(Names.newMethod("[T,P] [T2,P].M3()"));
 		md3.getBody().add(new DoLoop());
 
 		InvocationExpression ie3 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie3.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie3));
 
 		InvocationExpression ie4 = new InvocationExpression();
-		methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie4.setMethodName(methodName);
 
 		md3.getBody().add(wrap(ie4));

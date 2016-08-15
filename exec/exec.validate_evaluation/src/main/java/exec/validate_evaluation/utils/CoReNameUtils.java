@@ -66,7 +66,7 @@ public class CoReNameUtils {
 			return CoReTypeName.get(toCoReName(t.getDeclaringType()) + "$" + t.getName());
 		}
 
-		String ns = t.getNamespace().toString().replace('.', '/');
+		String ns = t.getNamespace().getIdentifier().replace('.', '/');
 		if (!ns.isEmpty()) {
 			ns += '/';
 		}

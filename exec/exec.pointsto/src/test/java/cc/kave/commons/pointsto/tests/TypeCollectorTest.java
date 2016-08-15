@@ -144,7 +144,7 @@ public class TypeCollectorTest {
 		ITypeName testClass = Names.newType("Test.SomeClassWithStringField, Test");
 		IFieldName testField = Names
 				.newField("[" + builder.getStringType().getIdentifier() + "] [" + testClass.getIdentifier() + "].desc");
-		IPropertyName strLengthProperty = Names.newProperty("[" + builder.getInt32Type().getIdentifier() + "] ["
+		IPropertyName strLengthProperty = Names.newProperty("get set [" + builder.getInt32Type().getIdentifier() + "] ["
 				+ builder.getStringType().getIdentifier() + "].Length()");
 
 		IFieldReference fieldReference = builder.buildFieldReference("dummy", testField);

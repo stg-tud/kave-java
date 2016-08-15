@@ -50,15 +50,14 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.mining.reader.ReposParser;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -70,10 +69,10 @@ public class ReposParserTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Mock
 	private Directory rootDirectory;
-	@Mock 
+	@Mock
 	FileReader reader;
 
 	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
@@ -100,18 +99,18 @@ public class ReposParserTest {
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
-		md.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
+		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
 		md.getBody().add(new ContinueStatement());
 		sst.getMethods().add(md);
 
 		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(MethodName.newMethodName("[T,P] [T3,P].M2()"));
+		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
 
 		InvocationExpression ie1 = new InvocationExpression();
-		IMethodName methodName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie1.setMethodName(methodName);
 		InvocationExpression ie2 = new InvocationExpression();
-		IMethodName methodName2 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		IMethodName methodName2 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
 		ie2.setMethodName(methodName2);
 
 		md2.getBody().add(wrap(ie1));
@@ -125,28 +124,28 @@ public class ReposParserTest {
 
 		SST sst3 = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(MethodName.newMethodName("[T,P] [T2,P].M()"));
+		md3.setName(Names.newMethod("[T,P] [T2,P].M()"));
 		InvocationExpression ie5 = new InvocationExpression();
-		IMethodName methodName5 = MethodName.newMethodName("[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName5 = Names.newMethod("[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie5.setMethodName(methodName5);
 		md3.getBody().add(wrap(ie5));
 		sst3.getMethods().add(md3);
-		
+
 		Context context3 = new Context();
 		context3.setSST(sst3);
 		data.put(REPO3, context3);
-		
+
 		SST sst2 = new SST();
 		MethodDeclaration md4 = new MethodDeclaration();
-		md4.setName(MethodName.newMethodName("[T,P] [T2,P].M3()"));
+		md4.setName(Names.newMethod("[T,P] [T2,P].M3()"));
 		md4.getBody().add(new DoLoop());
 
 		InvocationExpression ie3 = new InvocationExpression();
-		IMethodName methodName3 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		IMethodName methodName3 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie3.setMethodName(methodName3);
 
 		InvocationExpression ie4 = new InvocationExpression();
-		methodName3 = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		methodName3 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie4.setMethodName(methodName3);
 
 		md4.getBody().add(wrap(ie3));
@@ -158,11 +157,11 @@ public class ReposParserTest {
 		context2.setSST(sst2);
 
 		data.put(REPO2, context2);
-		
+
 		repositories = new LinkedList<>();
 		repositories.add("Github/usr1/repo1");
 		repositories.add("Github/usr1/repo3");
-		
+
 		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
 			@Override
 			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
@@ -181,7 +180,7 @@ public class ReposParserTest {
 			}
 		});
 		when(reader.readFile(any(File.class))).thenReturn(repositories);
-		
+
 		Logger.setPrinting(false);
 	}
 
@@ -189,7 +188,7 @@ public class ReposParserTest {
 	public void teardown() {
 		Logger.reset();
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
@@ -213,19 +212,19 @@ public class ReposParserTest {
 
 		assertTrue(fileName.exists());
 	}
-	
+
 	@Test
 	public void contentTest() throws IOException {
 		sut.learningStream(NUMBEROFREPOS);
 
 		File fileName = new File(getReposPath());
-		
+
 		StringBuilder expected = new StringBuilder();
 		expected.append("Github/usr1/repo1\n");
 		expected.append("Github/usr1/repo3\n");
-		
+
 		String actuals = FileUtils.readFileToString(fileName);
-		
+
 		assertEquals(expected.toString(), actuals);
 	}
 
@@ -246,7 +245,7 @@ public class ReposParserTest {
 	public void readThreeArchives() throws IOException {
 		List<Event> expectedEvents = getExpectedEvents();
 		List<Event> actualEvents = sut.learningStream(NUMBEROFREPOS);
-		
+
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
 		verify(rootDirectory).getReadingArchive(REPO3);
@@ -255,36 +254,36 @@ public class ReposParserTest {
 		verify(ras.get(REPO1)).getNext(Context.class);
 		verify(ras.get(REPO3), times(2)).hasNext();
 		verify(ras.get(REPO3)).getNext(Context.class);
-		
+
 		assertEquals(expectedEvents.size(), actualEvents.size());
 		assertEquals(expectedEvents, actualEvents);
 	}
-	
+
 	@Test
 	public void validationArchives() throws IOException {
 		List<Event> expectedEvents = new LinkedList<Event>();
-		
-		IMethodName declName = MethodName.newMethodName("[?] [?].???()");
+
+		IMethodName declName = Names.newMethod("[?] [?].???()");
 		Event firstMethod = Events.newFirstContext(declName);
 		Event enclosingMethod = Events.newContext(declName);
 		expectedEvents.add(firstMethod);
 		expectedEvents.add(enclosingMethod);
-		
-		IMethodName invName = MethodName.newMethodName("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+
+		IMethodName invName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		Event invocation = Events.newInvocation(invName);
 		expectedEvents.add(invocation);
 		expectedEvents.add(invocation);
-		
+
 		List<Event> actualEvents = sut.validationStream(NUMBEROFREPOS);
-		
+
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO2);
 
 		verify(ras.get(REPO2), times(2)).hasNext();
 		verify(ras.get(REPO2)).getNext(Context.class);
-		
+
 		verify(reader).readFile(any(File.class));
-		
+
 		assertEquals(expectedEvents.size(), actualEvents.size());
 		assertEquals(expectedEvents, actualEvents);
 	}
@@ -303,35 +302,35 @@ public class ReposParserTest {
 
 	private List<Event> getExpectedEvents() {
 		List<Event> events = new LinkedList<Event>();
-		
+
 		String md1 = "[?] [?].???()";
-		IMethodName methodDecl1 = MethodName.newMethodName(md1);
+		IMethodName methodDecl1 = Names.newMethod(md1);
 		Event e1 = Events.newFirstContext(methodDecl1);
 		events.add(e1);
 		events.add(Events.newContext(methodDecl1));
-		
+
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
-		IMethodName methodInv1 = MethodName.newMethodName(inv1);
+		IMethodName methodInv1 = Names.newMethod(inv1);
 		Event e2 = Events.newInvocation(methodInv1);
 		events.add(e2);
 
 		String inv2 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
-		IMethodName methodInv2 = MethodName.newMethodName(inv2);
+		IMethodName methodInv2 = Names.newMethod(inv2);
 		Event e3 = Events.newInvocation(methodInv2);
 		events.add(e3);
 		events.add(e3);
-		
+
 		events.add(e1);
 		events.add(Events.newContext(methodDecl1));
-		
+
 		String inv3 = "[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
-		IMethodName methodInv3 = MethodName.newMethodName(inv3);
+		IMethodName methodInv3 = Names.newMethod(inv3);
 		Event e5 = Events.newInvocation(methodInv3);
 		events.add(e5);
 
 		return events;
 	}
-	
+
 	private String getReposPath() {
 		String fileName = rootFolder.getRoot().getAbsolutePath() + "/" + NUMBEROFREPOS + "Repos/repositories.txt";
 		return fileName;

@@ -18,8 +18,9 @@ package cc.kave.commons.model.episodes;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.ToStringUtils;
 
 public class Event {
@@ -55,10 +56,10 @@ public class Event {
 
 	public Event createDummyEvent() {
 		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
-		
+		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
+
 		this.Method = DUMMY_METHOD;
-		
+
 		return this;
 	}
 

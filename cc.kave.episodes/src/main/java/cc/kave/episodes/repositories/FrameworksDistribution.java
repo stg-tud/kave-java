@@ -30,8 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.csharp.AssemblyVersion;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.statistics.StreamStatistics;
 
@@ -42,8 +41,7 @@ public class FrameworksDistribution {
 	private StreamStatistics statistics;
 
 	@Inject
-	public FrameworksDistribution(@Named("statistics") File folder,
-			ReposParser repos, StreamStatistics statistics) {
+	public FrameworksDistribution(@Named("statistics") File folder, ReposParser repos, StreamStatistics statistics) {
 		assertTrue(folder.exists(), "Statistics folder does not exist");
 		assertTrue(folder.isDirectory(), "Statistics is not a folder, but a file");
 		this.rootFolder = folder;
@@ -69,7 +67,7 @@ public class FrameworksDistribution {
 			IAssemblyName asm = entry.getKey().getMethod().getDeclaringType().getAssembly();
 			String frameworkName = asm.getIdentifier();
 			String typeName = entry.getKey().getMethod().getDeclaringType().getFullName();
-			if (AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
+			if (asm.getVersion().isUnknown()) {
 				continue;
 			}
 			// String methodName = entry.getKey().getMethod().getName();

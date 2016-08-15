@@ -18,10 +18,11 @@ package cc.kave.commons.model.episodes;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
+import org.junit.Test;
+
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
@@ -38,15 +39,15 @@ public class EventTest {
 	@Test
 	public void dummyEvent() {
 		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 		Event expected = Events.newContext(DUMMY_METHOD);
-		
+
 		Event actual = new Event();
 		actual.createDummyEvent();
-		
+
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void settingValues() {
 		ITypeName typeName = mock(ITypeName.class);

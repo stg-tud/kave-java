@@ -12,15 +12,15 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry1([System.String, mscorlib, 4.0.0.0] arg)"
+        "Element":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry2([System.String, mscorlib, 4.0.0.0] arg)"
+        "Element":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Show([System.String, mscorlib, 4.0.0.0] arg)"
+        "Element":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)"
       }
     ]
   },
@@ -37,7 +37,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry1([System.String, mscorlib, 4.0.0.0] arg)",
+        "Name":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -46,7 +46,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.StructTypeName:System.Boolean, mscorlib, 4.0.0.0"
+            "Type":"0T:p:bool"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -64,7 +64,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "PropertyName":"CSharp.PropertyName:get [System.Int32, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Length()"
+                  "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
                 }
               },
               "Operator":3,
@@ -103,7 +103,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"half"
                 },
-                "Type":"CSharp.StructTypeName:System.Int32, mscorlib, 4.0.0.0"
+                "Type":"0T:p:int"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -121,7 +121,7 @@
                         "$type":"[SST:References.VariableReference]",
                         "Identifier":"arg"
                       },
-                      "PropertyName":"CSharp.PropertyName:get [System.Int32, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Length()"
+                      "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
                     }
                   },
                   "Operator":12,
@@ -137,7 +137,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$1"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -151,7 +151,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Substring([System.Int32, mscorlib, 4.0.0.0] startIndex)",
+                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -169,7 +169,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$2"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -183,7 +183,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry1([System.String, mscorlib, 4.0.0.0] arg)",
+                  "MethodName":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -201,7 +201,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$3"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -215,7 +215,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Substring([System.Int32, mscorlib, 4.0.0.0] startIndex, [System.Int32, mscorlib, 4.0.0.0] length)",
+                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ConstantValueExpression]",
@@ -237,7 +237,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$4"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -251,7 +251,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry1([System.String, mscorlib, 4.0.0.0] arg)",
+                  "MethodName":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -269,7 +269,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$5"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -313,7 +313,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry2([System.String, mscorlib, 4.0.0.0] arg)",
+        "Name":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -322,7 +322,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.StructTypeName:System.Boolean, mscorlib, 4.0.0.0"
+            "Type":"0T:p:bool"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -348,7 +348,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":""
                   },
-                  "FieldName":"CSharp.FieldName:static [System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Empty"
+                  "FieldName":"CSharp.FieldName:static [p:string] [p:string].Empty"
                 }
               }
             }
@@ -369,7 +369,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"half"
                 },
-                "Type":"CSharp.StructTypeName:System.Int32, mscorlib, 4.0.0.0"
+                "Type":"0T:p:int"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -387,7 +387,7 @@
                         "$type":"[SST:References.VariableReference]",
                         "Identifier":"arg"
                       },
-                      "PropertyName":"CSharp.PropertyName:get [System.Int32, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Length()"
+                      "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
                     }
                   },
                   "Operator":12,
@@ -403,7 +403,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$1"
                 },
-                "Type":"CSharp.TypeName:System.String, mscorlib, 4.0.0.0"
+                "Type":"CSharp.TypeName:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -417,7 +417,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[System.String, mscorlib, 4.0.0.0] [System.String, mscorlib, 4.0.0.0].Substring([System.Int32, mscorlib, 4.0.0.0] startIndex, [System.Int32, mscorlib, 4.0.0.0] length)",
+                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ConstantValueExpression]",
@@ -441,7 +441,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Show([System.String, mscorlib, 4.0.0.0] arg)",
+                  "MethodName":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -462,7 +462,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Show([System.String, mscorlib, 4.0.0.0] arg)",
+        "Name":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
         "IsEntryPoint":false,
         "Body":[
           {
@@ -473,7 +473,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":""
               },
-              "MethodName":"CSharp.MethodName:static [System.Void, mscorlib, 4.0.0.0] [System.Console, mscorlib, 4.0.0.0].WriteLine([System.String, mscorlib, 4.0.0.0] value)",
+              "MethodName":"CSharp.MethodName:static [p:void] [System.Console, mscorlib, 4.0.0.0].WriteLine([p:string] value)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -493,7 +493,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"this"
               },
-              "MethodName":"CSharp.MethodName:[System.Void, mscorlib, 4.0.0.0] [Test.RecursionTest, ConsoleTest].Entry2([System.String, mscorlib, 4.0.0.0] arg)",
+              "MethodName":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",

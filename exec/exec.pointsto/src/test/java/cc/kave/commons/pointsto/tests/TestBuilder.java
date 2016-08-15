@@ -117,8 +117,7 @@ public abstract class TestBuilder {
 
 	public IMethodName constructor(ITypeName declType, ITypeName... parameters) {
 		String parameterIdentifiers = getParameterIdentifiers(Arrays.asList(parameters));
-		return Names.newMethod(
-				"[" + voidType() + "] [" + declType.getIdentifier() + "]..ctor(" + parameterIdentifiers + ")");
+		return Names.newMethod("[p:void] [" + declType.getIdentifier() + "]..ctor(" + parameterIdentifiers + ")");
 	}
 
 	public IFieldName field(ITypeName type, ITypeName declType, int id) {
@@ -126,8 +125,8 @@ public abstract class TestBuilder {
 	}
 
 	public IPropertyName property(ITypeName type, ITypeName declType, int id) {
-		return Names.newProperty(
-				"get set [" + type.getIdentifier() + "] [" + declType.getIdentifier() + "].p" + id + "()");
+		return Names
+				.newProperty("get set [" + type.getIdentifier() + "] [" + declType.getIdentifier() + "].p" + id + "()");
 	}
 
 	public IConstantValueExpression constantExpr() {

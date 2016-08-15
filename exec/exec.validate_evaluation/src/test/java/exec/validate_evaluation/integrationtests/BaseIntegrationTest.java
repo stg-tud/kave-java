@@ -152,6 +152,9 @@ public abstract class BaseIntegrationTest {
 	private Set<MicroCommit> readCommits() {
 		Set<MicroCommit> commits = Sets.newHashSet();
 		Directory dir = new Directory(path(dirCommits));
+		if (!dir.exists("a.zip")) {
+			return commits;
+		}
 		try (IReadingArchive ra = dir.getReadingArchive("a.zip")) {
 			while (ra.hasNext()) {
 				commits.add(ra.getNext(MicroCommit.class));
@@ -218,7 +221,7 @@ public abstract class BaseIntegrationTest {
 	}
 
 	protected IMethodName m(int typeNum, int methodNum) {
-		String name = String.format("[T,P] [%s].m%d()", t(typeNum), methodNum);
+		String name = String.format("[T,P] [%s].m%d()", t(typeNum).getIdentifier(), methodNum);
 		return Names.newMethod(name);
 	}
 

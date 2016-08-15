@@ -32,10 +32,9 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EnclosingMethodsTest {
 
@@ -209,7 +208,8 @@ public class EnclosingMethodsTest {
 		sut1.addMethod(episode, method1, events);
 		sut1.addMethod(episode, method2, events);
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(), Events.newContext(m(3, 2)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(),
+				Events.newContext(m(3, 2)).getMethod());
 
 		assertEquals(3, sut1.getOccurrences());
 		assertEquals(expected, sut1.getMethodNames(5));
@@ -291,13 +291,13 @@ public class EnclosingMethodsTest {
 
 	private IMethodName m(int typeNum, int methodNum) {
 		if ((typeNum == 0) || (methodNum == 0)) {
-			return MethodName.UNKNOWN_NAME;
+			return Names.getUnknownMethod();
 		} else {
-			return MethodName.newMethodName(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
+			return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
 		}
 	}
 
 	private ITypeName t(int typeNum) {
-		return TypeName.newTypeName(String.format("T%d,P", typeNum));
+		return Names.newType(String.format("T%d,P", typeNum));
 	}
 }

@@ -25,8 +25,8 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 
@@ -40,13 +40,13 @@ public class EpisodeToGraphConverter {
 		for (Fact fact : episode.getFacts()) {
 			if (!fact.isRelation()) {
 				graph.addVertex(fact);
-			} 
+			}
 		}
 		for (Fact fact : episode.getFacts()) {
 			if (fact.isRelation()) {
 				Tuple<Fact, Fact> existance = fact.getRelationFacts();
 				graph.addEdge(existance.getFirst(), existance.getSecond());
-			} 
+			}
 		}
 		TopologicalOrderIterator<Fact, DefaultEdge> toi = new TopologicalOrderIterator<>(graph);
 		while (toi.hasNext()) {

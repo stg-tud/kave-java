@@ -28,48 +28,49 @@ import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class StreamStatisticsTest {
-	
+
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-	private static final IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+	private static final IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
 	private List<Event> events;
 	private Map<Event, Integer> occurrences;
-	
+
 	private StreamStatistics sut;
-	
+
 	@Before
 	public void setup() {
 		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
-		
+
 		occurrences = Maps.newHashMap();
 		occurrences.put(ctx(1), 2);
 		occurrences.put(inv(2), 2);
 		occurrences.put(inv(3), 2);
 		occurrences.put(ctx(4), 1);
 		occurrences.put(inv(5), 1);
-		
+
 		sut = new StreamStatistics();
 	}
-	
+
 	@Test
 	public void aggregationTest() {
 		Map<Event, Integer> actuals = sut.getFrequencies(events);
-		
+
 		assertEquals(occurrences, actuals);
 	}
-	
+
 	@Test
 	public void freqTest() {
 		int actuals = sut.minFreq(occurrences);
-		
-		assertEquals(1, actuals);;
+
+		assertEquals(1, actuals);
+		;
 	}
-	
+
 	private static Event inv(int i) {
 		return Events.newInvocation(m(i));
 	}
@@ -77,8 +78,8 @@ public class StreamStatisticsTest {
 	private static Event ctx(int i) {
 		return Events.newContext(m(i));
 	}
-	
+
 	private static IMethodName m(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		return Names.newMethod("[T,P] [T,P].m" + i + "()");
 	}
 }

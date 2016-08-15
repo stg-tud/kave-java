@@ -15,6 +15,7 @@
  */
 package cc.kave.commons.model.episodes;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class Events {
@@ -24,14 +25,14 @@ public class Events {
 		event.setMethod(ctx);
 		return event;
 	}
-	
+
 	public static Event newFirstContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.FIRST_DECLARATION);
 		event.setMethod(ctx);
 		return event;
 	}
-	
+
 	public static Event newSuperContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.SUPER_DECLARATION);
@@ -45,10 +46,10 @@ public class Events {
 		event.setMethod(m);
 		return event;
 	}
-	
+
 	public static Event newDummyEvent() {
 		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
+		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 		Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 		return DUMMY_EVENT;
 	}

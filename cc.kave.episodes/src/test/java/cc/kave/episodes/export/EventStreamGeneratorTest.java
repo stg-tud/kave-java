@@ -29,10 +29,9 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -209,7 +208,7 @@ public class EventStreamGeneratorTest {
 	}
 
 	private IMethodName unknown() {
-		return MethodName.UNKNOWN_NAME;
+		return Names.getUnknownMethod();
 	}
 
 	private IStatement inv(String string, IMethodName m) {
@@ -254,11 +253,11 @@ public class EventStreamGeneratorTest {
 	}
 
 	private IMethodName m(int typeNum, int methodNum) {
-		return MethodName.newMethodName(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
+		return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
 	}
 
 	private ITypeName t(int typeNum) {
-		return TypeName.newTypeName(String.format("T%d,P", typeNum));
+		return Names.newType(String.format("T%d,P", typeNum));
 	}
 
 	private IMethodDeclaration methodDeclGenericBound(int typeNum, int methodNum, int typeParamNum,
@@ -277,19 +276,19 @@ public class EventStreamGeneratorTest {
 	}
 
 	private IMethodName mGenericBound(int typeNum, int methodNum, int typeParamNum) {
-		return MethodName.newMethodName(String.format("[R,P] [%s].m%d`1[[T -> %s]]()",
-				tGenericBound(typeNum, typeParamNum), methodNum, t(typeParamNum)));
+		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T -> %s]]()", tGenericBound(typeNum, typeParamNum),
+				methodNum, t(typeParamNum)));
 	}
 
 	private IMethodName mGenericFree(int typeNum, int methodNum) {
-		return MethodName.newMethodName(String.format("[R,P] [%s].m%d`1[[T]]()", tGenericFree(typeNum), methodNum));
+		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T]]()", tGenericFree(typeNum), methodNum));
 	}
 
 	private ITypeName tGenericFree(int typeNum) {
-		return TypeName.newTypeName(String.format("T%d`1[[T]],P", typeNum));
+		return Names.newType(String.format("T%d`1[[T]],P", typeNum));
 	}
 
 	private ITypeName tGenericBound(int typeNum, int typeParamNum) {
-		return TypeName.newTypeName(String.format("T%d`1[[T -> %s]],P", typeNum, t(typeParamNum)));
+		return Names.newType(String.format("T%d`1[[T -> %s]],P", typeNum, t(typeParamNum)));
 	}
 }

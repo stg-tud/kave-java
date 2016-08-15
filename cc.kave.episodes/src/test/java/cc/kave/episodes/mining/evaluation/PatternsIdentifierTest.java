@@ -50,8 +50,8 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -299,9 +299,9 @@ public class PatternsIdentifierTest {
 
 	private static IMethodName m(int i) {
 		if (i == 0) {
-			return MethodName.UNKNOWN_NAME;
+			return Names.getUnknownMethod();
 		} else {
-			return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+			return Names.newMethod("[T,P] [T,P].m" + i + "()");
 		}
 	}
 

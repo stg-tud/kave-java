@@ -22,8 +22,8 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -41,9 +41,10 @@ public class EventStreamGenerator {
 		ISST sst = ctx.getSST();
 		if (!sst.isPartialClass()) {
 			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
-//			System.out.println(ctx.getSST().getEnclosingType() + "-> " + ctx.getSST().getPartialClassIdentifier());
+			// System.out.println(ctx.getSST().getEnclosingType() + "-> " +
+			// ctx.getSST().getPartialClassIdentifier());
 		}
-//		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+		// sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
@@ -57,20 +58,22 @@ public class EventStreamGenerator {
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
 
-//		private IMethodName debug = MethodName.newMethodName(
-//				"[System.Void, mscorlib, 4.0.0.0] [ACAT.Lib.Core.PanelManagement.MenuPanelBase, Core].InitializeComponent()");
+		// private IMethodName debug = MethodName.newMethodName(
+		// "[System.Void, mscorlib, 4.0.0.0]
+		// [ACAT.Lib.Core.PanelManagement.MenuPanelBase,
+		// Core].InitializeComponent()");
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
-//			if (debug.equals(decl.getName())) {
-//				System.out.println();
-//			}
+			// if (debug.equals(decl.getName())) {
+			// System.out.println();
+			// }
 
 			// currentCtx = MethodName.UNKNOWN_NAME;
-			firstCtx = MethodName.UNKNOWN_NAME;
-			superCtx = MethodName.UNKNOWN_NAME;
-			elementCtx = MethodName.UNKNOWN_NAME;
+			firstCtx = Names.getUnknownMethod();
+			superCtx = Names.getUnknownMethod();
+			elementCtx = Names.getUnknownMethod();
 			IMethodName name = decl.getName();
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
@@ -107,7 +110,7 @@ public class EventStreamGenerator {
 		}
 
 		private boolean shouldInclude(IMethodName name) {
-			if (MethodName.UNKNOWN_NAME.equals(name)) {
+			if (name.isUnknown()) {
 				return false;
 			}
 
@@ -137,7 +140,7 @@ public class EventStreamGenerator {
 			}
 			if (superCtx != null) {
 				Event superEvent = Events.newSuperContext(TypeErasure.of(superCtx));
-				if (!superEvent.getMethod().equals(MethodName.UNKNOWN_NAME)) {
+				if (!superEvent.getMethod().isUnknown()) {
 					events.add(superEvent);
 				}
 				superCtx = null;

@@ -72,7 +72,7 @@ public class SST implements ISST {
 
 	@Override
 	public boolean isPartialClass() {
-		return !this.partialClassIdentifier.equals("");
+		return !StringUtils.isNullOrEmpty(this.partialClassIdentifier);
 	}
 
 	@Override
@@ -153,7 +153,8 @@ public class SST implements ISST {
 		result = prime * result + ((events == null) ? 0 : events.hashCode());
 		result = prime * result + ((fields == null) ? 0 : fields.hashCode());
 		result = prime * result + ((methods == null) ? 0 : methods.hashCode());
-		result = prime * result + (StringUtils.isNullOrEmpty(partialClassIdentifier) ? 0 : partialClassIdentifier.hashCode());
+		result = prime * result
+				+ (StringUtils.isNullOrEmpty(partialClassIdentifier) ? 0 : partialClassIdentifier.hashCode());
 		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}

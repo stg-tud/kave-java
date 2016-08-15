@@ -74,11 +74,11 @@ import cc.kave.commons.utils.json.JsonUtils;
 public class TestSSTBuilder {
 
 	public ITypeName getStringType() {
-		return Names.newType("System.String, mscorlib");
+		return Names.newType("p:string");
 	}
 
 	public ITypeName getVoidType() {
-		return Names.newType("System.Void, mscorlib");
+		return Names.newType("p:void");
 	}
 
 	public ITypeName getFileStreamType() {
@@ -86,15 +86,15 @@ public class TestSSTBuilder {
 	}
 
 	public ITypeName getByteArrayType() {
-		return Names.newType("System.Byte[], mscorlib");
+		return Names.newType("p:byte[]");
 	}
 
 	public ITypeName getInt32Type() {
-		return Names.newType("System.Int32, mscorlib");
+		return Names.newType("p:int");
 	}
 
 	public ITypeName getBooleanType() {
-		return Names.newType("System.Boolean, mscorlib");
+		return Names.newType("p:bool");
 	}
 
 	public SST createEmptySST(ITypeName enclosingType) {

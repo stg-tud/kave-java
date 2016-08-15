@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class EventsTest {
@@ -35,7 +36,7 @@ public class EventsTest {
 		assertSame(m, actual.getMethod());
 		assertNull(actual.getType());
 	}
-	
+
 	@Test
 	public void firstDecl() {
 		IMethodName m = mock(IMethodName.class);
@@ -45,7 +46,7 @@ public class EventsTest {
 		assertSame(m, actual.getMethod());
 		assertNull(actual.getType());
 	}
-	
+
 	@Test
 	public void superDecl() {
 		IMethodName m = mock(IMethodName.class);
@@ -65,16 +66,16 @@ public class EventsTest {
 		assertSame(m, actual.getMethod());
 		assertNull(actual.getType());
 	}
-	
+
 	@Test
 	public void dummy() {
 		Event actual = Events.newDummyEvent();
-		
+
 		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
-		IMethodName DUMMY_METHOD = MethodName.newMethodName(DUMMY_METHOD_NAME);
-		
+		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
+
 		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
-		assertSame(DUMMY_METHOD, actual.getMethod());
+		assertEquals(DUMMY_METHOD, actual.getMethod());
 		assertNull(actual.getType());
 	}
 }

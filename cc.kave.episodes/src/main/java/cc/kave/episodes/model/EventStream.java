@@ -27,7 +27,6 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.names.csharp.MethodName;
 
 public class EventStream {
 	public static final double DELTA = 0.001;
@@ -64,15 +63,16 @@ public class EventStream {
 
 		possiblyIncreaseTimout(event);
 
-		if (event.getMethod().equals(MethodName.UNKNOWN_NAME)) {
+		if (event.getMethod().isUnknown()) {
 			return;
 		}
 
 		int idx = ensureEventExistsAndGetId(event);
 
-//		if (idx >= 1230 && idx < 1240) {
-//			System.out.printf("%d => (%s) %s", idx, event.getKind(), event.getMethod());
-//		}
+		// if (idx >= 1230 && idx < 1240) {
+		// System.out.printf("%d => (%s) %s", idx, event.getKind(),
+		// event.getMethod());
+		// }
 
 		addEventIdToStream(idx);
 	}
