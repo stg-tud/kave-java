@@ -33,10 +33,14 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.DelegateTypeName;
 import cc.kave.commons.model.names.csharp.EventName;
+import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
+import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
+import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.references.EventReference;
 import cc.kave.commons.model.ssts.impl.references.MethodReference;
 import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
@@ -46,6 +50,61 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void addsTypeOnVariableDeclaration() {
 		SST sst = defaultSST(declare("someVariable", type("T1")));
+
+		assertUsedTypesForSST(sst, type("T1"));
+	}
+
+	@Test
+	public void addsEventTypeOnEventDeclaration() {
+		SST sst = new SST();
+		EventDeclaration eventDecl = new EventDeclaration();
+		eventDecl.setName(EventName.newEventName("[T1,P1] [?].???"));
+		sst.getEvents().add(eventDecl);
+
+		assertUsedTypesForSST(sst, type("T1"));
+	}
+
+	@Test
+	public void addsFieldTypeOnFieldDeclaration() {
+		SST sst = new SST();
+		sst.getFields().add(fieldDecl(field(type("int"), type("T1"), "f1")));
+
+		assertUsedTypesForSST(sst, type("int"));
+	}
+
+	@Test
+	public void addsPropertyTypeOnPropertyDeclaration() {
+		SST sst = new SST();
+		sst.getProperties().add(propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P1] [T1,P1].P")));
+
+		assertUsedTypesForSST(sst, type("PropertyType"));
+	}
+
+	@Test
+	public void addsReturnTypeOnMethodDeclaration() {
+		SST sst = new SST();
+		sst.setEnclosingType(type("T1"));
+		sst.getMethods().add(methodDecl(method(type("ReturnType"), type("T1"), "m1")));
+
+		assertUsedTypesForSST(sst, type("ReturnType"));
+	}
+
+	@Test
+	public void addsMethodParametersOnMethodDeclaration() {
+		SST sst = new SST();
+		sst.setEnclosingType(type("T1"));
+		sst.getMethods().add(methodDecl(method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"))));
+
+		assertUsedTypesForSST(sst, type("T2"));
+	}
+
+	@Test
+	public void addsDelegateParametersOnDelegateDeclaration() {
+		SST sst = new SST();
+		DelegateDeclaration delegateDecl = new DelegateDeclaration();
+		delegateDecl.setName(
+				DelegateTypeName.newDelegateTypeName("d:[?] [?].([T1,P1] p1)"));
+		sst.getDelegates().add(delegateDecl);
 
 		assertUsedTypesForSST(sst, type("T1"));
 	}

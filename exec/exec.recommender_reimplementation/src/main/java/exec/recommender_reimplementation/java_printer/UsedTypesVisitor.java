@@ -30,6 +30,11 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
+import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
+import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IEventReference;
@@ -57,10 +62,48 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	@Override
 	public Void visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		if (!isJavaValueType(type) && !type.equals(className)) {
+		addType(type);
+		return super.visit(stmt, context);
+	}
+
+	private void addType(ITypeName type) {
+		if (!isJavaValueType(type) && !type.equals(className) && !type.isUnknown()) {
 			usedTypes.add(type);		
 		}
+	}
+
+	@Override
+	public Void visit(IDelegateDeclaration stmt, Void context) {
+		addMethodParameters(stmt.getName().getParameters());
 		return super.visit(stmt, context);
+	}
+
+	@Override
+	public Void visit(IEventDeclaration stmt, Void context) {
+		addType(stmt.getName().getHandlerType());
+		return super.visit(stmt, context);
+	}
+
+	@Override
+	public Void visit(IFieldDeclaration stmt, Void context) {
+		addType(stmt.getName().getValueType());
+		return super.visit(stmt, context);
+	}
+
+	@Override
+	public Void visit(IMethodDeclaration decl, Void context) {
+		ITypeName returnType = decl.getName().getReturnType();
+		if (!returnType.isVoidType()) {
+			addType(returnType);
+		}
+		addMethodParameters(decl.getName().getParameters());
+		return super.visit(decl, context);
+	}
+
+	@Override
+	public Void visit(IPropertyDeclaration decl, Void context) {
+		addType(decl.getName().getValueType());
+		return super.visit(decl, context);
 	}
 
 	@Override
@@ -74,9 +117,9 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		ITypeName type = eventRef.getEventName().getDeclaringType();
 		String identifier = eventRef.getReference().getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier)) {
-			usedTypes.add(type);
+			addType(type);
 		}
-		usedTypes.add(eventRef.getEventName().getValueType());
+		addType(eventRef.getEventName().getValueType());
 		return super.visit(eventRef, context);
 	}
 	
@@ -85,9 +128,9 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		ITypeName type = fieldRef.getFieldName().getDeclaringType();
 		String identifier = fieldRef.getReference().getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier)) {
-			usedTypes.add(type);
+			addType(type);
 		}
-		usedTypes.add(fieldRef.getFieldName().getValueType());
+		addType(fieldRef.getFieldName().getValueType());
 		return super.visit(fieldRef, context);
 	}
 	
@@ -102,23 +145,23 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		ITypeName type = propertyRef.getPropertyName().getDeclaringType();
 		String identifier = propertyRef.getReference().getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier)) {
-			usedTypes.add(type);
+			addType(type);
 		}
-		usedTypes.add(propertyRef.getPropertyName().getValueType());
+		addType(propertyRef.getPropertyName().getValueType());
 		return super.visit(propertyRef, context);
 	}
 
 	@Override
 	public Void visit(ITryBlock block, Void context) {
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
-			usedTypes.add(catchBlock.getParameter().getValueType());
+			addType(catchBlock.getParameter().getValueType());
 		}
 		return super.visit(block, context);
 	}
 	
 	private void addMethodParameters(List<IParameterName> parameters) {
 		for (IParameterName parameterName : parameters) {
-			usedTypes.add(parameterName.getValueType());
+			addType(parameterName.getValueType());
 		}
 	}
 
@@ -126,11 +169,11 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		ITypeName type = methodName.getDeclaringType();
 		String identifier = varRef.getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier)) {
-			usedTypes.add(type);
+			addType(type);
 		}
 		ITypeName returnType = methodName.getReturnType();
 		if(!returnType.isVoidType()) {
-			usedTypes.add(returnType);
+			addType(returnType);
 		}
 		addMethodParameters(methodName.getParameters());
 	}

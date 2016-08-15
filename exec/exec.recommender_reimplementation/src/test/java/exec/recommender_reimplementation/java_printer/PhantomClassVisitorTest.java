@@ -51,6 +51,40 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	}
 
 	@Test
+	public void createsEmptySSTForValueTypeOnFieldDeclaration() {
+		SST sst = new SST();
+		sst.getFields().add(fieldDecl(field(type("int"), type("T1"), "f1")));
+
+		assertEmptySSTs(sst, type("int"));
+	}
+
+	@Test
+	public void createsEmptySSTForValueTypeOnPropertyDeclaration() {
+		SST sst = new SST();
+		sst.getProperties().add(propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P1] [T1,P1].P")));
+
+		assertEmptySSTs(sst, type("PropertyType"));
+	}
+
+	@Test
+	public void createsEmptySSTForReturnTypeOnMethodDeclaration() {
+		SST sst = new SST();
+		sst.setEnclosingType(type("T1"));
+		sst.getMethods().add(methodDecl(method(type("ReturnType"), type("T1"), "m1")));
+
+		assertEmptySSTs(sst, type("ReturnType"));
+	}
+
+	@Test
+	public void createsEmptySSTForMethodParametersOnMethodDeclaration() {
+		SST sst = new SST();
+		sst.setEnclosingType(type("T1"));
+		sst.getMethods().add(methodDecl(method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"))));
+
+		assertEmptySSTs(sst, type("T2"));
+	}
+
+	@Test
 	public void addsFieldDeclarationOnFieldReference() {
 		SST sst = defaultSST(
 				assign(varRef("someVariable"), refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));

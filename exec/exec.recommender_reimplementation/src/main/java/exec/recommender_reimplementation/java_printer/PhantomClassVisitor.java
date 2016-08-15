@@ -33,6 +33,9 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
@@ -67,6 +70,28 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	}
 
 	@Override
+	public Void visit(IFieldDeclaration stmt, Map<ITypeName, SST> context) {
+		addTypeToMap(context, stmt.getName().getValueType());
+		return super.visit(stmt, context);
+	}
+
+	@Override
+	public Void visit(IMethodDeclaration decl, Map<ITypeName, SST> context) {
+		ITypeName returnType = decl.getName().getReturnType();
+		if (!returnType.isVoidType()) {
+			addTypeToMap(context, returnType);
+		}
+		handleMethodParameters(decl.getName().getParameters(), context);
+		return super.visit(decl, context);
+	}
+
+	@Override
+	public Void visit(IPropertyDeclaration decl, Map<ITypeName, SST> context) {
+		addTypeToMap(context, decl.getName().getValueType());
+		return super.visit(decl, context);
+	}
+
+	@Override
 	public Void visit(ITryBlock block, Map<ITypeName, SST> context) {
 		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
 			ITypeName type = catchBlock.getParameter().getValueType();
@@ -98,7 +123,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	}
 
 	private void addTypeToMap(Map<ITypeName, SST> context, ITypeName type) {
-		if (isJavaValueType(type) || type.equals(className)) {
+		if (isJavaValueType(type) || type.equals(className) || type.isUnknown()) {
 			return;
 		}
 		if (!context.containsKey(type)) {
