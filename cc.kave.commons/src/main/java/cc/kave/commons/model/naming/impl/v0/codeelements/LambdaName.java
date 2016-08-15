@@ -28,6 +28,7 @@ import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.StringUtils;
 
 public class LambdaName extends BaseName implements ILambdaName {
 
@@ -62,11 +63,10 @@ public class LambdaName extends BaseName implements ILambdaName {
 		if (isUnknown()) {
 			return new TypeName();
 		}
-		int startIndexOfValueTypeIdentifier = identifier.indexOf('[') + 1;
-		int lastIndexOfValueTypeIdentifer = identifier.indexOf("]");
-		int lengthOfValueTypeIdentifier = lastIndexOfValueTypeIdentifer - startIndexOfValueTypeIdentifier;
-		return TypeUtils
-				.createTypeName(identifier.substring(startIndexOfValueTypeIdentifier, lengthOfValueTypeIdentifier));
+		int openR = identifier.indexOf('[');
+		int closeR = StringUtils.FindCorrespondingCloseBracket(identifier, openR);
+		openR++; // skip brackets
+		return TypeUtils.createTypeName(identifier.substring(openR, closeR));
 	}
 
 	public boolean isUnknown() {

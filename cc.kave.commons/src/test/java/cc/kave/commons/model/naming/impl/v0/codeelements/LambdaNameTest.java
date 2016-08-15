@@ -32,6 +32,7 @@ import cc.kave.commons.model.naming.codeelements.ILambdaName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.TestUtils;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.recommenders.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -80,6 +81,14 @@ public class LambdaNameTest {
 		assertEquals(
 				Lists.newArrayList(new ParameterName(f("[%s] p1", typeId)), new ParameterName(f("[%s] p2", typeId))),
 				sut.getParameters());
+	}
+
+	@Test
+	@Parameters(source = TestUtils.class, method = "provideTypes")
+	public void ShouldParseReturnType(String typeId) {
+		sut = new LambdaName(f("[%s] ([%s] p1, [%s] p2)", typeId, typeId, typeId));
+
+		assertEquals(TypeUtils.createTypeName(typeId), sut.getReturnType());
 	}
 
 	@Test
