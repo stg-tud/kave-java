@@ -55,11 +55,11 @@ public class DirectoryTest {
 	public void InitAddsTrailingSeparator() throws IOException {
 		String withSlash = relFile(tempFileName, "with") + File.separator;
 		URL a = new Directory(withSlash).getUrl();
-		assertTrue(a.toString().endsWith(File.separator));
+		assertTrue(a.toString().endsWith("/"));
 
 		String withoutSlash = relFile(tempFileName, File.separator) + "without";
 		URL b = new Directory(withoutSlash).getUrl();
-		assertTrue(b.toString().endsWith(File.separator));
+		assertTrue(b.toString().endsWith("/"));
 	}
 
 	@Test
