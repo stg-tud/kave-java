@@ -15,10 +15,14 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.completionExpr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
@@ -39,4 +43,13 @@ public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseT
 		assertPrint(completionExpr(""), "");
 	}
 
+	@Test
+	public void replacesBinaryExpressionsWithNull() {
+		assertPrint(binExpr(BinaryOperator.Plus, constant("0"), constant("1")), "null");
+	}
+
+	@Test
+	public void replacesUnaryExpressionsWithNull() {
+		assertPrint(unaryExpr(UnaryOperator.Plus, constant("0")), "null");
+	}
 }

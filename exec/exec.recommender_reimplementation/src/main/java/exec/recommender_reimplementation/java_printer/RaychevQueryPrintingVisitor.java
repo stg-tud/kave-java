@@ -15,7 +15,9 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
@@ -38,6 +40,18 @@ public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 			throw new InvalidJavaCodeException();
 		}
 		context.text("UNK.Must1(").text(varRef.getIdentifier()).text(")");
+		return null;
+	}
+	
+	@Override
+	public Void visit(IBinaryExpression expr, SSTPrintingContext context) {
+		context.text("null");
+		return null;
+	}
+
+	@Override
+	public Void visit(IUnaryExpression expr, SSTPrintingContext context) {
+		context.text("null");
 		return null;
 	}
 
