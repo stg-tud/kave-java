@@ -26,7 +26,7 @@ import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 
 public class EpisodeAsGraphWriter {
 

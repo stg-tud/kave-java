@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
 public class QueryTarget extends Pattern {

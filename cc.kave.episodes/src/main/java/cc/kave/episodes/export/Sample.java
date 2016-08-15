@@ -29,8 +29,8 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;

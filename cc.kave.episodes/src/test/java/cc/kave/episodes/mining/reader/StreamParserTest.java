@@ -35,7 +35,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.exceptions.AssertionException;
 
 public class StreamParserTest {

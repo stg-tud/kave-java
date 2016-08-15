@@ -32,9 +32,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -44,6 +41,9 @@ import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.EnclosingMethods;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
 

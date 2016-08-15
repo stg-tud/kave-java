@@ -31,11 +31,11 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.analyzer.ValidationSetAnalyzer;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Logger;
 
 public class ValidationSetAnalyzerTest {

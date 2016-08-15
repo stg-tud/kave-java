@@ -17,9 +17,9 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.evaluation.queries.Separator;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Measure;
 

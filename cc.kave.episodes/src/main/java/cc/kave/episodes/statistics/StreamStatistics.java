@@ -20,8 +20,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 
 public class StreamStatistics {
 

@@ -41,9 +41,6 @@ import org.mockito.Mock;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
@@ -54,6 +51,9 @@ import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 

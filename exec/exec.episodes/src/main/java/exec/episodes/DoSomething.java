@@ -27,8 +27,8 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.events.Event;
 
 public class DoSomething {
 
@@ -38,50 +38,50 @@ public class DoSomething {
 	}
 
 	private void readAllContexts(String dirContexts) throws ZipException, IOException {
-//		List<File> zips = findAllZips(dirContexts);
-//		for (File zip : zips) {
-//			ReadingArchive ra = new ReadingArchive(zip);
-//
-//			int i = 0;
-//
-//			EventStreamGenerator gen = new EventStreamGenerator();
-//			System.out.println("found contexts for the following classes:");
-//			while (ra.hasNext()) {
-//				Context ctx = ra.getNext(Context.class);
-//
-//				gen.add(ctx);
-//				
-//				
-//				
-//				List<Event> events = Lists.newLinkedList(); // get from
-//															// somewhere
-//															// ("eventMapping.txt")
-//				ToFactsVisitor tfv = new ToFactsVisitor(events);
-//
-//				ISST sst = ctx.getSST();
-//				for (IMethodDeclaration md : sst.getMethods()) {
-//					Episode ep = new Episode();
-//					Set<Fact> facts = Sets.newHashSet();
-//					md.accept(tfv, facts);
-//
-//					for (Fact f : facts) {
-//						ep.addFact(f);
-//					}
-//				}
-//
-//				System.out.println("\t- " + ctx.getSST().getEnclosingType());
-//
-//				if (i++ > 10) {
-//					System.out.println("\t... (skipping the rest)");
-//					ra.close();
-//					return;
-//				}
-//			}
-//			ra.close();
-//			
-//			List<Event> allEvents = gen.getEventStream();
-//			EventStreamIo.write(es, null, null);
-//		}
+		// List<File> zips = findAllZips(dirContexts);
+		// for (File zip : zips) {
+		// ReadingArchive ra = new ReadingArchive(zip);
+		//
+		// int i = 0;
+		//
+		// EventStreamGenerator gen = new EventStreamGenerator();
+		// System.out.println("found contexts for the following classes:");
+		// while (ra.hasNext()) {
+		// Context ctx = ra.getNext(Context.class);
+		//
+		// gen.add(ctx);
+		//
+		//
+		//
+		// List<Event> events = Lists.newLinkedList(); // get from
+		// // somewhere
+		// // ("eventMapping.txt")
+		// ToFactsVisitor tfv = new ToFactsVisitor(events);
+		//
+		// ISST sst = ctx.getSST();
+		// for (IMethodDeclaration md : sst.getMethods()) {
+		// Episode ep = new Episode();
+		// Set<Fact> facts = Sets.newHashSet();
+		// md.accept(tfv, facts);
+		//
+		// for (Fact f : facts) {
+		// ep.addFact(f);
+		// }
+		// }
+		//
+		// System.out.println("\t- " + ctx.getSST().getEnclosingType());
+		//
+		// if (i++ > 10) {
+		// System.out.println("\t... (skipping the rest)");
+		// ra.close();
+		// return;
+		// }
+		// }
+		// ra.close();
+		//
+		// List<Event> allEvents = gen.getEventStream();
+		// EventStreamIo.write(es, null, null);
+		// }
 	}
 
 	private List<File> findAllZips(String dir) {
@@ -111,7 +111,7 @@ public class DoSomething {
 			System.out.println(e);
 			if (e.getMethod().getDeclaringType().toString().startsWith("System")) {
 				System.out.println(e.getMethod().getDeclaringType().toString());
-//				usage.getType().getIdentifier().startsWith("Lorg/eclipse/swt/widgets/");
+				// usage.getType().getIdentifier().startsWith("Lorg/eclipse/swt/widgets/");
 			}
 		}
 		System.out.println(events.size());

@@ -22,12 +22,12 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
 public class EpisodeToGraphConverter {

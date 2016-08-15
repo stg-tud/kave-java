@@ -22,9 +22,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.reader.EpisodeParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
 public class EpisodesPostprocessor {

@@ -24,9 +24,9 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.common.reflect.TypeToken;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
+import cc.kave.episodes.model.events.Event;
 
 public class EventStreamIo {
 	

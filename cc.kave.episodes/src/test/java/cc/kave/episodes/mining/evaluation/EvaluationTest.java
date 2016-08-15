@@ -46,7 +46,6 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
@@ -54,6 +53,7 @@ import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.TargetsCategorization;
+import cc.kave.episodes.model.events.Event;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;

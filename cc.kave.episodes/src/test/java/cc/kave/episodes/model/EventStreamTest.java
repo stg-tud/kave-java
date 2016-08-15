@@ -27,10 +27,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 
 public class EventStreamTest {
 

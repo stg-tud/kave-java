@@ -23,7 +23,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
+import cc.kave.episodes.model.events.Event;
 
 public class EventStreamReader {
 

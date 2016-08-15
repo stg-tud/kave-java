@@ -16,18 +16,13 @@
 package cc.kave.commons.utils.exec;
 
 import java.io.File;
-import java.lang.reflect.Type;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 
@@ -35,7 +30,6 @@ public class ReadAllContextsRunner {
 
 	public void run(String fileEventStream, String fileEventMapping, String dirContexts) {
 		readAllContexts(dirContexts);
-		// readMapping(fileEventMapping);
 	}
 
 	private void readAllContexts(String dirContexts) {
@@ -69,29 +63,5 @@ public class ReadAllContextsRunner {
 			zips.add(f);
 		}
 		return zips;
-	}
-
-	@SuppressWarnings("serial")
-	private void readMapping(String fileEventMapping) {
-		File in = new File(fileEventMapping);
-		Type listType = new TypeToken<LinkedList<Event>>() {
-		}.getType();
-		List<Event> events = JsonUtils.fromJson(in, listType);
-
-		System.out.printf("found %s events:\n", events.size());
-		int i = 1;
-		// events.indexOf(event)
-		for (Event e : events) {
-			if (i == 4978 || i == 8698 || i == 8708 || i == 8718 || i == 8725 || i == 4641) {
-				i++;
-				continue;
-			}
-			System.out.println("--- " + (i++) + " ---------------------");
-			System.out.println(e);
-			if (e.getMethod().getDeclaringType().toString().startsWith("System")) {
-				System.out.println(e.getMethod().getDeclaringType().toString());
-			}
-		}
-		System.out.println(events.size());
 	}
 }

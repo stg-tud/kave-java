@@ -42,8 +42,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -54,6 +52,8 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;

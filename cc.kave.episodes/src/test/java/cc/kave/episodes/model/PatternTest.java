@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 
 public class PatternTest {
 

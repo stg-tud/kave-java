@@ -26,8 +26,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.events.Event;
 
 public class MappingParser {
 

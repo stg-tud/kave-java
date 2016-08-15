@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
 public class TargetResults {

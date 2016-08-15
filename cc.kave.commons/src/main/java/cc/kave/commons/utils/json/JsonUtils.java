@@ -35,7 +35,6 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.model.events.ActivityEvent;
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.ErrorEvent;
@@ -189,9 +188,6 @@ public abstract class JsonUtils {
 		registerNames(gb);
 		registerSSTHierarchy(gb);
 		registerEventHierarchy(gb);
-
-		// enums
-		registerEnum(gb, EventKind.class);
 
 		gb.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
 		gb.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);

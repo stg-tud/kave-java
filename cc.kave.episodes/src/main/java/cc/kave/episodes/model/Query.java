@@ -17,7 +17,7 @@ package cc.kave.episodes.model;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 
 public class Query extends Pattern {
 

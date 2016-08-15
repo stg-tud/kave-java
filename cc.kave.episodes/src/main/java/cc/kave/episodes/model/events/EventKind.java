@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.model.episodes;
+package cc.kave.episodes.model.events;
 
 public enum EventKind {
 	METHOD_DECLARATION, FIRST_DECLARATION, SUPER_DECLARATION, INVOCATION

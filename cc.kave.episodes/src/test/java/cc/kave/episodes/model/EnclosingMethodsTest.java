@@ -29,12 +29,12 @@ import org.junit.rules.ExpectedException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
+import cc.kave.episodes.model.events.Fact;
 
 public class EnclosingMethodsTest {
 

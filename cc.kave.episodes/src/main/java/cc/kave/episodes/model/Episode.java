@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Fact;
+import cc.kave.episodes.model.events.Fact;
 
 public class Episode {
 

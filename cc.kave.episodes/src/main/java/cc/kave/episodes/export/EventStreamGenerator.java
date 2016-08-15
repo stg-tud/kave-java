@@ -19,8 +19,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -32,6 +30,8 @@ import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.TypeErasure;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 
 public class EventStreamGenerator {
 

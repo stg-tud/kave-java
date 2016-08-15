@@ -48,8 +48,6 @@ import org.mockito.stubbing.Answer;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -59,6 +57,8 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;

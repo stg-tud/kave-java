@@ -28,9 +28,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
 
 public class MappingParserTest {
 

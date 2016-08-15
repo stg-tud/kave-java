@@ -40,12 +40,12 @@ import java.util.zip.ZipException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
 import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.export.EventsFilter;
 import cc.kave.episodes.mining.reader.ReposParser;
 import cc.kave.episodes.model.EventStream;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
 
 public class Preprocessing {
 

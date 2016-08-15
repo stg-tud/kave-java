@@ -28,14 +28,14 @@ import org.jgrapht.graph.DefaultEdge;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
 public class ValidationDataGraphGenerator {

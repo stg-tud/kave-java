@@ -24,9 +24,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Events;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Events;
 
 public class EventStream {
 	public static final double DELTA = 0.001;

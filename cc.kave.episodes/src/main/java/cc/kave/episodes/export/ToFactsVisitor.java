@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.commons.model.ssts.impl.visitor;
+package cc.kave.episodes.export;
 
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
 
 public class ToFactsVisitor extends AbstractTraversingNodeVisitor<Set<Fact>, Void> {
 

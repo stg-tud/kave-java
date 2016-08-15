@@ -12,8 +12,8 @@ import org.apache.commons.math.util.MathUtils;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
 public class QueryStrategy {

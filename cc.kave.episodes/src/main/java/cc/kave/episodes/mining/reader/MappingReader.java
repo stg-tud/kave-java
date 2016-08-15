@@ -20,7 +20,7 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.commons.model.episodes.Event;
+import cc.kave.episodes.model.events.Event;
 
 public class MappingReader {
 

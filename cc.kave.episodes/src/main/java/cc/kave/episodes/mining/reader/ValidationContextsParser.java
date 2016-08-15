@@ -24,14 +24,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.model.ssts.impl.visitor.ToFactsVisitor;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
+import cc.kave.episodes.export.ToFactsVisitor;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.IReadingArchive;

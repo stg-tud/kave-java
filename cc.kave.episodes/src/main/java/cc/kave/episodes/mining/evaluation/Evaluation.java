@@ -35,7 +35,6 @@ import org.apache.mahout.math.Arrays;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.commons.model.episodes.Event;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
@@ -45,6 +44,7 @@ import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.TargetResults;
 import cc.kave.episodes.model.TargetsCategorization;
+import cc.kave.episodes.model.events.Event;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
