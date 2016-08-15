@@ -109,7 +109,8 @@ public class PropertyTransformationHelper {
 				return expr(invocation);
 			} else {
 				IFieldReference fieldReference = fieldReferenceToLocalField(
-						createPropertyFieldName(propertyReferenceSet.getPropertyName()));
+						createPropertyFieldName(propertyReferenceSet.getPropertyName()),
+						propertyReferenceSet.getReference());
 				assignment.setReference(fieldReference);
 			}
 
@@ -120,7 +121,7 @@ public class PropertyTransformationHelper {
 	public void transformPropertyReference(IReferenceExpression expr) {
 		IPropertyReference propertyReference = (IPropertyReference) expr.getReference();
 		IFieldReference fieldReference = fieldReferenceToLocalField(
-				createPropertyFieldName(propertyReference.getPropertyName()));
+				createPropertyFieldName(propertyReference.getPropertyName()), propertyReference.getReference());
 		ReferenceExpression refExpr = (ReferenceExpression) expr;
 		refExpr.setReference(fieldReference);
 	}
@@ -148,7 +149,8 @@ public class PropertyTransformationHelper {
 		return generateMethodDeclaration(createSetterPropertyMethodName(propertyDeclaration.getName()),
 				Lists.newArrayList( //
 						assign( //
-								fieldReferenceToLocalField(createPropertyFieldName(propertyDeclaration.getName())),
+								fieldReferenceToLocalField(createPropertyFieldName(propertyDeclaration.getName()),
+										variableReference("this")),
 								refExpr(variableReference("value")))));
 	}
 
@@ -163,7 +165,8 @@ public class PropertyTransformationHelper {
 						returnStatement( //
 								refExpr( //
 										fieldReferenceToLocalField(
-												createPropertyFieldName(propertyDeclaration.getName()))))));
+												createPropertyFieldName(propertyDeclaration.getName()),
+												variableReference("this"))))));
 	}
 
 	private IInvocationExpression generateSetterInvocation(IVariableReference reference,
@@ -210,9 +213,9 @@ public class PropertyTransformationHelper {
 		return name;
 	}
 
-	private IFieldReference fieldReferenceToLocalField(IFieldName fieldName) {
+	private IFieldReference fieldReferenceToLocalField(IFieldName fieldName, IVariableReference varRef) {
 		FieldReference fieldRef = new FieldReference();
-		fieldRef.setReference(variableReference("this"));
+		fieldRef.setReference(varRef);
 		fieldRef.setFieldName(fieldName);
 		return fieldRef;
 	}

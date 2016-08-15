@@ -27,6 +27,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.csharp.PropertyName;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.SST;
@@ -34,8 +36,6 @@ import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-
-import com.google.common.collect.Lists;
 
 public class PropertyTransformationTest extends JavaTransformationBaseTest {
 
@@ -180,8 +180,8 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	public void propertyReferenceInReferenceExpression() {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(expr(
-						refExpr(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P")))), //
-				expr(refExpr(fieldRef("this", field(type("PropertyType"), type("DeclaringType"), "Property$P")))));
+						refExpr(propertyReference(varRef("other"), "get set [PropertyType,P1] [DeclaringType,P1].P")))), //
+				expr(refExpr(fieldRef("other", field(type("PropertyType"), type("DeclaringType"), "Property$P")))));
 	}
 
 }
