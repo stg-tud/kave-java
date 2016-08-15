@@ -260,10 +260,6 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		assertUsedTypesEmpty(sst);
 	}
 
-
-		assertUsedTypesEmpty(sst);
-	}
-
 	@Test
 	public void returnsAssemblies() {
 		SST sst = defaultSST(invocationStatement(method(type("SomeType"),

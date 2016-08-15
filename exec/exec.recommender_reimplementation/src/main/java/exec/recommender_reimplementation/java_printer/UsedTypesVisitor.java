@@ -16,6 +16,7 @@
 package exec.recommender_reimplementation.java_printer;
 
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isJavaValueType;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
 
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	}
 
 	private void addType(ITypeName type) {
-		if (!isJavaValueType(type) && !type.equals(className) && !type.isUnknown()) {
+		if (!isJavaValueType(type) && !type.equals(className) && isValidType(type)) {
 			usedTypes.add(type);		
 		}
 	}

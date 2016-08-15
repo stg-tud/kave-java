@@ -264,10 +264,6 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		assertNoSSTsGenerated(sst);
 	}
 
-
-		assertNoSSTsGenerated(sst);
-	}
-
 	@Test
 	public void handlesGenericsForMethods() {
 		SST sst = defaultSST(
