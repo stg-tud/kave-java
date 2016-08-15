@@ -24,7 +24,6 @@ import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -42,12 +41,12 @@ public class PhantomClassGeneratorUtil {
 		sst.getFields().add(fieldDecl);
 	}
 
-	public static void addMethodDeclarationToSST(IInvocationExpression invocation, SST sst) {
+	public static void addMethodDeclarationToSST(IMethodName methodName, SST sst) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
-		IMethodName methodName = TypeErasure.of(invocation.getMethodName());
-		methodDecl.setName(methodName);
-		if (!methodName.getReturnType().isVoidType()) {
-			addReturnStatement(methodDecl, methodName);
+		IMethodName nameWithoutGenerics = TypeErasure.of(methodName);
+		methodDecl.setName(nameWithoutGenerics);
+		if (!nameWithoutGenerics.getReturnType().isVoidType()) {
+			addReturnStatement(methodDecl, nameWithoutGenerics);
 		}
 
 		sst.getMethods().add(methodDecl);

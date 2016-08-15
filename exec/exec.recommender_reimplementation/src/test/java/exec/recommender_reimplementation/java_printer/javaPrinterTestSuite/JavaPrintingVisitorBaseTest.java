@@ -40,10 +40,13 @@ import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
@@ -174,6 +177,15 @@ public class JavaPrintingVisitorBaseTest {
 		methodDecl.setName(methodName);
 		methodDecl.setBody(Lists.newArrayList(statements));
 		return methodDecl;
+	}
+
+	protected IInvocationExpression invocation(String identifier, IMethodName methodName,
+			ISimpleExpression... parameters) {
+		InvocationExpression invocation = new InvocationExpression();
+		invocation.setReference(varRef(identifier));
+		invocation.setMethodName(methodName);
+		invocation.setParameters(Lists.newArrayList(parameters));
+		return invocation;
 	}
 
 	protected VariableReference varRef(String identifier) {

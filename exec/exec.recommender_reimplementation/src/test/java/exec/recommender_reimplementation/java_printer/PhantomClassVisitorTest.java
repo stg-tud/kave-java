@@ -17,24 +17,24 @@ package exec.recommender_reimplementation.java_printer;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.expr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.propertyReference;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
+import cc.kave.commons.model.ssts.impl.references.MethodReference;
 
 public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 
@@ -45,32 +45,17 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 
 	@Test
 	public void createsEmptySSTOnVariableDeclaration() {
-		SST sst = defaultSST(declare("someVariable", type("T1")));
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
+		ISST sst = defaultSST(declare("someVariable", type("T1")));
 
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertEmptySSTs(sst, type("T1"));
 	}
 
 	@Test
 	public void addsFieldDeclarationOnFieldReference() {
-		SST sst = defaultSST(assign(varRef("someVariable"),
-				refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
+		SST sst = defaultSST(
+				assign(varRef("someVariable"), refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getFields().add(fieldDecl(field(type("int"), type("T1"), "f1")));
-
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedFieldsInSST(sst, type("T1"), field(type("int"), type("T1"), "f1"));
 	}
 
 	@Test
@@ -80,17 +65,8 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 						field(type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"),
 								type("T1"), "f1")))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getFields()
-				.add(fieldDecl(field(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "f1")));
-
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedFieldsInSST(sst, type("T1"),
+				field(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "f1"));
 	}
 
 	@Test
@@ -98,17 +74,8 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		SST sst = defaultSST(assign(varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getProperties().add(
-				propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [T1,P1].P")));
-
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedPropertiesInSST(sst, type("T1"),
+				PropertyName.newPropertyName("get set [PropertyType,P] [T1,P1].P"));
 	}
 
 	@Test
@@ -116,120 +83,129 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		SST sst = defaultSST(assign(varRef("someVariable"), refExpr(propertyReference(varRef("other"),
 				"get set [System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]],P] [T1,P1].P"))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getProperties()
-				.add(propertyDecl(PropertyName
-						.newPropertyName("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P")));
-
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedPropertiesInSST(sst, type("T1"),
+				PropertyName.newPropertyName("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P"));
 	}
 
 	@Test
 	public void addsMethodDeclarationOnInvocation_NoReturnType() {
 		SST sst = defaultSST(invocationStatement(method(voidType, type("T1"), "m1")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getMethods().add(methodDecl(method(voidType, type("T1"), "m1")));
-
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedMethodsInSST(sst, type("T1"), methodDecl(method(voidType, type("T1"), "m1")));
 	}
-	
+
 	@Test
 	public void addsMethodDeclarationOnInvocation_ReturnReferenceType() {
 		SST sst = defaultSST(invocationStatement(method(type("SomeType"), type("T1"), "m1")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getMethods().add(methodDecl(method(type("SomeType"), type("T1"), "m1"), returnStatement(constant("null"))));
-		
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedMethodsInSST(sst, type("T1"),
+				methodDecl(method(type("SomeType"), type("T1"), "m1"), returnStatement(constant("null"))));
 	}
-	
+
 	@Test
 	public void addsMethodDeclarationOnInvocation_ReturnValueType() {
 		SST sst = defaultSST(invocationStatement(method(type("System.Int32"), type("T1"), "m1")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getMethods().add(methodDecl(method(type("System.Int32"), type("T1"), "m1"), returnStatement(constant("0"))));
-		
-		expected.put(type("T1"), expectedSST);
-
-		assertEquals(expected, actual);
+		assertGeneratedMethodsInSST(sst, type("T1"),
+				methodDecl(method(type("System.Int32"), type("T1"), "m1"), returnStatement(constant("0"))));
 	}
-	
+
 	@Test
 	public void addsMethodDeclarationOnInvocation_DeclaringTypeAndReceiverType() {
-		SST sst = defaultSST(declare("foo", type("T1")), invocationStatement("foo", method(type("SomeType"), type("SuperT1"), "m1")));
-	
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-	
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("T1"));
-		expectedSST.getMethods().add(methodDecl(method(type("SomeType"), type("SuperT1"), "m1"), returnStatement(constant("null"))));
-		
-		SST expectedSuperSST = new SST();
-		expectedSuperSST.setEnclosingType(type("SuperT1"));
-		expectedSuperSST.getMethods().add(methodDecl(method(type("SomeType"), type("SuperT1"), "m1"), returnStatement(constant("null"))));
-	
-		expected.put(type("T1"), expectedSST);
-		expected.put(type("SuperT1"), expectedSuperSST);
-		assertEquals(expected, actual);
+		SST sst = defaultSST(declare("foo", type("T1")),
+				invocationStatement("foo", method(type("SomeType"), type("SuperT1"), "m1")));
+
+		assertGeneratedSSTs(sst,
+				createSSTWithMethods(type("T1"),
+						methodDecl(method(type("SomeType"), type("SuperT1"), "m1"), returnStatement(constant("null")))),
+				createSSTWithMethods(type("SuperT1"), methodDecl(method(type("SomeType"), type("SuperT1"), "m1"),
+						returnStatement(constant("null")))));
 	}
 
 	@Test
 	public void addsMethodDeclarationOnInvocation_SuperType() {
 		SST sst = defaultSST(invocationStatement("super", method(voidType, type("SuperT1"), "m1")));
-	
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-	
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSuperSST = new SST();
-		expectedSuperSST.setEnclosingType(type("SuperT1"));
-		expectedSuperSST.getMethods().add(methodDecl(method(voidType, type("SuperT1"), "m1")));
-		expected.put(type("SuperT1"), expectedSuperSST);
-	
-		assertEquals(expected, actual);
+
+		assertGeneratedMethodsInSST(sst, type("SuperT1"), methodDecl(method(voidType, type("SuperT1"), "m1")));
+	}
+
+	@Test
+	public void addsMethodParametersOnInvocation() {
+		SST sst = defaultSST(type("T1"),
+				expr(invocation("this",
+				method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"), parameter(type("T3"), "p2")),
+				constant("1"), constant("2"))));
+		assertEmptySSTs(sst, type("T2"), type("T3"));
+	}
+
+	@Test
+	public void addsTypeOfCatchBlockParameter() {
+		CatchBlock catchBlock1 = new CatchBlock();
+		catchBlock1.setParameter(parameter(type("SomeException"), "e"));
+		CatchBlock catchBlock2 = new CatchBlock();
+		catchBlock2.setParameter(parameter(type("OtherException"), "e"));
+		TryBlock tryBlock = new TryBlock();
+		tryBlock.setCatchBlocks(Lists.newArrayList(catchBlock1, catchBlock2));
+		SST sst = defaultSST(tryBlock);
+		assertEmptySSTs(sst, type("SomeException"), type("OtherException"));
+	}
+
+	@Test
+	public void addsMethodDeclarationOnMethodReference() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(type("T1"), type("T2"), "m1"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+		assertGeneratedMethodsInSST(sst, type("T2"),
+				methodDecl(method(type("T1"), type("T2"), "m1"), returnStatement(constant("null"))));
+	}
+
+	@Test
+	public void addsMethodParameterOnMethodReference() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(voidType, type("T1"), "m1", parameter(type("T2"), "p1")));
+		methodRef.setReference(varRef("this"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+
+		assertEmptySSTs(sst, type("T2"));
+	}
+
+	@Test
+	public void addsMethodDeclarationOnMethodReference_DeclaringTypeAndReceiverType() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(type("SomeType"), type("SuperT1"), "m1"));
+		methodRef.setReference(varRef("foo"));
+		SST sst = defaultSST(declare("foo", type("T1")),assign(varRef("someVar"), refExpr(methodRef)));
+
+		assertGeneratedSSTs(sst,
+				createSSTWithMethods(type("T1"),
+						methodDecl(method(type("SomeType"), type("SuperT1"), "m1"), returnStatement(constant("null")))),
+				createSSTWithMethods(type("SuperT1"), methodDecl(method(type("SomeType"), type("SuperT1"), "m1"),
+						returnStatement(constant("null")))));
 	}
 
 	@Test
 	public void ignoresFieldInSameClass() {
-		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
-				refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
+		SST sst = defaultSST(type("T1"),
+				assign(varRef("someVariable"), refExpr(fieldRef("other", field(type("int"), type("T1"), "f1")))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		assertTrue(actual.isEmpty());
+		assertNoSSTsGenerated(sst);
 	}
-	
+
+	@Test
+	public void ignoresMethodReferenceToSameClass() {
+		MethodReference methodRef = new MethodReference();
+		methodRef.setMethodName(method(voidType, type("T1"), "m1"));
+		methodRef.setReference(varRef("this"));
+		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+
+		assertNoSSTsGenerated(sst);
+	}
+
 	@Test
 	public void ignoresInvocationOnSameClass() {
 		SST sst = defaultSST(type("T1"), invocationStatement(method(type("int"), type("T1"), "m1")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		assertTrue(actual.isEmpty());
+		assertNoSSTsGenerated(sst);
 	}
 
 	@Test
@@ -237,27 +213,21 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		assertTrue(actual.isEmpty());
+		assertNoSSTsGenerated(sst);
 	}
-	
+
 	@Test
 	public void ignoresInvocationOnValueType() {
 		SST sst = defaultSST(type("T1"), invocationStatement(method(voidType, type("System.Int32"), "m1")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		assertTrue(actual.isEmpty());
+		assertNoSSTsGenerated(sst);
 	}
 
 	@Test
 	public void ignoresJavaValueTypesInVariableDeclaration() {
 		SST sst = defaultSST(declare("someVar", type("System.Int32")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		assertTrue(actual.isEmpty());
+		assertNoSSTsGenerated(sst);
 	}
 
 	@Test
@@ -269,28 +239,12 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 						method(type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"),
 								type("T1"), "m2")));
 
-		Map<ITypeName, SST> actual = generatePhantomClasses(sst);
-
-		Map<ITypeName, SST> expected = Maps.newHashMap();
-		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(type("System.Collections.Dictionary`2[[TKey],[TValue]]"));
-		expectedSST.getMethods()
-				.add(methodDecl(method(voidType, type("System.Collections.Dictionary`2[[TKey],[TValue]]"), "m1")));
-		SST expectedSST2 = new SST();
-		expectedSST2.setEnclosingType(type("T1"));
-		expectedSST2.getMethods()
-				.add(methodDecl(method(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "m2"),
-						returnStatement(constant("null"))));
-		expected.put(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), expectedSST);
-		expected.put(type("T1"), expectedSST2);
-
-		assertEquals(expected, actual);
-	}
-
-	private Map<ITypeName, SST> generatePhantomClasses(SST sst) {
-		Map<ITypeName, SST> phantomClasses = Maps.newHashMap();
-		sst.accept(sut, phantomClasses);
-		return phantomClasses;
+		assertGeneratedSSTs(sst,
+				createSSTWithMethods(type("System.Collections.Dictionary`2[[TKey],[TValue]]"),
+						methodDecl(method(voidType, type("System.Collections.Dictionary`2[[TKey],[TValue]]"), "m1"))),
+				createSSTWithMethods(type("T1"),
+						methodDecl(method(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "m2"),
+								returnStatement(constant("null")))));
 	}
 
 }

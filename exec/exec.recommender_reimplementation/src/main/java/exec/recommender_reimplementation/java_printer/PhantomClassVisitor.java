@@ -22,16 +22,22 @@ import static exec.recommender_reimplementation.java_printer.PhantomClassGenerat
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isJavaValueType;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
+import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.references.IFieldReference;
+import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
@@ -56,33 +62,23 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 		ITypeName type = stmt.getType();
 		referenceToTypeMap.put(stmt.getReference(), type);
 		
-		if (isJavaValueType(type) || type.equals(className))
-			return super.visit(stmt, context);
-		if (!context.containsKey(type)) {
-			createNewSST(type, context);
-		}
+		addTypeToMap(context, type);
 		return super.visit(stmt, context);
 	}
 
 	@Override
-	public Void visit(IInvocationExpression invocation, Map<ITypeName, SST> context) {
-		ITypeName type = invocation.getMethodName().getDeclaringType();
-		String identifier = invocation.getReference().getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && !isJavaValueType(type)) {
-			addMethodDeclarationToSST(invocation, getOrCreateSST(type, context));
-			handleReceiverType(invocation, context);
+	public Void visit(ITryBlock block, Map<ITypeName, SST> context) {
+		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
+			ITypeName type = catchBlock.getParameter().getValueType();
+			addTypeToMap(context, type);
 		}
-		// TODO: add phantom classes for method parameter types
-		return super.visit(invocation, context);
+		return super.visit(block, context);
 	}
 
-	private void handleReceiverType(IInvocationExpression invocation, Map<ITypeName, SST> context) {
-		if(referenceToTypeMap.containsKey(invocation.getReference())) {
-			ITypeName receiverType = referenceToTypeMap.get(invocation.getReference());
-			if (!receiverType.isDelegateType()) {
-				addMethodDeclarationToSST(invocation, getOrCreateSST(receiverType, context));
-			}
-		}
+	@Override
+	public Void visit(IInvocationExpression invocation, Map<ITypeName, SST> context) {
+		handleMethod(invocation.getMethodName(), invocation.getReference(), context);
+		return super.visit(invocation, context);
 	}
 
 	@Override
@@ -93,6 +89,47 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 			addFieldDeclarationToSST(fieldRef, getOrCreateSST(type, context));
 		}
 		return super.visit(fieldRef, context);
+	}
+
+	@Override
+	public Void visit(IMethodReference methodRef, Map<ITypeName, SST> context) {
+		handleMethod(methodRef.getMethodName(), methodRef.getReference(), context);
+		return super.visit(methodRef, context);
+	}
+
+	private void addTypeToMap(Map<ITypeName, SST> context, ITypeName type) {
+		if (isJavaValueType(type) || type.equals(className)) {
+			return;
+		}
+		if (!context.containsKey(type)) {
+			createNewSST(type, context);
+		}
+	}
+
+	private void handleMethod(IMethodName methodName, IVariableReference varRef, Map<ITypeName, SST> context) {
+		ITypeName type = methodName.getDeclaringType();
+		String identifier = varRef.getIdentifier();
+		if (isReferenceToOutsideClass(type, identifier) && !isJavaValueType(type)) {
+			addMethodDeclarationToSST(methodName, getOrCreateSST(type, context));
+			handleReceiverType(varRef, methodName, context);
+		}
+		handleMethodParameters(methodName.getParameters(), context);
+	}
+
+	private void handleMethodParameters(List<IParameterName> parameters, Map<ITypeName, SST> context) {
+		for (IParameterName parameterName : parameters) {
+			ITypeName type = parameterName.getValueType();
+			addTypeToMap(context, type);		
+		}
+	}
+
+	private void handleReceiverType(IVariableReference varRef, IMethodName methodName, Map<ITypeName, SST> context) {
+		if (referenceToTypeMap.containsKey(varRef)) {
+			ITypeName receiverType = referenceToTypeMap.get(varRef);
+			if (!receiverType.isDelegateType()) {
+				addMethodDeclarationToSST(methodName, getOrCreateSST(receiverType, context));
+			}
+		}
 	}
 
 	@Override
