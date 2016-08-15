@@ -95,8 +95,14 @@ public class ProposalsSorter {
 
 		while (qidx < queryEvents.size()) {
 			epElems++;
+			//deletions
+			if (epElems > episode.getNumEvents()) {
+				dels += query.getNumEvents() - qidx;
+				break;
+			}
 			Set<Fact> eFacts = episodeEvents.get(eidx);
 			Fact qEvent = queryEvents.get(qidx);
+			//substitutions
 			if (!eFacts.contains(qEvent)) {
 				if (episode.getEvents().contains(qEvent)) {
 					adds++;
@@ -118,6 +124,7 @@ public class ProposalsSorter {
 			}
 			qidx++;
 		}
+		//additions
 		while (eidx < episodeEvents.size()) {
 			adds += episodeEvents.get(eidx).size();
 			eidx++;

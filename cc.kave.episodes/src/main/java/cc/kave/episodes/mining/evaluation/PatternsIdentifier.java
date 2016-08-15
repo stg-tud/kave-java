@@ -83,7 +83,7 @@ public class PatternsIdentifier {
 	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
 		List<List<Fact>> stream = streamParser.parseStream(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
-		// Logger.log("Number of events: %d", events.size());
+//		 Logger.log("Number of events: %d", events.size());
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
 

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -125,6 +126,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 				writer, graphConverter);
 	}
 
+	@Ignore
 	@Test
 	public void structureIsCreated() throws Exception {
 
@@ -137,6 +139,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		verify(mappingParser).parse(REPOS);
 	}
 
+	@Ignore
 	@Test
 	public void patternsStored() throws Exception {
 

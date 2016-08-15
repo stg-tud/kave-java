@@ -55,9 +55,7 @@ public class EventsFilter {
 			}
 			if (occurrences.get(e) >= freqThresh) {
 				IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-				Logger.log("Assembly version: %s", asm.getVersion().getIdentifier());
 				if (AssemblyVersion.UNKNOWN_NAME.equals(asm.getVersion())) {
-					Logger.log("Assembly version: %s", asm.getVersion().getIdentifier());
 					continue;
 				}
 				es.addEvent(e);
