@@ -29,11 +29,11 @@ public class StatementTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void testEmptyReturnStatementInPropertyDeclaration() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Int32,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Boolean,P1] [DeclaringType,P1].P"));
 		propertyDecl.setGet(Lists.newArrayList(new ReturnStatement()));
 		assertPropertyDeclaration(propertyDecl,
-				defaultSST(methodDecl(method(type("s:System.Int32"), type("DeclaringType"), "get$P"),
-						returnStatement(constant("0")))));
+				defaultSST(methodDecl(method(type("s:System.Boolean"), type("DeclaringType"), "get$P"),
+						returnStatement(constant("false")))));
 	}
 
 	@Test

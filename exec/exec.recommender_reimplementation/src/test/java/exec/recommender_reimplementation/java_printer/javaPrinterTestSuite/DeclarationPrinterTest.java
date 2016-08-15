@@ -196,7 +196,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.setName(
 				MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
 
-		assertPrint(sst, "ReturnType M(int p) { }");
+		assertPrint(sst, "ReturnType M(Int32 p) { }");
 	}
 
 	@Test

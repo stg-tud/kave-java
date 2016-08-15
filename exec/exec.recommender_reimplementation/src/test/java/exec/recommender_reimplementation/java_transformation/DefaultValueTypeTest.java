@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
@@ -30,6 +31,7 @@ import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
 public class DefaultValueTypeTest {
 
 	// tests translating value types and UnknownExpression resolving
+	@Ignore
 	@Test
 	public void valueTypeIntegrationTest() {
 		Context c = getTestSST();

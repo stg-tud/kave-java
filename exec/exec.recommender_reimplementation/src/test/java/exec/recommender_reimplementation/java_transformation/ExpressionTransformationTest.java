@@ -78,17 +78,17 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void constantValueExpression_Null() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
 						assign(varRef("x"), new ConstantValueExpression())),
-				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("0")));
+				declareVar("x", type("s:System.Boolean")), assign(varRef("x"), constant("false")));
 	}
 
 	@Test
 	public void composedExpressionInAssignment() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
 						assign(variableReference("x"), new ComposedExpression())),
-				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("0")));
+				declareVar("x", type("s:System.Boolean")), assign(varRef("x"), constant("false")));
 	}
 
 	@Test
@@ -100,20 +100,20 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void unknownExpressionNestedInBinaryExpression() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
 						assign(variableReference("x"),
 								binExpr(BinaryOperator.Plus, new UnknownExpression(), new UnknownExpression()))),
-				declareVar("x", type("s:System.Int32")),
-				assign(variableReference("x"), binExpr(BinaryOperator.Plus, constant("0"), constant("0"))));
+				declareVar("x", type("s:System.Boolean")),
+				assign(variableReference("x"), binExpr(BinaryOperator.Plus, constant("false"), constant("false"))));
 	}
 
 	@Test
 	public void unknownExpressionNestedInUnaryExpression() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
 						assign(variableReference("x"), unaryExpr(UnaryOperator.Plus, new UnknownExpression()))),
-				declareVar("x", type("s:System.Int32")),
-				assign(variableReference("x"), unaryExpr(UnaryOperator.Plus, constant("0"))));
+				declareVar("x", type("s:System.Boolean")),
+				assign(variableReference("x"), unaryExpr(UnaryOperator.Plus, constant("false"))));
 	}
 
 	@Test

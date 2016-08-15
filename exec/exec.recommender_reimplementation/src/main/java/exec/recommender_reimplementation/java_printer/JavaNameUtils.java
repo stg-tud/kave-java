@@ -28,20 +28,6 @@ public class JavaNameUtils {
 	public static final Map<String,String> C_SHARP_TO_JAVA_VALUE_TYPE_MAPPING =
 			ImmutableMap.<String, String>builder()
 			.put("System.Boolean", "boolean")
-			.put("System.SByte", "byte")
-			.put("System.Byte", "byte")
-			.put("System.UInt16", "short")
-			.put("System.Int16", "short")
-			.put("System.UInt32", "int")
-			.put("System.Int32", "int")
-			.put("System.UInt64", "long")
-			.put("System.Int64", "long")
-			.put("System.Double", "double")
-			.put("System.Single", "float")
-			.put("System.Float", "float")
-			.put("System.Decimal","double")
-			.put("System.Char", "char")
-			.put("System.Object", "Object")
 			.build();
 	
     public static String getTypeAliasFromFullTypeName(String typeName)

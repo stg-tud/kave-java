@@ -254,8 +254,12 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void ignoresJavaValueTypesInVariableDeclaration() {
-		SST sst = defaultSST(declare("someVar", type("System.Int32")));
+	public void ignoresBooleanTypesInVariableDeclaration() {
+		SST sst = defaultSST(declare("someVar", type("System.Boolean")));
+
+		assertUsedTypesEmpty(sst);
+	}
+
 
 		assertUsedTypesEmpty(sst);
 	}
