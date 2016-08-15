@@ -65,6 +65,14 @@ public class JavaPrintingContext extends SSTPrintingContext {
 	}
 	
 	@Override
+	public SSTPrintingContext type(ITypeName typeName) {
+		typeNameOnly(typeName);
+
+		// ignores TypeParameters
+		return this;
+	}
+
+	@Override
 	public SSTPrintingContext unknownMarker() {
 		return super.unknownMarker();
 	}

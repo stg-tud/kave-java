@@ -301,6 +301,13 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(sst, "enum TestClass", "{", "    VAL1", "}");
 	}
 
+	@Test
+	public void ignoresTypeParameters() {
+		ITypeName genericsType = type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]");
+
+		assertPrint(declare("foo", genericsType), "Dictionary foo;");
+	}
+
 	@Test(expected = InvalidJavaCodeException.class)
 	public void exceptionOnDelegateDeclaration() {
 		assertPrint(new DelegateDeclaration(), "");
