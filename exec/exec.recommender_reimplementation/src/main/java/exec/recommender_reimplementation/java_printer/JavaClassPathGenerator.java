@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static java.text.MessageFormat.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -36,25 +38,24 @@ public class JavaClassPathGenerator {
 		PhantomClassGenerator classGenerator = new PhantomClassGenerator();
 		Set<ISST> convertedSSTs = classGenerator.convert(ssts);
 		for (ISST sst : convertedSSTs) {
-			ITypeName type = sst.getEnclosingType();
-			if (type.isDelegateType()) {
-				System.err.println("DelegateType " + type);
-				continue;
-			}
-			String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
-			String javaCode = printPhantomClass(sst);
-			File file = new File(nestedFolderPath + "\\" + type.getName() + ".java");
-			if(file.exists()) {
-				throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
-			}
-			try {
-				FileUtils.writeStringToFile(file, javaCode);
-			}
-			catch (IOException exception) {
-				System.err.println("File Name not valid	" + file.getAbsolutePath());
-				continue;
-			}
+			File file = generateClassPath(sst);
+			writeSST(sst, file);
 		}
+	}
+
+	private void writeSST(ISST sst, File file) throws IOException {
+		String javaCode = printPhantomClass(sst);
+		FileUtils.writeStringToFile(file, javaCode);
+	}
+
+	private File generateClassPath(ISST sst) {
+		ITypeName type = sst.getEnclosingType();
+		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
+		File file = new File(format("{0}\\{1}.java", nestedFolderPath, type.getName()));
+		if (file.exists()) {
+			throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
+		}
+		return file;
 	}
 
 	private String createPackageSubFoldersAndReturnNestedFolderPath(ITypeName type) {

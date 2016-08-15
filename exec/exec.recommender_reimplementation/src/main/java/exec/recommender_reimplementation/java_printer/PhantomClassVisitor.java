@@ -111,7 +111,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	public Void visit(IFieldReference fieldRef, Map<ITypeName, SST> context) {
 		ITypeName type = fieldRef.getFieldName().getDeclaringType();
 		String identifier = fieldRef.getReference().getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier)) {
+		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
 			addFieldDeclarationToSST(fieldRef, getOrCreateSST(type, context));
 		}
 		return super.visit(fieldRef, context);
@@ -135,7 +135,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	private void handleMethod(IMethodName methodName, IVariableReference varRef, Map<ITypeName, SST> context) {
 		ITypeName type = methodName.getDeclaringType();
 		String identifier = varRef.getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && !isJavaValueType(type)) {
+		if (isReferenceToOutsideClass(type, identifier) && !isJavaValueType(type) && isValidType(type)) {
 			addMethodDeclarationToSST(methodName, getOrCreateSST(type, context));
 			handleReceiverType(varRef, methodName, context);
 		}
@@ -152,7 +152,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	private void handleReceiverType(IVariableReference varRef, IMethodName methodName, Map<ITypeName, SST> context) {
 		if (referenceToTypeMap.containsKey(varRef)) {
 			ITypeName receiverType = referenceToTypeMap.get(varRef);
-			if (!receiverType.isDelegateType()) {
+			if (isValidType(receiverType)) {
 				addMethodDeclarationToSST(methodName, getOrCreateSST(receiverType, context));
 			}
 		}
@@ -162,7 +162,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	public Void visit(IPropertyReference propertyRef, Map<ITypeName, SST> context) {
 		ITypeName type = propertyRef.getPropertyName().getDeclaringType();
 		String identifier = propertyRef.getReference().getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier)) {
+		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
 			addPropertyDeclarationToSST(propertyRef, getOrCreateSST(type, context));
 		}
 		return super.visit(propertyRef, context);
