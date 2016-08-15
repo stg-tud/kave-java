@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -240,6 +241,7 @@ public class UnificationAnalysisTest {
 	}
 
 	@Test
+	@Ignore
 	public void testParameterArrays() {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		Context context = builder.createParameterArrayTest();

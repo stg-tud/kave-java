@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -199,6 +200,7 @@ public class UsageExtractionTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Ignore
 	public void testStreamTestReferenceBased() {
 		TestSSTBuilder builder = new TestSSTBuilder();
 		PointsToAnalysis pointsToAnalysis = new ReferenceBasedAnalysis();
@@ -215,7 +217,8 @@ public class UsageExtractionTest {
 
 			if (usageTypeName.equals("FileStream")) {
 				++fileStreamUsages;
-				// analysis cannot infer that the FileStream created in OpenSource is the same as the one returned by
+				// analysis cannot infer that the FileStream created in
+				// OpenSource is the same as the one returned by
 				// the method call in CopyTo
 				assertThat(usage.getDefinitionSite().getKind(),
 						Matchers.isOneOf(DefinitionSiteKind.NEW, DefinitionSiteKind.RETURN));
