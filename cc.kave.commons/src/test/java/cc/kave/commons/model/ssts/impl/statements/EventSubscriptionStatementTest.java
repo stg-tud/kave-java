@@ -29,7 +29,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import cc.kave.commons.model.ssts.statements.EventSubscriptionOperation;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
-import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.testutils.ToStringAssert;
 
 public class EventSubscriptionStatementTest {
 

@@ -8,13 +8,11 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.testutils;
+package cc.recommenders.io;
 
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
-import cc.recommenders.io.Logger;
 
 public class LoggerUtils {
 	public static void assertLogContains(int index, String expected) {

@@ -39,8 +39,8 @@ import java.security.InvalidParameterException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import cc.kave.commons.testutils.ParameterData;
 import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.testutils.ParameterData;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

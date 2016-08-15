@@ -30,7 +30,7 @@ import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.testutils.ToStringAssert;
 
 public class SwitchBlockTest extends SSTBaseTest {
 

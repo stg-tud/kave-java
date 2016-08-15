@@ -12,7 +12,7 @@ package cc.recommenders.evaluation.distribution.calc;
 
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,8 +32,8 @@ import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
+import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.names.CoReTypeName;
-import cc.recommenders.testutils.LoggerUtils;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Lists;

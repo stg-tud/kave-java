@@ -28,8 +28,8 @@ import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
+import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.names.CoReTypeName;
-import cc.recommenders.testutils.LoggerUtils;
 
 import com.google.common.collect.Maps;
 

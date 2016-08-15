@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.testutils.ToStringAssert;
 
 public class ContinueStatementTest {
 

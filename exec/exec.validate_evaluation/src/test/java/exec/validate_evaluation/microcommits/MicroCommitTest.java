@@ -24,12 +24,12 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
-import cc.kave.commons.testutils.ToStringAssert;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
+import cc.recommenders.testutils.ToStringAssert;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;

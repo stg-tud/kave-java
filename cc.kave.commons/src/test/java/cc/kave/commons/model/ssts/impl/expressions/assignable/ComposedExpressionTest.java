@@ -26,7 +26,7 @@ import org.junit.Test;
 import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.testutils.ToStringAssert;
 
 public class ComposedExpressionTest extends SSTBaseTest {
 

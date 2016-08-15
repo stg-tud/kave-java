@@ -33,7 +33,7 @@ import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
-import cc.kave.commons.testutils.ToStringAssert;
+import cc.recommenders.testutils.ToStringAssert;
 
 public class ForLoopTest extends SSTBaseTest {
 

@@ -15,7 +15,7 @@
  */
 package cc.kave.commons.model.naming.impl.v0;
 
-import cc.kave.commons.testutils.ParameterData;
+import cc.recommenders.testutils.ParameterData;
 
 public class TestUtils {
 

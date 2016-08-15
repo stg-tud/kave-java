@@ -28,11 +28,11 @@ import org.junit.Test;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
+import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
 import cc.recommenders.mining.calls.bmn.BMNMiner;
-import cc.recommenders.testutils.LoggerUtils;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 

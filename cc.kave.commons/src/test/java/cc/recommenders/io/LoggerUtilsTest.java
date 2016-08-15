@@ -8,13 +8,11 @@
  * Contributors:
  *     Sebastian Proksch - initial API and implementation
  */
-package cc.recommenders.testutils;
+package cc.recommenders.io;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import cc.recommenders.io.Logger;
 
 public class LoggerUtilsTest {
 

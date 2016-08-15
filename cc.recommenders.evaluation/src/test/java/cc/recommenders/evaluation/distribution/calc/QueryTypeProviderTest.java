@@ -29,7 +29,7 @@ import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.data.NM;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.io.Logger;
-import cc.recommenders.testutils.LoggerUtils;
+import cc.recommenders.io.LoggerUtils;
 
 public class QueryTypeProviderTest {
 

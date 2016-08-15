@@ -13,12 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.commons.testutils;
+package cc.recommenders.testutils;
 
 import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import cc.recommenders.testutils.ParameterData;
 
 public class ParameterDataTest {
 

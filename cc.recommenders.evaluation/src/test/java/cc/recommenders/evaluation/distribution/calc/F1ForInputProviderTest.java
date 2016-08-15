@@ -12,7 +12,7 @@ package cc.recommenders.evaluation.distribution.calc;
 
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

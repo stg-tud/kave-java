@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;

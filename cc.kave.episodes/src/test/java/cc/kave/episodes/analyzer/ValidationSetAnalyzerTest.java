@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.analyzer;
 
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

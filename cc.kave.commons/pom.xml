@@ -23,5 +23,11 @@
 			<artifactId>gson-javatime-serialisers</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>cc.kave</groupId>
+			<artifactId>cc.recommenders.testutils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
