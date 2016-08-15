@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -38,6 +40,25 @@ import cc.kave.commons.model.typeshapes.TypeShape;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
 public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
+
+	@Test
+	public void addsPackageDeclaration() {
+		SST sst = new SST();
+		sst.setEnclosingType(TypeName.newTypeName("FirstPackage.SecondPackage.TestClass,P"));
+
+		assertPrint(sst, "package FirstPackage.SecondPackage;",
+				"class TestClass", "{", "}");
+	}
+
+	@Test
+	public void appendsImportList() {
+		SST sst = new SST();
+		sst.setEnclosingType(type("TestClass"));
+		sst.getMethods()
+				.add(methodDecl(method(type("T1"), type("TestClass"), "m1"), declare("foo", type("T1"))));
+		
+		assertPrint(sst, "import T1;", "class TestClass", "{", "    T1 m1()", "    {", "        T1 foo;", "    }", "}");
+	}
 
 	@Test
 	public void SSTDeclaration_WithSupertypes() {

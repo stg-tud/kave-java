@@ -15,9 +15,6 @@
  */
 package exec.recommender_reimplementation.java_printer.printer;
 
-import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
-import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
-
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
@@ -33,7 +30,6 @@ public class PhantomClassPrinter extends JavaPrinter {
 		StringBuilder sb = new StringBuilder();
 		sst.accept(new JavaPrintingVisitor(sst, false), printingContext);
 
-		appendImportListToString(getUsedTypes(sst), sb);
 		sb.append(printingContext.toString());
 		return sb.toString();
 	}

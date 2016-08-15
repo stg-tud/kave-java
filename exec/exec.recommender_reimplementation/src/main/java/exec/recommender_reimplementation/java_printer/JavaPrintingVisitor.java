@@ -15,11 +15,15 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
+import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
@@ -71,10 +75,13 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(ISST sst, SSTPrintingContext context) {
-		context.indentation();
+		addPackageName(sst.getEnclosingType(), context);
 
+		appendImportListToString(getUsedTypes(sst), context);
+
+		context.indentation();
 		addPublicModifier(context);
-		
+
 		if (sst.getEnclosingType().isInterfaceType()) {
 			context.keyword("interface");
 		} 
@@ -127,6 +134,27 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 		context.indentation().text("}");
 		return null;
+	}
+
+	private void addPackageName(ITypeName enclosingType, SSTPrintingContext context) {
+		String packageName = getPackageName(enclosingType);
+		if (!packageName.isEmpty()) {
+			context.indentation().text("package").space().text(packageName).newLine();
+		}
+	}
+
+	private String getPackageName(ITypeName type) {
+		String[] packages = type.getFullName().split("\\.");
+		String fullPackageName = "";
+		for (int i = 0; i < packages.length - 1; i++) {
+			String packageName = packages[i];
+			if (i < packages.length - 2) {
+				fullPackageName += packageName + ".";
+			} else {
+				fullPackageName += packageName + ";";
+			}
+		}
+		return fullPackageName;
 	}
 
 	private void appendEnumGroup(SSTPrintingContext context, Set<IFieldDeclaration> fields) {

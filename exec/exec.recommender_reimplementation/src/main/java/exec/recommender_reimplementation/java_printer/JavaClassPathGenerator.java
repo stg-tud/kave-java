@@ -43,7 +43,6 @@ public class JavaClassPathGenerator {
 			}
 			String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
 			String javaCode = printPhantomClass(sst);
-			javaCode = appendPackageDeclaration(getPackageName(type), javaCode);
 			File file = new File(nestedFolderPath + "\\" + type.getName() + ".java");
 			if(file.exists()) {
 				throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
@@ -69,28 +68,10 @@ public class JavaClassPathGenerator {
 		return nestedFolderPath;
 	}
 
-	private String appendPackageDeclaration(String fullPackageName, String javaCode) {
-		javaCode = String.join("\n", "package " + fullPackageName, javaCode);
-		return javaCode;
-	}
-
 	private String printPhantomClass(ISST sst) {
 		JavaPrintingContext context = new JavaPrintingContext();
 		sst.accept(new JavaPrintingVisitor(sst, true), context);
 		return context.toString();
 	}
 
-	private String getPackageName(ITypeName type) {
-		String[] packages = type.getFullName().split("\\.");
-		String fullPackageName = "";
-		for (int i = 0; i < packages.length - 1; i++) {
-			String packageName = packages[i];
-			if (i < packages.length - 2) {
-				fullPackageName += packageName + ".";
-			} else {
-				fullPackageName += packageName + ";";
-			}
-		}
-		return fullPackageName;
-	}
 }

@@ -15,7 +15,7 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.Set;
 
@@ -25,6 +25,7 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
 
 public class JavaPrintingUtilsTest extends JavaPrintingVisitorBaseTest {
@@ -40,7 +41,8 @@ public class JavaPrintingUtilsTest extends JavaPrintingVisitorBaseTest {
 				"import Assembly.Assembly2.Class3;"
 		};
 		
-		String[] actuals = JavaPrintingUtils.appendImportListToString(classesList, new StringBuilder()).toString().split("\n");
+		String[] actuals = JavaPrintingUtils.appendImportListToString(classesList, new SSTPrintingContext()).toString()
+				.split("\n");
 		
 		assertThat(actuals, Matchers.arrayContainingInAnyOrder(expecteds));		
 	}

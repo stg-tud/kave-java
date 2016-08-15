@@ -50,20 +50,21 @@ public class JavaPrintingUtils {
 		}
 	}
 	
-	public static StringBuilder appendImportListToString(Set<ITypeName> classes, StringBuilder sb) {
+	public static SSTPrintingContext appendImportListToString(Set<ITypeName> classes, SSTPrintingContext context) {
 		Iterator<ITypeName> classesIterator = classes.iterator();
+		if (!classes.isEmpty()) {
+			context.indentation();
+		}
 		while (classesIterator.hasNext()) {
 			ITypeName classType = classesIterator.next();
 			if (classType.isUnknown())
 				continue;
-			sb.append("import").append(" ").append(classType.getFullName()).append(";");
+			context.text("import").text(" ").text(classType.getFullName()).text(";");
 
-			if (classesIterator.hasNext()) {
-				sb.append("\n");
-			}
+			context.newLine();
 		}
 		
-		return sb.append("\n");
+		return context;
 	}
 	
 	public static Set<ITypeName> getUsedTypes(ISST sst) {
