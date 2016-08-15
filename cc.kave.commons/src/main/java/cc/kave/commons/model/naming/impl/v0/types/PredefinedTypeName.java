@@ -37,7 +37,6 @@ import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.utils.StringUtils;
 import cc.recommenders.assertions.Asserts;
-import cc.recommenders.exceptions.ValidationException;
 
 public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeName, IArrayTypeName {
 
@@ -72,13 +71,6 @@ public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeN
 		validate(!isArray() || !getArrayBaseType().isVoidType(), "impossible to create void array");
 		String baseId = isArray() ? getArrayBaseType().getIdentifier() : getIdentifier();
 		validate(IdToFullName.containsKey(baseId), f("unknown id '%s'", identifier));
-	}
-
-	// ReSharper disable once UnusedParameter.Local
-	private static void validate(boolean condition, String msg) {
-		if (!condition) {
-			throw new ValidationException(msg);
-		}
 	}
 
 	@Override

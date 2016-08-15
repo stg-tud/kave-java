@@ -15,6 +15,13 @@
  */
 package cc.kave.commons.model.naming.impl.v0.codeelements;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import cc.recommenders.exceptions.ValidationException;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
 /* Please note: the primary test source for member names should be the generated
  * test suite. If you encounter a bug, please fix it on the C# side first, then
  * regenerate the test suite to create a failing test, and only then fix the
@@ -23,5 +30,16 @@ package cc.kave.commons.model.naming.impl.v0.codeelements;
  * The sole purpose of this class is to test the "infrastructure", including
  * Java specific checks, implementation details, instantiation checks, or alike.
  */
+@RunWith(JUnitParamsRunner.class)
 public class PropertyNameTest {
+
+	@Test(expected = ValidationException.class)
+	@Parameters({ //
+			"get set [?] [?].P", // no paranthesis
+			"[?] [?].P()" // neither get nor set
+	})
+	public void ShouldRejectInvalidProperties(String invalidId) {
+		// ReSharper disable once ObjectCreationAsStatement
+		new PropertyName(invalidId);
+	}
 }

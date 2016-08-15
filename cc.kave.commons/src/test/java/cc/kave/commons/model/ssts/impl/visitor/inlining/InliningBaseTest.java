@@ -501,7 +501,7 @@ public class InliningBaseTest {
 		}
 
 		PropertyDeclaration propertyDeclaration = new PropertyDeclaration();
-		propertyDeclaration.setName(Names.newProperty("[T10,P] [T11,P].P"));
+		propertyDeclaration.setName(Names.newProperty("get [T10,P] [T11,P].P()"));
 		propertyDeclaration.setGet(Lists.newArrayList(new ReturnStatement()));
 		propertyDeclaration.setSet(Lists.newArrayList(new Assignment()));
 

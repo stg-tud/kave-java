@@ -30,7 +30,7 @@ import cc.kave.commons.testutils.ToStringAssert;
 public class PropertyReferenceTest extends SSTBaseTest {
 
 	private static IPropertyName someProperty() {
-		return Names.newProperty("[T1,P1] [T2,P2].P");
+		return Names.newProperty("get [T1,P1] [T2,P2].P()");
 	}
 
 	@Test

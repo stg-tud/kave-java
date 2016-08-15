@@ -25,10 +25,14 @@ public abstract class BaseName implements IName {
 	protected String identifier;
 
 	protected BaseName(String id) {
-		if (id == null) {
-			throw new ValidationException("identifier must not be null");
-		}
+		validate(id != null, "identifier must not be null");
 		this.identifier = id;
+	}
+
+	protected static void validate(boolean condition, String msg) {
+		if (!condition) {
+			throw new ValidationException(msg);
+		}
 	}
 
 	@Override

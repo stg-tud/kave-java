@@ -128,7 +128,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 		sst.getFields().add(field1);
 		sst.getFields().add(field2);
 		PropertyDeclaration property = new PropertyDeclaration();
-		property.setName(Names.newProperty("get set [PropertyType,P] [TestClass,P].SomeProperty"));
+		property.setName(Names.newProperty("get set [PropertyType,P] [TestClass,P].SomeProperty()"));
 		sst.getProperties().add(property);
 		MethodDeclaration method1 = new MethodDeclaration();
 		MethodDeclaration method2 = new MethodDeclaration();
@@ -235,7 +235,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_GetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("get [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get [PropertyType,P] [DeclaringType,P].P()"));
 
 		assertPrint(sst, "PropertyType P { get; }");
 	}
@@ -243,7 +243,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_SetterOnly() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("set [PropertyType,P] [DeclaringType,P].P()"));
 
 		assertPrint(sst, "PropertyType P { set; }");
 	}
@@ -251,7 +251,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P()"));
 
 		assertPrint(sst, "PropertyType P { get; set; }");
 	}
@@ -259,7 +259,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithBodies() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P()"));
 		sst.getGet().add(new ContinueStatement());
 		sst.getGet().add(new BreakStatement());
 		sst.getSet().add(new BreakStatement());
@@ -272,7 +272,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlyGetterBody() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P()"));
 		sst.getGet().add(new BreakStatement());
 
 		assertPrint(sst, "PropertyType P", "{", "    get", "    {", "        break;", "    }", "    set;", "}");
@@ -281,7 +281,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlySetterBody() {
 		PropertyDeclaration sst = new PropertyDeclaration();
-		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P()"));
 		sst.getSet().add(new BreakStatement());
 
 		assertPrint(sst, "PropertyType P", "{", "    get;", "    set", "    {", "        break;", "    }", "}");

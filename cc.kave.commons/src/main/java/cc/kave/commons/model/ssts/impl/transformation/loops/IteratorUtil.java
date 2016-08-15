@@ -45,7 +45,7 @@ public class IteratorUtil {
 		map.put(ITER_TYPE, "System.Collections.Generic.IEnumerator");
 		map.put(ITER_INV, "GetEnumerator");
 		map.put(ITER_HAS_NEXT, "MoveNext");
-		map.put(ITER_GET_NEXT, "Current"); // C# property
+		map.put(ITER_GET_NEXT, "get [?] [?].Current()"); // C# property
 		java2CSharp = Collections.unmodifiableMap(map);
 	}
 

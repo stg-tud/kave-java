@@ -36,6 +36,10 @@ public class PropertyName extends MemberName implements IPropertyName {
 
 	public PropertyName(String identifier) {
 		super(identifier);
+		if (!isUnknown()) {
+			validate(identifier.endsWith(")"), "must contain (empty) parameter list");
+			validate(hasGetter() || hasSetter(), "must have either a getter or a setter");
+		}
 	}
 
 	public boolean isUnknown() {

@@ -60,7 +60,7 @@ public class NamesTest {
 		AssertInit(Names.newLocalVariable("x"), LocalVariableName.class);
 		AssertInit(Names.newMethod("x"), MethodName.class);
 		AssertInit(Names.newParameter("[?] p"), ParameterName.class);
-		AssertInit(Names.newProperty("x"), PropertyName.class);
+		AssertInit(Names.newProperty("get [?] [?].P()"), PropertyName.class);
 
 		AssertInit(Names.newCommandBarControl("x"), CommandBarControlName.class);
 		AssertInit(Names.newCommand("x"), CommandName.class);

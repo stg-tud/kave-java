@@ -64,7 +64,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testPropertyReference() {
 		PropertyReference sst = new PropertyReference();
-		sst.setPropertyName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setPropertyName(Names.newProperty("get set [PropertyType,P] [DeclaringType,P].P()"));
 		sst.setReference(SSTUtil.variableReference("o"));
 
 		assertPrint(sst, "o.P");
@@ -75,11 +75,11 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 		UnknownReference sst = new UnknownReference();
 		assertPrint(sst, "???");
 	}
-	
+
 	@Test
 	public void testIndexAccessReference() {
 		// TODO: Better Example ? implementation?
 		IndexAccessReference sst = new IndexAccessReference();
 		assertPrint(sst, "[]");
-	}	
+	}
 }

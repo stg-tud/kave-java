@@ -120,7 +120,7 @@ public class PropertyDeclarationTest {
 	}
 
 	private IPropertyName someProperty() {
-		return Names.newProperty("[T1,P1] [T2,P2].Property");
+		return Names.newProperty("get [T1,P1] [T2,P2].Property()");
 	}
 
 	@Test

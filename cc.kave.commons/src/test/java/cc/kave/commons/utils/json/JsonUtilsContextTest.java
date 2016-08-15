@@ -69,7 +69,7 @@ public class JsonUtilsContextTest {
 			"        \"Properties\": [\n" + //
 			"            {\n" + //
 			"                \"$type\": \"[SST:Declarations.PropertyDeclaration]\",\n" + //
-			"                \"Name\": \"0P:[T10,P] [T11,P].P\",\n" + //
+			"                \"Name\": \"0P:get [T10,P] [T11,P].P()\",\n" + //
 			"                \"Get\": [\n" + //
 			"                    {\n" + //
 			"                        \"$type\": \"[SST:Statements.ReturnStatement]\",\n" + //
@@ -631,7 +631,7 @@ public class JsonUtilsContextTest {
 			"                                    \"$type\": \"[SST:References.VariableReference]\",\n" + //
 			"                                    \"Identifier\": \"\"\n" + //
 			"                                },\n" + //
-			"                                \"PropertyName\": \"0P:[?] [?].P()\"\n" + //
+			"                                \"PropertyName\": \"0P:get [?] [?].P()\"\n" + //
 			"                            }\n" + //
 			"                        }\n" + //
 			"                    },\n" + //

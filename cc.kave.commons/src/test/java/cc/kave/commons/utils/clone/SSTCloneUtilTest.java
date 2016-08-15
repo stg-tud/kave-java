@@ -125,7 +125,7 @@ public class SSTCloneUtilTest {
 	@Test
 	public void propertyReference() {
 		PropertyReference original = new PropertyReference();
-		original.setPropertyName(Names.newProperty("property"));
+		original.setPropertyName(Names.newProperty("get [?] [?].P()"));
 		original.setReference(someVarRef());
 		assertClone(original);
 	}
@@ -485,7 +485,7 @@ public class SSTCloneUtilTest {
 		PropertyDeclaration original = new PropertyDeclaration();
 		original.setGet(Lists.newArrayList(new ContinueStatement()));
 		original.setSet(Lists.newArrayList(new ContinueStatement()));
-		original.setName(Names.newProperty("P"));
+		original.setName(Names.newProperty("get [?] [?].P()"));
 		assertClone(original);
 	}
 

@@ -125,7 +125,7 @@ public class NameSerializationTest {
 		d.add("[T,P] v", "CSharp.LocalVariableName", "0LocalVar", LocalVariableName.class);
 		d.add("[RT,P] [DT,P].M()", "CSharp.MethodName", "0M", MethodName.class);
 		d.add("[PT,P] p", "CSharp.ParameterName", "0Param", ParameterName.class);
-		d.add("[VT,P] [DT,P].P()", "CSharp.PropertyName", "0P", PropertyName.class);
+		d.add("get [VT,P] [DT,P].P()", "CSharp.PropertyName", "0P", PropertyName.class);
 		// ide components
 		d.add("a|b|c", "VisualStudio.CommandBarControlName", "0Ctrl", CommandBarControlName.class);
 		d.add("a:1:abc", "VisualStudio.CommandName", "0Cmd", CommandName.class);
