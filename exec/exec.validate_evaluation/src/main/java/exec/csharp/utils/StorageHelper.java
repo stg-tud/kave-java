@@ -17,6 +17,7 @@ package exec.csharp.utils;
 
 import static cc.recommenders.assertions.Asserts.assertNotNull;
 
+import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -33,6 +34,9 @@ public class StorageHelper {
 	private String modifier;
 
 	public StorageHelper(String rootPath) {
+		if(!rootPath.endsWith(File.separator)) {
+			rootPath = rootPath + File.separator;
+		}
 		this.rootPath = rootPath;
 		locations = Maps.newHashMap();
 		locations.put(StorageCase.USAGES, "Usages");

@@ -28,12 +28,14 @@ import com.google.common.collect.Sets;
 
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.utils.LocaleUtils;
 
 public class CategorizedResultsTest {
 	private CategorizedResults<String> sut;
 
 	@Before
 	public void setup() {
+		LocaleUtils.setDefaultLocale();
 		sut = CategorizedResults.create();
 	}
 

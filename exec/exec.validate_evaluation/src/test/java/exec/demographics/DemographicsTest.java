@@ -8,12 +8,16 @@ import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 
+import cc.recommenders.utils.LocaleUtils;
+
 public class DemographicsTest {
 
 	private Demographics sut;
 
 	@Before
 	public void setup() {
+		LocaleUtils.setDefaultLocale();
+
 		Demographic demographic1 = new Demographic();
 		demographic1.user = "user1";
 		demographic1.position = Positions.ResearcherAcademic;

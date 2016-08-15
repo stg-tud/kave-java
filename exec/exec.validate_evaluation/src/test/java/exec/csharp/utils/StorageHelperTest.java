@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Before;
@@ -41,43 +43,44 @@ public class StorageHelperTest {
 	@Before
 	public void setup() {
 		tempFileName = tempFolder.getRoot().getAbsolutePath();
-		sut = new StorageHelper(tempFileName + "/");
+		sut = new StorageHelper(tempFileName);
 	}
 
 	@Test
 	public void correctDirectory() {
-		assertDirectory(StorageCase.USAGES, "Usages/");
-		assertDirectory(StorageCase.MICRO_COMMITS, "MicroCommits/");
-		assertDirectory(StorageCase.NETWORKS, "Networks/");
+		assertDirectory(StorageCase.USAGES, "Usages");
+		assertDirectory(StorageCase.MICRO_COMMITS, "MicroCommits");
+		assertDirectory(StorageCase.NETWORKS, "Networks");
 	}
 
 	@Test
 	public void correctDirectoryWithModifier() {
 		sut.setModifier("xyz");
-		assertDirectory(StorageCase.USAGES, "Usages-xyz/");
-		assertDirectory(StorageCase.MICRO_COMMITS, "MicroCommits-xyz/");
-		assertDirectory(StorageCase.NETWORKS, "Networks-xyz/");
+		assertDirectory(StorageCase.USAGES, "Usages-xyz");
+		assertDirectory(StorageCase.MICRO_COMMITS, "MicroCommits-xyz");
+		assertDirectory(StorageCase.NETWORKS, "Networks-xyz");
 	}
 
 	@Test
 	public void correctNestedZip() {
-		assertNestedZip(StorageCase.USAGES, "Usages/");
-		assertNestedZip(StorageCase.MICRO_COMMITS, "MicroCommits/");
-		assertNestedZip(StorageCase.NETWORKS, "Networks/");
+		assertNestedZip(StorageCase.USAGES, "Usages");
+		assertNestedZip(StorageCase.MICRO_COMMITS, "MicroCommits");
+		assertNestedZip(StorageCase.NETWORKS, "Networks");
 	}
 
 	@Test
 	public void modifierCanBeCleared() {
 		sut.setModifier("xyz");
 		sut.clearModifier();
-		assertDirectory(StorageCase.USAGES, "Usages/");
+		assertDirectory(StorageCase.USAGES, "Usages");
 	}
 
 	private void assertDirectory(StorageCase storageCase, String folder) {
 		try {
 			Directory d = sut.getDirectory(storageCase);
-			String actual = d.getUrl().getPath();
-			String expected = Paths.get(tempFileName, folder).toFile().getAbsolutePath() + "/";
+			URL actual = d.getUrl();
+			Path p = Paths.get(tempFileName, folder);
+			URL expected = new Directory(p.toFile().getAbsolutePath()).getUrl();
 			assertEquals(expected, actual);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -89,8 +92,9 @@ public class StorageHelperTest {
 	private void assertNestedZip(StorageCase storageCase, String folder) {
 		try {
 			NestedZipFolders<ICoReTypeName> f = sut.getNestedZipFolder(storageCase);
-			String actual = f.getUrl().getPath();
-			String expected = Paths.get(tempFileName, folder).toFile().getAbsolutePath() + "/";
+			URL actual = f.getUrl();
+			Path p = Paths.get(tempFileName, folder);
+			URL expected = new Directory(p.toFile().getAbsolutePath()).getUrl();
 			assertEquals(expected, actual);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
