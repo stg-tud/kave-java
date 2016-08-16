@@ -20,10 +20,13 @@ import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.objec
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 import static exec.recommender_reimplementation.raychev_analysis.Interaction.RETURN;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IPropertyName;
@@ -43,9 +46,6 @@ import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class RaychevAnalysisVisitorTest extends RaychevAnalysisBaseTest {
 
@@ -86,6 +86,35 @@ public class RaychevAnalysisVisitorTest extends RaychevAnalysisBaseTest {
 				createAbstractHistory(callAtPosition(methodName, 1)),
 				createAbstractHistory(callAtPosition(methodName, 0)),
 				createAbstractHistory(callAtPosition(methodName, RETURN)));
+	}
+	
+	@Test
+	public void ignoresInvocationWithGenericsInDeclaringType() {
+		IMethodName methodName = method(stringType,
+				type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"), "m1");
+		setupDefaultEnclosingMethod(
+				varDecl("bar", objectType),
+				assign("foobar",
+						invoke("bar", methodName)));
+
+		extractHistories();
+
+		assertHistories();
+	}
+
+	@Test
+	public void ignoresInvocationWithGenericsInParameter() {
+		IMethodName methodName = method(stringType,
+				DefaultClassContext, "m1",
+				parameter(type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]"), "p1"));
+		setupDefaultEnclosingMethod(
+				varDecl("someVar", type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]")),
+				invokeStmt(
+						invokeWithParameters("bar", methodName, referenceExpr(varRef("someVar")))));
+
+		extractHistories();
+
+		assertHistories();
 	}
 
 	@Test

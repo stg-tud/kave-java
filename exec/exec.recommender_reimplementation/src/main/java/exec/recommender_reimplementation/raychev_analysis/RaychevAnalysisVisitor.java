@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.IReference;
@@ -102,11 +103,12 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 		IAssignableExpression expression = assignment.getExpression();
 		if (expression instanceof IInvocationExpression) {
 			IInvocationExpression invocation = (IInvocationExpression) expression;
-			if (invocation.getMethodName().isConstructor()) {
-				handleObjectAllocation(assignment, invocation, historyMap);
-			}
-			else{
-				addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+			if (!methodContainsTypeParameters(invocation.getMethodName())) {
+				if (invocation.getMethodName().isConstructor()) {
+					handleObjectAllocation(assignment, invocation, historyMap);
+				} else {
+					addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+				}
 			}
 		}
 
@@ -141,11 +143,16 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 	public Object visit(IIfElseBlock block, HistoryMap historyMap) {
 		block.getCondition().accept(this, historyMap);
 
-		HistoryMap cloneElseBranch = historyMap.clone();
-		visit(block.getThen(), historyMap);
-		visit(block.getElse(), cloneElseBranch);
-		historyMap.mergeInto(cloneElseBranch);
-
+		if (!block.getElse().isEmpty()) {
+			HistoryMap cloneElseBranch = historyMap.clone();
+			visit(block.getThen(), historyMap);
+			visit(block.getElse(), cloneElseBranch);
+			historyMap.mergeInto(cloneElseBranch);
+		} else {
+			HistoryMap clone = historyMap.clone();
+			visit(block.getThen(), clone);
+			historyMap.mergeInto(clone);
+		}
 		historyMap.checkForAbstractHistoryThreshold();
 		return null;
 	}
@@ -236,6 +243,9 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 
 	@Override
 	public Object visit(IInvocationExpression invocation, HistoryMap historyMap) {
+		if (methodContainsTypeParameters(invocation.getMethodName())) {
+			return super.visit(invocation, historyMap);
+		}
 		addInteractionForReceiver(invocation, historyMap);
 
 		int parameterPosition = 1;
@@ -313,13 +323,27 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 		addInteractionForAbstractLocations(abstractLocations, invocation.getMethodName() , historyMap, 0);
 	}
 
+	private boolean methodContainsTypeParameters(IMethodName methodName) {
+		if (methodName.getDeclaringType().hasTypeParameters())
+			return true;
+		for (IParameterName parameterName : methodName.getParameters()) {
+			if (parameterName.getValueType().hasTypeParameters())
+				return true;
+		}
+		return false;
+	}
+
 	private void loopNodesTwoIterations(List<ISSTNode> nodes, HistoryMap historyMap) {
 
 		HistoryMap cloneLoopOneIteration = historyMap.clone();
-		nodes.forEach(node -> node.accept(this, cloneLoopOneIteration));
+		for (ISSTNode sstNode : nodes) {
+			sstNode.accept(this, cloneLoopOneIteration);
+		}
 
 		HistoryMap cloneLoopTwoIterations = cloneLoopOneIteration.clone();
-		nodes.forEach(node -> node.accept(this, cloneLoopTwoIterations));
+		for (ISSTNode sstNode : nodes) {
+			sstNode.accept(this, cloneLoopTwoIterations);
+		}
 
 		historyMap.mergeInto(cloneLoopOneIteration);
 		historyMap.mergeInto(cloneLoopTwoIterations);
