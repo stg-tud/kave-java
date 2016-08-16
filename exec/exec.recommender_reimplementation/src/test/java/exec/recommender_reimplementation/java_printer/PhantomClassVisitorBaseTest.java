@@ -12,7 +12,9 @@ import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
 
@@ -89,6 +91,20 @@ public class PhantomClassVisitorBaseTest extends JavaPrintingVisitorBaseTest {
 		SST expectedSST = new SST();
 		expectedSST.setEnclosingType(expectedTypeName);
 		expectedSST.setMethods(Sets.newHashSet(methodDecls));
+		return expectedSST;
+	}
+
+	protected SST createSSTWithFields(ITypeName expectedTypeName, IFieldDeclaration... fieldDecls) {
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(expectedTypeName);
+		expectedSST.setFields(Sets.newHashSet(fieldDecls));
+		return expectedSST;
+	}
+
+	protected SST createSSTWithProperties(ITypeName expectedTypeName, IPropertyDeclaration... propertyDecls) {
+		SST expectedSST = new SST();
+		expectedSST.setEnclosingType(expectedTypeName);
+		expectedSST.setProperties(Sets.newHashSet(propertyDecls));
 		return expectedSST;
 	}
 

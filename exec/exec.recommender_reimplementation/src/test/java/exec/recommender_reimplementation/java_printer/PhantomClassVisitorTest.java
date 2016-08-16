@@ -104,12 +104,34 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	}
 
 	@Test
+	public void addsFieldDeclarationOnFieldReference_DeclaringTypeAndReferenceType() {
+		SST sst = defaultSST(declare("foo", type("T1")),
+				assign(varRef("otherVar"), refExpr(fieldRef("foo", field(type("int"), type("SuperT1"), "f1")))));
+
+		assertGeneratedSSTs(sst, //
+				createSSTWithFields(type("T1"), fieldDecl(field(type("int"), type("SuperT1"), "f1"))),
+				createSSTWithFields(type("SuperT1"), fieldDecl(field(type("int"), type("SuperT1"), "f1"))));
+	}
+
+	@Test
 	public void addsPropertyDeclarationOnPropertyReference() {
 		SST sst = defaultSST(assign(varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
 
 		assertGeneratedPropertiesInSST(sst, type("T1"),
 				PropertyName.newPropertyName("get set [PropertyType,P] [T1,P1].P"));
+	}
+
+	@Test
+	public void addsPropertyDeclarationOnPropertyReference_DeclaringTypeAndReferenceType() {
+		SST sst = defaultSST(declare("foo", type("T1")), assign(varRef("someVariable"),
+				refExpr(propertyReference(varRef("foo"), "get set [PropertyType,P] [SuperT1,P1].P"))));
+
+		assertGeneratedSSTs(sst, //
+				createSSTWithProperties(type("T1"),
+						propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [SuperT1,P1].P"))),
+				createSSTWithProperties(type("SuperT1"),
+						propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [SuperT1,P1].P"))));
 	}
 
 	@Test
@@ -167,8 +189,8 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	public void addsMethodParametersOnInvocation() {
 		SST sst = defaultSST(type("T1"),
 				expr(invocation("this",
-				method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"), parameter(type("T3"), "p2")),
-				constant("1"), constant("2"))));
+						method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"), parameter(type("T3"), "p2")),
+						constant("1"), constant("2"))));
 		assertEmptySSTs(sst, type("T2"), type("T3"));
 	}
 
@@ -208,7 +230,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		MethodReference methodRef = new MethodReference();
 		methodRef.setMethodName(method(type("SomeType"), type("SuperT1"), "m1"));
 		methodRef.setReference(varRef("foo"));
-		SST sst = defaultSST(declare("foo", type("T1")),assign(varRef("someVar"), refExpr(methodRef)));
+		SST sst = defaultSST(declare("foo", type("T1")), assign(varRef("someVar"), refExpr(methodRef)));
 
 		assertGeneratedSSTs(sst,
 				createSSTWithMethods(type("T1"),
@@ -274,8 +296,6 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 								type("T1"), "m2")));
 
 		assertGeneratedSSTs(sst,
-				createSSTWithMethods(type("System.Collections.Dictionary`2[[TKey],[TValue]]"),
-						methodDecl(method(voidType, type("System.Collections.Dictionary`2[[TKey],[TValue]]"), "m1"))),
 				createSSTWithMethods(type("T1"),
 						methodDecl(method(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "m2"),
 								returnStatement(constant("null")))));

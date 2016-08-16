@@ -28,8 +28,10 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -112,7 +114,8 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 		ITypeName type = fieldRef.getFieldName().getDeclaringType();
 		String identifier = fieldRef.getReference().getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
-			addFieldDeclarationToSST(fieldRef, getOrCreateSST(type, context));
+			addFieldDeclarationToSST(fieldRef.getFieldName(), getOrCreateSST(type, context));
+			handleReferenceTypeForFields(fieldRef.getReference(), fieldRef.getFieldName(), context);
 		}
 		return super.visit(fieldRef, context);
 	}
@@ -158,12 +161,33 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 		}
 	}
 
+	private void handleReferenceTypeForFields(IVariableReference varRef, IFieldName fieldName,
+			Map<ITypeName, SST> context) {
+		if (referenceToTypeMap.containsKey(varRef)) {
+			ITypeName referenceType = referenceToTypeMap.get(varRef);
+			if (isValidType(referenceType)) {
+				addFieldDeclarationToSST(fieldName, getOrCreateSST(referenceType, context));
+			}
+		}
+	}
+
+	private void handleReferenceTypeForProperties(IVariableReference varRef, IPropertyName propertyName,
+			Map<ITypeName, SST> context) {
+		if (referenceToTypeMap.containsKey(varRef)) {
+			ITypeName referenceType = referenceToTypeMap.get(varRef);
+			if (isValidType(referenceType)) {
+				addPropertyDeclarationToSST(propertyName, getOrCreateSST(referenceType, context));
+			}
+		}
+	}
+
 	@Override
 	public Void visit(IPropertyReference propertyRef, Map<ITypeName, SST> context) {
 		ITypeName type = propertyRef.getPropertyName().getDeclaringType();
 		String identifier = propertyRef.getReference().getIdentifier();
 		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
-			addPropertyDeclarationToSST(propertyRef, getOrCreateSST(type, context));
+			addPropertyDeclarationToSST(propertyRef.getPropertyName(), getOrCreateSST(type, context));
+			handleReferenceTypeForProperties(propertyRef.getReference(), propertyRef.getPropertyName(), context);
 		}
 		return super.visit(propertyRef, context);
 	}

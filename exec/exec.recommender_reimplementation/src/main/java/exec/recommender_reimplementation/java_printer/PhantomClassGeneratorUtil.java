@@ -20,7 +20,9 @@ import static exec.recommender_reimplementation.java_printer.JavaNameUtils.getTy
 
 import java.util.Map;
 
+import cc.kave.commons.model.names.IFieldName;
 import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.names.IPropertyName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.FieldName;
 import cc.kave.commons.model.names.csharp.PropertyName;
@@ -29,15 +31,13 @@ import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.model.ssts.references.IFieldReference;
-import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.utils.TypeErasure;
 
 public class PhantomClassGeneratorUtil {
 
-	public static void addFieldDeclarationToSST(IFieldReference fieldRef, SST sst) {
+	public static void addFieldDeclarationToSST(IFieldName fieldname, SST sst) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setName(FieldName.newFieldName(TypeErasure.of(fieldRef.getFieldName().getIdentifier())));
+		fieldDecl.setName(FieldName.newFieldName(TypeErasure.of(fieldname.getIdentifier())));
 		sst.getFields().add(fieldDecl);
 	}
 
@@ -64,10 +64,10 @@ public class PhantomClassGeneratorUtil {
 		methodDecl.getBody().add(returnStatement);
 	}
 
-	public static void addPropertyDeclarationToSST(IPropertyReference propertyRef, SST sst) {
+	public static void addPropertyDeclarationToSST(IPropertyName propertyName, SST sst) {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
 		propertyDecl
-				.setName(PropertyName.newPropertyName(TypeErasure.of(propertyRef.getPropertyName().getIdentifier())));
+				.setName(PropertyName.newPropertyName(TypeErasure.of(propertyName.getIdentifier())));
 		sst.getProperties().add(propertyDecl);
 	}
 
