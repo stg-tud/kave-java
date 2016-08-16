@@ -67,6 +67,8 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 	private PropertyTransformationHelper propertyTransformationHelper;
 	private ExpressionTransformationHelper expressionTransformationHelper;
 
+	private static final String BOOLEAN_DEFAULT_VALUE = "false";
+
 	public JavaTransformationVisitor(ISSTNode sstNode) {
 		expressionTransformationHelper = new ExpressionTransformationHelper(sstNode);
 		propertyTransformationHelper = new PropertyTransformationHelper();
@@ -77,6 +79,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 			return node;
 		}
 		T transformedNode = type.cast(node.accept(this, null));
+		transformedNode = JavaArrayTypeTransformer.transform(transformedNode);
 		return transformedNode;
 	}
 
@@ -86,6 +89,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 			return node;
 		}
 		T transformedNode = (T) node.accept(this, null);
+		transformedNode = JavaArrayTypeTransformer.transform(transformedNode);
 		return transformedNode;
 	}
 
@@ -145,11 +149,12 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 
 	@Override
 	public ISSTNode visit(ISwitchBlock block, Void context) {
+		super.visit(block, context);
 		for (ICaseBlock caseBlock : block.getSections()) {
 			CaseBlock caseBlockImpl = (CaseBlock) caseBlock;
 			caseBlockImpl.setLabel(constant("0"));
 		}
-		return super.visit(block, context);
+		return block;
 	}
 
 	@Override
@@ -162,7 +167,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 
 	@Override
 	public ISSTNode visit(IConstantValueExpression expr, Void context) {
-		if (expr.getValue() == null) {
+		if (expr.getValue() == null || !expr.getValue().equals(BOOLEAN_DEFAULT_VALUE)) {
 			expressionTransformationHelper.transformConstantValueExpression(expr);
 		}
 		return super.visit(expr, context);

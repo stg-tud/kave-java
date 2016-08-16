@@ -6,6 +6,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.expr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static exec.recommender_reimplementation.java_transformation.ExpressionTransformationHelper.INT_TYPE_IDENTIFIER;
 
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
@@ -30,12 +32,16 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void indexAccessExpressionWithArray() {
 		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
-		indexAccessExpression.setIndices(Lists.newArrayList(constant("1"), constant("2")));
+		indexAccessExpression.setIndices(Lists.newArrayList(constant("1")));
 		indexAccessExpression.setReference(varRef("x"));
 
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(declareVar("x", type("String[]")), expr(indexAccessExpression)),
-				declareVar("x", type("String[]")), expr(indexAccessExpression));
+				declareVar("x", type("String$Array")),
+				expr(invocation("x",
+						method(type("String"), type("String$Array"), "get",
+								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+						constant("null"))));
 	}
 
 	@Test
@@ -44,9 +50,13 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 		indexAccessExpression.setIndices(Lists.newArrayList(constant("1")));
 		indexAccessExpression.setReference(varRef("x"));
 
-		ITypeName listType = type("List");
+		ITypeName listType = type("List`1[[T -> String,P1]]");
 		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", listType), expr(indexAccessExpression)),
-				declareVar("x", listType), expr(invocation("x", method(null, listType, "get"), constant("1"))));
+				declareVar("x", listType),
+				expr(invocation("x",
+						method(type("String"), listType, "get",
+								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+						constant("null"))));
 	}
 
 	@Test
@@ -55,11 +65,14 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 		indexAccessExpression.setIndices(Lists.newArrayList(constant("1")));
 		indexAccessExpression.setReference(varRef("x"));
 
-		ITypeName listType = type("List");
+		ITypeName listType = type("List`1[[T -> String,P1]]");
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(declareVar("x", listType), assign(varRef("y"), indexAccessExpression)),
 				declareVar("x", listType),
-				assign(varRef("y"), invocation("x", method(null, listType, "get"), constant("1"))));
+				assign(varRef("y"), invocation("x",
+						method(type("String"), listType, "get",
+								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+						constant("null"))));
 	}
 
 	@Test

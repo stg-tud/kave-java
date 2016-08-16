@@ -17,6 +17,8 @@ package exec.recommender_reimplementation.java_transformation;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 
+import java.util.List;
+
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
@@ -32,11 +34,12 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
 public class ExpressionTransformationHelper {
 
+	public static final String INT_TYPE_IDENTIFIER = "System.Int32, mscorlib, 2.0.0.0";
+
 	public DefaultValueHelper defaultValueHelper;
 
 	public ExpressionTransformationHelper(ISSTNode sstNode) {
 		defaultValueHelper = new DefaultValueHelper(sstNode);
-
 	}
 
 	public IAssignableExpression transformComposedExpression(IComposedExpression expression) {
@@ -46,15 +49,11 @@ public class ExpressionTransformationHelper {
 	public IAssignableExpression transformIndexAccessExpression(IIndexAccessExpression expr) {
 		ITypeName containerType = defaultValueHelper.getTypeForVariableReference(expr.getReference());
 		if (containerType != null) {
-			if (containerType.isArrayType()) {
-				return expr;
-			} else {
-				InvocationExpression invocation = new InvocationExpression();
-				invocation.setMethodName(createIndexAccessMethodName(containerType));
-				invocation.setReference(expr.getReference());
-				invocation.setParameters(expr.getIndices());
-				return invocation;
-			}
+			InvocationExpression invocation = new InvocationExpression();
+			invocation.setMethodName(createIndexAccessMethodName(containerType));
+			invocation.setReference(expr.getReference());
+			invocation.setParameters(expr.getIndices());
+			return invocation;
 		}
 		return expr;
 	}
@@ -73,6 +72,21 @@ public class ExpressionTransformationHelper {
 
 	private IMethodName createIndexAccessMethodName(ITypeName containerType) {
 		return MethodName.newMethodName(
-				String.format("[%1$s] [%2$s].%3$s()", containerType.getTypeParameterType(), containerType, "get"));
+				String.format("[%1$s] [%2$s].%3$s([%4$s] index)",
+						getBaseTypeFromTransformedArrayName(containerType),
+						containerType,
+						"get", INT_TYPE_IDENTIFIER));
+	}
+
+	private ITypeName getBaseTypeFromTransformedArrayName(ITypeName containerType) {
+		if (containerType.isArrayType()) {
+			return containerType.getArrayBaseType();
+		}
+		List<ITypeName> typeParameters = containerType.getTypeParameters();
+		if (typeParameters.size() > 0) {
+			ITypeName typeParameter = typeParameters.get(0);
+			return typeParameter.getTypeParameterType();
+		}
+		return null;
 	}
 }
