@@ -109,6 +109,11 @@ public class MethodName extends MemberName implements IMethodName {
 	}
 
 	@Override
+	public boolean isInit() {
+		return getName().equals(".init") || getName().equals(".cinit");
+	}
+
+	@Override
 	public ITypeName getReturnType() {
 		return getValueType();
 	}

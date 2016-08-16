@@ -23,6 +23,8 @@ public interface IMethodName extends IMemberName, IGenericName, IParameterizedNa
 
 	boolean isConstructor();
 
+	boolean isInit();
+
 	ITypeName getReturnType();
 
 	boolean isExtensionMethod();
