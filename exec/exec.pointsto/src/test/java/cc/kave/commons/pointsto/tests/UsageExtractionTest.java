@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -32,8 +33,10 @@ import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.ReferenceBasedAnalysis;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.extraction.CallsitePruning;
+import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.CallSiteKind;
 import cc.recommenders.usages.DefinitionSite;
@@ -41,6 +44,14 @@ import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Usage;
 
 public class UsageExtractionTest {
+	
+	private static ICoReTypeName CORE_STRING_TYPE;
+	
+	@BeforeClass
+	public static void setup() {
+		TestSSTBuilder builder = new TestSSTBuilder();
+		CORE_STRING_TYPE = CoReNameConverter.convert(builder.getStringType());
+	}
 
 	@Test
 	public void testPaperTest() {
@@ -165,7 +176,7 @@ public class UsageExtractionTest {
 			String methodContextName = usage.getMethodContext().getName();
 			assertEquals("CopyTo", methodContextName);
 
-			if (usageTypeName.equals("String")) {
+			if (usageTypeName.equals(CORE_STRING_TYPE.getClassName())) {
 				assertEquals(DefinitionSiteKind.PARAM, usage.getDefinitionSite().getKind());
 				assertEquals(0, usage.getDefinitionSite().getArgIndex());
 
@@ -226,7 +237,7 @@ public class UsageExtractionTest {
 						Sets.newHashSet(CallSiteKind.RECEIVER));
 				assertThat(callsites.stream().map(c -> c.getMethod().getName()).collect(Collectors.toSet()),
 						Matchers.isOneOf(Sets.newHashSet("Read", "Close"), Sets.newHashSet("Write", "Close")));
-			} else if (usageTypeName.equals("String")) {
+			} else if (usageTypeName.equals(CORE_STRING_TYPE.getClassName())) {
 				++stringUsages;
 				assertThat(usage.getDefinitionSite().getKind(),
 						Matchers.isOneOf(DefinitionSiteKind.PARAM, DefinitionSiteKind.FIELD));
