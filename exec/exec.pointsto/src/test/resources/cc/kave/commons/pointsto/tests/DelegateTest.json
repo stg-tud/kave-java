@@ -4,7 +4,7 @@
     "$type":"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons",
     "TypeHierarchy":{
       "$type":"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons",
-      "Element":"CSharp.TypeName:Test.DelegateTest, Test",
+      "Element":"0T:Test.DelegateTest, ConsoleTest",
       "Implements":[
 
       ]
@@ -12,22 +12,21 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry1()"
+        "Element":"0M:[p:string] [Test.DelegateTest, ConsoleTest].entry1()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry2()"
+        "Element":"0M:[p:string] [Test.DelegateTest, ConsoleTest].entry2()"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)"
+        "Element":"0M:[p:string] [Test.DelegateTest, ConsoleTest].foo([p:object] x)"
       }
     ]
   },
   "SST":{
     "$type":"[SST:SST]",
-    "EnclosingType":"CSharp.TypeName:Test.DelegateTest, Test",
-    "PartialClassIdentifier":"",
+    "EnclosingType":"0T:Test.DelegateTest, ConsoleTest",
     "Fields":[
 
     ],
@@ -37,7 +36,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry1()",
+        "Name":"0M:[p:string] [Test.DelegateTest, ConsoleTest].entry1()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -62,7 +61,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"this"
                 },
-                "MethodName":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)"
+                "MethodName":"0M:[p:string] [Test.DelegateTest, ConsoleTest].foo([p:object] x)"
               }
             }
           },
@@ -72,7 +71,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"arg"
             },
-            "Type":"CSharp.TypeName:p:object"
+            "Type":"0T:p:object"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -90,7 +89,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.TypeName:p:string"
+            "Type":"0T:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -104,7 +103,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"fun"
               },
-              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
+              "MethodName":"0M:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -131,7 +130,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].entry2()",
+        "Name":"0M:[p:string] [Test.DelegateTest, ConsoleTest].entry2()",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -150,7 +149,7 @@
             },
             "Expression":{
               "$type":"[SST:Expressions.Assignable.LambdaExpression]",
-              "Name":"CSharp.LambdaName:[p:string] ([p:object] x)",
+              "Name":"0L:[p:string] ([p:object] x)",
               "Body":[
                 {
                   "$type":"[SST:Statements.VariableDeclaration]",
@@ -158,7 +157,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"$0"
                   },
-                  "Type":"CSharp.TypeName:p:string"
+                  "Type":"0T:p:string"
                 },
                 {
                   "$type":"[SST:Statements.Assignment]",
@@ -172,7 +171,7 @@
                       "$type":"[SST:References.VariableReference]",
                       "Identifier":""
                     },
-                    "MethodName":"CSharp.MethodName:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
+                    "MethodName":"0M:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
                     "Parameters":[
                       {
                         "$type":"[SST:Expressions.Simple.ConstantValueExpression]"
@@ -207,7 +206,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"arg"
             },
-            "Type":"CSharp.TypeName:p:object"
+            "Type":"0T:p:object"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -225,7 +224,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$1"
             },
-            "Type":"CSharp.TypeName:p:string"
+            "Type":"0T:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -239,7 +238,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"fun"
               },
-              "MethodName":"CSharp.MethodName:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
+              "MethodName":"0M:[TResult] [d:[TResult] [System.Func`2[[T -> p:object],[TResult -> p:string]], mscorlib, 4.0.0.0].([T] arg)].Invoke([T] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -266,7 +265,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:string] [Test.DelegateTest, Test].foo([p:object] x)",
+        "Name":"0M:[p:string] [Test.DelegateTest, ConsoleTest].foo([p:object] x)",
         "IsEntryPoint":false,
         "Body":[
           {
@@ -275,7 +274,7 @@
               "$type":"[SST:References.VariableReference]",
               "Identifier":"$0"
             },
-            "Type":"CSharp.TypeName:p:string"
+            "Type":"0T:p:string"
           },
           {
             "$type":"[SST:Statements.Assignment]",
@@ -289,7 +288,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":""
               },
-              "MethodName":"CSharp.MethodName:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
+              "MethodName":"0M:static [p:string] [p:string].Format([p:string] format, [p:object] arg0)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ConstantValueExpression]"

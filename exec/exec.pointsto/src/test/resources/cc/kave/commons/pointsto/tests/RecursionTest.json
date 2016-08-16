@@ -4,7 +4,7 @@
     "$type":"KaVE.Commons.Model.TypeShapes.TypeShape, KaVE.Commons",
     "TypeHierarchy":{
       "$type":"KaVE.Commons.Model.TypeShapes.TypeHierarchy, KaVE.Commons",
-      "Element":"CSharp.TypeName:Test.RecursionTest, ConsoleTest",
+      "Element":"0T:Test.RecursionTest, ConsoleTest",
       "Implements":[
 
       ]
@@ -12,22 +12,21 @@
     "MethodHierarchies":[
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)"
+        "Element":"0M:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)"
+        "Element":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)"
       },
       {
         "$type":"KaVE.Commons.Model.TypeShapes.MethodHierarchy, KaVE.Commons",
-        "Element":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)"
+        "Element":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)"
       }
     ]
   },
   "SST":{
     "$type":"[SST:SST]",
-    "EnclosingType":"CSharp.TypeName:Test.RecursionTest, ConsoleTest",
-    "PartialClassIdentifier":"",
+    "EnclosingType":"0T:Test.RecursionTest, ConsoleTest",
     "Fields":[
 
     ],
@@ -37,7 +36,7 @@
     "Methods":[
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
+        "Name":"0M:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
         "IsEntryPoint":true,
         "Body":[
           {
@@ -64,7 +63,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
+                  "PropertyName":"0P:get [p:int] [p:string].Length()"
                 }
               },
               "Operator":3,
@@ -121,7 +120,7 @@
                         "$type":"[SST:References.VariableReference]",
                         "Identifier":"arg"
                       },
-                      "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
+                      "PropertyName":"0P:get [p:int] [p:string].Length()"
                     }
                   },
                   "Operator":12,
@@ -137,7 +136,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$1"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -151,7 +150,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex)",
+                  "MethodName":"0M:[p:string] [p:string].Substring([p:int] startIndex)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -169,7 +168,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$2"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -183,7 +182,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
+                  "MethodName":"0M:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -201,7 +200,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$3"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -215,7 +214,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
+                  "MethodName":"0M:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ConstantValueExpression]",
@@ -237,7 +236,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$4"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -251,7 +250,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
+                  "MethodName":"0M:[p:string] [Test.RecursionTest, ConsoleTest].Entry1([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -269,7 +268,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$5"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -313,8 +312,8 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
-        "IsEntryPoint":true,
+        "Name":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
+        "IsEntryPoint":false,
         "Body":[
           {
             "$type":"[SST:Statements.VariableDeclaration]",
@@ -348,7 +347,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":""
                   },
-                  "FieldName":"CSharp.FieldName:static [p:string] [p:string].Empty"
+                  "FieldName":"0F:static [p:string] [p:string].Empty"
                 }
               }
             }
@@ -387,7 +386,7 @@
                         "$type":"[SST:References.VariableReference]",
                         "Identifier":"arg"
                       },
-                      "PropertyName":"CSharp.PropertyName:get [p:int] [p:string].Length()"
+                      "PropertyName":"0P:get [p:int] [p:string].Length()"
                     }
                   },
                   "Operator":12,
@@ -403,7 +402,7 @@
                   "$type":"[SST:References.VariableReference]",
                   "Identifier":"$1"
                 },
-                "Type":"CSharp.TypeName:p:string"
+                "Type":"0T:p:string"
               },
               {
                 "$type":"[SST:Statements.Assignment]",
@@ -417,7 +416,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"arg"
                   },
-                  "MethodName":"CSharp.MethodName:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
+                  "MethodName":"0M:[p:string] [p:string].Substring([p:int] startIndex, [p:int] length)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ConstantValueExpression]",
@@ -441,7 +440,7 @@
                     "$type":"[SST:References.VariableReference]",
                     "Identifier":"this"
                   },
-                  "MethodName":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
+                  "MethodName":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
                   "Parameters":[
                     {
                       "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -462,7 +461,7 @@
       },
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
-        "Name":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
+        "Name":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Show([p:string] arg)",
         "IsEntryPoint":false,
         "Body":[
           {
@@ -473,7 +472,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":""
               },
-              "MethodName":"CSharp.MethodName:static [p:void] [System.Console, mscorlib, 4.0.0.0].WriteLine([p:string] value)",
+              "MethodName":"0M:static [p:void] [System.Console, mscorlib, 4.0.0.0].WriteLine([p:string] value)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
@@ -493,7 +492,7 @@
                 "$type":"[SST:References.VariableReference]",
                 "Identifier":"this"
               },
-              "MethodName":"CSharp.MethodName:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
+              "MethodName":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
               "Parameters":[
                 {
                   "$type":"[SST:Expressions.Simple.ReferenceExpression]",
