@@ -165,7 +165,7 @@ public class PredefinedTypeName extends BaseTypeName implements IPredefinedTypeN
 
 	@Override
 	public boolean isClassType() {
-		return is("p:object") || is("p:String");
+		return is("p:object") || is("p:string");
 	}
 
 	@Override
