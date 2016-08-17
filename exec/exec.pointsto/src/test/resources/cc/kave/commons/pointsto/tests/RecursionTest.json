@@ -313,7 +313,7 @@
       {
         "$type":"[SST:Declarations.MethodDeclaration]",
         "Name":"0M:[p:void] [Test.RecursionTest, ConsoleTest].Entry2([p:string] arg)",
-        "IsEntryPoint":true,
+        "IsEntryPoint":false,
         "Body":[
           {
             "$type":"[SST:Statements.VariableDeclaration]",
