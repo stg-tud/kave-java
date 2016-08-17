@@ -36,6 +36,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.ContextReader;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
+import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
@@ -45,7 +46,7 @@ public class RaychevRunner {
 	public static void sentenceBuilder() throws IOException {
 		Queue<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = (Queue<Context>) ContextReader.GetContexts(FOLDERPATH);
+			contextList = (Queue<Context>) ContextReader.GetContexts(QUERY_FOLDER_PATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -81,11 +82,18 @@ public class RaychevRunner {
 		Set<ISST> ssts = Sets.newHashSet();
 		for (Context context : contextList) {
 			try {
-				String javaCode = queryExtractor.createJavaCodeForQuery(context);
+				String javaCode = new JavaPrinter().print(context);
+				ISST transformedQuery = new RaychevQueryTransformer().transfromIntoQuery(context.getSST());
+				if (transformedQuery == null) {
+					continue;
+				}
+				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQuery);
 				if (!javaCode.isEmpty()) {
 					ISST sst = context.getSST();
 					if (!sst.getEnclosingType().isUnknown()) {
-						writeJavaFile(javaCode, sst);
+						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
+						writeJavaFile(javaCode, file);
+						writeQueryFile(transformedQueryJavaCode, transformedQuery);
 						ssts.add(sst);
 					}
 				}
@@ -109,12 +117,20 @@ public class RaychevRunner {
 		Set<ISST> ssts = Sets.newHashSet();
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
-				String javaCode = queryExtractor.createJavaCodeForQuery(completionEvent);
+				Context context = completionEvent.getContext();
+				String javaCode = new JavaPrinter().print(context);
+				ISST transformedQuery = new RaychevQueryTransformer()
+						.transfromIntoQuery(context.getSST());
+				if (transformedQuery == null) {
+					continue;
+				}
+				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQuery);
 				if (!javaCode.isEmpty()) {
 					ISST sst = completionEvent.getContext().getSST();
 					if (!sst.getEnclosingType().isUnknown()) {
-						writeJavaFile(javaCode, sst);
-						ssts.add(sst);
+						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
+						writeJavaFile(javaCode, file);
+						writeQueryFile(transformedQueryJavaCode, transformedQuery);
 					}
 				}
 			} catch (Exception e) {
@@ -124,11 +140,16 @@ public class RaychevRunner {
 		writeClassPaths(ssts);
 	}
 
-	private static void writeJavaFile(String javaCode, ISST sst) throws IOException {
-		FileUtils.writeStringToFile(new File(QUERY_FOLDER_PATH.toString() + "\\"
-				+ sst.getEnclosingType().getName() + ".java"), javaCode);
+	private static void writeJavaFile(String javaCode, File file) throws IOException {
+		FileUtils.writeStringToFile(file, javaCode);
 	}
 	
+	private static void writeQueryFile(String javaCode, ISST sst) throws IOException {
+		FileUtils.writeStringToFile(
+				new File(QUERY_FOLDER_PATH.toString() + "\\" + sst.getEnclosingType().getName() + ".java"),
+				javaCode);
+	}
+
 	private static void writeClassPaths(Set<ISST> ssts) {
 		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(QUERY_FOLDER_PATH.toString()); 
 		try {
@@ -139,8 +160,8 @@ public class RaychevRunner {
 	}
 
 	public static void main(String[] args) throws IOException {
-		sentenceBuilder();
-//		queryBuilder();
+		// sentenceBuilder();
+		queryBuilder();
 //		queryFromCompletionEvents();
 	}
 

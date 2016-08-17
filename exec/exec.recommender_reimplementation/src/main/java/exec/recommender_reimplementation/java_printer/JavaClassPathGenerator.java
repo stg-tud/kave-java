@@ -38,7 +38,7 @@ public class JavaClassPathGenerator {
 		PhantomClassGenerator classGenerator = new PhantomClassGenerator();
 		Set<ISST> convertedSSTs = classGenerator.convert(ssts);
 		for (ISST sst : convertedSSTs) {
-			File file = generateClassPath(sst);
+			File file = generateClassPath(sst, rootPath);
 			writeSST(sst, file);
 		}
 	}
@@ -48,9 +48,9 @@ public class JavaClassPathGenerator {
 		FileUtils.writeStringToFile(file, javaCode);
 	}
 
-	private File generateClassPath(ISST sst) {
+	public static File generateClassPath(ISST sst, String rootPath) {
 		ITypeName type = sst.getEnclosingType();
-		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type);
+		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type, rootPath);
 		File file = new File(format("{0}\\{1}.java", nestedFolderPath, type.getName()));
 		if (file.exists()) {
 			throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
@@ -58,7 +58,7 @@ public class JavaClassPathGenerator {
 		return file;
 	}
 
-	private String createPackageSubFoldersAndReturnNestedFolderPath(ITypeName type) {
+	public static String createPackageSubFoldersAndReturnNestedFolderPath(ITypeName type, String rootPath) {
 		String nestedFolderPath = rootPath;
 		String[] packages = type.getFullName().split("\\.");
 		for (int i = 0; i < packages.length - 1; i++) {

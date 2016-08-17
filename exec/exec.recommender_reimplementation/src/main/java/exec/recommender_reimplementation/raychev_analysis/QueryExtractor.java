@@ -22,6 +22,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;
 
@@ -34,12 +35,12 @@ public class QueryExtractor {
 		return "";
 	}
 
-	private boolean isValidCompletionEvent(CompletionEvent completionEvent) {
+	public static boolean isValidCompletionEvent(CompletionEvent completionEvent) {
 		return completionEvent.terminatedState == TerminationState.Applied && !completionEvent.selections.isEmpty()
 				&& IsNonStaticSelection(Iterables.getLast(completionEvent.selections).getProposal());
 	}
 
-	private boolean IsNonStaticSelection(IProposal proposal) {
+	public static boolean IsNonStaticSelection(IProposal proposal) {
 		IName name = proposal.getName();
 		return !name.getIdentifier().contains("static");
 	}
@@ -47,6 +48,15 @@ public class QueryExtractor {
 	public String createJavaCodeForQuery(Context context) {
 		try {
 			return new RaychevQueryPrinter().print(context);
+		} catch (InvalidJavaCodeException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	public String createJavaCodeForQuery(ISST sst) {
+		try {
+			return new RaychevQueryPrinter().print(sst);
 		} catch (InvalidJavaCodeException e) {
 			e.printStackTrace();
 			return "";

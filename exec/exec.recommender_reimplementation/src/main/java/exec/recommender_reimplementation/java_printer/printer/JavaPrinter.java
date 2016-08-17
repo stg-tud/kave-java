@@ -18,14 +18,18 @@ package exec.recommender_reimplementation.java_printer.printer;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
-public abstract class JavaPrinter {
-
-	public abstract String print(Context sst);
+public class JavaPrinter {
 
 	protected ISST transform(Context context) {
 		ISST sst = context.getSST();
+		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
+		return transformationVisitor.transform(sst, ISST.class);
+	}
+
+	protected ISST transform(ISST sst) {
 		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
 		return transformationVisitor.transform(sst, ISST.class);
 	}
@@ -36,4 +40,17 @@ public abstract class JavaPrinter {
 		return printingContext;
 	}
 
+	public String print(Context context) {
+		ISST sst = transform(context);
+		JavaPrintingContext printingContext = getPrintingContext(context);
+		sst.accept(new JavaPrintingVisitor(sst, true), printingContext);
+		return printingContext.toString();
+	}
+
+	public String print(ISST sst) {
+		sst = transform(sst);
+		JavaPrintingContext printingContext = new JavaPrintingContext();
+		sst.accept(new JavaPrintingVisitor(sst, true), printingContext);
+		return printingContext.toString();
+	}
 }
