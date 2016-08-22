@@ -87,23 +87,23 @@ public class PhantomClassVisitorBaseTest extends JavaPrintingVisitorBaseTest {
 		assertEquals(expected, actual);
 	}
 
-	protected SST createSSTWithMethods(ITypeName expectedTypeName, IMethodDeclaration... methodDecls) {
+	protected SST createSSTWithMethods(ITypeName typeName, IMethodDeclaration... methodDecls) {
 		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(expectedTypeName);
+		expectedSST.setEnclosingType(typeName);
 		expectedSST.setMethods(Sets.newHashSet(methodDecls));
 		return expectedSST;
 	}
 
-	protected SST createSSTWithFields(ITypeName expectedTypeName, IFieldDeclaration... fieldDecls) {
+	protected SST createSSTWithFields(ITypeName typeName, IFieldDeclaration... fieldDecls) {
 		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(expectedTypeName);
+		expectedSST.setEnclosingType(typeName);
 		expectedSST.setFields(Sets.newHashSet(fieldDecls));
 		return expectedSST;
 	}
 
-	protected SST createSSTWithProperties(ITypeName expectedTypeName, IPropertyDeclaration... propertyDecls) {
+	protected SST createSSTWithProperties(ITypeName typeName, IPropertyDeclaration... propertyDecls) {
 		SST expectedSST = new SST();
-		expectedSST.setEnclosingType(expectedTypeName);
+		expectedSST.setEnclosingType(typeName);
 		expectedSST.setProperties(Sets.newHashSet(propertyDecls));
 		return expectedSST;
 	}

@@ -79,7 +79,7 @@ public class RaychevRunner {
 		}
 
 		QueryExtractor queryExtractor = new QueryExtractor();
-		Set<ISST> ssts = Sets.newHashSet();
+		Set<Context> contexts = Sets.newHashSet();
 		for (Context context : contextList) {
 			try {
 				String javaCode = new JavaPrinter().print(context);
@@ -94,7 +94,7 @@ public class RaychevRunner {
 						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
 						writeJavaFile(javaCode, file);
 						writeQueryFile(transformedQueryJavaCode, transformedQuery);
-						ssts.add(sst);
+						contexts.add(context);
 					}
 				}
 			} catch (Exception e) {
@@ -102,7 +102,7 @@ public class RaychevRunner {
 				continue;
 			}
 		}
-		writeClassPaths(ssts);
+		writeClassPaths(contexts);
 	}
 
 	private static void queryFromCompletionEvents() {
@@ -114,7 +114,7 @@ public class RaychevRunner {
 		}
 
 		QueryExtractor queryExtractor = new QueryExtractor();
-		Set<ISST> ssts = Sets.newHashSet();
+		Set<Context> contexts = Sets.newHashSet();
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
 				Context context = completionEvent.getContext();
@@ -131,13 +131,14 @@ public class RaychevRunner {
 						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
 						writeJavaFile(javaCode, file);
 						writeQueryFile(transformedQueryJavaCode, transformedQuery);
+						contexts.add(context);
 					}
 				}
 			} catch (Exception e) {
 				continue;
 			}
 		}
-		writeClassPaths(ssts);
+		writeClassPaths(contexts);
 	}
 
 	private static void writeJavaFile(String javaCode, File file) throws IOException {
@@ -150,10 +151,10 @@ public class RaychevRunner {
 				javaCode);
 	}
 
-	private static void writeClassPaths(Set<ISST> ssts) {
+	private static void writeClassPaths(Set<Context> contexts) {
 		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(QUERY_FOLDER_PATH.toString()); 
 		try {
-			classPathGenerator.generate(ssts);
+			classPathGenerator.generate(contexts);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

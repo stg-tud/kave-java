@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 
@@ -34,9 +35,9 @@ public class JavaClassPathGenerator {
 		this.rootPath = rootPath;
 	}
 
-	public void generate(Set<ISST> ssts) throws IOException {
+	public void generate(Set<Context> contexts) throws IOException {
 		PhantomClassGenerator classGenerator = new PhantomClassGenerator();
-		Set<ISST> convertedSSTs = classGenerator.convert(ssts);
+		Set<ISST> convertedSSTs = classGenerator.convert(contexts);
 		for (ISST sst : convertedSSTs) {
 			File file = generateClassPath(sst, rootPath);
 			writeSST(sst, file);

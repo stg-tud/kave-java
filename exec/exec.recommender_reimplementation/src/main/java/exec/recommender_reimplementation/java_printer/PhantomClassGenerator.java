@@ -15,26 +15,50 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addMethodDeclarationToSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
+
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.ITypeShape;
 
 public class PhantomClassGenerator {
 
-	public Set<ISST> convert(Set<ISST> ssts) {
+	public Set<ISST> convert(Set<Context> contexts) {
 		Map<ITypeName, SST> phantomClasses = Maps.newHashMap();
 		
-		for (ISST sst : ssts) {
-			sst.accept(new PhantomClassVisitor(), phantomClasses);
+		for (Context context : contexts) {
+			addSuperMethods(context, phantomClasses);
+			context.getSST().accept(new PhantomClassVisitor(), phantomClasses);
 		}
 
 		return Sets.newHashSet(phantomClasses.values());
+	}
+
+	public void addSuperMethods(Context context, Map<ITypeName, SST> phantomClasses) {
+		ITypeShape typeShape = context.getTypeShape();
+		for (IMethodHierarchy methodHierarchy : typeShape.getMethodHierarchies()) {
+			IMethodName firstMethod = methodHierarchy.getFirst();
+			IMethodName superMethod = methodHierarchy.getSuper();
+			if (firstMethod != null) {
+				SST sst = getOrCreateSST(firstMethod.getDeclaringType(), phantomClasses);
+				addMethodDeclarationToSST(firstMethod, sst);
+			}
+			if (superMethod != null) {
+				SST sst = getOrCreateSST(superMethod.getDeclaringType(), phantomClasses);
+				addMethodDeclarationToSST(superMethod, sst);
+			}
+		}
 	}
 
 }
