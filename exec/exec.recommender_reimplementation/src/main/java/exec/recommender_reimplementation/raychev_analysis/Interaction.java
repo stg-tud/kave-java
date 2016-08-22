@@ -63,12 +63,20 @@ public class Interaction {
 
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return new HashCodeBuilder().append(methodName).append(position).append(interactionType).toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		if (!(obj instanceof Interaction)) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		Interaction other = (Interaction) obj;
+		return new EqualsBuilder().append(this.methodName, other.methodName).append(this.position, other.position)
+				.append(this.interactionType, other.interactionType).isEquals();
 	}
 	
 	@Override

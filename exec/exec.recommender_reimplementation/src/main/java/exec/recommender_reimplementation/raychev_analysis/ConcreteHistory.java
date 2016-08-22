@@ -21,9 +21,9 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.commons.utils.ToStringUtils;
-
 import com.google.common.collect.Lists;
+
+import cc.kave.commons.utils.ToStringUtils;
 
 public class ConcreteHistory {
 
@@ -55,12 +55,19 @@ public class ConcreteHistory {
 
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return new HashCodeBuilder().append(history).toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		if (!(obj instanceof ConcreteHistory)) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		ConcreteHistory other = (ConcreteHistory) obj;
+		return new EqualsBuilder().append(this.history, other.history).isEquals();
 	}
 	
 	@Override

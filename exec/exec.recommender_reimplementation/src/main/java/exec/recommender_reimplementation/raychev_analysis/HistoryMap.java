@@ -97,12 +97,12 @@ public class HistoryMap extends HashMap<Set<AbstractLocation>, AbstractHistory>{
 	
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return new HashCodeBuilder().append(this).toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		return new EqualsBuilder().append(this, obj).isEquals();
 	}
 	
 	@Override

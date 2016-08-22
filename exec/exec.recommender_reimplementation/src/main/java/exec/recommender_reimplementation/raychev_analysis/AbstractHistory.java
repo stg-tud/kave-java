@@ -69,12 +69,20 @@ public class AbstractHistory {
 
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return new HashCodeBuilder().append(abstractHistory).append(historySet).toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		if (!(obj instanceof AbstractHistory)) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		AbstractHistory other = (AbstractHistory) obj;
+		return new EqualsBuilder().append(this.abstractHistory, other.abstractHistory)
+				.append(this.historySet, other.historySet).isEquals();
 	}
 	
 	@Override
