@@ -15,22 +15,15 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
-import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
-import exec.recommender_reimplementation.java_transformation.DefaultValueHelper;
 
 public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 
-	private DefaultValueHelper defaultValueHelper;
-
 	public RaychevQueryPrintingVisitor(ISSTNode sst, boolean setPublicModifier) {
 		super(sst,setPublicModifier);
-		defaultValueHelper = new DefaultValueHelper(sst);
 	}
 
 //	@Override
@@ -45,25 +38,6 @@ public class RaychevQueryPrintingVisitor extends JavaPrintingVisitor {
 			throw new InvalidJavaCodeException();
 		}
 		context.text("UNK.Must1(").text(varRef.getIdentifier()).text(")");
-		return null;
-	}
-	
-	@Override
-	public Void visit(IVariableDeclaration stmt, SSTPrintingContext context) {
-		defaultValueHelper.addVariableReferenceToTypeMapping(stmt);
-
-		return super.visit(stmt, context);
-	}
-
-	@Override
-	public Void visit(IBinaryExpression expr, SSTPrintingContext context) {
-		context.text(defaultValueHelper.getDefaultValueForNode(expr));
-		return null;
-	}
-
-	@Override
-	public Void visit(IUnaryExpression expr, SSTPrintingContext context) {
-		context.text(defaultValueHelper.getDefaultValueForNode(expr));
 		return null;
 	}
 

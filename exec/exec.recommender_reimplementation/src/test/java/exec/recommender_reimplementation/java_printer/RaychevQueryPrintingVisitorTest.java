@@ -15,16 +15,10 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.completionExpr;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
-import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
@@ -45,27 +39,4 @@ public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseT
 		assertPrint(completionExpr(""), "");
 	}
 
-	@Test
-	public void replacesBinaryExpressionsWithNull() {
-		assertPrint(binExpr(BinaryOperator.Plus, constant("0"), constant("1")), "null");
-	}
-
-	@Test
-	public void replacesUnaryExpressionsWithNull() {
-		assertPrint(unaryExpr(UnaryOperator.Plus, constant("0")), "null");
-	}
-
-	@Test
-	public void replacesBinaryExpressionsAssignedToBooleanWithDefault() {
-		assertPrint(methodDecl(method(type("T1"), type("T1"), "m1"), declare("foo", type("System.Boolean")),
-				assign(varRef("foo"), binExpr(BinaryOperator.Plus, constant("0"), constant("1")))), "T1 m1()", "{",
-				"    boolean foo;", "    foo = false;", "}");
-	}
-
-	@Test
-	public void replacesUnaryExpressionsAssignedToBooleanWithDefault() {
-		assertPrint(methodDecl(method(type("T1"), type("T1"), "m1"), declare("foo", type("System.Boolean")),
-				assign(varRef("foo"), unaryExpr(UnaryOperator.Plus, constant("0")))), "T1 m1()", "{",
-				"    boolean foo;", "    foo = false;", "}");
-	}
 }

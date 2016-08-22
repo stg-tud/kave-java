@@ -132,6 +132,14 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 					expressionTransformationHelper
 							.transformComposedExpression((IComposedExpression) expressionStatement.getExpression()));
 		}
+		if (expressionStatement.getExpression() instanceof IBinaryExpression) {
+			expressionStatement.setExpression(expressionTransformationHelper
+					.transformBinaryExpression((IBinaryExpression) expressionStatement.getExpression()));
+		}
+		if (expressionStatement.getExpression() instanceof IUnaryExpression) {
+			expressionStatement.setExpression(expressionTransformationHelper
+					.transformUnaryExpression((IUnaryExpression) expressionStatement.getExpression()));
+		}
 		if (expressionStatement.getExpression() instanceof IIndexAccessExpression) {
 			expressionStatement.setExpression(
 					expressionTransformationHelper.transformIndexAccessExpression(
@@ -221,6 +229,18 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 		if (assignment.getExpression() instanceof IComposedExpression) {
 			assignment.setExpression(expressionTransformationHelper
 					.transformComposedExpression((IComposedExpression) assignment.getExpression()));
+		}
+
+		// Handle right-hand Binary Expression
+		if (assignment.getExpression() instanceof IBinaryExpression) {
+			assignment.setExpression(expressionTransformationHelper
+					.transformBinaryExpression((IBinaryExpression) assignment.getExpression()));
+		}
+
+		// Handle right-hand Unary Expression
+		if (assignment.getExpression() instanceof IUnaryExpression) {
+			assignment.setExpression(expressionTransformationHelper
+					.transformUnaryExpression((IUnaryExpression) assignment.getExpression()));
 		}
 
 		// Handle right-hand IndexAccessExpression

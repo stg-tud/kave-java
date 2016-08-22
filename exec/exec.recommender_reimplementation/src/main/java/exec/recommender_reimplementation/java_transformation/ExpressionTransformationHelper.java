@@ -24,8 +24,10 @@ import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
@@ -43,6 +45,14 @@ public class ExpressionTransformationHelper {
 	}
 
 	public IAssignableExpression transformComposedExpression(IComposedExpression expression) {
+		return constant(defaultValueHelper.getDefaultValueForNode(expression));
+	}
+
+	public IAssignableExpression transformBinaryExpression(IBinaryExpression expression) {
+		return constant(defaultValueHelper.getDefaultValueForNode(expression));
+	}
+
+	public IAssignableExpression transformUnaryExpression(IUnaryExpression expression) {
 		return constant(defaultValueHelper.getDefaultValueForNode(expression));
 	}
 
