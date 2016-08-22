@@ -1,10 +1,8 @@
 package exec.recommender_reimplementation.java_transformation;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareVar;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.expr;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.unaryExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 import static exec.recommender_reimplementation.java_transformation.ExpressionTransformationHelper.INT_TYPE_IDENTIFIER;
 
@@ -15,16 +13,15 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
-import cc.kave.commons.model.ssts.expressions.assignable.UnaryOperator;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
-import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
@@ -91,17 +88,25 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void constantValueExpression_Null() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
+				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
 						assign(varRef("x"), new ConstantValueExpression())),
+				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("null")));
+	}
+
+	@Test
+	public void doesNotTransformConstantBoolean() {
+		assertAroundMethodDeclaration(
+				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
+						assign(varRef("x"), constant("false"))),
 				declareVar("x", type("s:System.Boolean")), assign(varRef("x"), constant("false")));
 	}
 
 	@Test
 	public void composedExpressionInAssignment() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
+				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
 						assign(variableReference("x"), new ComposedExpression())),
-				declareVar("x", type("s:System.Boolean")), assign(varRef("x"), constant("false")));
+				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("null")));
 	}
 
 	@Test
@@ -111,23 +116,33 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	}
 
 	@Test
-	public void unknownExpressionNestedInBinaryExpression() {
+	public void binaryExpressionInAssignment() {
 		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
-						assign(variableReference("x"),
-								binExpr(BinaryOperator.Plus, new UnknownExpression(), new UnknownExpression()))),
-				declareVar("x", type("s:System.Boolean")),
-				assign(variableReference("x"), binExpr(BinaryOperator.Plus, constant("false"), constant("false"))));
+				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+						assign(variableReference("x"), new BinaryExpression())),
+				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("null")));
 	}
 
 	@Test
-	public void unknownExpressionNestedInUnaryExpression() {
-		assertAroundMethodDeclaration(
-				Lists.newArrayList(declareVar("x", type("s:System.Boolean")),
-						assign(variableReference("x"), unaryExpr(UnaryOperator.Plus, new UnknownExpression()))),
-				declareVar("x", type("s:System.Boolean")),
-				assign(variableReference("x"), unaryExpr(UnaryOperator.Plus, constant("false"))));
+	public void binaryExpressionInExprStatement() {
+		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", type("T1")), expr(new BinaryExpression())),
+				declareVar("x", type("T1")), expr(constant("null")));
 	}
+
+	@Test
+	public void unaryExpressionInAssignment() {
+		assertAroundMethodDeclaration(
+				Lists.newArrayList(declareVar("x", type("s:System.Int32")),
+						assign(variableReference("x"), new UnaryExpression())),
+				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("null")));
+	}
+
+	@Test
+	public void unaryExpressionInExprStatement() {
+		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", type("T1")), expr(new UnaryExpression())),
+				declareVar("x", type("T1")), expr(constant("null")));
+	}
+
 
 	@Test
 	public void testEmptyConditionInIfElseBlock() {

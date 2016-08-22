@@ -27,6 +27,7 @@ import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.declarations.DelegateDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.EventDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
@@ -34,20 +35,24 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
+import exec.recommender_reimplementation.java_printer.JavaPrintingContext;
+import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
 public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
+	
 	@Test
 	public void addsPackageDeclaration() {
 		SST sst = new SST();
 		sst.setEnclosingType(TypeName.newTypeName("FirstPackage.SecondPackage.TestClass,P"));
 
 		assertPrint(sst, "package FirstPackage.SecondPackage;",
-				"class TestClass", "{", "}");
+				"class TestClass extends Object", "{", "}");
 	}
 
 	@Test
@@ -56,8 +61,11 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.setEnclosingType(type("TestClass"));
 		sst.getMethods()
 				.add(methodDecl(method(type("T1"), type("TestClass"), "m1"), declare("foo", type("T1"))));
-		
-		assertPrint(sst, "import T1;", "class TestClass", "{", "    T1 m1()", "    {", "        T1 foo;", "    }", "}");
+		JavaPrintingContext context = new JavaPrintingContext();
+		sut = new JavaPrintingVisitor(sst, false);
+		sst.accept(sut, context);
+		String actual = context.toString();
+		actual.contains("import T1;");
 	}
 
 	@Test
@@ -102,7 +110,8 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		typeHierarchy.getImplements().add(type2);
 		typeShape.setTypeHierarchy(typeHierarchy);
 
-		assertPrintWithCustomContext(sst, typeShape, "class TestClass implements IDoesSomething", "{", "}");
+		assertPrintWithCustomContext(sst, typeShape, "class TestClass extends Object implements IDoesSomething", "{",
+				"}");
 	}
 
 	@Test
@@ -125,13 +134,23 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
+	public void SSTDeclaration_WithoutSuperTypes() {
+		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+
+		SST sst = new SST();
+		sst.setEnclosingType(thisType);
+
+		assertPrint(sst, "class TestClass extends Object", "{", "}");
+	}
+
+	@Test
 	public void SSTDeclaration_PublicModifier() {
 		ITypeName thisType = TypeName.newTypeName("TestClass,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
 
-		assertPrintWithPublicModifier(sst, "public class TestClass", "{", "}");
+		assertPrintWithPublicModifier(sst, "public class TestClass extends Object", "{", "}");
 	}
 
 	@Test
@@ -259,6 +278,13 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
+	public void VariableDeclaration() {
+		IVariableDeclaration sst = SSTUtil.declare("var", TypeName.newTypeName("T,P"));
+
+		assertPrint(sst, "T var = null;");
+	}
+
+	@Test
 	public void addsOverrideTag() {
 		ITypeName thisType = TypeName.newTypeName("TestClass,P");
 		ITypeName superType = TypeName.newTypeName("SuperClass,P");
@@ -275,21 +301,6 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void ignoresObjectOverrides() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("System.Object,P");
-
-		IMethodDeclaration methodDecl = methodDecl(method(type("T1"), thisType, "m1"));
-		TypeShape typeShape = new TypeShape();
-		MethodHierarchy methodHierarchy = new MethodHierarchy();
-		methodHierarchy.setElement(method(type("T1"), thisType, "m1"));
-		methodHierarchy.setSuper(method(type("T1"), superType, "m1"));
-		typeShape.setMethodHierarchies(Sets.newHashSet(methodHierarchy));
-
-		assertPrintWithCustomContext(methodDecl, typeShape, "T1 m1() { }");
-	}
-
-	@Test
 	public void printEnum() {
 		ITypeName thisType = TypeName.newTypeName("e:TestClass,P");
 		
@@ -298,14 +309,14 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.setFields(Sets.newHashSet(
 				fieldDecl(field(thisType, thisType, "VAL1"))));
 
-		assertPrint(sst, "enum TestClass", "{", "    VAL1", "}");
+		assertPrint(sst, "class TestClass extends Object", "{", "    TestClass VAL1;", "", "}");
 	}
 
 	@Test
 	public void ignoresTypeParameters() {
 		ITypeName genericsType = type("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]]");
 
-		assertPrint(declare("foo", genericsType), "Dictionary foo;");
+		assertPrint(declare("foo", genericsType), "Dictionary foo = null;");
 	}
 
 	@Test(expected = InvalidJavaCodeException.class)

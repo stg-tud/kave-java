@@ -113,12 +113,12 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void constantValueExpression_WithBoolTrue() {
-		assertPrint(constant("true"), "true");
+		assertPrint(constant("true"), "CSharpConstants.TRUE");
 	}
 
 	@Test
 	public void constantValueExpression_WithBoolFalse() {
-		assertPrint(constant("false"), "false");
+		assertPrint(constant("false"), "CSharpConstants.FALSE");
 	}
 
 

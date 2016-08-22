@@ -22,22 +22,30 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import cc.kave.commons.model.names.IMethodName;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.IDoLoop;
+import cc.kave.commons.model.ssts.blocks.IForLoop;
+import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
+import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
 import cc.kave.commons.model.ssts.declarations.IEventDeclaration;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
+import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
+import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
@@ -46,9 +54,8 @@ import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
 
 public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
-
+	private static final String C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME = "CSharpConverter.toBool";
 	private boolean setPublicModifier;
-	private boolean isEnum;
 
 	public JavaPrintingVisitor(ISSTNode sst, boolean setPublicModifier) {
 		this.setPublicModifier = setPublicModifier;
@@ -85,10 +92,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		if (sst.getEnclosingType().isInterfaceType()) {
 			context.keyword("interface");
 		} 
-		else if (sst.getEnclosingType().isEnumType()) {
-			context.keyword("enum");
-			isEnum = true;
-		} 
 		else {
 			context.keyword("class");
 		}
@@ -100,6 +103,10 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			if (context.typeShape.getTypeHierarchy().hasSuperclass() && extends1 != null) {
 				context.text(" extends ");
 				context.type(extends1.getElement());
+			}
+			else {
+				context.text(" extends ");
+				context.text("Object");
 			}
 
 			if (context.typeShape.getTypeHierarchy().isImplementingInterfaces()) {
@@ -115,6 +122,10 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				}
 			}
 		}
+		else if (!sst.getEnclosingType().getName().equals("Object")) {
+			context.text(" extends ");
+			context.text("Object");
+		}
 
 		context.newLine().indentation().text("{").newLine();
 
@@ -122,11 +133,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 		appendMemberDeclarationGroup(context, sst.getDelegates().stream().collect(Collectors.toSet()), 1, 2);
 		appendMemberDeclarationGroup(context, sst.getEvents().stream().collect(Collectors.toSet()), 1, 2);
-		if (isEnum) {
-			appendEnumGroup(context, sst.getFields());
-		} else {
-			appendMemberDeclarationGroup(context, sst.getFields().stream().collect(Collectors.toSet()), 1, 2);
-		}
+		appendMemberDeclarationGroup(context, sst.getFields().stream().collect(Collectors.toSet()), 1, 2);
 		appendMemberDeclarationGroup(context, sst.getProperties().stream().collect(Collectors.toSet()), 1, 2);
 		appendMemberDeclarationGroup(context, sst.getMethods().stream().collect(Collectors.toSet()), 2, 1);
 
@@ -155,23 +162,6 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			}
 		}
 		return fullPackageName;
-	}
-
-	private void appendEnumGroup(SSTPrintingContext context, Set<IFieldDeclaration> fields) {
-		List<IFieldDeclaration> nodeList = fields.stream().collect(Collectors.toList());
-		context.indentation();
-		for (int i = 0; i < nodeList.size(); i++) {
-			IMemberDeclaration node = nodeList.get(i);
-			node.accept(this, context);
-
-			if (i < (nodeList.size() - 1)) {
-				context.text(",");
-			}
-			else {
-				context.newLine();
-			}
-		}
-
 	}
 
 	private void addPublicModifier(SSTPrintingContext context) {
@@ -216,7 +206,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			for (IMethodHierarchy methodHierarchy : methodHierarchies) {
 				if (methodHierarchy.getElement().equals(stmt.getName())) {
 					if (methodHierarchy.getFirst() != null
-							|| methodHierarchy.getSuper() != null && IsNotObjectOverride(methodHierarchy.getSuper())) {
+							|| methodHierarchy.getSuper() != null) {
 						return true;
 					}
 				}
@@ -225,25 +215,14 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		return false;
 	}
 
-	private boolean IsNotObjectOverride(IMethodName superType) {
-		if (superType.getDeclaringType().getIdentifier().startsWith("System.Object")) {
-			return false;
-		}
-		return true;
-	}
-
 	@Override
 	public Void visit(IFieldDeclaration stmt, SSTPrintingContext context) {
-		if (isEnum) {
-			context.text(stmt.getName().getName());
-		} else {
-			context.indentation();
-			addPublicModifier(context);
-			if (stmt.getName().isStatic()) {
-				context.keyword("static").space();
-			}
-			context.type(stmt.getName().getValueType()).space().text(stmt.getName().getName()).text(";");
+		context.indentation();
+		addPublicModifier(context);
+		if (stmt.getName().isStatic()) {
+			context.keyword("static").space();
 		}
+		context.type(stmt.getName().getValueType()).space().text(stmt.getName().getName()).text(";");
 
 		return null;
 	}
@@ -254,9 +233,86 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	}
 
 	@Override
+	public Void visit(IVariableDeclaration stmt, SSTPrintingContext context) {
+		context.indentation().type(stmt.getType()).space();
+		stmt.getReference().accept(this, context);
+		context.text(" = ").text("null").text(";");
+		return null;
+	}
+
+	@Override
+	public Void visit(IDoLoop block, SSTPrintingContext context) {
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
+
+		context.indentation().keyword("do");
+
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(
+				Iterables.concat(block.getBody(), getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
+
+		context.newLine().indentation().keyword("while").space().text("(").text(C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME)
+				.text("(");
+		condition.accept(this, context);
+		context.text("));");
+		return null;
+	}
+
+	@Override
+	public Void visit(IIfElseBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("if").space().text("(").text(C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME).text("(");
+		block.getCondition().accept(this, context);
+		context.text("))");
+
+		context.statementBlock(block.getThen(), this, true);
+
+		if (!block.getElse().isEmpty()) {
+			context.newLine().indentation().keyword("else");
+
+			context.statementBlock(block.getElse(), this, true);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(IForLoop block, SSTPrintingContext context) {
+		statementBlockWithoutIndent(block.getInit(), context);
+
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
+
+		context.indentation().keyword("for").space().text("(").text(";").text(C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME)
+				.text("(");
+		condition.accept(this, context);
+		context.text(")").text(";").text(")");
+
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(Iterables.concat(block.getBody(),
+				block.getStep(), getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
+
+		return null;
+	}
+
+	@Override
 	public Void visit(IUncheckedBlock block, SSTPrintingContext context) {
 		// ignores unchecked keyword
 		statementBlockWithoutIndent(block.getBody(), context);
+		return null;
+	}
+
+	@Override
+	public Void visit(IWhileLoop block, SSTPrintingContext context) {
+		ISimpleExpression condition = getSimpleConditionOrAppendLoopBlock(block.getCondition(), context);
+
+		context.indentation().keyword("while").space().text("(").text(C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME).text("(");
+		condition.accept(this, context);
+		context.text("))");
+
+		List<IStatement> statementListWithLoopHeader = Lists.newArrayList(
+				Iterables.concat(block.getBody(), getLoopHeaderBlockWithoutDeclaration(block.getCondition())));
+
+		context.statementBlock(statementListWithLoopHeader, this, true);
+
 		return null;
 	}
 
@@ -267,8 +323,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 			String value = !value2.isEmpty() ? value2 : "...";
 
 			// Double.TryParse(expr.Value, out parsed
-			if (value.equals("false") || value.equals("true") || value.matches("[0-9]+")
-					|| value.matches("[0-9]+\\.[0-9]+(f|d|m)?") || value.matches("'.'") || value.equals("null")) {
+			if (value.equals("false")) {
+				context.text("CSharpConstants.FALSE");
+			} else if (value.equals("true")) {
+				context.text("CSharpConstants.TRUE");
+			} else if (value.matches("[0-9]+") || value.matches("[0-9]+\\.[0-9]+(f|d|m)?") || value.matches("'.'")
+					|| value.equals("null")) {
 				context.keyword(value);
 			} else {
 				context.stringLiteral(value);

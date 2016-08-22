@@ -31,8 +31,7 @@ import cc.kave.commons.model.names.csharp.MethodName;
 public class JavaNameUtils {
 	public static final Map<String,String> C_SHARP_TO_JAVA_VALUE_TYPE_MAPPING =
 			ImmutableMap.<String, String>builder()
-			.put("System.Boolean", "boolean")
-					.put("System.Object", "Object")
+					.put("System.Boolean", "boolean")
 			.build();
 	
     public static String getTypeAliasFromFullTypeName(String typeName)

@@ -20,20 +20,20 @@ public class StatementTransformationTest extends JavaTransformationBaseTest {
 
 	@Test
 	public void testEmptyReturnStatementInMethodDeclaration() {
-		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Boolean"), type("Class1, P1"), "m1"), true,
+		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Int32"), type("Class1, P1"), "m1"), true,
 				new ReturnStatement());
-		assertNode(methodDecl, methodDecl(method(type("s:System.Boolean"), type("Class1, P1"), "m1"),
-				returnStatement(constant("false"))));
+		assertNode(methodDecl, methodDecl(method(type("s:System.Int32"), type("Class1, P1"), "m1"),
+				returnStatement(constant("null"))));
 	}
 
 	@Test
 	public void testEmptyReturnStatementInPropertyDeclaration() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Boolean,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Int32,P1] [DeclaringType,P1].P"));
 		propertyDecl.setGet(Lists.newArrayList(new ReturnStatement()));
 		assertPropertyDeclaration(propertyDecl,
-				defaultSST(methodDecl(method(type("s:System.Boolean"), type("DeclaringType"), "get$P"),
-						returnStatement(constant("false")))));
+				defaultSST(methodDecl(method(type("s:System.Int32"), type("DeclaringType"), "get$P"),
+						returnStatement(constant("null")))));
 	}
 
 	@Test

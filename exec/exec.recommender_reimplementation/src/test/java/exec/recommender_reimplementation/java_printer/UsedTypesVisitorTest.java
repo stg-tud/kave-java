@@ -20,9 +20,9 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.invocationStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.propertyReference;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
+import static exec.recommender_reimplementation.java_printer.UsedTypesVisitor.CONSTANT_TYPES;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
@@ -254,13 +254,6 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
-	public void ignoresBooleanTypesInVariableDeclaration() {
-		SST sst = defaultSST(declare("someVar", type("System.Boolean")));
-
-		assertUsedTypesEmpty(sst);
-	}
-
-	@Test
 	public void returnsAssemblies() {
 		SST sst = defaultSST(invocationStatement(method(type("SomeType"),
 				type("T1"), "m1")));
@@ -269,6 +262,9 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		sst.accept(usedTypesVisitor, null);
 
 		Set<IAssemblyName> expected = Sets.newHashSet(type("T1").getAssembly());
+		for (ITypeName typeName : CONSTANT_TYPES) {
+			expected.add(typeName.getAssembly());
+		}
 		Set<IAssemblyName> actual = usedTypesVisitor.getAssemblies();
 
 		assertEquals(expected, actual);
@@ -276,12 +272,14 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 
 	private void assertUsedTypesEmpty(SST sst) {
 		Set<ITypeName> actual = getUsedTypes(sst);
-		assertTrue(actual.isEmpty());
+		Set<ITypeName> expected = Sets.newHashSet(CONSTANT_TYPES);
+		assertEquals(expected, actual);
 	}
 
 	private void assertUsedTypesForSST(SST sst, ITypeName... types) {
 		Set<ITypeName> actual = getUsedTypes(sst);
 		Set<ITypeName> expected = Sets.newHashSet(types);
+		expected.addAll(UsedTypesVisitor.CONSTANT_TYPES);
 		assertEquals(expected, actual);
 	}
 

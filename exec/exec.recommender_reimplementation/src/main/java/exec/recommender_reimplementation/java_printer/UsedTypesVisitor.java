@@ -15,7 +15,6 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
-import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isJavaValueType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
 
 import java.util.List;
@@ -28,6 +27,7 @@ import cc.kave.commons.model.names.IAssemblyName;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.names.csharp.TypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
@@ -50,8 +50,14 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 
 	private Set<ITypeName> usedTypes;
 	
+	public static final Set<ITypeName> CONSTANT_TYPES = Sets.newHashSet(
+			TypeName.newTypeName("System.Object, mscorlib, 2.0.0.0"),
+			TypeName.newTypeName("JavaToCSharpUtils.CSharpConstants, JavaToCSharp"),
+			TypeName.newTypeName("JavaToCSharpUtils.CSharpConverter, JavaToCSharp"));
+
 	public UsedTypesVisitor() {
 		usedTypes = Sets.newHashSet();
+		usedTypes.addAll(CONSTANT_TYPES);
 	}
 	
 	@Override
@@ -68,7 +74,7 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	}
 
 	private void addType(ITypeName type) {
-		if (!isJavaValueType(type) && !type.equals(className) && isValidType(type)) {
+		if (!type.equals(className) && isValidType(type)) {
 			usedTypes.add(type);		
 		}
 	}

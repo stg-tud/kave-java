@@ -69,8 +69,14 @@ public class JavaPrintingVisitorBaseTest {
 		}
 		sst.accept(sut, context);
 		String actual = context.toString();
+		actual = removeImports(actual);
 		Assert.assertEquals(expected, actual);
 		Assert.assertEquals(indentationLevel, context.indentationLevel);
+	}
+
+	private String removeImports(String actual) {
+		String removedImports = actual.replaceAll("( )*import (\\w+\\.|\\w+;)+\\n", "");
+		return removedImports;
 	}
 
 	protected void assertPrintWithCustomContext(ISSTNode sst, JavaPrintingContext context, String expected) {
@@ -80,6 +86,7 @@ public class JavaPrintingVisitorBaseTest {
 		}
 		sst.accept(sut, context);
 		String actual = context.toString();
+		actual = removeImports(actual);
 		Assert.assertEquals(expected, actual);
 		Assert.assertEquals(indentationLevel, context.indentationLevel);
 	}

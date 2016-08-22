@@ -20,7 +20,6 @@ import static exec.recommender_reimplementation.java_printer.PhantomClassGenerat
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addPropertyDeclarationToSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.createNewSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
-import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isJavaValueType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
 
 import java.util.List;
@@ -127,7 +126,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	}
 
 	private void addTypeToMap(Map<ITypeName, SST> context, ITypeName type) {
-		if (isJavaValueType(type) || type.equals(className) || !isValidType(type)) {
+		if (type.equals(className) || !isValidType(type)) {
 			return;
 		}
 		if (!context.containsKey(type)) {
@@ -138,7 +137,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	private void handleMethod(IMethodName methodName, IVariableReference varRef, Map<ITypeName, SST> context) {
 		ITypeName type = methodName.getDeclaringType();
 		String identifier = varRef.getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && !isJavaValueType(type) && isValidType(type)) {
+		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
 			addMethodDeclarationToSST(methodName, getOrCreateSST(type, context));
 			handleReceiverType(varRef, methodName, context);
 		}

@@ -26,7 +26,7 @@ public class RaychevQueryPrinter extends JavaPrinter {
 	public String print(Context context) {
 		ISST sst = transform(context);
 		JavaPrintingContext printingContext = getPrintingContext(context);
-		sst.accept(new RaychevQueryPrintingVisitor(context.getSST(), false), printingContext);
+		sst.accept(new RaychevQueryPrintingVisitor(context.getSST(), true), printingContext);
 		return printingContext.toString();
 	}
 
@@ -34,7 +34,7 @@ public class RaychevQueryPrinter extends JavaPrinter {
 	public String print(ISST sst) {
 		sst = transform(sst);
 		JavaPrintingContext printingContext = new JavaPrintingContext();
-		sst.accept(new RaychevQueryPrintingVisitor(sst, false), printingContext);
+		sst.accept(new RaychevQueryPrintingVisitor(sst, true), printingContext);
 		return printingContext.toString();
 	}
 

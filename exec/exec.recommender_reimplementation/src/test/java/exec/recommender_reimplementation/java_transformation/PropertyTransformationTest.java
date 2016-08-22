@@ -16,7 +16,6 @@
 package exec.recommender_reimplementation.java_transformation;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.binExpr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.expr;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.propertyReference;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.refExpr;
@@ -30,10 +29,9 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.names.csharp.PropertyName;
-import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
@@ -162,9 +160,9 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(
 						assign(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P"),
-								new BinaryExpression())), //
+								new IfElseExpression())), //
 				assign(fieldRef("this", field(type("PropertyType"), type("DeclaringType"), "Property$P")),
-						binExpr(BinaryOperator.Unknown, constant("null"), constant("null"))));
+						new IfElseExpression()));
 	}
 
 	@Test

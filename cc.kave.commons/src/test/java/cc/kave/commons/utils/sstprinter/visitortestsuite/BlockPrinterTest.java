@@ -235,7 +235,7 @@ public class BlockPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testSimpleDoLoop() {
 		assertPrint(
-				doLoop(loopHeader(returnStatement(referenceExprToVariable("true"))),
+				doLoop(loopHeader(returnStatement(constant("true"))),
 						new ContinueStatement(), new BreakStatement()), "do",
 				"{", "    continue;", "    break;", "}", "while (true);");
 	}

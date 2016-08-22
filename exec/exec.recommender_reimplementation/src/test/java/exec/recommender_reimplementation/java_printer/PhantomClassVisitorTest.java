@@ -160,10 +160,10 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 
 	@Test
 	public void addsMethodDeclarationOnInvocation_ReturnValueType() {
-		SST sst = defaultSST(invocationStatement(method(type("System.Boolean"), type("T1"), "m1")));
+		SST sst = defaultSST(invocationStatement(method(type("System.Int32"), type("T1"), "m1")));
 
 		assertGeneratedMethodsInSST(sst, type("T1"),
-				methodDecl(method(type("System.Boolean"), type("T1"), "m1"), returnStatement(constant("false"))));
+				methodDecl(method(type("System.Int32"), type("T1"), "m1"), returnStatement(constant("null"))));
 	}
 
 	@Test
@@ -268,20 +268,6 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	public void ignoresPropertyInSameClass() {
 		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
-
-		assertNoSSTsGenerated(sst);
-	}
-
-	@Test
-	public void ignoresInvocationOnValueType() {
-		SST sst = defaultSST(type("T1"), invocationStatement(method(voidType, type("System.Boolean"), "m1")));
-
-		assertNoSSTsGenerated(sst);
-	}
-
-	@Test
-	public void ignoresBooleanTypesInVariableDeclaration() {
-		SST sst = defaultSST(declare("someVar", type("System.Boolean")));
 
 		assertNoSSTsGenerated(sst);
 	}
