@@ -25,6 +25,7 @@ import cc.kave.commons.model.names.INamespaceName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.NamespaceName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
@@ -59,12 +60,28 @@ public class JavaPrintingUtils {
 			ITypeName classType = classesIterator.next();
 			if (classType.isUnknown())
 				continue;
-			context.text("import").text(" ").text(classType.getFullName()).text(";");
+			appendImportStmt(context, classType);
+		}
 
-			context.newLine();
+		if (context.typeShape != null && context.typeShape.getTypeHierarchy().hasSupertypes()) {
+
+			ITypeHierarchy extends1 = context.typeShape.getTypeHierarchy().getExtends();
+			if (context.typeShape.getTypeHierarchy().hasSuperclass() && extends1 != null) {
+				appendImportStmt(context, extends1.getElement());
+			}
+
+			for (ITypeHierarchy implementsTypeHierarchy : context.typeShape.getTypeHierarchy().getImplements()) {
+				appendImportStmt(context, implementsTypeHierarchy.getElement());
+			}
+
 		}
 		
 		return context;
+	}
+
+	private static void appendImportStmt(SSTPrintingContext context, ITypeName classType) {
+		context.text("import").text(" ").text(classType.getFullName()).text(";");
+		context.newLine();
 	}
 	
 	public static Set<ITypeName> getUsedTypes(ISST sst) {

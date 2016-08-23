@@ -16,6 +16,9 @@
 package exec.recommender_reimplementation.java_printer.javaPrinterTestSuite;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
@@ -66,6 +69,38 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.accept(sut, context);
 		String actual = context.toString();
 		actual.contains("import T1;");
+	}
+
+	@Test
+	public void appendsImportForSuperTypes() {
+		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+		ITypeName superType = TypeName.newTypeName("SuperClass,P");
+		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
+		ITypeName interface2 = TypeName.newTypeName("i:IDoesSomethingElse,P");
+
+		SST sst = new SST();
+		sst.setEnclosingType(thisType);
+		TypeShape typeShape = new TypeShape();
+		TypeHierarchy type = new TypeHierarchy();
+		TypeHierarchy type2 = new TypeHierarchy();
+		TypeHierarchy interface1Hierarchy = new TypeHierarchy();
+		TypeHierarchy interface2Hierarchy = new TypeHierarchy();
+		interface1Hierarchy.setElement(interface1);
+		interface2Hierarchy.setElement(interface2);
+		type2.setElement(superType);
+		type.setElement(thisType);
+		type.setExtends(type2);
+		type.getImplements().add(interface1Hierarchy);
+		type.getImplements().add(interface2Hierarchy);
+		typeShape.setTypeHierarchy(type);
+
+		JavaPrintingContext context = new JavaPrintingContext();
+		context.setTypeShape(typeShape);
+		sut = new JavaPrintingVisitor(sst, false);
+		sst.accept(sut, context);
+		String actual = context.toString();
+		assertThat(actual, allOf(containsString("import SuperClass;"), containsString("import IDoesSomething;"),
+				containsString("import IDoesSomethingElse;")));
 	}
 
 	@Test
