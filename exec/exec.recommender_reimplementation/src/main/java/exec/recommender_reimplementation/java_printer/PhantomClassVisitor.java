@@ -192,7 +192,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	}
 
 	private boolean isReferenceToOutsideClass(ITypeName type, String identifier) {
-		return !identifier.equals("this") && !type.equals(className);
+		return !type.equals(className);
 	}
 
 }

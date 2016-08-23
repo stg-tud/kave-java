@@ -156,7 +156,8 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void addsTypeOfMethodParameterWhenInvokingMethodInSameClass() {
-		SST sst = defaultSST(invocationStatement("this",
+		SST sst = defaultSST(type("T1"),
+				invocationStatement("this",
 				method(voidType, type("T1"), "m1", parameter(type("T2"), "p1"))));
 
 		assertUsedTypesForSST(sst, type("T2"));
@@ -188,7 +189,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		methodRef.setMethodName(method(voidType, type("T1"), "m1",
 				parameter(type("T2"), "p1")));
 		methodRef.setReference(varRef("this"));
-		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+		SST sst = defaultSST(type("T1"), assign(varRef("someVar"), refExpr(methodRef)));
 		
 		assertUsedTypesForSST(sst, type("T2"));
 	}
@@ -208,7 +209,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		EventReference eventRef = new EventReference();
 		eventRef.setEventName(EventName.newEventName("[T2,P1] [T1,P1].e"));
 		eventRef.setReference(varRef("this"));
-		SST sst = defaultSST(assign(varRef("someVar"), refExpr(eventRef)));
+		SST sst = defaultSST(type("T1"), assign(varRef("someVar"), refExpr(eventRef)));
 		
 		assertUsedTypesForSST(sst, type("T2"));
 	}
@@ -237,7 +238,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		MethodReference methodRef = new MethodReference();
 		methodRef.setMethodName(method(voidType, type("T1"), "m1"));
 		methodRef.setReference(varRef("this"));
-		SST sst = defaultSST(assign(varRef("someType"), refExpr(methodRef)));
+		SST sst = defaultSST(type("T1"), assign(varRef("someType"), refExpr(methodRef)));
 		
 		assertUsedTypesEmpty(sst);
 	}

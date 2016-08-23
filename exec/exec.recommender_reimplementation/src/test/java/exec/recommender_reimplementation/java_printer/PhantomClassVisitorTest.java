@@ -220,7 +220,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		MethodReference methodRef = new MethodReference();
 		methodRef.setMethodName(method(voidType, type("T1"), "m1", parameter(type("T2"), "p1")));
 		methodRef.setReference(varRef("this"));
-		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+		SST sst = defaultSST(type("T1"), assign(varRef("someVar"), refExpr(methodRef)));
 
 		assertEmptySSTs(sst, type("T2"));
 	}
@@ -252,7 +252,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		MethodReference methodRef = new MethodReference();
 		methodRef.setMethodName(method(voidType, type("T1"), "m1"));
 		methodRef.setReference(varRef("this"));
-		SST sst = defaultSST(assign(varRef("someVar"), refExpr(methodRef)));
+		SST sst = defaultSST(type("T1"), assign(varRef("someVar"), refExpr(methodRef)));
 
 		assertNoSSTsGenerated(sst);
 	}

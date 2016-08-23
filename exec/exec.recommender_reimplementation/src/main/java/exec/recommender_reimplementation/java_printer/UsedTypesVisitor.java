@@ -186,7 +186,7 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	}
 
 	private boolean isReferenceToOutsideClass(ITypeName type, String identifier) {
-		return !identifier.equals("this") && !type.equals(className);
+		return !type.equals(className);
 	}
 
 	public Set<ITypeName> getUsedTypes() {
