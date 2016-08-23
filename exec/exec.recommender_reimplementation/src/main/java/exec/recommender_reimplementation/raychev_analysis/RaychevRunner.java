@@ -37,16 +37,17 @@ import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.ContextReader;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
+import exec.recommender_reimplementation.raychev_analysis.NestedCompletionExpressionEliminationVisitor.EliminationStrategy;
 
 public class RaychevRunner {
-	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
+	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Small Testset");
 	public static final Path QUERY_FOLDER_PATH = Paths.get(FOLDERPATH.toString() + "\\Queries");
 
 	@SuppressWarnings("unchecked")
 	public static void sentenceBuilder() throws IOException {
 		Queue<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = (Queue<Context>) ContextReader.GetContexts(QUERY_FOLDER_PATH);
+			contextList = (Queue<Context>) ContextReader.GetContexts(FOLDERPATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -54,7 +55,7 @@ public class RaychevRunner {
 		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
-			try (FileWriter fw = new FileWriter(QUERY_FOLDER_PATH + "\\train_all", true);
+			try (FileWriter fw = new FileWriter(FOLDERPATH + "\\train_all", true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter out = new PrintWriter(bw)) {
 				try {
@@ -82,18 +83,20 @@ public class RaychevRunner {
 		Set<Context> contexts = Sets.newHashSet();
 		for (Context context : contextList) {
 			try {
-				String javaCode = new JavaPrinter().print(context);
-				ISST transformedQuery = new RaychevQueryTransformer().transfromIntoQuery(context.getSST());
-				if (transformedQuery == null) {
+				Context transformedQueryContext = new RaychevQueryTransformer().transfromIntoQuery(context.getSST());
+				context.getSST().accept(new NestedCompletionExpressionEliminationVisitor(EliminationStrategy.DELETE),
+						null);
+				if (transformedQueryContext == null) {
 					continue;
 				}
-				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQuery);
+				String javaCode = new JavaPrinter().print(context);
+				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQueryContext);
 				if (!javaCode.isEmpty()) {
 					ISST sst = context.getSST();
 					if (!sst.getEnclosingType().isUnknown()) {
 						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
 						writeJavaFile(javaCode, file);
-						writeQueryFile(transformedQueryJavaCode, transformedQuery);
+						writeQueryFile(transformedQueryJavaCode, transformedQueryContext.getSST());
 						contexts.add(context);
 					}
 				}
@@ -118,19 +121,21 @@ public class RaychevRunner {
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
 				Context context = completionEvent.getContext();
-				String javaCode = new JavaPrinter().print(context);
-				ISST transformedQuery = new RaychevQueryTransformer()
+				Context transformedQueryContext = new RaychevQueryTransformer()
 						.transfromIntoQuery(context.getSST());
-				if (transformedQuery == null) {
+				context.getSST().accept(new NestedCompletionExpressionEliminationVisitor(EliminationStrategy.DELETE),
+						null);
+				if (transformedQueryContext == null) {
 					continue;
 				}
-				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQuery);
+				String javaCode = new JavaPrinter().print(context);
+				String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQueryContext);
 				if (!javaCode.isEmpty()) {
 					ISST sst = completionEvent.getContext().getSST();
 					if (!sst.getEnclosingType().isUnknown()) {
 						File file = JavaClassPathGenerator.generateClassPath(sst, QUERY_FOLDER_PATH.toString());
 						writeJavaFile(javaCode, file);
-						writeQueryFile(transformedQueryJavaCode, transformedQuery);
+						writeQueryFile(transformedQueryJavaCode, transformedQueryContext.getSST());
 						contexts.add(context);
 					}
 				}
@@ -163,7 +168,7 @@ public class RaychevRunner {
 	public static void main(String[] args) throws IOException {
 		// sentenceBuilder();
 		queryBuilder();
-//		queryFromCompletionEvents();
+		// queryFromCompletionEvents();
 	}
 
 }

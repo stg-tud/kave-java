@@ -27,16 +27,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.names.IMethodName;
 import cc.kave.commons.model.names.IParameterName;
 import cc.kave.commons.model.names.ITypeName;
 import cc.kave.commons.model.names.csharp.MethodName;
 import cc.kave.commons.model.names.csharp.TypeName;
-import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.typeshapes.MethodHierarchy;
+import cc.kave.commons.model.typeshapes.TypeHierarchy;
+import cc.kave.commons.model.typeshapes.TypeShape;
 
 public class RaychevQueryTransformerTest {
 	protected RaychevQueryTransformer sut;
@@ -61,15 +65,33 @@ public class RaychevQueryTransformerTest {
 		sst.getMethods().add(methodDecl);
 		sst.setEnclosingType(type("T1"));
 
-		SST expected = new SST();
-		IMethodDeclaration expectedMethodDecl = declareMethod(
-				method(type("ReturnType"), type("com.example.fill.Query_T1"), "test"), true,
-				expr(new CompletionExpression()));
-		expected.getMethods().add(expectedMethodDecl);
-		expected.getMethods().add(methodDecl);
-		expected.setEnclosingType(type("com.example.fill.Query_T1"));
+		SST expectedSST = new SST();
+		expectedSST.setMethods(Sets.newHashSet(//
+				declareMethod(
+						method(type("ReturnType"), type("com.example.fill.Query_T1"), "test"), true,
+						expr(new CompletionExpression())), //
+				declareMethod(method(type("ReturnType"), type("T1"), "m1"), true)));
+		expectedSST.setEnclosingType(type("com.example.fill.Query_T1"));
 
-		ISST actual = sut.transfromIntoQuery(sst);
+		Context expected = new Context();
+		expected.setSST(expectedSST);
+		TypeShape typeShape = new TypeShape();
+
+		TypeHierarchy typeHierarchy = new TypeHierarchy();
+		typeHierarchy.setElement(type("com.example.fill.Query_T1"));
+		TypeHierarchy extendsTypeHierarchy = new TypeHierarchy();
+		extendsTypeHierarchy.setElement(type("T1"));
+		typeHierarchy.setExtends(extendsTypeHierarchy);
+
+		MethodHierarchy methodHierarchy = new MethodHierarchy();
+		methodHierarchy.setElement(method(type("ReturnType"), type("T1"), "m1"));
+		methodHierarchy.setSuper(method(type("ReturnType"), type("T1"), "m1"));
+
+		typeShape.setTypeHierarchy(typeHierarchy);
+		typeShape.getMethodHierarchies().add(methodHierarchy);
+		expected.setTypeShape(typeShape);
+
+		Context actual = sut.transfromIntoQuery(sst);
 
 		Assert.assertEquals(expected, actual);
 	}
