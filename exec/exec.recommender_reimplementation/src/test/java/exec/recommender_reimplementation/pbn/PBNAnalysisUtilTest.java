@@ -32,8 +32,11 @@ import java.util.Optional;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SST;
@@ -45,9 +48,6 @@ import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Usage;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class PBNAnalysisUtilTest extends PBNAnalysisBaseTest {
 

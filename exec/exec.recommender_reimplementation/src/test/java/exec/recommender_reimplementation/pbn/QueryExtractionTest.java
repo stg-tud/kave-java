@@ -21,8 +21,8 @@ import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidT
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.recommenders.usages.DefinitionSites;

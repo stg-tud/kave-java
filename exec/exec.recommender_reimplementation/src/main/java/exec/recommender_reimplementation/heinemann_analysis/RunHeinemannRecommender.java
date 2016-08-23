@@ -25,14 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.ICoReMethodName;
-
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.names.ICoReMethodName;
 import exec.recommender_reimplementation.ContextReader;
 
 public class RunHeinemannRecommender {
@@ -62,7 +61,7 @@ public class RunHeinemannRecommender {
 				
 				System.out.println("Input type name");
 				String typeNameString = reader.readLine();
-				ITypeName declaringType = TypeName.newTypeName(typeNameString);
+				ITypeName declaringType = Names.newType(typeNameString);
 				
 				HeinemannQuery query = new HeinemannQuery(lookback, declaringType);
 				Set<Tuple<ICoReMethodName, Double>> results = heinemannRecommender.query(query);

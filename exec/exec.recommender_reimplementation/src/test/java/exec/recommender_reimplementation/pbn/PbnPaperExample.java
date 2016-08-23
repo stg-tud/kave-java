@@ -25,17 +25,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Usage;
-
-import com.google.common.collect.Lists;
 
 public class PbnPaperExample extends PBNAnalysisBaseTest {
 

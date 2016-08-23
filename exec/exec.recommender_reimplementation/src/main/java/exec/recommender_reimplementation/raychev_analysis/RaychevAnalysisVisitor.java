@@ -28,10 +28,10 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
@@ -301,8 +301,8 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 
 	private IMethodName createPropertyMethodName(IPropertyReference reference) {
 		IPropertyName propertyName = reference.getPropertyName();
-		return MethodName.newMethodName(String.format("[%1$s] [%2$s].%3$s()", propertyName.getValueType(),
-				propertyName.getDeclaringType(), propertyName.getName()));
+		return Names.newMethod(String.format("[%1$s] [%2$s].%3$s()", propertyName.getValueType().getIdentifier(),
+				propertyName.getDeclaringType().getIdentifier(), propertyName.getName()));
 	}
 
 	private IPropertyReference expressionContainsPropertyReference(IAssignableExpression expression) {

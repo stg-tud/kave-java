@@ -15,8 +15,11 @@
  */
 package exec.recommender_reimplementation.heinemann_analysis;
 
-import static org.junit.Assert.*;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.intType;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.stringType;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,11 +33,10 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
@@ -68,7 +70,7 @@ public class HeinemannRecommenderTest {
 	
 	@Test
 	public void returnsCorrectSizeForSampleModel() {
-		assertEquals(1382, uut.getSize());
+		assertEquals(1054, uut.getSize());
 	}
 	
 	@Test
@@ -125,16 +127,17 @@ public class HeinemannRecommenderTest {
 	}
 	
 	protected static ITypeName type(String simpleName) {
-		return TypeName.newTypeName(simpleName + ",P1");
+		return Names.newType(simpleName + ",P1");
 	}
 
 	protected static IMethodName method(ITypeName returnType, ITypeName declType, String simpleName,
 			IParameterName... parameters) {
 		String parameterStr = Joiner.on(", ").join(
 				Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
-		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType, declType, simpleName,
+		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType.getIdentifier(),
+				declType.getIdentifier(), simpleName,
 				parameterStr);
-		return MethodName.newMethodName(methodIdentifier);
+		return Names.newMethod(methodIdentifier);
 	}
 
 }

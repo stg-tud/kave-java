@@ -26,7 +26,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 
 public class MethodFrequencyVisitorTest {

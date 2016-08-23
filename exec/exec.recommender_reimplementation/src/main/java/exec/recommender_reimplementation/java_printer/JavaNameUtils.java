@@ -21,17 +21,17 @@ import java.util.Map;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
+
 
 public class JavaNameUtils {
 	public static final Map<String,String> C_SHARP_TO_JAVA_VALUE_TYPE_MAPPING =
 			ImmutableMap.<String, String>builder()
-					.put("System.Boolean", "boolean")
+					.put("p:bool", "boolean")
 			.build();
 	
     public static String getTypeAliasFromFullTypeName(String typeName)
@@ -47,9 +47,10 @@ public class JavaNameUtils {
 		if (methodName.getDeclaringType().isDelegateType()) {
 			String parameterStr = Joiner.on(", ")
 					.join(methodName.getParameters().stream().map(p -> p.getIdentifier()).toArray());
-			String methodIdentifier = String.format("[%1$s] [%2$s].Delegate$%3$s(%4$s)", methodName.getReturnType(),
+			String methodIdentifier = String.format("[%1$s] [%2$s].Delegate$%3$s(%4$s)",
+					methodName.getReturnType().getIdentifier(),
 					methodName.getDeclaringType().getName(), "Invoke", parameterStr);
-			return MethodName.newMethodName(methodIdentifier);
+			return Names.newMethod(methodIdentifier);
 		}
 		return methodName;
 	}
@@ -61,8 +62,9 @@ public class JavaNameUtils {
 	public static IFieldName createFieldName(ITypeName valType, ITypeName declType, String fieldName,
 			boolean isStatic) {
 		String staticModifier = isStatic ? "static " : "";
-		String field = String.format("%1$s[%2$s] [%3$s].%4$s", staticModifier, valType, declType, fieldName);
-		return FieldName.newFieldName(field);
+		String field = String.format("%1$s[%2$s] [%3$s].%4$s", staticModifier, valType.getIdentifier(),
+				declType.getIdentifier(), fieldName);
+		return Names.newField(field);
 	}
 
 	public static IMethodName createMethodName(ITypeName returnType, ITypeName declType, String simpleName,
@@ -71,10 +73,11 @@ public class JavaNameUtils {
 		String staticModifier = isStatic ? "static " : "";
 		String parameterStr = Joiner.on(", ")
 				.join(Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
-		String methodIdentifier = String.format("%1$s[%2$s] [%3$s].%4$s(%5$s)", staticModifier, returnType, declType,
+		String methodIdentifier = String.format("%1$s[%2$s] [%3$s].%4$s(%5$s)", staticModifier,
+				returnType.getIdentifier(), declType.getIdentifier(),
 				simpleName,
 				parameterStr);
-		return MethodName.newMethodName(methodIdentifier);
+		return Names.newMethod(methodIdentifier);
 	}
 
 }

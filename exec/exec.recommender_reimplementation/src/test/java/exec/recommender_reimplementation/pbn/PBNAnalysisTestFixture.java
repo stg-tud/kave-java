@@ -15,18 +15,18 @@
  */
 package exec.recommender_reimplementation.pbn;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class PBNAnalysisTestFixture {
-	public static ITypeName voidType = TypeName.newTypeName("System.Void, mscorlib, 4.0.0.0");
+	public static ITypeName voidType = Names.newType("p:void");
 	
-	public static ITypeName intType = TypeName.newTypeName("System.Int32, mscore, 4.0.0.0");
+	public static ITypeName intType = Names.newType("p:int");
 	
-	public static ITypeName stringType = TypeName.newTypeName("System.String, mscore, 4.0.0.0");
+	public static ITypeName stringType = Names.newType("p:string");
 
-	public static ITypeName booleanType = TypeName.newTypeName("System.Boolean, mscorlib, 4.0.0.0");
+	public static ITypeName booleanType = Names.newType("p:bool");
 
-	public static ITypeName objectType = TypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
+	public static ITypeName objectType = Names.newType("p:object");
 
 }

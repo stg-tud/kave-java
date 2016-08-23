@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
-import cc.kave.commons.model.names.IMethodName;
-
-import com.google.common.collect.Sets;
 
 public class ExtractionUtil {
 	

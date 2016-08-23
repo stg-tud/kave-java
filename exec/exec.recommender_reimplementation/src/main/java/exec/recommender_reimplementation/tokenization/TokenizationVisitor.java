@@ -19,7 +19,7 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;

@@ -47,7 +47,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
     public void EventReference_static()
     {
 		EventReference sst = new EventReference();
-		sst.setEventName(EventName.newEventName("static [EventType,P] [DeclaringType,P].E"));
+		sst.setEventName(Names.newEvent("static [EventType,P] [DeclaringType,P].E"));
 
 		assertPrint(sst, "DeclaringType.E");
 
@@ -65,7 +65,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testFieldReference_static() {
 		FieldReference sst = new FieldReference();
-		sst.setFieldName(FieldName.newFieldName("static [FieldType,P] [DeclaringType,P].F"));
+		sst.setFieldName(Names.newField("static [FieldType,P] [DeclaringType,P].F"));
 
 		assertPrint(sst, "DeclaringType.F");
 	}
@@ -82,7 +82,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testMethodReference_static() {
 		MethodReference sst = new MethodReference();
-		sst.setMethodName(MethodName.newMethodName("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setMethodName(Names.newMethod("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "DeclaringType.M");
 	}
@@ -99,7 +99,7 @@ public class ReferencePrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void testPropertyReference_static() {
 		PropertyReference sst = new PropertyReference();
-		sst.setPropertyName(PropertyName.newPropertyName("static get set [PropertyType,P] [DeclaringType,P].P"));
+		sst.setPropertyName(Names.newProperty("static get set [PropertyType,P] [DeclaringType,P].P()"));
 
 		assertPrint(sst, "DeclaringType.P");
 	}

@@ -15,7 +15,7 @@
  */
 package exec.recommender_reimplementation.frequency_recommender;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 
 public class MethodFrequency {
 	

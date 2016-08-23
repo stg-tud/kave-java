@@ -15,17 +15,18 @@
  */
 package exec.recommender_reimplementation.pbn;
 
+import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
-import static cc.kave.commons.pointsto.extraction.CoReNameConverter.*;
 
 public class DefinitionDetectionTest extends PBNAnalysisBaseTest {
 

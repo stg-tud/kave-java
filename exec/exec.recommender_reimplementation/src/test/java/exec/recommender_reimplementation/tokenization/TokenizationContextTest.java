@@ -15,7 +15,7 @@
  */
 package exec.recommender_reimplementation.tokenization;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -23,9 +23,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeName;
+
 
 public class TokenizationContextTest {
 
@@ -59,73 +60,77 @@ public class TokenizationContextTest {
 	
 	@Test
 	public void pushesTypeWithoutTypeParameters() {
-		uut.pushType(TypeName.newTypeName("System.String, mscore, 4.0.0.0"));
+		uut.pushType(Names.newType("p:string"));
 		
-		assertListContainsToken("String");
+		assertListContainsToken("string");
 	}
 	
 	@Test
 	public void pushesTypeWithOneTypeParameters() {
-		uut.pushType(TypeName.newTypeName("SomeType`1[[T -> System.Int32, mscore, 4.0.0.0]], A, 4.0.0.0"));
+		uut.pushType(Names.newType("SomeType`1[[T -> p:int]], A, 4.0.0.0"));
 		
-		assertListContainsTokens("SomeType","<", "Int32", ">");
+		assertListContainsTokens("SomeType", "<", "int", ">");
 	}
 	
 	@Test
 	public void pushesTypeMultipleTypeParameters() {
-		uut.pushType(TypeName.newTypeName("SomeType`3[[T1 -> System.Int32, mscore, 4.0.0.0], [T2 -> System.Int32, mscore, 4.0.0.0], [T3 -> System.Int32, mscore, 4.0.0.0]], A, 4.0.0.0"));
+		uut.pushType(Names.newType(
+				"SomeType`3[[T1 -> p:int], [T2 -> p:int], [T3 -> p:int]], A, 4.0.0.0"));
 		
-		assertListContainsTokens("SomeType","<", "Int32",  "," , "Int32",  ",", "Int32",  ">");
+		assertListContainsTokens("SomeType", "<", "int", ",", "int", ",", "int", ">");
 	}
 	
 	@Test
 	public void pushesParamater() {
-		uut.pushParameter(ParameterName.newParameterName("[System.String, mscore, 4.0.0.0] someString"));
+		uut.pushParameter(Names.newParameter("[p:string] someString"));
 		
-		assertListContainsTokens("String", "someString");
+		assertListContainsTokens("string", "someString");
 	}
 	
 	@Test
 	public void pushesParameterWithType() {
-		uut.pushParameter(ParameterName.newParameterName("[SomeType`1[[T -> System.Int32, mscore, 4.0.0.0]], A, 4.0.0.0] foo"));
+		uut.pushParameter(Names.newParameter("[SomeType`1[[T -> p:int]], A, 4.0.0.0] foo"));
 		
-		assertListContainsTokens("SomeType", "<", "Int32", ">", "foo");
+		assertListContainsTokens("SomeType", "<", "int", ">", "foo");
 	}
 	
 	@Test
 	public void pushesOutParamater() {
-		uut.pushParameter(ParameterName.newParameterName("out [System.String, mscore, 4.0.0.0] someString"));
+		uut.pushParameter(Names.newParameter("out [p:string] someString"));
 		
-		assertListContainsTokens("out", "String", "someString");
+		assertListContainsTokens("out", "string", "someString");
 	}
 	@Test
 	public void pushesParamsParamater() {
-		uut.pushParameter(ParameterName.newParameterName("params [System.String, mscore, 4.0.0.0] someString"));
+		uut.pushParameter(Names.newParameter(
+				"params [" + Names.newArrayType(1, (TypeName) Names.newType("T1,P1")).getIdentifier()
+						+ "] someString"));
 		
-		assertListContainsTokens("params", "String", "someString");
+		assertListContainsTokens("params", "T1[]", "someString");
 	}
+
 	@Test
 	public void pushesRefParamater() {
-		uut.pushParameter(ParameterName.newParameterName("ref [e:someEnum, A, 4.0.0.0] refParameter"));
+		uut.pushParameter(Names.newParameter("ref [e:someEnum, A, 4.0.0.0] refParameter"));
 		
 		assertListContainsTokens("ref", "someEnum", "refParameter");
 	}
 	@Test
 	public void pushesOptionalParamater() {
-		uut.pushParameter(ParameterName.newParameterName("opt [System.String, mscore, 4.0.0.0] someString"));
+		uut.pushParameter(Names.newParameter("opt [p:string] someString"));
 		
-		assertListContainsTokens("opt", "String", "someString");
+		assertListContainsTokens("opt", "string", "someString");
 	}
 	
 	@Test
 	public void pushesParameterList() {
-		IParameterName someStringParameter = ParameterName.newParameterName("[System.String, mscore, 4.0.0.0] someString");
-		IParameterName someIntParameter = ParameterName.newParameterName("[System.Int32, mscore, 4.0.0.0] someInt");
-		IParameterName someObjectParameter = ParameterName.newParameterName("[System.Object, mscore, 4.0.0.0] someObject");
+		IParameterName someStringParameter = Names.newParameter("[p:string] someString");
+		IParameterName someIntParameter = Names.newParameter("[p:int] someInt");
+		IParameterName someObjectParameter = Names.newParameter("[p:object] someObject");
 	
 		uut.pushParameters(Lists.newArrayList(someStringParameter,someIntParameter, someObjectParameter));
 		
-		assertListContainsTokens("(", "String", "someString", ",", "Int32", "someInt", ",", "Object", "someObject", ")");
+		assertListContainsTokens("(", "string", "someString", ",", "int", "someInt", ",", "object", "someObject", ")");
 	
 	}
 	

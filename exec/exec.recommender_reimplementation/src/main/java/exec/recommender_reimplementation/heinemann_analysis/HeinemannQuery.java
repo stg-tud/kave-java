@@ -17,7 +17,8 @@ package exec.recommender_reimplementation.heinemann_analysis;
 
 import java.util.Set;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
+
 
 public class HeinemannQuery {
 	

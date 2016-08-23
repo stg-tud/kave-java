@@ -19,9 +19,10 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 
 import java.util.List;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
@@ -36,7 +37,7 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
 public class ExpressionTransformationHelper {
 
-	public static final String INT_TYPE_IDENTIFIER = "System.Int32, mscorlib, 2.0.0.0";
+	public static final String INT_TYPE_IDENTIFIER = "p:int";
 
 	public DefaultValueHelper defaultValueHelper;
 
@@ -81,22 +82,22 @@ public class ExpressionTransformationHelper {
 	}
 
 	private IMethodName createIndexAccessMethodName(ITypeName containerType) {
-		return MethodName.newMethodName(
+		return Names.newMethod(
 				String.format("[%1$s] [%2$s].%3$s([%4$s] index)",
-						getBaseTypeFromTransformedArrayName(containerType),
-						containerType,
+						getBaseTypeFromTransformedArrayName(containerType).getIdentifier(),
+						containerType.getIdentifier(),
 						"get", INT_TYPE_IDENTIFIER));
 	}
 
 	private ITypeName getBaseTypeFromTransformedArrayName(ITypeName containerType) {
-		if (containerType.isArrayType()) {
-			return containerType.getArrayBaseType();
+		if (containerType.isArray()) {
+			return containerType.asArrayTypeName().getArrayBaseType();
 		}
-		List<ITypeName> typeParameters = containerType.getTypeParameters();
+		List<ITypeParameterName> typeParameters = containerType.getTypeParameters();
 		if (typeParameters.size() > 0) {
-			ITypeName typeParameter = typeParameters.get(0);
-			return typeParameter.getTypeParameterType();
+			ITypeName typeParameter = typeParameters.get(0).getTypeParameterType();
+			return typeParameter;
 		}
-		return null;
+		return Names.getUnknownType();
 	}
 }

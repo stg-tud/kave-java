@@ -27,11 +27,11 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;

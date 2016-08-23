@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.blocks.UnsafeBlock;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
@@ -29,7 +29,7 @@ public class StatementTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void testEmptyReturnStatementInPropertyDeclaration() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get [s:System.Int32,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("get [s:System.Int32,P1] [DeclaringType,P1].P()"));
 		propertyDecl.setGet(Lists.newArrayList(new ReturnStatement()));
 		assertPropertyDeclaration(propertyDecl,
 				defaultSST(methodDecl(method(type("s:System.Int32"), type("DeclaringType"), "get$P"),

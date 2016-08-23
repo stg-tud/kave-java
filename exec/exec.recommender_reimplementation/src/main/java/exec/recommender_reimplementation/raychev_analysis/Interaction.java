@@ -18,7 +18,7 @@ package exec.recommender_reimplementation.raychev_analysis;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.ToStringUtils;
 
 public class Interaction {

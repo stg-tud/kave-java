@@ -16,7 +16,8 @@
 package exec.recommender_reimplementation.tokenization;
 
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -62,15 +63,7 @@ public class TokenizationTest extends PBNAnalysisBaseTest {
 				"class", "A", ":", "S", 
 				"{",
 					"B", "b", ";",
-				
-					"Void", "helper", "(", ")", 
-						"{", 
-							"B", "tmpB", ";",
-							"tmpB", "=", "this", ".", "b", ";", 
-							"tmpB", ".", "m2", "(", ")", ";",
-						"}",
-					
-					"Void", "entry1", "(", ")", 
+				"void", "entry1", "(", ")", 
 						"{",
 							"B", "tmpB", ";",  
 							"tmpB", "=", "this", ".", "b", ";", 
@@ -80,7 +73,8 @@ public class TokenizationTest extends PBNAnalysisBaseTest {
 							"c", "=", "this", ".", "fromS", "(", ")", ";", 
 							"c", ".", "entry2", "(", "this",".", "b", ")", ";",  
 						"}",
-									
+				"void", "helper", "(", ")", "{", "B", "tmpB", ";", "tmpB", "=", "this", ".", "b", ";", "tmpB", ".",
+				"m2", "(", ")", ";", "}", 
 				"}"));
 	}
 	

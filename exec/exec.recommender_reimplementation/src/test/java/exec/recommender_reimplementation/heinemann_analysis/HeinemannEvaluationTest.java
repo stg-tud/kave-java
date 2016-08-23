@@ -27,15 +27,14 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.pointsto.extraction.CoReNameConverter;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.ICoReMethodName;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.pointsto.extraction.CoReNameConverter;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.names.ICoReMethodName;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class HeinemannEvaluationTest extends PBNAnalysisBaseTest {

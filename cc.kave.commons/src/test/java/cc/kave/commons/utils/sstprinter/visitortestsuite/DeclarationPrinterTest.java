@@ -357,7 +357,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_Constructor() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
+		sst.setName(Names.newMethod("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
 		
 		assertPrint(sst, "DeclaringType() { }");
 	}
@@ -365,7 +365,7 @@ public class DeclarationPrinterTest extends SSTPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ConstructorWithParameters() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
 		
 		assertPrint(sst, "DeclaringType(ParameterType p) { }");
 	}

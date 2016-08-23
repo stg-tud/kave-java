@@ -15,6 +15,13 @@
  */
 package exec.recommender_reimplementation.pbn;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
+import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -23,14 +30,16 @@ import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -74,16 +83,6 @@ import cc.recommenders.usages.CallSites;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
-import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
-import static cc.kave.commons.pointsto.extraction.CoReNameConverter.*;
-import static org.junit.Assert.*;
 
 public class PBNAnalysisBaseTest {
 
@@ -256,26 +255,28 @@ public class PBNAnalysisBaseTest {
 	}
 
 	protected static IFieldName field(ITypeName valType, ITypeName declType, String fieldName) {
-		String field = String.format("[%1$s] [%2$s].%3$s", valType, declType, fieldName);
-		return FieldName.newFieldName(field);
+		String field = String.format("[%1$s] [%2$s].%3$s", valType.getIdentifier(), declType.getIdentifier(),
+				fieldName);
+		return Names.newField(field);
 	}
 
 	protected static IParameterName parameter(ITypeName valType, String paramName) {
-		String param = String.format("[%1$s] %2$s", valType, paramName);
-		return ParameterName.newParameterName(param);
+		String param = String.format("[%1$s] %2$s", valType.getIdentifier(), paramName);
+		return Names.newParameter(param);
 	}
 
 	protected static ITypeName type(String simpleName) {
-		return TypeName.newTypeName(simpleName + ",P1");
+		return Names.newType(simpleName + ",P1");
 	}
 
 	protected static IMethodName method(ITypeName returnType, ITypeName declType, String simpleName,
 			IParameterName... parameters) {
 		String parameterStr = Joiner.on(", ").join(
 				Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
-		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType, declType, simpleName,
+		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType.getIdentifier(),
+				declType.getIdentifier(), simpleName,
 				parameterStr);
-		return MethodName.newMethodName(methodIdentifier);
+		return Names.newMethod(methodIdentifier);
 	}
 
 	protected static SST sst(ITypeName declaringType, IMethodName enclosingMethod, IStatement... statements) {

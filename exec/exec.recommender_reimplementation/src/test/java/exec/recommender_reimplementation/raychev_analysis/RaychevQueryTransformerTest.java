@@ -32,11 +32,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
@@ -99,15 +98,16 @@ public class RaychevQueryTransformerTest {
 	}
 
 	protected ITypeName type(String simpleName) {
-		return TypeName.newTypeName(simpleName + ",P1");
+		return Names.newType(simpleName + ",P1");
 	}
 
 	protected static IMethodName method(ITypeName returnType, ITypeName declType, String simpleName,
 			IParameterName... parameters) {
 		String parameterStr = Joiner.on(", ")
 				.join(Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
-		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType, declType, simpleName,
+		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType.getIdentifier(),
+				declType.getIdentifier(), simpleName,
 				parameterStr);
-		return MethodName.newMethodName(methodIdentifier);
+		return Names.newMethod(methodIdentifier);
 	}
 }

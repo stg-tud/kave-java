@@ -8,9 +8,9 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;

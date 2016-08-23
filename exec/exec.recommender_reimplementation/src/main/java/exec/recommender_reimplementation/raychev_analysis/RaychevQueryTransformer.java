@@ -25,10 +25,10 @@ import java.text.MessageFormat;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -116,9 +116,9 @@ public class RaychevQueryTransformer {
 	}
 
 	private ITypeName changeEnclosingType(ITypeName typeName) {
-		ITypeName newTypeName = TypeName.newTypeName(
+		ITypeName newTypeName = Names.newType(
 				MessageFormat.format("{0}.Query_{1},{2}", "com.example.fill", typeName.getName(),
-						typeName.getAssembly()));
+						typeName.getAssembly().getIdentifier()));
 		return newTypeName;
 	}
 

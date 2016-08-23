@@ -24,10 +24,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
@@ -52,7 +50,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void addsPackageDeclaration() {
 		SST sst = new SST();
-		sst.setEnclosingType(TypeName.newTypeName("FirstPackage.SecondPackage.TestClass,P"));
+		sst.setEnclosingType(Names.newType("FirstPackage.SecondPackage.TestClass,P"));
 
 		assertPrint(sst, "package FirstPackage.SecondPackage;",
 				"class TestClass extends Object", "{", "}");
@@ -73,10 +71,10 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void appendsImportForSuperTypes() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
-		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
-		ITypeName interface2 = TypeName.newTypeName("i:IDoesSomethingElse,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
+		ITypeName interface1 = Names.newType("i:IDoesSomething,P");
+		ITypeName interface2 = Names.newType("i:IDoesSomethingElse,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -105,10 +103,10 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithSupertypes() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
-		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
-		ITypeName interface2 = TypeName.newTypeName("i:IDoesSomethingElse,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
+		ITypeName interface1 = Names.newType("i:IDoesSomething,P");
+		ITypeName interface2 = Names.newType("i:IDoesSomethingElse,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -132,8 +130,8 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithSupertypes_OnlyInterface() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName interface1 = TypeName.newTypeName("i:IDoesSomething,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName interface1 = Names.newType("i:IDoesSomething,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -151,8 +149,8 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithSupertypes_OnlySuperclass() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -170,7 +168,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_WithoutSuperTypes() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -180,7 +178,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void SSTDeclaration_PublicModifier() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
 
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);
@@ -191,7 +189,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+		sst.setName(Names.newField("[FieldType,P] [DeclaringType,P].F"));
 
 		assertPrint(sst, "FieldType F;");
 	}
@@ -199,7 +197,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration_Static() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("static [FieldType,P] [DeclaringType,P].F"));
+		sst.setName(Names.newField("static [FieldType,P] [DeclaringType,P].F"));
 
 		assertPrint(sst, "static FieldType F;");
 	}
@@ -207,7 +205,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration_PublicModifier() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("[FieldType,P] [DeclaringType,P].F"));
+		sst.setName(Names.newField("[FieldType,P] [DeclaringType,P].F"));
 
 		assertPrintWithPublicModifier(sst, "public FieldType F;");
 	}
@@ -215,7 +213,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void FieldDeclaration_Array() {
 		FieldDeclaration sst = new FieldDeclaration();
-		sst.setName(FieldName.newFieldName("[d:[V, A] [N.TD, A].()[]] [DT, A]._delegatesField"));
+		sst.setName(Names.newField("[d:[V, A] [N.TD, A].()[]] [DT, A]._delegatesField"));
 
 		assertPrint(sst, "TD[] _delegatesField;");
 	}
@@ -223,7 +221,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_EmptyMethod() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(ParameterType p) { }");
 	}
@@ -231,7 +229,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_Static() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("static [ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrint(sst, "static ReturnType M(ParameterType p) { }");
 	}
@@ -239,7 +237,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_PublicModifier() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 
 		assertPrintWithPublicModifier(sst, "public ReturnType M(ParameterType p) { }");
 	}
@@ -248,7 +246,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	public void MethodDeclaration_ParameterModifiers_PassedByReference() {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(
-				MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
+				Names.newMethod("[ReturnType,P] [DeclaringType,P].M(ref [System.Int32, mscore, 4.0.0.0] p)"));
 
 		assertPrint(sst, "ReturnType M(Int32 p) { }");
 	}
@@ -256,7 +254,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Output() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(out [ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(out [ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(ParameterType p) { }");
 	}
@@ -264,7 +262,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Params() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(params [ParameterType[],P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(params [ParameterType[],P] p)"));
 
 		assertPrint(sst, "ReturnType M(ParameterType[]... p) { }");
 	}
@@ -272,7 +270,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ParameterModifiers_Optional() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M(opt [ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M(opt [ParameterType,P] p)"));
 
 		assertPrint(sst, "ReturnType M(ParameterType p) { }");
 	}
@@ -280,7 +278,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_WithBody() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[ReturnType,P] [DeclaringType,P].M([ParameterType,P] p)"));
 		sst.getBody().add(new ContinueStatement());
 		sst.getBody().add(new BreakStatement());
 
@@ -291,15 +289,15 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	public void MethodDeclaration_Generic() {
 
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
+		sst.setName(Names.newMethod("[ReturnType, P] [DeclaringType, P].M`1[[T -> T]]([T] p)"));
 
-		assertPrint(sst, "<?> ReturnType M(? p) { }");
+		assertPrint(sst, "<T> ReturnType M(T p) { }");
 	}
 
 	@Test
 	public void MethodDeclaration_Constructor() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
+		sst.setName(Names.newMethod("[DeclaringType, P1] [DeclaringType, P1]..ctor()"));
 
 		assertPrint(sst, "DeclaringType() { }");
 	}
@@ -307,22 +305,22 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void MethodDeclaration_ConstructorWithParameters() {
 		MethodDeclaration sst = new MethodDeclaration();
-		sst.setName(MethodName.newMethodName("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
+		sst.setName(Names.newMethod("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
 
 		assertPrint(sst, "DeclaringType(ParameterType p) { }");
 	}
 
 	@Test
 	public void VariableDeclaration() {
-		IVariableDeclaration sst = SSTUtil.declare("var", TypeName.newTypeName("T,P"));
+		IVariableDeclaration sst = SSTUtil.declare("var", Names.newType("T,P"));
 
 		assertPrint(sst, "T var = null;");
 	}
 
 	@Test
 	public void addsOverrideTag() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
 
 		IMethodDeclaration methodDecl = methodDecl(method(type("T1"), thisType, "m1"));
 		TypeShape typeShape = new TypeShape();
@@ -337,7 +335,7 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 
 	@Test
 	public void printEnum() {
-		ITypeName thisType = TypeName.newTypeName("e:TestClass,P");
+		ITypeName thisType = Names.newType("e:TestClass,P");
 		
 		SST sst = new SST();
 		sst.setEnclosingType(thisType);

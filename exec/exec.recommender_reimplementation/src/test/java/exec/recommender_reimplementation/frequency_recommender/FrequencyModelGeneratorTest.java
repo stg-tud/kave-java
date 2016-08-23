@@ -15,6 +15,11 @@
  */
 package exec.recommender_reimplementation.frequency_recommender;
 
+import static exec.recommender_reimplementation.frequency_recommender.TestUtil.CreateTestMethodDeclaration;
+import static exec.recommender_reimplementation.frequency_recommender.TestUtil.method1;
+import static exec.recommender_reimplementation.frequency_recommender.TestUtil.method2;
+import static exec.recommender_reimplementation.frequency_recommender.TestUtil.method3;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -24,10 +29,9 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
-import static exec.recommender_reimplementation.frequency_recommender.TestUtil.*;
 
 public class FrequencyModelGeneratorTest {
 

@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 import exec.recommender_reimplementation.java_printer.javaPrinterTestSuite.JavaPrintingVisitorBaseTest;
 

@@ -16,12 +16,17 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.createTypeListFromParameters;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.findTypeForVarReference;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getIndexOfParameter;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isMethodCallToEntryPoint;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isThisOrSuper;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.usageListContainsSimilarUsage;
 
 import java.util.List;
 import java.util.Optional;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
@@ -97,7 +102,7 @@ public class PBNAnalysisVisitor extends AbstractTraversingNodeVisitor<List<Usage
 
 	public boolean isSupportedType(ITypeName type) {
 		// ignore Unknown Types, Array, Delegate and Enum Types
-		return type != null && !type.isUnknownType() && !type.isArrayType() && !type.isEnumType() && !type.isDelegateType();
+		return type != null && !type.isArray() && !type.isEnumType() && !type.isDelegateType();
 	}
 	
 	@Override

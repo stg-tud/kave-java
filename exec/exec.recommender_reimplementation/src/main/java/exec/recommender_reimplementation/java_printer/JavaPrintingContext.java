@@ -20,8 +20,8 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingContext extends SSTPrintingContext {
@@ -54,6 +54,9 @@ public class JavaPrintingContext extends SSTPrintingContext {
 		if (typeName != null) {
 			if (typeName.isVoidType()) {
 				return text("void");
+			}
+			if (typeName.isPredefined()) {
+				return text(typeName.getFullName());
 			}
 			return text(typeName.getName());
 		}

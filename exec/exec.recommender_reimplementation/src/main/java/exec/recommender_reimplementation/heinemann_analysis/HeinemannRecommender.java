@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.ICallsRecommender;

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
@@ -83,7 +83,7 @@ public class HeinemannEvaluation {
 		@Override
 		public Object visit(IInvocationExpression expr, TokenizationContext c) {
 			IMethodName expectedMethodName = expr.getMethodName();
-			if (expectedMethodName.equals(MethodName.UNKNOWN_NAME))
+			if (expectedMethodName.equals(Names.getUnknownMethod()))
 				return super.visit(expr, c);
 			Set<String> identifiers = collectTokens(c.getTokenStream(), lookback, removeStopwords);
 			filterSingleCharacterIdentifier(identifiers);

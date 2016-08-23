@@ -17,14 +17,19 @@
 package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.findTypeForVarReference;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getAssignmentList;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getParameterIndexInEntryPoint;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.getStatementParentForExpression;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isCallToSuperClass;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisUtil.isThisOrSuper;
 
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -264,7 +269,7 @@ public class UsageContextHelper {
 	}
 
 	public static ITypeName getObjectType() {
-		return TypeName.newTypeName("System.Object, mscorlib, 4.0.0.0");
+		return Names.newType("p:object");
 	}
 
 }

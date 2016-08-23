@@ -17,8 +17,10 @@ package exec.recommender_reimplementation.frequency_recommender;
 
 import java.util.LinkedList;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import com.google.common.collect.Lists;
+
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -26,12 +28,13 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 
-import com.google.common.collect.Lists;
-
 public class TestUtil {
-	public static IMethodName method1 = MethodName.newMethodName("[System.Void, mscorlib, 4.0.0.0] [SSTDiff.Util.StringSimilarity, SSTDiff].ToString()");
-	public static IMethodName method2 = MethodName.newMethodName("[System.Void, mscorlib, 4.0.0.0] [SSTDiff.Util.StringSimilarity, SSTDiff].CompareStrings()");
-	public static IMethodName method3 = MethodName.newMethodName("[System.Void, mscorlib, 4.0.0.0] [SSTDiff.Util.StringSimilarity, SSTDiff].Get()");
+	public static IMethodName method1 = Names
+			.newMethod("[p:void] [SSTDiff.Util.StringSimilarity, SSTDiff].ToString()");
+	public static IMethodName method2 = Names
+			.newMethod("[p:void] [SSTDiff.Util.StringSimilarity, SSTDiff].CompareStrings()");
+	public static IMethodName method3 = Names
+			.newMethod("[p:void] [SSTDiff.Util.StringSimilarity, SSTDiff].Get()");
 
 	private static int counter;
 	
@@ -49,7 +52,8 @@ public class TestUtil {
 		MethodDeclaration res = new MethodDeclaration();
 		res.setBody(statementList);
 		res.setEntryPoint(isEntryPoint);
-		res.setName(MethodName.newMethodName("[System.Void, mscorlib, 4.0.0.0], [SomeType, SomeAssembly, 1.2.3.4].SomeMethodName" + NextCounter()));
+		res.setName(Names.newMethod(
+				"[p:void, mscorlib, 4.0.0.0], [SomeType, SomeAssembly, 1.2.3.4].SomeMethodName" + NextCounter()));
 				
 		return res;
 	}

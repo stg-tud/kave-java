@@ -20,12 +20,11 @@ import static exec.recommender_reimplementation.java_printer.JavaNameUtils.getTy
 
 import java.util.Map;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -37,7 +36,7 @@ public class PhantomClassGeneratorUtil {
 
 	public static void addFieldDeclarationToSST(IFieldName fieldname, SST sst) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setName(FieldName.newFieldName(TypeErasure.of(fieldname.getIdentifier())));
+		fieldDecl.setName(Names.newField(TypeErasure.of(fieldname.getIdentifier())));
 		sst.getFields().add(fieldDecl);
 	}
 
@@ -67,7 +66,7 @@ public class PhantomClassGeneratorUtil {
 	public static void addPropertyDeclarationToSST(IPropertyName propertyName, SST sst) {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
 		propertyDecl
-				.setName(PropertyName.newPropertyName(TypeErasure.of(propertyName.getIdentifier())));
+				.setName(Names.newProperty(TypeErasure.of(propertyName.getIdentifier())));
 		sst.getProperties().add(propertyDecl);
 	}
 
@@ -99,6 +98,6 @@ public class PhantomClassGeneratorUtil {
 	}
 
 	public static boolean isValidType(ITypeName type) {
-		return !type.isUnknown() && !type.isUnknownType() && !type.hasTypeParameters() && !type.isDelegateType();
+		return !type.isUnknown() && !type.hasTypeParameters() && !type.isDelegateType();
 	}
 }

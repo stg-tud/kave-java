@@ -10,9 +10,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.blocks.CaseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.SwitchBlock;
@@ -37,7 +36,7 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 				declareVar("x", type("String$Array")),
 				expr(invocation("x",
 						method(type("String"), type("String$Array"), "get",
-								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+								parameter(Names.newType(INT_TYPE_IDENTIFIER), "index")),
 						constant("null"))));
 	}
 
@@ -52,7 +51,7 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 				declareVar("x", listType),
 				expr(invocation("x",
 						method(type("String"), listType, "get",
-								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+								parameter(Names.newType(INT_TYPE_IDENTIFIER), "index")),
 						constant("null"))));
 	}
 
@@ -68,19 +67,19 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 				declareVar("x", listType),
 				assign(varRef("y"), invocation("x",
 						method(type("String"), listType, "get",
-								parameter(TypeName.newTypeName(INT_TYPE_IDENTIFIER), "index")),
+								parameter(Names.newType(INT_TYPE_IDENTIFIER), "index")),
 						constant("null"))));
 	}
 
 	@Test
 	public void transformsDelegateMethods() {
 		InvocationExpression delegateInvoke = new InvocationExpression();
-		delegateInvoke.setMethodName(MethodName.newMethodName(
-				"[System.Void, mscorlib, 4.0.0.0] [d:[System.Void, mscorlib, 4.0.0.0] [P1.DelegateTest+Del, P1].([System.String, mscorlib, 4.0.0.0] message)].Invoke([System.String, mscorlib, 4.0.0.0] message)"));
+		delegateInvoke.setMethodName(Names.newMethod(
+				"[p:void] [d:[System.Void, mscorlib, 4.0.0.0] [P1.DelegateTest+Del, P1].([System.String, mscorlib, 4.0.0.0] message)].Invoke([System.String, mscorlib, 4.0.0.0] message)"));
 
 		InvocationExpression expected = new InvocationExpression();
-		expected.setMethodName(MethodName.newMethodName(
-				"[System.Void, mscorlib, 4.0.0.0] [Del].Delegate$Invoke([System.String, mscorlib, 4.0.0.0] message)"));
+		expected.setMethodName(Names.newMethod(
+				"[p:void] [Del].Delegate$Invoke([System.String, mscorlib, 4.0.0.0] message)"));
 
 		assertNode(delegateInvoke, expected);
 	}

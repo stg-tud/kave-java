@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.ITryBlock;
@@ -51,9 +51,9 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	private Set<ITypeName> usedTypes;
 	
 	public static final Set<ITypeName> CONSTANT_TYPES = Sets.newHashSet(
-			TypeName.newTypeName("System.Object, mscorlib, 2.0.0.0"),
-			TypeName.newTypeName("JavaToCSharpUtils.CSharpConstants, JavaToCSharp"),
-			TypeName.newTypeName("JavaToCSharpUtils.CSharpConverter, JavaToCSharp"));
+			Names.newType("p:object"),
+			Names.newType("JavaToCSharpUtils.CSharpConstants, JavaToCSharp"),
+			Names.newType("JavaToCSharpUtils.CSharpConverter, JavaToCSharp"));
 
 	public UsedTypesVisitor() {
 		usedTypes = Sets.newHashSet();

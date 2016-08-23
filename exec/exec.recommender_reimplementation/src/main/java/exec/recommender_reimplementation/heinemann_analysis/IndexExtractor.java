@@ -26,7 +26,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 

@@ -33,7 +33,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
 
 import org.junit.Test;
 
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
@@ -101,8 +101,7 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(
 				whileLoop(
 						loopHeader(
-								declareVar("var", TypeName
-										.newTypeName("SomeType, SomeAssembly")),
+								declareVar("var", Names.newType("SomeType, SomeAssembly")),
 								assignmentToLocal("var", nullExpr()),
 								returnStatement(referenceExprToVariable("var"))),
 						new ContinueStatement(), new BreakStatement()),
@@ -123,7 +122,7 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(
 				doLoop(loopHeader(
 						declareVar("var",
-								TypeName.newTypeName("SomeType, SomeAssembly")),
+								Names.newType("SomeType, SomeAssembly")),
 						assignmentToLocal("var", nullExpr()),
 						returnStatement(referenceExprToVariable("var"))),
 						new ContinueStatement(), new BreakStatement()),

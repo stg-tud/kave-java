@@ -26,13 +26,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -57,7 +55,7 @@ public class PropertyTransformationHelper {
 	public static final String GET_PROPERTY_METHOD_NAME_FORMAT = "[%1$s] [%2$s].%3$s$%4$s()";
 	public static final String SET_PROPERTY_METHOD_NAME_FORMAT = "[%1$s] [%2$s].%3$s$%4$s([%5$s] value)";
 	public static final String PROPERTY_FIELD_NAME_FORMAT = "[%1$s] [%2$s].Property$%3$s";
-	public static final ITypeName VOID_TYPE = TypeName.newTypeName("System.Void, mscorlib, 4.0.0.0");
+	public static final ITypeName VOID_TYPE = Names.newType("p:void");
 
 	public void transformPropertyDeclaration(IPropertyDeclaration propertyDeclaration, ISST sst) {
 		boolean hasGetter = !propertyDeclaration.getGet().isEmpty();
@@ -179,24 +177,25 @@ public class PropertyTransformationHelper {
 	}
 
 	private IMethodName createGetterPropertyMethodName(IPropertyName propertyName) {
-		String methodName = String.format(GET_PROPERTY_METHOD_NAME_FORMAT, propertyName.getValueType(),
-				propertyName.getDeclaringType(), "get", getNameForProperty(propertyName));
+		String methodName = String.format(GET_PROPERTY_METHOD_NAME_FORMAT, propertyName.getValueType().getIdentifier(),
+				propertyName.getDeclaringType().getIdentifier(), "get", getNameForProperty(propertyName));
 		methodName = insertStaticModifier(propertyName, methodName);
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	private IMethodName createSetterPropertyMethodName(IPropertyName propertyName) {
-		String methodName = String.format(SET_PROPERTY_METHOD_NAME_FORMAT, VOID_TYPE, propertyName.getDeclaringType(),
-				"set", getNameForProperty(propertyName), propertyName.getValueType());
+		String methodName = String.format(SET_PROPERTY_METHOD_NAME_FORMAT, VOID_TYPE.getIdentifier(),
+				propertyName.getDeclaringType().getIdentifier(), "set", getNameForProperty(propertyName),
+				propertyName.getValueType().getIdentifier());
 		methodName = insertStaticModifier(propertyName, methodName);
-		return MethodName.newMethodName(methodName);
+		return Names.newMethod(methodName);
 	}
 
 	private IFieldName createPropertyFieldName(IPropertyName propertyName) {
-		String fieldName = String.format(PROPERTY_FIELD_NAME_FORMAT, propertyName.getValueType(),
-				propertyName.getDeclaringType(), getNameForProperty(propertyName));
+		String fieldName = String.format(PROPERTY_FIELD_NAME_FORMAT, propertyName.getValueType().getIdentifier(),
+				propertyName.getDeclaringType().getIdentifier(), getNameForProperty(propertyName));
 		fieldName = insertStaticModifier(propertyName, fieldName);
-		return FieldName.newFieldName(fieldName);
+		return Names.newField(fieldName);
 	}
 
 	private String insertStaticModifier(IPropertyName propertyName, String memberName) {

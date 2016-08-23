@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;

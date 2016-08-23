@@ -24,7 +24,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 
 public class JavaClassPathGenerator {

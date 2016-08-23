@@ -29,10 +29,9 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
@@ -102,7 +101,7 @@ public class UsageContextHelperTest extends PBNAnalysisBaseTest {
 	public void returnsDirectSuperClass() {
 		TypeHierarchy typeHierarchy = (TypeHierarchy) context.getTypeShape().getTypeHierarchy();
 		TypeHierarchy extendTypeHierarchy = new TypeHierarchy();
-		ITypeName superType = TypeName.newTypeName("System.Object, mscorlib");
+		ITypeName superType = Names.newType("System.Object, mscorlib");
 		extendTypeHierarchy.setElement(superType);
 		typeHierarchy.setExtends(extendTypeHierarchy);
 
@@ -145,8 +144,8 @@ public class UsageContextHelperTest extends PBNAnalysisBaseTest {
 		VariableReference otherVarRef = new VariableReference();
 		otherVarRef.setIdentifier("c");
 		constructorInvocation.setReference(otherVarRef);
-		IMethodName constructorMethodName = MethodName
-				.newMethodName("[System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]..ctor()");
+		IMethodName constructorMethodName = Names
+				.newMethod("[System.String, mscore, 4.0.0.0] [System.String, mscore, 4.0.0.0]..ctor()");
 		constructorInvocation.setMethodName(constructorMethodName);
 
 		DefinitionSite constructorDefinitionSite = DefinitionSites

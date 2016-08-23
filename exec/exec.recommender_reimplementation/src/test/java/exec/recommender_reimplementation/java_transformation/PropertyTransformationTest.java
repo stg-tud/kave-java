@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
@@ -47,7 +47,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_GetterOnly() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("get [PropertyType,P1] [DeclaringType,P1].P()"));
 
 		assertPropertyDeclaration(propertyDecl, defaultSSTWithBackingField(
 				fieldDecl(field(type("PropertyType"), type("DeclaringType"), "Property$P")),
@@ -58,7 +58,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_SetterOnly() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("set [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("set [PropertyType,P1] [DeclaringType,P1].P()"));
 
 		assertPropertyDeclaration(propertyDecl, defaultSSTWithBackingField(
 				fieldDecl(field(type("PropertyType"), type("DeclaringType"), "Property$P")),
@@ -70,7 +70,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get set [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("get set [PropertyType,P1] [DeclaringType,P1].P()"));
 
 		assertPropertyDeclaration(propertyDecl,
 				defaultSSTWithBackingField(
@@ -90,7 +90,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_RemovesTrailingParenthesis() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get set [PropertyType,P1] [DeclaringType,P1].P()"));
+		propertyDecl.setName(Names.newProperty("get set [PropertyType,P1] [DeclaringType,P1].P()"));
 
 		assertPropertyDeclaration(propertyDecl,
 				defaultSSTWithBackingField(
@@ -110,7 +110,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_WithBodies() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get set [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("get set [PropertyType,P1] [DeclaringType,P1].P()"));
 		propertyDecl.getGet().add(new ContinueStatement());
 		propertyDecl.getGet().add(new BreakStatement());
 		propertyDecl.getSet().add(new BreakStatement());
@@ -126,7 +126,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlyGetterBody() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("get [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("get [PropertyType,P1] [DeclaringType,P1].P()"));
 		propertyDecl.getGet().add(new BreakStatement());
 
 		assertPropertyDeclaration(propertyDecl, defaultSST(
@@ -136,7 +136,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	@Test
 	public void PropertyDeclaration_WithOnlySetterBody() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		propertyDecl.setName(PropertyName.newPropertyName("set [PropertyType,P1] [DeclaringType,P1].P"));
+		propertyDecl.setName(Names.newProperty("set [PropertyType,P1] [DeclaringType,P1].P()"));
 		propertyDecl.getSet().add(new BreakStatement());
 		assertPropertyDeclaration(propertyDecl,
 				defaultSST(methodDecl(
@@ -148,7 +148,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	public void testPropertySet() {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(
-						assign(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P"),
+						assign(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P()"),
 								referenceExprToVariable("var"))), //
 				expr(invocation("this",
 						method(VOID_TYPE, type("DeclaringType"), "set$P", parameter(type("PropertyType"), "value")),
@@ -159,7 +159,7 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	public void testPropertySetWithAssignableExpression() {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(
-						assign(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P"),
+						assign(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P()"),
 								new IfElseExpression())), //
 				assign(fieldRef("this", field(type("PropertyType"), type("DeclaringType"), "Property$P")),
 						new IfElseExpression()));
@@ -169,7 +169,8 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	public void testPropertyGet() {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(assign(varRef("var"),
-						refExpr(propertyReference(varRef("this"), "get set [PropertyType,P1] [DeclaringType,P1].P")))), //
+						refExpr(propertyReference(varRef("this"),
+								"get set [PropertyType,P1] [DeclaringType,P1].P()")))), //
 				assign(varRef("var"),
 						invocation("this", method(type("PropertyType"), type("DeclaringType"), "get$P"))));
 	}
@@ -178,7 +179,8 @@ public class PropertyTransformationTest extends JavaTransformationBaseTest {
 	public void propertyReferenceInReferenceExpression() {
 		assertAroundMethodDeclaration(
 				Lists.newArrayList(expr(
-						refExpr(propertyReference(varRef("other"), "get set [PropertyType,P1] [DeclaringType,P1].P")))), //
+						refExpr(propertyReference(varRef("other"),
+								"get set [PropertyType,P1] [DeclaringType,P1].P()")))), //
 				expr(refExpr(fieldRef("other", field(type("PropertyType"), type("DeclaringType"), "Property$P")))));
 	}
 

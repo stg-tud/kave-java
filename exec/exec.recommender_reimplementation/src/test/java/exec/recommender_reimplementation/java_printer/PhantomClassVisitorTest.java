@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -61,7 +61,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	@Test
 	public void createsEmptySSTForValueTypeOnPropertyDeclaration() {
 		SST sst = new SST();
-		sst.getProperties().add(propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P1] [T1,P1].P")));
+		sst.getProperties().add(propertyDecl(Names.newProperty("get set [PropertyType,P1] [T1,P1].P()")));
 
 		assertEmptySSTs(sst, type("PropertyType"));
 	}
@@ -116,31 +116,31 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	@Test
 	public void addsPropertyDeclarationOnPropertyReference() {
 		SST sst = defaultSST(assign(varRef("someVariable"),
-				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
+				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P()"))));
 
 		assertGeneratedPropertiesInSST(sst, type("T1"),
-				PropertyName.newPropertyName("get set [PropertyType,P] [T1,P1].P"));
+				Names.newProperty("get set [PropertyType,P] [T1,P1].P()"));
 	}
 
 	@Test
 	public void addsPropertyDeclarationOnPropertyReference_DeclaringTypeAndReferenceType() {
 		SST sst = defaultSST(declare("foo", type("T1")), assign(varRef("someVariable"),
-				refExpr(propertyReference(varRef("foo"), "get set [PropertyType,P] [SuperT1,P1].P"))));
+				refExpr(propertyReference(varRef("foo"), "get set [PropertyType,P] [SuperT1,P1].P()"))));
 
 		assertGeneratedSSTs(sst, //
 				createSSTWithProperties(type("T1"),
-						propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [SuperT1,P1].P"))),
+						propertyDecl(Names.newProperty("get set [PropertyType,P] [SuperT1,P1].P()"))),
 				createSSTWithProperties(type("SuperT1"),
-						propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P] [SuperT1,P1].P"))));
+						propertyDecl(Names.newProperty("get set [PropertyType,P] [SuperT1,P1].P()"))));
 	}
 
 	@Test
 	public void handleGenericsForPropertyDeclaration() {
 		SST sst = defaultSST(assign(varRef("someVariable"), refExpr(propertyReference(varRef("other"),
-				"get set [System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]],P] [T1,P1].P"))));
+				"get set [System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]],P] [T1,P1].P()"))));
 
 		assertGeneratedPropertiesInSST(sst, type("T1"),
-				PropertyName.newPropertyName("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P"));
+				Names.newProperty("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P()"));
 	}
 
 	@Test
@@ -267,7 +267,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 	@Test
 	public void ignoresPropertyInSameClass() {
 		SST sst = defaultSST(type("T1"), assign(varRef("someVariable"),
-				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P"))));
+				refExpr(propertyReference(varRef("other"), "get set [PropertyType,P] [T1,P1].P()"))));
 
 		assertNoSSTsGenerated(sst);
 	}

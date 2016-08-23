@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 

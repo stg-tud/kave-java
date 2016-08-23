@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
@@ -141,7 +141,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		return null;
 	}
 
-	private <T extends IMemberDeclaration> Void appendMemberDeclarationGroup(SSTPrintingContext context,
+	protected <T extends IMemberDeclaration> Void appendMemberDeclarationGroup(SSTPrintingContext context,
 			Set<T> nodeGroup, int inBetweenNewLineCount, int trailingNewLineCount) {
 
 		List<T> nodeList = nodeGroup.stream().collect(Collectors.toList());

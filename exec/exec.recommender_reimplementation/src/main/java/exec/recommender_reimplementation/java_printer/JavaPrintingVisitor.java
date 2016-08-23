@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;

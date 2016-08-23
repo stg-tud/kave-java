@@ -19,8 +19,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.names.csharp.LambdaName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
@@ -34,7 +33,7 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void lambdaExpression() {
 		LambdaExpression sst = new LambdaExpression();
-		sst.setName(LambdaName.newLambdaName("[T,P]([C, A] p1, [C, B] p2)"));
+		sst.setName(Names.newLambda("[T,P]([C, A] p1, [C, B] p2)"));
 		sst.setBody(Lists.newArrayList(new ContinueStatement(), new BreakStatement()));
 
 		assertPrint(sst, "(C p1, C p2) ->", "{", "    continue;", "    break;", "}");
@@ -59,7 +58,7 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 		CastExpression sst = new CastExpression();
 		sst.setOperator(CastOperator.SafeCast);
 		sst.setReference(SSTUtil.variableReference("x"));
-		sst.setTargetType(TypeName.newTypeName("SomeType, SomeAssembly"));
+		sst.setTargetType(Names.newType("SomeType, SomeAssembly"));
 		assertPrint(sst, "x instanceof SomeType ? (SomeType) x : null");
 	}
 

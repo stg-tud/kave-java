@@ -21,7 +21,7 @@ import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.names.IName;
+import cc.kave.commons.model.naming.IName;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;

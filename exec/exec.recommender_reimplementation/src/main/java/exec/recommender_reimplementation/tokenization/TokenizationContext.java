@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeParameterName;
+
 
 public class TokenizationContext {
 
@@ -54,14 +56,14 @@ public class TokenizationContext {
 		return this;
 	}
 
-	public TokenizationContext pushTypeParameters(List<ITypeName> typeParameters) {
+	public TokenizationContext pushTypeParameters(List<ITypeParameterName> typeParameters) {
 		pushLeftAngleBracket();
 		
-		for (Iterator<ITypeName> iterator = typeParameters.iterator(); iterator.hasNext();) {
-			ITypeName typeParameter= iterator.next();
+		for (Iterator<ITypeParameterName> iterator = typeParameters.iterator(); iterator.hasNext();) {
+			ITypeParameterName typeParameter = iterator.next();
 			
-			if(typeParameter.isUnknown() || typeParameter.getTypeParameterType().isUnknownType()) {
-				pushToken(TypeName.UNKNOWN_NAME.getIdentifier());
+			if (typeParameter.isUnknown()) {
+				pushToken(Names.getUnknownType().getIdentifier());
 			}
 			else {
 				pushType(typeParameter.getTypeParameterType());

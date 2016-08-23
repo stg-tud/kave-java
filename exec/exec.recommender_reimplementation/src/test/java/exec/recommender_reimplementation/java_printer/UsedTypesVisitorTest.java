@@ -31,11 +31,10 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.DelegateTypeName;
-import cc.kave.commons.model.names.csharp.EventName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.IDelegateTypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
@@ -58,7 +57,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	public void addsEventTypeOnEventDeclaration() {
 		SST sst = new SST();
 		EventDeclaration eventDecl = new EventDeclaration();
-		eventDecl.setName(EventName.newEventName("[T1,P1] [?].???"));
+		eventDecl.setName(Names.newEvent("[T1,P1] [?].???"));
 		sst.getEvents().add(eventDecl);
 
 		assertUsedTypesForSST(sst, type("T1"));
@@ -75,7 +74,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void addsPropertyTypeOnPropertyDeclaration() {
 		SST sst = new SST();
-		sst.getProperties().add(propertyDecl(PropertyName.newPropertyName("get set [PropertyType,P1] [T1,P1].P")));
+		sst.getProperties().add(propertyDecl(Names.newProperty("get set [PropertyType,P1] [T1,P1].P()")));
 
 		assertUsedTypesForSST(sst, type("PropertyType"));
 	}
@@ -103,7 +102,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		SST sst = new SST();
 		DelegateDeclaration delegateDecl = new DelegateDeclaration();
 		delegateDecl.setName(
-				DelegateTypeName.newDelegateTypeName("d:[?] [?].([T1,P1] p1)"));
+				(IDelegateTypeName) Names.newType("d:[?] [?].([T1,P1] p1)"));
 		sst.getDelegates().add(delegateDecl);
 
 		assertUsedTypesForSST(sst, type("T1"));
@@ -123,7 +122,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 		SST sst = defaultSST(assign(
 				varRef("someVariable"),
 				refExpr(propertyReference(varRef("other"),
-						"get set [PropertyType,P1] [T1,P1].P"))));
+						"get set [PropertyType,P1] [T1,P1].P()"))));
 
 		assertUsedTypesForSST(sst, type("PropertyType"), type("T1"));
 	}
@@ -197,7 +196,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void addsTypeOnEventReference() {
 		EventReference eventRef = new EventReference();
-		eventRef.setEventName(EventName.newEventName("[T1,P1] [T2,P1].e"));
+		eventRef.setEventName(Names.newEvent("[T1,P1] [T2,P1].e"));
 		eventRef.setReference(varRef("other"));
 		SST sst = defaultSST(assign(varRef("someVar"), refExpr(eventRef)));
 		
@@ -207,7 +206,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void ignoresDeclaringTypeOnEventReferenceInSameClass() {
 		EventReference eventRef = new EventReference();
-		eventRef.setEventName(EventName.newEventName("[T2,P1] [T1,P1].e"));
+		eventRef.setEventName(Names.newEvent("[T2,P1] [T1,P1].e"));
 		eventRef.setReference(varRef("this"));
 		SST sst = defaultSST(type("T1"), assign(varRef("someVar"), refExpr(eventRef)));
 		
@@ -249,7 +248,7 @@ public class UsedTypesVisitorTest extends JavaPrintingVisitorBaseTest {
 				type("T1"),
 				assign(varRef("someVariable"),
 						refExpr(propertyReference(varRef("other"),
-								"get set [PropertyType,P1] [T1,P1].P"))));
+								"get set [PropertyType,P1] [T1,P1].P()"))));
 
 		assertUsedTypesForSST(sst, type("PropertyType"));
 	}

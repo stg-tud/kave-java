@@ -20,10 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.names.IAssemblyName;
-import cc.kave.commons.model.names.INamespaceName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.NamespaceName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
@@ -34,7 +34,7 @@ public class JavaPrintingUtils {
 		List<String> filteredNamespaceStrings = new ArrayList<>();
 		while (namespaces.hasNext()) {
 			INamespaceName name = namespaces.next();
-			if (!name.equals(NamespaceName.UNKNOWN_NAME)) {
+			if (!name.equals(Names.getUnknownNamespace())) {
 				String s = name.getIdentifier().trim();
 				if (!s.isEmpty()) {
 					filteredNamespaceStrings.add(s);

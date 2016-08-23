@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
@@ -30,9 +30,9 @@ public class PhantomClassGeneratorTest extends PhantomClassVisitorBaseTest {
 
 	@Test
 	public void addsMethodDeclarationsToOverridenClasses() {
-		ITypeName thisType = TypeName.newTypeName("TestClass,P");
-		ITypeName superType = TypeName.newTypeName("SuperClass,P");
-		ITypeName firstType = TypeName.newTypeName("FirstClass,P");
+		ITypeName thisType = Names.newType("TestClass,P");
+		ITypeName superType = Names.newType("SuperClass,P");
+		ITypeName firstType = Names.newType("FirstClass,P");
 
 		IMethodDeclaration methodDecl = methodDecl(method(type("T1"), thisType, "m1"));
 		TypeShape typeShape = new TypeShape();

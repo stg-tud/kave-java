@@ -30,11 +30,10 @@ import java.util.Set;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 
-import cc.kave.commons.model.names.IMethodName;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class RaychevAnalysisBaseTest extends PBNAnalysisBaseTest{

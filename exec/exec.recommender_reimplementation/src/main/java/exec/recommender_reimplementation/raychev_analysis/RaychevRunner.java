@@ -40,7 +40,7 @@ import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
 import exec.recommender_reimplementation.raychev_analysis.NestedCompletionExpressionEliminationVisitor.EliminationStrategy;
 
 public class RaychevRunner {
-	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Small Testset");
+	public static final Path FOLDERPATH = Paths.get("C:\\SST Datasets\\Testset");
 	public static final Path QUERY_FOLDER_PATH = Paths.get(FOLDERPATH.toString() + "\\Queries");
 
 	@SuppressWarnings("unchecked")
@@ -69,6 +69,21 @@ public class RaychevRunner {
 			}
 		}
 
+	}
+
+	public static void printContexts() throws IOException {
+		List<Context> contextList = Lists.newLinkedList();
+		try {
+			contextList = ContextReader.GetContexts(FOLDERPATH);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (Context context : contextList) {
+			String javaCode = new JavaPrinter().print(context);
+			File file = JavaClassPathGenerator.generateClassPath(context.getSST(), FOLDERPATH.toString());
+			writeJavaFile(javaCode, file);
+		}
 	}
 
 	public static void queryBuilder() {
@@ -167,7 +182,8 @@ public class RaychevRunner {
 
 	public static void main(String[] args) throws IOException {
 		// sentenceBuilder();
-		queryBuilder();
+		printContexts();
+		// queryBuilder();
 		// queryFromCompletionEvents();
 	}
 

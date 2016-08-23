@@ -17,7 +17,8 @@ package exec.recommender_reimplementation.heinemann_analysis;
 
 import java.util.Set;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+
 
 public class Entry {
 	private Set<String> lookback;

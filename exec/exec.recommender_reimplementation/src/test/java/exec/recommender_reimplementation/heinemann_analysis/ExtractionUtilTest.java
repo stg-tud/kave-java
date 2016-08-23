@@ -2,7 +2,9 @@ package exec.recommender_reimplementation.heinemann_analysis;
 
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.objectType;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,11 +13,10 @@ import java.util.Set;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class ExtractionUtilTest extends PBNAnalysisBaseTest {

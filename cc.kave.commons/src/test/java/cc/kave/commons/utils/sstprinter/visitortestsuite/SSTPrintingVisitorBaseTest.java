@@ -19,8 +19,6 @@ import static cc.kave.commons.utils.StringUtils.isNullOrEmpty;
 
 import org.junit.Assert;
 
-import com.google.common.base.Strings;
-
 import cc.kave.commons.model.ssts.IExpression;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;

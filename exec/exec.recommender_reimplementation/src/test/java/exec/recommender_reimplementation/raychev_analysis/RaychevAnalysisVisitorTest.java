@@ -28,9 +28,9 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IPropertyName;
-import cc.kave.commons.model.names.csharp.PropertyName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IPropertyName;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
@@ -444,8 +444,10 @@ public class RaychevAnalysisVisitorTest extends RaychevAnalysisBaseTest {
 	@Test
 	public void supportsProperties() {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
-		IPropertyName propertyName = PropertyName.newPropertyName(String
-				.format("[%1$s] [%2$s].%3$s", intType, DefaultClassContext,
+		IPropertyName propertyName = Names
+				.newProperty(String
+						.format("get set [%1$s] [%2$s].%3$s()", intType.getIdentifier(),
+								DefaultClassContext.getIdentifier(),
 						"SomeProperty"));
 		propertyDecl.setName(propertyName);
 

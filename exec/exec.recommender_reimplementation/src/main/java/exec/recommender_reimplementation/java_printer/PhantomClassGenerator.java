@@ -25,8 +25,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;

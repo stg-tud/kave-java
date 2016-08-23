@@ -20,12 +20,11 @@ import static exec.recommender_reimplementation.java_printer.JavaNameUtils.creat
 
 import java.text.MessageFormat;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -55,7 +54,7 @@ public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
 	@Override
 	public ISSTNode visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		if (type.isArrayType()) {
+		if (type.isArray()) {
 			VariableDeclaration varDeclImpl = (VariableDeclaration) stmt;
 			varDeclImpl.setType(transformArrayType(type));
 		}
@@ -103,12 +102,13 @@ public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
 	}
 
 	private ITypeName transformArrayType(ITypeName type) {
-		if (!type.isArrayType()) {
+		if (!type.isArray()) {
 			return type;
 		}
-		ITypeName baseType = type.getArrayBaseType();
-		ITypeName newType = TypeName
-				.newTypeName(MessageFormat.format("{0}$Array,{1}", baseType.getFullName(), baseType.getAssembly()));
+		ITypeName baseType = type.asArrayTypeName().getArrayBaseType();
+		ITypeName newType = Names
+				.newType(MessageFormat.format("{0}$Array,{1}", baseType.getFullName(),
+						baseType.getAssembly().getIdentifier()));
 		return newType;
 	}
 
@@ -130,13 +130,13 @@ public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
 	}
 
 	private IParameterName changeArrayTypeInParameterName(IParameterName parameterName) {
-		if (!parameterName.getValueType().isArrayType()) {
+		if (!parameterName.getValueType().isArray() || parameterName.isParameterArray()) {
 			return parameterName;
 		}
 		String identifier = parameterName.getIdentifier();
 		String newIdentifier = identifier.replace(parameterName.getValueType().getIdentifier(),
 				transformArrayType(parameterName.getValueType()).getIdentifier());
-		return ParameterName.newParameterName(newIdentifier);
+		return Names.newParameter(newIdentifier);
 	}
 
 }

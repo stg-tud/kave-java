@@ -20,7 +20,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.kave.commons.model.names.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;

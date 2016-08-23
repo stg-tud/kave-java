@@ -1,7 +1,9 @@
 package exec.recommender_reimplementation.raychev_analysis;
 
-import static org.junit.Assert.*;
-import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.*;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.intType;
+import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 
@@ -155,14 +157,16 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 						//
 						callAtPosition(
 								method(voidType,
-										TypeName.newTypeName("System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]], P1"),
+										Names.newType(
+												"System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]], P1"),
 										"m1"), 0),
 						callAtPosition(
-								method(voidType, TypeName.newTypeName("System.Nullable`1[[T -> Int32, P1]], P1"), "m2"),
+								method(voidType, Names.newType("System.Nullable`1[[T -> Int32, P1]], P1"), "m2"),
 								0),
 						callAtPosition(
 								method(voidType,
-										TypeName.newTypeName("d:System.Converter`2[[TInput],[TOutput -> i:System.Collections.Generic.IEnumerable`1[[T]], mscorlib, 2.0.0.0]], P1"),
+										Names.newType(
+												"System.Converter`2[[TInput],[TOutput -> i:System.Collections.Generic.IEnumerable`1[[T]], mscorlib, 2.0.0.0]], P1"),
 										"m3"), 0)));
 
 		List<String> expectedStrings = Lists

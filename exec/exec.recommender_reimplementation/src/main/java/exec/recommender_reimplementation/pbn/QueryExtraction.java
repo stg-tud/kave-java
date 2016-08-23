@@ -17,9 +17,10 @@ package exec.recommender_reimplementation.pbn;
 
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 import static com.google.common.base.MoreObjects.firstNonNull;
+
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.names.ITypeName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.impl.SSTUtil;

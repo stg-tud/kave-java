@@ -24,14 +24,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.kave.commons.model.names.IFieldName;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.IParameterName;
-import cc.kave.commons.model.names.ITypeName;
-import cc.kave.commons.model.names.csharp.FieldName;
-import cc.kave.commons.model.names.csharp.MethodName;
-import cc.kave.commons.model.names.csharp.ParameterName;
-import cc.kave.commons.model.names.csharp.TypeName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IFieldName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
@@ -49,7 +46,6 @@ import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
-import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class JavaTransformationBaseTest {
 
@@ -84,26 +80,28 @@ public class JavaTransformationBaseTest {
 	}
 
 	protected IFieldName field(ITypeName valType, ITypeName declType, String fieldName) {
-		String field = String.format("[%1$s] [%2$s].%3$s", valType, declType, fieldName);
-		return FieldName.newFieldName(field);
+		String field = String.format("[%1$s] [%2$s].%3$s", valType.getIdentifier(), declType.getIdentifier(),
+				fieldName);
+		return Names.newField(field);
 	}
 
 	protected static IMethodName method(ITypeName returnType, ITypeName declType, String simpleName,
 			IParameterName... parameters) {
 		String parameterStr = Joiner.on(", ")
 				.join(Arrays.asList(parameters).stream().map(p -> p.getIdentifier()).toArray());
-		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType, declType, simpleName,
+		String methodIdentifier = String.format("[%1$s] [%2$s].%3$s(%4$s)", returnType.getIdentifier(),
+				declType.getIdentifier(), simpleName,
 				parameterStr);
-		return MethodName.newMethodName(methodIdentifier);
+		return Names.newMethod(methodIdentifier);
 	}
 
 	protected IParameterName parameter(ITypeName valType, String paramName) {
-		String param = String.format("[%1$s] %2$s", valType, paramName);
-		return ParameterName.newParameterName(param);
+		String param = String.format("[%1$s] %2$s", valType.getIdentifier(), paramName);
+		return Names.newParameter(param);
 	}
 
 	protected ITypeName type(String simpleName) {
-		return TypeName.newTypeName(simpleName + ",P1");
+		return Names.newType(simpleName + ",P1");
 	}
 
 	protected ConstantValueExpression constant(String value) {
