@@ -59,8 +59,7 @@ public class HistoryExtractor {
 	}
 
 	public PointsToContext performPointsToAnalysis(Context context) {
-		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(
-				FieldSensitivity.FULL);
+		PointsToAnalysis pointsToAnalysis = new UnificationAnalysis(FieldSensitivity.FULL);
 		return pointsToAnalysis.compute(context);
 	}
 

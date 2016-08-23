@@ -31,6 +31,8 @@ public class AbstractHistory {
 
 	private Set<ConcreteHistory> historySet;
 	
+	static final int MAXIMUM_HISTORY_LENGTH = 32;
+
 	public AbstractHistory() {
 		abstractHistory = new ArrayList<>();
 		historySet = new HashSet<>();
@@ -96,8 +98,10 @@ public class AbstractHistory {
 		Set<ConcreteHistory> clonedHistory = new HashSet<>(historySet);
 		historySet.clear();
 		for (ConcreteHistory concreteHistory : clonedHistory) {
-			concreteHistory.add(interaction);
-			historySet.add(concreteHistory);
+			if (!(concreteHistory.getHistory().size() > MAXIMUM_HISTORY_LENGTH)) {
+				concreteHistory.add(interaction);
+				historySet.add(concreteHistory);
+			}
 		}
 	}
 
