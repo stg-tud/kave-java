@@ -15,6 +15,9 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static exec.recommender_reimplementation.java_printer.JavaNameUtils.createMethodName;
 
 import java.text.MessageFormat;
@@ -30,7 +33,6 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
@@ -84,7 +86,12 @@ public class RaychevQueryTransformer {
 		SST newSST = new SST();
 		newSST.setEnclosingType(changeEnclosingType(sst.getEnclosingType()));
 		newSST.getMethods().add(testMethodClone);
-		newSST.getMethods().add(SSTUtil.declareMethod(enclosingMethod.getName(), true));
+
+		IMethodDeclaration overriddenMethod = declareMethod(enclosingMethod.getName(), true);
+		if (!enclosingMethod.getName().getReturnType().isVoidType()) {
+			overriddenMethod.getBody().add(returnStatement(constant("null")));
+		}
+		newSST.getMethods().add(overriddenMethod);
 		return newSST;
 	}
 

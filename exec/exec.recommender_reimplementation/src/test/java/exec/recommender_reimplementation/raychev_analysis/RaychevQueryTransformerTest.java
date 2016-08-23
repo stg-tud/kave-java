@@ -16,8 +16,10 @@
 package exec.recommender_reimplementation.raychev_analysis;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.assign;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.declareMethod;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.expr;
+import static cc.kave.commons.model.ssts.impl.SSTUtil.returnStatement;
 import static cc.kave.commons.model.ssts.impl.SSTUtil.variableReference;
 
 import java.util.Arrays;
@@ -61,7 +63,7 @@ public class RaychevQueryTransformerTest {
 	public void transformsIntoQueryTest() {
 		SST sst = new SST();
 		IMethodDeclaration methodDecl = declareMethod(method(type("ReturnType"), type("T1"), "m1"), true,
-				assign(variableReference("foo"), new CompletionExpression()));
+				assign(variableReference("foo"), new CompletionExpression()), returnStatement(constant("null")));
 		sst.getMethods().add(methodDecl);
 		sst.setEnclosingType(type("T1"));
 
@@ -69,8 +71,8 @@ public class RaychevQueryTransformerTest {
 		expectedSST.setMethods(Sets.newHashSet(//
 				declareMethod(
 						method(type("ReturnType"), type("com.example.fill.Query_T1"), "test"), true,
-						expr(new CompletionExpression())), //
-				declareMethod(method(type("ReturnType"), type("T1"), "m1"), true)));
+						expr(new CompletionExpression()), returnStatement(constant("null"))), //
+				declareMethod(method(type("ReturnType"), type("T1"), "m1"), true, returnStatement(constant("null")))));
 		expectedSST.setEnclosingType(type("com.example.fill.Query_T1"));
 
 		Context expected = new Context();
