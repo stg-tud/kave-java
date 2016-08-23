@@ -36,11 +36,13 @@ import exec.recommender_reimplementation.java_transformation.JavaTransformationV
 public class HistoryExtractor {
 
 	public Set<ConcreteHistory> extractHistories(Context context) {
-		PointsToContext pointsToContext = performPointsToAnalysis(context);
 
 		ISST sst = context.getSST();
 		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
 		sst = transformationVisitor.transform(sst, ISST.class);
+
+		PointsToContext pointsToContext = performPointsToAnalysis(context);
+		context.setSST(sst);
 
 		Set<ConcreteHistory> concreteHistorySet = new HashSet<>();
 
