@@ -5,7 +5,7 @@ import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidT
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -147,7 +147,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 				"TDecl.length()i:0/1 SmsManager.sendTextMessage(M)v:1/2",
 				"SmsManager.divideMsg(M)A:R SmsManager.sendMultipartTextMessage(A)v:1/2");
 
-		assertSentencesString(expectedStrings, sut.getHistoryAsString(histories));
+		assertSentencesString(expectedStrings, histories);
 	}
 
 	@Test
@@ -172,14 +172,17 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 		List<String> expectedStrings = Lists
 				.newArrayList("System.Collections.Dictionary`2[[TKey],[TValue]].m1()v:0/1 System.Nullable`1[[T]].m2()v:0/1 System.Converter`2[[TInput],[TOutput]].m3()v:0/1");
 
-		assertSentencesString(expectedStrings, sut.getHistoryAsString(histories));
+		assertSentencesString(expectedStrings, histories);
 	}
 
-	private void assertSentencesString(List<String> expectedStrings, String historyString) {
-		List<String> actual = Arrays.asList(historyString.split("\n"));
+	private void assertSentencesString(List<String> expectedStrings, Set<ConcreteHistory> histories) {
+		List<String> actual = new ArrayList<>();
+		for (ConcreteHistory concreteHistory : histories) {
+			actual.add(sut.getHistoryAsString(concreteHistory).replace("\n", ""));
+		}
 		assertEquals("Different Sizes", expectedStrings.size(), actual.size());
 		for (String expectedString : expectedStrings) {
-			assertTrue("String missing: " + expectedString + " but was: \n" + historyString,
+			assertTrue("String missing: " + expectedString + " but was: \n" + actual,
 					actual.contains(expectedString));
 		}
 	}

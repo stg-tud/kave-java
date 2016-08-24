@@ -31,6 +31,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
+import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class PhantomClassGenerator {
 
@@ -39,7 +40,10 @@ public class PhantomClassGenerator {
 		
 		for (Context context : contexts) {
 			addSuperMethods(context, phantomClasses);
-			context.getSST().accept(new PhantomClassVisitor(), phantomClasses);
+			ISST sst = context.getSST();
+			JavaTransformationVisitor javaTransformationVisitor = new JavaTransformationVisitor(sst);
+			sst = javaTransformationVisitor.transform(sst);
+			sst.accept(new PhantomClassVisitor(), phantomClasses);
 		}
 
 		return Sets.newHashSet(phantomClasses.values());

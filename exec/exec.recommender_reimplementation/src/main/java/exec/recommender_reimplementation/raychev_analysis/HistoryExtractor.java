@@ -65,9 +65,8 @@ public class HistoryExtractor {
 		return pointsToAnalysis.compute(context);
 	}
 
-	public String getHistoryAsString(Set<ConcreteHistory> concreteHistories) {
+	public String getHistoryAsString(ConcreteHistory concreteHistory) {
 		StringBuilder sb = new StringBuilder();
-		for (ConcreteHistory concreteHistory : concreteHistories) {
 			for (Iterator<Interaction> iterator = concreteHistory.getHistory()
 					.iterator(); iterator.hasNext();) {
 				Interaction interaction = iterator.next();
@@ -75,8 +74,7 @@ public class HistoryExtractor {
 				sb.append(interactionString);
 				if(iterator.hasNext()) sb.append(" ");	
 			}
-			sb.append("\n");
-		}
+		sb.append("\n");
 		return sb.toString();
 	}
 
