@@ -28,6 +28,7 @@ import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IUnknownExpression;
@@ -54,6 +55,10 @@ public class ExpressionTransformationHelper {
 	}
 
 	public IAssignableExpression transformUnaryExpression(IUnaryExpression expression) {
+		return constant(defaultValueHelper.getDefaultValueForNode(expression));
+	}
+
+	public IAssignableExpression transformLambdaExpression(ILambdaExpression expression) {
 		return constant(defaultValueHelper.getDefaultValueForNode(expression));
 	}
 

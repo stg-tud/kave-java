@@ -19,6 +19,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.BinaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.ComposedExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.IndexAccessExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
@@ -112,6 +113,19 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	public void composedExpressionInExprStatement() {
 		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", type("T1")), expr(new ComposedExpression())),
 				declareVar("x", type("T1")), expr(constant("null")));
+	}
+
+	@Test
+	public void lambdaExpressionInAssignment() {
+		assertAroundMethodDeclaration(
+				Lists.newArrayList(declareVar("x", type("s:System.Int32")), assign(variableReference("x"), new LambdaExpression())),
+				declareVar("x", type("s:System.Int32")), assign(varRef("x"), constant("null")));
+	}
+
+	@Test
+	public void lambdaExpressionInExprStatement() {
+		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", type("T1")), expr(new LambdaExpression())), declareVar("x", type("T1")),
+				expr(constant("null")));
 	}
 
 	@Test

@@ -38,6 +38,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.IBinaryExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IComposedExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IIndexAccessExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IUnaryExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IReferenceExpression;
@@ -62,8 +63,8 @@ import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
 public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 
-	private static final List<Class<?>> statementTypesToDelete = Lists.newArrayList(IGotoStatement.class,
-			IUnsafeBlock.class, IUnknownStatement.class, IEventSubscriptionStatement.class);
+	private static final List<Class<?>> statementTypesToDelete = Lists.newArrayList(IGotoStatement.class, IUnsafeBlock.class, IUnknownStatement.class,
+			IEventSubscriptionStatement.class);
 	private PropertyTransformationHelper propertyTransformationHelper;
 	private ExpressionTransformationHelper expressionTransformationHelper;
 
@@ -129,21 +130,23 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 		ExpressionStatement expressionStatement = (ExpressionStatement) stmt;
 		if (expressionStatement.getExpression() instanceof IComposedExpression) {
 			expressionStatement.setExpression(
-					expressionTransformationHelper
-							.transformComposedExpression((IComposedExpression) expressionStatement.getExpression()));
+					expressionTransformationHelper.transformComposedExpression((IComposedExpression) expressionStatement.getExpression()));
 		}
 		if (expressionStatement.getExpression() instanceof IBinaryExpression) {
-			expressionStatement.setExpression(expressionTransformationHelper
-					.transformBinaryExpression((IBinaryExpression) expressionStatement.getExpression()));
+			expressionStatement
+					.setExpression(expressionTransformationHelper.transformBinaryExpression((IBinaryExpression) expressionStatement.getExpression()));
 		}
 		if (expressionStatement.getExpression() instanceof IUnaryExpression) {
-			expressionStatement.setExpression(expressionTransformationHelper
-					.transformUnaryExpression((IUnaryExpression) expressionStatement.getExpression()));
+			expressionStatement
+					.setExpression(expressionTransformationHelper.transformUnaryExpression((IUnaryExpression) expressionStatement.getExpression()));
+		}
+		if (expressionStatement.getExpression() instanceof ILambdaExpression) {
+			expressionStatement
+					.setExpression(expressionTransformationHelper.transformLambdaExpression((ILambdaExpression) expressionStatement.getExpression()));
 		}
 		if (expressionStatement.getExpression() instanceof IIndexAccessExpression) {
 			expressionStatement.setExpression(
-					expressionTransformationHelper.transformIndexAccessExpression(
-							(IIndexAccessExpression) expressionStatement.getExpression()));
+					expressionTransformationHelper.transformIndexAccessExpression((IIndexAccessExpression) expressionStatement.getExpression()));
 		}
 		return super.visit(stmt, context);
 	}
@@ -181,7 +184,6 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 		return super.visit(expr, context);
 	}
 
-
 	@Override
 	public ISSTNode visit(IInvocationExpression entity, Void context) {
 		InvocationExpression invoke = (InvocationExpression) entity;
@@ -189,8 +191,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 		List<ISimpleExpression> parameters = invoke.getParameters();
 		List<ISimpleExpression> parametersClone = new ArrayList<>(parameters);
 		for (ISimpleExpression simpleExpression : parametersClone) {
-			parameters.add(parameters.indexOf(simpleExpression),
-					expressionTransformationHelper.transformSimpleExpression(simpleExpression));
+			parameters.add(parameters.indexOf(simpleExpression), expressionTransformationHelper.transformSimpleExpression(simpleExpression));
 			parameters.remove(simpleExpression);
 		}
 		return super.visit(entity, context);
@@ -227,33 +228,33 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 
 		// Handle right-hand Composed Expression
 		if (assignment.getExpression() instanceof IComposedExpression) {
-			assignment.setExpression(expressionTransformationHelper
-					.transformComposedExpression((IComposedExpression) assignment.getExpression()));
+			assignment.setExpression(expressionTransformationHelper.transformComposedExpression((IComposedExpression) assignment.getExpression()));
 		}
 
 		// Handle right-hand Binary Expression
 		if (assignment.getExpression() instanceof IBinaryExpression) {
-			assignment.setExpression(expressionTransformationHelper
-					.transformBinaryExpression((IBinaryExpression) assignment.getExpression()));
+			assignment.setExpression(expressionTransformationHelper.transformBinaryExpression((IBinaryExpression) assignment.getExpression()));
 		}
 
 		// Handle right-hand Unary Expression
 		if (assignment.getExpression() instanceof IUnaryExpression) {
-			assignment.setExpression(expressionTransformationHelper
-					.transformUnaryExpression((IUnaryExpression) assignment.getExpression()));
+			assignment.setExpression(expressionTransformationHelper.transformUnaryExpression((IUnaryExpression) assignment.getExpression()));
 		}
 
 		// Handle right-hand IndexAccessExpression
 		if (assignment.getExpression() instanceof IIndexAccessExpression) {
-			assignment
-					.setExpression(expressionTransformationHelper
-							.transformIndexAccessExpression((IIndexAccessExpression) assignment.getExpression()));
+			assignment.setExpression(
+					expressionTransformationHelper.transformIndexAccessExpression((IIndexAccessExpression) assignment.getExpression()));
+		}
+
+		// Handle right-hand LambdaExpression
+		if (assignment.getExpression() instanceof ILambdaExpression) {
+			assignment.setExpression(expressionTransformationHelper.transformLambdaExpression((ILambdaExpression) assignment.getExpression()));
 		}
 
 		// Handle right-hand Simple Expression
 		if (assignment.getExpression() instanceof ISimpleExpression) {
-			assignment.setExpression(expressionTransformationHelper
-					.transformSimpleExpression((ISimpleExpression) assignment.getExpression()));
+			assignment.setExpression(expressionTransformationHelper.transformSimpleExpression((ISimpleExpression) assignment.getExpression()));
 		}
 
 		// Handle Property Set
