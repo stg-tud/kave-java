@@ -20,6 +20,8 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.completionExpr;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.references.UnknownReference;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 
 public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseTest{
@@ -37,6 +39,16 @@ public class RaychevQueryPrintingVisitorTest extends RaychevPrintingVisitorBaseT
 	@Test(expected = InvalidJavaCodeException.class)
 	public void exceptionWhenCompletionExpressionHasEmptyVariableReference() {
 		assertPrint(completionExpr(""), "");
+	}
+
+	@Test(expected = InvalidJavaCodeException.class)
+	public void exceptionOnUnknownReference() {
+		assertPrint(new UnknownReference());
+	}
+
+	@Test(expected = InvalidJavaCodeException.class)
+	public void exceptionOnUnknownMethodNameInInvocation() {
+		assertPrint(new InvocationExpression());
 	}
 
 }

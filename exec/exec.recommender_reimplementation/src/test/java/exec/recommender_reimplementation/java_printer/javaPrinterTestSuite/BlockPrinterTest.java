@@ -45,7 +45,7 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 	@Test
 	public void testForEachLoop() {
 		assertPrint(forEachLoop("e", "elements", new ContinueStatement()),
-				"for (? e : elements)", "{", "    continue;", "}");
+				"for (Object e : elements)", "{", "    continue;", "}");
 	}
 
 	@Test
@@ -136,9 +136,9 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 				declare(varRef("condition")),
 				assign(varRef("condition"), binExpr(BinaryOperator.Equal, referenceExprToVariable("var"), constant("2"))),
 				returnStatement(referenceExprToVariable("condition"))) , new ContinueStatement()), 
-				"? var = null;", 
+				"Object var = null;",
 				"var = 0;", 
-				"? condition = null;",
+				"Object condition = null;",
 				"condition = var == 2;",
 				"for (;CSharpConverter.toBool(condition);)", "{", 
 				"    continue;",

@@ -55,6 +55,8 @@ public class JavaPrintingContext extends SSTPrintingContext {
 			if (typeName.isVoidType()) {
 				return text("void");
 			}
+			if (typeName.isUnknown())
+				return text("Object");
 			if (typeName.isPredefined()) {
 				return text(typeName.getFullName());
 			}

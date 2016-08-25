@@ -84,7 +84,7 @@ public class QueryGenerator {
 		sst.accept(new NestedCompletionExpressionEliminationVisitor(EliminationStrategy.DELETE), null);
 		String javaCode = new JavaPrinter().print(context);
 		String transformedQueryJavaCode = queryExtractor.createJavaCodeForQuery(transformedQueryContext);
-		if (!javaCode.isEmpty() && !sst.getEnclosingType().isUnknown()) {
+		if (!transformedQueryJavaCode.isEmpty() && !sst.getEnclosingType().isUnknown()) {
 			File file = JavaClassPathGenerator.generateClassPath(sst, queryPath.toString());
 			writeJavaFile(javaCode, file);
 			writeQueryFile(transformedQueryJavaCode, transformedQueryContext.getSST());
