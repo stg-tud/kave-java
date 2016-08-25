@@ -60,9 +60,20 @@ public class RaychevAnalysisVisitorTest extends RaychevAnalysisBaseTest {
 		extractHistories();
 
 		AbstractHistory abstractHistory = createAbstractHistory(//
-		callAtPosition(method(voidType, stringType, ".ctor"), 0));
+				callAtPosition(method(voidType, stringType, "<init>"), 0));
 
 		assertHistories(abstractHistory);
+	}
+
+	@Test
+	public void ignoresIsInit() {
+		setupDefaultEnclosingMethod(//
+				varDecl("foo", objectType), //
+				assign("foo", invokeStatic(method(voidType, type("T1"), ".init"))));
+
+		extractHistories();
+
+		assertHistories();
 	}
 
 	@Test

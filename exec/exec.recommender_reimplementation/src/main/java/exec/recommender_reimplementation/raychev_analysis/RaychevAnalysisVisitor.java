@@ -60,6 +60,7 @@ import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
 import cc.kave.commons.utils.SSTNodeHierarchy;
+import exec.recommender_reimplementation.java_printer.JavaNameUtils;
 
 public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<HistoryMap, Object> {
 
@@ -104,11 +105,14 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 		if (expression instanceof IInvocationExpression) {
 			IInvocationExpression invocation = (IInvocationExpression) expression;
 			if (!methodContainsTypeParameters(invocation.getMethodName())) {
-				if (invocation.getMethodName().isConstructor()) {
-					handleObjectAllocation(assignment, invocation, historyMap);
-				} else {
-					addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+				if (!invocation.getMethodName().isInit()) {
+					if (invocation.getMethodName().isConstructor()) {
+						handleObjectAllocation(assignment, invocation, historyMap);
+					} else {
+						addInteractionForReturn(assignment, historyMap, invocation.getMethodName());
+					}
 				}
+
 			}
 		}
 
@@ -320,7 +324,12 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 		AbstractHistory abstractHistory = new AbstractHistory();
 		historyMap.put(abstractLocations, abstractHistory);
 		abstractHistory.getHistorySet().add(new ConcreteHistory());
-		addInteractionForAbstractLocations(abstractLocations, invocation.getMethodName() , historyMap, 0);
+		addInteractionForAbstractLocations(abstractLocations, transformConstructor(invocation.getMethodName()), historyMap, 0);
+	}
+
+	private IMethodName transformConstructor(IMethodName methodName) {
+		return JavaNameUtils.createMethodName(methodName.getReturnType(), methodName.getDeclaringType(), "<init>", false,
+				methodName.getParameters().toArray(new IParameterName[0]));
 	}
 
 	private boolean methodContainsTypeParameters(IMethodName methodName) {

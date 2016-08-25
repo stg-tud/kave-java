@@ -89,6 +89,6 @@ public class RaychevAnalysisBaseTest extends PBNAnalysisBaseTest{
 	}
 
 	protected Interaction constructorCall() {
-		return callAtPosition(method(voidType, stringType, ".ctor"), 0);
+		return callAtPosition(method(voidType, stringType, "<init>"), 0);
 	}
 }
