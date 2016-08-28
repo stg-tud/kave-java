@@ -15,6 +15,7 @@
  */
 package cc.kave.commons.utils;
 
+import static cc.kave.commons.utils.TypeErasure.ErasureStrategy.BOUND;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
@@ -119,7 +120,31 @@ public class TypeErasureTest {
 		IMethodName act = TypeErasure.of(inp);
 		assertEquals(exp, act);
 	}
+	
+	@Test
+	public void generic_bound_newMethod() {
+		String inp = "T`1[[G -> T2,P]],P";
+		String out = "T`1[[G]],P";
+		String act = TypeErasure.of(inp, BOUND);
+		assertEquals(act, out);
+	}
 
+	@Test
+	public void type_happyPath_newMethod() {
+		ITypeName inp = Names.newType("T`1[[G->T2,P]],P");
+		ITypeName exp = Names.newType("T`1[[G]],P");
+		ITypeName act = TypeErasure.of(inp, BOUND);
+		assertEquals(exp, act);
+	}
+
+	@Test
+	public void method_happyPath_newMethod() {
+		IMethodName inp = Names.newMethod("[T,P] [T,P].M`1[[G1 -> T,P]]()");
+		IMethodName exp = Names.newMethod("[T,P] [T,P].M`1[[G1]]()");
+		IMethodName act = TypeErasure.of(inp, BOUND);
+		assertEquals(exp, act);
+	}
+	
 	private void assertRepl(String in, String expected) {
 		String actual = TypeErasure.of(in);
 		assertEquals(expected, actual);

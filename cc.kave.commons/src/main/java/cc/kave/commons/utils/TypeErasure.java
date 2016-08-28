@@ -31,12 +31,85 @@ import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class TypeErasure {
+
+	public enum ErasureStrategy {
+		BOUND, FULL
+	}
+
 	public static ITypeName of(ITypeName type) {
 		return Names.newType(of(type.getIdentifier()));
 	}
 
 	public static IMethodName of(IMethodName method) {
 		return Names.newMethod(of(method.getIdentifier()));
+	}
+
+	public static ITypeName of(ITypeName type, ErasureStrategy strategy) {
+		switch (strategy) {
+		case BOUND:
+			return Names.newType(of(type.getIdentifier()));
+		case FULL:
+			return Names.newType(completeErasure(type.getIdentifier()));
+		default:
+			return type;
+		}
+	}
+
+	public static IMethodName of(IMethodName method, ErasureStrategy strategy) {
+		switch (strategy) {
+		case BOUND:
+			return Names.newMethod(of(method.getIdentifier()));
+		case FULL:
+			return Names.newMethod(completeErasure(method.getIdentifier()));
+		default:
+			return method;
+		}
+	}
+
+	public static String of(String id, ErasureStrategy strategy) {
+		switch (strategy) {
+		case BOUND:
+			return of(id);
+		case FULL:
+			return completeErasure(id);
+		default:
+			return id;
+		}
+	}
+
+	private static String completeErasure(String id) {
+		int startIdx = id.indexOf('`');
+		if (startIdx == -1) {
+			return id;
+		}
+
+		Map<String, String> replacements = Maps.newLinkedHashMap();
+		int tick = FindNext(id, 0, '`');
+
+		while (tick != -1) {
+			int open = FindNext(id, tick, '[');
+
+			// jump over array brackets
+			int close = FindCorrespondingCloseBracket(id, open);
+			if (close - open == 1) {
+				open = close;
+				open = FindNext(id, open, '[');
+			}
+
+			close = FindCorrespondingCloseBracket(id, open);
+			String complete = id.substring(open, close + 1);
+			replacements.put(complete, "");
+
+			String tickStr = id.substring(tick, tick + 2);
+			replacements.put(tickStr, "");
+			tick = FindNext(id, tick + 1, '`');
+		}
+		String res = id;
+		for (String k : replacements.keySet()) {
+			String with = replacements.get(k);
+			res = res.replace(k, with);
+		}
+		return res;
 	}
 
 	public static String of(String id) {
