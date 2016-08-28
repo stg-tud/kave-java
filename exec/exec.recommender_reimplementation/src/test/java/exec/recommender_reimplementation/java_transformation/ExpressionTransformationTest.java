@@ -51,7 +51,7 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", listType), expr(indexAccessExpression)),
 				declareVar("x", listType),
 				expr(invocation("x",
-						method(type("String"), listType, "get",
+						method(Names.newType("p:object"), listType, "get",
 								parameter(Names.newType(INT_TYPE_IDENTIFIER), "index")),
 						constant("null"))));
 	}
@@ -67,7 +67,7 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 				Lists.newArrayList(declareVar("x", listType), assign(varRef("y"), indexAccessExpression)),
 				declareVar("x", listType),
 				assign(varRef("y"), invocation("x",
-						method(type("String"), listType, "get",
+						method(Names.newType("p:object"), listType, "get",
 								parameter(Names.newType(INT_TYPE_IDENTIFIER), "index")),
 						constant("null"))));
 	}

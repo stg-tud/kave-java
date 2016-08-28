@@ -16,6 +16,7 @@
 package exec.recommender_reimplementation.java_printer;
 
 import static cc.kave.commons.model.ssts.impl.SSTUtil.constant;
+import static cc.kave.commons.utils.TypeErasure.ErasureStrategy.FULL;
 import static exec.recommender_reimplementation.java_printer.JavaNameUtils.getTypeAliasFromFullTypeName;
 
 import java.util.Map;
@@ -36,15 +37,15 @@ public class PhantomClassGeneratorUtil {
 
 	public static void addFieldDeclarationToSST(IFieldName fieldname, SST sst) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setName(Names.newField(TypeErasure.of(fieldname.getIdentifier())));
+		fieldDecl.setName(Names.newField(TypeErasure.of(fieldname.getIdentifier(), FULL)));
 		sst.getFields().add(fieldDecl);
 	}
 
 	public static void addMethodDeclarationToSST(IMethodName methodName, SST sst) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
-		IMethodName nameWithoutGenerics = TypeErasure.of(methodName);
+		IMethodName nameWithoutGenerics = TypeErasure.of(methodName, FULL);
 		methodDecl.setName(nameWithoutGenerics);
-		if (!nameWithoutGenerics.getReturnType().isVoidType()) {
+		if (nameWithoutGenerics.getReturnType().isVoidType()) {
 			addReturnStatement(methodDecl, nameWithoutGenerics);
 		}
 
@@ -66,13 +67,13 @@ public class PhantomClassGeneratorUtil {
 	public static void addPropertyDeclarationToSST(IPropertyName propertyName, SST sst) {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
 		propertyDecl
-				.setName(Names.newProperty(TypeErasure.of(propertyName.getIdentifier())));
+				.setName(Names.newProperty(TypeErasure.of(propertyName.getIdentifier(), FULL)));
 		sst.getProperties().add(propertyDecl);
 	}
 
 	public static SST createNewSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst = new SST();
-		ITypeName typeWithoutGenerics = TypeErasure.of(type);
+		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
 		sst.setEnclosingType(typeWithoutGenerics);
 		context.put(typeWithoutGenerics, sst);
 		return sst;
@@ -80,7 +81,7 @@ public class PhantomClassGeneratorUtil {
 
 	public static SST getOrCreateSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst;
-		ITypeName typeWithoutGenerics = TypeErasure.of(type);
+		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
 		if (context.containsKey(typeWithoutGenerics)) {
 			sst = context.get(typeWithoutGenerics);
 		} else {
@@ -100,4 +101,10 @@ public class PhantomClassGeneratorUtil {
 	public static boolean isValidType(ITypeName type) {
 		return !type.isUnknown() && !type.hasTypeParameters() && !type.isDelegateType();
 	}
+	
+	public static boolean isValidValueType(ITypeName returnType) {
+		return !returnType.isVoidType() && !returnType.isTypeParameter() &&
+				!returnType.getIdentifier().startsWith("T");
+	}
+
 }

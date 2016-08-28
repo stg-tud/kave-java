@@ -98,11 +98,6 @@ public class ExpressionTransformationHelper {
 		if (containerType.isArray()) {
 			return containerType.asArrayTypeName().getArrayBaseType();
 		}
-		List<ITypeParameterName> typeParameters = containerType.getTypeParameters();
-		if (typeParameters.size() > 0) {
-			ITypeName typeParameter = typeParameters.get(0).getTypeParameterType();
-			return typeParameter;
-		}
-		return Names.getUnknownType();
+		return Names.newType("p:object");
 	}
 }

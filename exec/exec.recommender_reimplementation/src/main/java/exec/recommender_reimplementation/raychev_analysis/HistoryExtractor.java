@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static cc.kave.commons.utils.TypeErasure.ErasureStrategy.FULL;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +99,7 @@ public class HistoryExtractor {
 	}
 
 	public String getDeclaringType(IMethodName methodName) {
-		return TypeErasure.of(methodName.getDeclaringType()).getFullName().replace(" ", "");
+		return TypeErasure.of(methodName.getDeclaringType(), FULL).getFullName().replace(" ", "");
 	}
 
 	private String getPositionString(IMethodName methodName, int position) {

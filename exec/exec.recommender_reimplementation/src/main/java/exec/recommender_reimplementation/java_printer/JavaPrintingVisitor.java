@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
@@ -54,6 +55,7 @@ import cc.kave.commons.utils.sstprinter.SSTPrintingVisitor;
 
 public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
+	private static final ITypeName OBJECT_TYPE = Names.newType("p:object");
 	private static final String C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME = "CSharpConverter.toBool";
 	private boolean setPublicModifier;
 
@@ -122,7 +124,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 				}
 			}
 		}
-		else if (!sst.getEnclosingType().getName().equals("Object")) {
+		else if (!sst.getEnclosingType().equals(OBJECT_TYPE)) {
 			context.text(" extends ");
 			context.text("Object");
 		}

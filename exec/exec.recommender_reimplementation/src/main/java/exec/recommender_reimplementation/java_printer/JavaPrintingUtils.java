@@ -26,6 +26,8 @@ import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
+import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.TypeErasure.ErasureStrategy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
@@ -80,7 +82,8 @@ public class JavaPrintingUtils {
 	}
 
 	private static void appendImportStmt(SSTPrintingContext context, ITypeName classType) {
-		context.text("import").text(" ").text(classType.getFullName()).text(";");
+		ITypeName typeWithoutGenerics = TypeErasure.of(classType, ErasureStrategy.FULL);
+		context.text("import").text(" ").text(typeWithoutGenerics.getFullName()).text(";");
 		context.newLine();
 	}
 	

@@ -51,6 +51,9 @@ public class JavaClassPathGenerator {
 
 	public static File generateClassPath(ISST sst, String rootPath) {
 		ITypeName type = sst.getEnclosingType();
+		if(type.isPredefined()) {
+			type = type.asPredefinedTypeName().getFullType();
+		}
 		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type, rootPath);
 		File file = new File(format("{0}\\{1}.java", nestedFolderPath, type.getName()));
 		if (file.exists()) {

@@ -16,6 +16,7 @@
 package exec.recommender_reimplementation.java_printer;
 
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidValueType;
 
 import java.util.List;
 import java.util.Set;
@@ -44,6 +45,8 @@ import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
+import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.TypeErasure.ErasureStrategy;
 
 public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> {
 	private ITypeName className;
@@ -75,7 +78,8 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 
 	private void addType(ITypeName type) {
 		if (!type.equals(className) && isValidType(type)) {
-			usedTypes.add(type);		
+			ITypeName typeWithoutGenerics = TypeErasure.of(type, ErasureStrategy.FULL);
+			usedTypes.add(typeWithoutGenerics);		
 		}
 	}
 
@@ -93,14 +97,17 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 
 	@Override
 	public Void visit(IFieldDeclaration stmt, Void context) {
-		addType(stmt.getName().getValueType());
+		ITypeName valueType = stmt.getName().getValueType();
+		if(isValidValueType(valueType)) {
+			addType(valueType);
+		}
 		return super.visit(stmt, context);
 	}
 
 	@Override
 	public Void visit(IMethodDeclaration decl, Void context) {
 		ITypeName returnType = decl.getName().getReturnType();
-		if (!returnType.isVoidType()) {
+		if (isValidValueType(returnType)) {
 			addType(returnType);
 		}
 		addMethodParameters(decl.getName().getParameters());
@@ -109,7 +116,10 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 
 	@Override
 	public Void visit(IPropertyDeclaration decl, Void context) {
-		addType(decl.getName().getValueType());
+		ITypeName valueType = decl.getName().getValueType();
+		if(isValidValueType(valueType)) {
+			addType(valueType);
+		}
 		return super.visit(decl, context);
 	}
 
@@ -137,7 +147,10 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		if (isReferenceToOutsideClass(type, identifier)) {
 			addType(type);
 		}
-		addType(fieldRef.getFieldName().getValueType());
+		ITypeName valueType = fieldRef.getFieldName().getValueType();
+		if(isValidValueType(valueType)) {	
+			addType(valueType);
+		}
 		return super.visit(fieldRef, context);
 	}
 	
@@ -154,7 +167,10 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 		if (isReferenceToOutsideClass(type, identifier)) {
 			addType(type);
 		}
-		addType(propertyRef.getPropertyName().getValueType());
+		ITypeName valueType = propertyRef.getPropertyName().getValueType();
+		if(isValidValueType(valueType)) {
+			addType(valueType);
+		}
 		return super.visit(propertyRef, context);
 	}
 
@@ -168,7 +184,10 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	
 	private void addMethodParameters(List<IParameterName> parameters) {
 		for (IParameterName parameterName : parameters) {
-			addType(parameterName.getValueType());
+			ITypeName valueType = parameterName.getValueType();
+			if(isValidValueType(valueType)) {
+				addType(valueType);
+			}
 		}
 	}
 
@@ -179,11 +198,12 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 			addType(type);
 		}
 		ITypeName returnType = methodName.getReturnType();
-		if(!returnType.isVoidType()) {
+		if(isValidValueType(returnType)) {
 			addType(returnType);
 		}
 		addMethodParameters(methodName.getParameters());
 	}
+
 
 	private boolean isReferenceToOutsideClass(ITypeName type, String identifier) {
 		return !type.equals(className);

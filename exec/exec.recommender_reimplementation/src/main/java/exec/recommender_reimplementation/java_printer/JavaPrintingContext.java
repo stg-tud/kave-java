@@ -58,7 +58,7 @@ public class JavaPrintingContext extends SSTPrintingContext {
 			if (typeName.isUnknown())
 				return text("Object");
 			if (typeName.isPredefined()) {
-				return text(typeName.getFullName());
+				typeName = typeName.asPredefinedTypeName().getFullType();
 			}
 			return text(typeName.getName());
 		}
