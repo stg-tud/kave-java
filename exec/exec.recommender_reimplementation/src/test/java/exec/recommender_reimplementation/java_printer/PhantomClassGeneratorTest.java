@@ -55,7 +55,7 @@ public class PhantomClassGeneratorTest extends PhantomClassVisitorBaseTest {
 						methodDecl(method(type("T1"), superType, "m1"), returnStatement(constant("null")))),
 				createSSTWithMethods(firstType,
 						methodDecl(method(type("T1"), firstType, "m1"), returnStatement(constant("null")))),
-				createSSTWithMethods(type("T1")));
+				createSSTWithMethods(type("T1")), createSSTWithMethods(Names.newType("p:object")));
 
 		assertEquals(expected, actual);
 	}

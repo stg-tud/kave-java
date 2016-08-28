@@ -30,18 +30,19 @@ import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.utils.TypeErasure;
 
 public class PhantomClassGeneratorUtil {
 
 	public static void addFieldDeclarationToSST(IFieldName fieldname, SST sst) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setName(Names.newField(fieldname.getIdentifier()));
+		fieldDecl.setName(Names.newField(TypeErasure.of(fieldname.getIdentifier())));
 		sst.getFields().add(fieldDecl);
 	}
 
 	public static void addMethodDeclarationToSST(IMethodName methodName, SST sst) {
 		MethodDeclaration methodDecl = new MethodDeclaration();
-		IMethodName nameWithoutGenerics = methodName;
+		IMethodName nameWithoutGenerics = TypeErasure.of(methodName);
 		methodDecl.setName(nameWithoutGenerics);
 		if (!nameWithoutGenerics.getReturnType().isVoidType()) {
 			addReturnStatement(methodDecl, nameWithoutGenerics);
@@ -65,13 +66,13 @@ public class PhantomClassGeneratorUtil {
 	public static void addPropertyDeclarationToSST(IPropertyName propertyName, SST sst) {
 		PropertyDeclaration propertyDecl = new PropertyDeclaration();
 		propertyDecl
-				.setName(Names.newProperty(propertyName.getIdentifier()));
+				.setName(Names.newProperty(TypeErasure.of(propertyName.getIdentifier())));
 		sst.getProperties().add(propertyDecl);
 	}
 
 	public static SST createNewSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst = new SST();
-		ITypeName typeWithoutGenerics = type;
+		ITypeName typeWithoutGenerics = TypeErasure.of(type);
 		sst.setEnclosingType(typeWithoutGenerics);
 		context.put(typeWithoutGenerics, sst);
 		return sst;
@@ -79,7 +80,7 @@ public class PhantomClassGeneratorUtil {
 
 	public static SST getOrCreateSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst;
-		ITypeName typeWithoutGenerics = type;
+		ITypeName typeWithoutGenerics = TypeErasure.of(type);
 		if (context.containsKey(typeWithoutGenerics)) {
 			sst = context.get(typeWithoutGenerics);
 		} else {

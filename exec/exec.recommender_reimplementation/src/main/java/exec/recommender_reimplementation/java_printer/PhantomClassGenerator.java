@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -37,7 +38,8 @@ public class PhantomClassGenerator {
 
 	public Set<ISST> convert(Set<Context> contexts) {
 		Map<ITypeName, SST> phantomClasses = Maps.newHashMap();
-		
+		addSystemObjectSST(phantomClasses);
+
 		for (Context context : contexts) {
 			addSuperMethods(context, phantomClasses);
 			ISST sst = context.getSST();
@@ -47,6 +49,12 @@ public class PhantomClassGenerator {
 		}
 
 		return Sets.newHashSet(phantomClasses.values());
+	}
+
+	private void addSystemObjectSST(Map<ITypeName, SST> phantomClasses) {
+		SST objectSST = new SST();
+		objectSST.setEnclosingType(Names.newType("p:object"));
+		phantomClasses.put(Names.newType("p:object"), objectSST);
 	}
 
 	public void addSuperMethods(Context context, Map<ITypeName, SST> phantomClasses) {
