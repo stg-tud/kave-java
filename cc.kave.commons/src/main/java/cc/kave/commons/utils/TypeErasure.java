@@ -67,9 +67,15 @@ public class TypeErasure {
 						id);
 			}
 
+			// jump over array brackets
+			int close = FindCorrespondingCloseBracket(id, open);
+			if(close - open == 1) {
+				open = close + 1;
+			}
+			
 			for (int i = 0; i < numGenerics; i++) {
 				open = FindNext(id, open + 1, '[');
-				int close = FindCorrespondingCloseBracket(id, open);
+				close = FindCorrespondingCloseBracket(id, open);
 
 				int arrowStart = FindNext(id, open, '-');
 				if (arrowStart != -1 && arrowStart < close) {
