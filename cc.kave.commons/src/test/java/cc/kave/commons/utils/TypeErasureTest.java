@@ -62,6 +62,13 @@ public class TypeErasureTest {
 	}
 
 	@Test
+	public void array_bound() {
+		String inp = "T`1[][[G -> T2,P]],P";
+		String out = "T`1[][[G]],P";
+		assertRepl(inp, out);
+	}
+
+	@Test
 	public void nestedGenercis() {
 		String inp = "T`1[[G1 -> T`1[[G2-> T2]],P]],P";
 		String out = "T`1[[G1]],P";
