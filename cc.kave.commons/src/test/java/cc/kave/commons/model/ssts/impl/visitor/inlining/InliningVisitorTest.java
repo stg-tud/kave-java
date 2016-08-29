@@ -38,6 +38,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.testutils.model.ssts.SSTFixture;
+import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 
@@ -704,9 +705,8 @@ public class InliningVisitorTest extends InliningBaseTest {
 	}
 
 	@Test
-	@Ignore("this test broke after fixing the incorrect parameter declaration")
 	public void testParamsMethodKeyWord() {
-		IMethodName name = Names.newMethod("[?] [?].m2(param [p:int[]] b)");
+		IMethodName name = Names.newMethod("[?] [?].m2(params [p:int[]] b)");
 		ISST sst = buildSST( //
 				declareEntryPoint("m1", //
 						declareVar("a"), //
@@ -718,7 +718,7 @@ public class InliningVisitorTest extends InliningBaseTest {
 				declareEntryPoint("m1", //
 						declareVar("a"), //
 						declareVar("b"), //
-						declareVar("$0_b", INTEGER), //
+						declareVar("$0_b", Names.newType("p:int[]")), //
 						assign(ref("$0_b"), new UnknownExpression()), //
 						declareVar("d")));
 		assertSSTs(sst, inlinedSST);
@@ -1381,9 +1381,9 @@ public class InliningVisitorTest extends InliningBaseTest {
 	public static void assertSSTs(ISST sst, ISST inlinedSST) {
 		InliningContext context = new InliningContext();
 		sst.accept(new InliningVisitor(), context);
-		// System.out.println(SSTPrintingUtils.printSST(sst));
-		// System.out.println("##########");
-		// System.out.println(SSTPrintingUtils.printSST(context.getSST()));
+//		 System.out.println(SSTPrintingUtils.printSST(inlinedSST));
+//		 System.out.println("##########");
+//		 System.out.println(SSTPrintingUtils.printSST(context.getSST()));
 		assertThat(context.getSST(), equalTo(inlinedSST));
 	}
 }

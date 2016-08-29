@@ -518,9 +518,9 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 				 * body.add(SSTUtil.assigmentToLocal(parameter.getName(),
 				 * expressions.get(i))); }
 				 */
-				if (parameter.isParameterArray() && !parameter.isPassedByReference()) {
+				if (parameter.isParameterArray()) {
 					body.add(SSTUtil.declare(parameter.getName(), parameter.getValueType()));
-					body.add(SSTUtil.assignmentToLocal(parameter.getName(), new UnknownExpression()));
+					body.add(SSTUtil.assignmentToLocal(parameter.getName(), createArray()));
 					break;
 				} else if (i < expressions.size() && expressions.get(i) instanceof ReferenceExpression) {
 					ReferenceExpression refExpr = SSTCloneUtil.clone(expressions.get(i), ReferenceExpression.class);
@@ -538,6 +538,11 @@ public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext
 			}
 		}
 
+	}
+
+	private IAssignableExpression createArray() {
+		// TODO: implement
+		return new UnknownExpression();
 	}
 
 	public Void visit(IReferenceExpression expr, InliningContext context) {
