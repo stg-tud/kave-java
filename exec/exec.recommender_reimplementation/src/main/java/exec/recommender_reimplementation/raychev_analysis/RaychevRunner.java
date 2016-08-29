@@ -94,15 +94,21 @@ public class RaychevRunner {
 	private static void queryBuilder(QueryStrategy queryStrategy) {
 		List<Context> contextList = readContexts(QUERY_FOLDER_PATH);
 
-		QueryGenerator queryGenerator = new QueryGenerator(QUERY_FOLDER_PATH);
 		for (Context context : contextList) {
 			try {
-				queryGenerator.generateQuery(context, queryStrategy);
+				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + context.getSST().getEnclosingType().getName());
+				if (new File(path.toString()).exists()) {
+					continue;
+				}
+				QueryGenerator queryGenerator = new QueryGenerator(path);
+				boolean successful = queryGenerator.generateQuery(context, queryStrategy);
+				if (successful) {
+					writeClassPaths(Sets.newHashSet(context), path);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		writeClassPaths(Sets.newHashSet(contextList));
 	}
 
 	private static List<Context> readContexts(Path path) {
@@ -123,21 +129,22 @@ public class RaychevRunner {
 			e.printStackTrace();
 		}
 
-		QueryGenerator queryGenerator = new QueryGenerator(QUERY_FOLDER_PATH);
-		Set<Context> contexts = Sets.newHashSet();
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
-				queryGenerator.generateQuery(completionEvent);
-				contexts.add(completionEvent.getContext());
+				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + completionEvent.context.getSST().getEnclosingType().getName());
+				QueryGenerator queryGenerator = new QueryGenerator(path);
+				boolean successful = queryGenerator.generateQuery(completionEvent);
+				if (successful) {
+					writeClassPaths(Sets.newHashSet(completionEvent.getContext()), QUERY_FOLDER_PATH);
+				}
 			} catch (Exception e) {
 				continue;
 			}
 		}
-		writeClassPaths(contexts);
 	}
 
-	private static void writeClassPaths(Set<Context> contexts) {
-		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(QUERY_FOLDER_PATH.toString()); 
+	private static void writeClassPaths(Set<Context> contexts, Path path) {
+		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(path.toString());
 		try {
 			classPathGenerator.generate(contexts);
 		} catch (IOException e) {

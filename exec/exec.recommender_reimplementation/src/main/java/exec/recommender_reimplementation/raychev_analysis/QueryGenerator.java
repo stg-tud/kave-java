@@ -53,33 +53,34 @@ public class QueryGenerator {
 		expectedCompletionsMap = new HashMap<>();
 	}
 
-	public void generateQuery(Context context, QueryStrategy queryStrategy) throws IOException {
+	public boolean generateQuery(Context context, QueryStrategy queryStrategy) throws IOException {
 		switch (queryStrategy) {
 		case RANDOM:
-			generateQueryWithRandomHoles(context);
-			break;
+			return generateQueryWithRandomHoles(context);
 		case COMPLETION:
-			generateQueryFromCompletionExpression(context);
-			break;
+			return generateQueryFromCompletionExpression(context);
+		default:
+			return false;
 		}
 	}
 
-	private void generateQueryWithRandomHoles(Context context) throws IOException {
+	private boolean generateQueryWithRandomHoles(Context context) throws IOException {
 		RandomHoleInsertionVisitor randomHoleVisitor = new RandomHoleInsertionVisitor();
 		ISST sst = context.getSST();
 		sst = (ISST) sst.accept(randomHoleVisitor, null);
 		if(randomHoleVisitor.hasGeneratedRandomHole()) {
 			context.setSST(sst);
 			expectedCompletionsMap.put(context, randomHoleVisitor.getExpectedProposals());
-			generateQueryFromCompletionExpression(context);
+			return generateQueryFromCompletionExpression(context);
 		}
+		return false;
 	}
 
-	public void generateQueryFromCompletionExpression(Context context) throws IOException {
+	public boolean generateQueryFromCompletionExpression(Context context) throws IOException {
 		ISST sst = context.getSST();
 		Context transformedQueryContext = new RaychevQueryTransformer().transfromIntoQuery(sst);
 		if (transformedQueryContext == null) {
-			return;
+			return false;
 		}
 		sst.accept(new NestedCompletionExpressionEliminationVisitor(EliminationStrategy.DELETE), null);
 		String javaCode = new JavaPrinter().print(context);
@@ -88,16 +89,23 @@ public class QueryGenerator {
 			File file = JavaClassPathGenerator.generateClassPath(sst, queryPath.toString());
 			writeJavaFile(javaCode, file);
 			writeQueryFile(transformedQueryJavaCode, transformedQueryContext.getSST());
+			return true;
 		}
+		return false;
 	}
 
-	public void generateQuery(CompletionEvent completionEvent) throws IOException {
+	public boolean generateQuery(CompletionEvent completionEvent) throws IOException {
 		if (QueryExtractor.isValidCompletionEvent(completionEvent)) {
 			IName selection = Iterables.getLast(completionEvent.selections).getProposal().getName();
 			Context context = completionEvent.getContext();
-			generateQueryFromCompletionExpression(context);
-			expectedCompletionsMap.put(completionEvent.getContext(), newArrayList(selection));
+			boolean successful = generateQueryFromCompletionExpression(context);
+			if (successful) {
+				expectedCompletionsMap.put(completionEvent.getContext(), newArrayList(selection));
+			}
+			return successful;
+
 		}
+		return false;
 	}
 
 	private void writeJavaFile(String javaCode, File file) throws IOException {
