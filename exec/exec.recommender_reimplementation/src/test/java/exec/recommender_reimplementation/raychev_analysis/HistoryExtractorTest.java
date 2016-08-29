@@ -170,7 +170,7 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 										"m3"), 0)));
 
 		List<String> expectedStrings = Lists
-				.newArrayList("System.Collections.Dictionary`2[[TKey],[TValue]].m1()v:0/1 System.Nullable`1[[T]].m2()v:0/1 System.Converter`2[[TInput],[TOutput]].m3()v:0/1");
+				.newArrayList("System.Collections.Dictionary.m1()v:0/1 System.Nullable.m2()v:0/1 System.Converter.m3()v:0/1");
 
 		assertSentencesString(expectedStrings, histories);
 	}

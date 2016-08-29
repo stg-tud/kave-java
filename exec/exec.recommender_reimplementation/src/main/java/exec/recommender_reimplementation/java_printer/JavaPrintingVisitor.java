@@ -17,6 +17,7 @@ package exec.recommender_reimplementation.java_printer;
 
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.appendImportListToString;
 import static exec.recommender_reimplementation.java_printer.JavaPrintingUtils.getUsedTypes;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidValueType;
 
 import java.util.List;
 import java.util.Set;
@@ -236,7 +237,11 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IVariableDeclaration stmt, SSTPrintingContext context) {
-		context.indentation().type(stmt.getType()).space();
+		ITypeName type = stmt.getType();
+		if (!isValidValueType(type)) {
+			type = OBJECT_TYPE;
+		}
+		context.indentation().type(type).space();
 		stmt.getReference().accept(this, context);
 		context.text(" = ").text("null").text(";");
 		return null;

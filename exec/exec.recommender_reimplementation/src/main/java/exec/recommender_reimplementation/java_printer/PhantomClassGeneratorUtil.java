@@ -31,6 +31,7 @@ import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.utils.StringUtils;
 import cc.kave.commons.utils.TypeErasure;
 
 public class PhantomClassGeneratorUtil {
@@ -45,7 +46,7 @@ public class PhantomClassGeneratorUtil {
 		MethodDeclaration methodDecl = new MethodDeclaration();
 		IMethodName nameWithoutGenerics = TypeErasure.of(methodName, FULL);
 		methodDecl.setName(nameWithoutGenerics);
-		if (nameWithoutGenerics.getReturnType().isVoidType()) {
+		if (!nameWithoutGenerics.getReturnType().isVoidType()) {
 			addReturnStatement(methodDecl, nameWithoutGenerics);
 		}
 
@@ -73,21 +74,39 @@ public class PhantomClassGeneratorUtil {
 
 	public static SST createNewSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst = new SST();
-		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
-		sst.setEnclosingType(typeWithoutGenerics);
-		context.put(typeWithoutGenerics, sst);
+		ITypeName transformedType = getTransformedType(type);
+		sst.setEnclosingType(transformedType);
+		context.put(transformedType, sst);
 		return sst;
 	}
 
 	public static SST getOrCreateSST(ITypeName type, Map<ITypeName, SST> context) {
 		SST sst;
-		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
-		if (context.containsKey(typeWithoutGenerics)) {
-			sst = context.get(typeWithoutGenerics);
+		ITypeName transformedType = getTransformedType(type);
+		if (context.containsKey(transformedType)) {
+			sst = context.get(transformedType);
 		} else {
-			sst = createNewSST(typeWithoutGenerics, context);
+			sst = createNewSST(transformedType, context);
 		}
 		return sst;
+	}
+
+	public static ITypeName getTransformedType(ITypeName type) {
+		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
+		ITypeName typeWithoutNestedTypes = transformNestedType(typeWithoutGenerics);
+		return typeWithoutNestedTypes;
+	}
+
+	public static ITypeName transformNestedType(ITypeName typeName) {
+		if (typeName.isNestedType()) {
+			String identifier = typeName.getIdentifier();
+			int plusSign = StringUtils.FindNext(identifier, 0, '+');
+			int endOfNestedType = StringUtils.FindNext(identifier, plusSign, ',');
+			String nestedTypeId = identifier.substring(plusSign, endOfNestedType);
+			String newIdentifier = identifier.replace(nestedTypeId, "");
+			return Names.newType(newIdentifier);
+		}
+		return typeName;
 	}
 
 	public static boolean isJavaValueType(ITypeName type) {
@@ -102,9 +121,8 @@ public class PhantomClassGeneratorUtil {
 		return !type.isUnknown() && !type.hasTypeParameters() && !type.isDelegateType();
 	}
 	
-	public static boolean isValidValueType(ITypeName returnType) {
-		return !returnType.isVoidType() && !returnType.isTypeParameter() &&
-				!returnType.getIdentifier().startsWith("T");
+	public static boolean isValidValueType(ITypeName valueType) {
+		return !valueType.isVoidType() && !valueType.isTypeParameter();
 	}
 
 }

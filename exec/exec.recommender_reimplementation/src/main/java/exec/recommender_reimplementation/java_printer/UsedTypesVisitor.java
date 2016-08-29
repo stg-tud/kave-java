@@ -15,6 +15,7 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getTransformedType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidValueType;
 
@@ -45,8 +46,6 @@ import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.references.IVariableReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.utils.TypeErasure;
-import cc.kave.commons.utils.TypeErasure.ErasureStrategy;
 
 public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> {
 	private ITypeName className;
@@ -72,14 +71,16 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	@Override
 	public Void visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		addType(type);
+		if (isValidValueType(type)) {
+			addType(type);
+		}
 		return super.visit(stmt, context);
 	}
 
 	private void addType(ITypeName type) {
 		if (!type.equals(className) && isValidType(type)) {
-			ITypeName typeWithoutGenerics = TypeErasure.of(type, ErasureStrategy.FULL);
-			usedTypes.add(typeWithoutGenerics);		
+			ITypeName transformedType = getTransformedType(type);
+			usedTypes.add(transformedType);		
 		}
 	}
 

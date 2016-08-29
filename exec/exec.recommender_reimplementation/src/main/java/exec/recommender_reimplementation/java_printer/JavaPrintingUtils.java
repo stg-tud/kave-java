@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getTransformedType;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,8 +28,6 @@ import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
-import cc.kave.commons.utils.TypeErasure;
-import cc.kave.commons.utils.TypeErasure.ErasureStrategy;
 import cc.kave.commons.utils.sstprinter.SSTPrintingContext;
 
 public class JavaPrintingUtils {
@@ -82,8 +82,8 @@ public class JavaPrintingUtils {
 	}
 
 	private static void appendImportStmt(SSTPrintingContext context, ITypeName classType) {
-		ITypeName typeWithoutGenerics = TypeErasure.of(classType, ErasureStrategy.FULL);
-		context.text("import").text(" ").text(typeWithoutGenerics.getFullName()).text(";");
+		ITypeName transformedType = getTransformedType(classType);
+		context.text("import").text(" ").text(transformedType.getFullName()).text(";");
 		context.newLine();
 	}
 	

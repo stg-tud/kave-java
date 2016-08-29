@@ -15,8 +15,6 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import static cc.kave.commons.utils.TypeErasure.ErasureStrategy.FULL;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +30,7 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.utils.TypeErasure;
+import exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class HistoryExtractor {
@@ -99,7 +97,7 @@ public class HistoryExtractor {
 	}
 
 	public String getDeclaringType(IMethodName methodName) {
-		return TypeErasure.of(methodName.getDeclaringType(), FULL).getFullName().replace(" ", "");
+		return PhantomClassGeneratorUtil.getTransformedType(methodName.getDeclaringType()).getFullName().replace(" ", "");
 	}
 
 	private String getPositionString(IMethodName methodName, int position) {

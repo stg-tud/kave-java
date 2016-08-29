@@ -100,7 +100,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 								type("T1"), "f1")))));
 
 		assertGeneratedFieldsInSST(sst, type("T1"),
-				field(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "f1"));
+				field(type("System.Collections.Dictionary"), type("T1"), "f1"));
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 				"get set [System.Collections.Dictionary`2[[TKey -> Int32, P1],[TValue -> String, P1]],P] [T1,P1].P()"))));
 
 		assertGeneratedPropertiesInSST(sst, type("T1"),
-				Names.newProperty("get set [System.Collections.Dictionary`2[[TKey],[TValue]],P] [T1,P1].P()"));
+				Names.newProperty("get set [System.Collections.Dictionary,P] [T1,P1].P()"));
 	}
 
 	@Test
@@ -283,7 +283,7 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 
 		assertGeneratedSSTs(sst,
 				createSSTWithMethods(type("T1"),
-						methodDecl(method(type("System.Collections.Dictionary`2[[TKey],[TValue]]"), type("T1"), "m2"),
+						methodDecl(method(type("System.Collections.Dictionary"), type("T1"), "m2"),
 								returnStatement(constant("null")))));
 	}
 

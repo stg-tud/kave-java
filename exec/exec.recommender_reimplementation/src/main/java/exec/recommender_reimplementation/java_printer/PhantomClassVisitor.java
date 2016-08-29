@@ -21,6 +21,7 @@ import static exec.recommender_reimplementation.java_printer.PhantomClassGenerat
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.createNewSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidValueType;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,9 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 		ITypeName type = stmt.getType();
 		referenceToTypeMap.put(stmt.getReference(), type);
 		
-		addTypeToMap(context, type);
+		if (isValidValueType(type)) {
+			addTypeToMap(context, type);
+		}
 		return super.visit(stmt, context);
 	}
 
