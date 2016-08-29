@@ -18,8 +18,8 @@ package exec.recommender_reimplementation.java_printer;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addFieldDeclarationToSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addMethodDeclarationToSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.addPropertyDeclarationToSST;
-import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.createNewSST;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getOrCreateSST;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getTransformedType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidType;
 import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.isValidValueType;
 
@@ -59,7 +59,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	
 	@Override
 	public Void visit(ISST sst, Map<ITypeName, SST> context) {
-		className = sst.getEnclosingType();
+		className = getTransformedType(sst.getEnclosingType());
 		return super.visit(sst, context);
 	}
 
@@ -132,9 +132,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 		if (type.equals(className) || !isValidType(type)) {
 			return;
 		}
-		if (!context.containsKey(type)) {
-			createNewSST(type, context);
-		}
+		getOrCreateSST(type, context);
 	}
 
 	private void handleMethod(IMethodName methodName, IVariableReference varRef, Map<ITypeName, SST> context) {

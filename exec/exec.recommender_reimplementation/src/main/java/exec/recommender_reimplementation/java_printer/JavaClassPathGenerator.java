@@ -69,6 +69,7 @@ public class JavaClassPathGenerator {
 			String packageName = packages[i];
 			nestedFolderPath += "\\" + packageName;
 		}
+		
 		new File(nestedFolderPath).mkdirs();
 		return nestedFolderPath;
 	}

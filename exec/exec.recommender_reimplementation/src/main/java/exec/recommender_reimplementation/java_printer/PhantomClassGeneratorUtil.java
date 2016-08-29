@@ -25,6 +25,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IPropertyName;
+import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
@@ -94,7 +95,25 @@ public class PhantomClassGeneratorUtil {
 	public static ITypeName getTransformedType(ITypeName type) {
 		ITypeName typeWithoutGenerics = TypeErasure.of(type, FULL);
 		ITypeName typeWithoutNestedTypes = transformNestedType(typeWithoutGenerics);
-		return typeWithoutNestedTypes;
+		ITypeName typeWithoutQualifier = removesQualifier(typeWithoutNestedTypes);
+		return typeWithoutQualifier;
+	}
+
+	public static ITypeName removesQualifier(ITypeName typeName) {
+		String identifier = typeName.getIdentifier();
+		if (typeName.getIdentifier().contains(TypeName.PrefixDelegate)) {
+			return Names.newType(identifier.replace(TypeName.PrefixDelegate, ""));
+		}
+		if (typeName.getIdentifier().contains(TypeName.PrefixEnum)) {
+			return Names.newType(identifier.replace(TypeName.PrefixEnum, ""));
+		}
+		if (typeName.getIdentifier().contains(TypeName.PrefixInterface)) {
+			return Names.newType(identifier.replace(TypeName.PrefixInterface, ""));
+		}
+		if (typeName.getIdentifier().contains(TypeName.PrefixStruct)) {
+			return Names.newType(identifier.replace(TypeName.PrefixStruct, ""));
+		}
+		return typeName;
 	}
 
 	public static ITypeName transformNestedType(ITypeName typeName) {
