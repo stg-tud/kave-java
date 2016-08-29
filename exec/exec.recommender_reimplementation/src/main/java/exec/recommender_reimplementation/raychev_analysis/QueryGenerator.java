@@ -42,6 +42,8 @@ public class QueryGenerator {
 		RANDOM, COMPLETION
 	}
 
+	private static final int RETRY_THRESHOLD = 10;
+
 	private Path queryPath;
 	private QueryExtractor queryExtractor;
 	
@@ -67,8 +69,12 @@ public class QueryGenerator {
 	private boolean generateQueryWithRandomHoles(Context context) throws IOException {
 		RandomHoleInsertionVisitor randomHoleVisitor = new RandomHoleInsertionVisitor();
 		ISST sst = context.getSST();
-		sst = (ISST) sst.accept(randomHoleVisitor, null);
-		if(randomHoleVisitor.hasGeneratedRandomHole()) {
+		int counter = 0;
+		while (!(counter > RETRY_THRESHOLD) && !randomHoleVisitor.hasGeneratedRandomHole()) {
+			sst = (ISST) sst.accept(randomHoleVisitor, null);
+			counter++;
+		}
+		if (randomHoleVisitor.hasGeneratedRandomHole()) {
 			context.setSST(sst);
 			expectedCompletionsMap.put(context, randomHoleVisitor.getExpectedProposals());
 			return generateQueryFromCompletionExpression(context);
