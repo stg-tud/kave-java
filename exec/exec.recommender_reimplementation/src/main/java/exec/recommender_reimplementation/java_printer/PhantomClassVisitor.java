@@ -129,7 +129,8 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	}
 
 	private void addTypeToMap(Map<ITypeName, SST> context, ITypeName type) {
-		if (type.equals(className) || !isValidType(type)) {
+		ITypeName transformedType = getTransformedType(type);
+		if (transformedType.equals(className) || !isValidType(type)) {
 			return;
 		}
 		getOrCreateSST(type, context);

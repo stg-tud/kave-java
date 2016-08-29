@@ -27,11 +27,6 @@ public class PhantomClassGeneratorUtilTest {
 		assertEquals(expected, actual);
 	}
 
-	@Test
-	public void removesDelegateQualfier() {
-		ITypeName enumType = Names.newType("d:T,P");
-		assertRemoveQualifier(enumType);
-	}
 
 	@Test
 	public void removesEnumQualfier() {
@@ -41,14 +36,14 @@ public class PhantomClassGeneratorUtilTest {
 
 	@Test
 	public void removesInterfaceQualfier() {
-		ITypeName enumType = Names.newType("i:T,P");
-		assertRemoveQualifier(enumType);
+		ITypeName interfaceType = Names.newType("i:T,P");
+		assertRemoveQualifier(interfaceType);
 	}
 
 	@Test
 	public void removesStructQualfier() {
-		ITypeName enumType = Names.newType("s:T,P");
-		assertRemoveQualifier(enumType);
+		ITypeName structType = Names.newType("s:T,P");
+		assertRemoveQualifier(structType);
 	}
 
 	@Test

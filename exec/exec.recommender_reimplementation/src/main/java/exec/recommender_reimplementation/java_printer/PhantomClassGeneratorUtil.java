@@ -101,9 +101,6 @@ public class PhantomClassGeneratorUtil {
 
 	public static ITypeName removesQualifier(ITypeName typeName) {
 		String identifier = typeName.getIdentifier();
-		if (typeName.getIdentifier().contains(TypeName.PrefixDelegate)) {
-			return Names.newType(identifier.replace(TypeName.PrefixDelegate, ""));
-		}
 		if (typeName.getIdentifier().contains(TypeName.PrefixEnum)) {
 			return Names.newType(identifier.replace(TypeName.PrefixEnum, ""));
 		}
