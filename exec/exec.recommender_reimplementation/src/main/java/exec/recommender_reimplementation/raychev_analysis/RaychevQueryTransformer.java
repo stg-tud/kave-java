@@ -87,11 +87,13 @@ public class RaychevQueryTransformer {
 		newSST.setEnclosingType(changeEnclosingType(sst.getEnclosingType()));
 		newSST.getMethods().add(testMethodClone);
 
-		IMethodDeclaration overriddenMethod = declareMethod(enclosingMethod.getName(), true);
-		if (!enclosingMethod.getName().getReturnType().isVoidType()) {
-			overriddenMethod.getBody().add(returnStatement(constant("null")));
+		if (!enclosingMethod.getName().isStatic()) {
+			IMethodDeclaration overriddenMethod = declareMethod(enclosingMethod.getName(), true);
+			if (!enclosingMethod.getName().getReturnType().isVoidType()) {
+				overriddenMethod.getBody().add(returnStatement(constant("null")));
+			}
+			newSST.getMethods().add(overriddenMethod);
 		}
-		newSST.getMethods().add(overriddenMethod);
 		return newSST;
 	}
 

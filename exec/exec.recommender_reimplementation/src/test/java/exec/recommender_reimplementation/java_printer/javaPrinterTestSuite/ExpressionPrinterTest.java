@@ -50,7 +50,7 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 	public void testCastExpression() {
 		CastExpression sst = new CastExpression();
 		sst.setReference(SSTUtil.variableReference("x"));
-		assertPrint(sst, "(?) x");
+		assertPrint(sst, "(Object) x");
 	}
 
 	@Test
