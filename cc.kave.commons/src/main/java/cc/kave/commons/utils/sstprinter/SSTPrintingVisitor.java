@@ -542,7 +542,7 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 			context.text(methodName.getDeclaringType().getName());
 		} else {
 			if (methodName.isStatic()) {
-				context.text(methodName.getDeclaringType().getName());
+				context.type(methodName.getDeclaringType());
 			} else {
 				expr.getReference().accept(this, context);
 			}
