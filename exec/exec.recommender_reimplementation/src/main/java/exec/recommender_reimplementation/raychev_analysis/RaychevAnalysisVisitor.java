@@ -281,7 +281,11 @@ public class RaychevAnalysisVisitor extends AbstractTraversingNodeVisitor<Histor
 			int parameterPosition, HistoryMap historyMap) {
 		Set<AbstractLocation> abstractLocations = tryFindAbstractLocationsForSimpleExpression(expression);
 		if (abstractLocations != null) {
-			Interaction interaction = new Interaction(invocation.getMethodName(), parameterPosition,
+			IMethodName methodName = invocation.getMethodName();
+			if (methodName.isConstructor()) {
+				methodName = transformConstructor(methodName);
+			}
+			Interaction interaction = new Interaction(methodName, parameterPosition,
 					METHOD_CALL);
 			historyMap.getOrCreateAbstractHistory(abstractLocations).addInteraction(interaction);
 		}

@@ -39,6 +39,7 @@ public class PhantomClassGenerator {
 	public Set<ISST> convert(Set<Context> contexts) {
 		Map<ITypeName, SST> phantomClasses = Maps.newHashMap();
 		addSystemObjectSST(phantomClasses);
+		addSystemBooleanSST(phantomClasses);
 
 		for (Context context : contexts) {
 			addSuperMethods(context, phantomClasses);
@@ -55,6 +56,12 @@ public class PhantomClassGenerator {
 		SST objectSST = new SST();
 		objectSST.setEnclosingType(Names.newType("p:object"));
 		phantomClasses.put(Names.newType("p:object"), objectSST);
+	}
+
+	private void addSystemBooleanSST(Map<ITypeName, SST> phantomClasses) {
+		SST objectSST = new SST();
+		objectSST.setEnclosingType(Names.newType("p:bool"));
+		phantomClasses.put(Names.newType("p:bool"), objectSST);
 	}
 
 	public void addSuperMethods(Context context, Map<ITypeName, SST> phantomClasses) {
