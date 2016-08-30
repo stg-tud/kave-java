@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -45,6 +46,14 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 	}
 
 	@Override
+	public ISSTNode visit(IMethodDeclaration stmt, Void context) {
+		if (stmt.getName().isConstructor()) {
+			return stmt;
+		}
+		return super.visit(stmt, context);
+	}
+
+	@Override
 	public ISSTNode visit(IAssignment stmt, Void context) {
 		if (generatedRandomHole) {
 			return super.visit(stmt, context);
@@ -63,13 +72,19 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 	}
 
 	private IAssignableExpression getTransformedExpression(IInvocationExpression invocation) {
-		if (!invocation.getReference().isMissing()) {
+		if (isValidInvocation(invocation)) {
 			ICompletionExpression completionExpression = transformInvocation(invocation);
 			expectedProposals.add(invocation.getMethodName());
 			generatedRandomHole = true;
 			return completionExpression;
 		}
 		return invocation;
+	}
+
+	private boolean isValidInvocation(IInvocationExpression invocation) {
+		return !invocation.getReference().isMissing() 
+				&& !invocation.getReference().getIdentifier().equals("this")
+				&& !invocation.getMethodName().isStatic();
 	}
 
 	private ICompletionExpression transformInvocation(IInvocationExpression invocation) {

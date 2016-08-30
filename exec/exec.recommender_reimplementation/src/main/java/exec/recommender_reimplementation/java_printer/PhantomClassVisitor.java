@@ -66,7 +66,9 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	@Override
 	public Void visit(IVariableDeclaration stmt, Map<ITypeName, SST> context) {
 		ITypeName type = stmt.getType();
-		referenceToTypeMap.put(stmt.getReference(), type);
+		ITypeName transformedType = getTransformedType(type);
+
+		referenceToTypeMap.put(stmt.getReference(), transformedType);
 		
 		if (isValidValueType(type)) {
 			addTypeToMap(context, type);
@@ -114,9 +116,10 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	@Override
 	public Void visit(IFieldReference fieldRef, Map<ITypeName, SST> context) {
 		ITypeName type = fieldRef.getFieldName().getDeclaringType();
+		ITypeName transformedType = getTransformedType(type);
 		String identifier = fieldRef.getReference().getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
-			addFieldDeclarationToSST(fieldRef.getFieldName(), getOrCreateSST(type, context));
+		if (isReferenceToOutsideClass(transformedType, identifier) && isValidType(transformedType)) {
+			addFieldDeclarationToSST(fieldRef.getFieldName(), getOrCreateSST(transformedType, context));
 			handleReferenceTypeForFields(fieldRef.getReference(), fieldRef.getFieldName(), context);
 		}
 		return super.visit(fieldRef, context);
@@ -138,9 +141,10 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 
 	private void handleMethod(IMethodName methodName, IVariableReference varRef, Map<ITypeName, SST> context) {
 		ITypeName type = methodName.getDeclaringType();
+		ITypeName transformedType = getTransformedType(type);
 		String identifier = varRef.getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
-			addMethodDeclarationToSST(methodName, getOrCreateSST(type, context));
+		if (isReferenceToOutsideClass(transformedType, identifier) && isValidType(transformedType)) {
+			addMethodDeclarationToSST(methodName, getOrCreateSST(transformedType, context));
 			handleReceiverType(varRef, methodName, context);
 		}
 		handleMethodParameters(methodName.getParameters(), context);
@@ -149,7 +153,7 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	private void handleMethodParameters(List<IParameterName> parameters, Map<ITypeName, SST> context) {
 		for (IParameterName parameterName : parameters) {
 			ITypeName type = parameterName.getValueType();
-			addTypeToMap(context, type);		
+			addTypeToMap(context, type);
 		}
 	}
 
@@ -185,9 +189,10 @@ public class PhantomClassVisitor extends AbstractTraversingNodeVisitor<Map<IType
 	@Override
 	public Void visit(IPropertyReference propertyRef, Map<ITypeName, SST> context) {
 		ITypeName type = propertyRef.getPropertyName().getDeclaringType();
+		ITypeName transformedType = getTransformedType(type);
 		String identifier = propertyRef.getReference().getIdentifier();
-		if (isReferenceToOutsideClass(type, identifier) && isValidType(type)) {
-			addPropertyDeclarationToSST(propertyRef.getPropertyName(), getOrCreateSST(type, context));
+		if (isReferenceToOutsideClass(transformedType, identifier) && isValidType(transformedType)) {
+			addPropertyDeclarationToSST(propertyRef.getPropertyName(), getOrCreateSST(transformedType, context));
 			handleReferenceTypeForProperties(propertyRef.getReference(), propertyRef.getPropertyName(), context);
 		}
 		return super.visit(propertyRef, context);

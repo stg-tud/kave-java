@@ -22,7 +22,6 @@ import static exec.recommender_reimplementation.raychev_analysis.NestedCompletio
 import static exec.recommender_reimplementation.raychev_analysis.NestedCompletionExpressionEliminationVisitor.EliminationStrategy.REPLACE;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -30,10 +29,6 @@ import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 
 public class NestedCompletionExpressionEliminationVisitorTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
 	public void deletesAssignmentOnDeleteStrategy() {

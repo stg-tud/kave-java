@@ -284,7 +284,9 @@ public class PhantomClassVisitorTest extends PhantomClassVisitorBaseTest {
 		assertGeneratedSSTs(sst,
 				createSSTWithMethods(type("T1"),
 						methodDecl(method(type("System.Collections.Dictionary"), type("T1"), "m2"),
-								returnStatement(constant("null")))));
+								returnStatement(constant("null")))),
+				createSSTWithMethods(type("System.Collections.Dictionary"),
+						methodDecl(method(voidType, type("System.Collections.Dictionary"), "m1"))));
 	}
 
 }

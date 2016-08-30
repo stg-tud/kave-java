@@ -47,9 +47,9 @@ public class JavaNameUtils {
 		if (methodName.getDeclaringType().isDelegateType()) {
 			String parameterStr = Joiner.on(", ")
 					.join(methodName.getParameters().stream().map(p -> p.getIdentifier()).toArray());
-			String methodIdentifier = String.format("[%1$s] [%2$s].Delegate$%3$s(%4$s)",
+			String methodIdentifier = String.format("[%1$s] [%2$s, %3$s].Delegate$%4$s(%5$s)",
 					methodName.getReturnType().getIdentifier(),
-					methodName.getDeclaringType().getName(), "Invoke", parameterStr);
+					methodName.getDeclaringType().getName(), methodName.getDeclaringType().getAssembly().getIdentifier(), "Invoke", parameterStr);
 			return Names.newMethod(methodIdentifier);
 		}
 		return methodName;

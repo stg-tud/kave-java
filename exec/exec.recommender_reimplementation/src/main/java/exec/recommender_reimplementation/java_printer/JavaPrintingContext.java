@@ -15,6 +15,9 @@
  */
 package exec.recommender_reimplementation.java_printer;
 
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.transformNestedType;
+
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +70,9 @@ public class JavaPrintingContext extends SSTPrintingContext {
 	
 	@Override
 	public SSTPrintingContext type(ITypeName typeName) {
+		if (typeName.isNestedType()) {
+			typeName = transformNestedType(typeName);
+		}
 		typeNameOnly(typeName);
 
 		// ignores TypeParameters
@@ -82,7 +88,8 @@ public class JavaPrintingContext extends SSTPrintingContext {
 	public SSTPrintingContext parameterList(List<IParameterName> list) {
 		text("(");
 
-		for (IParameterName parameter : list) {
+		for (Iterator<IParameterName> iterator = list.iterator(); iterator.hasNext();) {
+			IParameterName parameter = iterator.next();
 			if (parameter.isPassedByReference() && parameter.getValueType().isValueType()) {
 				// ignores ref 
 			}
@@ -104,7 +111,7 @@ public class JavaPrintingContext extends SSTPrintingContext {
 				type(parameter.getValueType()).space().text(parameter.getName());				
 			}
 
-			if (!parameter.equals(list.get(list.size() - 1))) {
+			if (iterator.hasNext()) {
 				text(",").space();
 			}
 		}

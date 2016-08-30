@@ -40,24 +40,22 @@ import cc.kave.commons.model.ssts.references.IMethodReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
-public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
+public class JavaTypeTransformer extends IdentityVisitor<Void> {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends ISSTNode> T transform(T node) {
 		if (node == null) {
 			return node;
 		}
-		T transformedNode = (T) node.accept(new JavaArrayTypeTransformer(), null);
+		T transformedNode = (T) node.accept(new JavaTypeTransformer(), null);
 		return transformedNode;
 	}
 
 	@Override
 	public ISSTNode visit(IVariableDeclaration stmt, Void context) {
 		ITypeName type = stmt.getType();
-		if (type.isArray()) {
-			VariableDeclaration varDeclImpl = (VariableDeclaration) stmt;
-			varDeclImpl.setType(transformArrayType(type));
-		}
+		VariableDeclaration varDeclImpl = (VariableDeclaration) stmt;
+		varDeclImpl.setType(transformType(type));
 		return super.visit(stmt, context);
 	}
 
@@ -101,20 +99,23 @@ public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
 		return super.visit(methodRef, context);
 	}
 
-	private ITypeName transformArrayType(ITypeName type) {
-		if (!type.isArray()) {
-			return type;
-		}
-		ITypeName baseType = type.asArrayTypeName().getArrayBaseType();
-		ITypeName newType = Names
+	private ITypeName transformType(ITypeName type) {
+		if (type.isArray()) {
+			ITypeName baseType = type.asArrayTypeName().getArrayBaseType();
+			ITypeName newType = Names
 				.newType(MessageFormat.format("{0}$Array,{1}", baseType.getFullName(),
 						baseType.getAssembly().getIdentifier()));
-		return newType;
+			return newType;
+		}
+		if (type.isTypeParameter()) {
+			return Names.newType("p:object");
+		}
+		return type;
 	}
 
 	private IFieldName transformFieldName(IFieldName fieldName) {
-		return createFieldName(transformArrayType(fieldName.getValueType()),
-				transformArrayType(fieldName.getDeclaringType()), fieldName.getName(), fieldName.isStatic());
+		return createFieldName(transformType(fieldName.getValueType()),
+				transformType(fieldName.getDeclaringType()), fieldName.getName(), fieldName.isStatic());
 	}
 
 	private IMethodName transformMethodName(IMethodName methodName) {
@@ -124,19 +125,22 @@ public class JavaArrayTypeTransformer extends IdentityVisitor<Void> {
 			newParameterArray[i] = changeArrayTypeInParameterName(parameterName);
 
 		}
-		return createMethodName(transformArrayType(methodName.getReturnType()),
-				transformArrayType(methodName.getDeclaringType()),
+		return createMethodName(transformType(methodName.getReturnType()),
+				transformType(methodName.getDeclaringType()),
 				methodName.getName(), methodName.isStatic(), newParameterArray);
 	}
 
 	private IParameterName changeArrayTypeInParameterName(IParameterName parameterName) {
-		if (!parameterName.getValueType().isArray() || parameterName.isParameterArray()) {
+		if (parameterName.isParameterArray()) {
 			return parameterName;
 		}
-		String identifier = parameterName.getIdentifier();
-		String newIdentifier = identifier.replace(parameterName.getValueType().getIdentifier(),
-				transformArrayType(parameterName.getValueType()).getIdentifier());
-		return Names.newParameter(newIdentifier);
+		if (parameterName.getValueType().isArray() || parameterName.getValueType().isTypeParameter()) {
+			String identifier = parameterName.getIdentifier();
+			String newIdentifier = identifier.replace(parameterName.getValueType().getIdentifier(),
+					transformType(parameterName.getValueType()).getIdentifier());
+			return Names.newParameter(newIdentifier);
+		}
+		return parameterName;
 	}
 
 }

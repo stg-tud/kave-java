@@ -22,6 +22,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
+import cc.kave.commons.model.ssts.impl.references.IndexAccessReference;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 
@@ -73,6 +74,21 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 	}
 
 	@Test
+	public void testLeftHandIndexAccessExpressionInAssignment() {
+		IndexAccessExpression indexAccessExpression = new IndexAccessExpression();
+		indexAccessExpression.setIndices(Lists.newArrayList(constant("1")));
+		indexAccessExpression.setReference(varRef("x"));
+		IndexAccessReference indexAccessReference = new IndexAccessReference();
+		indexAccessReference.setExpression(indexAccessExpression);
+
+		ITypeName listType = type("List`1[[T -> String,P1]]");
+		assertAroundMethodDeclaration(Lists.newArrayList(declareVar("x", listType), assign(indexAccessReference, constant("someString"))),
+				declareVar("x", listType),
+				expr(invocation("x", method(Names.newType("p:object"), listType, "set", parameter(Names.newType(INT_TYPE_IDENTIFIER), "index"),
+						parameter(Names.newType("p:object"), "value")), constant("null"), constant("null"))));
+	}
+
+	@Test
 	public void transformsDelegateMethods() {
 		InvocationExpression delegateInvoke = new InvocationExpression();
 		delegateInvoke.setMethodName(Names.newMethod(
@@ -80,7 +96,7 @@ public class ExpressionTransformationTest extends JavaTransformationBaseTest {
 
 		InvocationExpression expected = new InvocationExpression();
 		expected.setMethodName(Names.newMethod(
-				"[p:void] [Del].Delegate$Invoke([System.String, mscorlib, 4.0.0.0] message)"));
+				"[p:void] [Del, P1].Delegate$Invoke([System.String, mscorlib, 4.0.0.0] message)"));
 
 		assertNode(delegateInvoke, expected);
 	}

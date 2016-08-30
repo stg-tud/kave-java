@@ -25,6 +25,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.blocks.ICaseBlock;
@@ -50,7 +51,9 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
+import cc.kave.commons.model.ssts.impl.statements.VariableDeclaration;
 import cc.kave.commons.model.ssts.impl.visitor.IdentityVisitor;
+import cc.kave.commons.model.ssts.references.IIndexAccessReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
@@ -80,7 +83,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 			return node;
 		}
 		T transformedNode = type.cast(node.accept(this, null));
-		transformedNode = JavaArrayTypeTransformer.transform(transformedNode);
+		transformedNode = JavaTypeTransformer.transform(transformedNode);
 		return transformedNode;
 	}
 
@@ -90,7 +93,7 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 			return node;
 		}
 		T transformedNode = (T) node.accept(this, null);
-		transformedNode = JavaArrayTypeTransformer.transform(transformedNode);
+		transformedNode = JavaTypeTransformer.transform(transformedNode);
 		return transformedNode;
 	}
 
@@ -122,6 +125,10 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 	@Override
 	public ISSTNode visit(IVariableDeclaration variableDecl, Void context) {
 		expressionTransformationHelper.defaultValueHelper.addVariableReferenceToTypeMapping(variableDecl);
+		if (variableDecl.getType().isTypeParameter()) {
+			VariableDeclaration variableDeclImpl = (VariableDeclaration) variableDecl;
+			variableDeclImpl.setType(Names.newType("p:object"));
+		}
 		return super.visit(variableDecl, context);
 	}
 
@@ -226,6 +233,11 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 		// Handle Property Get
 		propertyTransformationHelper.transformLeftHandPropertyAssignment(assignment);
 
+		// Handle left-hand index access
+		if (assignment.getReference() instanceof IIndexAccessReference) {
+			return expressionTransformationHelper.transformIndexAccessReference((IIndexAccessReference) assignment.getReference());
+		}
+
 		// Handle right-hand Composed Expression
 		if (assignment.getExpression() instanceof IComposedExpression) {
 			assignment.setExpression(expressionTransformationHelper.transformComposedExpression((IComposedExpression) assignment.getExpression()));
@@ -278,6 +290,10 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 				statements.remove(stmt);
 				continue;
 			}
+			if (isStatementWithUnknownInvocation(stmt)) {
+				statements.remove(stmt);
+				continue;
+			}
 			if (stmt instanceof IAssignment) {
 				IStatement replacementNode = transformAssignment((Assignment) stmt);
 				statements.add(statements.indexOf(stmt), replacementNode);
@@ -285,8 +301,29 @@ public class JavaTransformationVisitor extends IdentityVisitor<Void> {
 				replacementNode.accept(this, context);
 				continue;
 			}
+
 			stmt.accept(this, context);
 		}
+	}
+
+	private boolean isStatementWithUnknownInvocation(IStatement stmt) {
+		IInvocationExpression invocation = null;
+		if (stmt instanceof IExpressionStatement) {
+			IExpressionStatement exprStmt = (IExpressionStatement) stmt;
+			if (exprStmt.getExpression() instanceof IInvocationExpression) {
+				invocation = (IInvocationExpression) exprStmt.getExpression();
+			}
+		}
+		if (stmt instanceof IAssignment) {
+			IAssignment assignment = (IAssignment) stmt;
+			if (assignment.getExpression() instanceof IInvocationExpression) {
+				invocation = (IInvocationExpression) assignment.getExpression();
+			}
+		}
+		if (invocation != null && invocation.getMethodName().isUnknown()) {
+			return true;
+		}
+		return false;
 	}
 
 }

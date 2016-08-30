@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -95,7 +97,7 @@ public class RaychevRunner {
 
 	private static void queryBuilder(QueryStrategy queryStrategy) {
 		List<Context> contextList = readContexts(QUERY_FOLDER_PATH);
-
+		int counter = 0;
 		for (Context context : contextList) {
 			try {
 				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + context.getSST().getEnclosingType().getName());
@@ -107,10 +109,16 @@ public class RaychevRunner {
 				if (successful) {
 					writeClassPaths(Sets.newHashSet(context), path);
 				}
+				else {
+					System.out.println("Unsuccessful Query: " + context.getSST().getEnclosingType().getName());
+					counter++;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Number of unsuccessful queries: " + counter);
+		System.out.println("Number of contexts: " + contextList.size());
 	}
 
 	private static List<Context> readContexts(Path path) {
@@ -151,9 +159,14 @@ public class RaychevRunner {
 		Set<ISST> convertedSSTs = classGenerator.convert(contexts);
 		try {
 			classPathGenerator.generate(convertedSSTs);
+			copyOverJavaCSharpUtilsFiles(path);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void copyOverJavaCSharpUtilsFiles(Path path) throws IOException {
+		FileUtils.copyDirectory(new File(QUERY_FOLDER_PATH.toString() + "\\JavaToCSharpUtils"), new File(path.toString() + "\\JavaToCSharpUtils"));
 	}
 
 	public static void main(String[] args) throws IOException {

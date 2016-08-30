@@ -15,6 +15,7 @@
  */
 package cc.kave.commons.utils.sstprinter;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -549,13 +550,16 @@ public class SSTPrintingVisitor extends AbstractThrowingNodeVisitor<SSTPrintingC
 		}
 
 		context.text("(");
-		for (ISimpleExpression parameter : expr.getParameters()) {
+
+		for (Iterator<ISimpleExpression> iterator = expr.getParameters().iterator(); iterator.hasNext();) {
+			ISimpleExpression parameter = iterator.next();
 			parameter.accept(this, context);
 			
-			if (!parameter.equals(expr.getParameters().get(expr.getParameters().size() - 1))) {
+			if (iterator.hasNext()) {
 				context.text(",");
 			}
 		}
+
 		context.text(")");
 
 		return null;

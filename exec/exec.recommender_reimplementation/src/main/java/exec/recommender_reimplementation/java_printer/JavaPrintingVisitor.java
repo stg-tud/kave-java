@@ -367,7 +367,7 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 					.text("?").space().text("(").type(expr.getTargetType()).text(") ")
 					.text(expr.getReference().getIdentifier()).text(" : ").text("null");
 		} else {
-			context.text("(" + expr.getTargetType().getName() + ") ");
+			context.text("(").type(expr.getTargetType()).text(") ");
 			context.text(expr.getReference().getIdentifier());
 		}
 		return null;

@@ -20,6 +20,7 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.declare;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.declarations.IFieldDeclaration;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -29,7 +30,14 @@ import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 
-public class JavaArrayTypeTransformerTest extends JavaTransformationBaseTest {
+public class JavaTypeTransformerTest extends JavaTransformationBaseTest {
+
+	@Test
+	public void doesNotTransformNonArray_TypeParameter() {
+		IVariableDeclaration varDecl = declare("someVar", type("Object"));
+		IVariableDeclaration expected = declare("someVar", type("Object"));
+		assertTransformation(varDecl, expected);
+	}
 
 	@Test
 	public void transformsArrayTypeInVariableDeclaration() {
@@ -87,8 +95,64 @@ public class JavaArrayTypeTransformerTest extends JavaTransformationBaseTest {
 		assertTransformation(methodReference, expected);
 	}
 
+	@Test
+	public void transformsTypeParameterInVariableDeclaration() {
+		IVariableDeclaration varDecl = declare("someVar", Names.newType("T"));
+		IVariableDeclaration expected = declare("someVar", Names.newType("p:object"));
+		assertTransformation(varDecl, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInFieldDeclaration() {
+		IFieldDeclaration fieldDecl = fieldDecl(field(Names.newType("T"), Names.newType("T"), "f"));
+		IFieldDeclaration expected = fieldDecl(field(Names.newType("p:object"), Names.newType("p:object"), "f"));
+		assertTransformation(fieldDecl, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInFieldReference() {
+		IFieldReference fieldRef = fieldRef("ref", field(Names.newType("T"), Names.newType("T"), "f"));
+		IFieldReference expected = fieldRef("ref", field(Names.newType("p:object"), Names.newType("p:object"), "f"));
+		assertTransformation(fieldRef, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInMethodDeclaration() {
+		IMethodName methodName = method(Names.newType("T"), Names.newType("T"), "m1", parameter(Names.newType("T"), "p1"),
+				parameter(Names.newType("T"), "p2"));
+		IMethodName expectedName = method(Names.newType("p:object"), Names.newType("p:object"), "m1", parameter(Names.newType("p:object"), "p1"),
+				parameter(Names.newType("p:object"), "p2"));
+		IMethodDeclaration methodDecl = methodDecl(methodName);
+		IMethodDeclaration expected = methodDecl(expectedName);
+		assertTransformation(methodDecl, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInInvocation() {
+		IMethodName methodName = method(Names.newType("T"), Names.newType("T"), "m1", parameter(Names.newType("T"), "p1"),
+				parameter(Names.newType("T"), "p2"));
+		IMethodName expectedName = method(Names.newType("p:object"), Names.newType("p:object"), "m1", parameter(Names.newType("p:object"), "p1"),
+				parameter(Names.newType("p:object"), "p2"));
+		IInvocationExpression invocation = invocation("", methodName);
+		IInvocationExpression expected = invocation("", expectedName);
+		assertTransformation(invocation, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInMethodReference() {
+		IMethodName methodName = method(Names.newType("T"), Names.newType("T"), "m1", parameter(Names.newType("T"), "p1"),
+				parameter(Names.newType("T"), "p2"));
+		IMethodName expectedName = method(Names.newType("p:object"), Names.newType("p:object"), "m1", parameter(Names.newType("p:object"), "p1"),
+				parameter(Names.newType("p:object"), "p2"));
+		MethodReference methodReference = new MethodReference();
+		methodReference.setMethodName(methodName);
+		MethodReference expected = new MethodReference();
+		expected.setMethodName(expectedName);
+		assertTransformation(methodReference, expected);
+	}
+
 	private void assertTransformation(ISSTNode node, ISSTNode expected) {
-		ISSTNode actual = JavaArrayTypeTransformer.transform(node);
+		ISSTNode actual = JavaTypeTransformer.transform(node);
 		Assert.assertEquals(expected, actual);
 	}
 

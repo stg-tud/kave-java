@@ -134,7 +134,7 @@ public class PhantomClassGeneratorUtil {
 	}
 
 	public static boolean isValidType(ITypeName type) {
-		return !type.isUnknown() && !type.hasTypeParameters() && !type.isDelegateType();
+		return !type.isUnknown() && !type.isDelegateType();
 	}
 	
 	public static boolean isValidValueType(ITypeName valueType) {
