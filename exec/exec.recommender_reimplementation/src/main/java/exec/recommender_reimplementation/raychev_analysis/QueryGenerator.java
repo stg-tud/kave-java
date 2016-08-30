@@ -42,7 +42,7 @@ public class QueryGenerator {
 		RANDOM, COMPLETION
 	}
 
-	private static final int RETRY_THRESHOLD = 10;
+	private static final int RETRY_THRESHOLD = 20;
 
 	private Path queryPath;
 	private QueryExtractor queryExtractor;

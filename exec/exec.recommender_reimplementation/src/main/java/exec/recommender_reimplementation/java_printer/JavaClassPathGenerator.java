@@ -23,22 +23,20 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 
 public class JavaClassPathGenerator {
 
+	private static final String JAVA_PATH_FORMAT = "{0}\\{1}.java";
 	private String rootPath;
 
 	public JavaClassPathGenerator(String rootPath) {
 		this.rootPath = rootPath;
 	}
 
-	public void generate(Set<Context> contexts) throws IOException {
-		PhantomClassGenerator classGenerator = new PhantomClassGenerator();
-		Set<ISST> convertedSSTs = classGenerator.convert(contexts);
-		for (ISST sst : convertedSSTs) {
+	public void generate(Set<ISST> ssts) throws IOException {
+		for (ISST sst : ssts) {
 			File file = generateClassPath(sst, rootPath);
 			writeSST(sst, file);
 		}
@@ -55,7 +53,7 @@ public class JavaClassPathGenerator {
 			type = type.asPredefinedTypeName().getFullType();
 		}
 		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type, rootPath);
-		File file = new File(format("{0}\\{1}.java", nestedFolderPath, type.getName()));
+		File file = new File(format(JAVA_PATH_FORMAT, nestedFolderPath, type.getName()));
 		if (file.exists()) {
 			throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
 		}

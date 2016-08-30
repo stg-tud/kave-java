@@ -49,7 +49,6 @@ public class QueryExtractor {
 		try {
 			return new RaychevQueryPrinter().print(context);
 		} catch (InvalidJavaCodeException e) {
-			e.printStackTrace();
 			return "";
 		}
 	}

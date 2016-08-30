@@ -34,8 +34,10 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.ContextReader;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
+import exec.recommender_reimplementation.java_printer.PhantomClassGenerator;
 import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
 import exec.recommender_reimplementation.raychev_analysis.QueryGenerator.QueryStrategy;
 
@@ -145,8 +147,10 @@ public class RaychevRunner {
 
 	private static void writeClassPaths(Set<Context> contexts, Path path) {
 		JavaClassPathGenerator classPathGenerator = new JavaClassPathGenerator(path.toString());
+		PhantomClassGenerator classGenerator = new PhantomClassGenerator();
+		Set<ISST> convertedSSTs = classGenerator.convert(contexts);
 		try {
-			classPathGenerator.generate(contexts);
+			classPathGenerator.generate(convertedSSTs);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
