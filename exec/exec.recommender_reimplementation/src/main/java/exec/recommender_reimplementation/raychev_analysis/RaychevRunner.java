@@ -51,11 +51,19 @@ public class RaychevRunner {
 	public static void sentenceBuilder() throws IOException {
 		Queue<Context> contextList = Lists.newLinkedList();
 		try {
-			contextList = (Queue<Context>) ContextReader.GetContexts(FOLDERPATH);
+			List<Path> zipList = ContextReader.GetAllZipFiles(FOLDERPATH);
+			for (Path path : zipList) {
+				contextList = (Queue<Context>) ContextReader.readType(path, Context.class);
+				buildSentencesForContextList(contextList);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+		buildSentencesForContextList(contextList);
+	}
+
+	private static void buildSentencesForContextList(Queue<Context> contextList) {
 		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
@@ -74,7 +82,6 @@ public class RaychevRunner {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public static void printContexts() throws IOException {
@@ -170,11 +177,11 @@ public class RaychevRunner {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// sentenceBuilder();
+		sentenceBuilder();
 		// printContexts();
 		// queryBuilderFromCompletionExpressions();
 		// queryBuilderFromCompletionEvents();
-		queryBuilderWithRandomHoles();
+		// queryBuilderWithRandomHoles();
 	}
 
 }

@@ -47,7 +47,7 @@ public class ContextReader {
 		return contextList;
 	}
 
-	private static <T> List<T> readType(Path path, Class<T> type) {
+	public static <T> List<T> readType(Path path, Class<T> type) {
 		List<T> res = Lists.newLinkedList();
 		try {
 			ReadingArchive ra = new ReadingArchive(new File(path.toString()));
@@ -61,7 +61,7 @@ public class ContextReader {
 		return res;
 	}
 
-	private static List<Path> GetAllZipFiles(Path folderPath) throws IOException {
+	public static List<Path> GetAllZipFiles(Path folderPath) throws IOException {
 		return IOHelper.getZipFiles(folderPath);
 	}
 	
