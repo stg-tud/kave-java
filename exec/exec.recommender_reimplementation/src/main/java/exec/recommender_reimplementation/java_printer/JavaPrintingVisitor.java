@@ -176,6 +176,9 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 	@Override
 	public Void visit(IMethodDeclaration stmt, SSTPrintingContext context) {
+		if (stmt.getName().isInit()) {
+			return null;
+		}
 		context.indentation();
 
 		if (isOverride(stmt, context)) {

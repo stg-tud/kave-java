@@ -303,6 +303,14 @@ public class DeclarationPrinterTest extends JavaPrintingVisitorBaseTest {
 	}
 
 	@Test
+	public void MethodDeclaration_IgnoresInit() {
+		MethodDeclaration sst = new MethodDeclaration();
+		sst.setName(Names.newMethod("[DeclaringType, P1] [DeclaringType, P1]..cinit()"));
+
+		assertPrint(sst, "");
+	}
+
+	@Test
 	public void MethodDeclaration_ConstructorWithParameters() {
 		MethodDeclaration sst = new MethodDeclaration();
 		sst.setName(Names.newMethod("[DeclaringType,P] [DeclaringType,P]..ctor([ParameterType,P] p)"));
