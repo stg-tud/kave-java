@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.getTransformedType;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +32,6 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class HistoryExtractor {
@@ -97,7 +98,7 @@ public class HistoryExtractor {
 	}
 
 	public String getDeclaringType(IMethodName methodName) {
-		return PhantomClassGeneratorUtil.getTransformedType(methodName.getDeclaringType()).getFullName().replace(" ", "");
+		return getTransformedType(methodName.getDeclaringType()).getFullName().replace(" ", "");
 	}
 
 	private String getPositionString(IMethodName methodName, int position) {

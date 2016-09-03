@@ -15,7 +15,7 @@ public class PhantomClassGeneratorUtilTest {
 	public void transformsNestedType() {
 		ITypeName nestedType = Names.newType("T+U,P");
 		ITypeName actual = transformNestedType(nestedType);
-		ITypeName expected = Names.newType("T,P");
+		ITypeName expected = Names.newType("T_U,P");
 		assertEquals(expected, actual);
 	}
 

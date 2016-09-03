@@ -32,7 +32,6 @@ import cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.declarations.PropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.kave.commons.utils.StringUtils;
 import cc.kave.commons.utils.TypeErasure;
 
 public class PhantomClassGeneratorUtil {
@@ -116,10 +115,7 @@ public class PhantomClassGeneratorUtil {
 	public static ITypeName transformNestedType(ITypeName typeName) {
 		if (typeName.isNestedType()) {
 			String identifier = typeName.getIdentifier();
-			int plusSign = StringUtils.FindNext(identifier, 0, '+');
-			int endOfNestedType = StringUtils.FindNext(identifier, plusSign, ',');
-			String nestedTypeId = identifier.substring(plusSign, endOfNestedType);
-			String newIdentifier = identifier.replace(nestedTypeId, "");
+			String newIdentifier = identifier.replace("+", "_");
 			return Names.newType(newIdentifier);
 		}
 		return typeName;
