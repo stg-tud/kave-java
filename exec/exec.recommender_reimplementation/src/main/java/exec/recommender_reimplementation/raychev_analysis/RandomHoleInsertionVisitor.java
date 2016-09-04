@@ -15,8 +15,8 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import static cc.kave.commons.utils.TypeErasure.ErasureStrategy.FULL;
+
 import java.util.Random;
 
 import cc.kave.commons.model.naming.IName;
@@ -29,6 +29,7 @@ import cc.kave.commons.model.ssts.impl.statements.Assignment;
 import cc.kave.commons.model.ssts.impl.visitor.IdentityVisitor;
 import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
+import cc.kave.commons.utils.TypeErasure;
 
 public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 
@@ -36,13 +37,12 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 
 	private static final double RANDOM_THRESHOLD = 0.5;
 
-	private List<IName> expectedProposals;
+	private IName expectedProposals;
 
 	private boolean generatedRandomHole;
 
 	public RandomHoleInsertionVisitor() {
 		random = new Random();
-		expectedProposals = new ArrayList<>();
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 	private IAssignableExpression getTransformedExpression(IInvocationExpression invocation) {
 		if (isValidInvocation(invocation)) {
 			ICompletionExpression completionExpression = transformInvocation(invocation);
-			expectedProposals.add(invocation.getMethodName());
+			expectedProposals = TypeErasure.of(invocation.getMethodName(), FULL);
 			generatedRandomHole = true;
 			return completionExpression;
 		}
@@ -93,7 +93,7 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 		return completionExpression;
 	}
 
-	public List<IName> getExpectedProposals() {
+	public IName getExpectedProposal() {
 		return expectedProposals;
 	}
 

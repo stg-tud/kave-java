@@ -15,13 +15,10 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -30,8 +27,12 @@ import com.google.common.collect.Iterables;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.events.completionevents.Proposal;
+import cc.kave.commons.model.events.completionevents.ProposalSelection;
+import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.naming.IName;
 import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.utils.json.JsonUtils;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
 import exec.recommender_reimplementation.raychev_analysis.NestedCompletionExpressionEliminationVisitor.EliminationStrategy;
@@ -47,7 +48,9 @@ public class QueryGenerator {
 	private Path queryPath;
 	private QueryExtractor queryExtractor;
 	
-	private Map<Context, List<IName>> expectedCompletionsMap;
+	private String latestQuery;
+
+	private Map<Context, IName> expectedCompletionsMap;
 
 	public QueryGenerator(Path queryPath) {
 		this.queryPath = queryPath;
@@ -76,10 +79,24 @@ public class QueryGenerator {
 		}
 		if (randomHoleVisitor.hasGeneratedRandomHole()) {
 			context.setSST(sst);
-			expectedCompletionsMap.put(context, randomHoleVisitor.getExpectedProposals());
+			latestQuery = createCompletionEvent(context, randomHoleVisitor.getExpectedProposal());
+			expectedCompletionsMap.put(context, randomHoleVisitor.getExpectedProposal());
 			return generateQueryFromCompletionExpression(context);
 		}
 		return false;
+	}
+
+	private String createCompletionEvent(Context context, IName expectedMethod) {
+		CompletionEvent completionEvent = new CompletionEvent();
+		completionEvent.context = context;
+
+		Proposal proposal = new Proposal();
+		proposal.Name = expectedMethod;
+
+		completionEvent.selections.add(new ProposalSelection(proposal));
+		completionEvent.terminatedState = TerminationState.Applied;
+
+		return JsonUtils.toJson(completionEvent);
 	}
 
 	public boolean generateQueryFromCompletionExpression(Context context) throws IOException {
@@ -106,7 +123,7 @@ public class QueryGenerator {
 			Context context = completionEvent.getContext();
 			boolean successful = generateQueryFromCompletionExpression(context);
 			if (successful) {
-				expectedCompletionsMap.put(completionEvent.getContext(), newArrayList(selection));
+				expectedCompletionsMap.put(completionEvent.getContext(), selection);
 			}
 			return successful;
 
@@ -123,8 +140,12 @@ public class QueryGenerator {
 				javaCode);
 	}
 
-	public Map<Context, List<IName>> getExpectedCompletionsMap() {
+	public Map<Context, IName> getExpectedCompletionsMap() {
 		return expectedCompletionsMap;
+	}
+
+	public String getLatestQuery() {
+		return latestQuery;
 	}
 
 }

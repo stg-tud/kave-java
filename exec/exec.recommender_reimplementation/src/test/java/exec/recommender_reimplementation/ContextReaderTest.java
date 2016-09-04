@@ -27,7 +27,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 
 public class ContextReaderTest {
 	
-	private static Path FolderPath = Paths.get("C:\\SST Datasets\\NewQueryset");
+	private static Path FolderPath = Paths.get("C:\\SSTDatasets\\NewQueryset");
 	
 	@Test
 	public void ContextListNotEmpty() throws IOException {
