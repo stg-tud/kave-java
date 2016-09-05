@@ -34,11 +34,15 @@ import static cc.kave.commons.model.ssts.impl.SSTUtil.whileLoop;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
 import cc.kave.commons.model.ssts.expressions.assignable.BinaryOperator;
+import cc.kave.commons.model.ssts.impl.blocks.CatchBlock;
 import cc.kave.commons.model.ssts.impl.blocks.IfElseBlock;
+import cc.kave.commons.model.ssts.impl.blocks.TryBlock;
 import cc.kave.commons.model.ssts.impl.blocks.UncheckedBlock;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.statements.ThrowStatement;
 
 public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 
@@ -145,5 +149,64 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 				"    var = 2;",
 				"    condition = var == 2;",
 				"}");
+	}
+
+	@Test
+	public void testTryBlock() {
+		TryBlock sst = new TryBlock();
+		ThrowStatement s = new ThrowStatement();
+		s.setReference(varRef("ExceptionType"));
+		CatchBlock catch1 = new CatchBlock();
+		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.getBody().add(new BreakStatement());
+		sst.getCatchBlocks().add(catch1);
+		sst.getFinally().add(new ContinueStatement());
+		sst.getBody().add(s);
+
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}", "finally", "{",
+				"    continue;", "}");
+	}
+
+	@Test
+	public void testTryBlock_NoFinallyBlock() {
+		TryBlock sst = new TryBlock();
+		ThrowStatement s = new ThrowStatement();
+		s.setReference(varRef("ExceptionType"));
+		CatchBlock catch1 = new CatchBlock();
+		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.getBody().add(new BreakStatement());
+		sst.getCatchBlocks().add(catch1);
+		sst.getBody().add(s);
+
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
+	}
+
+	@Test
+	public void testTryBlock_GeneralCatchBlock() {
+		TryBlock sst = new TryBlock();
+		ThrowStatement s = new ThrowStatement();
+		s.setReference(varRef("ExceptionType"));
+		CatchBlock catch1 = new CatchBlock();
+		catch1.setKind(CatchBlockKind.General);
+		catch1.getBody().add(new BreakStatement());
+		sst.getCatchBlocks().add(catch1);
+		sst.getBody().add(s);
+
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
+	}
+
+	@Test
+	public void testTryBlock_UnnamedCatchBlock() {
+		TryBlock sst = new TryBlock();
+		ThrowStatement s = new ThrowStatement();
+		s.setReference(varRef("ExceptionType"));
+		CatchBlock catch1 = new CatchBlock();
+		catch1.setParameter(Names.newParameter("[ExceptionType,P] e"));
+		catch1.setKind(CatchBlockKind.Unnamed);
+		catch1.getBody().add(new BreakStatement());
+		sst.getCatchBlocks().add(catch1);
+		sst.getBody().add(s);
+
+		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
 	}
 }

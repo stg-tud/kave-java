@@ -55,7 +55,7 @@ public class UsedTypesVisitor extends AbstractTraversingNodeVisitor<Void, Void> 
 	public static final Set<ITypeName> CONSTANT_TYPES = Sets.newHashSet(
 			Names.newType("p:object"),
 			Names.newType("JavaToCSharpUtils.CSharpConstants, JavaToCSharp"),
-			Names.newType("JavaToCSharpUtils.CSharpConverter, JavaToCSharp"));
+			Names.newType("JavaToCSharpUtils.CSharpConverter, JavaToCSharp"), Names.newType("JavaToCSharpUtils.CSharpException, JavaToCSharp"));
 
 	public UsedTypesVisitor() {
 		usedTypes = Sets.newHashSet();

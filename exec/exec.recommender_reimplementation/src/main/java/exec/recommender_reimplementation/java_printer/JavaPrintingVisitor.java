@@ -30,9 +30,12 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
+import cc.kave.commons.model.ssts.blocks.CatchBlockKind;
+import cc.kave.commons.model.ssts.blocks.ICatchBlock;
 import cc.kave.commons.model.ssts.blocks.IDoLoop;
 import cc.kave.commons.model.ssts.blocks.IForLoop;
 import cc.kave.commons.model.ssts.blocks.IIfElseBlock;
+import cc.kave.commons.model.ssts.blocks.ITryBlock;
 import cc.kave.commons.model.ssts.blocks.IUncheckedBlock;
 import cc.kave.commons.model.ssts.blocks.IWhileLoop;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -300,6 +303,31 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 
 		context.statementBlock(statementListWithLoopHeader, this, true);
 
+		return null;
+	}
+
+	@Override
+	public Void visit(ITryBlock block, SSTPrintingContext context) {
+		context.indentation().keyword("try").statementBlock(block.getBody(), this, true);
+
+		for (ICatchBlock catchBlock : block.getCatchBlocks()) {
+			context.newLine().indentation().keyword("catch");
+
+			context.space().text("(").text("CSharpException");
+
+			if (catchBlock.getKind() == CatchBlockKind.Default) {
+				context.space().text(catchBlock.getParameter().getName());
+			} else {
+				context.space().text("e");
+			}
+			context.text(")");
+
+			context.statementBlock(catchBlock.getBody(), this, true);
+		}
+
+		if (!block.getFinally().isEmpty()) {
+			context.newLine().indentation().keyword("finally").statementBlock(block.getFinally(), this, true);
+		}
 		return null;
 	}
 
