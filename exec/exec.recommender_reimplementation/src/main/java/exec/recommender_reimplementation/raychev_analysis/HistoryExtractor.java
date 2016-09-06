@@ -32,13 +32,23 @@ import cc.kave.commons.pointsto.analysis.FieldSensitivity;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
+import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class HistoryExtractor {
 
-	public Set<ConcreteHistory> extractHistories(Context context) {
+	public final int STATEMENT_LIMIT = 500;
 
+	public static int filteredCount = 0;
+
+	public Set<ConcreteHistory> extractHistories(Context context) {
 		ISST sst = context.getSST();
+		Integer statementCount = sst.accept(new StatementCounterVisitor(), null);
+		if (statementCount > STATEMENT_LIMIT) {
+			filteredCount++;
+			return new HashSet<>();
+		}
+
 		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(sst);
 		sst = transformationVisitor.transform(sst, ISST.class);
 
