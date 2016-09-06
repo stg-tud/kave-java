@@ -45,7 +45,9 @@ import exec.recommender_reimplementation.raychev_analysis.QueryGenerator.QuerySt
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SSTDatasets\\NewTestset");
-	public static final Path QUERY_FOLDER_PATH = Paths.get("C:\\SSTDatasets\\NewQuerySet");
+	public static Path QUERY_FOLDER_PATH;
+	public static final Path WIN_QUERY_FOLDER_PATH = Paths.get("C:\\SSTDatasets\\NewQuerySet");
+	public static final Path LIN_QUERY_FOLDER_PATH = Paths.get("//media//sf_C_DRIVE//SSTDataSets//NewQuerySet");
 
 	@SuppressWarnings("unchecked")
 	public static void sentenceBuilder() throws IOException {
@@ -61,13 +63,14 @@ public class RaychevRunner {
 		}
 
 		buildSentencesForContextList(contextList);
+		System.out.println(HistoryExtractor.filteredCount);
 	}
 
 	private static void buildSentencesForContextList(Queue<Context> contextList) {
 		HistoryExtractor historyExtractor = new HistoryExtractor();
 		while (!contextList.isEmpty()) {
 			Context context = contextList.poll();
-			try (FileWriter fw = new FileWriter(FOLDERPATH + "\\train_all", true);
+			try (FileWriter fw = new FileWriter(FOLDERPATH + File.separator + "train_all", true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter out = new PrintWriter(bw)) {
 				try {
@@ -131,7 +134,8 @@ public class RaychevRunner {
 
 	private static void writeCompletionEvent(Context context, String completionEventAsString) throws IOException {
 		String queryFileName = "Query_" + context.getSST().getEnclosingType().getName();
-		writeStringToFile(new File(QUERY_FOLDER_PATH + "\\" + queryFileName + "\\" + queryFileName + ".json"), completionEventAsString);
+		writeStringToFile(new File(QUERY_FOLDER_PATH + File.separator + queryFileName + File.separator + queryFileName + ".json"),
+				completionEventAsString);
 	}
 
 	private static List<Context> readContexts(Path path) {
@@ -179,10 +183,16 @@ public class RaychevRunner {
 	}
 
 	private static void copyOverJavaCSharpUtilsFiles(Path path) throws IOException {
-		FileUtils.copyDirectory(new File(QUERY_FOLDER_PATH.toString() + "\\JavaToCSharpUtils"), new File(path.toString() + "\\JavaToCSharpUtils"));
+		FileUtils.copyDirectory(new File(QUERY_FOLDER_PATH.toString() + File.separator + "JavaToCSharpUtils"),
+				new File(path.toString() + File.separator + "JavaToCSharpUtils"));
 	}
 
 	public static void main(String[] args) throws IOException {
+		if (System.getProperty("os.name").startsWith("Windows")) {
+			QUERY_FOLDER_PATH = WIN_QUERY_FOLDER_PATH;
+		} else {
+			QUERY_FOLDER_PATH = LIN_QUERY_FOLDER_PATH;
+		}
 		// sentenceBuilder();
 		// printContexts();
 		// queryBuilderFromCompletionExpressions();

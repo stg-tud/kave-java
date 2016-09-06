@@ -136,7 +136,7 @@ public class QueryGenerator {
 	}
 
 	private void writeQueryFile(String javaCode, ISST sst) throws IOException {
-		FileUtils.writeStringToFile(new File(queryPath.toString() + "\\" + sst.getEnclosingType().getName() + ".java"),
+		FileUtils.writeStringToFile(new File(queryPath.toString() + File.separator + sst.getEnclosingType().getName() + ".java"),
 				javaCode);
 	}
 

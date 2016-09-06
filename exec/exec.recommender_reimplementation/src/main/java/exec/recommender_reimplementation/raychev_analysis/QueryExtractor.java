@@ -15,13 +15,12 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
-import com.google.common.collect.Iterables;
-
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.IProposal;
 import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.naming.IName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;
@@ -37,7 +36,8 @@ public class QueryExtractor {
 
 	public static boolean isValidCompletionEvent(CompletionEvent completionEvent) {
 		return completionEvent.terminatedState == TerminationState.Applied && !completionEvent.selections.isEmpty()
-				&& IsNonStaticSelection(Iterables.getLast(completionEvent.selections).getProposal());
+				&& IsNonStaticSelection(completionEvent.getLastSelectedProposal())
+				&& completionEvent.getLastSelectedProposal().getName() instanceof IMethodName;
 	}
 
 	public static boolean IsNonStaticSelection(IProposal proposal) {

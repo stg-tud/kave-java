@@ -28,7 +28,7 @@ import cc.kave.commons.model.ssts.ISST;
 
 public class JavaClassPathGenerator {
 
-	private static final String JAVA_PATH_FORMAT = "{0}\\{1}.java";
+	private static final String JAVA_PATH_FORMAT = "{0}{1}{2}.java";
 	private String rootPath;
 
 	public JavaClassPathGenerator(String rootPath) {
@@ -53,7 +53,7 @@ public class JavaClassPathGenerator {
 			type = type.asPredefinedTypeName().getFullType();
 		}
 		String nestedFolderPath = createPackageSubFoldersAndReturnNestedFolderPath(type, rootPath);
-		File file = new File(format(JAVA_PATH_FORMAT, nestedFolderPath, type.getName()));
+		File file = new File(format(JAVA_PATH_FORMAT, nestedFolderPath, File.separator, type.getName()));
 		if (file.exists()) {
 			throw new RuntimeException("ClassPath file already exists " + file.getAbsolutePath());
 		}
@@ -65,7 +65,7 @@ public class JavaClassPathGenerator {
 		String[] packages = type.getFullName().split("\\.");
 		for (int i = 0; i < packages.length - 1; i++) {
 			String packageName = packages[i];
-			nestedFolderPath += "\\" + packageName;
+			nestedFolderPath += File.separator + packageName;
 		}
 		
 		new File(nestedFolderPath).mkdirs();
