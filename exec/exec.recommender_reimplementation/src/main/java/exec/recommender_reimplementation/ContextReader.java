@@ -17,18 +17,22 @@ package exec.recommender_reimplementation;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.pointsto.io.IOHelper;
 import cc.recommenders.io.ReadingArchive;
 
 public class ContextReader {
 	
+	public static final String ZIP_FILE_ENDING = ".zip";
+	public static final String JSON_FILE_ENDING = ".json";
+
 	public static List<Context> GetContexts(Path folderPath) throws IOException {
 		List<Context> contextList = Lists.newLinkedList();
 		List<Path> zipList = GetAllZipFiles(folderPath);
@@ -40,8 +44,9 @@ public class ContextReader {
 	
 	public static List<CompletionEvent> GetCompletionEvents(Path folderPath) throws IOException {
 		List<CompletionEvent> contextList = Lists.newLinkedList();
-		List<Path> zipList = GetAllZipFiles(folderPath);
-		for (Path path : zipList) {
+		List<Path> pathList = GetAllZipFiles(folderPath);
+		pathList.addAll(GetAllJsonFiles(folderPath));
+		for (Path path : pathList) {
 			contextList.addAll(readType(path, CompletionEvent.class));
 		}
 		return contextList;
@@ -62,7 +67,13 @@ public class ContextReader {
 	}
 
 	public static List<Path> GetAllZipFiles(Path folderPath) throws IOException {
-		return IOHelper.getZipFiles(folderPath);
+		return Files.walk(folderPath).filter(path -> Files.isRegularFile(path) && path.toString().endsWith(ZIP_FILE_ENDING))
+				.collect(Collectors.toList());
+	}
+
+	public static List<Path> GetAllJsonFiles(Path folderPath) throws IOException {
+		return Files.walk(folderPath).filter(path -> Files.isRegularFile(path) && path.toString().endsWith(JSON_FILE_ENDING))
+				.collect(Collectors.toList());
 	}
 	
 }
