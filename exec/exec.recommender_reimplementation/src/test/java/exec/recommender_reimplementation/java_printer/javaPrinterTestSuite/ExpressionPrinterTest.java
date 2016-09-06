@@ -23,6 +23,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CastExpression;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.IfElseExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.LambdaExpression;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.TypeCheckExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
@@ -120,6 +121,14 @@ public class ExpressionPrinterTest extends JavaPrintingVisitorBaseTest {
 		assertPrint(constant("false"), "CSharpConstants.FALSE");
 	}
 
+	@Test
+	public void ifElseExpression() {
+		IfElseExpression sst = new IfElseExpression();
+		sst.setCondition(constant("true"));
+		sst.setThenExpression(constant("1"));
+		sst.setElseExpression(constant("2"));
 
+		assertPrint(sst, "(CSharpConverter.toBool(CSharpConstants.TRUE)) ? 1 : 2");
+	}
 		
 }

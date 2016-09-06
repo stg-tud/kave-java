@@ -46,6 +46,7 @@ import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.ISimpleExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.CastOperator;
 import cc.kave.commons.model.ssts.expressions.assignable.ICastExpression;
+import cc.kave.commons.model.ssts.expressions.assignable.IIfElseExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
@@ -388,6 +389,17 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 	@Override
 	public Void visit(IPropertyReference propertyRef, SSTPrintingContext context) {
 		throw new InvalidJavaCodeException();
+	}
+
+	@Override
+	public Void visit(IIfElseExpression expr, SSTPrintingContext context) {
+		context.text("(").text(C_SHARP_CONVERTER_TO_BOOL_METHOD_NAME).text("(");
+		expr.getCondition().accept(this, context);
+		context.text("))").space().text("?").space();
+		expr.getThenExpression().accept(this, context);
+		context.space().text(":").space();
+		expr.getElseExpression().accept(this, context);
+		return null;
 	}
 
 	@Override
