@@ -163,7 +163,8 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.getFinally().add(new ContinueStatement());
 		sst.getBody().add(s);
 
-		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}", "finally", "{",
+		assertPrint(sst, "try", "{", "    throw new java.lang.Exception();", "}", "catch (CSharpException e)", "{", "    break;", "}",
+				"finally", "{",
 				"    continue;", "}");
 	}
 
@@ -178,7 +179,7 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
+		assertPrint(sst, "try", "{", "    throw new java.lang.Exception();", "}", "catch (CSharpException e)", "{", "    break;", "}");
 	}
 
 	@Test
@@ -192,7 +193,7 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
+		assertPrint(sst, "try", "{", "    throw new java.lang.Exception();", "}", "catch (CSharpException e)", "{", "    break;", "}");
 	}
 
 	@Test
@@ -207,6 +208,6 @@ public class BlockPrinterTest extends JavaPrintingVisitorBaseTest {
 		sst.getCatchBlocks().add(catch1);
 		sst.getBody().add(s);
 
-		assertPrint(sst, "try", "{", "    throw new ExceptionType();", "}", "catch (CSharpException e)", "{", "    break;", "}");
+		assertPrint(sst, "try", "{", "    throw new java.lang.Exception();", "}", "catch (CSharpException e)", "{", "    break;", "}");
 	}
 }

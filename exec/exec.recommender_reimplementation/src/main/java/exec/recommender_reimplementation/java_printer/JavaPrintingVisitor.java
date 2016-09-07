@@ -51,6 +51,7 @@ import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.expressions.simple.IConstantValueExpression;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
 import cc.kave.commons.model.ssts.statements.IEventSubscriptionStatement;
+import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
@@ -251,6 +252,12 @@ public class JavaPrintingVisitor extends SSTPrintingVisitor {
 		context.indentation().type(type).space();
 		stmt.getReference().accept(this, context);
 		context.text(" = ").text("null").text(";");
+		return null;
+	}
+
+	@Override
+	public Void visit(IThrowStatement stmt, SSTPrintingContext context) {
+		context.indentation().keyword("throw").space().keyword("new").space().text("java.lang.Exception()").text(";");
 		return null;
 	}
 
