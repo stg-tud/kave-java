@@ -42,11 +42,13 @@ public class RaychevRecommender {
 		}
 	}
 
-	public void executeRecommender(String queryName) throws IOException, InterruptedException {
+	public void executeRecommender(String queryName, boolean verbose) throws IOException, InterruptedException {
 		ProcessBuilder pb = new ProcessBuilder("sudo", "-S", MessageFormat.format("{0}/fill_ngram.sh", path), "all", queryName);
 		pb.directory(new File(path));
-		pb.redirectOutput(Redirect.INHERIT);
-		pb.redirectError(Redirect.INHERIT);
+		if(verbose) {
+			pb.redirectOutput(Redirect.INHERIT);
+			pb.redirectError(Redirect.INHERIT);			
+		}
 		Process process = pb.start();
 		writeSudoPassword(process);
 		process.waitFor();
@@ -80,6 +82,9 @@ public class RaychevRecommender {
 	}
 
 	public String getMethodName(String solution) {
+		if(solution.contains("%") || !solution.contains(">")) {
+			return "";
+		}
 		int start = StringUtils.FindNext(solution, 0, '>') + 2;
 		int bracketBelongingToMethodName = StringUtils.FindNext(solution, start, '(');
 		int end = StringUtils.FindNext(solution, bracketBelongingToMethodName + 1, '(');
