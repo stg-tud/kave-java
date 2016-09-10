@@ -102,6 +102,9 @@ public class JavaTypeTransformer extends IdentityVisitor<Void> {
 	private ITypeName transformType(ITypeName type) {
 		if (type.isArray()) {
 			ITypeName baseType = type.asArrayTypeName().getArrayBaseType();
+			if (baseType.isUnknown()) {
+				baseType = Names.newType("p:object");
+			}
 			ITypeName newType = Names
 				.newType(MessageFormat.format("{0}$Array,{1}", baseType.getFullName(),
 						baseType.getAssembly().getIdentifier()));
