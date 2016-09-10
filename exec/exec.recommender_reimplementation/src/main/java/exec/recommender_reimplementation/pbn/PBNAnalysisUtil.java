@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
@@ -93,9 +92,10 @@ public class PBNAnalysisUtil {
 		return false;
 	}
 
-	public static List<IAssignment> getAssignmentList(List<IStatement> body) {
-		return body.stream().filter(statement -> statement instanceof IAssignment)
-				.map(statement -> (IAssignment) statement).collect(Collectors.toList());
+	public static List<IAssignment> getAssignmentList(ISSTNode sstNode) {
+		List<IAssignment> assignments = new ArrayList<>();
+		sstNode.accept(new AssignmentCollectVisitor(), assignments);
+		return assignments;
 	}
 
 	public static int getIndexOfParameter(List<ISimpleExpression> parameters, ITypeName parameterType, TypeCollector typeCollector) {

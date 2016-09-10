@@ -32,7 +32,6 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
 import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.IAssignableExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
@@ -156,7 +155,10 @@ public class UsageContextHelper {
 			newUsage.setDefinition(definitionSite);
 			return true;
 		}
-		return false;
+		else {
+			newUsage.setDefinition(DefinitionSites.createUnknownDefinitionSite());
+			return false;
+		}
 	}
 
 	
@@ -191,7 +193,6 @@ public class UsageContextHelper {
 	
 	public DefinitionSite findDefinitionSiteByReference(IVariableReference varRef, IAssignableExpression expr,
 			IMethodDeclaration methodDecl) {
-		List<IStatement> body = methodDecl.getBody();
 		PointsToQuery queryForVarReference = pointsToQueryBuilder.newQuery(
 				varRef,
 				getStatementParentForExpression(expr, sstNodeHierarchy));
@@ -199,7 +200,7 @@ public class UsageContextHelper {
 				.query(queryForVarReference);
 	
 		// search Assignments
-		List<IAssignment> assignments = getAssignmentList(body);
+		List<IAssignment> assignments = getAssignmentList(methodDecl);
 
 		for (int i = assignments.size() - 1; i >= 0; i--) {
 			IAssignment assignment = assignments.get(i);

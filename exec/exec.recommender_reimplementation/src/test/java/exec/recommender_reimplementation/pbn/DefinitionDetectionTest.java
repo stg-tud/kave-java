@@ -21,9 +21,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
+import cc.kave.commons.model.ssts.impl.blocks.WhileLoop;
 import cc.kave.commons.model.ssts.impl.expressions.simple.ConstantValueExpression;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.DefinitionSites;
@@ -100,6 +103,21 @@ public class DefinitionDetectionTest extends PBNAnalysisBaseTest {
         DefinitionSite expected = DefinitionSites.createDefinitionByReturn(convert(callee));
         assertEquals(expected, actual);
     }
+
+	@Test
+	public void varDefinitionByReturnNested() {
+		IMethodName callee = method(type("A"), DefaultClassContext, "M");
+
+		WhileLoop loop = new WhileLoop();
+		loop.setBody(Lists.newArrayList(assign("a", invoke("this", callee)), invokeStmt("a", someMethodOnType("A"))));
+		setupDefaultEnclosingMethod(varDecl("a", type("A")), loop);
+
+		assertQueriesExistFor(type("A"));
+
+		DefinitionSite actual = findQueryWith(type("A")).getDefinitionSite();
+		DefinitionSite expected = DefinitionSites.createDefinitionByReturn(convert(callee));
+		assertEquals(expected, actual);
+	}
 
     @Test
     public void varDefinitionByReturn_ReturnsSubtype()

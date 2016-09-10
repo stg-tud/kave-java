@@ -135,7 +135,7 @@ public class PBNAnalysisUtilTest extends PBNAnalysisBaseTest {
 		List<IAssignment> expectedAssignments = Lists.newArrayList(someAssignment, someOtherAssignment);
 		IMethodDeclaration methodDecl = methodDecl(DefaultMethodContext, true, someAssignment, someOtherAssignment);
 		
-		assertThat(PBNAnalysisUtil.getAssignmentList(methodDecl.getBody()), Matchers.is(expectedAssignments));
+		assertThat(PBNAnalysisUtil.getAssignmentList(methodDecl), Matchers.is(expectedAssignments));
 	}
 	
 	@Test
