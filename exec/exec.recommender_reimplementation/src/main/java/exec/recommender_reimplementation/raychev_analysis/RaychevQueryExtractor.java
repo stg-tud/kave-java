@@ -15,34 +15,21 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static exec.recommender_reimplementation.util.QueryUtil.isValidCompletionEvent;
+
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.events.completionevents.IProposal;
-import cc.kave.commons.model.events.completionevents.TerminationState;
-import cc.kave.commons.model.naming.IName;
-import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import exec.recommender_reimplementation.java_printer.JavaPrintingVisitor.InvalidJavaCodeException;
 import exec.recommender_reimplementation.java_printer.printer.RaychevQueryPrinter;
 
-public class QueryExtractor {
+public class RaychevQueryExtractor {
 
 	public String createJavaCodeForQuery(CompletionEvent completionEvent) {
 		if (isValidCompletionEvent(completionEvent)) {
 			return createJavaCodeForQuery(completionEvent.getContext());
 		}
 		return "";
-	}
-
-	public static boolean isValidCompletionEvent(CompletionEvent completionEvent) {
-		return completionEvent.terminatedState == TerminationState.Applied && !completionEvent.selections.isEmpty()
-				&& IsNonStaticSelection(completionEvent.getLastSelectedProposal())
-				&& completionEvent.getLastSelectedProposal().getName() instanceof IMethodName;
-	}
-
-	public static boolean IsNonStaticSelection(IProposal proposal) {
-		IName name = proposal.getName();
-		return !name.getIdentifier().contains("static");
 	}
 
 	public String createJavaCodeForQuery(Context context) {

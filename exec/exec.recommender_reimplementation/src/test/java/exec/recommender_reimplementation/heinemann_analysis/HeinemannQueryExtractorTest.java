@@ -22,11 +22,14 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Proposal;
+import cc.kave.commons.model.events.completionevents.ProposalSelection;
+import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.CompletionExpression;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
-public class QueryExtractorTest extends PBNAnalysisBaseTest {
+public class HeinemannQueryExtractorTest extends PBNAnalysisBaseTest {
 
 	@Test
 	public void extractsIdentifiers() {
@@ -39,8 +42,12 @@ public class QueryExtractorTest extends PBNAnalysisBaseTest {
 		
 		CompletionEvent completionEvent = new CompletionEvent();
 		completionEvent.context = context;
+		completionEvent.terminatedState = TerminationState.Applied;
+		Proposal proposal = new Proposal();
+		proposal.Name = method(stringType, DefaultClassContext, "someMethod");
+		completionEvent.selections.add(new ProposalSelection(proposal));
 		
-		QueryExtractor queryExtractor = new QueryExtractor();
+		HeinemannQueryExtractor queryExtractor = new HeinemannQueryExtractor();
 		
 		HeinemannQuery query = queryExtractor.extractQueryFromCompletion(completionEvent, 5, false, false);
 		

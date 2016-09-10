@@ -19,6 +19,7 @@ import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUti
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.collectTokens;
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.filterSingleCharacterIdentifier;
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.stemTokens;
+import static exec.recommender_reimplementation.util.QueryUtil.isValidCompletionEvent;
 
 import java.util.Set;
 
@@ -31,9 +32,12 @@ import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 import exec.recommender_reimplementation.tokenization.TokenizationVisitor;
 
-public class QueryExtractor {
+public class HeinemannQueryExtractor {
 	public HeinemannQuery extractQueryFromCompletion(CompletionEvent completion, int lookback, boolean removeStopwords,
 			boolean removeKeywords) {
+		if (!isValidCompletionEvent(completion)) {
+			return null;
+		}
 		Context context = completion.context;
 		TokenizationSettings settings = new TokenizationSettings();
 		settings.setActiveBrackets(false);

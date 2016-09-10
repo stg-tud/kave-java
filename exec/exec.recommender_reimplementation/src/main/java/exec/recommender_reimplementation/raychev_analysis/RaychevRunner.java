@@ -37,11 +37,11 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
-import exec.recommender_reimplementation.ContextReader;
 import exec.recommender_reimplementation.java_printer.JavaClassPathGenerator;
 import exec.recommender_reimplementation.java_printer.PhantomClassGenerator;
 import exec.recommender_reimplementation.java_printer.printer.JavaPrinter;
 import exec.recommender_reimplementation.raychev_analysis.QueryGenerator.QueryStrategy;
+import exec.recommender_reimplementation.util.ContextReader;
 
 public class RaychevRunner {
 	public static final Path FOLDERPATH = Paths.get("C:\\SSTDatasets\\NewTestset");
@@ -62,7 +62,6 @@ public class RaychevRunner {
 			e.printStackTrace();
 		}
 
-		buildSentencesForContextList(contextList);
 		System.out.println(HistoryExtractor.filteredCount);
 	}
 

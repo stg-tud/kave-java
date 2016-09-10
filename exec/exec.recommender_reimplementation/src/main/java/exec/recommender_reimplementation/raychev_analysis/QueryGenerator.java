@@ -15,6 +15,8 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static exec.recommender_reimplementation.util.QueryUtil.isValidCompletionEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,7 +48,7 @@ public class QueryGenerator {
 	private static final int RETRY_THRESHOLD = 20;
 
 	private Path queryPath;
-	private QueryExtractor queryExtractor;
+	private RaychevQueryExtractor queryExtractor;
 	
 	private String latestQuery;
 
@@ -54,7 +56,7 @@ public class QueryGenerator {
 
 	public QueryGenerator(Path queryPath) {
 		this.queryPath = queryPath;
-		queryExtractor = new QueryExtractor();
+		queryExtractor = new RaychevQueryExtractor();
 		expectedCompletionsMap = new HashMap<>();
 	}
 
@@ -118,7 +120,7 @@ public class QueryGenerator {
 	}
 
 	public boolean generateQuery(CompletionEvent completionEvent) throws IOException {
-		if (QueryExtractor.isValidCompletionEvent(completionEvent)) {
+		if (isValidCompletionEvent(completionEvent)) {
 			IName selection = Iterables.getLast(completionEvent.selections).getProposal().getName();
 			Context context = completionEvent.getContext();
 			boolean successful = generateQueryFromCompletionExpression(context);

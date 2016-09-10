@@ -32,9 +32,6 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.pointsto.extraction.CoReNameConverter;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.names.ICoReMethodName;
 import exec.recommender_reimplementation.pbn.PBNAnalysisBaseTest;
 
 public class HeinemannEvaluationTest extends PBNAnalysisBaseTest {
@@ -45,64 +42,6 @@ public class HeinemannEvaluationTest extends PBNAnalysisBaseTest {
 	public void setup() {
 		HeinemannRecommender recommender = new HeinemannRecommender(createSampleModel(), 0.8);
 		heinemannEvaluation = new HeinemannEvaluation(recommender, 4, false, false);
-	}
-	
-	@Test
-	public void returnsCorrectReciprocalRankForRank1() {
-		ICoReMethodName expected = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m1 = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m2 = CoReNameConverter.convert(method(voidType, type("A"), "m2"));
-		ICoReMethodName m3 = CoReNameConverter.convert(method(voidType, type("A"), "m3"));
-		
-		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
-		proposals.add(Tuple.newTuple(m1, 0.8));
-		proposals.add(Tuple.newTuple(m2, 0.8));
-		proposals.add(Tuple.newTuple(m3, 0.8));
-		
-		assertEquals(1, HeinemannEvaluation.calculateReciprocalRank(expected, proposals), 0.0);
-	}
-	
-	@Test
-	public void returnsCorrectReciprocalRankForRank2() {
-		ICoReMethodName expected = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m1 = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m2 = CoReNameConverter.convert(method(voidType, type("A"), "m2"));
-		ICoReMethodName m3 = CoReNameConverter.convert(method(voidType, type("A"), "m3"));
-		
-		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
-		proposals.add(Tuple.newTuple(m2, 0.8));
-		proposals.add(Tuple.newTuple(m1, 0.8));
-		proposals.add(Tuple.newTuple(m3, 0.8));
-		
-		assertEquals(1 / (double) 2, HeinemannEvaluation.calculateReciprocalRank(expected, proposals), 0.0);
-	}
-	
-	@Test
-	public void returnsCorrectReciprocalRankForRank3() {
-		ICoReMethodName expected = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m1 = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m2 = CoReNameConverter.convert(method(voidType, type("A"), "m2"));
-		ICoReMethodName m3 = CoReNameConverter.convert(method(voidType, type("A"), "m3"));
-		
-		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
-		proposals.add(Tuple.newTuple(m2, 0.8));
-		proposals.add(Tuple.newTuple(m3, 0.8));
-		proposals.add(Tuple.newTuple(m1, 0.8));
-		
-		assertEquals(1 / (double) 3, HeinemannEvaluation.calculateReciprocalRank(expected, proposals), 0.0);
-	}
-	
-	@Test
-	public void returnsCorrectReciprocalRankIfNotInProposals() {
-		ICoReMethodName expected = CoReNameConverter.convert(method(voidType, type("A"), "m1"));
-		ICoReMethodName m2 = CoReNameConverter.convert(method(voidType, type("A"), "m2"));
-		ICoReMethodName m3 = CoReNameConverter.convert(method(voidType, type("A"), "m3"));
-		
-		Set<Tuple<ICoReMethodName, Double>> proposals = Sets.newLinkedHashSet();
-		proposals.add(Tuple.newTuple(m2, 0.8));
-		proposals.add(Tuple.newTuple(m3, 0.8));
-		
-		assertEquals(0, HeinemannEvaluation.calculateReciprocalRank(expected, proposals), 0.0);
 	}
 	
 	@Test

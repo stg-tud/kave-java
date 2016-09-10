@@ -32,7 +32,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
-import exec.recommender_reimplementation.ContextReader;
+import exec.recommender_reimplementation.util.ContextReader;
 
 public class RunHeinemannRecommender {
 

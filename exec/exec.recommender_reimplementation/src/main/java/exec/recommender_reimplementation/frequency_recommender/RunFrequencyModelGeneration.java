@@ -30,7 +30,7 @@ import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import exec.recommender_reimplementation.ContextReader;
+import exec.recommender_reimplementation.util.ContextReader;
 
 public class RunFrequencyModelGeneration {
 

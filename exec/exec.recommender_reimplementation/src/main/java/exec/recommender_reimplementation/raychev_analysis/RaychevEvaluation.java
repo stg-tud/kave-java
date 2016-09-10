@@ -66,7 +66,7 @@ public class RaychevEvaluation {
 		System.out.println("Mean reciprocal rank:" + mrr);
 	}
 
-	private static String getRaychevMethodName(IMethodName methodName) {
+	public static String getRaychevMethodName(IMethodName methodName) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getDeclaringType(methodName));
 		sb.append(".");

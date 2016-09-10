@@ -19,8 +19,8 @@ import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUti
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.collectTokens;
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.filterSingleCharacterIdentifier;
 import static exec.recommender_reimplementation.heinemann_analysis.ExtractionUtil.stemTokens;
+import static exec.recommender_reimplementation.util.QueryUtil.calculateReciprocalRank;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -112,17 +112,5 @@ public class HeinemannEvaluation {
 
 	}
 
-	public static double calculateReciprocalRank(ICoReMethodName coReMethodName,
-			Set<Tuple<ICoReMethodName, Double>> proposals) {
-		Iterator<Tuple<ICoReMethodName, Double>> iterator = proposals.iterator();
-		int i = 1;
-		while (iterator.hasNext()) {
-			Tuple<ICoReMethodName, Double> proposal = iterator.next();
-			if (coReMethodName.equals(proposal.getFirst())) {
-				return 1 / (double) i;
-			}
-			i++;
-		}
-		return 0;
-	}
+
 }

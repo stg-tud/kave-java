@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package exec.recommender_reimplementation;
+package exec.recommender_reimplementation.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import exec.recommender_reimplementation.util.ContextReader;
 
 public class ContextReaderTest {
 	

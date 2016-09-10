@@ -31,10 +31,14 @@ import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.utils.SSTNodeHierarchy;
 import cc.recommenders.usages.Query;
+import exec.recommender_reimplementation.util.QueryUtil;
 
-public class QueryExtraction {
+public class PBNQueryExtractor {
 	
 	public Query extractQueryFromCompletion(CompletionEvent completion) {
+		if (!QueryUtil.isValidCompletionEvent(completion)) {
+			return null;
+		}
 		Context context = completion.context;
 		TypeCollector typeCollector = new TypeCollector(context);
 		PointsToContext pointsToContext = UsageExtractor.performPointsToAnalysis(context);

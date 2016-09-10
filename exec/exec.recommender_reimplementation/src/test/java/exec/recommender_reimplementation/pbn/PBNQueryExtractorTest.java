@@ -18,9 +18,13 @@ package exec.recommender_reimplementation.pbn;
 import static cc.kave.commons.pointsto.extraction.CoReNameConverter.convert;
 import static exec.recommender_reimplementation.pbn.PBNAnalysisTestFixture.voidType;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.kave.commons.model.events.completionevents.Proposal;
+import cc.kave.commons.model.events.completionevents.ProposalSelection;
+import cc.kave.commons.model.events.completionevents.TerminationState;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -28,7 +32,7 @@ import cc.kave.commons.model.ssts.impl.SSTUtil;
 import cc.recommenders.usages.DefinitionSites;
 import cc.recommenders.usages.Query;
 
-public class QueryExtractionTest extends PBNAnalysisBaseTest {
+public class PBNQueryExtractorTest extends PBNAnalysisBaseTest {
 
 	@Test
 	public void extractionOfQuery() {
@@ -37,6 +41,10 @@ public class QueryExtractionTest extends PBNAnalysisBaseTest {
 		PbnPaperExample pbnPaperExample = new PbnPaperExample();
 		pbnPaperExample.LoadPaperExample();
 		completionEvent.context = pbnPaperExample.contexts.get(0);
+		completionEvent.terminatedState = TerminationState.Applied;
+		Proposal proposal = new Proposal();
+		proposal.Name = method(voidType, DefaultClassContext, "someMethod");
+		completionEvent.selections.add(new ProposalSelection(proposal));
 		
 		IMethodDeclaration methodDecl = completionEvent.context.getSST().getMethods().stream().findFirst().get();
 		methodDecl.getBody().add(SSTUtil.expr(SSTUtil.completionExpr("c")));
@@ -52,6 +60,10 @@ public class QueryExtractionTest extends PBNAnalysisBaseTest {
 		cS.setType(convert(cType));
 		cS.setDefinition(DefinitionSites.createDefinitionByReturn(convert(method(cType, sType, "fromS"))));
 		
+		PBNQueryExtractor pbnQueryExtractor = new PBNQueryExtractor();
+		Query actual = pbnQueryExtractor.extractQueryFromCompletion(completionEvent);
+
+		Assert.assertEquals(cS, actual);
 	}
 
 }

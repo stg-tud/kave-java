@@ -30,7 +30,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import exec.recommender_reimplementation.ContextReader;
+import exec.recommender_reimplementation.util.ContextReader;
 
 public class IndexBuilder {
 	

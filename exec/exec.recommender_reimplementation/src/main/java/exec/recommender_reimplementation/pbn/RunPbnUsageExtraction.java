@@ -29,10 +29,9 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.usages.Usage;
+import exec.recommender_reimplementation.util.ContextReader;
 
 import com.google.common.collect.Lists;
-
-import exec.recommender_reimplementation.ContextReader;
 
 
 public class RunPbnUsageExtraction {
