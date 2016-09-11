@@ -47,7 +47,7 @@ public class RandomHoleInsertionVisitor extends IdentityVisitor<Void> {
 
 	@Override
 	public ISSTNode visit(IMethodDeclaration stmt, Void context) {
-		if (stmt.getName().isConstructor()) {
+		if (stmt.getName().isConstructor() || stmt.getName().isInit()) {
 			return stmt;
 		}
 		return super.visit(stmt, context);
