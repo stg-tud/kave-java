@@ -28,7 +28,10 @@ import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.calls.QueryOptions.QueryType;
 import cc.recommenders.mining.calls.clustering.FeatureWeighter;
 import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
+import cc.recommenders.mining.features.FeatureExtractor;
+import cc.recommenders.mining.features.UsageFeatureExtractor;
 import cc.recommenders.mining.features.UsageFeatureWeighter;
+import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
 
 public class PBNMinerModule extends AbstractModule {
@@ -40,12 +43,12 @@ public class PBNMinerModule extends AbstractModule {
 
 	private void configueOptions() {
 		QueryOptions qOpts = new QueryOptions();
-		qOpts.queryType = QueryType.NM;
+		qOpts.queryType = QueryType.ZERO;
 		qOpts.minProbability = 0.3;
 		qOpts.useClassContext = false;
 		qOpts.useMethodContext = true;
 		qOpts.useDefinition = true;
-		qOpts.useParameterSites = true;
+		qOpts.useParameterSites = false;
 		qOpts.isIgnoringAfterFullRecall = false;
 		bind(QueryOptions.class).toInstance(qOpts);
 
@@ -55,13 +58,18 @@ public class PBNMinerModule extends AbstractModule {
 		mOpts.setT1(0.151);
 		mOpts.setT2(0.15);
 
-		mOpts.setFeatureDropping(true);
+		mOpts.setFeatureDropping(false);
 		bind(MiningOptions.class).toInstance(mOpts);
 	}
 
 	@Provides
 	public FeatureWeighter<UsageFeature> provideFeatureWeighter(MiningOptions options) {
 		return new UsageFeatureWeighter(options);
+	}
+
+	@Provides
+	public FeatureExtractor<Usage, UsageFeature> provideFeatureExtractor(MiningOptions options) {
+		return new UsageFeatureExtractor(options);
 	}
 
 	@Provides

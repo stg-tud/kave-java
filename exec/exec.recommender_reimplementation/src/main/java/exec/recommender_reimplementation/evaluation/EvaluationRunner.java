@@ -20,13 +20,11 @@ import java.io.IOException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.kave.commons.pointsto.evaluation.DefaultModule;
-
 public class EvaluationRunner {
 
 	public static void main(String[] args) {
 		Injector injector;
-		injector = Guice.createInjector(new DefaultModule());
+		injector = Guice.createInjector(new PBNMinerModule());
 		EvaluationWithRaychev evaluation = injector.getInstance(EvaluationWithRaychev.class);
 		evaluation.runAnalysis();
 		try {

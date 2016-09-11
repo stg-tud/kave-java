@@ -63,7 +63,7 @@ import exec.recommender_reimplementation.util.QueryUtil;
 
 public class EvaluationWithRaychev {
 
-	private static final int HEINEMANN_LOOKBACK = 4;
+	private static final int HEINEMANN_LOOKBACK = 5;
 
 	private static final double HEINEMANN_MINIMUM_PROBABILITY = 0.8;
 
@@ -73,7 +73,7 @@ public class EvaluationWithRaychev {
 	public static String QUERY_PATH = "C:\\SSTDatasets\\WorkingQueries\\SuperPutty\\";
 
 	// Linux Path: public static String ANALYSIS_PATH = "/media/sf_C_DRIVE/SSTDataSets/SmallTestset";
-	public static String ANALYSIS_PATH = "C:\\SSTDatasets\\UsedForQueries\\";
+	public static String ANALYSIS_PATH = "C:\\SSTDatasets\\NewTestset\\dotnet\\";
 
 	// Linux Path: public static String RESULT_PATH = "/home/markus/Documents/EvaluationResults/";
 	public static String RESULT_PATH = "C:\\SSTDatasets\\";
@@ -207,7 +207,7 @@ public class EvaluationWithRaychev {
 
 	private double calculateRaychevRank(RaychevRecommender raychevRecommender, QueryContext queryContext, IMethodName expectedMethodName)
 			throws IOException, InterruptedException {
-		raychevRecommender.executeRecommender(queryContext.getQueryName(), false);
+		raychevRecommender.executeRecommender(queryContext.getQueryName(), "dotnet", false);
 		int rank = raychevRecommender.parseOutputAndReturnRank(RaychevEvaluation.getRaychevMethodName(expectedMethodName));
 		return rank == 0 ? 0.0 : 1 / (double) rank;
 	}
