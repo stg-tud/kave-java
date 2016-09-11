@@ -71,6 +71,7 @@ public class JavaTypeTransformerTest extends JavaTransformationBaseTest {
 		assertTransformation(methodDecl, expected);
 	}
 
+	
 	@Test
 	public void transformsArrayTypesInInvocation() {
 		IMethodName methodName = method(type("Object[]"), type("Object[]"), "m1", parameter(type("Object[]"), "p1"),
@@ -122,6 +123,16 @@ public class JavaTypeTransformerTest extends JavaTransformationBaseTest {
 				parameter(Names.newType("T"), "p2"));
 		IMethodName expectedName = method(Names.newType("p:object"), Names.newType("p:object"), "m1", parameter(Names.newType("p:object"), "p1"),
 				parameter(Names.newType("p:object"), "p2"));
+		IMethodDeclaration methodDecl = methodDecl(methodName);
+		IMethodDeclaration expected = methodDecl(expectedName);
+		assertTransformation(methodDecl, expected);
+	}
+
+	@Test
+	public void transformsTypeParameterInMethodParametersTypeHasSimiliarName() {
+		IMethodName methodName = method(type("T1"), type("T1"), "m1", parameter(Names.newType("pKey"), "pKey1"),
+				parameter(type("T1"), "p2"));
+		IMethodName expectedName = method(type("T1"), type("T1"), "m1", parameter(Names.newType("p:object"), "pKey1"), parameter(type("T1"), "p2"));
 		IMethodDeclaration methodDecl = methodDecl(methodName);
 		IMethodDeclaration expected = methodDecl(expectedName);
 		assertTransformation(methodDecl, expected);

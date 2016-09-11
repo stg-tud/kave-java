@@ -15,8 +15,10 @@
  */
 package exec.recommender_reimplementation.java_transformation;
 
+import static cc.kave.commons.utils.StringUtils.f;
 import static exec.recommender_reimplementation.java_printer.JavaNameUtils.createFieldName;
 import static exec.recommender_reimplementation.java_printer.JavaNameUtils.createMethodName;
+import static exec.recommender_reimplementation.java_printer.PhantomClassGeneratorUtil.transformNestedType;
 
 import java.text.MessageFormat;
 
@@ -113,6 +115,9 @@ public class JavaTypeTransformer extends IdentityVisitor<Void> {
 		if (type.isTypeParameter()) {
 			return Names.newType("p:object");
 		}
+		if (type.isNestedType()) {
+			return transformNestedType(type);
+		}
 		return type;
 	}
 
@@ -125,7 +130,7 @@ public class JavaTypeTransformer extends IdentityVisitor<Void> {
 		IParameterName[] newParameterArray = new IParameterName[methodName.getParameters().size()];
 		for (int i = 0; i < methodName.getParameters().size(); i++) {
 			IParameterName parameterName = methodName.getParameters().get(i);
-			newParameterArray[i] = changeArrayTypeInParameterName(parameterName);
+			newParameterArray[i] = changeTypeInParameterName(parameterName);
 
 		}
 		return createMethodName(transformType(methodName.getReturnType()),
@@ -133,14 +138,14 @@ public class JavaTypeTransformer extends IdentityVisitor<Void> {
 				methodName.getName(), methodName.isStatic(), newParameterArray);
 	}
 
-	private IParameterName changeArrayTypeInParameterName(IParameterName parameterName) {
+	private IParameterName changeTypeInParameterName(IParameterName parameterName) {
 		if (parameterName.isParameterArray()) {
 			return parameterName;
 		}
 		if (parameterName.getValueType().isArray() || parameterName.getValueType().isTypeParameter()) {
 			String identifier = parameterName.getIdentifier();
-			String newIdentifier = identifier.replace(parameterName.getValueType().getIdentifier(),
-					transformType(parameterName.getValueType()).getIdentifier());
+			String newIdentifier = identifier.replace(f("[%s]", parameterName.getValueType().getIdentifier()),
+					f("[%s]", transformType(parameterName.getValueType()).getIdentifier()));
 			return Names.newParameter(newIdentifier);
 		}
 		return parameterName;

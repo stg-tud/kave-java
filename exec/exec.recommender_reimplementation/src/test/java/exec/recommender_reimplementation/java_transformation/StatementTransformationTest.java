@@ -31,9 +31,9 @@ public class StatementTransformationTest extends JavaTransformationBaseTest {
 
 	@Test
 	public void testEmptyReturnStatementInMethodDeclaration() {
-		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Int32"), type("Class1, P1"), "m1"), true,
+		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Int32"), type("Class1"), "m1"), true,
 				new ReturnStatement());
-		assertNode(methodDecl, methodDecl(method(type("s:System.Int32"), type("Class1, P1"), "m1"),
+		assertNode(methodDecl, methodDecl(method(type("s:System.Int32"), type("Class1"), "m1"),
 				returnStatement(constant("null"))));
 	}
 
@@ -41,8 +41,8 @@ public class StatementTransformationTest extends JavaTransformationBaseTest {
 	public void testReturnStatementWithUnknownReferenceInMethodDeclaration() {
 		ReturnStatement returnStatement = new ReturnStatement();
 		returnStatement.setExpression(refExpr(new UnknownReference()));
-		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Int32"), type("Class1, P1"), "m1"), true, returnStatement);
-		assertNode(methodDecl, methodDecl(method(type("s:System.Int32"), type("Class1, P1"), "m1"), returnStatement(constant("null"))));
+		IMethodDeclaration methodDecl = declareMethod(method(type("s:System.Int32"), type("Class1"), "m1"), true, returnStatement);
+		assertNode(methodDecl, methodDecl(method(type("s:System.Int32"), type("Class1"), "m1"), returnStatement(constant("null"))));
 	}
 
 	@Test
