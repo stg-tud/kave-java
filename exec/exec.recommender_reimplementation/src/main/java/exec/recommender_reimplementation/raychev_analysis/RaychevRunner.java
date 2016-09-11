@@ -15,6 +15,7 @@
  */
 package exec.recommender_reimplementation.raychev_analysis;
 
+import static cc.kave.commons.utils.json.JsonUtils.toJson;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 
 import java.io.BufferedWriter;
@@ -44,9 +45,9 @@ import exec.recommender_reimplementation.raychev_analysis.QueryGenerator.QuerySt
 import exec.recommender_reimplementation.util.ContextReader;
 
 public class RaychevRunner {
-	public static final Path FOLDERPATH = Paths.get("C:\\SSTDatasets\\NewTestset");
+	public static final Path FOLDERPATH = Paths.get("C:\\SSTDatasets\\NewTestset\\dotnet");
 	public static Path QUERY_FOLDER_PATH;
-	public static final Path WIN_QUERY_FOLDER_PATH = Paths.get("C:\\SSTDatasets\\NewQuerySet");
+	public static final Path WIN_QUERY_FOLDER_PATH = Paths.get("C:\\SSTDatasets\\Events\\");
 	public static final Path LIN_QUERY_FOLDER_PATH = Paths.get("//media//sf_C_DRIVE//SSTDataSets//NewQuerySet");
 
 	@SuppressWarnings("unchecked")
@@ -108,31 +109,42 @@ public class RaychevRunner {
 		List<Context> contextList = readContexts(QUERY_FOLDER_PATH);
 		int counter = 0;
 		for (Context context : contextList) {
-			try {
-				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + context.getSST().getEnclosingType().getName());
-				if (new File(path.toString()).exists()) {
-					continue;
-				}
-				QueryGenerator queryGenerator = new QueryGenerator(path);
-				boolean successful = queryGenerator.generateQuery(context, queryStrategy);
-				if (successful) {
-					writeClassPaths(Sets.newHashSet(context), path);
-					writeCompletionEvent(context, queryGenerator.getLatestQuery());
-				}
-				else {
-					System.out.println("Unsuccessful Query: " + context.getSST().getEnclosingType().getName());
-					counter++;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			counter = buildQueryFromContext(queryStrategy, counter, context);
 		}
 		System.out.println("Number of unsuccessful queries: " + counter);
 		System.out.println("Number of contexts: " + contextList.size());
 	}
 
+	private static int buildQueryFromContext(QueryStrategy queryStrategy, int counter, Context context) {
+		try {
+			Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + context.getSST().getEnclosingType().getName());
+			if (new File(path.toString()).exists()) {
+				return counter;
+			}
+			QueryGenerator queryGenerator = new QueryGenerator(path);
+			boolean successful = queryGenerator.generateQuery(context, queryStrategy);
+			if (successful) {
+				writeClassPaths(Sets.newHashSet(context), path);
+				writeCompletionEvent(context, queryGenerator.getLatestQuery());
+			}
+			else {
+				System.out.println("Unsuccessful Query: " + context.getSST().getEnclosingType().getName());
+				counter++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return counter;
+	}
+
 	private static void writeCompletionEvent(Context context, String completionEventAsString) throws IOException {
 		String queryFileName = "Query_" + context.getSST().getEnclosingType().getName();
+		writeStringToFile(new File(QUERY_FOLDER_PATH + File.separator + queryFileName + File.separator + queryFileName + ".json"),
+				completionEventAsString);
+	}
+
+	private static void writeCompletionEvent(Context context, String completionEventAsString, int counter) throws IOException {
+		String queryFileName = "Query_" + context.getSST().getEnclosingType().getName() + counter;
 		writeStringToFile(new File(QUERY_FOLDER_PATH + File.separator + queryFileName + File.separator + queryFileName + ".json"),
 				completionEventAsString);
 	}
@@ -154,19 +166,31 @@ public class RaychevRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		int unsuccesfulCounter = 0;
+		int successfulCounter = 0;
 		for (CompletionEvent completionEvent: completionEventList) {
 			try {
-				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + completionEvent.context.getSST().getEnclosingType().getName());
+				Context context = completionEvent.context;
+				Path path = Paths.get(QUERY_FOLDER_PATH.toString(), "Query_" + context.getSST().getEnclosingType().getName() + successfulCounter);
+				if (new File(path.toString()).exists()) {
+					continue;
+				}
 				QueryGenerator queryGenerator = new QueryGenerator(path);
 				boolean successful = queryGenerator.generateQuery(completionEvent);
 				if (successful) {
-					writeClassPaths(Sets.newHashSet(completionEvent.getContext()), QUERY_FOLDER_PATH);
+					writeClassPaths(Sets.newHashSet(context), path);
+					writeCompletionEvent(context, toJson(completionEvent), successfulCounter);
+					successfulCounter++;
+				} else {
+					System.out.println("Unsuccessful Query: " + context.getSST().getEnclosingType().getName());
+					unsuccesfulCounter++;
 				}
 			} catch (Exception e) {
-				continue;
+				e.printStackTrace();
 			}
 		}
+		System.out.println("Number of unsuccessful queries: " + unsuccesfulCounter);
+		System.out.println("Number of contexts: " + completionEventList.size());
 	}
 
 	private static void writeClassPaths(Set<Context> contexts, Path path) {
@@ -195,8 +219,8 @@ public class RaychevRunner {
 		// sentenceBuilder();
 		// printContexts();
 		// queryBuilderFromCompletionExpressions();
-		// queryBuilderFromCompletionEvents();
-		queryBuilderWithRandomHoles();
+		queryBuilderFromCompletionEvents();
+		// queryBuilderWithRandomHoles();
 	}
 
 }

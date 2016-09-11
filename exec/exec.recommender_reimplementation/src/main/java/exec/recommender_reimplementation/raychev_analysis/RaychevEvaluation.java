@@ -32,6 +32,8 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class RaychevEvaluation {
+	public static final String ANALYSIS_SET = "dotnet";
+
 	public static String DEFAULT_PATH = "/home/markus/Documents/SLANG";
 
 	public static String QUERY_PATH = "/home/markus/Documents/SLANG/tests/src/com/example/fill";
@@ -47,7 +49,7 @@ public class RaychevEvaluation {
 		int invocationCount = 0;
 		for (String queryName : queryNames) {
 			try {
-				raychevRecommender.executeRecommender(queryName, false);
+				raychevRecommender.executeRecommender(queryName, ANALYSIS_SET, false);
 				IMethodName methodName = getExpectedMethod(queryName);
 				int rank = raychevRecommender.parseOutputAndReturnRank(getRaychevMethodName(methodName));
 				System.out.println(queryName + " " + rank);

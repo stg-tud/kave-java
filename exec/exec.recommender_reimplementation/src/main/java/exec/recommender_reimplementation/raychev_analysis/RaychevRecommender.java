@@ -42,8 +42,8 @@ public class RaychevRecommender {
 		}
 	}
 
-	public void executeRecommender(String queryName, boolean verbose) throws IOException, InterruptedException {
-		ProcessBuilder pb = new ProcessBuilder("sudo", "-S", MessageFormat.format("{0}/fill_ngram.sh", path), "all", queryName);
+	public void executeRecommender(String queryName, String analysisSet, boolean verbose) throws IOException, InterruptedException {
+		ProcessBuilder pb = new ProcessBuilder("sudo", "-S", MessageFormat.format("{0}/fill_ngram.sh", path), analysisSet, queryName);
 		pb.directory(new File(path));
 		if(verbose) {
 			pb.redirectOutput(Redirect.INHERIT);

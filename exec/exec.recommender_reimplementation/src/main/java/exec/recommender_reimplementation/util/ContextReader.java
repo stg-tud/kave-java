@@ -22,8 +22,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.model.events.IDEEvent;
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.recommenders.io.ReadingArchive;
@@ -43,12 +45,13 @@ public class ContextReader {
 	}
 	
 	public static List<CompletionEvent> GetCompletionEvents(Path folderPath) throws IOException {
-		List<CompletionEvent> contextList = Lists.newLinkedList();
+		List<IDEEvent> events = Lists.newArrayList();
 		List<Path> pathList = GetAllZipFiles(folderPath);
 		pathList.addAll(GetAllJsonFiles(folderPath));
 		for (Path path : pathList) {
-			contextList.addAll(readType(path, CompletionEvent.class));
+			events.addAll(readType(path, IDEEvent.class));
 		}
+		List<CompletionEvent> contextList = Lists.newLinkedList(Iterables.filter(events, CompletionEvent.class));
 		return contextList;
 	}
 
