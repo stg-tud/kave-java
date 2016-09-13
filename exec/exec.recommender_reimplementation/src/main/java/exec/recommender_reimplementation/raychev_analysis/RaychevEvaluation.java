@@ -32,7 +32,7 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class RaychevEvaluation {
-	public static final String ANALYSIS_SET = "dotnet";
+	public static final String ANALYSIS_SET = "all";
 
 	public static String DEFAULT_PATH = "/home/markus/Documents/SLANG";
 

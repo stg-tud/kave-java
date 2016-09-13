@@ -15,26 +15,16 @@
  */
 package exec.recommender_reimplementation.evaluation;
 
-import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import java.util.Set;
 
-public class QueryContext {
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.names.ICoReMethodName;
 
-	public String queryName;
+public interface MeasureCalculator {
 
-	public CompletionEvent completionEvent;
+	public void addValue(ICoReMethodName expectedMethod, Set<Tuple<ICoReMethodName, Double>> proposals);
 
+	public double getMean();
 
-	public QueryContext(String queryName, CompletionEvent completionEvent) {
-		this.queryName = queryName;
-		this.completionEvent = completionEvent;
-	}
-
-	public String getQueryName() {
-		return queryName;
-	}
-
-	public CompletionEvent getCompletionEvent() {
-		return completionEvent;
-	}
-
+	public String getName();
 }

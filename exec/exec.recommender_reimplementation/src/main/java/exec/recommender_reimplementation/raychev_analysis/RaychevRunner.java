@@ -144,8 +144,8 @@ public class RaychevRunner {
 	}
 
 	private static void writeCompletionEvent(Context context, String completionEventAsString, int counter) throws IOException {
-		String queryFileName = "Query_" + context.getSST().getEnclosingType().getName() + counter;
-		writeStringToFile(new File(QUERY_FOLDER_PATH + File.separator + queryFileName + File.separator + queryFileName + ".json"),
+		String queryFileName = "Query_" + context.getSST().getEnclosingType().getName();
+		writeStringToFile(new File(QUERY_FOLDER_PATH + File.separator + queryFileName + counter + File.separator + queryFileName + ".json"),
 				completionEventAsString);
 	}
 
@@ -176,10 +176,11 @@ public class RaychevRunner {
 					continue;
 				}
 				QueryGenerator queryGenerator = new QueryGenerator(path);
+				String completionEventAsJson = toJson(completionEvent);
 				boolean successful = queryGenerator.generateQuery(completionEvent);
 				if (successful) {
 					writeClassPaths(Sets.newHashSet(context), path);
-					writeCompletionEvent(context, toJson(completionEvent), successfulCounter);
+					writeCompletionEvent(context, completionEventAsJson, successfulCounter);
 					successfulCounter++;
 				} else {
 					System.out.println("Unsuccessful Query: " + context.getSST().getEnclosingType().getName());

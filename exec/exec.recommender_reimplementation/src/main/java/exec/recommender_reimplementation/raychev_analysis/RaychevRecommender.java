@@ -21,10 +21,12 @@ import java.io.OutputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.StringUtils;
 
@@ -42,6 +44,10 @@ public class RaychevRecommender {
 		}
 	}
 
+	public RaychevRecommender() {
+		path = DEFAULT_PATH;
+	}
+	
 	public void executeRecommender(String queryName, String analysisSet, boolean verbose) throws IOException, InterruptedException {
 		ProcessBuilder pb = new ProcessBuilder("sudo", "-S", MessageFormat.format("{0}/fill_ngram.sh", path), analysisSet, queryName);
 		pb.directory(new File(path));
@@ -79,6 +85,26 @@ public class RaychevRecommender {
 			}
 		}
 		return 0;
+	}
+
+	public List<String> getProposals() throws IOException {
+		List<String> proposals = Lists.newLinkedList();
+		
+		File file = Paths.get(path, "tst1.eval").toFile();
+		String outputString = FileUtils.readFileToString(file);
+		if (Strings.isNullOrEmpty(outputString)) {
+			return proposals;
+		}
+		String[] solutionArray = outputString.trim().split("> Solution [0-9]* : ");
+		for (int i = 0; i < solutionArray.length; i++) {
+			String solution = solutionArray[i];
+			if (solution.isEmpty()) {
+				continue;
+			}
+			String methodName = getMethodName(solution);
+			proposals.add(methodName);
+		}
+		return proposals;
 	}
 
 	public String getMethodName(String solution) {

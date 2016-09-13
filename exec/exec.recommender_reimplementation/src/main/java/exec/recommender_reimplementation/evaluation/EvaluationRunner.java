@@ -17,15 +17,10 @@ package exec.recommender_reimplementation.evaluation;
 
 import java.io.IOException;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 public class EvaluationRunner {
 
 	public static void main(String[] args) {
-		Injector injector;
-		injector = Guice.createInjector(new PBNMinerModule());
-		EvaluationWithRaychev evaluation = injector.getInstance(EvaluationWithRaychev.class);
+		EvaluationExecutor evaluation = new EvaluationExecutor();
 		evaluation.runAnalysis();
 		try {
 			evaluation.runEvaluation();
