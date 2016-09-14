@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -84,7 +83,7 @@ public class EvaluationExecutor {
 		}
 
 		for (EvaluationRecommender evalRecommender : recommender) {
-			evalRecommender.initalizeMeasures(Sets.newHashSet(new F1Calculator(), new MRRCalculator()));
+			evalRecommender.initalizeMeasures(Lists.newArrayList(new F1Calculator(), new MRRCalculator()));
 		}
 	}
 
@@ -125,7 +124,6 @@ public class EvaluationExecutor {
 			transformContext(context);
 			IMethodName expectedMethodName = QueryUtil.getExpectedMethodName(queryContext.getCompletionEvent());
 			ICoReMethodName expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
-
 			for (EvaluationRecommender evalRecommender : recommender) {
 				Set<Tuple<ICoReMethodName, Double>> proposals = evalRecommender.handleQuery(queryContext);
 				evalRecommender.calculateMeasures(proposals, expectedCoReMethodName);

@@ -15,19 +15,28 @@
  */
 package exec.recommender_reimplementation.evaluation;
 
+import static exec.recommender_reimplementation.raychev_analysis.RaychevEvaluation.getRaychevMethodName;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
 import exec.recommender_reimplementation.raychev_analysis.RaychevRecommender;
+import exec.recommender_reimplementation.util.QueryUtil;
 
 public class RaychevEvaluationRecommender extends EvaluationRecommender {
 
 	private RaychevRecommender raychevRecommender;
 
 	private static final String RAYCHEV_ANALYSIS_SET = "superputty";
+
+	private List<String> proposalsOfLastQuery;
+
+	private IMethodName expectedMethodOfLastQuery;
 
 	@Override
 	public String getName() {
@@ -46,8 +55,21 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 
 	@Override
 	public Set<Tuple<ICoReMethodName, Double>> handleQuery(QueryContext query) {
-		// TODO Auto-generated method stub
+		try {
+			raychevRecommender.executeRecommender(query.getQueryName(), RAYCHEV_ANALYSIS_SET, false);
+			proposalsOfLastQuery = raychevRecommender.getProposals();
+			expectedMethodOfLastQuery = QueryUtil.getExpectedMethodName(query.getCompletionEvent());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 		return null;
+	}
+
+	@Override
+	public void calculateMeasures(Set<Tuple<ICoReMethodName, Double>> proposals, ICoReMethodName expectedMethod) {
+		for (MeasureCalculator measure : measures) {
+			measure.addValue(getRaychevMethodName(expectedMethodOfLastQuery), proposalsOfLastQuery);
+		}
 	}
 
 	@Override

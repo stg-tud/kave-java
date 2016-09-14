@@ -15,6 +15,7 @@
  */
 package exec.recommender_reimplementation.evaluation;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,20 @@ public class F1Calculator implements MeasureCalculator {
 	@Override
 	public String getName() {
 		return "F1";
+	}
+
+	@Override
+	public void addValue(String expectedRaychevMethod, List<String> proposals) {
+		queryCount++;
+		int numberOfProposals = proposals.size();
+		int numberOfHits = 0;
+		if (proposals.contains(expectedRaychevMethod)) {
+			numberOfHits = 1;
+		}
+		double precision = numberOfHits != 0 ? numberOfHits / (double) numberOfProposals : 0.0;
+		double recall = numberOfHits / 1.0;
+		double f1 = precision != 0.0 || recall != 0.0 ? 2 * (precision * recall / (precision + recall)) : 0.0;
+		f1Value += f1;
 	}
 
 }

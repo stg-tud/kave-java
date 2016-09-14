@@ -15,6 +15,7 @@
  */
 package exec.recommender_reimplementation.evaluation;
 
+import java.util.List;
 import java.util.Set;
 
 import cc.recommenders.datastructures.Tuple;
@@ -23,6 +24,8 @@ import cc.recommenders.names.ICoReMethodName;
 public interface MeasureCalculator {
 
 	public void addValue(ICoReMethodName expectedMethod, Set<Tuple<ICoReMethodName, Double>> proposals);
+
+	public void addValue(String expectedRaychevMethod, List<String> proposals);
 
 	public double getMean();
 

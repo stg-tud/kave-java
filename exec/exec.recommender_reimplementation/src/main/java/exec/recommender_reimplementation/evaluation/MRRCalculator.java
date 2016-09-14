@@ -16,6 +16,7 @@
 package exec.recommender_reimplementation.evaluation;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import cc.recommenders.datastructures.Tuple;
@@ -40,6 +41,7 @@ public class MRRCalculator implements MeasureCalculator {
 			Tuple<ICoReMethodName, Double> proposal = iterator.next();
 			if (expectedMethod.equals(proposal.getFirst())) {
 				reciprocalRank += 1 / (double) i;
+				return;
 			}
 			i++;
 		}
@@ -54,6 +56,18 @@ public class MRRCalculator implements MeasureCalculator {
 	@Override
 	public String getName() {
 		return "MRR";
+	}
+
+	@Override
+	public void addValue(String expectedRaychevMethod, List<String> proposals) {
+		queryCount++;
+		for (int i = 0; i < proposals.size(); i++) {
+			String proposal = proposals.get(i);
+			if(expectedRaychevMethod.equals(proposal)) {
+				reciprocalRank += 1 / (double) (i + 1);
+			}
+		}
+		reciprocalRank += 0;
 	}
 
 }

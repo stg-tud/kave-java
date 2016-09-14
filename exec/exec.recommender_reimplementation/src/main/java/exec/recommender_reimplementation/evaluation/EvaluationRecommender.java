@@ -26,7 +26,7 @@ import exec.recommender_reimplementation.java_transformation.JavaTransformationV
 
 public abstract class EvaluationRecommender {
 
-	private Set<MeasureCalculator> measures;
+	protected List<MeasureCalculator> measures;
 
 	public abstract String getName();
 
@@ -34,7 +34,7 @@ public abstract class EvaluationRecommender {
 
 	public abstract void initalizeRecommender();
 	
-	public void initalizeMeasures(Set<MeasureCalculator> measures) {
+	public void initalizeMeasures(List<MeasureCalculator> measures) {
 		this.measures = measures;
 	}
 
