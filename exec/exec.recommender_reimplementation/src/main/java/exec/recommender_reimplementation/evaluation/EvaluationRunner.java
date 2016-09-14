@@ -20,7 +20,7 @@ import java.io.IOException;
 public class EvaluationRunner {
 
 	public static void main(String[] args) {
-		EvaluationExecutor evaluation = new EvaluationExecutor();
+		AutomaticEvaluation evaluation = new AutomaticEvaluation();
 		evaluation.runAnalysis();
 		try {
 			evaluation.runEvaluation();

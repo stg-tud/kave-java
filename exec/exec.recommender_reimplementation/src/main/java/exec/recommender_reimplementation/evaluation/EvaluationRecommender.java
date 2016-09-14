@@ -28,6 +28,8 @@ public abstract class EvaluationRecommender {
 
 	protected List<MeasureCalculator> measures;
 
+	protected boolean loggingActive;
+
 	public abstract String getName();
 
 	public abstract void analysis(List<Context> contextList);
@@ -62,4 +64,11 @@ public abstract class EvaluationRecommender {
 		JavaTransformationVisitor transformationVisitor = new JavaTransformationVisitor(context.getSST());
 		context.setSST(transformationVisitor.transform(context.getSST(), ISST.class));
 	}
+
+	public void setLogging(boolean value) {
+		loggingActive = value;
+	}
+
+	public abstract String returnLog();
+
 }

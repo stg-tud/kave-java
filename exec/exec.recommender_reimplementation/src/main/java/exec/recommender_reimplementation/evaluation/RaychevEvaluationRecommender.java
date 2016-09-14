@@ -38,6 +38,8 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 
 	private IMethodName expectedMethodOfLastQuery;
 
+	private StringBuilder log;
+
 	@Override
 	public String getName() {
 		return "Raychev";
@@ -59,10 +61,25 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 			raychevRecommender.executeRecommender(query.getQueryName(), RAYCHEV_ANALYSIS_SET, false);
 			proposalsOfLastQuery = raychevRecommender.getProposals();
 			expectedMethodOfLastQuery = QueryUtil.getExpectedMethodName(query.getCompletionEvent());
+			
+			if(loggingActive) {
+				addLogString(query, getRaychevMethodName(expectedMethodOfLastQuery), proposalsOfLastQuery);
+			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void addLogString(QueryContext query, String expectedMethod, List<String> proposals) {
+		log.append(query.getQueryName()).append(System.lineSeparator()).append("Expected Method: ").append(System.lineSeparator())
+				.append(expectedMethod).append(System.lineSeparator()).append("Proposals: ")
+				.append(System.lineSeparator());
+
+		for (String proposal : proposals) {
+			log.append(proposal).append(System.lineSeparator());
+		}
+		log.append(System.lineSeparator());
 	}
 
 	@Override
@@ -75,5 +92,18 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 	@Override
 	public boolean supportsAnalysis() {
 		return false;
+	}
+
+	@Override
+	public void setLogging(boolean value) {
+		super.setLogging(value);
+		if (loggingActive) {
+			log = new StringBuilder();
+		}
+	}
+
+	@Override
+	public String returnLog() {
+		return log.toString();
 	}
 }

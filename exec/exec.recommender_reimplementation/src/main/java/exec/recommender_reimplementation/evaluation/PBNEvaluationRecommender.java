@@ -38,12 +38,12 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 	private ICallsRecommender<Query> pbnRecommender;
 	private PBNMiner pbnMiner;
 	private PBNQueryExtractor pbnQueryExtraction;
+	private StringBuilder log;
 
 	@Inject
 	public PBNEvaluationRecommender(PBNMiner pbnMiner) {
 		this.pbnMiner = pbnMiner;
 		pbnUsageList = Lists.newArrayList();
-
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 		UsageExtractor usageExtractor = new UsageExtractor();
 		for (Context context : contextList) {
 			Integer statementCount = context.getSST().accept(new StatementCounterVisitor(), null);
-			if (statementCount > EvaluationExecutor.STATEMENT_LIMIT) {
+			if (statementCount > AutomaticEvaluation.STATEMENT_LIMIT) {
 				continue;
 			}
 			try {
@@ -78,12 +78,39 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 	public Set<Tuple<ICoReMethodName, Double>> handleQuery(QueryContext query) {
 		Query pbnQuery = pbnQueryExtraction.extractQueryFromCompletion(query.getCompletionEvent());
 		Set<Tuple<ICoReMethodName, Double>> proposals = pbnRecommender.query(pbnQuery);
+		if (loggingActive) {
+			addLogString(pbnQuery, query, proposals);
+		}
 		return proposals;
+	}
+
+	private void addLogString(Query pbnQuery, QueryContext query, Set<Tuple<ICoReMethodName, Double>> proposals) {
+		log.append(query.getQueryName()).append(System.lineSeparator()).append(pbnQuery.toString()).append(System.lineSeparator())
+				.append("Expected Method: ").append(System.lineSeparator())
+				.append(query.getExpectedMethod().toString()).append(System.lineSeparator()).append("Proposals: ").append(System.lineSeparator());
+
+		for (Tuple<ICoReMethodName, Double> tuple : proposals) {
+			log.append(tuple.getFirst()).append(" 	").append(tuple.getSecond()).append(System.lineSeparator());
+		}
+		log.append(System.lineSeparator());
 	}
 
 	@Override
 	public boolean supportsAnalysis() {
 		return true;
+	}
+
+	@Override
+	public void setLogging(boolean value) {
+		super.setLogging(value);
+		if (loggingActive) {
+			log = new StringBuilder();
+		}
+	}
+
+	@Override
+	public String returnLog() {
+		return log.toString();
 	}
 
 }

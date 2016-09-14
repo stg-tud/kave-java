@@ -18,6 +18,7 @@ package exec.recommender_reimplementation.heinemann_analysis;
 import java.util.Set;
 
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.ToStringUtils;
 
 
 public class HeinemannQuery {
@@ -55,5 +56,10 @@ public class HeinemannQuery {
 
 	public void setDeclaringType(ITypeName declaringType) {
 		this.declaringType = declaringType;
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringUtils.toString(this);
 	}
 }

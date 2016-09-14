@@ -42,8 +42,13 @@ public class HeinemannEvaluationRecommender extends EvaluationRecommender {
 
 	private HeinemannRecommender heinemannRecommender;
 
+	private StringBuilder log;
+
 	public HeinemannEvaluationRecommender() {
 		heinemannModel = new HashMap<>();
+		if (loggingActive) {
+			log = new StringBuilder();
+		}
 	}
 
 	@Override
@@ -78,12 +83,39 @@ public class HeinemannEvaluationRecommender extends EvaluationRecommender {
 		HeinemannQuery heinemannQuery = heinemannQueryExtractor.extractQueryFromCompletion(query.getCompletionEvent(), HEINEMANN_LOOKBACK,
 				false, false);
 		Set<Tuple<ICoReMethodName, Double>> proposals = heinemannRecommender.query(heinemannQuery);
+		if (loggingActive) {
+			addLogString(heinemannQuery, query, proposals);
+		}
 		return proposals;
+	}
+
+	private void addLogString(HeinemannQuery heinemannQuery, QueryContext query, Set<Tuple<ICoReMethodName, Double>> proposals) {
+		log.append(query.getQueryName()).append(System.lineSeparator()).append(heinemannQuery.toString()).append(System.lineSeparator())
+				.append("Expected Method: ").append(System.lineSeparator())
+				.append(query.getExpectedMethod().toString()).append(System.lineSeparator()).append("Proposals: ").append(System.lineSeparator());
+		
+		for (Tuple<ICoReMethodName, Double> tuple : proposals) {
+			log.append(tuple.getFirst()).append(" 	").append(tuple.getSecond()).append(System.lineSeparator());
+		}
+		log.append(System.lineSeparator());
 	}
 
 	@Override
 	public boolean supportsAnalysis() {
 		return true;
+	}
+
+	@Override
+	public void setLogging(boolean value) {
+		super.setLogging(value);
+		if (loggingActive) {
+			log = new StringBuilder();
+		}
+	}
+
+	@Override
+	public String returnLog() {
+		return log.toString();
 	}
 
 }

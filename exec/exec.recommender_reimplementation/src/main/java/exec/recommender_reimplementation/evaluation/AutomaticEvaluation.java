@@ -43,9 +43,10 @@ import exec.recommender_reimplementation.java_transformation.JavaTransformationV
 import exec.recommender_reimplementation.util.ContextReader;
 import exec.recommender_reimplementation.util.QueryUtil;
 
-public class EvaluationExecutor {
+public class AutomaticEvaluation {
 
 	public static final int STATEMENT_LIMIT = 800;
+	public static final boolean LOGGING = true;
 
 	public static String LIN_QUERY_PATH = "/home/markus/Documents/SLANG/tests/src/com/example/fill";
 	public static String WIN_QUERY_PATH = "C:\\SSTDatasets\\WorkingQueries\\SuperPutty\\";
@@ -56,14 +57,14 @@ public class EvaluationExecutor {
 	public String analysisPath;
 
 	public static String LIN_RESULT_PATH = "/home/markus/Documents/EvaluationResults/";
-	public static String WIN_RESULT_PATH = "C:\\SSTDatasets\\";
+	public static String WIN_RESULT_PATH = "C:\\SSTDatasets\\EvaluationResults\\";
 	public String resultPath;
 
 	private List<QueryContext> queryList;
 
 	private List<EvaluationRecommender> recommender;
 
-	public EvaluationExecutor() {
+	public AutomaticEvaluation() {
 		Injector injector = Guice.createInjector(new PBNMinerModule());
 		
 		if (isWindows()) {
@@ -84,6 +85,10 @@ public class EvaluationExecutor {
 
 		for (EvaluationRecommender evalRecommender : recommender) {
 			evalRecommender.initalizeMeasures(Lists.newArrayList(new F1Calculator(), new MRRCalculator()));
+		}
+
+		for (EvaluationRecommender evalRecommender : recommender) {
+			evalRecommender.setLogging(LOGGING);
 		}
 	}
 
@@ -120,18 +125,22 @@ public class EvaluationExecutor {
 		int queryCount = 0;
 		for (QueryContext queryContext : queryList) {
 			queryCount++;
-			Context context = queryContext.completionEvent.context;
+			Context context = queryContext.getCompletionEvent().context;
 			transformContext(context);
-			IMethodName expectedMethodName = QueryUtil.getExpectedMethodName(queryContext.getCompletionEvent());
-			ICoReMethodName expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
 			for (EvaluationRecommender evalRecommender : recommender) {
 				Set<Tuple<ICoReMethodName, Double>> proposals = evalRecommender.handleQuery(queryContext);
-				evalRecommender.calculateMeasures(proposals, expectedCoReMethodName);
+				evalRecommender.calculateMeasures(proposals, queryContext.getExpectedMethod());
 			}
 		}
 
 		String evaluationResults = createEvaluationResults(queryCount);
 		writeEvaluationResults(evaluationResults);
+
+		if (LOGGING) {
+			for (EvaluationRecommender evalRecommender : recommender) {
+				writeLog(evalRecommender);
+			}
+		}
 	}
 
 	private void readQueries() {
@@ -141,7 +150,9 @@ public class EvaluationExecutor {
 			String pathToCompletionEvent = MessageFormat.format("{0}/{1}/{1}.json", queryPath, file.getName());
 			CompletionEvent completionEvent = JsonUtils.fromJson(new File(pathToCompletionEvent), CompletionEvent.class);
 			if (isValidCompletionEvent(completionEvent)) {
-				QueryContext query = new QueryContext(file.getName(), completionEvent);
+				IMethodName expectedMethodName = QueryUtil.getExpectedMethodName(completionEvent);
+				ICoReMethodName expectedCoReMethodName = CoReNameConverter.convert(expectedMethodName);
+				QueryContext query = new QueryContext(file.getName(), completionEvent, expectedCoReMethodName);
 				queryList.add(query);
 			}
 		}
@@ -162,6 +173,10 @@ public class EvaluationExecutor {
 
 	private void writeEvaluationResults(String evaluationResults) throws IOException {
 		FileUtils.writeStringToFile(new File(resultPath + "EvaluationResults.txt"), evaluationResults);
+	}
+
+	private void writeLog(EvaluationRecommender evalRecommender) throws IOException {
+		FileUtils.writeStringToFile(new File(resultPath + evalRecommender.getName() + "Log.txt"), evalRecommender.returnLog());
 	}
 
 	private void transformContext(Context context) {

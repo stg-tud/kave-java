@@ -16,17 +16,21 @@
 package exec.recommender_reimplementation.evaluation;
 
 import cc.kave.commons.model.events.completionevents.CompletionEvent;
+import cc.recommenders.names.ICoReMethodName;
 
 public class QueryContext {
 
-	public String queryName;
+	private String queryName;
 
-	public CompletionEvent completionEvent;
+	private CompletionEvent completionEvent;
+
+	private ICoReMethodName expectedMethod;
 
 
-	public QueryContext(String queryName, CompletionEvent completionEvent) {
+	public QueryContext(String queryName, CompletionEvent completionEvent, ICoReMethodName expectedMethod) {
 		this.queryName = queryName;
 		this.completionEvent = completionEvent;
+		this.expectedMethod = expectedMethod;
 	}
 
 	public String getQueryName() {
@@ -35,6 +39,10 @@ public class QueryContext {
 
 	public CompletionEvent getCompletionEvent() {
 		return completionEvent;
+	}
+
+	public ICoReMethodName getExpectedMethod() {
+		return expectedMethod;
 	}
 
 }
