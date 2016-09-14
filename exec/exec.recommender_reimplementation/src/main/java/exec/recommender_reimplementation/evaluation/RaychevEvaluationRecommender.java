@@ -32,7 +32,7 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 
 	private RaychevRecommender raychevRecommender;
 
-	private static final String RAYCHEV_ANALYSIS_SET = "superputty";
+	public static String RAYCHEV_ANALYSIS_SET = "superputty";
 
 	private List<String> proposalsOfLastQuery;
 
