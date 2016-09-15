@@ -30,9 +30,11 @@ import exec.recommender_reimplementation.util.QueryUtil;
 
 public class RaychevEvaluationRecommender extends EvaluationRecommender {
 
+	private static final boolean VERBOSE = false;
+
 	private RaychevRecommender raychevRecommender;
 
-	public static String RAYCHEV_ANALYSIS_SET = "superputty";
+	public static String RAYCHEV_ANALYSIS_SET = "all";
 
 	private List<String> proposalsOfLastQuery;
 
@@ -58,7 +60,7 @@ public class RaychevEvaluationRecommender extends EvaluationRecommender {
 	@Override
 	public Set<Tuple<ICoReMethodName, Double>> handleQuery(QueryContext query) {
 		try {
-			raychevRecommender.executeRecommender(query.getQueryName(), RAYCHEV_ANALYSIS_SET, false);
+			raychevRecommender.executeRecommender(query.getQueryName(), RAYCHEV_ANALYSIS_SET, VERBOSE);
 			proposalsOfLastQuery = raychevRecommender.getProposals();
 			expectedMethodOfLastQuery = QueryUtil.getExpectedMethodName(query.getCompletionEvent());
 			
