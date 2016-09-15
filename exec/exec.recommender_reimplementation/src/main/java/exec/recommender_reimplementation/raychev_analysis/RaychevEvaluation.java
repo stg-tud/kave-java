@@ -34,6 +34,7 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.names.ICoReMethodName;
+import exec.recommender_reimplementation.evaluation.EvaluationRecommender;
 import exec.recommender_reimplementation.evaluation.F1Calculator;
 import exec.recommender_reimplementation.evaluation.MRRCalculator;
 import exec.recommender_reimplementation.evaluation.QueryContext;
@@ -41,7 +42,7 @@ import exec.recommender_reimplementation.evaluation.RaychevEvaluationRecommender
 import exec.recommender_reimplementation.util.QueryUtil;
 
 public class RaychevEvaluation {
-	public static final String ANALYSIS_SET = "superputty";
+	public static final String ANALYSIS_SET = "all";
 
 	public static String DEFAULT_PATH = "/home/markus/Documents/SLANG";
 
@@ -56,6 +57,7 @@ public class RaychevEvaluation {
 	public static void runEvaluation(String path) throws IOException {
 		RaychevEvaluationRecommender raychevRecommender = new RaychevEvaluationRecommender();
 		RaychevEvaluationRecommender.RAYCHEV_ANALYSIS_SET = ANALYSIS_SET;
+		raychevRecommender.setLogging(true);
 		raychevRecommender.initalizeRecommender();
 		raychevRecommender.initalizeMeasures(Lists.newArrayList(new F1Calculator(), new MRRCalculator()));
 		List<String> queryNames = getQueryNames(path);
@@ -68,6 +70,7 @@ public class RaychevEvaluation {
 			raychevRecommender.calculateMeasures(null, expectedCoreMethodName);
 		}
 		writeEvaluationResults(createEvaluationResults(queryNames.size(), raychevRecommender.getEvaluationResults()));
+		writeLog(raychevRecommender);
 	}
 
 	private static String createEvaluationResults(int queryCount, String evaluationResults) {
@@ -102,8 +105,13 @@ public class RaychevEvaluation {
 		if (returnType.isVoidType())
 			return 'v';
 		char firstChar = returnType.getName().charAt(0);
-		if (returnType.isValueType())
-			firstChar = Character.toLowerCase(firstChar);
+		if (returnType.isPredefined()) {
+			ITypeName fullType = returnType.asPredefinedTypeName().getFullType();
+			firstChar = fullType.getName().charAt(0);
+		}
+		if (returnType.isUnknown()) {
+			firstChar = 'O';
+		}
 		return firstChar;
 	}
 
@@ -111,9 +119,17 @@ public class RaychevEvaluation {
 		List<IParameterName> parameters = methodName.getParameters();
 		StringBuilder sb = new StringBuilder();
 		for (IParameterName parameterName : parameters) {
-			char firstChar = parameterName.getValueType().getName().charAt(0);
-			if (parameterName.getValueType().isValueType())
-				firstChar = Character.toLowerCase(firstChar);
+			char firstChar;
+			ITypeName valueType = parameterName.getValueType();
+			if (valueType.isPredefined()) {
+				ITypeName fullType = valueType.asPredefinedTypeName().getFullType();
+				firstChar = fullType.getName().charAt(0);
+			} else {
+				firstChar = parameterName.getValueType().getName().charAt(0);
+			}
+			if (valueType.isUnknown()) {
+				firstChar = 'O';
+			}
 			sb.append(firstChar);
 		}
 		return sb.toString();
@@ -137,4 +153,9 @@ public class RaychevEvaluation {
 	private static void writeEvaluationResults(String evaluationResults) throws IOException {
 		FileUtils.writeStringToFile(new File(RESULT_PATH + "RaychevEvaluationResults.txt"), evaluationResults);
 	}
+	
+	private static void writeLog(EvaluationRecommender evalRecommender) throws IOException {
+		FileUtils.writeStringToFile(new File(RESULT_PATH + evalRecommender.getName() + "Log.txt"), evalRecommender.returnLog());
+	}
+
 }

@@ -37,7 +37,7 @@ import exec.recommender_reimplementation.java_transformation.JavaTransformationV
 
 public class HistoryExtractor {
 
-	public final int STATEMENT_LIMIT = 500;
+	public final int STATEMENT_LIMIT = 800;
 
 	public static int filteredCount = 0;
 
@@ -124,8 +124,13 @@ public class HistoryExtractor {
 		if (returnType.isVoidType())
 			return 'v';
 		char firstChar = returnType.getName().charAt(0);
-		if (returnType.isValueType())
-			firstChar = Character.toLowerCase(firstChar);
+		if (returnType.isPredefined()) {
+			ITypeName fullType = returnType.asPredefinedTypeName().getFullType();
+			firstChar = fullType.getName().charAt(0);
+		}
+		if (returnType.isUnknown()) {
+			firstChar = 'O';
+		}
 		return firstChar;
 	}
 
@@ -133,9 +138,17 @@ public class HistoryExtractor {
 		List<IParameterName> parameters = methodName.getParameters();
 		StringBuilder sb = new StringBuilder();
 		for (IParameterName parameterName : parameters) {
-			char firstChar = parameterName.getValueType().getName().charAt(0);
-			if (parameterName.getValueType().isValueType())
-				firstChar = Character.toLowerCase(firstChar);
+			char firstChar;
+			ITypeName valueType = parameterName.getValueType();
+			if (valueType.isPredefined()) {
+				ITypeName fullType = valueType.asPredefinedTypeName().getFullType();
+				firstChar = fullType.getName().charAt(0);
+			} else {
+				firstChar = parameterName.getValueType().getName().charAt(0);
+			}
+			if (valueType.isUnknown()) {
+				firstChar = 'O';
+			}
 			sb.append(firstChar);
 		}
 		return sb.toString();
