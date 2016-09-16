@@ -32,10 +32,6 @@ import exec.recommender_reimplementation.heinemann_analysis.IndexExtractor;
 
 public class HeinemannEvaluationRecommender extends EvaluationRecommender {
 
-	private static final int HEINEMANN_LOOKBACK = 5;
-
-	private static final double HEINEMANN_MINIMUM_PROBABILITY = 0.8;
-
 	private Map<ITypeName, Set<Entry>> heinemannModel;
 
 	private HeinemannQueryExtractor heinemannQueryExtractor;
@@ -58,7 +54,7 @@ public class HeinemannEvaluationRecommender extends EvaluationRecommender {
 
 	@Override
 	public void analysis(List<Context> contextList) {
-		Map<ITypeName, Set<Entry>> model = IndexExtractor.buildModel(contextList, HEINEMANN_LOOKBACK, false, false);
+		Map<ITypeName, Set<Entry>> model = IndexExtractor.buildModel(contextList, EvaluationConstants.HEINEMANN_LOOKBACK, false, false);
 		mergeModel(model);
 	}
 
@@ -74,13 +70,13 @@ public class HeinemannEvaluationRecommender extends EvaluationRecommender {
 
 	@Override
 	public void initalizeRecommender() {
-		heinemannRecommender = new HeinemannRecommender(heinemannModel, HEINEMANN_MINIMUM_PROBABILITY);
+		heinemannRecommender = new HeinemannRecommender(heinemannModel, EvaluationConstants.HEINEMANN_MINIMUM_PROBABILITY);
 		heinemannQueryExtractor = new HeinemannQueryExtractor();
 	}
 
 	@Override
 	public Set<Tuple<ICoReMethodName, Double>> handleQuery(QueryContext query) {
-		HeinemannQuery heinemannQuery = heinemannQueryExtractor.extractQueryFromCompletion(query.getCompletionEvent(), HEINEMANN_LOOKBACK,
+		HeinemannQuery heinemannQuery = heinemannQueryExtractor.extractQueryFromCompletion(query.getCompletionEvent(), EvaluationConstants.HEINEMANN_LOOKBACK,
 				false, false);
 		Set<Tuple<ICoReMethodName, Double>> proposals = heinemannRecommender.query(heinemannQuery);
 		if (loggingActive) {

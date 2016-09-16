@@ -29,10 +29,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.StringUtils;
+import exec.recommender_reimplementation.evaluation.EvaluationConstants;
 
 public class RaychevRecommender {
-
-	private static final String SUDO_PASSWORD = "mangos";
 
 	public static String DEFAULT_PATH = "/home/markus/Documents/SLANG";
 
@@ -64,7 +63,7 @@ public class RaychevRecommender {
 
 	private void writeSudoPassword(Process process) throws IOException {
 		OutputStream outputStream = process.getOutputStream();
-		String password = SUDO_PASSWORD + System.lineSeparator();
+		String password = EvaluationConstants.SUDO_PASSWORD + System.lineSeparator();
 		outputStream.write(password.getBytes());
 		outputStream.flush();
 	}
@@ -104,7 +103,9 @@ public class RaychevRecommender {
 				continue;
 			}
 			String methodName = getMethodName(solution);
-			proposals.add(methodName);
+			if(!methodName.isEmpty()) {
+				proposals.add(methodName);
+			}
 		}
 		return proposals;
 	}

@@ -33,7 +33,7 @@ import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
 import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
-import exec.recommender_reimplementation.evaluation.AutomaticEvaluation;
+import exec.recommender_reimplementation.evaluation.EvaluationConstants;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 
 public class HistoryExtractor {
@@ -43,7 +43,7 @@ public class HistoryExtractor {
 	public Set<ConcreteHistory> extractHistories(Context context) {
 		ISST sst = context.getSST();
 		Integer statementCount = sst.accept(new StatementCounterVisitor(), null);
-		if (statementCount > AutomaticEvaluation.STATEMENT_LIMIT) {
+		if (statementCount > EvaluationConstants.STATEMENT_LIMIT) {
 			filteredCount++;
 			return new HashSet<>();
 		}
