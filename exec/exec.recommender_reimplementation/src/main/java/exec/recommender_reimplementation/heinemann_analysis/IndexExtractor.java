@@ -29,14 +29,13 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
+import exec.recommender_reimplementation.evaluation.AutomaticEvaluation;
 import exec.recommender_reimplementation.java_transformation.JavaTransformationVisitor;
 import exec.recommender_reimplementation.tokenization.TokenizationContext;
 import exec.recommender_reimplementation.tokenization.TokenizationSettings;
 
 public class IndexExtractor {
 	
-	private static final int STATEMENT_LIMIT = 500;
-
 	public static Map<ITypeName, Set<Entry>> buildModel(List<Context> contexts, int lookback, boolean removeStopwords, boolean removeKeywords) {
 		Set<Entry> entrySet = new HashSet<>();
 		
@@ -45,7 +44,7 @@ public class IndexExtractor {
 		while (!contextQueue.isEmpty()) {
 			Context context = contextQueue.poll();
 			Integer statementCount = context.getSST().accept(new StatementCounterVisitor(), null);
-			if (statementCount > STATEMENT_LIMIT) {
+			if (statementCount > AutomaticEvaluation.STATEMENT_LIMIT) {
 				continue;
 			}
 			try {

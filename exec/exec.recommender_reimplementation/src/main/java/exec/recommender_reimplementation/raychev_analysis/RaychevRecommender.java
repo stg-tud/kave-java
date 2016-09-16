@@ -32,6 +32,8 @@ import cc.kave.commons.utils.StringUtils;
 
 public class RaychevRecommender {
 
+	private static final String SUDO_PASSWORD = "mangos";
+
 	public static String DEFAULT_PATH = "/home/markus/Documents/SLANG";
 
 	public String path;
@@ -62,7 +64,7 @@ public class RaychevRecommender {
 
 	private void writeSudoPassword(Process process) throws IOException {
 		OutputStream outputStream = process.getOutputStream();
-		String password = "mangos" + System.lineSeparator();
+		String password = SUDO_PASSWORD + System.lineSeparator();
 		outputStream.write(password.getBytes());
 		outputStream.flush();
 	}
