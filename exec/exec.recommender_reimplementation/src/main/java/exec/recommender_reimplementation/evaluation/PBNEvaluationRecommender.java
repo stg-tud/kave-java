@@ -89,7 +89,7 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 				typeToUsagesMap.get(type).add(usage);
 			}
 			else {
-				typeToUsagesMap.put(type, Lists.newArrayList());
+				typeToUsagesMap.put(type, Lists.newArrayList(usage));
 			}
 		}
 	}

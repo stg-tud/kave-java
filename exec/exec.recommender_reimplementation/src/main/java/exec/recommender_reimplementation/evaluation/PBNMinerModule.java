@@ -44,7 +44,7 @@ public class PBNMinerModule extends AbstractModule {
 	private void configueOptions() {
 		QueryOptions qOpts = new QueryOptions();
 		qOpts.queryType = QueryType.ZERO;
-		qOpts.minProbability = 0.0;
+		qOpts.minProbability = 0.3;
 		qOpts.useClassContext = false;
 		qOpts.useMethodContext = true;
 		qOpts.useDefinition = true;
@@ -58,7 +58,7 @@ public class PBNMinerModule extends AbstractModule {
 		mOpts.setT1(0.151);
 		mOpts.setT2(0.15);
 
-		mOpts.setFeatureDropping(true);
+		mOpts.setFeatureDropping(false);
 		bind(MiningOptions.class).toInstance(mOpts);
 	}
 

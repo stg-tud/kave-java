@@ -55,9 +55,13 @@ public class RaychevRunner {
 		Queue<Context> contextList = Lists.newLinkedList();
 		try {
 			List<Path> zipList = ContextReader.GetAllZipFiles(FOLDERPATH);
+			int zipNum = 0;
+			int size = zipList.size();
 			for (Path path : zipList) {
 				contextList = (Queue<Context>) ContextReader.readType(path, Context.class);
 				buildSentencesForContextList(contextList);
+				zipNum++;
+				System.out.println("Processed Zip Number: " + zipNum + " of " + size);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -217,10 +221,10 @@ public class RaychevRunner {
 		} else {
 			QUERY_FOLDER_PATH = LIN_QUERY_FOLDER_PATH;
 		}
-		// sentenceBuilder();
+		sentenceBuilder();
 		// printContexts();
 		// queryBuilderFromCompletionExpressions();
-		queryBuilderFromCompletionEvents();
+		// queryBuilderFromCompletionEvents();
 		// queryBuilderWithRandomHoles();
 	}
 

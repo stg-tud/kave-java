@@ -50,7 +50,7 @@ public class AutomaticEvaluation {
 	public String queryPath;
 
 	public static String LIN_ANALYSIS_PATH = "/media/sf_C_DRIVE/SSTDataSets/UsedForQueries";
-	public static String WIN_ANALYSIS_PATH = "C:\\SSTDatasets\\UsedForQueries\\";
+	public static String WIN_ANALYSIS_PATH = "C:\\SSTDatasets\\NewTestset\\";
 	public String analysisPath;
 
 	public static String LIN_RESULT_PATH = "/home/markus/Documents/EvaluationResults/";
