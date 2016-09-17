@@ -30,7 +30,7 @@ import cc.recommenders.names.ICoReName;
 public class CoReNameConverter {
 
 	private static final String VOID_NAME = "LSystem/Void";
-	private static final String OBJECT_NAME = "LSystem/Object";
+	private static final String OBJECT_NAME = "LSystem/object";
 	private static final String UNKNOWN_NAME = "LUnknown";
 
 	private static final LanguageOptions LANGUAGE_OPTIONS = LanguageOptions.getInstance();
@@ -118,7 +118,7 @@ public class CoReNameConverter {
 		}
 		builder.append(toName(declaringType));
 
-		if (sstMethod.isConstructor()) {
+		if (sstMethod.isConstructor() || sstMethod.isInit()) {
 			builder.append(".<init>(");
 			builder.append(sstMethod.getParameters().stream().map(parameter -> toName(parameter.getValueType()) + ";")
 					.collect(Collectors.joining()));
