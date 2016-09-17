@@ -29,6 +29,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.StringUtils;
+import exec.recommender_reimplementation.evaluation.EvaluationConstants;
 
 public class RaychevRecommender {
 
@@ -62,7 +63,7 @@ public class RaychevRecommender {
 
 	private void writeSudoPassword(Process process) throws IOException {
 		OutputStream outputStream = process.getOutputStream();
-		String password = "mangos" + System.lineSeparator();
+		String password = EvaluationConstants.SUDO_PASSWORD + System.lineSeparator();
 		outputStream.write(password.getBytes());
 		outputStream.flush();
 	}
@@ -102,7 +103,9 @@ public class RaychevRecommender {
 				continue;
 			}
 			String methodName = getMethodName(solution);
-			proposals.add(methodName);
+			if(!methodName.isEmpty()) {
+				proposals.add(methodName);
+			}
 		}
 		return proposals;
 	}

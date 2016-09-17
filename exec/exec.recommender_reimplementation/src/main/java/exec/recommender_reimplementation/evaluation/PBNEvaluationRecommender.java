@@ -16,17 +16,22 @@
 package exec.recommender_reimplementation.evaluation;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.evaluation.StatementCounterVisitor;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.ICallsRecommender;
+import cc.recommenders.mining.calls.ProposalHelper;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
 import cc.recommenders.names.ICoReMethodName;
+import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import exec.recommender_reimplementation.pbn.PBNQueryExtractor;
@@ -34,16 +39,16 @@ import exec.recommender_reimplementation.pbn.UsageExtractor;
 
 public class PBNEvaluationRecommender extends EvaluationRecommender {
 
-	private List<Usage> pbnUsageList;
-	private ICallsRecommender<Query> pbnRecommender;
+	private List<Usage> pbnFullUsageList;
 	private PBNMiner pbnMiner;
 	private PBNQueryExtractor pbnQueryExtraction;
 	private StringBuilder log;
+	private Map<ICoReTypeName, ICallsRecommender<Query>> typeToRecommenderMap;
 
 	@Inject
 	public PBNEvaluationRecommender(PBNMiner pbnMiner) {
 		this.pbnMiner = pbnMiner;
-		pbnUsageList = Lists.newArrayList();
+		pbnFullUsageList = Lists.newArrayList();
 	}
 
 	@Override
@@ -56,12 +61,12 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 		UsageExtractor usageExtractor = new UsageExtractor();
 		for (Context context : contextList) {
 			Integer statementCount = context.getSST().accept(new StatementCounterVisitor(), null);
-			if (statementCount > AutomaticEvaluation.STATEMENT_LIMIT) {
+			if (statementCount > EvaluationConstants.STATEMENT_LIMIT) {
 				continue;
 			}
 			try {
 				transformContext(context);
-				usageExtractor.extractUsageFromContext(context, pbnUsageList);
+				usageExtractor.extractUsageFromContext(context, pbnFullUsageList);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -70,25 +75,61 @@ public class PBNEvaluationRecommender extends EvaluationRecommender {
 
 	@Override
 	public void initalizeRecommender() {
-		pbnRecommender = pbnMiner.createRecommender(pbnUsageList);
+		Map<ICoReTypeName, List<Usage>> typeToUsagesMap = Maps.newHashMap();
+		createTypeMap(typeToUsagesMap);
+		typeToRecommenderMap = Maps.newHashMap();
+		createRecommenders(typeToUsagesMap);
 		pbnQueryExtraction = new PBNQueryExtractor();
+	}
+
+	protected void createTypeMap(Map<ICoReTypeName, List<Usage>> typeToUsagesMap) {
+		for (Usage usage : pbnFullUsageList) {
+			ICoReTypeName type = usage.getType();
+			if(typeToUsagesMap.containsKey(type)) {
+				typeToUsagesMap.get(type).add(usage);
+			}
+			else {
+				typeToUsagesMap.put(type, Lists.newArrayList());
+			}
+		}
+	}
+
+	protected void createRecommenders(
+			Map<ICoReTypeName, List<Usage>> typeToUsagesMap) {
+		for (Entry<ICoReTypeName, List<Usage>> entry : typeToUsagesMap.entrySet()) {
+			ICallsRecommender<Query> recommender = pbnMiner.createRecommender(entry.getValue());
+			typeToRecommenderMap.put(entry.getKey(), recommender);
+		}
 	}
 
 	@Override
 	public Set<Tuple<ICoReMethodName, Double>> handleQuery(QueryContext query) {
 		Query pbnQuery = pbnQueryExtraction.extractQueryFromCompletion(query.getCompletionEvent());
-		Set<Tuple<ICoReMethodName, Double>> proposals = pbnRecommender.query(pbnQuery);
+		ICoReTypeName type = pbnQuery.getType();
+		Set<Tuple<ICoReMethodName, Double>> proposals = ProposalHelper.createSortedSet();
+		ICallsRecommender<Query> recommender = null;
+		if(typeToRecommenderMap.containsKey(type)) {
+			recommender = typeToRecommenderMap.get(type);
+			proposals = recommender.query(pbnQuery);
+		}
 		if (loggingActive) {
-			addLogString(pbnQuery, query, proposals);
+			addLogString(pbnQuery, query, proposals, recommender);
 		}
 		return proposals;
 	}
 
-	private void addLogString(Query pbnQuery, QueryContext query, Set<Tuple<ICoReMethodName, Double>> proposals) {
+	private void addLogString(Query pbnQuery, QueryContext query, Set<Tuple<ICoReMethodName, Double>> proposals, ICallsRecommender<Query> recommender) {
 		log.append(query.getQueryName()).append(System.lineSeparator()).append(pbnQuery.toString()).append(System.lineSeparator())
 				.append("Expected Method: ").append(System.lineSeparator())
-				.append(query.getExpectedMethod().toString()).append(System.lineSeparator()).append("Proposals: ").append(System.lineSeparator());
-
+				.append(query.getExpectedMethod().toString()).append(System.lineSeparator());
+		if(recommender == null) {
+			log.append("No model for this type");
+		}
+		else {
+			log.append("Model Size: ").append(recommender.getSize());
+		}
+		log.append(System.lineSeparator()).append("Proposals: ").append(System.lineSeparator());
+				
 		for (Tuple<ICoReMethodName, Double> tuple : proposals) {
 			log.append(tuple.getFirst()).append(" 	").append(tuple.getSecond()).append(System.lineSeparator());
 		}

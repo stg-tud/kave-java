@@ -141,10 +141,10 @@ public class HistoryExtractorTest extends RaychevAnalysisBaseTest {
 										parameter(type("ArrayList"), "msgList")), 1)));
 
 		List<String> expectedStrings = Lists.newArrayList("TDecl.getDefault()S:R SmsManager.sendTextMessage(M)v:0/2",
-				"TDecl.length()i:R",
+				"TDecl.length()I:R",
 				"TDecl.getDefault()S:R SmsManager.divideMsg(M)A:0/2 SmsManager.sendMultipartTextMessage(A)v:0/2",
-				"TDecl.length()i:0/1 SmsManager.divideMsg(M)A:1/2",
-				"TDecl.length()i:0/1 SmsManager.sendTextMessage(M)v:1/2",
+				"TDecl.length()I:0/1 SmsManager.divideMsg(M)A:1/2",
+				"TDecl.length()I:0/1 SmsManager.sendTextMessage(M)v:1/2",
 				"SmsManager.divideMsg(M)A:R SmsManager.sendMultipartTextMessage(A)v:1/2");
 
 		assertSentencesString(expectedStrings, histories);

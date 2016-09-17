@@ -45,9 +45,6 @@ import exec.recommender_reimplementation.util.QueryUtil;
 
 public class AutomaticEvaluation {
 
-	public static final int STATEMENT_LIMIT = 800;
-	public static final boolean LOGGING = true;
-
 	public static String LIN_QUERY_PATH = "/home/markus/Documents/SLANG/tests/src/com/example/fill";
 	public static String WIN_QUERY_PATH = "C:\\SSTDatasets\\WorkingQueries\\SuperPutty\\";
 	public String queryPath;
@@ -88,7 +85,7 @@ public class AutomaticEvaluation {
 		}
 
 		for (EvaluationRecommender evalRecommender : recommender) {
-			evalRecommender.setLogging(LOGGING);
+			evalRecommender.setLogging(EvaluationConstants.LOGGING);
 		}
 	}
 
@@ -136,7 +133,7 @@ public class AutomaticEvaluation {
 		String evaluationResults = createEvaluationResults(queryCount);
 		writeEvaluationResults(evaluationResults);
 
-		if (LOGGING) {
+		if (EvaluationConstants.LOGGING) {
 			for (EvaluationRecommender evalRecommender : recommender) {
 				writeLog(evalRecommender);
 			}
