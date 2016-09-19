@@ -39,12 +39,14 @@ public class EventStreamGenerator {
 
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
-		if (!sst.isPartialClass()) {
+		if (sst.isPartialClass()) {
+			String fileName = sst.getPartialClassIdentifier();
+			if (!(fileName.contains(".designer") || fileName.contains(".Designer"))) {
+				sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+			}
+		} else {
 			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
-			// System.out.println(ctx.getSST().getEnclosingType() + "-> " +
-			// ctx.getSST().getPartialClassIdentifier());
 		}
-		// sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
@@ -53,7 +55,6 @@ public class EventStreamGenerator {
 
 	private class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
-		// private IMethodName currentCtx;
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
@@ -84,11 +85,6 @@ public class EventStreamGenerator {
 						superCtx = h.getSuper();
 					}
 					elementCtx = h.getElement();
-					// if (h.getFirst() != null) {
-					// currentCtx = h.getFirst();
-					// } else if (h.getSuper() != null) {
-					// currentCtx = h.getSuper();
-					// }
 				}
 			}
 			return super.visit(decl, context);

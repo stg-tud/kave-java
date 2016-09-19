@@ -83,6 +83,53 @@ public class EventStreamGeneratorTest {
 				Events.newContext(mGenericFree(1, 2)), Events.newInvocation(mGenericFree(2, 3)));
 
 	}
+	
+	@Test
+	public void handlesPartialClass1() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+
+		ctx.setSST(sstPartialClass1(1, methodDeclGenericBound(1, 2, 3, //
+				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream();
+
+	}
+	
+	@Test
+	public void handlesPartialClass2() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+
+		ctx.setSST(sstPartialClass2(1, methodDeclGenericBound(1, 2, 3, //
+				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream();
+
+	}
+	
+	@Test
+	public void handlesUserCode() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+
+		ctx.setSST(sstUserCode(1, methodDeclGenericBound(1, 2, 3, //
+				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream(Events.newFirstContext(mGenericFree(21, 22)), //
+				Events.newSuperContext(mGenericFree(11, 12)), //
+				Events.newContext(mGenericFree(1, 2)), Events.newInvocation(mGenericFree(2, 3)));
+
+	}
 
 	@Test
 	public void usesSuperMethod() {
@@ -242,6 +289,30 @@ public class EventStreamGeneratorTest {
 		SST sst = new SST();
 		sst.setEnclosingType(t(typeNum));
 		sst.setMethods(Sets.newHashSet(decls));
+		return sst;
+	}
+	
+	private ISST sstUserCode(int typeNum, IMethodDeclaration... decls) {
+		SST sst = new SST();
+		sst.setEnclosingType(t(typeNum));
+		sst.setMethods(Sets.newHashSet(decls));
+		sst.setPartialClassIdentifier("fileName.cs");
+		return sst;
+	}
+	
+	private ISST sstPartialClass1(int typeNum, IMethodDeclaration... decls) {
+		SST sst = new SST();
+		sst.setEnclosingType(t(typeNum));
+		sst.setMethods(Sets.newHashSet(decls));
+		sst.setPartialClassIdentifier("fileName.designer.cs");
+		return sst;
+	}
+	
+	private ISST sstPartialClass2(int typeNum, IMethodDeclaration... decls) {
+		SST sst = new SST();
+		sst.setEnclosingType(t(typeNum));
+		sst.setMethods(Sets.newHashSet(decls));
+		sst.setPartialClassIdentifier("fileName.Designer.cs");
 		return sst;
 	}
 
