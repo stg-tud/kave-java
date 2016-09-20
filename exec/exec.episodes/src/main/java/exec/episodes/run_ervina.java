@@ -21,19 +21,22 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.mining.evaluation.MethodSize;
+import cc.recommenders.io.Logger;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
-import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
-import cc.recommenders.io.Logger;
 
 public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	private static final int NUMBREPOS = 200;
-	private static final int FREQTHRESH = 240;
-	private static final double BIDIRECTTHRESH = 0.3;
+	
+	private static final int NUMBREPOS = 5;
+	private static final int FREQTHRESH = 2;
+	private static final double BIDIRECTTHRESH = 0.1;
+	
+	private static final int METHODSIZE = 500;
 
 	private static Injector injector;
 
@@ -50,11 +53,13 @@ public class run_ervina {
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
 //		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
 		
+		load(MethodSize.class).identifier(NUMBREPOS, METHODSIZE);
+		
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
 		
 //		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+//		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 //		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 //		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
