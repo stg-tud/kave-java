@@ -137,7 +137,7 @@ public class PatternsIdentifierTest {
 		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos,
 				transClosure, episodeGraphConverter, graphWriter);
 
-		when(streamParser.parseStream(anyInt())).thenReturn(stream);
+		when(streamParser.parse(anyInt())).thenReturn(stream);
 		when(mappingParser.parse(anyInt())).thenReturn(events);
 		when(processor.postprocess(anyInt(), anyInt(), anyDouble())).thenReturn(patterns);
 		when(maxEpisodes.getMaximalEpisodes(any(Map.class))).thenReturn(patterns);
@@ -170,7 +170,7 @@ public class PatternsIdentifierTest {
 	public void mocksAreCalledInTraining() throws Exception {
 		sut.trainingCode(NUMBREPOS, FREQUENCY, ENTROPY);
 
-		verify(streamParser).parseStream(anyInt());
+		verify(streamParser).parse(anyInt());
 		verify(mappingParser).parse(anyInt());
 		verify(processor).postprocess(anyInt(), anyInt(), anyDouble());
 		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));

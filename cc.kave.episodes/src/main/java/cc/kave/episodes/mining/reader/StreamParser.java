@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -39,9 +40,9 @@ public class StreamParser {
 		this.reader = reader;
 	}
 
-	public List<List<Fact>> parseStream(int numbRepos) {
-		List<List<Fact>> stream = new LinkedList<>();
-		List<Fact> method = new LinkedList<Fact>();
+	public List<List<Fact>> parse(int numbRepos) {
+		List<List<Fact>> stream = Lists.newLinkedList();
+		List<Fact> method = Lists.newLinkedList();
 		
 		List<String> lines = reader.readFile(getStreamPath(numbRepos));
 		

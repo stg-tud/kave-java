@@ -89,7 +89,7 @@ public class StreamParserTest {
 	
 	@Test
 	public void MocksAreCalled() {
-		sut.parseStream(NUMBREPOS);
+		sut.parse(NUMBREPOS);
 		
 		verify(reader).readFile(any(File.class));
 	}
@@ -115,7 +115,7 @@ public class StreamParserTest {
 		method.add(new Fact(8));
 		expected.add(method);
 		
-		List<List<Fact>> actuals = sut.parseStream(NUMBREPOS);
+		List<List<Fact>> actuals = sut.parse(NUMBREPOS);
 		
 		assertEquals(expected, actuals);
 	}
