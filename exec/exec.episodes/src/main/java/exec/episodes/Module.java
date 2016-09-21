@@ -18,10 +18,6 @@ package exec.episodes;
 import java.io.File;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-
 import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
@@ -33,13 +29,16 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.EventStreamReader;
 import cc.kave.episodes.mining.reader.FileReader;
+import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Directory;
+
+import com.google.common.collect.Maps;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 public class Module extends AbstractModule {
 
@@ -51,14 +50,12 @@ public class Module extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		File episodeFile = new File(rootFolder + "configurations/");
-		// Directory episodeDir = new Directory(episodeFile.getAbsolutePath());
+		File rootFile = new File(rootFolder + "/");
+		Directory rootDir = new Directory(rootFile.getAbsolutePath());
 		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
-		File episodeRootFile = new File(rootFolder + "dataSet/");
-		Directory episodeRootDir = new Directory(episodeRootFile.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());
 		File statFile = new File(rootFolder + "statistics/");
@@ -67,19 +64,17 @@ public class Module extends AbstractModule {
 		Directory patternsDir = new Directory(patternsFile.getAbsolutePath());
 
 		Map<String, Directory> dirs = Maps.newHashMap();
-		// dirs.put("episode", episodeDir);
+		dirs.put("root", rootDir);
 		dirs.put("statistics", statDir);
 		dirs.put("events", eventsDir);
 		dirs.put("contexts", ctxtDir);
-		dirs.put("rootDir", episodeRootDir);
 		dirs.put("evaluation", evaluationDir);
 		dirs.put("patterns", patternsDir);
 		bindInstances(dirs);
 
-		bind(File.class).annotatedWith(Names.named("episode")).toInstance(episodeFile);
+		bind(File.class).annotatedWith(Names.named("root")).toInstance(rootFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventsData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
-		bind(File.class).annotatedWith(Names.named("rootDir")).toInstance(episodeRootFile);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
 		bind(File.class).annotatedWith(Names.named("patterns")).toInstance(patternsFile);
@@ -92,7 +87,7 @@ public class Module extends AbstractModule {
 		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
 
 		MappingParser mappingParser = new MappingParser(eventStreamRoot);
-		File graphRoot = episodeRootFile;
+		File graphRoot = rootFile;
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));

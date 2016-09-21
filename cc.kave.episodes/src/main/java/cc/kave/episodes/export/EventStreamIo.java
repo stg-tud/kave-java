@@ -22,11 +22,14 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.reflect.TypeToken;
-
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.recommenders.assertions.Asserts;
+
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 
 public class EventStreamIo {
 	
@@ -40,6 +43,42 @@ public class EventStreamIo {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static List<Event> createMapping(List<Event> stream) {
+		List<Event> mapping = Lists.newLinkedList();
+		for (Event e : stream) {
+			if (mapping.indexOf(e) == -1) {
+				mapping.add(e);
+			}
+		}
+		return mapping;
+	}
+
+	private static String toString(List<Event> stream, List<Event> mapping) {
+		StringBuilder sb = new StringBuilder();
+
+		boolean isFirstMethod = true;
+		double time = 0.000;
+
+		for (Event e : stream) {
+			int idx = mapping.indexOf(e);
+			Asserts.assertNotNegative(idx);
+
+			if (e.getKind() == EventKind.METHOD_DECLARATION && !isFirstMethod) {
+				time += TIMEOUT;
+			}
+			isFirstMethod = false;
+
+			sb.append(idx);
+			sb.append(',');
+			sb.append(String.format("%.3f",time));
+			sb.append('\n');
+
+			time += DELTA;
+		}
+		return sb.toString();
+
 	}
 
 	public static List<Event> readMapping(String path) {
