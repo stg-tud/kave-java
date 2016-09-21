@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.MethodSize;
+import cc.kave.episodes.repositories.Preprocessing;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -51,9 +51,9 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-//		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
+		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
 		
-		load(MethodSize.class).identifier(NUMBREPOS, METHODSIZE);
+//		load(MethodSize.class).identifier(NUMBREPOS, METHODSIZE);
 		
 //		load(ThresholdsFrequency.class).writer(NUMBREPOS);
 //		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);

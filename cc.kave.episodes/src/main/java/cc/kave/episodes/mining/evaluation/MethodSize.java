@@ -4,11 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.EventKind;
-import cc.kave.commons.model.episodes.Fact;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.StreamParser;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;

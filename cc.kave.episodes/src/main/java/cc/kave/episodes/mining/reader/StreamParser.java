@@ -52,12 +52,10 @@ public class StreamParser {
 			String[] eventTime = line.split(",");
 			int eventID = Integer.parseInt(eventTime[0]);
 			double timestamp = Double.parseDouble(eventTime[1]);
-			if (timer == -1) {
-				timer = timestamp;
-			} else if ((timestamp - timer) >= 0.5) {
+			if ((timer != -1) && ((timestamp - timer) >= 0.5)) {
 				stream.add(method);
 				method = new LinkedList<Fact>();
-			} 
+			}
 			timer = timestamp;
 			method.add(new Fact(eventID));
 		}

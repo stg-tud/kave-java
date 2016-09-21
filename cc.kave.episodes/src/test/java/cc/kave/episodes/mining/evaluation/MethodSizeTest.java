@@ -1,5 +1,6 @@
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,15 +12,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static cc.recommenders.testutils.LoggerUtils.assertLogContains;
-
-import cc.kave.commons.model.episodes.Event;
-import cc.kave.commons.model.episodes.Events;
-import cc.kave.commons.model.episodes.Fact;
-import cc.kave.commons.model.names.IMethodName;
-import cc.kave.commons.model.names.csharp.MethodName;
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.mining.reader.MappingParser;
 import cc.kave.episodes.mining.reader.StreamParser;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
@@ -139,6 +138,6 @@ public class MethodSizeTest {
 	}
 
 	private static IMethodName m(int i) {
-		return MethodName.newMethodName("[T,P] [T,P].m" + i + "()");
+		return Names.newMethod("[T,P] [T,P].m" + i + "()");
 	}
 }
