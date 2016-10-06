@@ -28,10 +28,6 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -46,6 +42,10 @@ import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class PatternsIdentifier {
 
@@ -63,12 +63,15 @@ public class PatternsIdentifier {
 	private ReposParser repos;
 
 	@Inject
-	public PatternsIdentifier(@Named("patterns") File folder, StreamParser streamParser, EpisodesPostprocessor episodes,
-			MappingParser mappingParser, MaximalEpisodes maxEpisodes, ReposParser repos,
-			TransitivelyClosedEpisodes transClosure, EpisodeToGraphConverter episodeGraphConverter,
+	public PatternsIdentifier(@Named("patterns") File folder,
+			StreamParser streamParser, EpisodesPostprocessor episodes,
+			MappingParser mappingParser, MaximalEpisodes maxEpisodes,
+			ReposParser repos, TransitivelyClosedEpisodes transClosure,
+			EpisodeToGraphConverter episodeGraphConverter,
 			EpisodeAsGraphWriter graphWriter) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
-		assertTrue(folder.isDirectory(), "Patterns folder is not a folder, but a file");
+		assertTrue(folder.isDirectory(),
+				"Patterns folder is not a folder, but a file");
 		this.patternsFolder = folder;
 		this.streamParser = streamParser;
 		this.mappingParser = mappingParser;
@@ -80,42 +83,54 @@ public class PatternsIdentifier {
 		this.graphWriter = graphWriter;
 	}
 
-	public void trainingCode(int numbRepos, int frequency, double entropy) throws Exception {
+	public void trainingCode(int numbRepos, int frequency, double entropy)
+			throws Exception {
 		List<List<Fact>> stream = streamParser.parse(numbRepos);
 		List<Event> events = mappingParser.parse(numbRepos);
-//		 Logger.log("Number of events: %d", events.size());
-		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor.postprocess(numbRepos, frequency, entropy);
-		Map<Integer, Set<Episode>> patterns = maxEpisodes.getMaximalEpisodes(postpEpisodes);
-
-		// checkMethodSize(stream, events);
+		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor
+				.postprocess(numbRepos, frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = maxEpisodes
+				.getMaximalEpisodes(postpEpisodes);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			if (entry.getKey() < 2) {
 				continue;
 			}
-			// Episode debug = createDebuggingEpisode();
+			Episode debug = createDebuggingEpisode();
+
 			for (Episode episode : entry.getValue()) {
 				Set<Fact> episodeFacts = episode.getEvents();
-				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
+						true);
 
 				for (List<Fact> method : stream) {
 					if (method.size() < 3) {
 						continue;
 					}
+					if (episode.equals(debug)) {
+						if (method.contains(new Fact(9))) {
+							Logger.log("Method: %s", method.toString());
+						}
+					}
 					if (method.containsAll(episodeFacts)) {
 						methodsOrderRelation.addMethod(episode, method, events);
-						// if (episode.equals(debug)) {
-						// Logger.log("Method: %s\noccurrence: %d",
-						// method.toString(),
-						// methodsOrderRelation.getOccurrences());
-						// }
+
+//						if (episode.equals(debug)) {
+//							Logger.log("Method: %s\noccurrence: %d",
+//									method.toString(),
+//									methodsOrderRelation.getOccurrences());
+//						}
+						
 					}
 				}
-				if (methodsOrderRelation.getOccurrences() < episode.getFrequency()) {
+				if (methodsOrderRelation.getOccurrences() < episode
+						.getFrequency()) {
 					Logger.log("Episode: %s", episode.toString());
-					Logger.log("Frequency = %d, occurrence = %d", episode.getFrequency(),
+					Logger.log("Frequency = %d, occurrence = %d",
+							episode.getFrequency(),
 							methodsOrderRelation.getOccurrences());
-					throw new Exception("Episode is not found sufficient number of times on the training stream!");
+					throw new Exception(
+							"Episode is not found sufficient number of times on the training stream!");
 				}
 			}
 			Logger.log("Processed %d-node patterns!", entry.getKey());
@@ -123,48 +138,23 @@ public class PatternsIdentifier {
 		Logger.log("All patterns are identified in the training data!");
 	}
 
-	private void checkMethodSize(List<List<Fact>> stream, List<Event> events) {
-		int largestMethod = 0;
-		int bigMethods = 0;
-		List<Fact> keepMethod = new LinkedList<Fact>();
-		for (List<Fact> method : stream) {
-			// if (method.size() >= 446) {
-			// continue;
-			// }
-			if (method.size() > 500) {
-				bigMethods++;
-			}
-			if (method.size() > largestMethod) {
-				largestMethod = method.size();
-				keepMethod = method;
-			}
-		}
-		String methodName = "";
-		for (Fact fact : keepMethod) {
-			Event event = events.get(fact.getFactID());
-			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				methodName = event.getMethod().getDeclaringType().getFullName() + "." + event.getMethod().getName();
-			}
-		}
-		Logger.log("Size of the largest method is: %d", largestMethod);
-		Logger.log("Method name is: %s", methodName);
-		Logger.log("Methods with more than 500 events are: %d", bigMethods);
-	}
-
 	private Episode createDebuggingEpisode() {
 		Episode episode = new Episode();
-		episode.addStringsOfFacts("50", "14", "50>14");
-		episode.setFrequency(25);
-		episode.setBidirectMeasure(1.0);
+		episode.addStringsOfFacts("9", "3063");
+		episode.setFrequency(356);
+		episode.setBidirectMeasure(0.8157);
 		return episode;
 	}
 
-	public void validationCode(int numbRepos, int frequency, double entropy) throws Exception {
+	public void validationCode(int numbRepos, int frequency, double entropy)
+			throws Exception {
 		List<Event> trainEvents = mappingParser.parse(numbRepos);
-		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(numbRepos, frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
+				numbRepos, frequency, entropy);
 
 		List<Event> stream = repos.validationStream(numbRepos);
-		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream, trainEvents);
+		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream,
+				trainEvents);
 		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
 		List<Event> listEvents = mapToList(mapEvents);
 		StringBuilder sb = new StringBuilder();
@@ -177,33 +167,43 @@ public class PatternsIdentifier {
 			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
 			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
 			for (Episode episode : entry.getValue()) {
-				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(false);
-				EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
+				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
+						false);
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
+						true);
 
 				for (List<Fact> method : streamMethods) {
 					if (method.containsAll(episode.getEvents())) {
-						methodsNoOrderRelation.addMethod(episode, method, listEvents);
-						methodsOrderRelation.addMethod(episode, method, listEvents);
+						methodsNoOrderRelation.addMethod(episode, method,
+								listEvents);
+						methodsOrderRelation.addMethod(episode, method,
+								listEvents);
 					}
 				}
-				sb.append(patternId + "\t" + episode.getFrequency() + "\t" + methodsNoOrderRelation.getOccurrences()
-						+ "\t" + methodsOrderRelation.getOccurrences() + "\n");
-				patternsWriter(episode, trainEvents, numbRepos, frequency, entropy, patternId);
+				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+						+ methodsNoOrderRelation.getOccurrences() + "\t"
+						+ methodsOrderRelation.getOccurrences() + "\n");
+				patternsWriter(episode, trainEvents, numbRepos, frequency,
+						entropy, patternId);
 				patternId++;
 			}
 			sb.append("\n");
 			Logger.log("Processed %d-node patterns!", entry.getKey());
 		}
-		FileUtils.writeStringToFile(getValidationPath(getPath(numbRepos, frequency, entropy)), sb.toString());
+		FileUtils.writeStringToFile(
+				getValidationPath(getPath(numbRepos, frequency, entropy)),
+				sb.toString());
 	}
 
-	private void patternsWriter(Episode episode, List<Event> events, int numbRepos, int frequency, double entropy,
-			int pId) throws IOException {
+	private void patternsWriter(Episode episode, List<Event> events,
+			int numbRepos, int frequency, double entropy, int pId)
+			throws IOException {
 		Episode closedEpisodes = transClosure.remTransClosure(episode);
 
 		File filePath = getPath(numbRepos, frequency, entropy);
 
-		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(closedEpisodes, events);
+		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
+				closedEpisodes, events);
 		graphWriter.write(graph, getGraphPaths(filePath, pId));
 	}
 
@@ -216,7 +216,8 @@ public class PatternsIdentifier {
 		return result;
 	}
 
-	private Map<Event, Integer> mergeTrainingValidationEvents(List<Event> stream, List<Event> events) {
+	private Map<Event, Integer> mergeTrainingValidationEvents(
+			List<Event> stream, List<Event> events) {
 		Map<Event, Integer> completeEvents = Maps.newLinkedHashMap();
 		int index = 0;
 		for (Event event : events) {
@@ -232,7 +233,8 @@ public class PatternsIdentifier {
 		return completeEvents;
 	}
 
-	private List<List<Fact>> streamOfMethods(List<Event> stream, Map<Event, Integer> events) {
+	private List<List<Fact>> streamOfMethods(List<Event> stream,
+			Map<Event, Integer> events) {
 		List<List<Fact>> result = new LinkedList<>();
 		List<Fact> method = new LinkedList<Fact>();
 
@@ -253,8 +255,9 @@ public class PatternsIdentifier {
 	}
 
 	private File getPath(int numbRepos, int freqThresh, double bidirectThresh) {
-		File folderPath = new File(patternsFolder.getAbsolutePath() + "/Repos" + numbRepos + "/Freq" + freqThresh
-				+ "/Bidirect" + bidirectThresh + "/");
+		File folderPath = new File(patternsFolder.getAbsolutePath() + "/Repos"
+				+ numbRepos + "/Freq" + freqThresh + "/Bidirect"
+				+ bidirectThresh + "/");
 		if (!folderPath.isDirectory()) {
 			folderPath.mkdirs();
 		}
@@ -267,7 +270,8 @@ public class PatternsIdentifier {
 	}
 
 	private File getValidationPath(File folderPath) {
-		File fileName = new File(folderPath.getAbsolutePath() + "/patternsValidation.txt");
+		File fileName = new File(folderPath.getAbsolutePath()
+				+ "/patternsValidation.txt");
 		return fileName;
 	}
 }

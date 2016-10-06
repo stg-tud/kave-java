@@ -29,6 +29,10 @@ public class MethodSize {
 		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
 		List<Event> events = mappingParser.parse(numberOfRepos);
 
+//		Logger.log("Event: %s", events.get(16529));
+//		Logger.log("Event: %s", events.get(29904));
+//		Logger.log("Number of unique events is: %d", events.size());
+		
 		checkMethodSize(stream, events, methodLength);
 	}
 
@@ -78,6 +82,7 @@ public class MethodSize {
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
 				fileName = event.getMethod().getDeclaringType().getFullName()
 						+ "." + event.getMethod().getName();
+//				fileName = event.getMethod().getIdentifier();
 				break;
 			}
 		}

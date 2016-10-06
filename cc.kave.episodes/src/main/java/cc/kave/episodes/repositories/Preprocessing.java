@@ -62,22 +62,14 @@ public class Preprocessing {
 
 	public void generate(int numbRepos, int freqThresh) throws ZipException, IOException {
 		List<Event> allEvents = repos.learningStream(numbRepos);
-
-//		System.out.println();
-//		System.out.println("before stream creation:");
 		EventStream stream = EventsFilter.filterStream(allEvents, freqThresh);
-
-//		System.out.println();
-//		System.out.println("before writing:");
 
 //		debugStream(stream.getMapping().keySet());
 
 		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath);
 
-//		System.out.println("after reading:");
 //		List<Event> mapping = new MappingParser(eventsFolder).parse(1);
 //		debugStream(mapping);
-
 	}
 
 	private void debugStream(Iterable<Event> keySet) {

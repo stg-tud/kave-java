@@ -45,8 +45,6 @@ public class EventsFilter {
 		EventStream es = new EventStream();
 
 		for (Event e : streamWithoutDublicates) {
-			// Logger.log("Event: %s", e.getMethod().getIdentifier());
-
 			if ((e.getKind() == EventKind.FIRST_DECLARATION) || (e.getKind() == EventKind.METHOD_DECLARATION)) {
 				es.addEvent(e);
 				continue;

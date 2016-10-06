@@ -58,9 +58,17 @@ public class ProposalsSorter {
 	}
 
 	private double calcF1Facts(Episode query, Episode episode) {
+		Set<Fact> episodeFacts = episode.getFacts();
+		Set<Fact> queryFacts = getQueryFacts(query, episodeFacts);
 		Measure m = Measure.newMeasure(query.getFacts(), episode.getFacts());
 		double f1 = m.getF1();
 		return f1;
+	}
+
+	private Set<Fact> getQueryFacts(Episode query, Set<Fact> episodeFacts) {
+		Set<Fact> relations = query.getRelations();
+		 
+		return null;
 	}
 
 	private double calcF1Events(Episode query, Episode episode) {
