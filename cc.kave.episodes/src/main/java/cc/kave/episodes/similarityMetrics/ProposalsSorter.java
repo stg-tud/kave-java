@@ -33,8 +33,12 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class ProposalsSorter {
 
-	public Set<Tuple<Episode, Double>> sort(Episode query, Set<Episode> patterns, Metrics metric) throws Exception {
-		Set<Tuple<Episode, Double>> proposals = ProposalHelper.createEpisodesSortedSet();
+	private TriangleNumber triangleNumber = new TriangleNumber();
+
+	public Set<Tuple<Episode, Double>> sort(Episode query,
+			Set<Episode> patterns, Metrics metric) throws Exception {
+		Set<Tuple<Episode, Double>> proposals = ProposalHelper
+				.createEpisodesSortedSet();
 
 		for (Episode p : patterns) {
 			double sim = getMetric(metric, query, p);
@@ -43,7 +47,8 @@ public class ProposalsSorter {
 		return proposals;
 	}
 
-	private double getMetric(Metrics metric, Episode query, Episode episode) throws Exception {
+	private double getMetric(Metrics metric, Episode query, Episode episode)
+			throws Exception {
 		if (metric == Metrics.F1_FACTS) {
 			return calcF1Facts(query, episode);
 		} else if (metric == Metrics.F1_EVENTS) {
@@ -58,17 +63,37 @@ public class ProposalsSorter {
 	}
 
 	private double calcF1Facts(Episode query, Episode episode) {
+		int episodeRelations = episode.getRelations().size();
+		int episodeEvents = episode.getNumEvents();
 		Set<Fact> episodeFacts = episode.getFacts();
-		Set<Fact> queryFacts = getQueryFacts(query, episodeFacts);
-		Measure m = Measure.newMeasure(query.getFacts(), episode.getFacts());
+		Set<Fact> queryFacts = query.getFacts();
+
+		if (episodeRelations < triangleNumber.calculate(episodeEvents)) {
+			queryFacts = getQueryFacts(query, episodeFacts);
+		}
+		Measure m = Measure.newMeasure(queryFacts, episodeFacts);
 		double f1 = m.getF1();
 		return f1;
 	}
 
-	private Set<Fact> getQueryFacts(Episode query, Set<Fact> episodeFacts) {
-		Set<Fact> relations = query.getRelations();
-		 
-		return null;
+	private Set<Fact> getQueryFacts(Episode query, Set<Fact> epFacts) {
+		Set<Fact> queryFacts = Sets.newHashSet();
+		queryFacts.addAll(query.getFacts());
+		Set<Fact> queryRel = query.getRelations();
+		
+		for (Fact rel : queryRel) {
+			Tuple<Fact, Fact> relFacts = rel.getRelationFacts();
+			Fact order1 = new Fact(relFacts.getFirst() + ">"
+					+ relFacts.getSecond());
+			Fact order2 = new Fact(relFacts.getSecond() + ">"
+					+ relFacts.getFirst());
+			if (epFacts.contains(relFacts.getFirst())
+					&& epFacts.contains(relFacts.getSecond())
+					&& !(epFacts.contains(order1) || epFacts.contains(order2))) {
+				queryFacts.remove(rel);
+			}
+		}
+		return queryFacts;
 	}
 
 	private double calcF1Events(Episode query, Episode episode) {
@@ -86,11 +111,12 @@ public class ProposalsSorter {
 
 	private double calcLevenstein(Episode query, Episode episode) {
 		Map<Integer, Set<Fact>> qe = sortFactsInEpisode(query);
-		assertTrue(qe.size() == query.getNumEvents(), "Query is not with strict sequential order!");
+		assertTrue(qe.size() == query.getNumEvents(),
+				"Query is not with strict sequential order!");
 		List<Fact> queryEvents = wrapQuery(qe);
 		Map<Integer, Set<Fact>> ee = sortFactsInEpisode(episode);
 		List<Set<Fact>> episodeEvents = wrapEpisode(ee);
-		
+
 		int eventsInQuery = query.getNumEvents();
 		int eventsInEpisode = episode.getNumEvents();
 
@@ -103,14 +129,14 @@ public class ProposalsSorter {
 
 		while (qidx < queryEvents.size()) {
 			epElems++;
-			//deletions
+			// deletions
 			if (epElems > episode.getNumEvents()) {
 				dels += query.getNumEvents() - qidx;
 				break;
 			}
 			Set<Fact> eFacts = episodeEvents.get(eidx);
 			Fact qEvent = queryEvents.get(qidx);
-			//substitutions
+			// substitutions
 			if (!eFacts.contains(qEvent)) {
 				if (episode.getEvents().contains(qEvent)) {
 					adds++;
@@ -132,7 +158,7 @@ public class ProposalsSorter {
 			}
 			qidx++;
 		}
-		//additions
+		// additions
 		while (eidx < episodeEvents.size()) {
 			adds += episodeEvents.get(eidx).size();
 			eidx++;
@@ -174,8 +200,10 @@ public class ProposalsSorter {
 		return results;
 	}
 
-	private Set<Tuple<Integer, Set<Fact>>> sorter(Map<Integer, Set<Fact>> rankFacts) {
-		Set<Tuple<Integer, Set<Fact>>> sortedFacts = ProposalHelper.createFactsSortedSet();
+	private Set<Tuple<Integer, Set<Fact>>> sorter(
+			Map<Integer, Set<Fact>> rankFacts) {
+		Set<Tuple<Integer, Set<Fact>>> sortedFacts = ProposalHelper
+				.createFactsSortedSet();
 
 		for (Map.Entry<Integer, Set<Fact>> entry : rankFacts.entrySet()) {
 			sortedFacts.add(Tuple.newTuple(entry.getKey(), entry.getValue()));
@@ -183,7 +211,8 @@ public class ProposalsSorter {
 		return sortedFacts;
 	}
 
-	private Map<Integer, Set<Fact>> getFactsRanking(Map<Fact, Set<Fact>> factRelations) {
+	private Map<Integer, Set<Fact>> getFactsRanking(
+			Map<Fact, Set<Fact>> factRelations) {
 		Map<Integer, Set<Fact>> result = Maps.newHashMap();
 
 		for (Map.Entry<Fact, Set<Fact>> entry : factRelations.entrySet()) {
