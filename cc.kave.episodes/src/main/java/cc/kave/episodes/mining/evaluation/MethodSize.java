@@ -31,9 +31,9 @@ public class MethodSize {
 
 //		Logger.log("Event: %s", events.get(16529));
 //		Logger.log("Event: %s", events.get(29904));
-//		Logger.log("Number of unique events is: %d", events.size());
+		Logger.log("Number of unique events is: %d", events.size());
 		
-		checkMethodSize(stream, events, methodLength);
+//		checkMethodSize(stream, events, methodLength);
 	}
 
 	private void checkMethodSize(List<List<Fact>> stream, List<Event> events,

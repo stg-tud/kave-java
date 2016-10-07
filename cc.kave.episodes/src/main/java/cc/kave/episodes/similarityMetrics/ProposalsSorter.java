@@ -21,19 +21,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import cc.kave.episodes.mining.evaluation.ProposalHelper;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Measure;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 public class ProposalsSorter {
 
-	private TriangleNumber triangleNumber = new TriangleNumber();
+	private F1Facts f1FactMetric = new F1Facts();
 
 	public Set<Tuple<Episode, Double>> sort(Episode query,
 			Set<Episode> patterns, Metrics metric) throws Exception {
@@ -50,7 +50,7 @@ public class ProposalsSorter {
 	private double getMetric(Metrics metric, Episode query, Episode episode)
 			throws Exception {
 		if (metric == Metrics.F1_FACTS) {
-			return calcF1Facts(query, episode);
+			return f1FactMetric.calcF1Facts(query, episode);
 		} else if (metric == Metrics.F1_EVENTS) {
 			return calcF1Events(query, episode);
 		} else if (metric == Metrics.MAPO) {
@@ -60,40 +60,6 @@ public class ProposalsSorter {
 		} else {
 			throw new Exception("This metric is not available!");
 		}
-	}
-
-	private double calcF1Facts(Episode query, Episode episode) {
-		int episodeRelations = episode.getRelations().size();
-		int episodeEvents = episode.getNumEvents();
-		Set<Fact> episodeFacts = episode.getFacts();
-		Set<Fact> queryFacts = query.getFacts();
-
-		if (episodeRelations < triangleNumber.calculate(episodeEvents)) {
-			queryFacts = getQueryFacts(query, episodeFacts);
-		}
-		Measure m = Measure.newMeasure(queryFacts, episodeFacts);
-		double f1 = m.getF1();
-		return f1;
-	}
-
-	private Set<Fact> getQueryFacts(Episode query, Set<Fact> epFacts) {
-		Set<Fact> queryFacts = Sets.newHashSet();
-		queryFacts.addAll(query.getFacts());
-		Set<Fact> queryRel = query.getRelations();
-		
-		for (Fact rel : queryRel) {
-			Tuple<Fact, Fact> relFacts = rel.getRelationFacts();
-			Fact order1 = new Fact(relFacts.getFirst() + ">"
-					+ relFacts.getSecond());
-			Fact order2 = new Fact(relFacts.getSecond() + ">"
-					+ relFacts.getFirst());
-			if (epFacts.contains(relFacts.getFirst())
-					&& epFacts.contains(relFacts.getSecond())
-					&& !(epFacts.contains(order1) || epFacts.contains(order2))) {
-				queryFacts.remove(rel);
-			}
-		}
-		return queryFacts;
 	}
 
 	private double calcF1Events(Episode query, Episode episode) {
@@ -271,16 +237,6 @@ public class ProposalsSorter {
 		return diffs;
 	}
 
-	private Set<Fact> getDisjunctionFacts(Episode query, Episode episode) {
-		Set<Fact> disjunction = Sets.newHashSet();
-		Set<Fact> queryFacts = query.getFacts();
-		Set<Fact> episodeFacts = episode.getFacts();
-
-		disjunction.addAll(queryFacts);
-		disjunction.addAll(episodeFacts);
-		return disjunction;
-	}
-
 	private Set<Fact> getConjunctionFacts(Episode query, Episode episode) {
 		Set<Fact> conjuction = Sets.newHashSet();
 		Set<Fact> queryFacts = query.getFacts();
@@ -292,6 +248,16 @@ public class ProposalsSorter {
 			}
 		}
 		return conjuction;
+	}
+	
+	private Set<Fact> getDisjunctionFacts(Episode query, Episode episode) {
+		Set<Fact> disjunction = Sets.newHashSet();
+		Set<Fact> queryFacts = query.getFacts();
+		Set<Fact> episodeFacts = episode.getFacts();
+
+		disjunction.addAll(queryFacts);
+		disjunction.addAll(episodeFacts);
+		return disjunction;
 	}
 
 	private Double fract(double numerator, double denominator) {

@@ -32,9 +32,9 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 	
-	private static final int NUMBREPOS = 20;
-	private static final int FREQTHRESH = 230;
-	private static final double BIDIRECTTHRESH = 0.4;
+	private static final int NUMBREPOS = 150;
+	private static final int FREQTHRESH = 500;
+	private static final double BIDIRECTTHRESH = 0.6;
 	
 	private static final int METHODSIZE = 500;
 
