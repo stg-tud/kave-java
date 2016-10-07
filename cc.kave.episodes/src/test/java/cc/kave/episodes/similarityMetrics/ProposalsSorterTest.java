@@ -32,11 +32,13 @@ import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.exceptions.AssertionException;
 
 public class ProposalsSorterTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+	
 
 	private Episode query;
 	private Set<Episode> patterns;
@@ -64,6 +66,46 @@ public class ProposalsSorterTest {
 	}
 	
 	@Test
+	public void emptyQuery() throws Exception {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Query is empty!");
+		
+		query = new Episode();
+		Episode pattern = createEpisode("1", "2", "1>2");
+		
+		patterns = Sets.newHashSet(pattern);
+		
+		sut.sort(query, patterns, Metrics.F1_FACTS);
+	}
+	
+	@Test
+	public void emptyPattern() throws Exception {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Pattern is empty!");
+		
+		query = createEpisode("1", "2", "1>2");
+		Episode pattern = new Episode();
+		
+		patterns = Sets.newHashSet(pattern);
+		
+		sut.sort(query, patterns, Metrics.F1_FACTS);
+	}
+	
+	@Test
+	public void oneEmptyPattern() throws Exception {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Pattern is empty!");
+		
+		query = createEpisode("1", "2", "1>2");
+		Episode p1 = new Episode();
+		Episode p2 = createEpisode("1", "2", "3", "1>2", "1>3");
+		
+		patterns = Sets.newHashSet(p1, p2);
+		
+		sut.sort(query, patterns, Metrics.F1_FACTS);
+	}
+	
+	@Test
 	public void f1Facts() throws Exception {
 		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
 
@@ -73,7 +115,8 @@ public class ProposalsSorterTest {
 		Episode p4 = createEpisode("1", "2", "3", "3>1", "3>2", "1>2");
 		Episode p5 = createEpisode("1", "2", "3", "4", "3>1", "3>2", "3>4", "1>4", "2>4");
 		Episode p6 = createEpisode("1", "3", "4", "1>3", "1>4");
-		patterns = Sets.newHashSet(p1, p2, p3, p4, p5, p6);
+		Episode p7 = createEpisode("4");
+		patterns = Sets.newHashSet(p1, p2, p3, p4, p5, p6, p7);
 
 		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
 		expected.add(Tuple.newTuple(p1, 1.0));
@@ -82,6 +125,7 @@ public class ProposalsSorterTest {
 		expected.add(Tuple.newTuple(p6, fract(6.0, 11.0)));
 		expected.add(Tuple.newTuple(p2, fract(10.0, 19.0)));
 		expected.add(Tuple.newTuple(p5, fract(3.0, 7.0)));
+		expected.add(Tuple.newTuple(p7, 0.0));
 
 		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.F1_FACTS);
 
@@ -93,7 +137,6 @@ public class ProposalsSorterTest {
 		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
 
 		Episode p1 = createEpisode("1", "2", "3", "1>2", "1>3");
-//		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "1>4", "1>5", "2>4", "2>5", "3>4", "3>5", "4>5");
 		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
 		Episode p4 = createEpisode("1", "2", "3", "3>1", "3>2", "1>2");
 		Episode p5 = createEpisode("1", "2", "3", "4", "3>1", "3>2", "3>4", "1>4", "2>4");
@@ -105,7 +148,6 @@ public class ProposalsSorterTest {
 		expected.add(Tuple.newTuple(p4, 1.0));
 		expected.add(Tuple.newTuple(p3, fract(6.0, 7.0)));
 		expected.add(Tuple.newTuple(p5, fract(6.0, 7.0)));
-//		expected.add(Tuple.newTuple(p2, fract(3.0, 4.0)));
 		expected.add(Tuple.newTuple(p6, fract(2.0, 3.0)));
 
 		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.F1_EVENTS);
@@ -113,20 +155,27 @@ public class ProposalsSorterTest {
 		assertProposals(expected, actuals);
 	}
 	
-	@Ignore
 	@Test
-	public void example31() throws Exception {
+	public void mapo() throws Exception {
 		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
 
-		Episode p1 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3");
-		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "2>3", "3>4", "4>5");
-		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "2>3", "2>4");
-		patterns = Sets.newHashSet(p1, p2, p3);
+		Episode p1 = createEpisode("1", "2", "3", "1>2", "1>3");
+		Episode p2 = createEpisode("1", "2", "3", "4", "5", "1>2", "1>3", "1>4", "1>5", "2>4", "2>5", "3>4", "3>5", "4>5");
+		Episode p3 = createEpisode("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
+		Episode p4 = createEpisode("1", "2", "3", "3>1", "3>2", "1>2");
+		Episode p5 = createEpisode("1", "2", "3", "4", "3>1", "3>2", "3>4", "1>4", "2>4");
+		Episode p6 = createEpisode("1", "3", "4", "1>3", "1>4");
+		Episode p7 = createEpisode("4");
+		patterns = Sets.newHashSet(p1, p2, p3, p4, p5, p6, p7);
 
 		Set<Tuple<Episode, Double>> expected = Sets.newLinkedHashSet();
-		expected.add(Tuple.newTuple(p1, fract(6, 7)));
-		expected.add(Tuple.newTuple(p3, fract(6, 8)));
-		expected.add(Tuple.newTuple(p2, fract(6, 10)));
+		expected.add(Tuple.newTuple(p1, 1.0));
+		expected.add(Tuple.newTuple(p3, fract(5.0, 9.0)));
+		expected.add(Tuple.newTuple(p4, fract(3.0, 7.0)));
+		expected.add(Tuple.newTuple(p6, fract(3.0, 7.0)));
+		expected.add(Tuple.newTuple(p2, fract(5.0, 14.0)));
+		expected.add(Tuple.newTuple(p5, fract(3.0, 11.0)));
+		expected.add(Tuple.newTuple(p7, 0.0));
 
 		Set<Tuple<Episode, Double>> actuals = sut.sort(query, patterns, Metrics.MAPO);
 

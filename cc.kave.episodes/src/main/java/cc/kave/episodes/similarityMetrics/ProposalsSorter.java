@@ -32,8 +32,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ProposalsSorter {
-
-	private F1Facts f1FactMetric = new F1Facts();
+	
+	private Mapo mapo = new Mapo();
 
 	public Set<Tuple<Episode, Double>> sort(Episode query,
 			Set<Episode> patterns, Metrics metric) throws Exception {
@@ -47,32 +47,44 @@ public class ProposalsSorter {
 		return proposals;
 	}
 
-	private double getMetric(Metrics metric, Episode query, Episode episode)
+	private double getMetric(Metrics metric, Episode query, Episode pattern)
 			throws Exception {
+		assertTrue(!isEmptyEpisode(query), "Query is empty!");
+		assertTrue(!isEmptyEpisode(pattern), "Pattern is empty!");
+		
+		int episodeRelations = pattern.getRelations().size();
+		int episodeEvents = pattern.getNumEvents();
+		Set<Fact> queryFacts = Sets.newHashSet();
+		
+		if (episodeRelations < triangleNumber(episodeEvents)) {
+			queryFacts = getQueryFacts(query, pattern.getFacts());
+		} else {
+			queryFacts = query.getFacts();
+		}
+		
 		if (metric == Metrics.F1_FACTS) {
-			return f1FactMetric.calcF1Facts(query, episode);
+			return calcF1Facts(queryFacts, pattern.getFacts());
 		} else if (metric == Metrics.F1_EVENTS) {
-			return calcF1Events(query, episode);
+			return calcF1Events(query, pattern);
 		} else if (metric == Metrics.MAPO) {
-			return calcMapo(query, episode);
+			return mapo.calcMapo(queryFacts, pattern.getFacts());
 		} else if (metric == Metrics.LEVENSTEIN) {
-			return calcLevenstein(query, episode);
+			return calcLevenstein(query, pattern);
 		} else {
 			throw new Exception("This metric is not available!");
 		}
+	}
+	
+	private double calcF1Facts(Set<Fact> query, Set<Fact> pattern) {
+		Measure m = Measure.newMeasure(query, pattern);
+		double f1 = m.getF1();
+		return f1;
 	}
 
 	private double calcF1Events(Episode query, Episode episode) {
 		Measure m = Measure.newMeasure(query.getEvents(), episode.getEvents());
 		double f1 = m.getF1();
 		return f1;
-	}
-
-	private double calcMapo(Episode query, Episode episode) {
-		Set<Fact> conjunction = getConjunctionFacts(query, episode);
-		Set<Fact> disjunction = getDisjunctionFacts(query, episode);
-
-		return fract(conjunction.size(), disjunction.size());
 	}
 
 	private double calcLevenstein(Episode query, Episode episode) {
@@ -237,30 +249,45 @@ public class ProposalsSorter {
 		return diffs;
 	}
 
-	private Set<Fact> getConjunctionFacts(Episode query, Episode episode) {
-		Set<Fact> conjuction = Sets.newHashSet();
-		Set<Fact> queryFacts = query.getFacts();
-		Set<Fact> episodeFacts = episode.getFacts();
-
-		for (Fact fact : episodeFacts) {
-			if (queryFacts.contains(fact)) {
-				conjuction.add(fact);
-			}
-		}
-		return conjuction;
-	}
-	
-	private Set<Fact> getDisjunctionFacts(Episode query, Episode episode) {
-		Set<Fact> disjunction = Sets.newHashSet();
-		Set<Fact> queryFacts = query.getFacts();
-		Set<Fact> episodeFacts = episode.getFacts();
-
-		disjunction.addAll(queryFacts);
-		disjunction.addAll(episodeFacts);
-		return disjunction;
-	}
-
 	private Double fract(double numerator, double denominator) {
 		return numerator / denominator;
+	}
+	
+	private int triangleNumber(int num) {
+		if (num < 2) {
+			return 0;
+		} else if (num == 2) {
+			return 1;
+		} else {
+			return (num - 1) + triangleNumber(num - 1);
+		}
+	}
+	
+	private Set<Fact> getQueryFacts(Episode query, Set<Fact> epFacts) {
+		Set<Fact> queryFacts = Sets.newHashSet();
+		queryFacts.addAll(query.getFacts());
+		Set<Fact> queryRel = query.getRelations();
+		
+		for (Fact rel : queryRel) {
+			Tuple<Fact, Fact> relFacts = rel.getRelationFacts();
+			Fact order1 = new Fact(relFacts.getFirst() + ">"
+					+ relFacts.getSecond());
+			Fact order2 = new Fact(relFacts.getSecond() + ">"
+					+ relFacts.getFirst());
+			if (epFacts.contains(relFacts.getFirst())
+					&& epFacts.contains(relFacts.getSecond())
+					&& !(epFacts.contains(order1) || epFacts.contains(order2))) {
+				queryFacts.remove(rel);
+			}
+		}
+		return queryFacts;
+	}
+	
+	private boolean isEmptyEpisode(Episode episode) {
+		if (episode.getNumFacts() == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
