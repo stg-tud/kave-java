@@ -28,13 +28,13 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ReposParser;
+import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.ReposParser;
-import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.EnclosingMethods;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;

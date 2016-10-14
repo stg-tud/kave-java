@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import java.util.List;
 
 import com.google.inject.Inject;
 
-import cc.kave.episodes.mining.reader.MappingParser;
+import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.model.events.Event;
 
 public class MappingReader {

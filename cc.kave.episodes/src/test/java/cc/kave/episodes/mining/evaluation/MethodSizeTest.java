@@ -14,8 +14,8 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.StreamParser;
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;

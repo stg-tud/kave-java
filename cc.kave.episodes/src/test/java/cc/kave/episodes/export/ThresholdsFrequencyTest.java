@@ -41,7 +41,7 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;

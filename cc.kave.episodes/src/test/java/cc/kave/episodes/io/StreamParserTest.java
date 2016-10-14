@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -35,6 +35,8 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.episodes.io.FileReader;
+import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.exceptions.AssertionException;
 

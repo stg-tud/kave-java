@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.StreamParser;
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
@@ -31,6 +31,7 @@ public class MethodSize {
 
 //		Logger.log("Event: %s", events.get(16529));
 //		Logger.log("Event: %s", events.get(29904));
+		Logger.log("Number of methods is %d", stream.size());
 		Logger.log("Number of unique events is: %d", events.size());
 		
 //		checkMethodSize(stream, events, methodLength);

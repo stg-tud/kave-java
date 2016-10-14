@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -31,6 +31,8 @@ import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.exceptions.AssertionException;
 

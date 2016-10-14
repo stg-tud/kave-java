@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.episodes.io.FileReader;
 import cc.recommenders.exceptions.AssertionException;
 
 public class FileReaderTest {

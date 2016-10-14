@@ -16,13 +16,13 @@ import javax.inject.Inject;
 
 import com.google.inject.name.Named;
 
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.MappingParser;
 
 public class Suggestions {
 

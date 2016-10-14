@@ -23,14 +23,14 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.ValidationContextsParser;
 
 public class RecommenderGraphGenerator {
 	

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import static cc.recommenders.assertions.Asserts.assertFalse;
 import static cc.recommenders.assertions.Asserts.assertTrue;

@@ -30,7 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
-import cc.kave.episodes.mining.reader.ReposParser;
+import cc.kave.episodes.io.ReposParser;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.statistics.StreamStatistics;
 

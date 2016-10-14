@@ -49,13 +49,13 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ReposParser;
+import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.ReposParser;
-import cc.kave.episodes.mining.reader.StreamParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;

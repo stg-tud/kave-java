@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.mining.reader.EpisodeParser;
+import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Logger;

@@ -42,7 +42,7 @@ import com.google.inject.name.Named;
 
 import cc.kave.episodes.export.EventStreamIo;
 import cc.kave.episodes.export.EventsFilter;
-import cc.kave.episodes.mining.reader.ReposParser;
+import cc.kave.episodes.io.ReposParser;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;

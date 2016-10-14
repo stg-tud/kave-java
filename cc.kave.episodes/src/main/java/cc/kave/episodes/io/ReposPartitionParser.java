@@ -28,7 +28,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.reader;
+package cc.kave.episodes.io;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -41,6 +41,7 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -51,14 +52,14 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
-public class ReposParser {
+public class ReposPartitionParser {
 	
 	private Directory contextsDir;
 	private File eventsFolder;
 	private FileReader reader;
 	
 	@Inject
-	public ReposParser(@Named("contexts") Directory directory, @Named("events") File folder, FileReader reader) {
+	public ReposPartitionParser(@Named("contexts") Directory directory, @Named("events") File folder, FileReader reader) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.contextsDir = directory;
@@ -66,21 +67,25 @@ public class ReposParser {
 		this.reader = reader;
 	}
 	
-	public List<Event> learningStream(int numberOfRepos) throws ZipException, IOException {
+	public List<List<Event>> learningStream(int numberOfRepos) throws ZipException, IOException {
+		List<List<Event>> allEvents = Lists.newLinkedList();
 		EventStreamGenerator generator = new EventStreamGenerator();
 		StringBuilder repositories = new StringBuilder();
+		List<Event> events = Lists.newLinkedList();
 		String repoName = "";
 		int repoID = 0;
-
+		
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
-				repoID++;
-				if (repoID > numberOfRepos) {
-					break;
-				}
 				repoName = getRepoName(zip);
 				repositories.append(repoName + "\n");
+				repoID++;
+				if ((numberOfRepos > 200) && (repoID == 160)) {
+					events = generator.getEventStream();
+					allEvents.add(events);
+					generator = new EventStreamGenerator();
+				}
 			} 
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 
@@ -94,7 +99,8 @@ public class ReposParser {
 			ra.close();
 		}
 		FileUtils.writeStringToFile(new File(getReposPath(numberOfRepos)), repositories.toString());
-		List<Event> allEvents = generator.getEventStream();
+		events = generator.getEventStream();
+		allEvents.add(events);
 		return allEvents;
 	}
 	

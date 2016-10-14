@@ -47,10 +47,10 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
-import cc.kave.episodes.mining.reader.EpisodeParser;
-import cc.kave.episodes.mining.reader.MappingParser;
-import cc.kave.episodes.mining.reader.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;

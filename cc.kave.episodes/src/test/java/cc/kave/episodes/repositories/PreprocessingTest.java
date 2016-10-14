@@ -43,7 +43,7 @@ import com.google.common.collect.Maps;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.export.EventStreamIo;
-import cc.kave.episodes.mining.reader.ReposParser;
+import cc.kave.episodes.io.ReposParser;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
