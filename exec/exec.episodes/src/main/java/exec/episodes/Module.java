@@ -25,6 +25,7 @@ import cc.kave.episodes.export.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ReposFoldedParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;
@@ -33,6 +34,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.TargetsCategorization;
+import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Directory;
 
@@ -54,6 +56,8 @@ public class Module extends AbstractModule {
 		Directory rootDir = new Directory(rootFile.getAbsolutePath());
 		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
+		File reposData = new File(eventsData.getAbsolutePath() + "/repositories/");
+		Directory reposDir = new Directory(reposData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
@@ -67,6 +71,7 @@ public class Module extends AbstractModule {
 		dirs.put("root", rootDir);
 		dirs.put("statistics", statDir);
 		dirs.put("events", eventsDir);
+		dirs.put("repositories", reposDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("evaluation", evaluationDir);
 		dirs.put("patterns", patternsDir);
@@ -74,6 +79,7 @@ public class Module extends AbstractModule {
 
 		bind(File.class).annotatedWith(Names.named("root")).toInstance(rootFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventsData);
+		bind(File.class).annotatedWith(Names.named("repositories")).toInstance(reposData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
@@ -85,6 +91,10 @@ public class Module extends AbstractModule {
 
 		File eventStreamRoot = eventsData;
 		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
+		
+		Directory reposRoot = reposDir;
+		ReposFoldedParser reposParser = new ReposFoldedParser(ctxtDir);
+		bind(PreprocessingFolded.class).toInstance(new PreprocessingFolded(reposRoot, reposParser));
 
 		MappingParser mappingParser = new MappingParser(eventStreamRoot);
 		File graphRoot = rootFile;

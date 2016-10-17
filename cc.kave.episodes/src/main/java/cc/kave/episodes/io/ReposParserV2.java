@@ -30,92 +30,92 @@
  */
 package cc.kave.episodes.io;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipException;
+
+import org.apache.commons.io.FileUtils;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.export.EventStreamGenerator;
+import cc.kave.episodes.export.EventsFilter;
+import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class ReposFoldedParser {
-
+public class ReposParserV2 {
+	
 	private Directory contextsDir;
-
+	private File eventsFolder;
+	
 	@Inject
-	public ReposFoldedParser(@Named("contexts") Directory directory) {
+	public ReposParserV2(@Named("contexts") Directory directory, @Named("events") File folder) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.contextsDir = directory;
+		this.eventsFolder = folder;
 	}
-
-	public List<List<EventStreamGenerator>> generateFoldedEvents(int numFolds)
-			throws IOException {
-		List<EventStreamGenerator> generator = generateFoldedStream();
-		List<List<EventStreamGenerator>> events = initializeFolds(numFolds);
-
-		int i = 0;
-		for (EventStreamGenerator stream : generator) {
-			events.get(i).add(stream);
-			i = (i + 1) % numFolds;
-		}
-		return events;
-	}
-
-	private List<List<EventStreamGenerator>> initializeFolds(int numFolds) {
-		List<List<EventStreamGenerator>> events = Lists.newLinkedList();
-
-		for (int i = 0; i < numFolds; i++) {
-			events.add(Lists.newLinkedList());
-		}
-		return events;
-	}
-
-	private List<EventStreamGenerator> generateFoldedStream()
-			throws IOException {
-		List<EventStreamGenerator> reposStreams = Lists.newLinkedList();
+	
+	public Map<String, List<Event>> learningStream(int numRepos, int freq) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
-		EventStreamGenerator genAllRepos = new EventStreamGenerator();
+		EventStreamGenerator repoGen = new EventStreamGenerator();
+		StringBuilder repositories = new StringBuilder();
+		Map<String, List<Event>> allEvents = Maps.newLinkedHashMap();
 		String repoName = "";
+		int repoID = 0;
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
-			if (repoName.equalsIgnoreCase("") || (!zip.startsWith(repoName))) {
-				repoName = getRepoName(zip);
-				if (!generator.getEventStream().isEmpty()) {
-					reposStreams.add(generator);
-					generator = new EventStreamGenerator();
+			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
+				repoID++;
+				if (repoID > numRepos) {
+					break;
 				}
-			}
+				if (!repoGen.getEventStream().isEmpty()) {
+					List<Event> repoEvents = repoGen.getEventStream();
+					allEvents.put(repoName, repoEvents);
+					repoGen = new EventStreamGenerator();
+				}
+				repoName = getRepoName(zip);
+				repositories.append(repoName + "\n");
+			} 
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
+
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				if (ctx == null) {
 					continue;
 				}
 				generator.add(ctx);
-				genAllRepos.add(ctx);
+				repoGen.add(ctx);
 			}
 			ra.close();
 		}
-		writeReposStream(genAllRepos);
-		reposStreams.add(generator);
-		return reposStreams;
+		List<Event> repoEvents = repoGen.getEventStream();
+		allEvents.put(repoName, repoEvents);
+		FileUtils.writeStringToFile(new File(getReposPath(numRepos)), repositories.toString());
+		
+		List<Event> events = generator.getEventStream();
+		EventStream es = EventsFilter.filterStream(events, freq);
+		JsonUtils.toJson(es.getMapping().keySet(), new File(getMappingFile(numRepos)));
+		return allEvents;
 	}
-
-	private void writeReposStream(EventStreamGenerator genAllRepos) {
-		List<Event> events = genAllRepos.getEventStream();
-	}
-
+	
 	private String getRepoName(String zipName) {
-		int index = zipName.indexOf("/",
-				zipName.indexOf("/", zipName.indexOf("/") + 1) + 1);
+		int index = zipName.indexOf("/", zipName.indexOf("/", zipName.indexOf("/") + 1) + 1);
 		String startPrefix = zipName.substring(0, index);
 
 		return startPrefix;
@@ -130,5 +130,23 @@ public class ReposFoldedParser {
 			}
 		});
 		return zips;
+	}
+	
+	private String getReposPath(int numberOfRepos) {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
+		if (!pathName.isDirectory()) {
+			pathName.mkdir();
+		}
+		String fileName = pathName.getAbsolutePath() + "/repositories.txt";
+		return fileName;
+	}
+	
+	private String getMappingFile(int numberOfRepos) {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
+		if (!pathName.isDirectory()) {
+			pathName.mkdir();
+		}
+		String fileName = pathName.getAbsolutePath() + "/mapping.txt";
+		return fileName;
 	}
 }
