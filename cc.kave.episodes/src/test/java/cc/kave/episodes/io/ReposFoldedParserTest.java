@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +50,6 @@ import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.export.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -251,6 +249,34 @@ public class ReposFoldedParserTest {
 		stream = Lists.newLinkedList();
 		generator = new EventStreamGenerator();
 		generator.add(context3);
+		stream.add(generator);
+		expectedEvents.add(stream);
+
+		assertStream(expectedEvents, actualEvents);
+	}
+	
+	@Test
+	public void threeFolds() throws IOException {
+		List<List<EventStreamGenerator>> actualEvents = sut
+				.generateFoldedEvents(3);
+
+		List<List<EventStreamGenerator>> expectedEvents = Lists.newLinkedList();
+
+		List<EventStreamGenerator> stream = Lists.newLinkedList();
+		EventStreamGenerator generator = new EventStreamGenerator();
+		generator.add(context);
+		stream.add(generator);
+		expectedEvents.add(stream);
+		
+		stream = Lists.newLinkedList();
+		generator = new EventStreamGenerator();
+		generator.add(context3);
+		stream.add(generator);
+		expectedEvents.add(stream);
+		
+		stream = Lists.newLinkedList();
+		generator = new EventStreamGenerator();
+		generator.add(context2);
 		stream.add(generator);
 		expectedEvents.add(stream);
 
