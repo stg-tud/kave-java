@@ -25,7 +25,6 @@ import cc.kave.episodes.export.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
-import cc.kave.episodes.io.ReposFoldedParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.Evaluation;
@@ -34,7 +33,6 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.TargetsCategorization;
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Directory;
 
@@ -92,9 +90,9 @@ public class Module extends AbstractModule {
 		File eventStreamRoot = eventsData;
 		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
 		
-		Directory reposRoot = reposDir;
-		ReposFoldedParser reposParser = new ReposFoldedParser(ctxtDir);
-		bind(PreprocessingFolded.class).toInstance(new PreprocessingFolded(reposRoot, reposParser));
+//		Directory reposRoot = reposDir;
+//		ReposFoldedParser reposParser = new ReposFoldedParser(ctxtDir);
+//		bind(PreprocessingFolded.class).toInstance(new PreprocessingFolded(reposRoot, reposParser));
 
 		MappingParser mappingParser = new MappingParser(eventStreamRoot);
 		File graphRoot = rootFile;

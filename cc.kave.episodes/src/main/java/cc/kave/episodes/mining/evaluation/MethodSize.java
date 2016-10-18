@@ -26,13 +26,21 @@ public class MethodSize {
 	}
 
 	public void identifier(int numberOfRepos, int methodLength) {
-		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
+//		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
 		List<Event> events = mappingParser.parse(numberOfRepos);
-
+		
 //		Logger.log("Event: %s", events.get(16529));
 //		Logger.log("Event: %s", events.get(29904));
-		Logger.log("Number of methods is %d", stream.size());
+//		Logger.log("Number of methods is %d", stream.size());
 		Logger.log("Number of unique events is: %d", events.size());
+		
+		int md = 0;
+		for (Event event : events) {
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+				md++;
+			}
+		}
+		Logger.log("Number of method declarations is %d out of %d", md, events.size());
 		
 //		checkMethodSize(stream, events, methodLength);
 	}

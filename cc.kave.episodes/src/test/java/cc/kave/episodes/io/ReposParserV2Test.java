@@ -218,7 +218,7 @@ public class ReposParserV2Test {
 
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.learningStream(NUM_REPOS, FREQ);
+		sut.generateReposEvents(NUM_REPOS, FREQ);
 
 		File reposName = new File(getReposPath(NUM_REPOS));
 		File mappingFile = new File(getMappingFile(NUM_REPOS));
@@ -229,7 +229,7 @@ public class ReposParserV2Test {
 
 	@Test
 	public void contentTest() throws IOException {
-		sut.learningStream(NUM_REPOS, FREQ);
+		sut.generateReposEvents(NUM_REPOS, FREQ);
 
 		StringBuilder expectedRepos = new StringBuilder();
 		expectedRepos.append("Github/usr1/repo1\n");
@@ -252,7 +252,7 @@ public class ReposParserV2Test {
 
 	@Test
 	public void contextTest() throws ZipException, IOException {
-		sut.learningStream(NUM_REPOS, FREQ);
+		sut.generateReposEvents(NUM_REPOS, FREQ);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
@@ -266,7 +266,7 @@ public class ReposParserV2Test {
 	@Test
 	public void readTwoArchives() throws IOException {
 		Map<String, List<Event>> expectedEvents = getRepoEvents();
-		Map<String, List<Event>> actualEvents = sut.learningStream(NUM_REPOS,
+		Map<String, List<Event>> actualEvents = sut.generateReposEvents(NUM_REPOS,
 				FREQ);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));

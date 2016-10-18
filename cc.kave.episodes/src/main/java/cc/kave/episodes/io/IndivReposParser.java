@@ -32,7 +32,9 @@ package cc.kave.episodes.io;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipException;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.episodes.export.EventStreamGenerator;
@@ -42,80 +44,52 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class ReposFoldedParser {
-
+public class IndivReposParser {
+	
 	private Directory contextsDir;
-
+	
 	@Inject
-	public ReposFoldedParser(@Named("contexts") Directory directory) {
+	public IndivReposParser(@Named("contexts") Directory directory) {
 		this.contextsDir = directory;
 	}
-
-	public List<List<EventStreamGenerator>> generateFoldedEvents(int numFolds)
-			throws IOException {
-		List<EventStreamGenerator> generator = generateFoldedStream();
-		List<List<EventStreamGenerator>> events = initializeFolds(numFolds);
-
-		int i = 0;
-		for (EventStreamGenerator stream : generator) {
-			events.get(i).add(stream);
-			i = (i + 1) % numFolds;
-		}
-		return events;
-	}
-
-	private List<List<EventStreamGenerator>> initializeFolds(int numFolds) {
-		List<List<EventStreamGenerator>> events = Lists.newLinkedList();
-
-		for (int i = 0; i < numFolds; i++) {
-			events.add(Lists.newLinkedList());
-		}
-		return events;
-	}
-
-	private List<EventStreamGenerator> generateFoldedStream()
-			throws IOException {
-		List<EventStreamGenerator> reposStreams = Lists.newLinkedList();
-		EventStreamGenerator generator = new EventStreamGenerator();
-		EventStreamGenerator genAllRepos = new EventStreamGenerator();
+	
+	public Map<String, List<Event>> generateReposEvents() throws ZipException, IOException {
+		EventStreamGenerator repoGen = new EventStreamGenerator();
+		Map<String, List<Event>> allEvents = Maps.newLinkedHashMap();
 		String repoName = "";
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
-			if (repoName.equalsIgnoreCase("") || (!zip.startsWith(repoName))) {
-				repoName = getRepoName(zip);
-				if (!generator.getEventStream().isEmpty()) {
-					reposStreams.add(generator);
-					generator = new EventStreamGenerator();
+			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
+				if (!repoGen.getEventStream().isEmpty()) {
+					List<Event> repoEvents = repoGen.getEventStream();
+					allEvents.put(repoName, repoEvents);
+					repoGen = new EventStreamGenerator();
 				}
-			}
+				repoName = getRepoName(zip);
+			} 
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
+
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				if (ctx == null) {
 					continue;
 				}
-				generator.add(ctx);
-				genAllRepos.add(ctx);
+				repoGen.add(ctx);
 			}
 			ra.close();
 		}
-		writeReposStream(genAllRepos);
-		reposStreams.add(generator);
-		return reposStreams;
+		List<Event> repoEvents = repoGen.getEventStream();
+		allEvents.put(repoName, repoEvents);
+		return allEvents;
 	}
-
-	private void writeReposStream(EventStreamGenerator genAllRepos) {
-		List<Event> events = genAllRepos.getEventStream();
-	}
-
+	
 	private String getRepoName(String zipName) {
-		int index = zipName.indexOf("/",
-				zipName.indexOf("/", zipName.indexOf("/") + 1) + 1);
+		int index = zipName.indexOf("/", zipName.indexOf("/", zipName.indexOf("/") + 1) + 1);
 		String startPrefix = zipName.substring(0, index);
 
 		return startPrefix;

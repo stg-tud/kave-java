@@ -69,7 +69,7 @@ public class ReposParserV2 {
 		this.eventsFolder = folder;
 	}
 	
-	public Map<String, List<Event>> learningStream(int numRepos, int freq) throws ZipException, IOException {
+	public Map<String, List<Event>> generateReposEvents(int numRepos, int freq) throws ZipException, IOException {
 		EventStreamGenerator generator = new EventStreamGenerator();
 		EventStreamGenerator repoGen = new EventStreamGenerator();
 		StringBuilder repositories = new StringBuilder();

@@ -16,7 +16,6 @@
 package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -25,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +31,9 @@ import java.util.zip.ZipException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -48,8 +48,8 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.export.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -58,7 +58,10 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class ReposFoldedParserTest {
+public class IndiviReposParserTest {
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
 	private Directory rootDirectory;
@@ -70,11 +73,7 @@ public class ReposFoldedParserTest {
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
 
-	private Context context;
-	private Context context3;
-	private Context context2;
-
-	private ReposFoldedParser sut;
+	private IndivReposParser sut;
 
 	@Before
 	public void setup() throws IOException {
@@ -85,7 +84,7 @@ public class ReposFoldedParserTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ReposFoldedParser(rootDirectory);
+		sut = new IndivReposParser(rootDirectory);
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
@@ -110,21 +109,21 @@ public class ReposFoldedParserTest {
 		md2.getBody().add(wrap(ie2));
 		sst.getMethods().add(md2);
 
-		context = new Context();
+		Context context = new Context();
 		context.setSST(sst);
 		data.put(REPO1, context);
 
 		SST sst3 = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(Names.newMethod("[T,P] [T2,P].M()"));
+		md3.setName(Names.newMethod("[T,P] [T4,P].M()"));
 		InvocationExpression ie5 = new InvocationExpression();
 		IMethodName methodName5 = Names
-				.newMethod("[System.Void,mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie5.setMethodName(methodName5);
 		md3.getBody().add(wrap(ie5));
 		sst3.getMethods().add(md3);
 
-		context3 = new Context();
+		Context context3 = new Context();
 		context3.setSST(sst3);
 		data.put(REPO3, context3);
 
@@ -148,7 +147,7 @@ public class ReposFoldedParserTest {
 		md4.getBody().add(new ExpressionStatement());
 
 		sst2.getMethods().add(md4);
-		context2 = new Context();
+		Context context2 = new Context();
 		context2.setSST(sst2);
 
 		data.put(REPO2, context2);
@@ -186,134 +185,28 @@ public class ReposFoldedParserTest {
 
 	@Test
 	public void contextTest() throws ZipException, IOException {
-		sut.generateFoldedEvents(2);
+		sut.generateReposEvents();
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
 		verify(rootDirectory).getReadingArchive(REPO3);
 		verify(rootDirectory).getReadingArchive(REPO2);
-
+		
 		verify(ras.get(REPO1), times(2)).hasNext();
 		verify(ras.get(REPO1)).getNext(Context.class);
-
 		verify(ras.get(REPO3), times(2)).hasNext();
 		verify(ras.get(REPO3)).getNext(Context.class);
-
 		verify(ras.get(REPO2), times(2)).hasNext();
 		verify(ras.get(REPO2)).getNext(Context.class);
 	}
 
 	@Test
-	public void oneFold() throws IOException {
-		List<List<EventStreamGenerator>> actualEvents = sut
-				.generateFoldedEvents(1);
+	public void readTwoArchives() throws IOException {
+		Map<String, List<Event>> expectedEvents = getRepoEvents();
+		Map<String, List<Event>> actualEvents = sut.generateReposEvents();
 
-		List<List<EventStreamGenerator>> expectedEvents = Lists.newLinkedList();
-
-		List<EventStreamGenerator> stream = Lists.newLinkedList();
-		EventStreamGenerator generator = new EventStreamGenerator();
-		generator.add(context);
-		stream.add(generator);
-
-		generator = new EventStreamGenerator();
-		generator.add(context3);
-		stream.add(generator);
-
-		generator = new EventStreamGenerator();
-		generator.add(context2);
-		stream.add(generator);
-
-		expectedEvents.add(stream);
-
-		assertStream(expectedEvents, actualEvents);
-	}
-	
-	@Test
-	public void twoFolds() throws IOException {
-		List<List<EventStreamGenerator>> actualEvents = sut
-				.generateFoldedEvents(2);
-
-		List<List<EventStreamGenerator>> expectedEvents = Lists.newLinkedList();
-
-		List<EventStreamGenerator> stream = Lists.newLinkedList();
-		EventStreamGenerator generator = new EventStreamGenerator();
-		generator.add(context);
-		stream.add(generator);
-
-		generator = new EventStreamGenerator();
-		generator.add(context2);
-		stream.add(generator);
-
-		expectedEvents.add(stream);
-		
-		stream = Lists.newLinkedList();
-		generator = new EventStreamGenerator();
-		generator.add(context3);
-		stream.add(generator);
-		expectedEvents.add(stream);
-
-		assertStream(expectedEvents, actualEvents);
-	}
-	
-	@Test
-	public void threeFolds() throws IOException {
-		List<List<EventStreamGenerator>> actualEvents = sut
-				.generateFoldedEvents(3);
-
-		List<List<EventStreamGenerator>> expectedEvents = Lists.newLinkedList();
-
-		List<EventStreamGenerator> stream = Lists.newLinkedList();
-		EventStreamGenerator generator = new EventStreamGenerator();
-		generator.add(context);
-		stream.add(generator);
-		expectedEvents.add(stream);
-		
-		stream = Lists.newLinkedList();
-		generator = new EventStreamGenerator();
-		generator.add(context3);
-		stream.add(generator);
-		expectedEvents.add(stream);
-		
-		stream = Lists.newLinkedList();
-		generator = new EventStreamGenerator();
-		generator.add(context2);
-		stream.add(generator);
-		expectedEvents.add(stream);
-
-		assertStream(expectedEvents, actualEvents);
-	}
-
-	private void assertStream(List<List<EventStreamGenerator>> expected,
-			List<List<EventStreamGenerator>> actuals) {
-		if (expected.isEmpty() && actuals.isEmpty()) {
-			assertTrue(true);
-		}
-		assertTrue(expected.size() == actuals.size());
-
-		Iterator<List<EventStreamGenerator>> itEFold = expected.iterator();
-		Iterator<List<EventStreamGenerator>> itAFold = actuals.iterator();
-		
-		while(itEFold.hasNext()) {
-			List<EventStreamGenerator> expectFold = itEFold.next();
-			List<EventStreamGenerator> actualFold = itAFold.next();
-			
-			assertTrue(expectFold.size() == actualFold.size());
-
-			Iterator<EventStreamGenerator> itE = expectFold.iterator();
-			Iterator<EventStreamGenerator> itA = actualFold.iterator();
-			
-			while(itE.hasNext()) {
-				EventStreamGenerator expect = itE.next();
-				EventStreamGenerator actual = itA.next();
-				
-				List<Event> expEvents = expect.getEventStream();
-				List<Event> actEvents = actual.getEventStream();
-				
-				assertTrue(expEvents.size() == actEvents.size());
-				
-				assertEquals(expect.getEventStream(), actual.getEventStream());
-			}
-		}
+		assertEquals(expectedEvents.size(), actualEvents.size());
+		assertEquals(expectedEvents, actualEvents);
 	}
 
 	private <T> Predicate<T> anyPredicateOf(Class<T> clazz) {
@@ -326,5 +219,50 @@ public class ReposFoldedParserTest {
 		ExpressionStatement expressionStatement = new ExpressionStatement();
 		expressionStatement.setExpression(ie1);
 		return expressionStatement;
+	}
+
+	private Map<String, List<Event>> getRepoEvents() {
+		Map<String, List<Event>> reposEvents = Maps.newLinkedHashMap();
+		List<Event> events = Lists.newLinkedList();
+
+		String md1 = "[?] [?].???()";
+		IMethodName methodDecl1 = Names.newMethod(md1);
+		Event e1 = Events.newFirstContext(methodDecl1);
+		events.add(e1);
+		events.add(Events.newContext(methodDecl1));
+
+		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
+		IMethodName methodInv1 = Names.newMethod(inv1);
+		Event e2 = Events.newInvocation(methodInv1);
+		events.add(e2);
+
+		String inv2 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
+		IMethodName methodInv2 = Names.newMethod(inv2);
+		Event e3 = Events.newInvocation(methodInv2);
+		events.add(e3);
+		events.add(e3);
+
+		reposEvents.put("Github/usr1/repo1", events);
+
+		events = Lists.newLinkedList();
+		events.add(e1);
+		events.add(Events.newContext(methodDecl1));
+		events.add(e2);
+
+		reposEvents.put("Github/usr1/repo3", events);
+		
+		events = Lists.newLinkedList();
+		events.add(e1);
+		events.add(Events.newContext(methodDecl1));
+		
+		String inv4 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
+		IMethodName methInv4 = Names.newMethod(inv4);
+		Event e4 = Events.newInvocation(methInv4);
+		events.add(e4);
+		events.add(e4);
+		
+		reposEvents.put("Github/usr1/repo2", events);
+
+		return reposEvents;
 	}
 }
