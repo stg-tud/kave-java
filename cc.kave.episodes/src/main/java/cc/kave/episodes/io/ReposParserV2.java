@@ -132,21 +132,23 @@ public class ReposParserV2 {
 		return zips;
 	}
 	
-	private String getReposPath(int numberOfRepos) {
-		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
-		if (!pathName.isDirectory()) {
-			pathName.mkdir();
-		}
+	private String getReposPath(int numRepos) {
+		File pathName = getPath(numRepos);
 		String fileName = pathName.getAbsolutePath() + "/repositories.txt";
 		return fileName;
 	}
 	
-	private String getMappingFile(int numberOfRepos) {
-		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numberOfRepos + "Repos");
+	private String getMappingFile(int numRepos) {
+		File pathName = getPath(numRepos);
+		String fileName = pathName.getAbsolutePath() + "/mapping.txt";
+		return fileName;
+	}
+	
+	private File getPath(int numRepos) {
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numRepos + "Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();
 		}
-		String fileName = pathName.getAbsolutePath() + "/mapping.txt";
-		return fileName;
+		return pathName;
 	}
 }

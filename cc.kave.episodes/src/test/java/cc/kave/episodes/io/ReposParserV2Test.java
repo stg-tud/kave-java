@@ -110,10 +110,12 @@ public class ReposParserV2Test {
 		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
 
 		InvocationExpression ie1 = new InvocationExpression();
-		IMethodName methodName = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie1.setMethodName(methodName);
 		InvocationExpression ie2 = new InvocationExpression();
-		IMethodName methodName2 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		IMethodName methodName2 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
 		ie2.setMethodName(methodName2);
 
 		md2.getBody().add(wrap(ie1));
@@ -127,9 +129,10 @@ public class ReposParserV2Test {
 
 		SST sst3 = new SST();
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(Names.newMethod("[T,P] [T2,P].M()"));
+		md3.setName(Names.newMethod("[T,P] [T4,P].M()"));
 		InvocationExpression ie5 = new InvocationExpression();
-		IMethodName methodName5 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		IMethodName methodName5 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
 		ie5.setMethodName(methodName5);
 		md3.getBody().add(wrap(ie5));
 		sst3.getMethods().add(md3);
@@ -144,11 +147,13 @@ public class ReposParserV2Test {
 		md4.getBody().add(new DoLoop());
 
 		InvocationExpression ie3 = new InvocationExpression();
-		IMethodName methodName3 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		IMethodName methodName3 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie3.setMethodName(methodName3);
 
 		InvocationExpression ie4 = new InvocationExpression();
-		methodName3 = Names.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		methodName3 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
 		ie4.setMethodName(methodName3);
 
 		md4.getBody().add(wrap(ie3));
@@ -165,23 +170,28 @@ public class ReposParserV2Test {
 		repositories.add("Github/usr1/repo1");
 		repositories.add("Github/usr1/repo3");
 
-		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(new Answer<Set<String>>() {
-			@Override
-			public Set<String> answer(InvocationOnMock invocation) throws Throwable {
-				return data.keySet();
-			}
-		});
-		when(rootDirectory.getReadingArchive(anyString())).then(new Answer<ReadingArchive>() {
-			@Override
-			public ReadingArchive answer(InvocationOnMock invocation) throws Throwable {
-				String file = (String) invocation.getArguments()[0];
-				ReadingArchive ra = mock(ReadingArchive.class);
-				ras.put(file, ra);
-				when(ra.hasNext()).thenReturn(true).thenReturn(false);
-				when(ra.getNext(Context.class)).thenReturn(data.get(file));
-				return ra;
-			}
-		});
+		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(
+				new Answer<Set<String>>() {
+					@Override
+					public Set<String> answer(InvocationOnMock invocation)
+							throws Throwable {
+						return data.keySet();
+					}
+				});
+		when(rootDirectory.getReadingArchive(anyString())).then(
+				new Answer<ReadingArchive>() {
+					@Override
+					public ReadingArchive answer(InvocationOnMock invocation)
+							throws Throwable {
+						String file = (String) invocation.getArguments()[0];
+						ReadingArchive ra = mock(ReadingArchive.class);
+						ras.put(file, ra);
+						when(ra.hasNext()).thenReturn(true).thenReturn(false);
+						when(ra.getNext(Context.class)).thenReturn(
+								data.get(file));
+						return ra;
+					}
+				});
 
 		Logger.setPrinting(false);
 	}
@@ -227,11 +237,9 @@ public class ReposParserV2Test {
 
 		File fileName = new File(getReposPath(NUM_REPOS));
 		String actualsRepos = FileUtils.readFileToString(fileName);
-		
-		Map<String, List<Event>> expMapping = getExpectedEvents();
-		List<Event> expEvents = Lists.newLinkedList();
-		expEvents.addAll(expMapping.get("Github/usr1/repo1"));
-		expEvents.addAll(expMapping.get("Github/usr1/repo3"));
+
+		List<Event> expEvents = getMappingEvents();
+
 		File mappFile = new File(getMappingFile(NUM_REPOS));
 		@SuppressWarnings("serial")
 		Type listType = new TypeToken<LinkedList<Event>>() {
@@ -257,8 +265,9 @@ public class ReposParserV2Test {
 
 	@Test
 	public void readTwoArchives() throws IOException {
-		Map<String, List<Event>> expectedEvents = getExpectedEvents();
-		Map<String, List<Event>> actualEvents = sut.learningStream(NUM_REPOS, FREQ);
+		Map<String, List<Event>> expectedEvents = getRepoEvents();
+		Map<String, List<Event>> actualEvents = sut.learningStream(NUM_REPOS,
+				FREQ);
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
 		verify(rootDirectory).getReadingArchive(REPO1);
@@ -285,7 +294,7 @@ public class ReposParserV2Test {
 		return expressionStatement;
 	}
 
-	private Map<String, List<Event>> getExpectedEvents() {
+	private Map<String, List<Event>> getRepoEvents() {
 		Map<String, List<Event>> reposEvents = Maps.newLinkedHashMap();
 		List<Event> events = Lists.newLinkedList();
 
@@ -305,27 +314,47 @@ public class ReposParserV2Test {
 		Event e3 = Events.newInvocation(methodInv2);
 		events.add(e3);
 		events.add(e3);
-		
+
 		reposEvents.put("Github/usr1/repo1", events);
-		
+
 		events = Lists.newLinkedList();
 		events.add(e1);
 		events.add(Events.newContext(methodDecl1));
 		events.add(e2);
-		
+
 		reposEvents.put("Github/usr1/repo3", events);
 
 		return reposEvents;
 	}
 
+	private List<Event> getMappingEvents() {
+		List<Event> mapping = Lists.newLinkedList();
+
+		Event dummyEvent = Events.newDummyEvent();
+		mapping.add(dummyEvent);
+
+		IMethodName i1Name = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		Event ie1 = Events.newInvocation(i1Name);
+		mapping.add(ie1);
+		
+		IMethodName i2Name = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		Event ie2 = Events.newInvocation(i2Name);
+		mapping.add(ie2);
+
+		return mapping;
+	}
+
 	private String getReposPath(int numRepos) {
-		String fileName = rootFolder.getRoot().getAbsolutePath() + "/" + numRepos + "Repos/repositories.txt";
+		String fileName = rootFolder.getRoot().getAbsolutePath() + "/"
+				+ numRepos + "Repos/repositories.txt";
 		return fileName;
 	}
-	
 
 	private String getMappingFile(int numRepos) {
-		String fileName = rootFolder.getRoot().getAbsolutePath() + "/" + numRepos + "Repos/mapping.txt";
+		String fileName = rootFolder.getRoot().getAbsolutePath() + "/"
+				+ numRepos + "Repos/mapping.txt";
 		return fileName;
 	}
 }
