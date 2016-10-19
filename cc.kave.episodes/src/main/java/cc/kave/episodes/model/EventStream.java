@@ -15,6 +15,9 @@
  */
 package cc.kave.episodes.model;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -22,11 +25,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.google.common.collect.Maps;
-
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Events;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class EventStream {
 	public static final double DELTA = 0.001;
@@ -34,6 +38,7 @@ public class EventStream {
 
 	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();
+	private List<Event> enclMethods = Lists.newLinkedList();
 	private int streamLength = 0;
 	private int numMethods = 0;
 
@@ -51,7 +56,11 @@ public class EventStream {
 	public Map<Event, Integer> getMapping() {
 		return this.mappingData;
 	}
-	
+
+	public List<Event> getEnclMethods() {
+		return this.enclMethods;
+	}
+
 	public int getNumMethods() {
 		return this.numMethods;
 	}
@@ -69,6 +78,13 @@ public class EventStream {
 		possiblyIncreaseTimout(event);
 
 		if (event.getMethod().isUnknown()) {
+			return;
+		}
+
+		if (event.getKind() == EventKind.METHOD_DECLARATION) {
+			enclMethods.add(event);
+			assertTrue(this.numMethods == this.enclMethods.size(),
+					"Mismatch between number of methods and enclosing methods!");
 			return;
 		}
 
@@ -114,7 +130,8 @@ public class EventStream {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringBuilder.reflectionToString(this,
+				ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 	@Override
@@ -134,7 +151,7 @@ public class EventStream {
 		if (!this.sb.toString().equals(sm.getStream())) {
 			return false;
 		}
-		if (this.numMethods != sm.getNumMethods()) {
+		if (!this.getEnclMethods().equals(sm.getEnclMethods())) {
 			return false;
 		}
 		return true;
