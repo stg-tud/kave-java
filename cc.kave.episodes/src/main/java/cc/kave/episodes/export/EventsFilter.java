@@ -20,15 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.statistics.StreamStatistics;
-import cc.recommenders.exceptions.AssertionException;
+
+import com.google.common.collect.Sets;
 
 public class EventsFilter {
 

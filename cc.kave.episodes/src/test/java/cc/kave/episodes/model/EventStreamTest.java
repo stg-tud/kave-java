@@ -53,6 +53,7 @@ public class EventStreamTest {
 		assertEquals(0, sut.getStreamLength());
 
 		assertTrue(sut.getStream().equals(""));
+		assertTrue(sut.getNumMethods() == 0);
 	}
 
 	@Test
@@ -67,6 +68,7 @@ public class EventStreamTest {
 		assertEquals(0, sut.getStreamLength());
 
 		assertTrue(sut.getStream().equals(""));
+		assertTrue(sut.getNumMethods() == 1);
 	}
 
 	@Test
@@ -84,6 +86,8 @@ public class EventStreamTest {
 		assertEquals(2, sut.getNumberEvents());
 		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
+		
+		assertTrue(sut.getNumMethods() == 1);
 	}
 
 	@Test
@@ -101,41 +105,39 @@ public class EventStreamTest {
 		assertEquals(2, sut.getNumberEvents());
 		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
+		
+		assertTrue(sut.getNumMethods() == 0);
 	}
 
 	@Test
 	public void addMultipleEvents() {
 		sut.addEvent(firstCtx(1)); // 1
 		sut.addEvent(superCtx(2)); // 2
-		sut.addEvent(enclosingCtx(31)); // 3
-		sut.addEvent(inv(2)); // 4
-		sut.addEvent(inv(3)); // 5
+		sut.addEvent(inv(2)); // 3
+		sut.addEvent(inv(3)); // 4
 		sut.addEvent(firstCtx(0));
-		sut.addEvent(enclosingCtx(32)); // 6
-		sut.addEvent(inv(2)); // 4
+		sut.addEvent(inv(2)); // 3
 
 		Map<Event, Integer> expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
 		expectedMap.put(firstCtx(1), 1);
 		expectedMap.put(superCtx(2), 2);
-		expectedMap.put(enclosingCtx(31), 3);
-		expectedMap.put(inv(2), 4);
-		expectedMap.put(inv(3), 5);
-		expectedMap.put(enclosingCtx(32), 6);
+		expectedMap.put(inv(2), 3);
+		expectedMap.put(inv(3), 4);
 
 		StringBuilder expectedSb = new StringBuilder();
 		expectedSb.append("1,0.000\n");
 		expectedSb.append("2,0.001\n");
 		expectedSb.append("3,0.002\n");
 		expectedSb.append("4,0.003\n");
-		expectedSb.append("5,0.004\n");
-		expectedSb.append("6,0.505\n");
-		expectedSb.append("4,0.506\n");
+		expectedSb.append("3,0.504\n");
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(7, sut.getNumberEvents());
-		assertEquals(7, sut.getStreamLength());
+		assertEquals(5, sut.getNumberEvents());
+		assertEquals(5, sut.getStreamLength());
 		assertEquals(expectedSb.toString(), sut.getStream());
+		
+		assertTrue(sut.getNumMethods() == 2);
 	}
 
 	@Test
@@ -160,6 +162,8 @@ public class EventStreamTest {
 		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
+		
+		assertTrue(a.getNumMethods() == b.getNumMethods());
 		assertTrue(a.equals(b));
 	}
 
@@ -177,6 +181,9 @@ public class EventStreamTest {
 		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
+		
+		assertTrue(a.getNumMethods() == b.getNumMethods());
+		
 		assertFalse(a.equals(b));
 	}
 
@@ -195,6 +202,9 @@ public class EventStreamTest {
 		assertNotEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
+		
+		assertTrue(a.getNumMethods() == b.getNumMethods());
+		
 		assertFalse(a.equals(b));
 	}
 
@@ -213,6 +223,32 @@ public class EventStreamTest {
 		assertEquals(a.getNumberEvents(), b.getNumberEvents());
 		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
+		
+		assertTrue(a.getNumMethods() == b.getNumMethods());
+		
+		assertFalse(a.equals(b));
+	}
+	
+	@Test
+	public void notEqualNumMethods() {
+		EventStream a = new EventStream();
+		a.addEvent(firstCtx(1));
+		a.addEvent(inv(2));
+		a.addEvent(inv(2));
+
+		EventStream b = new EventStream();
+		b.addEvent(firstCtx(1));
+		b.addEvent(inv(2));
+		b.addEvent(firstCtx(0));
+		b.addEvent(inv(2));
+
+		assertEquals(a.getMapping(), b.getMapping());
+		assertEquals(a.getNumberEvents(), b.getNumberEvents());
+		assertEquals(a.getStreamLength(), b.getStreamLength());
+		assertNotEquals(a.getStream(), b.getStream());
+		
+		assertTrue(a.getNumMethods() != b.getNumMethods());
+		
 		assertFalse(a.equals(b));
 	}
 
@@ -226,10 +262,6 @@ public class EventStreamTest {
 
 	private static Event superCtx(int i) {
 		return Events.newSuperContext(m(i));
-	}
-
-	private static Event enclosingCtx(int i) {
-		return Events.newContext(m(i));
 	}
 
 	private static IMethodName m(int i) {

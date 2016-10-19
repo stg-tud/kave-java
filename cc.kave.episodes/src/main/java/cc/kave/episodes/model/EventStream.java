@@ -35,6 +35,7 @@ public class EventStream {
 	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();
 	private int streamLength = 0;
+	private int numMethods = 0;
 
 	boolean isFirstMethod = true;
 	double time = 0.000;
@@ -49,6 +50,10 @@ public class EventStream {
 
 	public Map<Event, Integer> getMapping() {
 		return this.mappingData;
+	}
+	
+	public int getNumMethods() {
+		return this.numMethods;
 	}
 
 	public int getStreamLength() {
@@ -98,8 +103,11 @@ public class EventStream {
 	}
 
 	private void possiblyIncreaseTimout(Event event) {
-		if (event.getKind() == EventKind.FIRST_DECLARATION && !isFirstMethod) {
-			time += TIMEOUT;
+		if (event.getKind() == EventKind.FIRST_DECLARATION) {
+			numMethods++;
+			if (!isFirstMethod) {
+				time += TIMEOUT;
+			}
 		}
 		isFirstMethod = false;
 	}
@@ -124,6 +132,9 @@ public class EventStream {
 			return false;
 		}
 		if (!this.sb.toString().equals(sm.getStream())) {
+			return false;
+		}
+		if (this.numMethods != sm.getNumMethods()) {
 			return false;
 		}
 		return true;
