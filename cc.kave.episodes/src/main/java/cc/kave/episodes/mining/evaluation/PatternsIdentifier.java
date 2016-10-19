@@ -104,7 +104,7 @@ public class PatternsIdentifier {
 						true);
 
 				for (List<Fact> method : stream) {
-					if (method.size() < 3) {
+					if (method.size() < 2) {
 						continue;
 					}
 					if (episode.equals(debug)) {

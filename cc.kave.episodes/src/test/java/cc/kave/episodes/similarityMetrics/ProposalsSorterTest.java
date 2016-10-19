@@ -155,6 +155,7 @@ public class ProposalsSorterTest {
 		assertProposals(expected, actuals);
 	}
 	
+	@Ignore
 	@Test
 	public void mapo() throws Exception {
 		query = createEpisode("1", "2", "3", "1>2", "1>3", "2>3");
