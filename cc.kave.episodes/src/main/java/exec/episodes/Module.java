@@ -21,7 +21,7 @@ import java.util.Map;
 import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
 import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.export.ThresholdsFrequency;
+import cc.kave.episodes.eventstream.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;

@@ -5,7 +5,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.util.List;
 
-import cc.kave.episodes.export.EventStreamIo;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;

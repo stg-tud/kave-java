@@ -43,8 +43,8 @@ import org.apache.commons.io.FileUtils;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.episodes.export.EventStreamGenerator;
-import cc.kave.episodes.export.EventsFilter;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Directory;

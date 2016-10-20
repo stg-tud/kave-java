@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,13 +41,14 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import cc.kave.episodes.eventstream.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
-public class ThresholdsBidirectionalTest {
+public class ThresholdsFrequencyTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -60,9 +61,8 @@ public class ThresholdsBidirectionalTest {
 	private EpisodesStatistics stats;
 	
 	private static final int NUMBREPOS = 2;
-	private static final int FREQTHRESH = 3;
 	
-	private ThresholdsBidirection sut;
+	private ThresholdsFrequency sut;
 	
 	@Before
 	public void setup() throws IOException {
@@ -91,7 +91,7 @@ public class ThresholdsBidirectionalTest {
 		
 		stats = new EpisodesStatistics();
 		
-		sut = new ThresholdsBidirection(rootFolder.getRoot(), parser, stats);
+		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
 		when(parser.parse(anyInt())).thenReturn(episodes);
 	}
@@ -105,7 +105,7 @@ public class ThresholdsBidirectionalTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new ThresholdsBidirection(new File("does not exist"), parser, stats);
+		sut = new ThresholdsFrequency(new File("does not exist"), parser, stats);
 	}
 
 	@Test
@@ -113,55 +113,56 @@ public class ThresholdsBidirectionalTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns is not a folder, but a file");
-		sut = new ThresholdsBidirection(file, parser, stats);
+		sut = new ThresholdsFrequency(file, parser, stats);
 	}
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(NUMBREPOS);
 
 		verify(parser).parse(eq(NUMBREPOS));
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(NUMBREPOS);
 
 		verify(parser).parse(eq(NUMBREPOS));
 
-		File bdsFile = new File(getBdsPath());
+		File freqsFile = new File(getFreqsPath());
 
-		assertTrue(bdsFile.exists());
+		assertTrue(freqsFile.exists());
 	}
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(NUMBREPOS);
 
 		verify(parser).parse(eq(NUMBREPOS));
 
-		File bdsFile = new File(getBdsPath());
+		File freqsFile = new File(getFreqsPath());
 		
-		StringBuilder expBds = new StringBuilder();
-		expBds.append("Bidirectional distribution for 2-node episodes:\n");
-		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("0.6\t2\n");
-		expBds.append("0.8\t1\n\n");
+		StringBuilder expFreqs = new StringBuilder();
+		expFreqs.append("Frequency distribution for 2-node episodes:\n");
+		expFreqs.append("Frequency\tCounter\n");
+		expFreqs.append("3\t2\n");
+		expFreqs.append("2\t3\n\n");
 		
-		expBds.append("Bidirectional distribution for 3-node episodes:\n");
-		expBds.append("Bidirectional\tCounter\n");
-		expBds.append("1.0\t1\n\n");
+		expFreqs.append("Frequency distribution for 3-node episodes:\n");
+		expFreqs.append("Frequency\tCounter\n");
+		expFreqs.append("2\t2\n");
+		expFreqs.append("3\t1\n\n");
 		
-		String actualBds = FileUtils.readFileToString(bdsFile);
+		String actualFreqs = FileUtils.readFileToString(freqsFile);
 		
-		assertEquals(expBds.toString(), actualBds);
-	}
-
-	private String getBdsPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/bds" + FREQTHRESH + "Freq" + NUMBREPOS + "Repos.txt");
-		return streamFile.getAbsolutePath();
+		assertEquals(expFreqs.toString(), actualFreqs);
 	}
 	
+	private String getFreqsPath() {
+		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/freqs" + NUMBREPOS + "Repos.txt");
+		return streamFile.getAbsolutePath();
+	}
+
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);

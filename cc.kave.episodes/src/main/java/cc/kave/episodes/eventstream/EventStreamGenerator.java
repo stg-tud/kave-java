@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.eventstream;
 
 import java.util.List;
 

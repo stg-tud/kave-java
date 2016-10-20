@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,6 +39,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 

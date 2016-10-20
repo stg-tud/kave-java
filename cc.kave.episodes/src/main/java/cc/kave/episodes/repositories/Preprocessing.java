@@ -37,15 +37,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipException;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import cc.kave.episodes.export.EventStreamIo;
-import cc.kave.episodes.export.EventsFilter;
+import cc.kave.episodes.eventstream.EventsFilter;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ReposParser;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class Preprocessing {
 
@@ -66,7 +66,7 @@ public class Preprocessing {
 
 //		debugStream(stream.getMapping().keySet());
 
-		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath);
+		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath, null);
 
 //		List<Event> mapping = new MappingParser(eventsFolder).parse(1);
 //		debugStream(mapping);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.export;
+package cc.kave.episodes.eventstream;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -32,14 +32,14 @@ import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Logger;
 
-public class ThresholdsBidirection {
+public class ThresholdsFrequency {
 
 	private File patternsFolder;
 	private EpisodeParser parser;
 	private EpisodesStatistics statistics;
 
 	@Inject
-	public ThresholdsBidirection(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
+	public ThresholdsFrequency(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -47,35 +47,36 @@ public class ThresholdsBidirection {
 		this.statistics = stats;
 	}
 
-	public void writer(int numbRepos, int frequency) throws IOException {
+	public void writer(int numbRepos) throws IOException {
 		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
-		StringBuilder bdsBuilder = new StringBuilder();
+		StringBuilder freqsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
 			}
 			Logger.log("Writting %d - node episodes", entry.getKey());
-			Map<Double, Integer> bds = statistics.bidirectEpisodes(entry.getValue(), frequency);
-			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
-			bdsBuilder.append(bdsLevel);
+			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
+			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
+			freqsBuilder.append(freqsLevel);
 		}
-		FileUtils.writeStringToFile(new File(getPath(numbRepos, frequency)), bdsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getFreqPath(numbRepos)), freqsBuilder.toString());
 	}
 
-	private String getBdsStringRep(Integer epLevel, Map<Double, Integer> bds) {
-		String data = "Bidirectional distribution for " + epLevel + "-node episodes:\n";
-		data += "Bidirectional\tCounter\n";
+	private String getFreqsStringRep(Integer epLevel, Map<Integer, Integer> frequences) {
+		String data = "Frequency distribution for " + epLevel + "-node episodes:\n";
+		data += "Frequency\tCounter\n";
 		
-		for (Map.Entry<Double, Integer> entry : bds.entrySet()) {
+		for (Map.Entry<Integer, Integer> entry : frequences.entrySet()) {
 			data += entry.getKey() + "\t" + entry.getValue() + "\n";
 		}
 		data += "\n";
 		return data;
 	}
 	
-	private String getPath(int numbRepos, int freq) {
-		String paths = patternsFolder.getAbsolutePath() + "/bds" + freq + "Freq" + numbRepos + "Repos.txt";
-		return paths;
+	private String getFreqPath(int numbRepos) {
+		String freqPath = patternsFolder.getAbsolutePath() + "/freqs" + numbRepos + "Repos.txt";
+
+		return freqPath;
 	}
 }
