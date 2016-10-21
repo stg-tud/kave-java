@@ -50,7 +50,7 @@ public class PreprocessingFolded {
 		}
 	}
 
-	private List<Event> createTrainingData(int curFold, int numFolds,
+	public List<Event> createTrainingData(int curFold, int numFolds,
 			Map<String, List<Event>> in) {
 
 		List<Event> outs = Lists.newLinkedList();
@@ -69,7 +69,7 @@ public class PreprocessingFolded {
 		return outs;
 	}
 
-	private List<Event> createValidationData(int curFold, int numFolds,
+	public List<Event> createValidationData(int curFold, int numFolds,
 			Map<String, List<Event>> in) {
 		List<Event> outs = Lists.newLinkedList();
 
