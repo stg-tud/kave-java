@@ -28,6 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepoMethodsMapperIO;
 import cc.kave.episodes.io.TrainingDataIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
@@ -49,6 +50,8 @@ public class PreprocessingFoldedTest {
 	private TrainingDataIO trainingIo;
 	@Mock
 	private ValidationDataIO validationIo;
+	@Mock
+	private RepoMethodsMapperIO repoMethodsIO;
 
 	private static final int NUM_FOLD = 10;
 	private static final int FREQTHRESH = 5;
@@ -59,12 +62,13 @@ public class PreprocessingFoldedTest {
 	public void setup() throws ZipException, IOException {
 		initMocks(this);
 
-		sut = new PreprocessingFolded(repoParser, trainingIo, validationIo);
+		sut = new PreprocessingFolded(repoParser, trainingIo, validationIo, repoMethodsIO);
 
 		when(repoParser.generateReposEvents()).thenReturn(generateMapper());
 
 		doNothing().when(trainingIo).write(any(EventStream.class), anyInt());
 		doNothing().when(validationIo).write(anyListOf(Event.class), anyInt());
+		doNothing().when(repoMethodsIO).writer(any(Map.class));
 	}
 	
 	@Test
@@ -75,6 +79,7 @@ public class PreprocessingFoldedTest {
 		
 		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt());
 		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt());
+		verify(repoMethodsIO).writer(any(Map.class));
 	}
 	
 	@Test

@@ -67,7 +67,7 @@ public class EpisodesStatistics {
 			if (!valid(ep, frequency)){
 				continue;
 			}
-			double bd = ep.getBidirectMeasure();
+			double bd = ep.getEntropy();
 			double roundBd = Precision.round(bd, ROUNDVALUE);
 			int count = total.get(roundBd);
 			total.put(roundBd, count + 1);
@@ -101,7 +101,7 @@ public class EpisodesStatistics {
 			if (epFreq < freqThresh) {
 				continue;
 			}
-			double bd = ep.getBidirectMeasure();
+			double bd = ep.getEntropy();
 			double reoundBd = Precision.round(bd, ROUNDVALUE);
 			if (!initializer.containsKey(reoundBd)) {
 				initializer.put(reoundBd, 0);

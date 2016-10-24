@@ -1,7 +1,7 @@
 package cc.kave.episodes.io;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
@@ -16,7 +16,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mock;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -36,9 +35,6 @@ public class ReposMethodsMapperTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Mock
-	private IndivReposParser reposParser;
-
 	private Map<String, List<Event>> mapper;
 
 	private RepoMethodsMapperIO sut;
@@ -49,16 +45,14 @@ public class ReposMethodsMapperTest {
 
 		mapper = generateMapper();
 
-		sut = new RepoMethodsMapperIO(tmp.getRoot(), reposParser);
-
-		when(reposParser.generateReposEvents()).thenReturn(mapper);
+		sut = new RepoMethodsMapperIO(tmp.getRoot());
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Repositories folder does not exist");
-		sut = new RepoMethodsMapperIO(new File("does not exist"), reposParser);
+		sut = new RepoMethodsMapperIO(new File("does not exist"));
 	}
 
 	@Test
@@ -66,21 +60,21 @@ public class ReposMethodsMapperTest {
 		File file = tmp.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Repositories is not a folder, but a file");
-		sut = new RepoMethodsMapperIO(file, reposParser);
+		sut = new RepoMethodsMapperIO(file);
 	}
 
 	@Test
 	public void fileIsCreated() throws ZipException, IOException {
 		File file = new File(getReposMethodsPath());
 
-		sut.writer();
+		sut.writer(mapper);
 
 		assertTrue(file.exists());
 	}
 
 	@Test
 	public void fileContent() throws ZipException, IOException {
-		sut.writer();
+		sut.writer(mapper);
 
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<Map<String, List<Event>>>() {
@@ -93,7 +87,7 @@ public class ReposMethodsMapperTest {
 
 	private String getReposMethodsPath() {
 		String path = tmp.getRoot().getAbsolutePath()
-				+ "/repoMethodsMapper.txt";
+				+ "/repoMethodsMapper.json";
 		return path;
 	}
 

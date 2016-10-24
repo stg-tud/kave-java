@@ -77,14 +77,14 @@ public class EventStream {
 
 		possiblyIncreaseTimout(event);
 
-		if (event.getMethod().isUnknown()) {
-			return;
-		}
-
 		if (event.getKind() == EventKind.METHOD_DECLARATION) {
 			enclMethods.add(event);
 			assertTrue(this.numMethods == this.enclMethods.size(),
 					"Mismatch between number of methods and enclosing methods!");
+			return;
+		}
+		
+		if (event.getMethod().isUnknown()) {
 			return;
 		}
 
@@ -126,6 +126,12 @@ public class EventStream {
 			}
 		}
 		isFirstMethod = false;
+	}
+	
+	public void delete() {
+		this.enclMethods.clear();
+		this.mappingData.clear();
+		this.sb.delete(0, sb.length());
 	}
 
 	@Override

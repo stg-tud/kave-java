@@ -51,7 +51,7 @@ public class EpisodesPostprocessor {
 			
 			for (Episode ep : entry.getValue()) {
 				int freq = ep.getFrequency();
-				double bidirect = ep.getBidirectMeasure();
+				double bidirect = ep.getEntropy();
 				
 				if ((freq >= freqThresh) && (bidirect >= bidirectThresh)) {
 					
@@ -86,10 +86,10 @@ public class EpisodesPostprocessor {
 
 	private Episode getRepresentative(Episode filterEp, Episode currEp, int freqThresh, double bidirectThresh) {
 		int ffreq = filterEp.getFrequency();
-		double fbidirect = filterEp.getBidirectMeasure();
+		double fbidirect = filterEp.getEntropy();
 		
 		int cfreq = currEp.getFrequency();
-		double cbidirect = currEp.getBidirectMeasure();
+		double cbidirect = currEp.getEntropy();
 		
 		if (ffreq > cfreq) {
 			return filterEp;

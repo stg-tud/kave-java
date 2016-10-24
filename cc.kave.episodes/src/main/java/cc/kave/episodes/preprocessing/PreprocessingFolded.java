@@ -6,6 +6,7 @@ import java.util.Map;
 
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepoMethodsMapperIO;
 import cc.kave.episodes.io.TrainingDataIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
@@ -18,22 +19,27 @@ import com.google.inject.Inject;
 public class PreprocessingFolded {
 
 	private IndivReposParser reposParser;
+
+	private RepoMethodsMapperIO reposMethodsIO;
 	private TrainingDataIO trainingIO;
 	private ValidationDataIO validationIO;
-
+	
 	private static final int NUM_FOLDS = 10;
 
 	@Inject
 	public PreprocessingFolded(IndivReposParser repositories,
-			TrainingDataIO training, ValidationDataIO valIo) {
+			TrainingDataIO training, ValidationDataIO valIo,
+			RepoMethodsMapperIO repMeth) {
 		this.reposParser = repositories;
 		this.trainingIO = training;
 		this.validationIO = valIo;
+		this.reposMethodsIO = repMeth;
 	}
 
 	public void runPreparation(int freq) throws IOException {
 
 		Map<String, List<Event>> repos = reposParser.generateReposEvents();
+		reposMethodsIO.writer(repos);
 
 		for (int curFold = 0; curFold < NUM_FOLDS; curFold++) {
 			Logger.log("Generating foldNum %d/%d", (curFold + 1), NUM_FOLDS);
@@ -43,10 +49,13 @@ public class PreprocessingFolded {
 			EventStream trainingStream = EventsFilter.filterStream(
 					trainingData, freq);
 			trainingIO.write(trainingStream, curFold);
+			trainingData.clear();
+			trainingStream.delete();
 
 			List<Event> validationData = createValidationData(curFold,
 					NUM_FOLDS, repos);
 			validationIO.write(validationData, curFold);
+			validationData.clear();
 		}
 	}
 
@@ -82,7 +91,7 @@ public class PreprocessingFolded {
 			}
 			i = (i + 1) % numFolds;
 		}
-		Logger.log("Writting event stream ... (validation: %d repositories)",
+		Logger.log("\tWritting event stream ... (validation: %d repositories)",
 				numRepos);
 		return outs;
 	}

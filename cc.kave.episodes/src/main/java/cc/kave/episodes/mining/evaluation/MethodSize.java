@@ -26,7 +26,7 @@ public class MethodSize {
 	}
 
 	public void identifier(int numberOfRepos, int methodLength) {
-//		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
+		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
 		List<Event> events = mappingParser.parse(numberOfRepos);
 		
 //		Logger.log("Event: %s", events.get(16529));
@@ -42,7 +42,7 @@ public class MethodSize {
 		}
 		Logger.log("Number of method declarations is %d out of %d", md, events.size());
 		
-//		checkMethodSize(stream, events, methodLength);
+		checkMethodSize(stream, events, methodLength);
 	}
 
 	private void checkMethodSize(List<List<Fact>> stream, List<Event> events,

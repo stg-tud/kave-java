@@ -11,31 +11,26 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class RepoMethodsMapperIO {
 
 	private File reposDir;
 	
-	private IndivReposParser reposParser;
-	
 	@Inject
-	public RepoMethodsMapperIO(@Named("repositories") File folder, IndivReposParser parser) {
+	public RepoMethodsMapperIO(@Named("repositories") File folder) {
 		assertTrue(folder.exists(), "Repositories folder does not exist");
 		assertTrue(folder.isDirectory(),
 				"Repositories is not a folder, but a file");
 		this.reposDir = folder;
-		this.reposParser = parser;
 	}
 	
-	public void writer() throws ZipException, IOException {
-		Map<String, List<Event>> repos = reposParser.generateReposEvents();
-		
+	public void writer(Map<String, List<Event>> repos) throws ZipException, IOException {
 		Map<String, List<Event>> repoMethods = Maps.newLinkedHashMap();
 
 		for (Map.Entry<String, List<Event>> entry : repos.entrySet()) {
@@ -53,7 +48,7 @@ public class RepoMethodsMapperIO {
 	}
 	
 	private String repoMethodsPath() {
-		String fileName = reposDir.getAbsolutePath() + "/repoMethodsMapper.txt";
+		String fileName = reposDir.getAbsolutePath() + "/repoMethodsMapper.json";
 		return fileName;
 	}
 }

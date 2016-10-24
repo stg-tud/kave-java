@@ -43,7 +43,7 @@ public class Episode {
 		return this.frequency;
 	}
 
-	public double getBidirectMeasure() {
+	public double getEntropy() {
 		return this.bidirectMeasure;
 	}
 

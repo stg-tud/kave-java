@@ -43,10 +43,6 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.MappingParser;
@@ -63,6 +59,10 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class PatternsIdentifierTest {
 
@@ -134,8 +134,8 @@ public class PatternsIdentifierTest {
 				enclosingCtx(7), inv(3), firstCtx(0), enclosingCtx(8), inv(4), inv(3), firstCtx(5), enclosingCtx(9),
 				inv(3));
 
-		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos,
-				transClosure, episodeGraphConverter, graphWriter);
+//		sut = new PatternsIdentifier(rootFolder.getRoot(), streamParser, processor, mappingParser, maxEpisodes, repos,
+//				transClosure, episodeGraphConverter, graphWriter);
 
 		when(streamParser.parse(anyInt())).thenReturn(stream);
 		when(mappingParser.parse(anyInt())).thenReturn(events);
@@ -153,8 +153,8 @@ public class PatternsIdentifierTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new PatternsIdentifier(new File("does not exist"), streamParser, processor, mappingParser, maxEpisodes,
-				repos, transClosure, episodeGraphConverter, graphWriter);
+//		sut = new PatternsIdentifier(new File("does not exist"), streamParser, processor, mappingParser, maxEpisodes,
+//				repos, transClosure, episodeGraphConverter, graphWriter);
 	}
 
 	@Test
@@ -162,8 +162,8 @@ public class PatternsIdentifierTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder is not a folder, but a file");
-		sut = new PatternsIdentifier(file, streamParser, processor, mappingParser, maxEpisodes, repos, transClosure,
-				episodeGraphConverter, graphWriter);
+//		sut = new PatternsIdentifier(file, streamParser, processor, mappingParser, maxEpisodes, repos, transClosure,
+//				episodeGraphConverter, graphWriter);
 	}
 
 	@Test
@@ -178,7 +178,7 @@ public class PatternsIdentifierTest {
 
 	@Test
 	public void mocksAreCalledInValidation() throws Exception {
-		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
+//		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
 
 		verify(mappingParser).parse(anyInt());
 		verify(processor).postprocess(anyInt(), anyInt(), anyDouble());
@@ -230,7 +230,7 @@ public class PatternsIdentifierTest {
 		when(episodeGraphConverter.convert(any(Episode.class), any(List.class)))
 				.thenReturn(any(DefaultDirectedGraph.class));
 
-		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
+//		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
 
 		verify(transClosure, times(2)).remTransClosure(any(Episode.class));
 		verify(episodeGraphConverter, times(2)).convert(any(Episode.class), any(List.class));
@@ -243,7 +243,7 @@ public class PatternsIdentifierTest {
 	public void fileIsCreated() throws Exception {
 		File fileName = getFilePath(NUMBREPOS, FREQUENCY, ENTROPY);
 
-		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
+//		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
 
 		assertTrue(fileName.exists());
 	}
@@ -261,7 +261,7 @@ public class PatternsIdentifierTest {
 		ep = createEpisode(2, "3", "4", "5", "3>4");
 		patterns.put(3, Sets.newHashSet(ep));
 
-		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
+//		sut.validationCode(NUMBREPOS, FREQUENCY, ENTROPY);
 
 		String actuals = FileUtils.readFileToString(getFilePath(NUMBREPOS, FREQUENCY, ENTROPY));
 

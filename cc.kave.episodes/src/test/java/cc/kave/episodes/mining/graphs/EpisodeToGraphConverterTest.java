@@ -118,7 +118,7 @@ public class EpisodeToGraphConverterTest {
 		labels += "3. " + kind3 + ": " + out3 + "\\l";
 		labels += "4. " + kind4 + ": " + out4 + "\\l";
 
-		labels += "Freq = " + episode.getFrequency() + ", bd = " + episode.getBidirectMeasure();
+		labels += "Freq = " + episode.getFrequency() + ", bd = " + episode.getEntropy();
 
 		Fact labelNode = new Fact(labels);
 		expected.addVertex(labelNode);

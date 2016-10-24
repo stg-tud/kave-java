@@ -70,7 +70,7 @@ public class EpisodeTest {
 	@Test
 	public void defaultValues() {
 		assertEquals(0, sut.getFrequency());
-		assertTrue(sut.getBidirectMeasure() == 0.0);
+		assertTrue(sut.getEntropy() == 0.0);
 		assertEquals(0, sut.getNumFacts());
 		assertEquals(0, sut.getNumEvents());
 		assertEquals(Sets.newHashSet(), sut.getEvents());
@@ -87,7 +87,7 @@ public class EpisodeTest {
 		Set<Fact> facts = Sets.newHashSet(new Fact("f"));
 		
 		assertEquals(3, sut.getFrequency());
-		assertTrue(sut.getBidirectMeasure() == 0.5);
+		assertTrue(sut.getEntropy() == 0.5);
 		assertEquals(facts, sut.getFacts());
 		assertEquals(facts, sut.getEvents());
 		assertEquals(Sets.newHashSet(), sut.getRelations());
@@ -155,7 +155,7 @@ public class EpisodeTest {
 		assertEquals(a.hashCode(), b.hashCode());
 
 		assertEquals(a.getFrequency(), b.getFrequency());
-		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertTrue(a.getEntropy() == b.getEntropy());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
@@ -180,7 +180,7 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 
 		assertNotEquals(a.getFrequency(), b.getFrequency());
-		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertTrue(a.getEntropy() == b.getEntropy());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
@@ -204,7 +204,7 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 
 		assertEquals(a.getFrequency(), b.getFrequency());
-		assertTrue(a.getBidirectMeasure() != b.getBidirectMeasure());
+		assertTrue(a.getEntropy() != b.getEntropy());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertEquals(a.getFacts(), b.getFacts());
@@ -228,7 +228,7 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 
 		assertEquals(a.getFrequency(), b.getFrequency());
-		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertTrue(a.getEntropy() == b.getEntropy());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());
@@ -253,7 +253,7 @@ public class EpisodeTest {
 		assertNotEquals(a.hashCode(), b.hashCode());
 
 		assertEquals(a.getFrequency(), b.getFrequency());
-		assertTrue(a.getBidirectMeasure() == b.getBidirectMeasure());
+		assertTrue(a.getEntropy() == b.getEntropy());
 		assertEquals(a.getNumEvents(), b.getNumEvents());
 		assertEquals(a.getNumFacts(), b.getNumFacts());
 		assertNotEquals(a.getFacts(), b.getFacts());

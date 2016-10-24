@@ -97,13 +97,13 @@ public class EventStreamTest {
 	@Test
 	public void addContext() {
 		sut.addEvent(firstCtx(1));
-		sut.addEvent(enclCtx(1));
+		sut.addEvent(enclCtx(0));
 
 		expectedMap = Maps.newLinkedHashMap();
 		expectedMap.put(Events.newDummyEvent(), 0);
 		expectedMap.put(firstCtx(1), 1);
 
-		expMethods.add(enclCtx(1));
+		expMethods.add(enclCtx(0));
 
 		String expectedStream = "1,0.000\n";
 		String actualStream = sut.getStream();
@@ -326,6 +326,26 @@ public class EventStreamTest {
 		assertTrue(a.getNumMethods() == b.getNumMethods());
 
 		assertFalse(a.equals(b));
+	}
+	
+	@Test
+	public void delete() {
+		EventStream emptyStream = new EventStream();
+		
+		assertTrue(sut.equals(emptyStream));
+		
+		sut.addEvent(firstCtx(1));
+		sut.addEvent(superCtx(2));
+		sut.addEvent(enclCtx(3));
+		sut.addEvent(inv(4));
+		
+		assertFalse(sut.equals(emptyStream));
+		
+		sut.delete();
+
+		assertTrue(sut.getEnclMethods().isEmpty());
+		assertTrue(sut.getMapping().isEmpty());
+		assertTrue(sut.getStream().isEmpty());
 	}
 
 	private static Event inv(int i) {
