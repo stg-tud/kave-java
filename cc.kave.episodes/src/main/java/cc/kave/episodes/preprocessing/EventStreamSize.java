@@ -4,14 +4,12 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -48,10 +46,24 @@ public class EventStreamSize {
 					"stream.txt"));
 			List<Event> methods = EventStreamIo.readMethods(getPath(fold, "methods.txt"));
 			
-			Map<String, Integer> longMethods = Maps.newLinkedHashMap();
-			
 			assertTrue(stream.size() == methods.size(), "Inconsistency between number of methods!");
+			
+			for (List<Fact> m : stream) {
+				if (m.size() > sizeLimit) {
+					int index = stream.indexOf(m);
+					Event event = methods.get(index);
+					String enclMethod = getMethodName(event);
+					
+					Logger.log("Method: %s\t has %d events", enclMethod, m.size());
+				}
+			}
 		}
+	}
+
+	private String getMethodName(Event event) {
+		String methodName = event.getMethod().getDeclaringType().getFullName()
+				+ "." + event.getMethod().getName();
+		return methodName;
 	}
 
 	private String getPath(int fold, String file) {
