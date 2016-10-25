@@ -85,6 +85,14 @@ public class EventStreamSizeTest {
 
 		assertLogContains(0, "Number of unique events is 9");
 	}
+	
+	@Test
+	public void methodSize() {
+		Logger.clearLog();
+		
+		sut.printMethodSize(NUM_FOLDS, SIZELIMIT);
+		
+	}
 
 	private static Event inv(int i) {
 		return Events.newInvocation(m(i));

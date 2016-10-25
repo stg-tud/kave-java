@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ReposParser;
@@ -152,54 +153,54 @@ public class PatternsIdentifier {
 		return episode;
 	}
 
-//	public void validationCode(int numbRepos, int frequency, double entropy)
-//			throws Exception {
-//		List<Event> trainEvents = mappingParser.parse(numbRepos);
-//		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
-//				numbRepos, frequency, entropy);
-//
-//		List<Event> stream = repos.validationStream(numbRepos);
-//		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream,
-//				trainEvents);
-//		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
-//		List<Event> listEvents = mapToList(mapEvents);
-//		StringBuilder sb = new StringBuilder();
-//		int patternId = 0;
-//
-//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-//			if ((entry.getKey() < 2) || (entry.getValue().size() == 0)) {
-//				continue;
-//			}
-//			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
-//			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-//			for (Episode episode : entry.getValue()) {
-//				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
-//						false);
-//				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
-//						true);
-//
-//				for (List<Fact> method : streamMethods) {
-//					if (method.containsAll(episode.getEvents())) {
-//						methodsNoOrderRelation.addMethod(episode, method,
-//								listEvents);
-//						methodsOrderRelation.addMethod(episode, method,
-//								listEvents);
-//					}
-//				}
-//				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
-//						+ methodsNoOrderRelation.getOccurrences() + "\t"
-//						+ methodsOrderRelation.getOccurrences() + "\n");
-//				patternsWriter(episode, trainEvents, numbRepos, frequency,
-//						entropy, patternId);
-//				patternId++;
-//			}
-//			sb.append("\n");
-//			Logger.log("Processed %d-node patterns!", entry.getKey());
-//		}
-//		FileUtils.writeStringToFile(
-//				getValidationPath(getPath(numbRepos, frequency, entropy)),
-//				sb.toString());
-//	}
+	// public void validationCode(int numbRepos, int frequency, double entropy)
+	// throws Exception {
+	// List<Event> trainEvents = mappingParser.parse(numbRepos);
+	// Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
+	// numbRepos, frequency, entropy);
+	//
+	// List<Event> stream = repos.validationStream(numbRepos);
+	// Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream,
+	// trainEvents);
+	// List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
+	// List<Event> listEvents = mapToList(mapEvents);
+	// StringBuilder sb = new StringBuilder();
+	// int patternId = 0;
+	//
+	// for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+	// if ((entry.getKey() < 2) || (entry.getValue().size() == 0)) {
+	// continue;
+	// }
+	// sb.append("Patterns of size: " + entry.getKey() + "-events\n");
+	// sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+	// for (Episode episode : entry.getValue()) {
+	// EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
+	// false);
+	// EnclosingMethods methodsOrderRelation = new EnclosingMethods(
+	// true);
+	//
+	// for (List<Fact> method : streamMethods) {
+	// if (method.containsAll(episode.getEvents())) {
+	// methodsNoOrderRelation.addMethod(episode, method,
+	// listEvents);
+	// methodsOrderRelation.addMethod(episode, method,
+	// listEvents);
+	// }
+	// }
+	// sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+	// + methodsNoOrderRelation.getOccurrences() + "\t"
+	// + methodsOrderRelation.getOccurrences() + "\n");
+	// patternsWriter(episode, trainEvents, numbRepos, frequency,
+	// entropy, patternId);
+	// patternId++;
+	// }
+	// sb.append("\n");
+	// Logger.log("Processed %d-node patterns!", entry.getKey());
+	// }
+	// FileUtils.writeStringToFile(
+	// getValidationPath(getPath(numbRepos, frequency, entropy)),
+	// sb.toString());
+	// }
 
 	public void inRepos(int numbRepos, int frequency, double entropy)
 			throws Exception {
@@ -218,15 +219,19 @@ public class PatternsIdentifier {
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
 
+		List<Integer> debugs = Lists.newArrayList(0, 15, 22, 29, 44, 48, 66,
+				68, 72, 83, 90, 104, 110, 113, 120, 127, 130, 136, 144, 146,
+				148, 149, 150, 151, 153, 157, 158, 160, 161);
+
 		for (Map.Entry<Integer, Set<Episode>> patternsEntry : patterns
 				.entrySet()) {
 			if ((patternsEntry.getKey() < 2)
 					|| (patternsEntry.getValue().size() == 0)) {
 				continue;
 			}
-			sb.append("Patterns of size: " + patternsEntry.getKey()
-					+ "-events\n");
-			sb.append("Pattern\tFreq\tEntropy\trepos\tsetOcc\torderOcc\n");
+			// sb.append("Patterns of size: " + patternsEntry.getKey()
+			// + "-events\n");
+			// sb.append("Pattern\tFreq\tEntropy\trepos\tsetOcc\torderOcc\n");
 			for (Episode episode : patternsEntry.getValue()) {
 				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
 						false);
@@ -246,12 +251,22 @@ public class PatternsIdentifier {
 						}
 					}
 				}
-				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
-						+ episode.getEntropy() + "\t" + reposNames.size()
-						+ "\t" + methodsNoOrderRelation.getOccurrences() + "\t"
-						+ methodsOrderRelation.getOccurrences() + "\n");
-				patternsWriter(episode, trainEvents, numbRepos, frequency,
-						entropy, patternId);
+				if (debugs.contains(patternId)) {
+					sb.append("pattern id = " + patternId + "\t" + episode.getFacts().toString() + "\n");
+					sb.append("repository name is" + reposNames.toString() + "\n");
+					Set<IMethodName> methods = methodsOrderRelation.getMethodNames(methodsOrderRelation.getOccurrences());
+					for (IMethodName m : methods) {
+						String methodName = m.getDeclaringType().getFullName() + "." + m.getName();
+						sb.append(methodName + "\n");
+					}
+				}
+				
+//				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+//						+ episode.getEntropy() + "\t" + reposNames.size()
+//						+ "\t" + methodsNoOrderRelation.getOccurrences() + "\t"
+//						+ methodsOrderRelation.getOccurrences() + "\n");
+//				patternsWriter(episode, trainEvents, numbRepos, frequency,
+//						entropy, patternId);
 				patternId++;
 			}
 			sb.append("\n");
