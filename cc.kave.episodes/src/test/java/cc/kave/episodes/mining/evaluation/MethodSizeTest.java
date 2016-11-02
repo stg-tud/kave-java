@@ -1,38 +1,37 @@
 package cc.kave.episodes.mining.evaluation;
 
 import static cc.recommenders.io.LoggerUtils.assertLogContains;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.io.MappingParser;
-import cc.kave.episodes.io.StreamParser;
+import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
-import com.google.common.collect.Lists;
-
 public class MethodSizeTest {
 
-	@Mock
-	private StreamParser streamParser;
-	@Mock
-	private MappingParser mapParser;
+	@Rule
+	public TemporaryFolder rootFolder = new TemporaryFolder();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-	private List<List<Fact>> stream = Lists.newLinkedList();
-	private List<Event> events = Lists.newLinkedList();
+	private EventStream eventStream = new EventStream();
 
 	private static final int NUMBREPOS = 5;
 
@@ -47,30 +46,23 @@ public class MethodSizeTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		sut = new MethodSize(streamParser, mapParser);
+		sut = new MethodSize(rootFolder.getRoot());
 
-		List<Fact> method1 = createMethod("1", "2", "3", "4", "5");
-		List<Fact> method2 = createMethod("1", "6");
-		List<Fact> method3 = createMethod("2", "7", "5");
-		List<Fact> method4 = createMethod("8", "4", "5");
-
-		stream.add(method1);
-		stream.add(method2);
-		stream.add(method3);
-		stream.add(method4);
-
-		events.add(dummy());
-		events.add(first(1));
-		events.add(sup(2));
-		events.add(ctx(3));
-		events.add(inv(4));
-		events.add(inv(5));
-		events.add(ctx(6));
-		events.add(ctx(7));
-		events.add(ctx(8));
-
-		when(streamParser.parse(NUMBREPOS)).thenReturn(stream);
-		when(mapParser.parse(NUMBREPOS)).thenReturn(events);
+		eventStream.addEvent(first(1));
+		eventStream.addEvent(sup(2));
+		eventStream.addEvent(ctx(3));
+		eventStream.addEvent(inv(4));
+		eventStream.addEvent(inv(5));
+		eventStream.addEvent(first(1));
+		eventStream.addEvent(ctx(6));
+		eventStream.addEvent(first(1));
+		eventStream.addEvent(sup(2));
+		eventStream.addEvent(ctx(7));
+		eventStream.addEvent(inv(5));
+		eventStream.addEvent(first(1));
+		eventStream.addEvent(ctx(8));
+		eventStream.addEvent(inv(4));
+		eventStream.addEvent(inv(5));
 	}
 
 	@After
@@ -79,46 +71,41 @@ public class MethodSizeTest {
 	}
 
 	@Test
+	public void cannotBeInitializedWithNonExistingFolder() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events folder does not exist");
+		sut = new MethodSize(new File("does not exist"));
+	}
+
+	@Test
+	public void cannotBeInitializedWithFile() throws IOException {
+		File file = rootFolder.newFile("a");
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events is not a folder, but a file");
+		sut = new MethodSize(file);
+	}
+
+	@Test
 	public void logger() {
 		Logger.clearLog();
 
-		sut.identifier(NUMBREPOS, 3);
+		EventStreamIo.write(eventStream, getStreamPath(NUMBREPOS),
+				getMappingPath(NUMBREPOS), getMethodsPath(NUMBREPOS));
 
-		verify(streamParser).parse(NUMBREPOS);
-		verify(mapParser).parse(NUMBREPOS);
+		assertTrue(new File(getStreamPath(NUMBREPOS)).exists());
+		assertTrue(new File(getMappingPath(NUMBREPOS)).exists());
+		assertTrue(new File(getMethodsPath(NUMBREPOS)).exists());
 
-		assertLogContains(0, "Size of the largest method is: 5");
-		assertLogContains(1, "The longest method is: T.m3");
-		assertLogContains(2, "Methods with more than 3 events are: 3");
-		assertLogContains(3, "Method T.m3\thas 5 events");
-		assertLogContains(4, "Method T.m7\thas 3 events");
-		assertLogContains(5, "Method T.m8\thas 3 events");
-	}
-	
-	@Test
-	public void noBigMethods() {
-		Logger.clearLog();
+		sut.statistics(NUMBREPOS, 3);
 
-		sut.identifier(NUMBREPOS, 6);
+		assertLogContains(0, "Number of methods in stream data is 4");
+		assertLogContains(1, "Number of unique events is 5");
+		assertLogContains(2, "Number of enclosing methods is 4");
 
-		verify(streamParser).parse(NUMBREPOS);
-		verify(mapParser).parse(NUMBREPOS);
-
-		assertLogContains(0, "Size of the largest method is: 5");
-		assertLogContains(1, "The longest method is: T.m3");
-	}
-
-	private List<Fact> createMethod(String... strings) {
-		List<Fact> method = Lists.newLinkedList();
-		for (String s : strings) {
-			Fact fact = new Fact(s);
-			method.add(fact);
-		}
-		return method;
-	}
-
-	private static Event dummy() {
-		return Events.newDummyEvent();
+//		assertLogContains(3, "Size of the largest method is: 4");
+//		assertLogContains(4, "The longest method is: T.m3");
+//		assertLogContains(5, "Methods with more than 3 events are: 1");
+//		assertLogContains(6, "Method T.m3\thas 4 events");
 	}
 
 	private static Event inv(int i) {
@@ -139,5 +126,26 @@ public class MethodSizeTest {
 
 	private static IMethodName m(int i) {
 		return Names.newMethod("[T,P] [T,P].m" + i + "()");
+	}
+
+	private File getPath(int numRepos) {
+		File path = new File(rootFolder.getRoot().getAbsolutePath() + "/"
+				+ numRepos + "Repos");
+		return path;
+	}
+
+	private String getStreamPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/stream.txt";
+		return fileName;
+	}
+
+	private String getMappingPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/mapping.txt";
+		return fileName;
+	}
+
+	private String getMethodsPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/methods.txt";
+		return fileName;
 	}
 }

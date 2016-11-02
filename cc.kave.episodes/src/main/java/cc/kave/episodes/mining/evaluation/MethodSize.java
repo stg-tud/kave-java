@@ -1,48 +1,57 @@
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import cc.kave.episodes.io.MappingParser;
-import cc.kave.episodes.io.StreamParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class MethodSize {
 
-	private StreamParser streamParser;
-	private MappingParser mappingParser;
+	private File directory;
 
 	@Inject
-	public MethodSize(StreamParser streamParser, MappingParser mappingParser) {
-		this.streamParser = streamParser;
-		this.mappingParser = mappingParser;
+	public MethodSize(@Named("events") File folder) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.directory = folder;
 	}
 
-	public void identifier(int numberOfRepos, int methodLength) {
-		List<List<Fact>> stream = streamParser.parse(numberOfRepos);
-		List<Event> events = mappingParser.parse(numberOfRepos);
+	public void statistics(int numbRepos, int methodLength) {
+		List<List<Fact>> stream = EventStreamIo.parseStream(getStreamPath(numbRepos));
+		List<Event> events = EventStreamIo.readMapping(getMappingPath(numbRepos));
+		List<Event> methods = EventStreamIo.readMethods(getMethodsPath(numbRepos));
 		
-//		Logger.log("Event: %s", events.get(16529));
-//		Logger.log("Event: %s", events.get(29904));
-//		Logger.log("Number of methods is %d", stream.size());
-//		Logger.log("Number of unique events is: %d", events.size());
-//		
-//		int md = 0;
-//		for (Event event : events) {
-//			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-//				md++;
-//			}
-//		}
-//		Logger.log("Number of method declarations is %d out of %d", md, events.size());
+		Set<Event> uniqMethods = listToSet(methods);
+		assertTrue(uniqMethods.size() <= methods.size(), "Error in converting List to Set!");
+
+		Logger.log("Number of methods in stream data is %d", stream.size());
+		Logger.log("Number of unique events is %d", events.size());
+		Logger.log("Number of enclosing methods is %d", uniqMethods.size());
+
+//		checkMethodSize(stream, events, methodLength);
+	}
+
+	private Set<Event> listToSet(List<Event> methods) {
+		Set<Event> result = Sets.newLinkedHashSet();
 		
-		checkMethodSize(stream, events, methodLength);
+		for (Event m : methods) {
+			result.add(m);
+		}
+		return result;
 	}
 
 	private void checkMethodSize(List<List<Fact>> stream, List<Event> events,
@@ -91,10 +100,31 @@ public class MethodSize {
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
 				fileName = event.getMethod().getDeclaringType().getFullName()
 						+ "." + event.getMethod().getName();
-//				fileName = event.getMethod().getIdentifier();
+				// fileName = event.getMethod().getIdentifier();
 				break;
 			}
 		}
+		return fileName;
+	}
+
+	private File getPath(int numRepos) {
+		File path = new File(directory.getAbsolutePath() + "/" + numRepos
+				+ "Repos");
+		return path;
+	}
+	
+	private String getStreamPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/stream.txt";
+		return fileName;
+	}
+	
+	private String getMappingPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/mapping.txt";
+		return fileName;
+	}
+	
+	private String getMethodsPath(int numRepos) {
+		String fileName = getPath(numRepos).getAbsolutePath() + "/methods.txt";
 		return fileName;
 	}
 }
