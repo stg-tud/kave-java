@@ -152,25 +152,32 @@ public class PreprocessingTest {
 	@Test
 	public void contentTest() throws IOException {
 		sut.generate(NUMBREPOS, FREQTHRESH);
-		// 1 2 3 4 2 1 3
-		// firstCtx(1), inv(2), inv(3), firstCtx(0), superCtx(2), inv(5),
-		// inv(2), firstCtx(1), superCtx(0), inv(3)
+//		firstCtx(1)		1
+//		enclosingCtx(6)	
+//		inv(2)			2
+//		inv(3)			3
+//		firstCtx(0)
+//		superCtx(2)
+//		enclosingCtx(7)
+//		inv(5)
+//		inv(2)			2
+//		firstCtx(1)		1
+//		superCtx(0)
+//		enclosingCtx(8)
+//		inv(3));		3
 
 		verify(repos).learningStream(anyInt());
 
 		File streamFile = new File(getStreamPath());
 		File mappingFile = new File(getMappingPath());
 
-		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n4,0.003\n5,0.504\n3,0.505\n1,1.006\n6,1.007\n4,1.008\n";
+		String expectedStream = "1,0.000\n2,0.001\n3,0.002\n2,0.503\n1,1.004\n3,1.005\n";
 
 		List<Event> expectedMapping = Lists.newLinkedList();
 		expectedMapping.add(dummy());
 		expectedMapping.add(firstCtx(1));
-		expectedMapping.add(enclosingCtx(6));
 		expectedMapping.add(inv(2));
 		expectedMapping.add(inv(3));
-		expectedMapping.add(enclosingCtx(7));
-		expectedMapping.add(enclosingCtx(8));
 
 		String actualStream = FileUtils.readFileToString(streamFile);
 		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());

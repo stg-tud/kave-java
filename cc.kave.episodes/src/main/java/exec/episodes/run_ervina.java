@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
-import cc.kave.episodes.preprocessing.EventStreamSize;
+import cc.kave.episodes.repositories.Preprocessing;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -33,8 +32,8 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 	
-	private static final int NUMBREPOS = 200;
-	private static final int FREQ = 500;
+	private static final int NUMBREPOS = 360;
+	private static final int FREQ = 1;
 	private static final double ENTROPY = 0.6;
 	
 	private static final int METHODSIZE = 500;
@@ -55,12 +54,12 @@ public class run_ervina {
 //		load(PreprocessingFolded.class).runPreparation(FREQTHRESH);
 //		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
 		
-		load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
+//		load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
 		
 //		load(ReposPreprocess.class).generate(FREQTHRESH);
 		
 //		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-//		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
+		load(Preprocessing.class).generate(NUMBREPOS, FREQ);
 		
 //		load(MethodSize.class).identifier(NUMBREPOS, METHODSIZE);
 		

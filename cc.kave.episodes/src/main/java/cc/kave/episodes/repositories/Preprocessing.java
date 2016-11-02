@@ -43,6 +43,7 @@ import cc.kave.episodes.io.ReposParser;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -60,16 +61,21 @@ public class Preprocessing {
 		this.repos = repos;
 	}
 
-	public void generate(int numbRepos, int freqThresh) throws ZipException, IOException {
+	public void generate(int numbRepos, int freqThresh) throws ZipException,
+			IOException {
 		List<Event> allEvents = repos.learningStream(numbRepos);
 		EventStream stream = EventsFilter.filterStream(allEvents, freqThresh);
 
-//		debugStream(stream.getMapping().keySet());
+		// debugStream(stream.getMapping().keySet());
 
-		EventStreamIo.write(stream, getPath(numbRepos).streamPath, getPath(numbRepos).mappingPath, null);
+		EventStreamIo.write(stream, getPath(numbRepos).streamPath,
+				getPath(numbRepos).mappingPath, getPath(numbRepos).enclMethods);
+		
+		Logger.log("\nPreprocessing ran for %d repositories.", numbRepos);
+		Logger.log("For events with a frequency of %d or higher.", freqThresh);
 
-//		List<Event> mapping = new MappingParser(eventsFolder).parse(1);
-//		debugStream(mapping);
+		// List<Event> mapping = new MappingParser(eventsFolder).parse(1);
+		// debugStream(mapping);
 	}
 
 	private void debugStream(Iterable<Event> keySet) {
@@ -85,13 +91,15 @@ public class Preprocessing {
 	}
 
 	private FilePaths getPath(int numbRepos) {
-		File pathName = new File(eventsFolder.getAbsolutePath() + "/" + numbRepos + "Repos");
+		File pathName = new File(eventsFolder.getAbsolutePath() + "/"
+				+ numbRepos + "Repos");
 		if (!pathName.isDirectory()) {
 			pathName.mkdir();
 		}
 		FilePaths paths = new FilePaths();
 		paths.streamPath = pathName.getAbsolutePath() + "/stream.txt";
 		paths.mappingPath = pathName.getAbsolutePath() + "/mapping.txt";
+		paths.enclMethods = pathName.getAbsolutePath() + "/methods.txt";
 
 		return paths;
 	}
@@ -99,5 +107,6 @@ public class Preprocessing {
 	private class FilePaths {
 		private String streamPath = "";
 		private String mappingPath = "";
+		private String enclMethods = "";
 	}
 }

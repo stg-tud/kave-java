@@ -52,27 +52,29 @@ public class EventsFilterTest {
 									firstCtx(0), enclCtx(8), inv(2),
 									firstCtx(1), enclCtx(6), inv(2), inv(3), 
 									firstCtx(3), superCtx(4), enclCtx(0), inv(3));
-		// partitionEvents1 = Lists.newArrayList(ctx(2), inv(5), ctx(1), inv(4),
-		// inv(3), inv(2));
 
 		expectedStream = new EventStream();
-		expectedStream.addEvent(firstCtx(1)); // 1
-		expectedStream.addEvent(enclCtx(0)); // 2
-		expectedStream.addEvent(inv(2)); // 3
-		expectedStream.addEvent(inv(3)); // 4
+		expectedStream.addEvent(firstCtx(1));	// 1
+		expectedStream.addEvent(enclCtx(0));  	
+		expectedStream.addEvent(inv(2)); 		// 2
+		expectedStream.addEvent(inv(3)); 		// 3
 		expectedStream.addEvent(firstCtx(0));
-		expectedStream.addEvent(enclCtx(7)); // 5
-		expectedStream.addEvent(inv(2)); // 3
-		expectedStream.addEvent(firstCtx(1));
+		expectedStream.addEvent(enclCtx(7)); 	
+		expectedStream.addEvent(inv(2)); 		// 2
+		expectedStream.addEvent(firstCtx(1));	// 1
 		expectedStream.addEvent(enclCtx(6));
-		expectedStream.addEvent(inv(2));
-		expectedStream.addEvent(inv(3));
+		expectedStream.addEvent(inv(2));		// 2
+		expectedStream.addEvent(inv(3));		// 3
+		expectedStream.addEvent(firstCtx(1));	// 1	
+		expectedStream.addEvent(enclCtx(0));
+		expectedStream.addEvent(inv(2));		// 2
+		expectedStream.addEvent(inv(3));		// 3
 		expectedStream.addEvent(firstCtx(0));
 		expectedStream.addEvent(enclCtx(8));
-		expectedStream.addEvent(inv(2));
-		expectedStream.addEvent(firstCtx(3)); // 6
-		expectedStream.addEvent(enclCtx(0)); // 7
-		expectedStream.addEvent(inv(3)); // 4
+		expectedStream.addEvent(inv(2));		// 2
+		expectedStream.addEvent(firstCtx(3)); 	// 4
+		expectedStream.addEvent(enclCtx(0)); 
+		expectedStream.addEvent(inv(3)); 		// 3
 
 		// expectedPartition1 +=
 		// "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n5,1.005\n6,1.006\n3,1.007\n";
@@ -93,6 +95,7 @@ public class EventsFilterTest {
 	public void filterStream() {
 		EventStream actuals = EventsFilter.filterStream(events, REMFREQS);
 
+		
 		assertEquals(expectedStream.getStream(), actuals.getStream());
 		assertEquals(expectedStream.getMapping(), actuals.getMapping());
 		assertEquals(expectedStream.getStreamLength(), actuals.getStreamLength());
