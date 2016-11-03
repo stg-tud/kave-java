@@ -32,17 +32,29 @@ public class MethodSize {
 
 	public void statistics(int numbRepos, int methodLength) {
 		List<List<Fact>> stream = EventStreamIo.parseStream(getStreamPath(numbRepos));
-		List<Event> events = EventStreamIo.readMapping(getMappingPath(numbRepos));
-		List<Event> methods = EventStreamIo.readMethods(getMethodsPath(numbRepos));
+		int streamLength = calcStreamLength(stream);
 		
+		List<Event> events = EventStreamIo.readMapping(getMappingPath(numbRepos));
+
+		List<Event> methods = EventStreamIo.readMethods(getMethodsPath(numbRepos));
 		Set<Event> uniqMethods = listToSet(methods);
 		assertTrue(uniqMethods.size() <= methods.size(), "Error in converting List to Set!");
 
 		Logger.log("Number of methods in stream data is %d", stream.size());
+		Logger.log("Number of events in the event stream is %d", streamLength);
 		Logger.log("Number of unique events is %d", events.size());
 		Logger.log("Number of enclosing methods is %d", uniqMethods.size());
 
 //		checkMethodSize(stream, events, methodLength);
+	}
+
+	private int calcStreamLength(List<List<Fact>> stream) {
+		int length = 0;
+		
+		for (List<Fact> method : stream) {
+			length += method.size();
+		}
+		return length;
 	}
 
 	private Set<Event> listToSet(List<Event> methods) {

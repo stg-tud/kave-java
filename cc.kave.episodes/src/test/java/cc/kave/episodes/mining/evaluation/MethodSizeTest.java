@@ -48,11 +48,11 @@ public class MethodSizeTest {
 
 		sut = new MethodSize(rootFolder.getRoot());
 
-		eventStream.addEvent(first(1));
-		eventStream.addEvent(sup(2));
+		eventStream.addEvent(first(1));	// 1
+		eventStream.addEvent(sup(2));	// 2
 		eventStream.addEvent(ctx(3));
-		eventStream.addEvent(inv(4));
-		eventStream.addEvent(inv(5));
+		eventStream.addEvent(inv(4));	// 3
+		eventStream.addEvent(inv(5));	// 4
 		eventStream.addEvent(first(1));
 		eventStream.addEvent(ctx(6));
 		eventStream.addEvent(first(1));
@@ -99,8 +99,9 @@ public class MethodSizeTest {
 		sut.statistics(NUMBREPOS, 3);
 
 		assertLogContains(0, "Number of methods in stream data is 4");
-		assertLogContains(1, "Number of unique events is 5");
-		assertLogContains(2, "Number of enclosing methods is 4");
+		assertLogContains(1, "Number of events in the event stream is 11");
+		assertLogContains(2, "Number of unique events is 5");
+		assertLogContains(3, "Number of enclosing methods is 4");
 
 //		assertLogContains(3, "Size of the largest method is: 4");
 //		assertLogContains(4, "The longest method is: T.m3");
