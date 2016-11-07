@@ -16,14 +16,10 @@ public class MapoTest {
 	private Set<Fact> query;
 	private Set<Fact> pattern;
 
-	private Mapo sut;
-
 	@Before
 	public void setup() {
 		query = Sets.newHashSet();
 		pattern = Sets.newHashSet();
-
-		sut = new Mapo();
 	}
 
 	@Test
@@ -34,7 +30,7 @@ public class MapoTest {
 				new Fact("1>2"), new Fact("1>3"));
 
 		double expected = 1.0;
-		double actuals = sut.calcMapo(query, pattern);
+		double actuals = Mapo.calcMapo(query, pattern);
 
 		assertTrue(expected == actuals);
 	}
@@ -47,7 +43,7 @@ public class MapoTest {
 				new Fact("3>1"), new Fact("3>2"));
 
 		double expected = fract(3.0, 7.0);
-		double actuals = sut.calcMapo(query, pattern);
+		double actuals = Mapo.calcMapo(query, pattern);
 
 		assertTrue(expected == actuals);
 	}
@@ -61,7 +57,7 @@ public class MapoTest {
 				new Fact("1>4"), new Fact("2>4"), new Fact("3>4"));
 
 		double expected = fract(5.0, 9.0);
-		double actuals = sut.calcMapo(query, pattern);
+		double actuals = Mapo.calcMapo(query, pattern);
 
 		assertTrue(expected == actuals);
 	}

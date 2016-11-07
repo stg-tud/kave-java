@@ -48,14 +48,13 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class IndiviReposParserTest {
@@ -72,6 +71,10 @@ public class IndiviReposParserTest {
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
+	
+	private Context context;
+	private Context context3;
+	private Context context2;
 
 	private IndivReposParser sut;
 
@@ -109,7 +112,7 @@ public class IndiviReposParserTest {
 		md2.getBody().add(wrap(ie2));
 		sst.getMethods().add(md2);
 
-		Context context = new Context();
+		context = new Context();
 		context.setSST(sst);
 		data.put(REPO1, context);
 
@@ -123,7 +126,7 @@ public class IndiviReposParserTest {
 		md3.getBody().add(wrap(ie5));
 		sst3.getMethods().add(md3);
 
-		Context context3 = new Context();
+		context3 = new Context();
 		context3.setSST(sst3);
 		data.put(REPO3, context3);
 
@@ -147,7 +150,7 @@ public class IndiviReposParserTest {
 		md4.getBody().add(new ExpressionStatement());
 
 		sst2.getMethods().add(md4);
-		Context context2 = new Context();
+		context2 = new Context();
 		context2.setSST(sst2);
 
 		data.put(REPO2, context2);
@@ -202,11 +205,31 @@ public class IndiviReposParserTest {
 
 	@Test
 	public void readTwoArchives() throws IOException {
-		Map<String, List<Event>> expectedEvents = getRepoEvents();
-		Map<String, List<Event>> actualEvents = sut.generateReposEvents();
+		Map<String, EventStreamGenerator> expReposGen = getRepoEvents();
+		Map<String, EventStreamGenerator> actReposGen = sut.generateReposEvents();
 
-		assertEquals(expectedEvents.size(), actualEvents.size());
-		assertEquals(expectedEvents, actualEvents);
+		assertEquals(expReposGen.size(), actReposGen.size());
+		assertRepos(expReposGen, actReposGen);
+	}
+
+	private void assertRepos(Map<String, EventStreamGenerator> expReposGen,
+			Map<String, EventStreamGenerator> actReposGen) {
+		
+		Map<String, List<Event>> expReposEvents = generateEvents(expReposGen);
+		Map<String, List<Event>> actReposEvents = generateEvents(actReposGen);
+		
+		assertEquals(expReposEvents, actReposEvents);
+	}
+
+	private Map<String, List<Event>> generateEvents(
+			Map<String, EventStreamGenerator> repos) {
+		
+		Map<String, List<Event>> results = Maps.newLinkedHashMap();
+		
+		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
+			results.put(entry.getKey(), entry.getValue().getEventStream());
+		}
+		return results;
 	}
 
 	private <T> Predicate<T> anyPredicateOf(Class<T> clazz) {
@@ -221,47 +244,20 @@ public class IndiviReposParserTest {
 		return expressionStatement;
 	}
 
-	private Map<String, List<Event>> getRepoEvents() {
-		Map<String, List<Event>> reposEvents = Maps.newLinkedHashMap();
-		List<Event> events = Lists.newLinkedList();
-
-		String md1 = "[?] [?].???()";
-		IMethodName methodDecl1 = Names.newMethod(md1);
-		Event e1 = Events.newFirstContext(methodDecl1);
-		events.add(e1);
-		events.add(Events.newContext(methodDecl1));
-
-		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
-		IMethodName methodInv1 = Names.newMethod(inv1);
-		Event e2 = Events.newInvocation(methodInv1);
-		events.add(e2);
-
-		String inv2 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
-		IMethodName methodInv2 = Names.newMethod(inv2);
-		Event e3 = Events.newInvocation(methodInv2);
-		events.add(e3);
-		events.add(e3);
-
-		reposEvents.put("Github/usr1/repo1", events);
-
-		events = Lists.newLinkedList();
-		events.add(e1);
-		events.add(Events.newContext(methodDecl1));
-		events.add(e2);
-
-		reposEvents.put("Github/usr1/repo3", events);
+	private Map<String, EventStreamGenerator> getRepoEvents() {
+		Map<String, EventStreamGenerator> reposEvents = Maps.newLinkedHashMap();
+		EventStreamGenerator generator = new EventStreamGenerator();
 		
-		events = Lists.newLinkedList();
-		events.add(e1);
-		events.add(Events.newContext(methodDecl1));
+		generator.add(context);
+		reposEvents.put("Github/usr1/repo1", generator);
 		
-		String inv4 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
-		IMethodName methInv4 = Names.newMethod(inv4);
-		Event e4 = Events.newInvocation(methInv4);
-		events.add(e4);
-		events.add(e4);
+		generator = new EventStreamGenerator();
+		generator.add(context3);
+		reposEvents.put("Github/usr1/repo3", generator);
 		
-		reposEvents.put("Github/usr1/repo2", events);
+		generator = new EventStreamGenerator();
+		generator.add(context2);
+		reposEvents.put("Github/usr1/repo2", generator);
 
 		return reposEvents;
 	}

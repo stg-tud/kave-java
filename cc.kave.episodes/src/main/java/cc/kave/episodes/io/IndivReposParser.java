@@ -31,14 +31,12 @@
 package cc.kave.episodes.io;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
-import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -57,17 +55,16 @@ public class IndivReposParser {
 		this.contextsDir = directory;
 	}
 	
-	public Map<String, List<Event>> generateReposEvents() throws ZipException, IOException {
+	public Map<String, EventStreamGenerator> generateReposEvents() throws ZipException, IOException {
 		EventStreamGenerator repoGen = new EventStreamGenerator();
-		Map<String, List<Event>> allEvents = Maps.newLinkedHashMap();
+		Map<String, EventStreamGenerator> allEvents = Maps.newLinkedHashMap();
 		String repoName = "";
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
 				if (!repoGen.getEventStream().isEmpty()) {
-					List<Event> repoEvents = repoGen.getEventStream();
-					allEvents.put(repoName, repoEvents);
+					allEvents.put(repoName, repoGen);
 					repoGen = new EventStreamGenerator();
 				}
 				repoName = getRepoName(zip);
@@ -83,8 +80,7 @@ public class IndivReposParser {
 			}
 			ra.close();
 		}
-		List<Event> repoEvents = repoGen.getEventStream();
-		allEvents.put(repoName, repoEvents);
+		allEvents.put(repoName, repoGen);
 		return allEvents;
 	}
 	

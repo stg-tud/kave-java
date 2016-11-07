@@ -6,17 +6,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class RepoMethodsMapperIO {
 
@@ -30,20 +32,20 @@ public class RepoMethodsMapperIO {
 		this.reposDir = folder;
 	}
 	
-	public void writer(Map<String, List<Event>> repos) throws ZipException, IOException {
-		Map<String, List<Event>> repoMethods = Maps.newLinkedHashMap();
+	public void writer(Map<String, EventStreamGenerator> repos) throws ZipException, IOException {
+		Map<String, Set<Event>> repoCtx = Maps.newLinkedHashMap();
 
-		for (Map.Entry<String, List<Event>> entry : repos.entrySet()) {
-			List<Event> methods = Lists.newLinkedList();
-			List<Event> events = entry.getValue();
+		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
+			List<Event> events = entry.getValue().getEventStream();
+			Set<Event> ctx = Sets.newLinkedHashSet();
 
 			for (Event e : events) {
 				if (e.getKind() == EventKind.METHOD_DECLARATION) {
-					methods.add(e);
+					ctx.add(e);
 				}
 			}
-			repoMethods.put(entry.getKey(), methods);
-			JsonUtils.toJson(repoMethods, new File(repoMethodsPath()));
+			repoCtx.put(entry.getKey(), ctx);
+			JsonUtils.toJson(repoCtx, new File(repoMethodsPath()));
 		}
 	}
 	

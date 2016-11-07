@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.RepoMethodsMapperIO;
@@ -38,7 +39,9 @@ public class PreprocessingFolded {
 
 	public void runPreparation(int freq) throws IOException {
 
-		Map<String, List<Event>> repos = reposParser.generateReposEvents();
+		Map<String, EventStreamGenerator> repos = reposParser.generateReposEvents();
+		Logger.log("Generating event stream data for freq = %d ...", freq);
+		Logger.log("\nWriting repositories - enclosing methods mapper ...");
 		reposMethodsIO.writer(repos);
 
 		for (int curFold = 0; curFold < NUM_FOLDS; curFold++) {
@@ -60,15 +63,15 @@ public class PreprocessingFolded {
 	}
 
 	public List<Event> createTrainingData(int curFold, int numFolds,
-			Map<String, List<Event>> in) {
+			Map<String, EventStreamGenerator> in) {
 
 		List<Event> outs = Lists.newLinkedList();
 
 		int numRepos = 0;
 		int i = 0;
-		for (Map.Entry<String, List<Event>> entry : in.entrySet()) {
+		for (Map.Entry<String, EventStreamGenerator> entry : in.entrySet()) {
 			if (i != curFold) {
-				outs.addAll(entry.getValue());
+				outs.addAll(entry.getValue().getEventStream());
 				numRepos++;
 			}
 			i = (i + 1) % numFolds;
@@ -79,14 +82,14 @@ public class PreprocessingFolded {
 	}
 
 	public List<Event> createValidationData(int curFold, int numFolds,
-			Map<String, List<Event>> in) {
+			Map<String, EventStreamGenerator> in) {
 		List<Event> outs = Lists.newLinkedList();
 
 		int numRepos = 0;
 		int i = 0;
-		for (Map.Entry<String, List<Event>> entry : in.entrySet()) {
+		for (Map.Entry<String, EventStreamGenerator> entry : in.entrySet()) {
 			if (i == curFold) {
-				outs.addAll(entry.getValue());
+				outs.addAll(entry.getValue().getEventStream());
 				numRepos++;
 			}
 			i = (i + 1) % numFolds;

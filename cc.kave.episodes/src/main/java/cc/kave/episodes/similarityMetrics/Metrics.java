@@ -16,5 +16,5 @@
 package cc.kave.episodes.similarityMetrics;
 
 public enum Metrics {
-	F1_FACTS, F1_EVENTS, MAPO, LEVENSTEIN, RTED, UNDEFINED
+	F1_FACTS, F1_EVENTS, MAPO, LEVENSTEIN, SHINGLES, UNDEFINED
 }

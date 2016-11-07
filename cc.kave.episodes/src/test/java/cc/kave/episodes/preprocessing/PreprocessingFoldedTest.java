@@ -25,17 +25,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.RepoMethodsMapperIO;
 import cc.kave.episodes.io.TrainingDataIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,7 +66,8 @@ public class PreprocessingFoldedTest {
 	public void setup() throws ZipException, IOException {
 		initMocks(this);
 
-		sut = new PreprocessingFolded(repoParser, trainingIo, validationIo, repoMethodsIO);
+		sut = new PreprocessingFolded(repoParser, trainingIo, validationIo,
+				repoMethodsIO);
 
 		when(repoParser.generateReposEvents()).thenReturn(generateMapper());
 
@@ -70,67 +75,80 @@ public class PreprocessingFoldedTest {
 		doNothing().when(validationIo).write(anyListOf(Event.class), anyInt());
 		doNothing().when(repoMethodsIO).writer(any(Map.class));
 	}
-	
+
 	@Test
 	public void checkCrossFold() throws IOException {
 		sut.runPreparation(FREQTHRESH);
-		
+
 		verify(repoParser).generateReposEvents();
-		
+
 		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt());
 		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt());
 		verify(repoMethodsIO).writer(any(Map.class));
 	}
-	
+
 	@Test
 	public void checkOverlapping() {
 		for (int fold = 0; fold < NUM_FOLD; fold++) {
-			
-			List<Event> trainingData = sut.createTrainingData(fold, NUM_FOLD, generateMapper());
-			List<Event> validationData = sut.createValidationData(fold, NUM_FOLD, generateMapper());
-			
+
+			List<Event> trainingData = sut.createTrainingData(fold, NUM_FOLD,
+					generateMapper());
+			List<Event> validationData = sut.createValidationData(fold,
+					NUM_FOLD, generateMapper());
+
 			assertTrue(trainingData.size() == 27);
 			assertTrue(validationData.size() == 3);
-			
+
 			assertNotEquals(trainingData, validationData);
 			boolean overlap = trainingData.contains(validationData);
 			assertFalse(overlap);
 		}
 	}
 
-	private Map<String, List<Event>> generateMapper() {
-		Map<String, List<Event>> mapper = Maps.newLinkedHashMap();
-		mapper.put("Github/usr1/repo1", Lists.newArrayList(firstCtx(0), enclCtx(1), inv(1)));
-		mapper.put("Github/usr1/repo2", Lists.newArrayList(firstCtx(0), enclCtx(2), inv(2)));
-		mapper.put("Github/usr1/repo3", Lists.newArrayList(firstCtx(0), enclCtx(3), inv(3)));
-		mapper.put("Github/usr1/repo4", Lists.newArrayList(firstCtx(0), enclCtx(4), inv(4)));
-		mapper.put("Github/usr1/repo5", Lists.newArrayList(firstCtx(0), enclCtx(5), inv(5)));
-		mapper.put("Github/usr1/repo6", Lists.newArrayList(firstCtx(0), enclCtx(6), inv(6)));
-		mapper.put("Github/usr1/repo7", Lists.newArrayList(firstCtx(0), enclCtx(7), inv(7)));
-		mapper.put("Github/usr1/repo8", Lists.newArrayList(firstCtx(0), enclCtx(8), inv(8)));
-		mapper.put("Github/usr1/repo9", Lists.newArrayList(firstCtx(0), enclCtx(9), inv(9)));
-		mapper.put("Github/usr1/repo10", Lists.newArrayList(firstCtx(0), enclCtx(10), inv(10)));
+	private Map<String, EventStreamGenerator> generateMapper() {
+
+		Map<String, EventStreamGenerator> mapper = Maps.newLinkedHashMap();
+		mapper.put("Github/usr1/repo1", genCtx(1));
+		mapper.put("Github/usr1/repo2", genCtx(2));
+		mapper.put("Github/usr1/repo3", genCtx(3));
+		mapper.put("Github/usr1/repo4", genCtx(4));
+		mapper.put("Github/usr1/repo5", genCtx(5));
+		mapper.put("Github/usr1/repo6", genCtx(6));
+		mapper.put("Github/usr1/repo7", genCtx(7));
+		mapper.put("Github/usr1/repo8", genCtx(8));
+		mapper.put("Github/usr1/repo9", genCtx(9));
+		mapper.put("Github/usr1/repo10", genCtx(10));
 
 		return mapper;
 	}
-	
-	private static Event firstCtx(int i) {
-		return Events.newFirstContext(m(i));
-	}
 
-	private static Event enclCtx(int i) {
-		return Events.newContext(m(i));
+	private EventStreamGenerator genCtx(int i) {
+
+		SST sst = new SST();
+		Context context = new Context();
+		EventStreamGenerator generator = new EventStreamGenerator();
+		
+		MethodDeclaration md = new MethodDeclaration();
+		md.setName(Names.newMethod("[T,P] [T3,P].M" + i + "()"));
+
+		InvocationExpression ie1 = new InvocationExpression();
+		IMethodName methodName = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI"
+						+ i + "()");
+		ie1.setMethodName(methodName);
+
+		md.getBody().add(wrap(ie1));
+		sst.getMethods().add(md);
+
+		context.setSST(sst);
+		generator.add(context);
+		
+		return generator;
 	}
 	
-	private static Event inv(int i) {
-		return Events.newInvocation(m(i));
-	}
-
-	private static IMethodName m(int i) {
-		if (i == 0) {
-			return Names.getUnknownMethod();
-		} else {
-			return Names.newMethod("[T,P] [T,P].m" + i + "()");
-		}
+	private static ExpressionStatement wrap(InvocationExpression ie1) {
+		ExpressionStatement expressionStatement = new ExpressionStatement();
+		expressionStatement.setExpression(ie1);
+		return expressionStatement;
 	}
 }

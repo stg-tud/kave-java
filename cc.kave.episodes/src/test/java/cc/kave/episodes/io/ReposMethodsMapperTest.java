@@ -2,13 +2,15 @@ package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipException;
 
 import org.junit.Before;
@@ -17,15 +19,23 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.ssts.impl.SST;
+import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
+import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
+import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
+import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
+import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.recommenders.exceptions.AssertionException;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 public class ReposMethodsMapperTest {
@@ -35,7 +45,7 @@ public class ReposMethodsMapperTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private Map<String, List<Event>> mapper;
+	private Map<String, EventStreamGenerator> reposGenerators;
 
 	private RepoMethodsMapperIO sut;
 
@@ -43,7 +53,7 @@ public class ReposMethodsMapperTest {
 	public void setup() throws ZipException, IOException {
 		initMocks(this);
 
-		mapper = generateMapper();
+		reposGenerators = generateMapper();
 
 		sut = new RepoMethodsMapperIO(tmp.getRoot());
 	}
@@ -67,22 +77,65 @@ public class ReposMethodsMapperTest {
 	public void fileIsCreated() throws ZipException, IOException {
 		File file = new File(getReposMethodsPath());
 
-		sut.writer(mapper);
+		sut.writer(reposGenerators);
 
 		assertTrue(file.exists());
 	}
 
 	@Test
 	public void fileContent() throws ZipException, IOException {
-		sut.writer(mapper);
+		sut.writer(reposGenerators);
 
 		@SuppressWarnings("serial")
-		Type type = new TypeToken<Map<String, List<Event>>>() {
+		Type type = new TypeToken<Map<String, Set<Event>>>() {
 		}.getType();
-		Map<String, List<Event>> actMapper = JsonUtils.fromJson(new File(
+		Map<String, Set<Event>> actMapper = JsonUtils.fromJson(new File(
 				getReposMethodsPath()), type);
 
-		assertEquals(generateMapper(), actMapper);
+		assertTrue(generateReposMethods().size() == actMapper.size());
+		assertMapEquality(generateReposMethods(), actMapper);
+	}
+
+	private void assertMapEquality(Map<String, Set<Event>> expected,
+			Map<String, Set<Event>> actuals) {
+		
+		if (expected.isEmpty() && actuals.isEmpty()) {
+			assertTrue(true);
+		}
+		if (expected.size() != actuals.size()) {
+			fail();
+		}
+		for (Map.Entry<String, Set<Event>> entry : expected.entrySet()) {
+			if (!actuals.containsKey(entry.getKey())) {
+				fail();
+			}
+			Set<Event> expMethods = entry.getValue();
+			Set<Event> actMethods = actuals.get(entry.getKey());
+			
+			if (expMethods.isEmpty() && actMethods.isEmpty()) {
+				continue;
+			}
+			Iterator<Event> expIt = expMethods.iterator();
+			Iterator<Event> actIt = actMethods.iterator();
+			while (actIt.hasNext()) {
+				Event expEvent = expIt.next();
+				Event actEvent = actIt.next();
+				assertEquals(expEvent, actEvent);
+			}
+ 		}
+		assertTrue(true);
+	}
+
+	private Map<String, Set<Event>> generateReposMethods() {
+		Map<String, Set<Event>> mapper = Maps.newLinkedHashMap();
+		Set<Event> method = Sets.newLinkedHashSet();
+		method.add(enclCtx(0));
+
+		mapper.put("Github/usr1/repo1", method);
+		mapper.put("Github/usr1/repo2", method);
+		mapper.put("Github/usr1/repo3", method);
+
+		return mapper;
 	}
 
 	private String getReposMethodsPath() {
@@ -91,13 +144,105 @@ public class ReposMethodsMapperTest {
 		return path;
 	}
 
-	private Map<String, List<Event>> generateMapper() {
-		Map<String, List<Event>> mapper = Maps.newLinkedHashMap();
-		mapper.put("Github/usr1/repo1", Lists.newArrayList(enclCtx(1)));
-		mapper.put("Github/usr1/repo2", Lists.newArrayList(enclCtx(2)));
-		mapper.put("Github/usr1/repo3", Lists.newArrayList(enclCtx(3)));
+	private Map<String, EventStreamGenerator> generateMapper() {
+
+		Map<String, EventStreamGenerator> mapper = Maps.newLinkedHashMap();
+		EventStreamGenerator gen1 = new EventStreamGenerator();
+		EventStreamGenerator gen2 = new EventStreamGenerator();
+		EventStreamGenerator gen3 = new EventStreamGenerator();
+
+		gen1.add(genCtx1());
+		gen2.add(genCtx2());
+		gen3.add(genCtx3());
+
+		mapper.put("Github/usr1/repo1", gen1);
+		mapper.put("Github/usr1/repo2", gen2);
+		mapper.put("Github/usr1/repo3", gen3);
 
 		return mapper;
+	}
+
+	private Context genCtx1() {
+		Context context = new Context();
+
+		SST sst = new SST();
+		MethodDeclaration md = new MethodDeclaration();
+		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
+		md.getBody().add(new ContinueStatement());
+		sst.getMethods().add(md);
+
+		MethodDeclaration md2 = new MethodDeclaration();
+		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
+
+		InvocationExpression ie1 = new InvocationExpression();
+		IMethodName methodName = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		ie1.setMethodName(methodName);
+		InvocationExpression ie2 = new InvocationExpression();
+		IMethodName methodName2 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()");
+		ie2.setMethodName(methodName2);
+
+		md2.getBody().add(wrap(ie1));
+		md2.getBody().add(wrap(ie2));
+		md2.getBody().add(wrap(ie2));
+		sst.getMethods().add(md2);
+
+		context.setSST(sst);
+
+		return context;
+	}
+
+	private Context genCtx2() {
+		Context context = new Context();
+
+		SST sst3 = new SST();
+		MethodDeclaration md3 = new MethodDeclaration();
+		md3.setName(Names.newMethod("[T,P] [T4,P].M()"));
+		InvocationExpression ie5 = new InvocationExpression();
+		IMethodName methodName5 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+		ie5.setMethodName(methodName5);
+		md3.getBody().add(wrap(ie5));
+		sst3.getMethods().add(md3);
+
+		context.setSST(sst3);
+
+		return context;
+	}
+
+	private Context genCtx3() {
+		Context context = new Context();
+
+		SST sst2 = new SST();
+		MethodDeclaration md4 = new MethodDeclaration();
+		md4.setName(Names.newMethod("[T,P] [T2,P].M3()"));
+		md4.getBody().add(new DoLoop());
+
+		InvocationExpression ie3 = new InvocationExpression();
+		IMethodName methodName3 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		ie3.setMethodName(methodName3);
+
+		InvocationExpression ie4 = new InvocationExpression();
+		methodName3 = Names
+				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
+		ie4.setMethodName(methodName3);
+
+		md4.getBody().add(wrap(ie3));
+		md4.getBody().add(wrap(ie4));
+		md4.getBody().add(new ExpressionStatement());
+
+		sst2.getMethods().add(md4);
+		context.setSST(sst2);
+
+		return context;
+	}
+
+	private static ExpressionStatement wrap(InvocationExpression ie1) {
+		ExpressionStatement expressionStatement = new ExpressionStatement();
+		expressionStatement.setExpression(ie1);
+		return expressionStatement;
 	}
 
 	private static Event enclCtx(int i) {

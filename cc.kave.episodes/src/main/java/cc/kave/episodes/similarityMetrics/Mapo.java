@@ -8,14 +8,14 @@ import com.google.common.collect.Sets;
 
 public class Mapo {
 
-	public double calcMapo(Set<Fact> query, Set<Fact> pattern) {
+	public static double calcMapo(Set<Fact> query, Set<Fact> pattern) {
 		Set<Fact> conjunction = getConjunctionFacts(query, pattern);
 		Set<Fact> disjunction = getDisjunctionFacts(query, pattern);
 
 		return fract(conjunction.size(), disjunction.size());
 	}
 	
-	private Set<Fact> getConjunctionFacts(Set<Fact> query, Set<Fact> pattern) {
+	private static Set<Fact> getConjunctionFacts(Set<Fact> query, Set<Fact> pattern) {
 		Set<Fact> conjuction = Sets.newHashSet();
 
 		for (Fact fact : pattern) {
@@ -26,7 +26,7 @@ public class Mapo {
 		return conjuction;
 	}
 	
-	private Set<Fact> getDisjunctionFacts(Set<Fact> query, Set<Fact> pattern) {
+	private static Set<Fact> getDisjunctionFacts(Set<Fact> query, Set<Fact> pattern) {
 		Set<Fact> disjunction = Sets.newHashSet();
 
 		disjunction.addAll(query);
@@ -34,7 +34,7 @@ public class Mapo {
 		return disjunction;
 	}
 	
-	private Double fract(double numerator, double denominator) {
+	private static Double fract(double numerator, double denominator) {
 		return numerator / denominator;
 	}
 }
