@@ -9,6 +9,10 @@ import com.google.common.collect.Sets;
 public class Mapo {
 
 	public static double calcMapo(Set<Fact> query, Set<Fact> pattern) {
+		if (query.isEmpty() && pattern.isEmpty()) {
+			return 1.0;
+		}
+		
 		Set<Fact> conjunction = getConjunctionFacts(query, pattern);
 		Set<Fact> disjunction = getDisjunctionFacts(query, pattern);
 
@@ -16,6 +20,8 @@ public class Mapo {
 	}
 	
 	private static Set<Fact> getConjunctionFacts(Set<Fact> query, Set<Fact> pattern) {
+		
+		
 		Set<Fact> conjuction = Sets.newHashSet();
 
 		for (Fact fact : pattern) {

@@ -1,5 +1,6 @@
 package cc.kave.episodes.similarityMetrics;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
@@ -11,11 +12,11 @@ import cc.kave.episodes.model.events.Fact;
 
 import com.google.common.collect.Sets;
 
-public class MapoTest {
+public class F1MeasureTest {
 
 	private Set<Fact> query;
 	private Set<Fact> pattern;
-
+	
 	@Before
 	public void setup() {
 		query = Sets.newHashSet();
@@ -23,56 +24,58 @@ public class MapoTest {
 	}
 	
 	@Test
-	public void emptySets() {
-		double actuals = Mapo.calcMapo(query, pattern);
+	public void empty() {
+		double actuals = F1Measure.calcF1(query, pattern);
 		
 		assertTrue(actuals == 1.0);
-	}
-	
-	@Test
-	public void emptyQuery() {
-		pattern = Sets.newHashSet(new Fact(1), new Fact(2), new Fact("1>2"));
-		
-		double actuals = Mapo.calcMapo(query, pattern);
-		
-		assertTrue(actuals == 0.0);
 	}
 	
 	@Test
 	public void emptyPattern() {
 		query = Sets.newHashSet(new Fact(1), new Fact(2), new Fact("1>2"));
 		
-		double actuals = Mapo.calcMapo(query, pattern);
+		double actuals = F1Measure.calcF1(query, pattern);
 		
 		assertTrue(actuals == 0.0);
 	}
-
+	
 	@Test
-	public void same() {
+	public void emptyQuery() {
+		pattern = Sets.newHashSet(new Fact(1), new Fact(2), new Fact("1>2"));
+		
+		double actuals = F1Measure.calcF1(query, pattern);
+		
+		assertTrue(actuals == 0.0);
+	}
+	
+	@Test
+	public void sameFacts() {
 		query = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
 				new Fact("1>2"), new Fact("1>3"), new Fact("2>3"));
 		pattern = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
 				new Fact("1>2"), new Fact("1>3"));
-
-		double expected = fract(5.0, 6.0);
-		double actuals = Mapo.calcMapo(query, pattern);
-
+		
+		double expected = fract(10.0, 11.0);
+		
+		double actuals = F1Measure.calcF1(query, pattern);
+		
 		assertTrue(expected == actuals);
 	}
-
+	
 	@Test
 	public void diffOrder() {
 		query = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
 				new Fact("1>3"), new Fact("2>3"), new Fact("1>2"));
 		pattern = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
 				new Fact("3>1"), new Fact("3>2"));
-
-		double expected = fract(3.0, 8.0);
-		double actuals = Mapo.calcMapo(query, pattern);
-
+		
+		double expected = fract(6.0, 11.0);
+		
+		double actuals = F1Measure.calcF1(query, pattern);
+		
 		assertTrue(expected == actuals);
 	}
-
+	
 	@Test
 	public void different() {
 		query = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
@@ -80,14 +83,15 @@ public class MapoTest {
 		pattern = Sets.newHashSet(new Fact("1"), new Fact("2"), new Fact("3"),
 				new Fact("4"), new Fact("1>2"), new Fact("1>3"),
 				new Fact("1>4"), new Fact("2>4"), new Fact("3>4"));
-
-		double expected = fract(5.0, 10.0);
-		double actuals = Mapo.calcMapo(query, pattern);
-
-		assertTrue(expected == actuals);
+		
+		double expected = fract(2.0, 3.0);
+		
+		double actuals = F1Measure.calcF1(query, pattern);
+		
+		assertEquals(expected, actuals, 0.001);
 	}
-
-	private Double fract(double numerator, double denominator) {
+	
+	private double fract(double numerator, double denominator) {
 		return numerator / denominator;
 	}
 }

@@ -39,7 +39,6 @@ public class ProposalsSorterTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
-
 	private Episode query;
 	private Set<Episode> patterns;
 
