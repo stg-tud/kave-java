@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
+import cc.kave.episodes.mining.evaluation.SimilarityMetrics;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -51,7 +51,7 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(PreprocessingFolded.class).runPreparation(FREQ);
+//		load(PreprocessingFolded.class).runPreparation(FREQ);
 //		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
 		
 //		load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
@@ -71,6 +71,7 @@ public class run_ervina {
 //		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 //		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
+		load(SimilarityMetrics.class).validate();
 		
 //		load(FrameworksData.class).getFrameworksDistribution();
 //		load(StreamFrequencies.class).frequencies();

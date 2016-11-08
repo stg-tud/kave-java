@@ -18,9 +18,7 @@ import java.util.Map;
 import java.util.zip.ZipException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -44,9 +42,6 @@ import com.google.common.collect.Maps;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PreprocessingFoldedTest {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
 	private IndivReposParser repoParser;
