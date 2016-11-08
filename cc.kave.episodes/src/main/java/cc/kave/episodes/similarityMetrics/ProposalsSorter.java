@@ -25,66 +25,54 @@ import cc.kave.episodes.mining.evaluation.ProposalHelper;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.evaluation.data.Measure;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ProposalsSorter {
-	
-	private Mapo mapo = new Mapo();
 
 	public Set<Tuple<Episode, Double>> sort(Episode query,
 			Set<Episode> patterns, Metrics metric) throws Exception {
+		assertTrue(!isEmptyEpisode(query), "Query is empty!");
+		assertTrue(!patterns.isEmpty(), "Pattern list is empty!");
+
 		Set<Tuple<Episode, Double>> proposals = ProposalHelper
 				.createEpisodesSortedSet();
 
 		for (Episode p : patterns) {
-			double sim = getMetric(metric, query, p);
-			proposals.add(Tuple.newTuple(p, sim));
+			if (!isEmptyEpisode(p)) {
+				double sim = getMetric(metric, query, p);
+				proposals.add(Tuple.newTuple(p, sim));
+			}
 		}
 		return proposals;
 	}
 
 	private double getMetric(Metrics metric, Episode query, Episode pattern)
 			throws Exception {
-		assertTrue(!isEmptyEpisode(query), "Query is empty!");
-		assertTrue(!isEmptyEpisode(pattern), "Pattern is empty!");
-		
+
 		int episodeRelations = pattern.getRelations().size();
 		int episodeEvents = pattern.getNumEvents();
 		Set<Fact> queryFacts = Sets.newHashSet();
-		
+
 		if (episodeRelations < triangleNumber(episodeEvents)) {
-			queryFacts = getQueryFacts(query, pattern.getFacts());
+			queryFacts = getQueryFacts(query, pattern);
 		} else {
 			queryFacts = query.getFacts();
 		}
-		
+
 		if (metric == Metrics.F1_FACTS) {
-			return calcF1Facts(queryFacts, pattern.getFacts());
+			return F1Measure.calcF1(queryFacts, pattern.getFacts());
 		} else if (metric == Metrics.F1_EVENTS) {
-			return calcF1Events(query, pattern);
+			return F1Measure.calcF1(query.getEvents(), pattern.getEvents());
 		} else if (metric == Metrics.MAPO) {
-			return mapo.calcMapo(queryFacts, pattern.getFacts());
+			return Mapo.calcMapo(queryFacts, pattern.getFacts());
 		} else if (metric == Metrics.LEVENSTEIN) {
 			return calcLevenstein(query, pattern);
 		} else {
 			throw new Exception("This metric is not available!");
 		}
-	}
-	
-	private double calcF1Facts(Set<Fact> query, Set<Fact> pattern) {
-		Measure m = Measure.newMeasure(query, pattern);
-		double f1 = m.getF1();
-		return f1;
-	}
-
-	private double calcF1Events(Episode query, Episode episode) {
-		Measure m = Measure.newMeasure(query.getEvents(), episode.getEvents());
-		double f1 = m.getF1();
-		return f1;
 	}
 
 	private double calcLevenstein(Episode query, Episode episode) {
@@ -252,7 +240,7 @@ public class ProposalsSorter {
 	private Double fract(double numerator, double denominator) {
 		return numerator / denominator;
 	}
-	
+
 	private int triangleNumber(int num) {
 		if (num < 2) {
 			return 0;
@@ -262,12 +250,14 @@ public class ProposalsSorter {
 			return (num - 1) + triangleNumber(num - 1);
 		}
 	}
-	
-	private Set<Fact> getQueryFacts(Episode query, Set<Fact> epFacts) {
+
+	private Set<Fact> getQueryFacts(Episode query, Episode pattern) {
+		Set<Fact> epFacts = pattern.getFacts();
+
 		Set<Fact> queryFacts = Sets.newHashSet();
 		queryFacts.addAll(query.getFacts());
 		Set<Fact> queryRel = query.getRelations();
-		
+
 		for (Fact rel : queryRel) {
 			Tuple<Fact, Fact> relFacts = rel.getRelationFacts();
 			Fact order1 = new Fact(relFacts.getFirst() + ">"
@@ -282,7 +272,7 @@ public class ProposalsSorter {
 		}
 		return queryFacts;
 	}
-	
+
 	private boolean isEmptyEpisode(Episode episode) {
 		if (episode.getNumFacts() == 0) {
 			return true;
