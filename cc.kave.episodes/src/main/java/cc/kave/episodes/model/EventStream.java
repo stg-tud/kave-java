@@ -90,11 +90,6 @@ public class EventStream {
 
 		int idx = ensureEventExistsAndGetId(event);
 
-		// if (idx >= 1230 && idx < 1240) {
-		// System.out.printf("%d => (%s) %s", idx, event.getKind(),
-		// event.getMethod());
-		// }
-
 		addEventIdToStream(idx);
 	}
 

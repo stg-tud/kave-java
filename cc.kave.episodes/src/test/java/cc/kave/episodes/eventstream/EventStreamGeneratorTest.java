@@ -23,9 +23,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -39,9 +36,11 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
-import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class EventStreamGeneratorTest {
 
@@ -123,6 +122,70 @@ public class EventStreamGeneratorTest {
 
 		ctx.setSST(sstUserCode(1, methodDeclGenericBound(1, 2, 3, //
 				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream(Events.newFirstContext(mGenericFree(21, 22)), //
+				Events.newSuperContext(mGenericFree(11, 12)), //
+				Events.newContext(mGenericFree(1, 2)), Events.newInvocation(mGenericFree(2, 3)));
+
+	}
+	
+	@Test
+	public void handlesGenericsFree() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
+
+		ctx.setSST(sst(1, methodDeclGenericFree(1, 2, //
+				inv("o", mGenericFree(2, 3)))));
+
+		sut.add(ctx);
+
+		assertStream(Events.newFirstContext(mGenericFree(21, 22)), //
+				Events.newSuperContext(mGenericFree(11, 12)), //
+				Events.newContext(mGenericFree(1, 2)), Events.newInvocation(mGenericFree(2, 3)));
+
+	}
+	
+	@Test
+	public void handlesPartialFreeClass1() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
+
+		ctx.setSST(sstPartialClass1(1, methodDeclGenericFree(1, 2, //
+				inv("o", mGenericBound(2, 3, 4)))));
+
+		sut.add(ctx);
+
+		assertStream();
+
+	}
+	
+	@Test
+	public void handlesPartialFreeClass2() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
+
+		ctx.setSST(sstPartialClass2(1, methodDeclGenericFree(1, 2, //
+				inv("o", mGenericFree(2, 3)))));
+
+		sut.add(ctx);
+
+		assertStream();
+
+	}
+	
+	@Test
+	public void handlesUserFreeCode() {
+		Context ctx = new Context();
+
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
+
+		ctx.setSST(sstUserCode(1, methodDeclGenericFree(1, 2, //
+				inv("o", mGenericFree(2, 3)))));
 
 		sut.add(ctx);
 

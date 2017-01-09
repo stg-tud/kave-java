@@ -27,7 +27,7 @@ import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-public class Separator {
+public class MDMISeparator {
 	
 	public Tuple<Fact, Set<Fact>> separateFacts(Episode episode) {
 		assertTrue(episode.getNumEvents() > 1, "Episode contains only one event!");

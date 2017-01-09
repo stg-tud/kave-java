@@ -17,8 +17,6 @@ package cc.kave.episodes.eventstream;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -32,6 +30,8 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+
+import com.google.common.collect.Lists;
 
 public class EventStreamGenerator {
 
@@ -59,19 +59,9 @@ public class EventStreamGenerator {
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
 
-		// private IMethodName debug = MethodName.newMethodName(
-		// "[System.Void, mscorlib, 4.0.0.0]
-		// [ACAT.Lib.Core.PanelManagement.MenuPanelBase,
-		// Core].InitializeComponent()");
-
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
-			// if (debug.equals(decl.getName())) {
-			// System.out.println();
-			// }
-
-			// currentCtx = MethodName.UNKNOWN_NAME;
 			firstCtx = Names.getUnknownMethod();
 			superCtx = Names.getUnknownMethod();
 			elementCtx = Names.getUnknownMethod();
@@ -109,27 +99,10 @@ public class EventStreamGenerator {
 			if (name.isUnknown()) {
 				return false;
 			}
-
-			// enable to speed up evaluation (but do not commit!)
-			// IAssemblyName mscorlib = AssemblyName.newAssemblyName("mscorlib,
-			// 4.0.0.0");
-			// IAssemblyName actualLib = name.getDeclaringType().getAssembly();
-			// if (!mscorlib.equals(actualLib)) {
-			// return false;
-			// }
-
 			return true;
 		}
 
 		private void addEnclosingMethodIfAvailable() {
-			// Asserts.assertNotNull(currentCtx);
-			// events.add(Events.newContext(currentCtx));
-			// currentCtx = null;
-
-			// if (currentCtx != null) {
-			// events.add(Events.newContext(currentCtx));
-			// currentCtx = null;
-			// }
 			if (firstCtx != null) {
 				events.add(Events.newFirstContext(TypeErasure.of(firstCtx)));
 				firstCtx = null;

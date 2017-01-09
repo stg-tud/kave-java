@@ -19,7 +19,7 @@ import cc.recommenders.datastructures.Tuple;
 public class QueryStrategy {
 
 	private SubsetsGenerator generator = new SubsetsGenerator();
-	private Separator separator = new Separator();
+	private MDMISeparator separator = new MDMISeparator();
 	private Tuple<Fact, Set<Fact>> declInv = Tuple.newTuple(new Fact(), Sets.newHashSet());
 	private int numInvs = 0;
 	

@@ -37,12 +37,12 @@ public class SeparatorTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private Episode episode;
-	private Separator sut;
+	private MDMISeparator sut;
 
 	@Before
 	public void setup() {
 		episode = createEpisode("11", "12", "13", "14", "11>12", "11>13", "11>14", "12>13", "12>14");
-		sut = new Separator();
+		sut = new MDMISeparator();
 	}
 
 	@Test

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.eventstream.StreamAndMethodChecker;
 import cc.kave.episodes.mining.evaluation.PartialOrderAnalyzer;
 import cc.kave.episodes.mining.evaluation.PatternsComparisons;
 import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
@@ -54,6 +55,8 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
+		
+		load(StreamAndMethodChecker.class).checkLengths();
 
 		// load(PreprocessingFolded.class).runPreparation(FREQ);
 		// load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
@@ -61,7 +64,7 @@ public class run_ervina {
 		// EpisodeKind.GENERAL);
 //		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,
 //				EpisodeKind.PARALLEL, FREQ, ENTROPY);
-		load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
+//		load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
 
 		// load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
 

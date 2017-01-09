@@ -35,11 +35,6 @@ public class EventsFilter {
 	private static StreamStatistics statistics = new StreamStatistics();
 	// private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
 
-	private static final double DELTA = 0.001;
-	private static final double TIMEOUT = 0.5;
-	private static double time = 0.0;
-	private static boolean firstMethod = true;
-
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {
 		List<Event> streamWithoutDublicates = removeMethodDublicates(stream);
 		Map<Event, Integer> occurrences = statistics.getFrequencies(stream);
@@ -107,39 +102,5 @@ public class EventsFilter {
 		observedMethods.clear();
 		obsUnknownMethods.clear();
 		return results;
-	}
-
-	public static String filterPartition(List<Event> partition,
-			Map<Event, Integer> stream) {
-		StringBuilder sb = new StringBuilder();
-		time = 0.0;
-		firstMethod = true;
-
-		for (Event e : partition) {
-			if (stream.keySet().contains(e)) {
-				sb.append(addToPartitionStream(e, stream.get(e)));
-			} else {
-				if (e.getKind() == EventKind.METHOD_DECLARATION && !firstMethod) {
-					time += TIMEOUT;
-				}
-			}
-			firstMethod = false;
-		}
-		return sb.toString();
-	}
-
-	private static String addToPartitionStream(Event event, int eventId) {
-		if ((event.getKind() == EventKind.METHOD_DECLARATION) && !firstMethod) {
-			time += TIMEOUT;
-		}
-		StringBuilder sb = new StringBuilder();
-		sb.append(eventId);
-		sb.append(',');
-		sb.append(String.format("%.3f", time));
-		sb.append('\n');
-
-		time += DELTA;
-
-		return sb.toString();
 	}
 }

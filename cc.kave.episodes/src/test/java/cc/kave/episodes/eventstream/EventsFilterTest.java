@@ -21,27 +21,23 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+
+import com.google.common.collect.Lists;
 
 public class EventsFilterTest {
 
 	private static final int REMFREQS = 2;
 
 	private List<Event> events;
-	private List<Event> partitionEvents1;
 
 	private EventStream expectedStream;
-	private String expectedPartition1 = "";
 
 	@Before
 	public void setup() {
@@ -75,9 +71,6 @@ public class EventsFilterTest {
 		expectedStream.addEvent(firstCtx(3)); 	// 4
 		expectedStream.addEvent(enclCtx(0)); 
 		expectedStream.addEvent(inv(3)); 		// 3
-
-		// expectedPartition1 +=
-		// "1,0.000\n2,0.001\n3,0.002\n4,0.503\n2,0.504\n5,1.005\n6,1.006\n3,1.007\n";
 	}
 	
 	@Test
@@ -101,14 +94,6 @@ public class EventsFilterTest {
 		assertEquals(expectedStream.getStreamLength(), actuals.getStreamLength());
 		assertEquals(expectedStream.getNumberEvents(), actuals.getNumberEvents());
 		assertTrue(expectedStream.equals(actuals));
-	}
-
-	@Ignore
-	@Test
-	public void filterPartition() {
-		String actualsPartition = EventsFilter.filterPartition(partitionEvents1, expectedStream.getMapping());
-
-		assertEquals(expectedPartition1, actualsPartition);
 	}
 
 	private static Event inv(int i) {

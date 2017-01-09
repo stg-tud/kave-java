@@ -17,7 +17,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.evaluation.queries.Separator;
+import cc.kave.episodes.evaluation.queries.MDMISeparator;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
@@ -25,7 +25,7 @@ import cc.recommenders.evaluation.data.Measure;
 
 public class EpisodeRecommender {
 	
-	private Separator separator = new Separator();
+	private MDMISeparator separator = new MDMISeparator();
 
 	public Set<Tuple<Episode, Double>> getProposals(Episode query, Map<Integer, Set<Episode>> patterns, 
 															int numberOfProposals) {
