@@ -19,6 +19,7 @@ import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +45,6 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.MappingParser;
@@ -58,7 +57,9 @@ import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
-public class EvaluationTest {
+import com.google.common.collect.Sets;
+
+public class RecommenderEvaluationTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -89,7 +90,7 @@ public class EvaluationTest {
 	private Map<Integer, Set<Episode>> maxPatterns = new HashMap<Integer, Set<Episode>>();
 	private Map<String, Set<Episode>> categories = new LinkedHashMap<String, Set<Episode>>();
 
-	private Evaluation sut;
+	private RecommenderEvaluation sut;
 
 	@Before
 	public void setup() throws ZipException, IOException {
@@ -102,7 +103,7 @@ public class EvaluationTest {
 		recommender = new EpisodeRecommender();
 
 		MockitoAnnotations.initMocks(this);
-		sut = new Evaluation(rootFolder.getRoot(), validationParser, mappingParser, queryGenerator, recommender,
+		sut = new RecommenderEvaluation(rootFolder.getRoot(), validationParser, mappingParser, queryGenerator, recommender,
 				episodeParser, maxEpisodeTracker, categorizer);
 
 		validationData.add(createQuery("11"));
@@ -146,7 +147,7 @@ public class EvaluationTest {
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		when(episodeParser.parse(eq(FREQUENCY))).thenReturn(patterns);
+		when(episodeParser.parse(any(File.class))).thenReturn(patterns);
 		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
@@ -161,7 +162,7 @@ public class EvaluationTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder does not exist");
-		sut = new Evaluation(new File("does not exist"), validationParser, mappingParser, queryGenerator, recommender,
+		sut = new RecommenderEvaluation(new File("does not exist"), validationParser, mappingParser, queryGenerator, recommender,
 				episodeParser, maxEpisodeTracker, categorizer);
 	}
 
@@ -170,7 +171,7 @@ public class EvaluationTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder is not a folder, but a file");
-		sut = new Evaluation(file, validationParser, mappingParser, queryGenerator, recommender, episodeParser,
+		sut = new RecommenderEvaluation(file, validationParser, mappingParser, queryGenerator, recommender, episodeParser,
 				maxEpisodeTracker, categorizer);
 	}
 
@@ -180,7 +181,7 @@ public class EvaluationTest {
 		Logger.clearLog();
 		sut.evaluate(REPOS);
 
-		verify(episodeParser).parse(eq(FREQUENCY));
+		verify(episodeParser).parse(any(File.class));
 		verify(mappingParser).parse(REPOS);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);

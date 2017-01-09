@@ -32,6 +32,7 @@ public class MethodSizeTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private EventStream eventStream = new EventStream();
+	private EventStreamIo streamIo;
 
 	private static final int NUMBREPOS = 5;
 
@@ -45,6 +46,8 @@ public class MethodSizeTest {
 		Logger.setCapturing(true);
 
 		MockitoAnnotations.initMocks(this);
+		
+		streamIo = new EventStreamIo();
 
 		sut = new MethodSize(rootFolder.getRoot());
 
@@ -89,7 +92,7 @@ public class MethodSizeTest {
 	public void logger() {
 		Logger.clearLog();
 
-		EventStreamIo.write(eventStream, getStreamPath(NUMBREPOS),
+		streamIo.write(eventStream, getStreamPath(NUMBREPOS),
 				getMappingPath(NUMBREPOS), getMethodsPath(NUMBREPOS));
 
 		assertTrue(new File(getStreamPath(NUMBREPOS)).exists());
@@ -102,11 +105,6 @@ public class MethodSizeTest {
 		assertLogContains(1, "Number of events in the event stream is 11");
 		assertLogContains(2, "Number of unique events is 5");
 		assertLogContains(3, "Number of enclosing methods is 4");
-
-//		assertLogContains(3, "Size of the largest method is: 4");
-//		assertLogContains(4, "The longest method is: T.m3");
-//		assertLogContains(5, "Methods with more than 3 events are: 1");
-//		assertLogContains(6, "Method T.m3\thas 4 events");
 	}
 
 	private static Event inv(int i) {

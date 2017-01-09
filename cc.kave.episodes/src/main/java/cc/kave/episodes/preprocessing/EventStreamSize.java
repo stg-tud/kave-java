@@ -16,6 +16,7 @@ import com.google.inject.name.Named;
 public class EventStreamSize {
 
 	private File reposDir;
+	private EventStreamIo eventStreamIo;
 
 	@Inject
 	public EventStreamSize(@Named("repositories") File folder) {
@@ -30,7 +31,7 @@ public class EventStreamSize {
 
 		for (int fold = 0; fold < numFods; fold++) {
 			String filePath = getPath(fold, "mapping.txt");
-			List<Event> mapping = EventStreamIo.readMapping(filePath);
+			List<Event> mapping = eventStreamIo.readMapping(filePath);
 
 			if (mapping.size() > numEvents) {
 				numEvents = mapping.size();
@@ -42,9 +43,9 @@ public class EventStreamSize {
 	public void printMethodSize(int numFolds, int sizeLimit) {
 
 		for (int fold = 0; fold < numFolds; fold++) {
-			List<List<Fact>> stream = EventStreamIo.parseStream(getPath(fold,
+			List<List<Fact>> stream = eventStreamIo.parseStream(getPath(fold,
 					"stream.txt"));
-			List<Event> methods = EventStreamIo.readMethods(getPath(fold, "methods.txt"));
+			List<Event> methods = eventStreamIo.readMethods(getPath(fold, "methods.txt"));
 			
 			assertTrue(stream.size() == methods.size(), "Inconsistency between number of methods!");
 			

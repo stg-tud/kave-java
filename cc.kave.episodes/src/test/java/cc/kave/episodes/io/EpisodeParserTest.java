@@ -29,12 +29,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import com.google.common.collect.Sets;
-
-import cc.kave.episodes.io.EpisodeParser;
-import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.model.Episode;
-import cc.recommenders.exceptions.AssertionException;
+
+import com.google.common.collect.Sets;
 
 public class EpisodeParserTest {
 
@@ -42,8 +39,6 @@ public class EpisodeParserTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
-	private static final int NUMREPOS = 2;
 
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
@@ -57,22 +52,7 @@ public class EpisodeParserTest {
 		expected = new HashMap<Integer, Set<Episode>>();
 		episodes = Sets.newHashSet();
 
-		sut = new EpisodeParser(rootFolder.getRoot(), reader);
-	}
-
-	@Test
-	public void cannotBeInitializedWithNonExistingFolder() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Frequent episode folder does not exist");
-		sut = new EpisodeParser(new File("does not exist"), reader);
-	}
-
-	@Test
-	public void cannotBeInitializedWithFile() throws IOException {
-		File file = rootFolder.newFile("a");
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Frequent episode folder is not a folder, but a file");
-		sut = new EpisodeParser(file, reader);
+		sut = new EpisodeParser(reader);
 	}
 
 	@Test
@@ -98,7 +78,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
+		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
 
 		verify(reader).readFile(file);
 
@@ -131,7 +111,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
+		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
 
 		verify(reader).readFile(file);
 
@@ -175,7 +155,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(NUMREPOS);
+		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
 
 		verify(reader).readFile(file);
 
@@ -185,7 +165,7 @@ public class EpisodeParserTest {
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
-		episode.setBidirectMeasure(bdmeas);
+		episode.setEntropy(bdmeas);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}
@@ -193,7 +173,7 @@ public class EpisodeParserTest {
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/" + NUMREPOS + "Repos/episodes.txt");
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/TrainingData/episodes.txt");
 		return fileName;
 	}
 }

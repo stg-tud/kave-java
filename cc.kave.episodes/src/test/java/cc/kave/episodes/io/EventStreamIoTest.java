@@ -24,19 +24,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+
+import com.google.common.collect.Lists;
 
 public class EventStreamIoTest {
 
@@ -47,6 +47,13 @@ public class EventStreamIoTest {
 	private static final IMethodName DUMMY_METHOD = Names
 			.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+	
+	private EventStreamIo sut;
+	
+	@Before
+	public void setup() {
+		sut = new EventStreamIo();
+	}
 
 	@Test
 	public void happyPath() throws IOException {
@@ -75,21 +82,21 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(2), new Fact(3)));
 
-		EventStreamIo.write(expected, streamFile.getAbsolutePath(),
+		sut.write(expected, streamFile.getAbsolutePath(),
 				mappingFile.getAbsolutePath(), methodsFile.getAbsolutePath());
 
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());
 		assertTrue(methodsFile.exists());
 
-		List<Event> actMapping = EventStreamIo.readMapping(mappingFile
+		List<Event> actMapping = sut.readMapping(mappingFile
 				.getAbsolutePath());
-		List<Event> actMethods = EventStreamIo.readMethods(methodsFile
+		List<Event> actMethods = sut.readMethods(methodsFile
 				.getAbsolutePath());
 
-		String actStringStream = EventStreamIo.readStream(streamFile
+		String actStringStream = sut.readStream(streamFile
 				.getAbsolutePath());
-		List<List<Fact>> actParserStream = EventStreamIo.parseStream(streamFile
+		List<List<Fact>> actParserStream = sut.parseStream(streamFile
 				.getAbsolutePath());
 
 		assertMapping(expected.getMapping().keySet(), actMapping);

@@ -22,6 +22,7 @@ import com.google.inject.name.Named;
 public class MethodSize {
 
 	private File directory;
+	private EventStreamIo eventStreamIo;
 
 	@Inject
 	public MethodSize(@Named("events") File folder) {
@@ -31,12 +32,12 @@ public class MethodSize {
 	}
 
 	public void statistics(int numbRepos, int methodLength) {
-		List<List<Fact>> stream = EventStreamIo.parseStream(getStreamPath(numbRepos));
+		List<List<Fact>> stream = eventStreamIo.parseStream(getStreamPath(numbRepos));
 		int streamLength = calcStreamLength(stream);
 		
-		List<Event> events = EventStreamIo.readMapping(getMappingPath(numbRepos));
+		List<Event> events = eventStreamIo.readMapping(getMappingPath(numbRepos));
 
-		List<Event> methods = EventStreamIo.readMethods(getMethodsPath(numbRepos));
+		List<Event> methods = eventStreamIo.readMethods(getMethodsPath(numbRepos));
 		Set<Event> uniqMethods = listToSet(methods);
 		assertTrue(uniqMethods.size() <= methods.size(), "Error in converting List to Set!");
 

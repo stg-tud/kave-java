@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -33,6 +30,10 @@ import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class PatternsOutput {
 
@@ -60,9 +61,9 @@ public class PatternsOutput {
 		this.graphWriter = writer;
 	}
 
-	public void write(int numbRepos, int freqThresh, double bidirectThresh) throws Exception {
-		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(numbRepos, freqThresh, bidirectThresh);
-		List<Event> events = mappingParser.parse(numbRepos);
+	public void write(int foldNum, int freqThresh, double entropy) throws Exception {
+		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(Maps.newHashMap(), freqThresh, entropy);
+		List<Event> events = mappingParser.parse(foldNum);
 		Logger.log("Number of unique event is %d", events.size());
 		int graphNumber = 0;
 

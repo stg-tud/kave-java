@@ -31,6 +31,7 @@ public class EventStreamSizeTest {
 
 	private EventStream es0;
 	private EventStream es1;
+	private EventStreamIo streamIo;
 
 	private static final int NUM_FOLDS = 2;
 	private static final int SIZELIMIT = 3;
@@ -43,15 +44,17 @@ public class EventStreamSizeTest {
 
 		Logger.reset();
 		Logger.setCapturing(true);
+		
+		streamIo = new EventStreamIo();
 
 		es0 = addEvents(first(1), ctx(1), inv(1), inv(6), first(0), sup(1),
 				ctx(2), inv(2), inv(3), inv(4), inv(5));
 		es1 = addEvents(first(0), sup(2), ctx(3), inv(7), inv(5), first(8),
 				ctx(4), inv(4), inv(5));
 
-		EventStreamIo.write(es0, getFilePath(0, "stream.txt"),
+		streamIo.write(es0, getFilePath(0, "stream.txt"),
 				getFilePath(0, "mapping.txt"), getFilePath(0, "methods.txt"));
-		EventStreamIo.write(es1, getFilePath(1, "stream.txt"),
+		streamIo.write(es1, getFilePath(1, "stream.txt"),
 				getFilePath(1, "mapping.txt"), getFilePath(1, "methods.txt"));
 
 		sut = new EventStreamSize(rootFolder.getRoot());

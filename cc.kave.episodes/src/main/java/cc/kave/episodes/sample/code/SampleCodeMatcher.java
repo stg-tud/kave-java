@@ -26,9 +26,6 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
@@ -38,6 +35,9 @@ import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class SampleCodeMatcher {
 
@@ -50,7 +50,7 @@ public class SampleCodeMatcher {
 		this.rootFolder = folder;
 	}
 	private FileReader reader = new FileReader();
-	private EpisodeParser epParser = new EpisodeParser(rootFolder, reader);
+	private EpisodeParser epParser = new EpisodeParser(reader);
 	private MappingParser mapParser = new MappingParser(rootFolder);
 	private EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 	private TransitivelyClosedEpisodes transitivity = new TransitivelyClosedEpisodes();
@@ -61,7 +61,7 @@ public class SampleCodeMatcher {
 //		Set<String> types = Sets.newHashSet();
 //		types.add("ArrayList");
 		
-		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(600);
+		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(new File(""));
 		List<Event> mapper = mapParser.parse(numbRepos);
 		
 		int nodeLevel = allEpisodes.size() - 1;

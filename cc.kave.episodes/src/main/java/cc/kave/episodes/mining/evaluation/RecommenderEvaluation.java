@@ -48,7 +48,7 @@ import cc.kave.episodes.model.events.Event;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
-public class Evaluation {
+public class RecommenderEvaluation {
 
 	private File rootFolder;
 
@@ -77,7 +77,7 @@ public class Evaluation {
 	private StringBuilder sb;
 
 	@Inject
-	public Evaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
+	public RecommenderEvaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
 			MappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
 			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
@@ -300,7 +300,7 @@ public class Evaluation {
 
 	private Map<Integer, Set<Episode>> readPatterns() {
 		Logger.log("Reading the learned patterns");
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(FREQUENCY);
+		Map<Integer, Set<Episode>> patterns = episodeParser.parse(new File(""));
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		return maxPatterns;
 	}

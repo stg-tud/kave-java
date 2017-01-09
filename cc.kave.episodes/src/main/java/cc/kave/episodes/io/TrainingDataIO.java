@@ -13,6 +13,7 @@ import com.google.inject.Inject;
 public class TrainingDataIO {
 
 	private File repoDir;
+	private EventStreamIo eventStreamIo;
 
 	@Inject
 	public TrainingDataIO(@Named("repositories") File folder) {
@@ -23,7 +24,7 @@ public class TrainingDataIO {
 	}
 
 	public void write(EventStream eventStream, int fold) {
-		EventStreamIo.write(eventStream, getTrainPath(fold).streamPath,
+		eventStreamIo.write(eventStream, getTrainPath(fold).streamPath,
 				getTrainPath(fold).mappingPath, getTrainPath(fold).methodsPath);
 	}
 

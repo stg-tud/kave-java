@@ -26,6 +26,7 @@ import cc.kave.episodes.similarityMetrics.ProposalsSorter;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -34,6 +35,7 @@ public class SimilarityMetrics {
 
 	private File eventsFolder;
 
+	private EventStreamIo eventStreamIo;
 	private EpisodesPostprocessor episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 	private QueryGeneration generator;
@@ -62,10 +64,10 @@ public class SimilarityMetrics {
 	}
 
 	public void validate() throws Exception {
-		List<Event> mapping = EventStreamIo.readMapping(getMappingPath());
-		
-		Map<Integer, Set<Episode>> episodes = episodeProcessor.postprocess(200,
-				500, 0.6);
+		List<Event> mapping = eventStreamIo.readMapping(getMappingPath());
+
+		Map<Integer, Set<Episode>> episodes = episodeProcessor.postprocess(
+				Maps.newHashMap(), 500, 0.6);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(episodes);
 		Set<Episode> patternsSet = getAllPatterns(patterns);
@@ -81,33 +83,45 @@ public class SimilarityMetrics {
 						Logger.log("Generating results for query %d...",
 								queryCounter);
 
-//						Episode closedEpisodes = transClosure.remTransClosure(episode);
-//
-//						File filePath = getPath(numbRepos, frequency, entropy);
-//
-//						DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
-//								closedEpisodes, events);
-//						graphWriter.write(graph, getGraphPaths(filePath, pId));
-						
-						Episode closedQuery = transClosure.remTransClosure(query);
-						DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(closedQuery, mapping);
-						graphWriter.write(queryGraph, getPropPath(queryCounter, "query"));
-						
-						Episode closedPattern = transClosure.remTransClosure(pattern);
-						DirectedGraph<Fact, DefaultEdge> patternGraph = episodeGraphConverter.convert(closedPattern, mapping);
-						graphWriter.write(patternGraph, getPropPath(queryCounter, "pattern"));
-						
-//						FileUtils.writeStringToFile(
-//								new File(getPropPath(queryCounter, "query")),
-//								query.toString());
+						// Episode closedEpisodes =
+						// transClosure.remTransClosure(episode);
+						//
+						// File filePath = getPath(numbRepos, frequency,
+						// entropy);
+						//
+						// DirectedGraph<Fact, DefaultEdge> graph =
+						// episodeGraphConverter.convert(
+						// closedEpisodes, events);
+						// graphWriter.write(graph, getGraphPaths(filePath,
+						// pId));
+
+						Episode closedQuery = transClosure
+								.remTransClosure(query);
+						DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter
+								.convert(closedQuery, mapping);
+						graphWriter.write(queryGraph,
+								getPropPath(queryCounter, "query"));
+
+						Episode closedPattern = transClosure
+								.remTransClosure(pattern);
+						DirectedGraph<Fact, DefaultEdge> patternGraph = episodeGraphConverter
+								.convert(closedPattern, mapping);
+						graphWriter.write(patternGraph,
+								getPropPath(queryCounter, "pattern"));
+
+						// FileUtils.writeStringToFile(
+						// new File(getPropPath(queryCounter, "query")),
+						// query.toString());
 
 						Set<Tuple<Episode, Double>> proposals = sorter.sort(
 								query, patternsSet, Metrics.F1_EVENTS);
-						storeProposals(proposals, queryCounter, "f1Events", mapping);
+						storeProposals(proposals, queryCounter, "f1Events",
+								mapping);
 
 						proposals = sorter.sort(query, patternsSet,
 								Metrics.F1_FACTS);
-						storeProposals(proposals, queryCounter, "f1Facts", mapping);
+						storeProposals(proposals, queryCounter, "f1Facts",
+								mapping);
 
 						proposals = sorter.sort(query, patternsSet,
 								Metrics.MAPO);
@@ -120,35 +134,44 @@ public class SimilarityMetrics {
 	}
 
 	private String getMappingPath() {
-		String mapping = eventsFolder.getAbsolutePath() + "/200Repos/mapping.txt";
+		String mapping = eventsFolder.getAbsolutePath()
+				+ "/200Repos/mapping.txt";
 		return mapping;
 	}
 
 	private void storeProposals(Set<Tuple<Episode, Double>> proposals,
-			int queryCounter, String metric, List<Event> mapping) throws IOException {
+			int queryCounter, String metric, List<Event> mapping)
+			throws IOException {
 		StringBuilder sb = new StringBuilder();
 		int propCounter = 0;
-		
-//		Episode closedEpisodes = transClosure.remTransClosure(episode);
-//
-//		File filePath = getPath(numbRepos, frequency, entropy);
-//
-//		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
-//				closedEpisodes, events);
-//		graphWriter.write(graph, getGraphPaths(filePath, pId));
-		
+
+		// Episode closedEpisodes = transClosure.remTransClosure(episode);
+		//
+		// File filePath = getPath(numbRepos, frequency, entropy);
+		//
+		// DirectedGraph<Fact, DefaultEdge> graph =
+		// episodeGraphConverter.convert(
+		// closedEpisodes, events);
+		// graphWriter.write(graph, getGraphPaths(filePath, pId));
+
 		for (Tuple<Episode, Double> tuple : proposals) {
 			if (tuple.getSecond() > 0.0) {
-				Episode closedEpisode = transClosure.remTransClosure(tuple.getFirst());
-				DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(closedEpisode, mapping);
-				graphWriter.write(queryGraph, getPropPath(queryCounter, metric + "Prop" + propCounter));
+				Episode closedEpisode = transClosure.remTransClosure(tuple
+						.getFirst());
+				DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter
+						.convert(closedEpisode, mapping);
+				graphWriter
+						.write(queryGraph,
+								getPropPath(queryCounter, metric + "Prop"
+										+ propCounter));
 				propCounter++;
-//				sb.append(tuple.getFirst() + "\nMetric = " + tuple.getSecond());
+				// sb.append(tuple.getFirst() + "\nMetric = " +
+				// tuple.getSecond());
 			}
-//			sb.append("\n");
+			// sb.append("\n");
 		}
-//		FileUtils.writeStringToFile(
-//				new File(getPropPath(queryCounter, metric)), sb.toString());
+		// FileUtils.writeStringToFile(
+		// new File(getPropPath(queryCounter, metric)), sb.toString());
 	}
 
 	private File getPath(int queryCounter) {

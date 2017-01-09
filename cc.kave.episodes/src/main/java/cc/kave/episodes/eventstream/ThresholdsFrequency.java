@@ -48,7 +48,7 @@ public class ThresholdsFrequency {
 	}
 
 	public void writer(int numbRepos) throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
+		Map<Integer, Set<Episode>> episodes = parser.parse(new File(""));
 		StringBuilder freqsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {

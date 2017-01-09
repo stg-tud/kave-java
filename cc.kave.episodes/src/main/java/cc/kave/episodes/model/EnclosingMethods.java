@@ -24,15 +24,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-
-import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.EventKind;
-import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.datastructures.Tuple;
 
 public class EnclosingMethods {
 	
@@ -44,7 +43,7 @@ public class EnclosingMethods {
 		this.order = order;
 	}
 
-	public void addMethod(Episode episode, List<Fact> method, List<Event> events) throws Exception {
+	public void addMethod(Episode episode, List<Fact> method, Event enclMethod) {
 		int counter = 0;
 
 		if (order) {
@@ -53,8 +52,7 @@ public class EnclosingMethods {
 			counter = getSetCounter(episode, method);
 		}
 		if (counter > 0) {
-			IMethodName enclosingMethod = getEnclosingMethod(method, events);
-			methods.put(enclosingMethod, counter);
+			methods.put(enclMethod.getMethod(), counter);
 		}
 	}
 	
@@ -77,16 +75,6 @@ public class EnclosingMethods {
 			counter += entry.getValue();
 		}
 		return counter;
-	}
-
-	private IMethodName getEnclosingMethod(List<Fact> method, List<Event> events) throws Exception {
-		for (Fact fact : method) {
-			Event event = events.get(fact.getFactID());
-			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				return event.getMethod();
-			}
-		}
-		throw new Exception("Method does not have enclosing method!");
 	}
 
 	private int getOrderCounter(Episode episode, List<Fact> method) {

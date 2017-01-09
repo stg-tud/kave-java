@@ -17,8 +17,7 @@ package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,15 +37,14 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import cc.kave.episodes.eventstream.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ThresholdsFrequencyTest {
 
@@ -93,7 +91,7 @@ public class ThresholdsFrequencyTest {
 		
 		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
-		when(parser.parse(anyInt())).thenReturn(episodes);
+		when(parser.parse(any(File.class))).thenReturn(episodes);
 	}
 	
 	@After
@@ -120,14 +118,14 @@ public class ThresholdsFrequencyTest {
 	public void mockIsCalled() throws ZipException, IOException {
 		sut.writer(NUMBREPOS);
 
-		verify(parser).parse(eq(NUMBREPOS));
+		verify(parser).parse(any(File.class));
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
 		sut.writer(NUMBREPOS);
 
-		verify(parser).parse(eq(NUMBREPOS));
+		verify(parser).parse(any(File.class));
 
 		File freqsFile = new File(getFreqsPath());
 
@@ -138,7 +136,7 @@ public class ThresholdsFrequencyTest {
 	public void contentTest() throws IOException {
 		sut.writer(NUMBREPOS);
 
-		verify(parser).parse(eq(NUMBREPOS));
+		verify(parser).parse(any(File.class));
 
 		File freqsFile = new File(getFreqsPath());
 		
@@ -166,7 +164,7 @@ public class ThresholdsFrequencyTest {
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
-		episode.setBidirectMeasure(bdmeas);
+		episode.setEntropy(bdmeas);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}

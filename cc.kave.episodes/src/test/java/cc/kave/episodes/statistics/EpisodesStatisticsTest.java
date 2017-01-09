@@ -75,7 +75,7 @@ public class EpisodesStatisticsTest {
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
-		episode.setBidirectMeasure(bdmeas);
+		episode.setEntropy(bdmeas);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}

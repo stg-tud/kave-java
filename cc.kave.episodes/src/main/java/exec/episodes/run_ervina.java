@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.mining.evaluation.PartialOrderAnalyzer;
+import cc.kave.episodes.mining.evaluation.PatternsComparisons;
+import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
+import cc.kave.episodes.model.EpisodeKind;
 import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 
@@ -31,11 +35,11 @@ public class run_ervina {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	
-	private static final int NUMBREPOS = 360;
-	private static final int FREQ = 700;
+
+	private static final int FOLDNUM = 0;
+	private static final int FREQ = 600;
 	private static final double ENTROPY = 0.6;
-	
+
 	private static final int METHODSIZE = 500;
 	private static final int NUM_FOLDS = 10;
 
@@ -50,42 +54,51 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
-		
-		load(PreprocessingFolded.class).runPreparation(FREQ);
-//		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
-		
-//		load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
-		
-//		load(ReposPreprocess.class).generate(FREQTHRESH);
-		
-//		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-//		load(Preprocessing.class).generate(NUMBREPOS, FREQ);
-		
-//		load(MethodSize.class).statistics(NUMBREPOS, METHODSIZE);
-		
-//		load(ThresholdsFrequency.class).writer(NUMBREPOS);
-//		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
-		
-//		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
-//		load(SimilarityMetrics.class).validate();
-		
-//		load(FrameworksData.class).getFrameworksDistribution();
-//		load(StreamFrequencies.class).frequencies();
-//		load(Preprocessing.class).generate();
-//		load(StreamPartition.class).partition();
-//		load(SampleCodeMatcher.class).generateGraphs();
-		
+		// load(PreprocessingFolded.class).runPreparation(FREQ);
+		// load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
+		// load(PatternsIdentifier.class).trainingCode(FOLDNUM, FREQ, ENTROPY,
+		// EpisodeKind.GENERAL);
+//		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,
+//				EpisodeKind.PARALLEL, FREQ, ENTROPY);
+		load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
+
+		// load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
+
+		// load(ReposPreprocess.class).generate(FREQTHRESH);
+
+		// load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
+		// load(Preprocessing.class).generate(NUMBREPOS, FREQ);
+
+		// load(MethodSize.class).statistics(NUMBREPOS, METHODSIZE);
+
+		// load(ThresholdsFrequency.class).writer(NUMBREPOS);
+		// load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
+
+		// load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH,
+		// BIDIRECTTHRESH);
+		// load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH,
+		// BIDIRECTTHRESH);
+		// load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH,
+		// BIDIRECTTHRESH);
+		// load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS,
+		// FREQTHRESH, BIDIRECTTHRESH);
+
+		// load(SimilarityMetrics.class).validate();
+
+		// load(FrameworksData.class).getFrameworksDistribution();
+		// load(StreamFrequencies.class).frequencies();
+		// load(Preprocessing.class).generate();
+		// load(StreamPartition.class).partition();
+		// load(SampleCodeMatcher.class).generateGraphs();
+
 		// load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
 		// load(QueriesGraphGenerator.class).generateGraphs();
 		// load(EpisodeGraphGeneratorTrainingData.class).generateGraphs(5,
 		// 0.01);
 		// load(RecommenderGraphGenerator.class).generateGraphs();
 		// load(ProposalStrategyProvider.class).evaluate();
-//		load(Evaluation.class).evaluate();
+		// load(Evaluation.class).evaluate();
 		// load(TargetsCategorization.class).categorize();
 
 		// load(Suggestions.class).run();
@@ -116,7 +129,8 @@ public class run_ervina {
 			properties.load(new FileReader(PROPERTY_FILE));
 			String property = properties.getProperty(propertyName);
 			if (property == null) {
-				throw new RuntimeException("property '" + propertyName + "' not found in properties file");
+				throw new RuntimeException("property '" + propertyName
+						+ "' not found in properties file");
 			}
 			Logger.log("%s: %s", propertyName, property);
 

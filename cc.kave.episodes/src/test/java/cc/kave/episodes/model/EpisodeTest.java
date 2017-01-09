@@ -57,14 +57,14 @@ public class EpisodeTest {
 	public void BiDirectIsPositive() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Bidirectional measure should be a probability value!");
-		sut.setBidirectMeasure(-0.5);
+		sut.setEntropy(-0.5);
 	}
 	
 	@Test
 	public void BiDirectIsLessThenOne() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Bidirectional measure should be a probability value!");
-		sut.setBidirectMeasure(1.5);
+		sut.setEntropy(1.5);
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class EpisodeTest {
 	@Test
 	public void valuesCanBeSet() {
 		sut.setFrequency(3);
-		sut.setBidirectMeasure(0.5);
+		sut.setEntropy(0.5);
 		sut.addFact("f");
 		
 		Set<Fact> facts = Sets.newHashSet(new Fact("f"));
@@ -143,12 +143,12 @@ public class EpisodeTest {
 		Episode a = new Episode();
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		a.setFrequency(3);
-		a.setBidirectMeasure(0.5);
+		a.setEntropy(0.5);
 
 		Episode b = new Episode();
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 		b.setFrequency(3);
-		b.setBidirectMeasure(0.5);
+		b.setEntropy(0.5);
 		
 		assertEquals(a, b);
 		assertTrue(a.equals(b));
@@ -167,12 +167,12 @@ public class EpisodeTest {
 	public void diffFreq() {
 		Episode a = new Episode();
 		a.setFrequency(3);
-		a.setBidirectMeasure(0.5);
+		a.setEntropy(0.5);
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
 		b.setFrequency(5);
-		b.setBidirectMeasure(0.5);
+		b.setEntropy(0.5);
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertNotEquals(a, b);
@@ -191,12 +191,12 @@ public class EpisodeTest {
 	public void diffBiDirect() {
 		Episode a = new Episode();
 		a.setFrequency(3);
-		a.setBidirectMeasure(0.5);
+		a.setEntropy(0.5);
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
 		b.setFrequency(3);
-		b.setBidirectMeasure(0.8);
+		b.setEntropy(0.8);
 		b.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		assertNotEquals(a, b);
@@ -215,12 +215,12 @@ public class EpisodeTest {
 	public void equality_diffEvents() {
 		Episode a = new Episode();
 		a.setFrequency(3);
-		a.setBidirectMeasure(0.5);
+		a.setEntropy(0.5);
 		a.addStringsOfFacts("1", "2", "1>2");
 
 		Episode b = new Episode();
 		b.setFrequency(3);
-		b.setBidirectMeasure(0.5);
+		b.setEntropy(0.5);
 		b.addStringsOfFacts("3", "4", "3>4");
 
 		assertNotEquals(a, b);
@@ -240,12 +240,12 @@ public class EpisodeTest {
 	public void equality_sameEventsDiffRelations() {
 		Episode a = new Episode();
 		a.setFrequency(3);
-		a.setBidirectMeasure(0.5);
+		a.setEntropy(0.5);
 		a.addStringsOfFacts("1", "2", "3", "1>2", "1>3");
 
 		Episode b = new Episode();
 		b.setFrequency(3);
-		b.setBidirectMeasure(0.5);
+		b.setEntropy(0.5);
 		b.addStringsOfFacts("1", "2", "3", "1>2", "2>3");
 
 		assertNotEquals(a, b);

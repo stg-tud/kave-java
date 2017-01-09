@@ -37,14 +37,13 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class FrequenciesAnalyzerTest {
 
@@ -65,7 +64,7 @@ public class FrequenciesAnalyzerTest {
 	private FrequenciesAnalyzer sut;
 
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
 		Logger.reset();
 		Logger.setCapturing(true);
 
@@ -77,7 +76,7 @@ public class FrequenciesAnalyzerTest {
 		patterns.put(3, Sets.newHashSet(createEpisode(4, 0.9, "1", "2", "3", "2>3"),
 				createEpisode(3, 0.8, "1", "4", "5", "1>4", "1>5")));
 		
-		when(postprocessor.postprocess(anyInt(), anyInt(), anyDouble())).thenReturn(patterns);
+		when(postprocessor.postprocess(any(Map.class), anyInt(), anyDouble())).thenReturn(patterns);
 		
 		sut = new FrequenciesAnalyzer(rootFolder.getRoot(), postprocessor);
 	}
@@ -101,10 +100,10 @@ public class FrequenciesAnalyzerTest {
 	public void mocksAreCalledInTraining() throws Exception {
 		sut.analyzeSuperEpisodes(NUMBREPOS, FREQUENCY, ENTROPY);;
 
-		verify(postprocessor).postprocess(anyInt(), anyInt(), anyDouble());
+		verify(postprocessor).postprocess(any(Map.class), anyInt(), anyDouble());
 	}
 	
-	public void fileIsCreated() throws IOException {
+	public void fileIsCreated() throws Exception {
 		File fileName = getFileName(NUMBREPOS, FREQUENCY, ENTROPY);
 		
 		sut.analyzeSuperEpisodes(NUMBREPOS, FREQUENCY, ENTROPY);
@@ -113,7 +112,7 @@ public class FrequenciesAnalyzerTest {
 	}
 	
 	@Test
-	public void checkFileContent() throws IOException {
+	public void checkFileContent() throws Exception {
 		StringBuilder expected = new StringBuilder();
 	    expected.append("2-node episodes\n");
 	    expected.append("[1, 2]\t5\n");
@@ -130,7 +129,7 @@ public class FrequenciesAnalyzerTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts(string);
 		episode.setFrequency(freq);
-		episode.setBidirectMeasure(entropy);
+		episode.setEntropy(entropy);
 		return episode;
 	}
 	

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.GraphGenerator;
 
 import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.mockito.Mockito.verify;
@@ -31,7 +31,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.analyzer.ValidationSetAnalyzer;
+import cc.kave.episodes.GraphGenerator.ValidationSetAnalyzer;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;

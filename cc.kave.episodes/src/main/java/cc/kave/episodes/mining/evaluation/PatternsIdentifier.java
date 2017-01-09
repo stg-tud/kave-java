@@ -27,16 +27,16 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.IndivReposParser;
-import cc.kave.episodes.io.MappingParser;
-import cc.kave.episodes.io.ReposParser;
-import cc.kave.episodes.io.StreamParser;
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.EnclosingMethods;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeKind;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
@@ -50,49 +50,57 @@ import com.google.inject.name.Named;
 
 public class PatternsIdentifier {
 
+	private File eventsFolder;
 	private File patternsFolder;
 
-	private StreamParser streamParser;
-	private MappingParser mappingParser;
+	private EventStreamIo eventStream;
+	private EpisodeParser episodeParser;
 	private EpisodesPostprocessor episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 
+	private ValidationDataIO validationIO;
 	private TransitivelyClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
-	private IndivReposParser irp;
-
-	private ReposParser repos;
-
 	@Inject
 	public PatternsIdentifier(@Named("patterns") File folder,
-			StreamParser streamParser, EpisodesPostprocessor episodes,
-			MappingParser mappingParser, MaximalEpisodes maxEpisodes,
-			ReposParser repos, TransitivelyClosedEpisodes transClosure,
+			@Named("events") File eventsFolder, EpisodesPostprocessor episodes,
+			MaximalEpisodes maxEpisodes, EventStreamIo eventStream,
+			EpisodeParser epParser, TransitivelyClosedEpisodes transClosure,
 			EpisodeToGraphConverter episodeGraphConverter,
-			EpisodeAsGraphWriter graphWriter, IndivReposParser indRepos) {
+			EpisodeAsGraphWriter graphWriter, ValidationDataIO validationIO) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
-		assertTrue(folder.isDirectory(),
-				"Patterns folder is not a folder, but a file");
+		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
+		assertTrue(eventsFolder.exists(), "Events folder does not exist");
+		assertTrue(eventsFolder.isDirectory(),
+				"Events is not a folder, but a file");
+		this.eventsFolder = eventsFolder;
 		this.patternsFolder = folder;
-		this.streamParser = streamParser;
-		this.mappingParser = mappingParser;
+		this.eventStream = eventStream;
+		this.episodeParser = epParser;
 		this.episodeProcessor = episodes;
 		this.maxEpisodes = maxEpisodes;
-		this.repos = repos;
 		this.transClosure = transClosure;
 		this.episodeGraphConverter = episodeGraphConverter;
 		this.graphWriter = graphWriter;
-		this.irp = indRepos;
+		this.validationIO = validationIO;
 	}
 
-	public void trainingCode(int numbRepos, int frequency, double entropy)
-			throws Exception {
-		List<List<Fact>> stream = streamParser.parse(numbRepos);
-		List<Event> events = mappingParser.parse(numbRepos);
+	public void trainingCode(int foldNum, int frequency, double entropy,
+			EpisodeKind episodeKind) throws Exception {
+		List<List<Fact>> stream = eventStream.parseStream(getStreamPath(
+				"Training", foldNum));
+		List<Event> enclMethods = eventStream.readMethods(getMethodsPath(
+				"Training", foldNum));
+		Logger.log("Stream size is: %d", stream.size());
+		Logger.log("Methods size is: %d", enclMethods.size());
+		// assertTrue(stream.size() == enclMethods.size(),
+		// "Stream and Element contexts have different sizes!");
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(new File(
+				getEpisodesPath("Training", foldNum, episodeKind)));
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor
-				.postprocess(numbRepos, frequency, entropy);
+				.postprocess(episodes, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(postpEpisodes);
 
@@ -103,11 +111,13 @@ public class PatternsIdentifier {
 			// Episode debug = createDebuggingEpisode();
 
 			for (Episode episode : entry.getValue()) {
-				Set<Fact> episodeFacts = episode.getEvents();
+				Set<Fact> episodeEvents = episode.getEvents();
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
 						true);
 
-				for (List<Fact> method : stream) {
+				for (int i = 0; i < stream.size(); i++) {
+
+					List<Fact> method = stream.get(i);
 					if (method.size() < 2) {
 						continue;
 					}
@@ -116,8 +126,9 @@ public class PatternsIdentifier {
 					// Logger.log("Method: %s", method.toString());
 					// }
 					// }
-					if (method.containsAll(episodeFacts)) {
-						methodsOrderRelation.addMethod(episode, method, events);
+					if (method.containsAll(episodeEvents)) {
+						methodsOrderRelation.addMethod(episode, method,
+								enclMethods.get(i));
 
 						// if (episode.equals(debug)) {
 						// Logger.log("Method: %s\noccurrence: %d",
@@ -142,136 +153,172 @@ public class PatternsIdentifier {
 		Logger.log("All patterns are identified in the training data!");
 	}
 
+	private String getMethodsPath(String foldType, int foldNum) {
+		String methods = getEventsPath(foldType, foldNum) + "/methods.txt";
+		return methods;
+	}
+
+	private String getEpisodesPath(String foldType, int foldNum,
+			EpisodeKind episodeKind) {
+		String type = "";
+		if (episodeKind == EpisodeKind.SEQUENTIAL) {
+			type = "Seq";
+		} else if (episodeKind == EpisodeKind.PARALLEL) {
+			type = "Parallel";
+		} else {
+			type = "Mix";
+		}
+		String fileName = getEventsPath(foldType, foldNum) + "/episodes" + type
+				+ ".txt";
+		return fileName;
+	}
+
+	private String getStreamPath(String foldType, int foldNum) {
+		String fileName = getEventsPath(foldType, foldNum) + "/stream.txt";
+		return fileName;
+	}
+
+	private String getEventsPath(String foldType, int foldNum) {
+		String fileName = eventsFolder.getAbsolutePath() + "/" + foldType
+				+ "Data/fold" + foldNum;
+		return fileName;
+	}
+
 	private Episode createDebuggingEpisode() {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("9", "3063");
 		episode.setFrequency(356);
-		episode.setBidirectMeasure(0.8157);
+		episode.setEntropy(0.8157);
 		return episode;
 	}
 
-	// public void validationCode(int numbRepos, int frequency, double entropy)
-	// throws Exception {
-	// List<Event> trainEvents = mappingParser.parse(numbRepos);
-	// Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
-	// numbRepos, frequency, entropy);
-	//
-	// List<Event> stream = repos.validationStream(numbRepos);
-	// Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream,
-	// trainEvents);
-	// List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
-	// List<Event> listEvents = mapToList(mapEvents);
-	// StringBuilder sb = new StringBuilder();
-	// int patternId = 0;
-	//
-	// for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-	// if ((entry.getKey() < 2) || (entry.getValue().size() == 0)) {
-	// continue;
-	// }
-	// sb.append("Patterns of size: " + entry.getKey() + "-events\n");
-	// sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
-	// for (Episode episode : entry.getValue()) {
-	// EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
-	// false);
-	// EnclosingMethods methodsOrderRelation = new EnclosingMethods(
-	// true);
-	//
-	// for (List<Fact> method : streamMethods) {
-	// if (method.containsAll(episode.getEvents())) {
-	// methodsNoOrderRelation.addMethod(episode, method,
-	// listEvents);
-	// methodsOrderRelation.addMethod(episode, method,
-	// listEvents);
-	// }
-	// }
-	// sb.append(patternId + "\t" + episode.getFrequency() + "\t"
-	// + methodsNoOrderRelation.getOccurrences() + "\t"
-	// + methodsOrderRelation.getOccurrences() + "\n");
-	// patternsWriter(episode, trainEvents, numbRepos, frequency,
-	// entropy, patternId);
-	// patternId++;
-	// }
-	// sb.append("\n");
-	// Logger.log("Processed %d-node patterns!", entry.getKey());
-	// }
-	// FileUtils.writeStringToFile(
-	// getValidationPath(getPath(numbRepos, frequency, entropy)),
-	// sb.toString());
-	// }
-
-	public void inRepos(int numbRepos, int frequency, double entropy)
-			throws Exception {
-//		Map<String, List<Event>> repos = irp.generateReposEvents();
+//	public void validationCode(int foldNum, int frequency, double entropy,
+//			EpisodeKind episodeKind) throws Exception {
+//		List<Event> trainEvents = eventStream.readMapping(getMethodsPath(
+//				"Training", foldNum));
+//		Map<Integer, Set<Episode>> episodes = episodeParser.parse(new File(
+//				getEpisodesPath("Training", foldNum, episodeKind)));
+//		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(episodes, frequency, entropy);
 //
-//		List<Event> trainEvents = mappingParser.parse(numbRepos);
-//		Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
-//				numbRepos, frequency, entropy);
-//
-//		// List<Event> stream = repos.validationStream(numbRepos);
-//		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(repos,
+//		List<Event> validationStream = validationIO.read(foldNum);
+//		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(stream,
 //				trainEvents);
-//		Map<String, List<List<Fact>>> streamMethods = streamOfMethods(repos,
-//				mapEvents);
+//		List<List<Fact>> streamMethods = streamOfMethods(stream, mapEvents);
 //		List<Event> listEvents = mapToList(mapEvents);
 //		StringBuilder sb = new StringBuilder();
 //		int patternId = 0;
 //
-//		List<Integer> debugs = Lists.newArrayList(0, 15, 22, 29, 44, 48, 66,
-//				68, 72, 83, 90, 104, 110, 113, 120, 127, 130, 136, 144, 146,
-//				148, 149, 150, 151, 153, 157, 158, 160, 161);
-//
-//		for (Map.Entry<Integer, Set<Episode>> patternsEntry : patterns
-//				.entrySet()) {
-//			if ((patternsEntry.getKey() < 2)
-//					|| (patternsEntry.getValue().size() == 0)) {
+//		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+//			if ((entry.getKey() < 2) || (entry.getValue().size() == 0)) {
 //				continue;
 //			}
-//			// sb.append("Patterns of size: " + patternsEntry.getKey()
-//			// + "-events\n");
-//			// sb.append("Pattern\tFreq\tEntropy\trepos\tsetOcc\torderOcc\n");
-//			for (Episode episode : patternsEntry.getValue()) {
+//			sb.append("Patterns of size: " + entry.getKey() + "-events\n");
+//			sb.append("Pattern\tFrequency\toccurrencesAsSet\toccurrencesOrder\n");
+//			for (Episode episode : entry.getValue()) {
 //				EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
 //						false);
 //				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
 //						true);
-//				Set<String> reposNames = Sets.newLinkedHashSet();
 //
-//				for (Map.Entry<String, List<List<Fact>>> reposEntry : streamMethods
-//						.entrySet()) {
-//					for (List<Fact> method : reposEntry.getValue()) {
-//						if (method.containsAll(episode.getEvents())) {
-//							methodsNoOrderRelation.addMethod(episode, method,
-//									listEvents);
-//							methodsOrderRelation.addMethod(episode, method,
-//									listEvents);
-//							reposNames.add(reposEntry.getKey());
-//						}
+//				for (List<Fact> method : streamMethods) {
+//					if (method.containsAll(episode.getEvents())) {
+//						methodsNoOrderRelation.addMethod(episode, method,
+//								listEvents);
+//						methodsOrderRelation.addMethod(episode, method,
+//								listEvents);
 //					}
 //				}
-//				if (debugs.contains(patternId)) {
-//					sb.append("pattern id = " + patternId + "\t" + episode.getFacts().toString() + "\n");
-//					sb.append("repository name is" + reposNames.toString() + "\n");
-//					Set<IMethodName> methods = methodsOrderRelation.getMethodNames(methodsOrderRelation.getOccurrences());
-//					for (IMethodName m : methods) {
-//						String methodName = m.getDeclaringType().getFullName() + "." + m.getName();
-//						sb.append(methodName + "\n");
-//					}
-//				}
-//				
-////				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
-////						+ episode.getEntropy() + "\t" + reposNames.size()
-////						+ "\t" + methodsNoOrderRelation.getOccurrences() + "\t"
-////						+ methodsOrderRelation.getOccurrences() + "\n");
-////				patternsWriter(episode, trainEvents, numbRepos, frequency,
-////						entropy, patternId);
+//				sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+//						+ methodsNoOrderRelation.getOccurrences() + "\t"
+//						+ methodsOrderRelation.getOccurrences() + "\n");
+//				patternsWriter(episode, trainEvents, numbRepos, frequency,
+//						entropy, patternId);
 //				patternId++;
 //			}
 //			sb.append("\n");
-//			Logger.log("Processed %d-node patterns!", patternsEntry.getKey());
+//			Logger.log("Processed %d-node patterns!", entry.getKey());
 //		}
 //		FileUtils.writeStringToFile(
 //				getValidationPath(getPath(numbRepos, frequency, entropy)),
 //				sb.toString());
+//	}
+
+	public void inRepos(int numbRepos, int frequency, double entropy)
+			throws Exception {
+		// Map<String, List<Event>> repos = irp.generateReposEvents();
+		//
+		// List<Event> trainEvents = mappingParser.parse(numbRepos);
+		// Map<Integer, Set<Episode>> patterns = episodeProcessor.postprocess(
+		// numbRepos, frequency, entropy);
+		//
+		// // List<Event> stream = repos.validationStream(numbRepos);
+		// Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(repos,
+		// trainEvents);
+		// Map<String, List<List<Fact>>> streamMethods = streamOfMethods(repos,
+		// mapEvents);
+		// List<Event> listEvents = mapToList(mapEvents);
+		// StringBuilder sb = new StringBuilder();
+		// int patternId = 0;
+		//
+		// List<Integer> debugs = Lists.newArrayList(0, 15, 22, 29, 44, 48, 66,
+		// 68, 72, 83, 90, 104, 110, 113, 120, 127, 130, 136, 144, 146,
+		// 148, 149, 150, 151, 153, 157, 158, 160, 161);
+		//
+		// for (Map.Entry<Integer, Set<Episode>> patternsEntry : patterns
+		// .entrySet()) {
+		// if ((patternsEntry.getKey() < 2)
+		// || (patternsEntry.getValue().size() == 0)) {
+		// continue;
+		// }
+		// // sb.append("Patterns of size: " + patternsEntry.getKey()
+		// // + "-events\n");
+		// // sb.append("Pattern\tFreq\tEntropy\trepos\tsetOcc\torderOcc\n");
+		// for (Episode episode : patternsEntry.getValue()) {
+		// EnclosingMethods methodsNoOrderRelation = new EnclosingMethods(
+		// false);
+		// EnclosingMethods methodsOrderRelation = new EnclosingMethods(
+		// true);
+		// Set<String> reposNames = Sets.newLinkedHashSet();
+		//
+		// for (Map.Entry<String, List<List<Fact>>> reposEntry : streamMethods
+		// .entrySet()) {
+		// for (List<Fact> method : reposEntry.getValue()) {
+		// if (method.containsAll(episode.getEvents())) {
+		// methodsNoOrderRelation.addMethod(episode, method,
+		// listEvents);
+		// methodsOrderRelation.addMethod(episode, method,
+		// listEvents);
+		// reposNames.add(reposEntry.getKey());
+		// }
+		// }
+		// }
+		// if (debugs.contains(patternId)) {
+		// sb.append("pattern id = " + patternId + "\t" +
+		// episode.getFacts().toString() + "\n");
+		// sb.append("repository name is" + reposNames.toString() + "\n");
+		// Set<IMethodName> methods =
+		// methodsOrderRelation.getMethodNames(methodsOrderRelation.getOccurrences());
+		// for (IMethodName m : methods) {
+		// String methodName = m.getDeclaringType().getFullName() + "." +
+		// m.getName();
+		// sb.append(methodName + "\n");
+		// }
+		// }
+		//
+		// // sb.append(patternId + "\t" + episode.getFrequency() + "\t"
+		// // + episode.getEntropy() + "\t" + reposNames.size()
+		// // + "\t" + methodsNoOrderRelation.getOccurrences() + "\t"
+		// // + methodsOrderRelation.getOccurrences() + "\n");
+		// // patternsWriter(episode, trainEvents, numbRepos, frequency,
+		// // entropy, patternId);
+		// patternId++;
+		// }
+		// sb.append("\n");
+		// Logger.log("Processed %d-node patterns!", patternsEntry.getKey());
+		// }
+		// FileUtils.writeStringToFile(
+		// getValidationPath(getPath(numbRepos, frequency, entropy)),
+		// sb.toString());
 	}
 
 	private void patternsWriter(Episode episode, List<Event> events,

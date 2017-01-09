@@ -18,19 +18,19 @@ package cc.kave.episodes.mining.patterns;
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.collect.Sets;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class FrequenciesAnalyzer {
 	
@@ -45,8 +45,8 @@ public class FrequenciesAnalyzer {
 		this.postprocessor = processor;
 	}
 	
-	public void analyzeSuperEpisodes(int numbRepos, int frequency, double entropy) throws IOException {
-		Map<Integer, Set<Episode>> patterns = postprocessor.postprocess(numbRepos, frequency, entropy);
+	public void analyzeSuperEpisodes(int numbRepos, int frequency, double entropy) throws Exception {
+		Map<Integer, Set<Episode>> patterns = postprocessor.postprocess(Maps.newHashMap(), frequency, entropy);
 		StringBuilder sb = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {

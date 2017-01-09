@@ -22,7 +22,8 @@ import com.google.inject.name.Named;
 
 public class QueryGeneration {
 
-	File rootFolder;
+	private File rootFolder;
+	private EventStreamIo eventStreamIo;
 
 	@Inject
 	public QueryGeneration(@Named("events") File folder) {
@@ -35,7 +36,7 @@ public class QueryGeneration {
 		assertTrue(pattern.getNumEvents() > 1,
 				"Pattern is non-valid, few events!");
 
-		List<Event> mapping = EventStreamIo.readMapping(getMappingPath());
+		List<Event> mapping = eventStreamIo.readMapping(getMappingPath());
 
 		Tuple<Set<Fact>, Set<Fact>> mdmi = separateEvents(pattern, mapping);
 

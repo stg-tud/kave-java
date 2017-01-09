@@ -74,7 +74,7 @@ public class Episode {
 		this.frequency = freq;
 	}
 
-	public void setBidirectMeasure(double bidirect) {
+	public void setEntropy(double bidirect) {
 		assertTrue(bidirect >= 0.0 && bidirect <= 1.0, "Bidirectional measure should be a probability value!");
 		this.bidirectMeasure = bidirect;
 	}
@@ -98,7 +98,7 @@ public class Episode {
 			addFact(fact);
 		}
 	}
-
+	
 	public boolean containsFact(Fact fact1) {
 		if (facts.contains(fact1)) {
 			return true;

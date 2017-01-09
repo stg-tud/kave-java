@@ -18,52 +18,41 @@ package cc.kave.episodes.postprocessor;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.inject.Inject;
-
-import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class EpisodesPostprocessor {
 
-	private EpisodeParser parser;
-	
-	@Inject
-	public EpisodesPostprocessor(EpisodeParser parser) {
-		this.parser = parser;
-	}
-	
-	public Map<Integer, Set<Episode>> postprocess(int numbRepos, int freqThresh, double bidirectThresh) {
+	public Map<Integer, Set<Episode>> postprocess(
+			Map<Integer, Set<Episode>> episodes, int freqThresh, double entropy) {
 		Map<Integer, Set<Episode>> patterns = Maps.newLinkedHashMap();
-		
-		Map<Integer, Set<Episode>> episodes = parser.parse(numbRepos);
-		Logger.log("Finished parsing the episodes!");
-		
+
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
 			}
 			Logger.log("Postprocessing %d-node episodes!", entry.getKey());
 			Map<Set<Fact>, Episode> filtered = Maps.newLinkedHashMap();
-			
+
 			for (Episode ep : entry.getValue()) {
 				int freq = ep.getFrequency();
 				double bidirect = ep.getEntropy();
-				
-				if ((freq >= freqThresh) && (bidirect >= bidirectThresh)) {
-					
+
+				if ((freq >= freqThresh) && (bidirect >= entropy)) {
+
 					if (filtered.containsKey(ep.getEvents())) {
 						Set<Fact> events = ep.getEvents();
 						Episode filterEp = filtered.get(events);
-						
-						Episode repEp = getRepresentative(filterEp, ep, freqThresh, bidirectThresh);
-						
-						if (repEp.equals(ep)) {
-							filtered.put(events, repEp);
-						}
+						filtered.remove(events);
+
+						Episode repEp = getRepresentative(filterEp, ep,
+								freqThresh, entropy);
+						filtered.put(repEp.getEvents(), repEp);
 					} else {
 						filtered.put(ep.getEvents(), ep);
 					}
@@ -77,37 +66,61 @@ public class EpisodesPostprocessor {
 
 	private Set<Episode> getfilteredEp(Map<Set<Fact>, Episode> filtered) {
 		Set<Episode> episodes = Sets.newLinkedHashSet();
-		
+
 		for (Map.Entry<Set<Fact>, Episode> entry : filtered.entrySet()) {
 			episodes.add(entry.getValue());
 		}
 		return episodes;
 	}
 
-	private Episode getRepresentative(Episode filterEp, Episode currEp, int freqThresh, double bidirectThresh) {
+	private Episode getRepresentative(Episode filterEp, Episode currEp,
+			int freqThresh, double bidirectThresh) {
 		int ffreq = filterEp.getFrequency();
-		double fbidirect = filterEp.getEntropy();
-		
+		double fentropy = filterEp.getEntropy();
+
 		int cfreq = currEp.getFrequency();
-		double cbidirect = currEp.getEntropy();
-		
+		double centropy = currEp.getEntropy();
+
 		if (ffreq > cfreq) {
 			return filterEp;
-		}
-		if (ffreq < cfreq) {
+		} else if (ffreq < cfreq) {
 			return currEp;
-		}
-		if (ffreq == cfreq) {
-			if (fbidirect < cbidirect) {
+		} else {
+			if (fentropy < centropy) {
 				return filterEp;
 			}
-			if (fbidirect > cbidirect) {
+			if (fentropy > centropy) {
 				return currEp;
+			} else {
+				Set<Fact> e1Order = filterEp.getRelations();
+				Set<Fact> e2Order = currEp.getRelations();
+				Set<Fact> repFacts = Sets.newHashSet();
+				
+				for (Fact fact : e1Order) {
+					Tuple<Fact, Fact> orderFacts = fact.getRelationFacts();
+					Fact repFact = new Fact(orderFacts.getSecond(), orderFacts.getFirst());
+					
+					if (!e2Order.contains(repFact)) {
+						repFacts.add(fact);
+					}
+				}
+				Episode representative = createEpisode(repFacts, filterEp);
+				return representative;
 			}
 		}
-		return filterEp;
-//		Logger.log("Episode 1: %s", filterEp.toString());
-//		Logger.log("Episode 2: %s", currEp.toString());
-//		throw new Exception("There are two episodes exactly the same!");
+	}
+
+	private Episode createEpisode(Set<Fact> repFacts, Episode filterEp) {
+		Episode episode = new Episode();
+		episode.setFrequency(filterEp.getFrequency());
+		episode.setEntropy(filterEp.getEntropy() - 0.1);
+		
+		for (Fact event : filterEp.getEvents()) {
+			episode.addFact(event);
+		}
+		for (Fact fact : repFacts) {
+			episode.addFact(fact);
+		}
+		return episode;
 	}
 }

@@ -16,40 +16,23 @@
 package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
+import cc.kave.episodes.model.Episode;
+import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.episodes.io.EpisodeParser;
-import cc.kave.episodes.model.Episode;
-import cc.recommenders.io.Logger;
-
 public class EpisodesPostprocessorTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	@Mock
-	private EpisodeParser parser;
-	
-	private static final int NUMBREPOS = 2;
-	private static final int FREQTHRESH = 5;
-	private static final double BIDIRECTTHRESH = 0.5;
+	private static final int FREQUENCY = 5;
+	private static final double ENTROPY = 0.5;
 	
 	private Map<Integer, Set<Episode>> episodes;
 	
@@ -60,13 +43,9 @@ public class EpisodesPostprocessorTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 
-		MockitoAnnotations.initMocks(this);
-		
 		episodes = Maps.newLinkedHashMap();
 		
-		sut = new EpisodesPostprocessor(parser);
-		
-		when(parser.parse(anyInt())).thenReturn(episodes);
+		sut = new EpisodesPostprocessor();
 	}
 	
 	@Test
@@ -77,31 +56,39 @@ public class EpisodesPostprocessorTest {
 		oneNodes.add(createEpisode(8, 0.5, "2"));
 		episodes.put(1, oneNodes);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		
-		when(parser.parse(anyInt())).thenReturn(episodes);
-		
-		verify(parser).parse(eq(NUMBREPOS));
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(Maps.newLinkedHashMap(), actuals);
 	}
 	
-	@Ignore
 	@Test
 	public void multipleEqualEpisodes() throws Exception {
-		thrown.expect(Exception.class);
-		thrown.expectMessage("There are two episodes exactly the same!");
 		
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "1>2"));
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "2>1"));
 		episodes.put(2, twoNodes);
 		
-		sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		expected.put(2, Sets.newHashSet(createEpisode(8, 0.5, "1", "2")));
 		
-		when(parser.parse(anyInt())).thenReturn(episodes);
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void threNodeEqualEpisodes() throws Exception {
 		
-		verify(parser).parse(eq(NUMBREPOS));
+		Set<Episode> twoNodes = Sets.newLinkedHashSet();
+		twoNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "2>3"));
+		twoNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "3>2"));
+		episodes.put(2, twoNodes);
+		
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		expected.put(2, Sets.newHashSet(createEpisode(8, 0.5, "1", "2", "3", "1>2")));
+		
+		assertEquals(expected, actuals);
 	}
 	
 	@Test
@@ -118,11 +105,7 @@ public class EpisodesPostprocessorTest {
 		set.add(createEpisode(9, 0.6, "1", "2", "2>1"));
 		expected.put(2, set);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		
-		when(parser.parse(anyInt())).thenReturn(episodes);
-		
-		verify(parser).parse(eq(NUMBREPOS));
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}
@@ -156,11 +139,7 @@ public class EpisodesPostprocessorTest {
 		set3.add(createEpisode(8, 0.5, "1", "2", "3"));
 		expected.put(3, set3);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		
-		when(parser.parse(anyInt())).thenReturn(episodes);
-		
-		verify(parser).parse(eq(NUMBREPOS));
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}
@@ -194,11 +173,7 @@ public class EpisodesPostprocessorTest {
 		set3.add(createEpisode(7, 0.9, "1", "2", "3", "1>2", "1>3"));
 		expected.put(3, set3);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-		
-		when(parser.parse(anyInt())).thenReturn(episodes);
-		
-		verify(parser).parse(eq(NUMBREPOS));
+		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}
@@ -206,7 +181,7 @@ public class EpisodesPostprocessorTest {
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
-		episode.setBidirectMeasure(bdmeas);
+		episode.setEntropy(bdmeas);
 		for (String fact : strings) {
 			episode.addFact(fact);
 		}

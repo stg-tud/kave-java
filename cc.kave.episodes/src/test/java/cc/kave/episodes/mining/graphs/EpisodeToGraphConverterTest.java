@@ -46,7 +46,7 @@ public class EpisodeToGraphConverterTest {
 	public void setup() {
 		episode = new Episode();
 		episode.setFrequency(3);
-		episode.setBidirectMeasure(0.5);
+		episode.setEntropy(0.5);
 		episode.addStringsOfFacts("1", "2", "3", "4", "1>2", "1>3", "1>4", "2>4", "3>4");
 
 		createMapping(eventMethodDecl("M1"), eventInvocation("M2"), eventMethodDecl("M3"), eventInvocation("M4"),

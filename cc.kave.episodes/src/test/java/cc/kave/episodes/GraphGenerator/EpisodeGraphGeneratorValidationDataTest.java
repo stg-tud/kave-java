@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.GraphGenerator;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,14 +24,12 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,12 +42,12 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
 import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
-import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -57,62 +55,58 @@ import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
-public class EpisodeGraphGeneratorTrainingDataTest {
+public class EpisodeGraphGeneratorValidationDataTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private String tmpFolderName;
-	private static final int FREQ = 12;
-	private static final double BD = 0.8;
-	private static final int REPOS = 2;
-
 	@Mock
-	private EpisodeParser episodeParser;
+	private ValidationContextsParser contextParser;
 	@Mock
 	private MappingParser mappingParser;
 	@Mock
 	private Directory episodeDirectory;
 
-	private MaximalEpisodes episodeLearned;
+	private static final int REPOS = 2;
+
+	private String tmpFolderName;
 	private EpisodeToGraphConverter graphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
-	private Map<Integer, Set<Episode>> episodes;
+	private Set<Episode> episodes;
 	private File folderStructure;
 
-	private TrainingDataGraphGenerator sut;
+	private ValidationDataGraphGenerator sut;
 
 	@Before
-	public void setup() {
+	public void setup() throws ZipException, IOException {
 		initMocks(this);
 
-		episodeLearned = new MaximalEpisodes();
 		graphConverter = new EpisodeToGraphConverter();
 		transitivityClosure = new TransitivelyClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
-		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationSpecificAPI("M1"),
-				eventMethodDeclSpecificAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),
+		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationGeneralAPI("M1"),
+				eventMethodDeclGeneralAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 
-		sut = new TrainingDataGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser,
-				transitivityClosure, writer, graphConverter);
+		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, mappingParser, transitivityClosure,
+				writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
-		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
+		folderStructure = new File(tmpFolderName + "/graphs/ValidationData/");
 
-		when(episodeParser.parse(eq(FREQ))).thenReturn(episodes);
 		when(mappingParser.parse(REPOS)).thenReturn(events);
+		when(contextParser.parse(eq(events))).thenReturn(episodes);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Episode-miner folder does not exist");
-		sut = new TrainingDataGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, mappingParser,
+		thrown.expectMessage("Validation data folder does not exist");
+		sut = new ValidationDataGraphGenerator(new File("does not exist"), contextParser, mappingParser,
 				transitivityClosure, writer, graphConverter);
 	}
 
@@ -120,89 +114,43 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
-		sut = new TrainingDataGraphGenerator(file, episodeParser, episodeLearned, mappingParser, transitivityClosure,
-				writer, graphConverter);
+		thrown.expectMessage("Validation data folder is not a folder, but a file");
+		sut = new ValidationDataGraphGenerator(file, contextParser, mappingParser, transitivityClosure, writer,
+				graphConverter);
 	}
 
-	@Ignore
 	@Test
 	public void structureIsCreated() throws Exception {
 
-		// sut.generateGraphs(FREQ, BD);
+		sut.generateGraphs(REPOS);
 
 		assertTrue(folderStructure.exists());
 		assertTrue(folderStructure.isDirectory());
 
-		// verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse(REPOS);
+		verify(contextParser).parse(events);
 	}
 
-	@Ignore
 	@Test
-	public void patternsStored() throws Exception {
+	public void validationGraphStored() throws Exception {
 
-		// sut.generateGraphs(FREQ, BD);
+		sut.generateGraphs(REPOS);
 
-		// verify(episodeParser).parse(eq(FREQ), eq(BD));
 		verify(mappingParser).parse(REPOS);
+		verify(contextParser).parse(events);
 
 		File fileName;
 		int epCounter = 0;
-		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
-			if (entry.getKey() > 1) {
-				for (Episode e : entry.getValue()) {
-					List<String> types = getTypes(e, events);
-					for (String type : types) {
-						String folder = folderStructure.getAbsolutePath();
-						fileName = new File(folder + "/" + type + "/graph" + epCounter + ".dot");
-						assertTrue(fileName.exists());
-						assertFalse(fileName.isDirectory());
-					}
-					epCounter++;
-				}
+		for (Episode episode : episodes) {
+			List<String> types = getTypes(episode, events);
+			for (String type : types) {
+				String folder = folderStructure.getAbsolutePath();
+				fileName = new File(folder + "/" + type + "/graph" + epCounter + ".dot");
+				assertTrue(fileName.exists());
+				assertFalse(fileName.isDirectory());
 			}
+			epCounter++;
 		}
-	}
-
-	private List<String> getTypes(Episode e, List<Event> events) {
-		List<String> types = new LinkedList<String>();
-		for (Fact fact : e.getFacts()) {
-			if (!fact.isRelation()) {
-				int factID = fact.getFactID();
-				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".",
-						"/");
-				if (!types.contains(type)) {
-					types.add(type);
-				}
-			}
-		}
-		return types;
-	}
-
-	private Map<Integer, Set<Episode>> createEpisodes() {
-		Map<Integer, Set<Episode>> episodes = new HashMap<Integer, Set<Episode>>();
-		episodes.put(1, Sets.newHashSet(newEpisode("1"), newEpisode("2"), newEpisode("3")));
-		episodes.put(2, Sets.newHashSet(newEpisode("4", "5"), newEpisode("3", "4")));
-		episodes.put(3, Sets.newHashSet(newEpisode("1", "3", "5"), newEpisode("2", "3", "5")));
-		episodes.put(4, Sets.newHashSet(newEpisode("1", "2", "3", "6")));
-		return episodes;
-	}
-
-	private Episode newEpisode(String... facts) {
-		Episode episode = new Episode();
-		episode.setFrequency(3);
-		episode.addStringsOfFacts(facts);
-		if (facts.length > 1) {
-			for (int idx1 = 0; idx1 < facts.length - 1; idx1++) {
-				for (int idx2 = idx1 + 1; idx2 < facts.length; idx2++) {
-					Fact fact1 = new Fact(facts[idx1]);
-					Fact fact2 = new Fact(facts[idx2]);
-					episode.addFact(new Fact(fact1, fact2));
-				}
-			}
-		}
-		return episode;
 	}
 
 	private List<Event> createMapping(Event... events) {
@@ -258,5 +206,50 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 
 	private static ITypeName typeSpecificAPI(String name) {
 		return Names.newType("some.namespace." + name + ", P");
+	}
+
+	private Set<Episode> createEpisodes() {
+		Set<Episode> episodes = Sets.newHashSet();
+		episodes.add(newEpisode("1"));
+		episodes.add(newEpisode("2"));
+		episodes.add(newEpisode("3"));
+		episodes.add(newEpisode("4", "5"));
+		episodes.add(newEpisode("3", "4"));
+		episodes.add(newEpisode("1", "3", "5"));
+		episodes.add(newEpisode("2", "3", "5"));
+		episodes.add(newEpisode("1", "2", "3", "6"));
+
+		return episodes;
+	}
+
+	private Episode newEpisode(String... facts) {
+		Episode episode = new Episode();
+		episode.setFrequency(3);
+		episode.addStringsOfFacts(facts);
+		if (facts.length > 1) {
+			for (int idx1 = 0; idx1 < facts.length - 1; idx1++) {
+				for (int idx2 = idx1 + 1; idx2 < facts.length; idx2++) {
+					Fact fact1 = new Fact(facts[idx1]);
+					Fact fact2 = new Fact(facts[idx2]);
+					episode.addFact(new Fact(fact1, fact2));
+				}
+			}
+		}
+		return episode;
+	}
+
+	private List<String> getTypes(Episode e, List<Event> events) {
+		List<String> types = new LinkedList<String>();
+		for (Fact fact : e.getFacts()) {
+			if (!fact.isRelation()) {
+				int factID = fact.getFactID();
+				String type = events.get(factID).getMethod().getDeclaringType().getFullName().toString().replace(".",
+						"/");
+				if (!types.contains(type)) {
+					types.add(type);
+				}
+			}
+		}
+		return types;
 	}
 }

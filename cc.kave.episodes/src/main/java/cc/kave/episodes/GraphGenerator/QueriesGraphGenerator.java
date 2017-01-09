@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.GraphGenerator;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -28,6 +28,7 @@ import org.jgrapht.graph.DefaultEdge;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -38,20 +39,22 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
-public class ValidationDataGraphGenerator {
+public class QueriesGraphGenerator {
 
 	private ValidationContextsParser validationParser;
 	private MappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransitivelyClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
+	private QueryStrategy queryGenerator;
 
 	private File rootFolder;
 
 	@Inject
-	public ValidationDataGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
+	public QueriesGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
 			MappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
-			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter) {
+			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
+			QueryStrategy queryGenerator) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
 		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");
@@ -62,11 +65,12 @@ public class ValidationDataGraphGenerator {
 		this.episodeGraphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
 		this.writer = writer;
+		this.queryGenerator = queryGenerator;
 	}
 
 	public void generateGraphs(int numbRepos) throws Exception {
 		
-		Logger.setPrinting(false);
+		Logger.setPrinting(true);
 		
 		Logger.log("Reading the mapping file");
 		List<Event> eventMapping = mappingParser.parse(numbRepos);
@@ -74,52 +78,59 @@ public class ValidationDataGraphGenerator {
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);
 		
+		
 		String directory = createDirectoryStructure();
 
-		int graphIndex = 0;
+		int episodeID = 0;
 
 		for (Episode e : validationData) {
-			Episode simplEpisode = transitivityClosure.remTransClosure(e);
-			Logger.log("Writting episode number %s.\n", graphIndex);
-			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(simplEpisode, eventMapping);
-			List<String> types = getAPIType(simplEpisode, eventMapping);
-			for (String t : types) {
-				writer.write(graph, getFilePath(directory, t, graphIndex));
+			
+			if (e.getNumEvents() > 1) {
+				int queryID = 0;
+				
+				Map<Double, Set<Episode>> queries = queryGenerator.byPercentage(e);
+				
+				Logger.log("Removing transitivity closures");
+				Episode ep = transitivityClosure.remTransClosure(e);
+				
+				Logger.log("Writting episode number %s.\n", episodeID);
+				DirectedGraph<Fact, DefaultEdge> epGraph = episodeGraphConverter.convert(ep, eventMapping);
+				writer.write(epGraph, getEpisodePath(directory, episodeID));
+				
+				if (!queries.isEmpty()) {
+					for (Map.Entry<Double, Set<Episode>> entry : queries.entrySet()) {
+						for (Episode query : entry.getValue()) {
+							Episode simQuery = transitivityClosure.remTransClosure(query);
+							DirectedGraph<Fact, DefaultEdge> queryGraph = episodeGraphConverter.convert(simQuery, eventMapping);
+							writer.write(queryGraph, getQueryPath(directory, episodeID, queryID));
+							queryID++;
+						}
+					}
+				}
+				episodeID++;
 			}
-			graphIndex++;
 		}
 	}
 
-	private List<String> getAPIType(Episode episode, List<Event> eventMapper) {
-		List<String> apiTypes = new LinkedList<String>();
-		for (Fact fact : episode.getFacts()) {
-			if (fact.isRelation()) {
-				continue;
-			}
-			int index = fact.getFactID();
-			String type = eventMapper.get(index).getMethod().getDeclaringType().getFullName().toString().replace(".",
-					"/");
-			if (!apiTypes.contains(type)) {
-				apiTypes.add(type);
-			}
-		}
-		return apiTypes;
+	private String getQueryPath(String directory, int episodeID, int queryID) {
+		String fileName = directory + "/Episode" + episodeID + "/query" + queryID + ".dot";
+		return fileName;
 	}
 
 	private String createDirectoryStructure() {
-		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/validationData/";
+		String targetDirectory = rootFolder.getAbsolutePath() + "/graphs/validationData/Queries/";
 		if (!(new File(targetDirectory).isDirectory())) {
 			new File(targetDirectory).mkdirs();
 		}
 		return targetDirectory;
 	}
 
-	private String getFilePath(String folderPath, String apiType, int fileNumber) throws Exception {
-		String typeFolder = folderPath + "/" + apiType + "/";
+	private String getEpisodePath(String folderPath, int episodeNumber) throws Exception {
+		String typeFolder = folderPath + "/Episode" + episodeNumber + "/";
 		if (!(new File(typeFolder).isDirectory())) {
 			new File(typeFolder).mkdirs();
 		}
-		String fileName = typeFolder + "/graph" + fileNumber + ".dot";
+		String fileName = typeFolder + "/episode" + episodeNumber + ".dot";
 
 		return fileName;
 	}

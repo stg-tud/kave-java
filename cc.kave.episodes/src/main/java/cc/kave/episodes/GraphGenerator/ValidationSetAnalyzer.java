@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.analyzer;
+package cc.kave.episodes.GraphGenerator;
 
 import static cc.recommenders.io.Logger.append;
 

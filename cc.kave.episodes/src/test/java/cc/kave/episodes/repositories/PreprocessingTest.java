@@ -37,9 +37,6 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EventStreamIo;
@@ -50,6 +47,9 @@ import cc.kave.episodes.model.events.Events;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 public class PreprocessingTest {
 
 	@Rule
@@ -59,6 +59,8 @@ public class PreprocessingTest {
 
 	@Mock
 	private ReposParser repos;
+	@Mock
+	private EventStreamIo streamIo;
 
 	private static final int NUMBREPOS = 10;
 	private static final int FREQTHRESH = 2;
@@ -66,6 +68,7 @@ public class PreprocessingTest {
 	private List<Event> events;
 	private EventStream stream;
 	private Map<Event, Integer> frequencies;
+	
 
 	private Preprocessing sut;
 
@@ -180,7 +183,7 @@ public class PreprocessingTest {
 		expectedMapping.add(inv(3));
 
 		String actualStream = FileUtils.readFileToString(streamFile);
-		List<Event> actualMapping = EventStreamIo.readMapping(mappingFile.getAbsolutePath());
+		List<Event> actualMapping = streamIo.readMapping(mappingFile.getAbsolutePath());
 
 		assertEquals(expectedStream, actualStream);
 		assertEquals(expectedMapping, actualMapping);

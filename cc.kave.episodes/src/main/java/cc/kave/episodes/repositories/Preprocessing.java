@@ -52,6 +52,7 @@ public class Preprocessing {
 
 	private File eventsFolder;
 	private ReposParser repos;
+	private EventStreamIo eventStreamIo;
 
 	@Inject
 	public Preprocessing(@Named("events") File folder, ReposParser repos) {
@@ -68,7 +69,7 @@ public class Preprocessing {
 
 		// debugStream(stream.getMapping().keySet());
 
-		EventStreamIo.write(stream, getPath(numbRepos).streamPath,
+		eventStreamIo.write(stream, getPath(numbRepos).streamPath,
 				getPath(numbRepos).mappingPath, getPath(numbRepos).enclMethods);
 		
 		Logger.log("\nPreprocessing ran for %d repositories.", numbRepos);

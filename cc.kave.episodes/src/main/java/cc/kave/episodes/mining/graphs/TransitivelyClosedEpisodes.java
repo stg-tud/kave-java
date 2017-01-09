@@ -50,7 +50,7 @@ public class TransitivelyClosedEpisodes {
 		}
 		episodeResult.addListOfFacts(finalRelations);
 		episodeResult.setFrequency(episode.getFrequency());
-		episodeResult.setBidirectMeasure(episode.getEntropy());
+		episodeResult.setEntropy(episode.getEntropy());
 
 		return episodeResult;
 	}

@@ -18,8 +18,8 @@ package exec.episodes;
 import java.io.File;
 import java.util.Map;
 
-import cc.kave.episodes.analyzer.TrainingDataGraphGenerator;
-import cc.kave.episodes.analyzer.ValidationDataGraphGenerator;
+import cc.kave.episodes.GraphGenerator.TrainingDataGraphGenerator;
+import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.eventstream.ThresholdsFrequency;
 import cc.kave.episodes.io.EpisodeParser;
@@ -27,7 +27,7 @@ import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
-import cc.kave.episodes.mining.evaluation.Evaluation;
+import cc.kave.episodes.mining.evaluation.RecommenderEvaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
@@ -83,24 +83,17 @@ public class Module extends AbstractModule {
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);
 		bind(File.class).annotatedWith(Names.named("patterns")).toInstance(patternsFile);
 
-		File eventsRoot = eventsData;
-		FileReader reader = new FileReader();
-		bind(EpisodeParser.class).toInstance(new EpisodeParser(eventsRoot, reader));
-
 		File eventStreamRoot = eventsData;
 		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
 		
-//		Directory reposRoot = reposDir;
-//		ReposFoldedParser reposParser = new ReposFoldedParser(ctxtDir);
-//		bind(PreprocessingFolded.class).toInstance(new PreprocessingFolded(reposRoot, reposParser));
-
 		MappingParser mappingParser = new MappingParser(eventStreamRoot);
 		File graphRoot = rootFile;
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
 
-		EpisodeParser episodeParser = new EpisodeParser(eventsRoot, reader);
+		FileReader reader = new FileReader();
+		EpisodeParser episodeParser = new EpisodeParser(reader);
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
@@ -120,7 +113,7 @@ public class Module extends AbstractModule {
 		File evaluationRoot = evaluationFile;
 		QueryStrategy queryGenerator = new QueryStrategy();
 		TargetsCategorization categorizer = new TargetsCategorization();
-		bind(Evaluation.class).toInstance(new Evaluation(evaluationRoot, validationParser, mappingParser,
+		bind(RecommenderEvaluation.class).toInstance(new RecommenderEvaluation(evaluationRoot, validationParser, mappingParser,
 				queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
 	}
 

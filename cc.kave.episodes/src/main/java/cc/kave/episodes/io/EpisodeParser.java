@@ -15,39 +15,29 @@
  */
 package cc.kave.episodes.io;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cc.kave.episodes.model.Episode;
+
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import cc.kave.episodes.model.Episode;
-import cc.recommenders.io.Logger;
 
 public class EpisodeParser {
 
-	private File rootFolder;
 	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(@Named("events") File directory, FileReader reader) {
-		assertTrue(directory.exists(), "Frequent episode folder does not exist");
-		assertTrue(directory.isDirectory(), "Frequent episode folder is not a folder, but a file");
-		this.rootFolder = directory;
+	public EpisodeParser(FileReader reader) {
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> parse(int numRepos) {
+	public Map<Integer, Set<Episode>> parse(File fileName) {
 
-		File filePath = getFilePath(numRepos);
-		Logger.log("%s", filePath.getAbsolutePath());
-		List<String> lines = reader.readFile(filePath);
+		List<String> lines = reader.readFile(fileName);
 
 		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -83,7 +73,7 @@ public class EpisodeParser {
 	private Episode readEpisode(int numberOfNodes, String[] rowValues) {
 		Episode episode = new Episode();
 		episode.setFrequency(Integer.parseInt(rowValues[1].trim()));
-		episode.setBidirectMeasure(Double.parseDouble(rowValues[2].trim()));
+		episode.setEntropy(Double.parseDouble(rowValues[2].trim()));
 		String[] events = rowValues[0].split("\\s+");
 		for (int idx = 0; idx < numberOfNodes; idx++) {
 			episode.addFact(events[idx]);
@@ -95,11 +85,5 @@ public class EpisodeParser {
 			}
 		}
 		return episode;
-	}
-
-	private File getFilePath(int numbRepos) {
-		String fileName = rootFolder.getAbsolutePath() + "/" + numbRepos + "Repos/episodes.txt";
-		File file = new File(fileName);
-		return file;
 	}
 }
