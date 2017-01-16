@@ -45,17 +45,15 @@ public class EventStreamSizeTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 		
-		streamIo = new EventStreamIo();
+		streamIo = new EventStreamIo(rootFolder.getRoot());
 
 		es0 = addEvents(first(1), ctx(1), inv(1), inv(6), first(0), sup(1),
 				ctx(2), inv(2), inv(3), inv(4), inv(5));
 		es1 = addEvents(first(0), sup(2), ctx(3), inv(7), inv(5), first(8),
 				ctx(4), inv(4), inv(5));
 
-		streamIo.write(es0, getFilePath(0, "stream.txt"),
-				getFilePath(0, "mapping.txt"), getFilePath(0, "methods.txt"));
-		streamIo.write(es1, getFilePath(1, "stream.txt"),
-				getFilePath(1, "mapping.txt"), getFilePath(1, "methods.txt"));
+		streamIo.write(es0, NUM_FOLDS);
+		streamIo.write(es1, NUM_FOLDS);
 
 		sut = new EventStreamSize(rootFolder.getRoot());
 	}
@@ -119,21 +117,6 @@ public class EventStreamSizeTest {
 		} else {
 			return Names.newMethod("[T,P] [T,P].m" + i + "()");
 		}
-	}
-
-	private File getPath(int fold) {
-		File path = new File(rootFolder.getRoot().getAbsolutePath()
-				+ "/TrainingData/fold" + fold);
-
-		if (!path.isDirectory()) {
-			path.mkdirs();
-		}
-		return path;
-	}
-
-	private String getFilePath(int fold, String file) {
-		String fileName = getPath(fold) + "/" + file;
-		return fileName;
 	}
 
 	private EventStream addEvents(Event... events) {

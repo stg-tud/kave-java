@@ -37,14 +37,14 @@ import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
-public class StreamFrequencies {
+public class EventsFrequencies {
 
 	private Directory rootDir;
 	private File rootFolder;
 	private StreamStatistics statistics;
 
 	@Inject
-	public StreamFrequencies(@Named("contexts") Directory directory, @Named("statistics") File folder,
+	public EventsFrequencies(@Named("contexts") Directory directory, @Named("statistics") File folder,
 			StreamStatistics statistics) {
 		assertTrue(folder.exists(), "Contexts folder does not exist");
 		assertTrue(folder.isDirectory(), "Contexts is not a folder, but a file");

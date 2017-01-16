@@ -6,9 +6,9 @@ import java.util.Map;
 
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.RepoMethodsMapperIO;
-import cc.kave.episodes.io.TrainingDataIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
@@ -22,17 +22,17 @@ public class PreprocessingFolded {
 	private IndivReposParser reposParser;
 
 	private RepoMethodsMapperIO reposMethodsIO;
-	private TrainingDataIO trainingIO;
+	private EventStreamIo eventStreamIo;
 	private ValidationDataIO validationIO;
 	
 	private static final int NUM_FOLDS = 10;
 
 	@Inject
 	public PreprocessingFolded(IndivReposParser repositories,
-			TrainingDataIO training, ValidationDataIO valIo,
+			EventStreamIo trainingData, ValidationDataIO valIo,
 			RepoMethodsMapperIO repMeth) {
 		this.reposParser = repositories;
-		this.trainingIO = training;
+		this.eventStreamIo = trainingData;
 		this.validationIO = valIo;
 		this.reposMethodsIO = repMeth;
 	}
@@ -51,7 +51,7 @@ public class PreprocessingFolded {
 					repos);
 			EventStream trainingStream = EventsFilter.filterStream(
 					trainingData, freq);
-			trainingIO.write(trainingStream, curFold);
+			eventStreamIo.write(trainingStream, curFold);
 			trainingData.clear();
 			trainingStream.delete();
 

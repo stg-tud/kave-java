@@ -16,7 +16,6 @@
 package cc.kave.episodes.io;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,6 +26,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.naming.Names;
@@ -35,6 +35,7 @@ import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Lists;
 
@@ -42,25 +43,44 @@ public class EventStreamIoTest {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = Names
 			.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 	
+	private static final int FOLDNUM = 2;
+	
 	private EventStreamIo sut;
 	
 	@Before
 	public void setup() {
-		sut = new EventStreamIo();
+		sut = new EventStreamIo(tmp.getRoot());
+	}
+	
+	@Test
+	public void cannotBeInitializedWithNonExistingFolder() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Repositories folder does not exist");
+		sut = new EventStreamIo(new File("does not exist"));
+	}
+
+	@Test
+	public void cannotBeInitializedWithFile() throws IOException {
+		File file = tmp.newFile("a");
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Repositories is not a folder, but a file");
+		sut = new EventStreamIo(file);
 	}
 
 	@Test
 	public void happyPath() throws IOException {
 
-		File streamFile = file();
-		File mappingFile = file();
-		File methodsFile = file();
+		File streamFile = getStreamFile();
+		File mappingFile = getMappingFile();
+		File methodsFile = getMethodsFile();
 
 		EventStream expected = new EventStream();
 		expected.addEvent(firstCtx(1)); // 1
@@ -82,8 +102,7 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(2), new Fact(3)));
 
-		sut.write(expected, streamFile.getAbsolutePath(),
-				mappingFile.getAbsolutePath(), methodsFile.getAbsolutePath());
+		sut.write(expected, FOLDNUM);
 
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());
@@ -120,12 +139,28 @@ public class EventStreamIoTest {
 		}
 		return true;
 	}
+	
+	private File getMethodsFile() {
+		File fileName = new File(getPath() + "/methods.txt");
+		return fileName;
+	}
 
-	private File file() throws IOException {
-		File file = tmp.newFile();
-		file.delete();
-		assertFalse(file.exists());
-		return file;
+	private File getMappingFile() {
+		File fileName = new File(getPath() + "/mapping.txt");
+		return fileName;
+	}
+
+	private File getStreamFile() {
+		File fileName = new File(getPath() + "/stream.txt");
+		return fileName;
+	}
+
+	private String getPath() {
+		File path = new File(tmp.getRoot().getAbsolutePath() + "/TrainingData/fold" + FOLDNUM);
+		if (!path.isDirectory()) {
+			path.mkdirs();
+		}
+		return path.getAbsolutePath();
 	}
 
 	private static Event inv(int i) {

@@ -38,7 +38,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
-public class ReposMethodsMapperTest {
+public class ReposMethodsMapperIoTest {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();

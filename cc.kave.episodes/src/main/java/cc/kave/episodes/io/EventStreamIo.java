@@ -23,6 +23,8 @@ import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.apache.commons.io.FileUtils;
 
 import cc.kave.commons.utils.json.JsonUtils;
@@ -33,19 +35,30 @@ import cc.kave.episodes.model.events.Fact;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
 
 public class EventStreamIo {
 
+	private File repoDir;
+
 	public static final double TIMEOUT = 0.5;
 
-	public void write(EventStream stream, String fileStream,
-			String fileMapping, String fileMethods) {
+	@Inject
+	public EventStreamIo(@Named("repositories") File folder) {
+		assertTrue(folder.exists(), "Repositories folder does not exist");
+		assertTrue(folder.isDirectory(),
+				"Repositories is not a folder, but a file");
+		this.repoDir = folder;
+	}
+
+	public void write(EventStream stream, int foldNum) {
 		try {
-			FileUtils.writeStringToFile(new File(fileStream),
-					stream.getStream());
-			JsonUtils.toJson(stream.getMapping().keySet(),
-					new File(fileMapping));
-			JsonUtils.toJson(stream.getEnclMethods(), new File(fileMethods));
+			FileUtils.writeStringToFile(new File(
+					getTrainPath(foldNum).streamPath), stream.getStream());
+			JsonUtils.toJson(stream.getMapping().keySet(), new File(
+					getTrainPath(foldNum).mappingPath));
+			JsonUtils.toJson(stream.getEnclMethods(), new File(
+					getTrainPath(foldNum).methodsPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -115,5 +128,25 @@ public class EventStreamIo {
 			throw new RuntimeException(e);
 		}
 		return lines;
+	}
+
+	private class TrainingPath {
+		String streamPath = "";
+		String mappingPath = "";
+		String methodsPath = "";
+	}
+
+	private TrainingPath getTrainPath(int fold) {
+		File path = new File(repoDir.getAbsolutePath() + "/TrainingData/fold"
+				+ fold);
+		if (!path.isDirectory()) {
+			path.mkdirs();
+		}
+		TrainingPath trainPath = new TrainingPath();
+		trainPath.streamPath = path.getAbsolutePath() + "/stream.txt";
+		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
+		trainPath.methodsPath = path.getAbsolutePath() + "/methods.txt";
+
+		return trainPath;
 	}
 }

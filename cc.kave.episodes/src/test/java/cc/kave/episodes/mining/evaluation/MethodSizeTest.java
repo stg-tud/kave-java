@@ -35,6 +35,7 @@ public class MethodSizeTest {
 	private EventStreamIo streamIo;
 
 	private static final int NUMBREPOS = 5;
+	private static final int NUM_FOLDS = 2;
 
 	private MethodSize sut;
 
@@ -47,7 +48,7 @@ public class MethodSizeTest {
 
 		MockitoAnnotations.initMocks(this);
 		
-		streamIo = new EventStreamIo();
+		streamIo = new EventStreamIo(rootFolder.getRoot());
 
 		sut = new MethodSize(rootFolder.getRoot());
 
@@ -92,8 +93,7 @@ public class MethodSizeTest {
 	public void logger() {
 		Logger.clearLog();
 
-		streamIo.write(eventStream, getStreamPath(NUMBREPOS),
-				getMappingPath(NUMBREPOS), getMethodsPath(NUMBREPOS));
+		streamIo.write(eventStream, NUM_FOLDS);
 
 		assertTrue(new File(getStreamPath(NUMBREPOS)).exists());
 		assertTrue(new File(getMappingPath(NUMBREPOS)).exists());

@@ -31,9 +31,9 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.RepoMethodsMapperIO;
-import cc.kave.episodes.io.TrainingDataIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
@@ -46,7 +46,7 @@ public class PreprocessingFoldedTest {
 	@Mock
 	private IndivReposParser repoParser;
 	@Mock
-	private TrainingDataIO trainingIo;
+	private EventStreamIo trainingIo;
 	@Mock
 	private ValidationDataIO validationIo;
 	@Mock
