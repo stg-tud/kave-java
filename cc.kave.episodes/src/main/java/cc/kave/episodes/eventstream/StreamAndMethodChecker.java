@@ -14,6 +14,12 @@ import cc.recommenders.io.Logger;
 
 import com.google.inject.name.Named;
 
+/* Stream length can be less or equal to the method file length
+ * We include empty methods along the stream in our parsing, 
+ * but not the empty methods in the end of the stream.  
+ */
+
+
 public class StreamAndMethodChecker {
 
 	private File directory;

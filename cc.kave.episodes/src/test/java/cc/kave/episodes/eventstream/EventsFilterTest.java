@@ -35,42 +35,69 @@ public class EventsFilterTest {
 
 	private static final int REMFREQS = 2;
 
-	private List<Event> events;
+	private List<Event> events1;
+	private List<Event> events2;
 
-	private EventStream expectedStream;
+	private EventStream expStream1;
+	private EventStream expStream2;
 
 	@Before
 	public void setup() {
-		events = Lists.newArrayList(firstCtx(1), enclCtx(0), inv(2), inv(3), 
+		events1 = Lists.newArrayList(firstCtx(1), enclCtx(0), inv(2), inv(3), 
 									firstCtx(0), superCtx(2), enclCtx(7), inv(5), inv(0), inv(2), 
 									firstCtx(1), enclCtx(6), inv(2), inv(3), 
 									firstCtx(1), enclCtx(0), inv(2), inv(3),
 									firstCtx(0), enclCtx(8), inv(2),
 									firstCtx(1), enclCtx(6), inv(2), inv(3), 
 									firstCtx(3), superCtx(4), enclCtx(0), inv(3));
+		
+		events2 = Lists.newArrayList(firstCtx(1), enclCtx(0),
+									firstCtx(0), superCtx(2), enclCtx(7), inv(5), inv(0), 
+									firstCtx(1), enclCtx(6), inv(2), inv(3), 
+									firstCtx(0), enclCtx(8), 
+									firstCtx(1), enclCtx(9), inv(3), inv(2), 
+									firstCtx(3), superCtx(4), enclCtx(0));
 
-		expectedStream = new EventStream();
-		expectedStream.addEvent(firstCtx(1));	// 1
-		expectedStream.addEvent(enclCtx(0));  	
-		expectedStream.addEvent(inv(2)); 		// 2
-		expectedStream.addEvent(inv(3)); 		// 3
-		expectedStream.addEvent(firstCtx(0));
-		expectedStream.addEvent(enclCtx(7)); 	
-		expectedStream.addEvent(inv(2)); 		// 2
-		expectedStream.addEvent(firstCtx(1));	// 1
-		expectedStream.addEvent(enclCtx(6));
-		expectedStream.addEvent(inv(2));		// 2
-		expectedStream.addEvent(inv(3));		// 3
-		expectedStream.addEvent(firstCtx(1));	// 1	
-		expectedStream.addEvent(enclCtx(0));
-		expectedStream.addEvent(inv(2));		// 2
-		expectedStream.addEvent(inv(3));		// 3
-		expectedStream.addEvent(firstCtx(0));
-		expectedStream.addEvent(enclCtx(8));
-		expectedStream.addEvent(inv(2));		// 2
-		expectedStream.addEvent(firstCtx(3)); 	// 4
-		expectedStream.addEvent(enclCtx(0)); 
-		expectedStream.addEvent(inv(3)); 		// 3
+		expStream1 = new EventStream();
+		expStream1.addEvent(firstCtx(1));	// 1
+		expStream1.addEvent(enclCtx(0));  	
+		expStream1.addEvent(inv(2)); 		// 2
+		expStream1.addEvent(inv(3)); 		// 3
+		expStream1.addEvent(firstCtx(0));
+		expStream1.addEvent(enclCtx(7)); 	
+		expStream1.addEvent(inv(2)); 		// 2
+		expStream1.addEvent(firstCtx(1));	// 1
+		expStream1.addEvent(enclCtx(6));
+		expStream1.addEvent(inv(2));		// 2
+		expStream1.addEvent(inv(3));		// 3
+		expStream1.addEvent(firstCtx(1));	// 1	
+		expStream1.addEvent(enclCtx(0));
+		expStream1.addEvent(inv(2));		// 2
+		expStream1.addEvent(inv(3));		// 3
+		expStream1.addEvent(firstCtx(0));
+		expStream1.addEvent(enclCtx(8));
+		expStream1.addEvent(inv(2));		// 2
+		expStream1.addEvent(firstCtx(3)); 	// 4
+		expStream1.addEvent(enclCtx(0)); 
+		expStream1.addEvent(inv(3)); 		// 3
+		
+		expStream2 = new EventStream();
+		expStream2.addEvent(firstCtx(1));	// 1	
+		expStream2.addEvent(enclCtx(0));  	
+		expStream2.addEvent(firstCtx(0));
+		expStream2.addEvent(enclCtx(7)); 	
+		expStream2.addEvent(firstCtx(1));	// 1	
+		expStream2.addEvent(enclCtx(6));	
+		expStream2.addEvent(inv(2));		// 2
+		expStream2.addEvent(inv(3));		// 3
+		expStream2.addEvent(firstCtx(0));
+		expStream2.addEvent(enclCtx(8));	
+		expStream2.addEvent(firstCtx(1));	// 1
+		expStream2.addEvent(enclCtx(9));	
+		expStream2.addEvent(inv(3));		// 3
+		expStream2.addEvent(inv(2));		// 2
+		expStream2.addEvent(firstCtx(3)); 	// 4
+		expStream2.addEvent(enclCtx(0)); 
 	}
 	
 	@Test
@@ -85,15 +112,28 @@ public class EventsFilterTest {
 	}
 
 	@Test
-	public void filterStream() {
-		EventStream actuals = EventsFilter.filterStream(events, REMFREQS);
+	public void filterStream1() {
+		EventStream actuals = EventsFilter.filterStream(events1, REMFREQS);
 
 		
-		assertEquals(expectedStream.getStream(), actuals.getStream());
-		assertEquals(expectedStream.getMapping(), actuals.getMapping());
-		assertEquals(expectedStream.getStreamLength(), actuals.getStreamLength());
-		assertEquals(expectedStream.getNumberEvents(), actuals.getNumberEvents());
-		assertTrue(expectedStream.equals(actuals));
+		assertEquals(expStream1.getStream(), actuals.getStream());
+		assertEquals(expStream1.getMapping(), actuals.getMapping());
+		assertEquals(expStream1.getStreamLength(), actuals.getStreamLength());
+		assertEquals(expStream1.getNumberEvents(), actuals.getNumberEvents());
+		assertTrue(expStream1.equals(actuals));
+	}
+	
+	@Test
+	public void filterStream2() {
+		EventStream actuals = EventsFilter.filterStream(events2, REMFREQS);
+
+		
+		assertEquals(expStream2.getStream(), actuals.getStream());
+		assertEquals(expStream2.getMapping(), actuals.getMapping());
+		assertEquals(expStream2.getStreamLength(), actuals.getStreamLength());
+		assertEquals(expStream2.getNumberEvents(), actuals.getNumberEvents());
+		assertTrue(actuals.getEnclMethods().size() == 6);
+		assertTrue(expStream2.equals(actuals));
 	}
 
 	private static Event inv(int i) {

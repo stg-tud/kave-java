@@ -75,18 +75,16 @@ public class EventStreamIo {
 
 		List<String> lines = readlines(path);
 
-		double timer = -1;
+		double timer = 0.0;
 
 		for (String line : lines) {
 			String[] eventTime = line.split(",");
 			int eventID = Integer.parseInt(eventTime[0]);
 			double timestamp = Double.parseDouble(eventTime[1]);
-			if (timer != -1) {
-				while ((timestamp - timer) > TIMEOUT) {
-					stream.add(method);
-					method = new LinkedList<Fact>();
-					timer += TIMEOUT;
-				}
+			while ((timestamp - timer) >= TIMEOUT) {
+				stream.add(method);
+				method = new LinkedList<Fact>();
+				timer += TIMEOUT;
 			}
 			timer = timestamp;
 			method.add(new Fact(eventID));
