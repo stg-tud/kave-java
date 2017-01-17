@@ -27,7 +27,7 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -36,7 +36,7 @@ import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.EnclosingMethods;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeKind;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
@@ -54,7 +54,7 @@ public class PatternsIdentifier {
 	private File patternsFolder;
 
 	private EventStreamIo eventStream;
-	private EpisodeParser episodeParser;
+	private EpisodesParser episodeParser;
 	private EpisodesPostprocessor episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 
@@ -67,7 +67,7 @@ public class PatternsIdentifier {
 	public PatternsIdentifier(@Named("patterns") File folder,
 			@Named("events") File eventsFolder, EpisodesPostprocessor episodes,
 			MaximalEpisodes maxEpisodes, EventStreamIo eventStream,
-			EpisodeParser epParser, TransitivelyClosedEpisodes transClosure,
+			EpisodesParser epParser, TransitivelyClosedEpisodes transClosure,
 			EpisodeToGraphConverter episodeGraphConverter,
 			EpisodeAsGraphWriter graphWriter, ValidationDataIO validationIO) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
@@ -88,7 +88,7 @@ public class PatternsIdentifier {
 	}
 
 	public void trainingCode(int foldNum, int frequency, double entropy,
-			EpisodeKind episodeKind) throws Exception {
+			EpisodeType episodeKind) throws Exception {
 		List<List<Fact>> stream = eventStream.parseStream(getStreamPath(
 				"Training", foldNum));
 		List<Event> enclMethods = eventStream.readMethods(getMethodsPath(
@@ -97,8 +97,7 @@ public class PatternsIdentifier {
 		Logger.log("Methods size is: %d", enclMethods.size());
 		// assertTrue(stream.size() == enclMethods.size(),
 		// "Stream and Element contexts have different sizes!");
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(new File(
-				getEpisodesPath("Training", foldNum, episodeKind)));
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency, episodeKind);
 		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor
 				.postprocess(episodes, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
@@ -159,11 +158,11 @@ public class PatternsIdentifier {
 	}
 
 	private String getEpisodesPath(String foldType, int foldNum,
-			EpisodeKind episodeKind) {
+			EpisodeType episodeKind) {
 		String type = "";
-		if (episodeKind == EpisodeKind.SEQUENTIAL) {
+		if (episodeKind == EpisodeType.SEQUENTIAL) {
 			type = "Seq";
-		} else if (episodeKind == EpisodeKind.PARALLEL) {
+		} else if (episodeKind == EpisodeType.PARALLEL) {
 			type = "Parallel";
 		} else {
 			type = "Mix";

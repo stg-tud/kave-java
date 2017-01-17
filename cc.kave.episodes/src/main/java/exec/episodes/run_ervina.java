@@ -25,7 +25,7 @@ import cc.kave.episodes.eventstream.StreamAndMethodChecker;
 import cc.kave.episodes.mining.evaluation.PartialOrderAnalyzer;
 import cc.kave.episodes.mining.evaluation.PatternsComparisons;
 import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
-import cc.kave.episodes.model.EpisodeKind;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 

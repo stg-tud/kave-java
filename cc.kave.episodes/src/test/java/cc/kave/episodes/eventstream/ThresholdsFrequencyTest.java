@@ -18,6 +18,7 @@ package cc.kave.episodes.eventstream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,8 +38,9 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
@@ -54,11 +56,11 @@ public class ThresholdsFrequencyTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private EpisodeParser parser;
+	private EpisodesParser parser;
 
 	private EpisodesStatistics stats;
 	
-	private static final int NUMBREPOS = 2;
+	private static final int FREQUENCY = 2;
 	
 	private ThresholdsFrequency sut;
 	
@@ -91,7 +93,7 @@ public class ThresholdsFrequencyTest {
 		
 		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
-		when(parser.parse(any(File.class))).thenReturn(episodes);
+		when(parser.parse(anyInt(), any(EpisodeType.class))).thenReturn(episodes);
 	}
 	
 	@After
@@ -116,16 +118,16 @@ public class ThresholdsFrequencyTest {
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(FREQUENCY, EpisodeType.GENERAL);
 
-		verify(parser).parse(any(File.class));
+		verify(parser).parse(anyInt(), any(EpisodeType.class));
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(FREQUENCY, EpisodeType.GENERAL);
 
-		verify(parser).parse(any(File.class));
+		verify(parser).parse(anyInt(), any(EpisodeType.class));
 
 		File freqsFile = new File(getFreqsPath());
 
@@ -134,9 +136,9 @@ public class ThresholdsFrequencyTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(NUMBREPOS);
+		sut.writer(FREQUENCY, EpisodeType.GENERAL);
 
-		verify(parser).parse(any(File.class));
+		verify(parser).parse(anyInt(), any(EpisodeType.class));
 
 		File freqsFile = new File(getFreqsPath());
 		
@@ -157,7 +159,7 @@ public class ThresholdsFrequencyTest {
 	}
 	
 	private String getFreqsPath() {
-		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/freqs" + NUMBREPOS + "Repos.txt");
+		File streamFile = new File(rootFolder.getRoot().getAbsolutePath() + "/freqs" + FREQUENCY + "Repos.txt");
 		return streamFile.getAbsolutePath();
 	}
 

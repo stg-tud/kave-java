@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,11 +46,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.exceptions.AssertionException;
@@ -71,7 +72,7 @@ public class RecommenderEvaluationTest {
 	@Mock
 	private MappingParser mappingParser;
 	@Mock
-	private EpisodeParser episodeParser;
+	private EpisodesParser episodeParser;
 	@Mock
 	private MaximalEpisodes maxEpisodeTracker;
 	@Mock
@@ -147,7 +148,7 @@ public class RecommenderEvaluationTest {
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		when(episodeParser.parse(any(File.class))).thenReturn(patterns);
+		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(patterns);
 		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
@@ -181,7 +182,7 @@ public class RecommenderEvaluationTest {
 		Logger.clearLog();
 		sut.evaluate(REPOS);
 
-		verify(episodeParser).parse(any(File.class));
+		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 		verify(mappingParser).parse(REPOS);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);

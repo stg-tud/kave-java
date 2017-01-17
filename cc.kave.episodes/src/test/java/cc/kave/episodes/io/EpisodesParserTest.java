@@ -30,20 +30,24 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 
 import com.google.common.collect.Sets;
 
-public class EpisodeParserTest {
+public class EpisodesParserTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private static final int FREQUENCY = 100;
+	private static final EpisodeType EPISODETYPE = EpisodeType.GENERAL;
+
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
 	private Set<Episode> episodes;
-	private EpisodeParser sut;
+	private EpisodesParser sut;
 
 	@Before
 	public void setup() {
@@ -52,7 +56,7 @@ public class EpisodeParserTest {
 		expected = new HashMap<Integer, Set<Episode>>();
 		episodes = Sets.newHashSet();
 
-		sut = new EpisodeParser(reader);
+		sut = new EpisodesParser(rootFolder.getRoot(), reader);
 	}
 
 	@Test
@@ -78,7 +82,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
 
 		verify(reader).readFile(file);
 
@@ -111,7 +115,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
 
 		verify(reader).readFile(file);
 
@@ -155,7 +159,7 @@ public class EpisodeParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(getFilePath());
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
 
 		verify(reader).readFile(file);
 
@@ -173,7 +177,17 @@ public class EpisodeParserTest {
 	}
 
 	private File getFilePath() {
-		File fileName = new File(rootFolder.getRoot().getAbsolutePath() + "/TrainingData/episodes.txt");
+		String episodeType = "";
+		if (EPISODETYPE == EpisodeType.SEQUENTIAL) {
+			episodeType = "Seq";
+		} else if (EPISODETYPE == EpisodeType.GENERAL) {
+			episodeType = "Mix";
+		} else {
+			episodeType = "Par";
+		}
+		File fileName = new File(rootFolder.getRoot().getAbsolutePath()
+				+ "/freq" + FREQUENCY + "/TrainingData/fold0/episodes" + episodeType
+				+ ".txt");
 		return fileName;
 	}
 }

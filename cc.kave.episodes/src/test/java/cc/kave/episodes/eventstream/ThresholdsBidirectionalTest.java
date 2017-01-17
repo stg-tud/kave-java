@@ -18,6 +18,7 @@ package cc.kave.episodes.eventstream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,8 +38,9 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
@@ -54,7 +56,7 @@ public class ThresholdsBidirectionalTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private EpisodeParser parser;
+	private EpisodesParser episodeParser;
 
 	private EpisodesStatistics stats;
 	
@@ -90,9 +92,9 @@ public class ThresholdsBidirectionalTest {
 		
 		stats = new EpisodesStatistics();
 		
-		sut = new ThresholdsBidirection(rootFolder.getRoot(), parser, stats);
+		sut = new ThresholdsBidirection(rootFolder.getRoot(), episodeParser, stats);
 		
-		when(parser.parse(any(File.class))).thenReturn(episodes);
+		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(episodes);
 	}
 	
 	@After
@@ -104,7 +106,7 @@ public class ThresholdsBidirectionalTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new ThresholdsBidirection(new File("does not exist"), parser, stats);
+		sut = new ThresholdsBidirection(new File("does not exist"), episodeParser, stats);
 	}
 
 	@Test
@@ -112,21 +114,21 @@ public class ThresholdsBidirectionalTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns is not a folder, but a file");
-		sut = new ThresholdsBidirection(file, parser, stats);
+		sut = new ThresholdsBidirection(file, episodeParser, stats);
 	}
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(FREQTHRESH, EpisodeType.GENERAL);
 
-		verify(parser).parse(any(File.class));
+		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(FREQTHRESH, any(EpisodeType.class));
 
-		verify(parser).parse(any(File.class));
+		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 
 		File bdsFile = new File(getBdsPath());
 
@@ -135,9 +137,9 @@ public class ThresholdsBidirectionalTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(NUMBREPOS, FREQTHRESH);
+		sut.writer(FREQTHRESH, EpisodeType.GENERAL);
 
-		verify(parser).parse(any(File.class));
+		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 
 		File bdsFile = new File(getBdsPath());
 		

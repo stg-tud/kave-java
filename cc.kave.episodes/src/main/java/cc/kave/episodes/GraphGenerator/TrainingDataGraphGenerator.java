@@ -24,7 +24,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -36,7 +36,7 @@ import cc.kave.episodes.model.events.Fact;
 
 public class TrainingDataGraphGenerator {
 
-	private EpisodeParser episodeParser;
+	private EpisodesParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	private MappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
@@ -46,7 +46,7 @@ public class TrainingDataGraphGenerator {
 	private File rootFolder;
 
 	@Inject
-	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodeParser episodeParser,
+	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodesParser episodeParser,
 			MaximalEpisodes episodeLearned, MappingParser mappingParser,
 			TransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {

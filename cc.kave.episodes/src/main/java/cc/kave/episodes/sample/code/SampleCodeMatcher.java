@@ -26,13 +26,14 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 
@@ -50,19 +51,19 @@ public class SampleCodeMatcher {
 		this.rootFolder = folder;
 	}
 	private FileReader reader = new FileReader();
-	private EpisodeParser epParser = new EpisodeParser(reader);
+	private EpisodesParser epParser = new EpisodesParser(rootFolder, reader);
 	private MappingParser mapParser = new MappingParser(rootFolder);
 	private EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 	private TransitivelyClosedEpisodes transitivity = new TransitivelyClosedEpisodes();
 	private EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 	
-	public void generateGraphs(int numbRepos) throws IOException {
+	public void generateGraphs(int frequency) throws IOException {
 		String type = "ArrayList";
 //		Set<String> types = Sets.newHashSet();
 //		types.add("ArrayList");
 		
-		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(new File(""));
-		List<Event> mapper = mapParser.parse(numbRepos);
+		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(frequency, EpisodeType.GENERAL);
+		List<Event> mapper = mapParser.parse(frequency);
 		
 		int nodeLevel = allEpisodes.size() - 1;
 		int graphID = 0;

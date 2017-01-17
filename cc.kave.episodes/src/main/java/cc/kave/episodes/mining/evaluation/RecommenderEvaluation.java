@@ -36,12 +36,13 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.TargetResults;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;
@@ -60,7 +61,7 @@ public class RecommenderEvaluation {
 	private MappingParser mappingParser;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
-	private EpisodeParser episodeParser;
+	private EpisodesParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	private TargetsCategorization categorizer;
 
@@ -79,7 +80,7 @@ public class RecommenderEvaluation {
 	@Inject
 	public RecommenderEvaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
 			MappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
-			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
+			EpisodesParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
 		assertTrue(directory.exists(), "Evaluations folder does not exist");
 		assertTrue(directory.isDirectory(), "Evaluations folder is not a folder, but a file");
@@ -300,7 +301,7 @@ public class RecommenderEvaluation {
 
 	private Map<Integer, Set<Episode>> readPatterns() {
 		Logger.log("Reading the learned patterns");
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(new File(""));
+		Map<Integer, Set<Episode>> patterns = episodeParser.parse(100, EpisodeType.GENERAL);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		return maxPatterns;
 	}

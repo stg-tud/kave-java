@@ -8,9 +8,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeKind;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
@@ -21,12 +21,12 @@ import com.google.inject.name.Named;
 public class PatternsComparisons {
 
 	private File eventsFolder;
-	private EpisodeParser parser;
+	private EpisodesParser parser;
 	private EpisodesPostprocessor processor;
 
 	@Inject
 	public PatternsComparisons(@Named("events") File folder,
-			EpisodeParser parser, EpisodesPostprocessor processor) {
+			EpisodesParser parser, EpisodesPostprocessor processor) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsFolder = folder;
@@ -34,7 +34,7 @@ public class PatternsComparisons {
 		this.processor = processor;
 	}
 
-	public void compare(int foldNum, EpisodeKind kind1, EpisodeKind kind2,
+	public void compare(int foldNum, EpisodeType kind1, EpisodeType kind2,
 			int frequency, double entropy) {
 		Map<Integer, Set<Episode>> set1Episodes = generatePatterns(foldNum,
 				kind1, frequency, entropy);
@@ -106,9 +106,8 @@ public class PatternsComparisons {
 	}
 
 	private Map<Integer, Set<Episode>> generatePatterns(int foldNum,
-			EpisodeKind kind, int frequency, double entropy) {
-		Map<Integer, Set<Episode>> episodes = parser.parse(getEpisodePath(
-				foldNum, kind));
+			EpisodeType kind, int frequency, double entropy) {
+		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, kind);
 		Map<Integer, Set<Episode>> patterns = getProcessedPatterns(episodes,
 				kind, frequency, entropy);
 
@@ -122,7 +121,7 @@ public class PatternsComparisons {
 	}
 
 	private Map<Integer, Set<Episode>> getProcessedPatterns(
-			Map<Integer, Set<Episode>> episodes, EpisodeKind kind,
+			Map<Integer, Set<Episode>> episodes, EpisodeType kind,
 			int frequency, double entropy) {
 //		if (kind == EpisodeKind.GENERAL) {
 //			return processor.postprocess(episodes, frequency, entropy);
@@ -137,11 +136,11 @@ public class PatternsComparisons {
 		return filePath;
 	}
 
-	private String getEpisodeType(EpisodeKind kind) {
+	private String getEpisodeType(EpisodeType kind) {
 		String type = "";
-		if (kind == EpisodeKind.SEQUENTIAL) {
+		if (kind == EpisodeType.SEQUENTIAL) {
 			type = "Seq";
-		} else if (kind == EpisodeKind.PARALLEL) {
+		} else if (kind == EpisodeType.PARALLEL) {
 			type = "Parallel";
 		} else {
 			type = "Mix";
@@ -149,7 +148,7 @@ public class PatternsComparisons {
 		return type;
 	}
 
-	private File getEpisodePath(int foldNum, EpisodeKind kind) {
+	private File getEpisodePath(int foldNum, EpisodeType kind) {
 		String episodeType = getEpisodeType(kind);
 		String fileName = getPath(foldNum) + "/episodes" + episodeType + ".txt";
 		return new File(fileName);

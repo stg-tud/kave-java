@@ -27,19 +27,20 @@ import org.apache.commons.io.FileUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Logger;
 
 public class ThresholdsFrequency {
 
 	private File patternsFolder;
-	private EpisodeParser parser;
+	private EpisodesParser parser;
 	private EpisodesStatistics statistics;
 
 	@Inject
-	public ThresholdsFrequency(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
+	public ThresholdsFrequency(@Named("patterns") File folder, EpisodesParser parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -47,8 +48,8 @@ public class ThresholdsFrequency {
 		this.statistics = stats;
 	}
 
-	public void writer(int numbRepos) throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(new File(""));
+	public void writer(int frequency, EpisodeType episodeType) throws IOException {
+		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, episodeType);
 		StringBuilder freqsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
@@ -60,7 +61,7 @@ public class ThresholdsFrequency {
 			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
 			freqsBuilder.append(freqsLevel);
 		}
-		FileUtils.writeStringToFile(new File(getFreqPath(numbRepos)), freqsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getFreqPath(frequency)), freqsBuilder.toString());
 	}
 
 	private String getFreqsStringRep(Integer epLevel, Map<Integer, Integer> frequences) {

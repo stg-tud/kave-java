@@ -46,14 +46,14 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeKind;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
@@ -83,7 +83,7 @@ public class PatternsIdentifierTest {
 	@Mock
 	private MaximalEpisodes maxEpisodes;
 	@Mock
-	private EpisodeParser epParser;
+	private EpisodesParser epParser;
 	@Mock
 	private TransitivelyClosedEpisodes transClosure;
 	@Mock
@@ -153,7 +153,7 @@ public class PatternsIdentifierTest {
 		when(eventStream.parseStream(any(String.class))).thenReturn(stream);
 		when(eventStream.readMapping(any(String.class))).thenReturn(events);
 		when(eventStream.readMethods(any(String.class))).thenReturn(enclCtx);
-		when(epParser.parse(any(File.class))).thenReturn(patterns);
+		when(epParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(patterns);
 		when(maxEpisodes.getMaximalEpisodes(any(Map.class))).thenReturn(
 				patterns);
 		when(processor.postprocess(any(Map.class), anyInt(), anyDouble()))
@@ -206,11 +206,11 @@ public class PatternsIdentifierTest {
 
 	@Test
 	public void mocksAreCalledInTraining() throws Exception {
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeKind.SEQUENTIAL);
+		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.SEQUENTIAL);
 		
 		verify(eventStream).parseStream(any(String.class));
 		verify(eventStream).readMethods(any(String.class));
-		verify(epParser).parse(any(File.class));
+		verify(epParser).parse(anyInt(), any(EpisodeType.class));
 		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));
 		verify(processor).postprocess(any(Map.class), anyInt(), anyInt());
 	}
@@ -227,7 +227,7 @@ public class PatternsIdentifierTest {
 
 		assertTrue(eventsFolder.getRoot().exists());
 
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeKind.GENERAL);
+		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.GENERAL);
 	}
 
 	@Test
@@ -244,7 +244,7 @@ public class PatternsIdentifierTest {
 		episodes.add(ep);
 		patterns.put(2, episodes);
 
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeKind.PARALLEL);
+		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.PARALLEL);
 
 		assertLogContains(0, "Processed 2-node patterns!");
 	}

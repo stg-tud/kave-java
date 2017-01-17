@@ -24,22 +24,23 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Logger;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class ThresholdsBidirection {
 
 	private File patternsFolder;
-	private EpisodeParser parser;
+	private EpisodesParser parser;
 	private EpisodesStatistics statistics;
 
 	@Inject
-	public ThresholdsBidirection(@Named("patterns") File folder, EpisodeParser parse, EpisodesStatistics stats) {
+	public ThresholdsBidirection(@Named("patterns") File folder, EpisodesParser parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -47,8 +48,8 @@ public class ThresholdsBidirection {
 		this.statistics = stats;
 	}
 
-	public void writer(int numbRepos, int frequency) throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(new File(""));
+	public void writer(int frequency, EpisodeType episodeType) throws IOException {
+		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, episodeType);
 		StringBuilder bdsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
@@ -60,7 +61,7 @@ public class ThresholdsBidirection {
 			String bdsLevel = getBdsStringRep(entry.getKey(), bds);
 			bdsBuilder.append(bdsLevel);
 		}
-		FileUtils.writeStringToFile(new File(getPath(numbRepos, frequency)), bdsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getPath(frequency)), bdsBuilder.toString());
 	}
 
 	private String getBdsStringRep(Integer epLevel, Map<Double, Integer> bds) {
@@ -74,8 +75,8 @@ public class ThresholdsBidirection {
 		return data;
 	}
 	
-	private String getPath(int numbRepos, int freq) {
-		String paths = patternsFolder.getAbsolutePath() + "/bds" + freq + "Freq" + numbRepos + "Repos.txt";
+	private String getPath(int freq) {
+		String paths = patternsFolder.getAbsolutePath() + "Freq" + freq + "Repos.txt";
 		return paths;
 	}
 }

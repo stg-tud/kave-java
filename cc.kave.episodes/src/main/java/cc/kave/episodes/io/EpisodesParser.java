@@ -15,29 +15,39 @@
  */
 package cc.kave.episodes.io;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Named;
+
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-public class EpisodeParser {
+public class EpisodesParser {
 
+	private File eventsDir;
 	private FileReader reader;
 
 	@Inject
-	public EpisodeParser(FileReader reader) {
+	public EpisodesParser(@Named("events") File rootFolder, FileReader reader) {
+		assertTrue(rootFolder.exists(), "Events folder does not exist");
+		assertTrue(rootFolder.isDirectory(),
+				"Events is not a folder, but a file");
+		this.eventsDir = rootFolder;
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> parse(File fileName) {
+	public Map<Integer, Set<Episode>> parse(int frequency, EpisodeType episodeType) {
 
-		List<String> lines = reader.readFile(fileName);
+		List<String> lines = reader.readFile(getEpisodesFile(frequency, episodeType));
 
 		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -54,7 +64,7 @@ public class EpisodeParser {
 				rowValues = line.split("\\s+");
 				if (!episodes.isEmpty()) {
 					episodeIndexed.put(numNodes, episodes);
-				} 
+				}
 				if (Integer.parseInt(rowValues[3]) > 0) {
 					String[] nodeString = rowValues[0].split("-");
 					numNodes = Integer.parseInt(nodeString[0]);
@@ -68,6 +78,27 @@ public class EpisodeParser {
 			episodeIndexed.put(numNodes, episodes);
 		}
 		return episodeIndexed;
+	}
+	
+	private String getPath(int frequency) {
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency + "/TrainingData/fold0");
+		if (!path.isDirectory()) {
+			path.mkdirs();
+		}
+		return path.getAbsolutePath();
+	}
+
+	private File getEpisodesFile(int frequency, EpisodeType episodeType) {
+		String type = "";
+		if (episodeType == EpisodeType.SEQUENTIAL) {
+			type = "Seq";
+		} else if (episodeType == EpisodeType.GENERAL) {
+			type = "Mix";
+		} else {
+			type = "Par";
+		}
+		File fileName = new File(getPath(frequency) + "/episodes" + type + ".txt");
+		return fileName;
 	}
 
 	private Episode readEpisode(int numberOfNodes, String[] rowValues) {

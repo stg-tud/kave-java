@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
@@ -43,7 +43,7 @@ public class RecommenderGraphGenerator {
 	private EpisodeAsGraphWriter writer;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
-	private EpisodeParser episodeParser;
+	private EpisodesParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 
 	private File rootFolder;
@@ -53,7 +53,7 @@ public class RecommenderGraphGenerator {
 			MappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator, EpisodeRecommender recommender, 
-			EpisodeParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
+			EpisodesParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
 		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");
