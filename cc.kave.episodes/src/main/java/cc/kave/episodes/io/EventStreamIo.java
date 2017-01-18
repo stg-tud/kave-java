@@ -101,7 +101,7 @@ public class EventStreamIo {
 		assertMethods(methods);
 		return methods;
 	}
-
+	
 	private void assertMethods(List<Event> methods) {
 		for (Event ctx : methods) {
 			assertTrue(ctx.getKind() == EventKind.METHOD_DECLARATION,

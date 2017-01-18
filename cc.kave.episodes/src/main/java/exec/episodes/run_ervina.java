@@ -21,12 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.eventstream.StreamAndMethodChecker;
-import cc.kave.episodes.mining.evaluation.PartialOrderAnalyzer;
-import cc.kave.episodes.mining.evaluation.PatternsComparisons;
-import cc.kave.episodes.mining.evaluation.PatternsIdentifier;
-import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
+import cc.kave.episodes.postprocessor.EventsReader;
+import cc.kave.episodes.preprocessing.EventStreamSize;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -38,7 +34,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = 0;
-	private static final int FREQ = 300;
+	private static final int FREQ = 500;
 	private static final double ENTROPY = 0.1;
 
 	private static final int METHODSIZE = 500;
@@ -56,10 +52,11 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(StreamAndMethodChecker.class).checkLengths();
-
 //		 load(PreprocessingFolded.class).runPreparation(FREQ);
-		// load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
+//		load(StreamAndMethodChecker.class).checkLengths();
+		load(EventsReader.class).read(FREQ);
+		
+//		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
 		// load(PatternsIdentifier.class).trainingCode(FOLDNUM, FREQ, ENTROPY,
 		// EpisodeKind.GENERAL);
 //		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,
