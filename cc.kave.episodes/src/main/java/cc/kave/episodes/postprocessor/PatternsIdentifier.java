@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.postprocessor;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
@@ -40,7 +40,6 @@ import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
@@ -55,7 +54,7 @@ public class PatternsIdentifier {
 
 	private EventStreamIo eventStream;
 	private EpisodesParser episodeParser;
-	private EpisodesPostprocessor episodeProcessor;
+	private EpisodesFilter episodeFilter;
 	private MaximalEpisodes maxEpisodes;
 
 	private ValidationDataIO validationIO;
@@ -64,22 +63,22 @@ public class PatternsIdentifier {
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
-	public PatternsIdentifier(@Named("patterns") File folder,
-			@Named("events") File eventsFolder, EpisodesPostprocessor episodes,
+	public PatternsIdentifier(@Named("patterns") File patternsFolder,
+			@Named("events") File eventsFolder, EpisodesFilter epFilter,
 			MaximalEpisodes maxEpisodes, EventStreamIo eventStream,
 			EpisodesParser epParser, TransitivelyClosedEpisodes transClosure,
 			EpisodeToGraphConverter episodeGraphConverter,
 			EpisodeAsGraphWriter graphWriter, ValidationDataIO validationIO) {
-		assertTrue(folder.exists(), "Patterns folder does not exist");
-		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
+		assertTrue(patternsFolder.exists(), "Patterns folder does not exist");
+		assertTrue(patternsFolder.isDirectory(), "Patterns is not a folder, but a file");
 		assertTrue(eventsFolder.exists(), "Events folder does not exist");
 		assertTrue(eventsFolder.isDirectory(),
 				"Events is not a folder, but a file");
 		this.eventsFolder = eventsFolder;
-		this.patternsFolder = folder;
+		this.patternsFolder = patternsFolder;
 		this.eventStream = eventStream;
 		this.episodeParser = epParser;
-		this.episodeProcessor = episodes;
+		this.episodeFilter = epFilter;
 		this.maxEpisodes = maxEpisodes;
 		this.transClosure = transClosure;
 		this.episodeGraphConverter = episodeGraphConverter;
@@ -98,7 +97,7 @@ public class PatternsIdentifier {
 		// assertTrue(stream.size() == enclMethods.size(),
 		// "Stream and Element contexts have different sizes!");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency, episodeKind);
-		Map<Integer, Set<Episode>> postpEpisodes = episodeProcessor
+		Map<Integer, Set<Episode>> postpEpisodes = episodeFilter
 				.postprocess(episodes, frequency, entropy);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(postpEpisodes);

@@ -9,10 +9,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.reflect.TypeToken;
-
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.events.Event;
+
+import com.google.common.reflect.TypeToken;
 
 public class ValidationDataIO {
 
@@ -26,24 +26,24 @@ public class ValidationDataIO {
 		this.repoDir = folder;
 	}
 	
-	public void write(List<Event> stream, int fold) {
-		JsonUtils.toJson(stream, getValidationPath(fold));
+	public void write(List<Event> stream, int frequency) {
+		JsonUtils.toJson(stream, getValidationPath(frequency));
 	}
 
-	private File getValidationPath(int foldNum) {
-		File path = new File(repoDir.getAbsolutePath() + "/ValidationData");
+	private File getValidationPath(int frequency) {
+		File path = new File(repoDir.getAbsolutePath() + "/freq" + frequency + "/ValidationData");
 		if (!path.exists()) {
 			path.mkdir();
 		}
-		File fileName = new File(path.getAbsoluteFile() + "/stream" + foldNum + ".json");
+		File fileName = new File(path.getAbsoluteFile() + "/stream0.json");
 		return fileName;
 	}
 	
-	public List<Event> read(int foldNum) {
+	public List<Event> read(int frequency) {
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
-		List<Event> stream = JsonUtils.fromJson(getValidationPath(foldNum), type);
+		List<Event> stream = JsonUtils.fromJson(getValidationPath(frequency), type);
 		return stream;
 	}
 }

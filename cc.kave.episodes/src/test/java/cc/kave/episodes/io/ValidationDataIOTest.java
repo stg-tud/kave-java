@@ -24,7 +24,7 @@ public class ValidationDataIOTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private static final int FOLDNUM = 5;
+	private static final int FREQUENCY = 5;
 
 	private ValidationDataIO sut;
 
@@ -52,16 +52,27 @@ public class ValidationDataIOTest {
 	public void fileIsCreated() {
 		List<Event> stream = Lists.newLinkedList();
 
-		sut.write(stream, FOLDNUM);
+		sut.write(stream, FREQUENCY);
 
 		File validationData = getValidationPath();
-		
+
 		assertTrue(validationData.exists());
+	}
+	
+	@Test
+	public void readerCheck() {
+		List<Event> stream = Lists.newLinkedList();
+		sut.write(stream, FREQUENCY);
+		
+		List<Event> actuals = sut.read(FREQUENCY);
+		
+		assertTrue(actuals.isEmpty());
+		assertTrue(actuals.size() == 0);
 	}
 
 	private File getValidationPath() {
-		File fileName = new File(tmp.getRoot().getAbsolutePath()
-				+ "/ValidationData/stream" + FOLDNUM + ".json");
+		File fileName = new File(tmp.getRoot().getAbsolutePath() + "/freq"
+				+ FREQUENCY +"/ValidationData/stream0.json");
 		return fileName;
 	}
 }

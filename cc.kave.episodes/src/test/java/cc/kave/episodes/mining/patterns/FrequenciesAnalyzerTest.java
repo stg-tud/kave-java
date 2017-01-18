@@ -38,7 +38,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
@@ -57,7 +57,7 @@ public class FrequenciesAnalyzerTest {
 	private static final double ENTROPY = 0.5;
 	
 	@Mock
-	private EpisodesPostprocessor postprocessor;
+	private EpisodesFilter postprocessor;
 
 	private Map<Integer, Set<Episode>> patterns;
 

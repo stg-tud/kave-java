@@ -26,7 +26,7 @@ import cc.recommenders.io.Logger;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class EpisodesPostprocessor {
+public class EpisodesFilter {
 
 	public Map<Integer, Set<Episode>> postprocess(
 			Map<Integer, Set<Episode>> episodes, int freqThresh, double entropy) {
@@ -88,8 +88,7 @@ public class EpisodesPostprocessor {
 		} else {
 			if (fentropy < centropy) {
 				return filterEp;
-			}
-			if (fentropy > centropy) {
+			} else if (fentropy > centropy) {
 				return currEp;
 			} else {
 				Set<Fact> e1Order = filterEp.getRelations();
@@ -113,7 +112,7 @@ public class EpisodesPostprocessor {
 	private Episode createEpisode(Set<Fact> repFacts, Episode filterEp) {
 		Episode episode = new Episode();
 		episode.setFrequency(filterEp.getFrequency());
-		episode.setEntropy(filterEp.getEntropy() - 0.1);
+		episode.setEntropy(filterEp.getEntropy());
 		
 		for (Fact event : filterEp.getEvents()) {
 			episode.addFact(event);

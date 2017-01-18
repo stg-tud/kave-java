@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.name.Named;
@@ -20,11 +20,11 @@ public class PartialOrderAnalyzer {
 
 	private File eventsFolder;
 	private EpisodesParser parser;
-	private EpisodesPostprocessor processor;
+	private EpisodesFilter processor;
 
 	@Inject
 	public PartialOrderAnalyzer(@Named("events") File folder,
-			EpisodesParser parser, EpisodesPostprocessor processor) {
+			EpisodesParser parser, EpisodesFilter processor) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsFolder = folder;

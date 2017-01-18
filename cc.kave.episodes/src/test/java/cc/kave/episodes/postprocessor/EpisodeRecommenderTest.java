@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.episodes.mining.evaluation;
+package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +26,7 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.model.Episode;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;

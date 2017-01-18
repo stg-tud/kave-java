@@ -57,7 +57,8 @@ import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
+import cc.kave.episodes.postprocessor.PatternsIdentifier;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
@@ -79,7 +80,7 @@ public class PatternsIdentifierTest {
 	private static final double ENTROPY = 0.5;
 
 	@Mock
-	private EpisodesPostprocessor processor;
+	private EpisodesFilter processor;
 	@Mock
 	private MaximalEpisodes maxEpisodes;
 	@Mock

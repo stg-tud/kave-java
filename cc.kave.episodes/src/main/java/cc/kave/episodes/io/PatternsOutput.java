@@ -27,7 +27,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
@@ -38,14 +38,14 @@ public class PatternsOutput {
 
 	private File patternsFolder;
 
-	private EpisodesPostprocessor episodesProcessor;
+	private EpisodesFilter episodesProcessor;
 	private MappingParser mappingParser;
 	private TransitivelyClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
-	public PatternsOutput(@Named("patterns") File folder, EpisodesPostprocessor episodes, MappingParser mappingParser,
+	public PatternsOutput(@Named("patterns") File folder, EpisodesFilter episodes, MappingParser mappingParser,
 			TransitivelyClosedEpisodes transitivityClosure, EpisodeToGraphConverter graphConverter,
 			EpisodeAsGraphWriter writer) {
 

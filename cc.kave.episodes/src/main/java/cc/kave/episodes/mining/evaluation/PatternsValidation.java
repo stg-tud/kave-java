@@ -13,7 +13,7 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -23,7 +23,7 @@ public class PatternsValidation {
 	private File reposFolder;
 	private StreamParser streamParser;
 	private EventStreamIo mapping;
-	private EpisodesPostprocessor episodeProcessor;
+	private EpisodesFilter episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 	private TransitivelyClosedEpisodes closedEpisodes;
 	private EpisodeToGraphConverter episodeToGraph;
@@ -36,7 +36,7 @@ public class PatternsValidation {
 	@Inject
 	public PatternsValidation(@Named("repositories") File folder,
 			StreamParser stream, EventStreamIo mapping,
-			EpisodesPostprocessor processor, MaximalEpisodes maxEp,
+			EpisodesFilter processor, MaximalEpisodes maxEp,
 			TransitivelyClosedEpisodes closedEp,
 			EpisodeToGraphConverter episodeToGraph,
 			EpisodeAsGraphWriter grpahWriter, IndivReposParser repoParser) {

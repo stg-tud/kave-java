@@ -29,14 +29,14 @@ import cc.recommenders.io.Logger;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class EpisodesPostprocessorTest {
+public class EpisodesFilterTest {
 
 	private static final int FREQUENCY = 5;
 	private static final double ENTROPY = 0.5;
 	
 	private Map<Integer, Set<Episode>> episodes;
 	
-	EpisodesPostprocessor sut;
+	EpisodesFilter sut;
 	
 	@Before
 	public void setup() {
@@ -45,7 +45,7 @@ public class EpisodesPostprocessorTest {
 
 		episodes = Maps.newLinkedHashMap();
 		
-		sut = new EpisodesPostprocessor();
+		sut = new EpisodesFilter();
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class EpisodesPostprocessorTest {
 		
 		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
-		expected.put(2, Sets.newHashSet(createEpisode(8, 0.5, "1", "2")));
+		expected.put(2, Sets.newHashSet(createEpisode(8, 0.6, "1", "2")));
 		
 		assertEquals(expected, actuals);
 	}
@@ -86,7 +86,7 @@ public class EpisodesPostprocessorTest {
 		
 		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
-		expected.put(2, Sets.newHashSet(createEpisode(8, 0.5, "1", "2", "3", "1>2")));
+		expected.put(2, Sets.newHashSet(createEpisode(8, 0.6, "1", "2", "3", "1>2")));
 		
 		assertEquals(expected, actuals);
 	}

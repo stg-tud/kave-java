@@ -24,7 +24,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
@@ -35,10 +35,10 @@ import com.google.inject.name.Named;
 public class FrequenciesAnalyzer {
 	
 	private File patternsFolder;
-	private EpisodesPostprocessor postprocessor;
+	private EpisodesFilter postprocessor;
 	
 	@Inject
-	public FrequenciesAnalyzer(@Named("patterns") File folder, EpisodesPostprocessor processor) {
+	public FrequenciesAnalyzer(@Named("patterns") File folder, EpisodesFilter processor) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns folder is not a folder, but a file");
 		this.patternsFolder = folder;

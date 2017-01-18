@@ -20,7 +20,7 @@ import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EpisodesPostprocessor;
+import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.similarityMetrics.Metrics;
 import cc.kave.episodes.similarityMetrics.ProposalsSorter;
 import cc.recommenders.datastructures.Tuple;
@@ -36,7 +36,7 @@ public class SimilarityMetrics {
 	private File eventsFolder;
 
 	private EventStreamIo eventStreamIo;
-	private EpisodesPostprocessor episodeProcessor;
+	private EpisodesFilter episodeProcessor;
 	private MaximalEpisodes maxEpisodes;
 	private QueryGeneration generator;
 	private ProposalsSorter sorter;
@@ -47,7 +47,7 @@ public class SimilarityMetrics {
 
 	@Inject
 	public SimilarityMetrics(@Named("events") File folder,
-			EpisodesPostprocessor postprocess, MaximalEpisodes maxEp,
+			EpisodesFilter postprocess, MaximalEpisodes maxEp,
 			QueryGeneration qGenerator, ProposalsSorter propSorter,
 			TransitivelyClosedEpisodes closedEp,
 			EpisodeToGraphConverter epToGraph, EpisodeAsGraphWriter graphWriter) {
