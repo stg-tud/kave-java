@@ -8,7 +8,7 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.episodes.mining.patterns;
+package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder;
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.recommenders.exceptions.AssertionException;
 
 public class MaximalEpisodesTest {

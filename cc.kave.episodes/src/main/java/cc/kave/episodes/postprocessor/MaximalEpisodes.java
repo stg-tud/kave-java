@@ -8,25 +8,25 @@
  * Contributors:
  *     Ervina Cergani - initial API and implementation
  */
-package cc.kave.episodes.mining.patterns;
+package cc.kave.episodes.postprocessor;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class MaximalEpisodes {
 	
 	public Map<Integer, Set<Episode>> getMaximalEpisodes(Map<Integer, Set<Episode>> episodes) {
 		assertTrue(!episodes.isEmpty(), "The list of learned episodes is empty!");
 		
-		Map<Integer, Set<Episode>> maximalEpisodes = new HashMap<Integer, Set<Episode>>();
+		Map<Integer, Set<Episode>> maximalEpisodes = Maps.newLinkedHashMap();
 		
 		if (episodes.size() == 1) {
 			return episodes;

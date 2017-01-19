@@ -15,7 +15,6 @@ import cc.kave.episodes.io.RepoMethodsMapperIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
@@ -23,6 +22,7 @@ import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
+import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.io.Logger;
 
@@ -76,9 +76,8 @@ public class PatternsValidation {
 		this.validationIO = validationIO;
 		this.reposIo = reposMethods;
 	}
-
-	private void validatePatterns(int frequency, EpisodeType episodeType) {
-
+	
+	public void inTraining(int frequency, EpisodeType episodeType) {
 		List<Event> trainEvents = eventStream.readMapping(getMethodsPath(
 				"Training", frequency));
 
@@ -90,13 +89,7 @@ public class PatternsValidation {
 				.getMaximalEpisodes(filteredEpisodes);
 
 		Map<String, Set<IMethodName>> repoCtxMapper = reposIo.reader();
-
-		List<Event> valData = validationIO.read(frequency);
-		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(
-				trainEvents, valData);
-		List<Event> allEvents = mapToList(mapEvents);
-		List<List<Fact>> valStream = streamOfMethods(valData, mapEvents);
-
+		
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
 
@@ -131,11 +124,19 @@ public class PatternsValidation {
 			sb.append("\n");
 			Logger.log("Processed %d-node patterns!", entry.getKey());
 		}
-//		FileUtils.writeStringToFile(
-//				getValidationPath(getPath(numbRepos, frequency, entropy)),
-//				sb.toString());
 	}
 
+	public void inValidation(int frequency, EpisodeType episodeType) {
+		List<Event> trainEvents = eventStream.readMapping(getMethodsPath(
+				"Training", frequency));
+		
+		List<Event> valData = validationIO.read(frequency);
+		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(
+				trainEvents, valData);
+		List<Event> allEvents = mapToList(mapEvents);
+		List<List<Fact>> valStream = streamOfMethods(valData, mapEvents);
+	}
+	
 	private int getReposOcc(Episode episode, int frequency) {
 		List<List<Fact>> trainStream = eventStream.parseStream(getStreamPath(
 				"Training", frequency));

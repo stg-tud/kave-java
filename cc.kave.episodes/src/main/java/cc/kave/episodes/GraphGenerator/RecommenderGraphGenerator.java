@@ -29,7 +29,7 @@ import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.patterns.MaximalEpisodes;
+import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
 public class RecommenderGraphGenerator {
