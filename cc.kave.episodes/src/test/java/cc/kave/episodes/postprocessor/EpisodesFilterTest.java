@@ -56,7 +56,7 @@ public class EpisodesFilterTest {
 		oneNodes.add(createEpisode(8, 0.5, "2"));
 		episodes.put(1, oneNodes);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(Maps.newLinkedHashMap(), actuals);
 	}
@@ -69,7 +69,7 @@ public class EpisodesFilterTest {
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "2>1"));
 		episodes.put(2, twoNodes);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		expected.put(2, Sets.newHashSet(createEpisode(8, 0.6, "1", "2")));
 		
@@ -84,7 +84,7 @@ public class EpisodesFilterTest {
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "3>2"));
 		episodes.put(2, twoNodes);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		expected.put(2, Sets.newHashSet(createEpisode(8, 0.6, "1", "2", "3", "1>2")));
 		
@@ -105,7 +105,7 @@ public class EpisodesFilterTest {
 		set.add(createEpisode(9, 0.6, "1", "2", "2>1"));
 		expected.put(2, set);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}
@@ -139,7 +139,7 @@ public class EpisodesFilterTest {
 		set3.add(createEpisode(8, 0.5, "1", "2", "3"));
 		expected.put(3, set3);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}
@@ -173,7 +173,7 @@ public class EpisodesFilterTest {
 		set3.add(createEpisode(7, 0.9, "1", "2", "3", "1>2", "1>3"));
 		expected.put(3, set3);
 		
-		Map<Integer, Set<Episode>> actuals = sut.postprocess(episodes, FREQUENCY, ENTROPY);
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 		
 		assertEquals(expected, actuals);
 	}

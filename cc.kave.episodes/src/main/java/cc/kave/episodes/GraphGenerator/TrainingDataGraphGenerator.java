@@ -28,11 +28,11 @@ import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
 public class TrainingDataGraphGenerator {
 
@@ -40,7 +40,7 @@ public class TrainingDataGraphGenerator {
 	private MaximalEpisodes maxEpisodeTracker;
 	private MappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
-	private TransitivelyClosedEpisodes transitivityClosure;
+	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 
 	private File rootFolder;
@@ -48,7 +48,7 @@ public class TrainingDataGraphGenerator {
 	@Inject
 	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodesParser episodeParser,
 			MaximalEpisodes episodeLearned, MappingParser mappingParser,
-			TransitivelyClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
+			TransClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {
 
 		assertTrue(directory.exists(), "Episode-miner folder does not exist");

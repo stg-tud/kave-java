@@ -46,13 +46,13 @@ import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
@@ -80,7 +80,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 
 	private MaximalEpisodes episodeLearned;
 	private EpisodeToGraphConverter graphConverter;
-	private TransitivelyClosedEpisodes transitivityClosure;
+	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
 	private Map<Integer, Set<Episode>> episodes;
@@ -94,7 +94,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 
 		episodeLearned = new MaximalEpisodes();
 		graphConverter = new EpisodeToGraphConverter();
-		transitivityClosure = new TransitivelyClosedEpisodes();
+		transitivityClosure = new TransClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
 		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationSpecificAPI("M1"),
 				eventMethodDeclSpecificAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),

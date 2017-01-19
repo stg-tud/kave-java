@@ -7,7 +7,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +27,6 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
@@ -36,7 +34,6 @@ import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.reflect.TypeToken;
 
 public class ReposMethodsMapperIoTest {
 
@@ -61,7 +58,7 @@ public class ReposMethodsMapperIoTest {
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories folder does not exist");
+		thrown.expectMessage("Events folder does not exist");
 		sut = new RepoMethodsMapperIO(new File("does not exist"));
 	}
 
@@ -69,7 +66,7 @@ public class ReposMethodsMapperIoTest {
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = tmp.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories is not a folder, but a file");
+		thrown.expectMessage("Events is not a folder, but a file");
 		sut = new RepoMethodsMapperIO(file);
 	}
 
@@ -85,12 +82,12 @@ public class ReposMethodsMapperIoTest {
 	@Test
 	public void fileContent() throws ZipException, IOException {
 		sut.writer(reposGenerators);
-
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<Map<String, Set<Event>>>() {
-		}.getType();
-		Map<String, Set<Event>> actMapper = JsonUtils.fromJson(new File(
-				getReposMethodsPath()), type);
+		Map<String, Set<Event>> actMapper = sut.reader();
+//		@SuppressWarnings("serial")
+//		Type type = new TypeToken<Map<String, Set<Event>>>() {
+//		}.getType();
+//		Map<String, Set<Event>> actMapper = JsonUtils.fromJson(new File(
+//				getReposMethodsPath()), type);
 
 		assertTrue(generateReposMethods().size() == actMapper.size());
 		assertMapEquality(generateReposMethods(), actMapper);

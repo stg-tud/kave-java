@@ -76,7 +76,7 @@ public class FrequenciesAnalyzerTest {
 		patterns.put(3, Sets.newHashSet(createEpisode(4, 0.9, "1", "2", "3", "2>3"),
 				createEpisode(3, 0.8, "1", "4", "5", "1>4", "1>5")));
 		
-		when(postprocessor.postprocess(any(Map.class), anyInt(), anyDouble())).thenReturn(patterns);
+		when(postprocessor.filter(any(Map.class), anyInt(), anyDouble())).thenReturn(patterns);
 		
 		sut = new FrequenciesAnalyzer(rootFolder.getRoot(), postprocessor);
 	}
@@ -100,7 +100,7 @@ public class FrequenciesAnalyzerTest {
 	public void mocksAreCalledInTraining() throws Exception {
 		sut.analyzeSuperEpisodes(NUMBREPOS, FREQUENCY, ENTROPY);;
 
-		verify(postprocessor).postprocess(any(Map.class), anyInt(), anyDouble());
+		verify(postprocessor).filter(any(Map.class), anyInt(), anyDouble());
 	}
 	
 	public void fileIsCreated() throws Exception {

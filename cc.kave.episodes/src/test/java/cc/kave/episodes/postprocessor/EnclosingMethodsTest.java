@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.model;
+package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -27,8 +27,10 @@ import org.junit.Test;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.EnclosingMethods;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

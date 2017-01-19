@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.model;
+package cc.kave.episodes.postprocessor;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;

@@ -24,10 +24,10 @@ import java.util.Set;
 
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
@@ -40,13 +40,13 @@ public class PatternsOutput {
 
 	private EpisodesFilter episodesProcessor;
 	private MappingParser mappingParser;
-	private TransitivelyClosedEpisodes transClosure;
+	private TransClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
 	public PatternsOutput(@Named("patterns") File folder, EpisodesFilter episodes, MappingParser mappingParser,
-			TransitivelyClosedEpisodes transitivityClosure, EpisodeToGraphConverter graphConverter,
+			TransClosedEpisodes transitivityClosure, EpisodeToGraphConverter graphConverter,
 			EpisodeAsGraphWriter writer) {
 
 		assertTrue(folder.exists(), "Patterns folder does not exist");
@@ -61,7 +61,7 @@ public class PatternsOutput {
 	}
 
 	public void write(int foldNum, int freqThresh, double entropy) throws Exception {
-		Map<Integer, Set<Episode>> patterns = episodesProcessor.postprocess(Maps.newHashMap(), freqThresh, entropy);
+		Map<Integer, Set<Episode>> patterns = episodesProcessor.filter(Maps.newHashMap(), freqThresh, entropy);
 		List<Event> events = mappingParser.parse(foldNum);
 		Logger.log("Number of unique event is %d", events.size());
 		int graphNumber = 0;

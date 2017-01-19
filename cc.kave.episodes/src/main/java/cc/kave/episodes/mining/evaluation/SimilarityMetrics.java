@@ -15,12 +15,12 @@ import cc.kave.episodes.evaluation.queries.QueryGeneration;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.kave.episodes.similarityMetrics.Metrics;
 import cc.kave.episodes.similarityMetrics.ProposalsSorter;
 import cc.recommenders.datastructures.Tuple;
@@ -41,7 +41,7 @@ public class SimilarityMetrics {
 	private QueryGeneration generator;
 	private ProposalsSorter sorter;
 
-	private TransitivelyClosedEpisodes transClosure;
+	private TransClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
@@ -49,7 +49,7 @@ public class SimilarityMetrics {
 	public SimilarityMetrics(@Named("events") File folder,
 			EpisodesFilter postprocess, MaximalEpisodes maxEp,
 			QueryGeneration qGenerator, ProposalsSorter propSorter,
-			TransitivelyClosedEpisodes closedEp,
+			TransClosedEpisodes closedEp,
 			EpisodeToGraphConverter epToGraph, EpisodeAsGraphWriter graphWriter) {
 		assertTrue(folder.exists(), "Events folder does not exist!");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file!");
@@ -66,7 +66,7 @@ public class SimilarityMetrics {
 	public void validate() throws Exception {
 		List<Event> mapping = eventStreamIo.readMapping(getMappingPath());
 
-		Map<Integer, Set<Episode>> episodes = episodeProcessor.postprocess(
+		Map<Integer, Set<Episode>> episodes = episodeProcessor.filter(
 				Maps.newHashMap(), 500, 0.6);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(episodes);

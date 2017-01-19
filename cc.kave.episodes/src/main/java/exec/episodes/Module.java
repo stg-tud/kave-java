@@ -30,9 +30,9 @@ import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.RecommenderEvaluation;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.TargetsCategorization;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.io.Directory;
 
@@ -97,7 +97,7 @@ public class Module extends AbstractModule {
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
-		TransitivelyClosedEpisodes transitivityClosure = new TransitivelyClosedEpisodes();
+		TransClosedEpisodes transitivityClosure = new TransClosedEpisodes();
 
 		File patternsRoot = patternsFile;
 		EpisodesStatistics stats = new EpisodesStatistics();

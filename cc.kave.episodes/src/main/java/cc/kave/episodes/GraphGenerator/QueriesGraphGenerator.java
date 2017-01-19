@@ -33,10 +33,10 @@ import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.io.Logger;
 
 public class QueriesGraphGenerator {
@@ -44,7 +44,7 @@ public class QueriesGraphGenerator {
 	private ValidationContextsParser validationParser;
 	private MappingParser mappingParser;
 	private EpisodeToGraphConverter episodeGraphConverter;
-	private TransitivelyClosedEpisodes transitivityClosure;
+	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private QueryStrategy queryGenerator;
 
@@ -52,7 +52,7 @@ public class QueriesGraphGenerator {
 
 	@Inject
 	public QueriesGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
-			MappingParser mappingParser,  TransitivelyClosedEpisodes transitivityClosure, 
+			MappingParser mappingParser,  TransClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator) {
 

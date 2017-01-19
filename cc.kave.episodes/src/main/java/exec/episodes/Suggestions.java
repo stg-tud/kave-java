@@ -21,14 +21,14 @@ import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
 public class Suggestions {
 
 	private EpisodesParser episodeParser;
 	private MaximalEpisodes maximalEpisodes;
-	private TransitivelyClosedEpisodes transitivityClosure;
+	private TransClosedEpisodes transitivityClosure;
 	private MappingParser eventMappingParser;
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
@@ -38,7 +38,7 @@ public class Suggestions {
 
 	@Inject
 	public Suggestions(@Named("graph") File directory, EpisodesParser episodeParser, MaximalEpisodes maximalEpisodes,
-			TransitivelyClosedEpisodes transitivityClosure, MappingParser eventMapping,
+			TransClosedEpisodes transitivityClosure, MappingParser eventMapping,
 			EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;

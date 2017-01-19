@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
 
 public class EpisodesFilter {
 
-	public Map<Integer, Set<Episode>> postprocess(
+	public Map<Integer, Set<Episode>> filter(
 			Map<Integer, Set<Episode>> episodes, int freqThresh, double entropy) {
 		Map<Integer, Set<Episode>> patterns = Maps.newLinkedHashMap();
 

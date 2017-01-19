@@ -46,7 +46,7 @@ public class FrequenciesAnalyzer {
 	}
 	
 	public void analyzeSuperEpisodes(int numbRepos, int frequency, double entropy) throws Exception {
-		Map<Integer, Set<Episode>> patterns = postprocessor.postprocess(Maps.newHashMap(), frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = postprocessor.filter(Maps.newHashMap(), frequency, entropy);
 		StringBuilder sb = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {

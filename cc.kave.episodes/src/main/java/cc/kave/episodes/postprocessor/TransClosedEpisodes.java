@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.graphs;
+package cc.kave.episodes.postprocessor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
-public class TransitivelyClosedEpisodes {
+public class TransClosedEpisodes {
 
 	public Episode remTransClosure(Episode episode) {
 		if (episode.getNumFacts() != episode.getNumEvents()) {

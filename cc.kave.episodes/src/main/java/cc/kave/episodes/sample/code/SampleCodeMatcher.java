@@ -31,11 +31,11 @@ import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -54,7 +54,7 @@ public class SampleCodeMatcher {
 	private EpisodesParser epParser = new EpisodesParser(rootFolder, reader);
 	private MappingParser mapParser = new MappingParser(rootFolder);
 	private EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
-	private TransitivelyClosedEpisodes transitivity = new TransitivelyClosedEpisodes();
+	private TransClosedEpisodes transitivity = new TransClosedEpisodes();
 	private EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();
 	
 	public void generateGraphs(int frequency) throws IOException {

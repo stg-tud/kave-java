@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.postprocessor.EventsReader;
-import cc.kave.episodes.preprocessing.EventStreamSize;
+import cc.kave.episodes.mining.evaluation.EvaluationsPaper;
+import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.postprocessor.PatternsIdentifier;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -54,11 +55,14 @@ public class run_ervina {
 		
 //		 load(PreprocessingFolded.class).runPreparation(FREQ);
 //		load(StreamAndMethodChecker.class).checkLengths();
-		load(EventsReader.class).read(FREQ);
+//		load(EventsReader.class).read(FREQ);
+//		load(PatternsIdentifier.class).trainingCode(FREQ, EpisodeType.GENERAL);
+		
+//		load(EvaluationsPaper.class).diff(FREQ);
+		load(EvaluationsPaper.class).part2(FREQ);
+//		load(EvaluationsPaper.class).part1(FREQ);
 		
 //		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
-		// load(PatternsIdentifier.class).trainingCode(FOLDNUM, FREQ, ENTROPY,
-		// EpisodeKind.GENERAL);
 //		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,
 //				EpisodeKind.PARALLEL, FREQ, ENTROPY);
 //		load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);

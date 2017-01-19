@@ -47,11 +47,11 @@ import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
@@ -73,7 +73,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 
 	private String tmpFolderName;
 	private EpisodeToGraphConverter graphConverter;
-	private TransitivelyClosedEpisodes transitivityClosure;
+	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
 	private List<Event> events;
 	private Set<Episode> episodes;
@@ -86,7 +86,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		initMocks(this);
 
 		graphConverter = new EpisodeToGraphConverter();
-		transitivityClosure = new TransitivelyClosedEpisodes();
+		transitivityClosure = new TransClosedEpisodes();
 		writer = new EpisodeAsGraphWriter();
 		events = createMapping(eventMethodDeclGeneralAPI("M0"), eventInvocationGeneralAPI("M1"),
 				eventMethodDeclGeneralAPI("M2"), eventInvocationGeneralAPI("M3"), eventMethodDeclGeneralAPI("M4"),

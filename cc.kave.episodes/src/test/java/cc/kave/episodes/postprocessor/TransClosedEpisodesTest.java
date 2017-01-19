@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.mining.graphs;
+package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,17 +23,18 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
-public class TransitivelyClosedEpisodesTest {
+public class TransClosedEpisodesTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private TransitivelyClosedEpisodes sut;
+	private TransClosedEpisodes sut;
 
 	@Before
 	public void setup() {
-		sut = new TransitivelyClosedEpisodes();
+		sut = new TransClosedEpisodes();
 	}
 
 	@Test

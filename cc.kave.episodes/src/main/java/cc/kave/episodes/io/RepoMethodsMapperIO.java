@@ -4,6 +4,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,17 +20,18 @@ import cc.kave.episodes.model.events.EventKind;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 
 public class RepoMethodsMapperIO {
 
-	private File reposDir;
+	private File eventsFile;
 	
 	@Inject
-	public RepoMethodsMapperIO(@Named("repositories") File folder) {
-		assertTrue(folder.exists(), "Repositories folder does not exist");
+	public RepoMethodsMapperIO(@Named("events") File folder) {
+		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(),
-				"Repositories is not a folder, but a file");
-		this.reposDir = folder;
+				"Events is not a folder, but a file");
+		this.eventsFile = folder;
 	}
 	
 	public void writer(Map<String, EventStreamGenerator> repos) throws ZipException, IOException {
@@ -49,8 +51,15 @@ public class RepoMethodsMapperIO {
 		}
 	}
 	
+	public Map<String, Set<Event>> reader() {
+		@SuppressWarnings("serial")
+		Type type = new TypeToken<Map<String, Set<Event>>>() {
+		}.getType();
+		return JsonUtils.fromJson(new File(repoMethodsPath()), type);
+	}
+	
 	private String repoMethodsPath() {
-		String fileName = reposDir.getAbsolutePath() + "/repoMethodsMapper.json";
+		String fileName = eventsFile.getAbsolutePath() + "/repoMethodsMapper.json";
 		return fileName;
 	}
 }

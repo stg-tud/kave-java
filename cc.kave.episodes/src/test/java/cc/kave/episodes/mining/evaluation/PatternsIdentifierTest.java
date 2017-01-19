@@ -50,7 +50,6 @@ import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
-import cc.kave.episodes.mining.graphs.TransitivelyClosedEpisodes;
 import cc.kave.episodes.mining.patterns.MaximalEpisodes;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -59,6 +58,7 @@ import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.PatternsIdentifier;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
@@ -86,7 +86,7 @@ public class PatternsIdentifierTest {
 	@Mock
 	private EpisodesParser epParser;
 	@Mock
-	private TransitivelyClosedEpisodes transClosure;
+	private TransClosedEpisodes transClosure;
 	@Mock
 	private EpisodeToGraphConverter episodeGraphConverter;
 	@Mock
@@ -157,7 +157,7 @@ public class PatternsIdentifierTest {
 		when(epParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(patterns);
 		when(maxEpisodes.getMaximalEpisodes(any(Map.class))).thenReturn(
 				patterns);
-		when(processor.postprocess(any(Map.class), anyInt(), anyDouble()))
+		when(processor.filter(any(Map.class), anyInt(), anyDouble()))
 				.thenReturn(patterns);
 		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(ep);
 	}
@@ -207,13 +207,13 @@ public class PatternsIdentifierTest {
 
 	@Test
 	public void mocksAreCalledInTraining() throws Exception {
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.SEQUENTIAL);
+		sut.trainingCode(FREQUENCY, EpisodeType.SEQUENTIAL);
 		
 		verify(eventStream).parseStream(any(String.class));
 		verify(eventStream).readMethods(any(String.class));
 		verify(epParser).parse(anyInt(), any(EpisodeType.class));
 		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));
-		verify(processor).postprocess(any(Map.class), anyInt(), anyInt());
+		verify(processor).filter(any(Map.class), anyInt(), anyInt());
 	}
 
 	@Test
@@ -228,7 +228,7 @@ public class PatternsIdentifierTest {
 
 		assertTrue(eventsFolder.getRoot().exists());
 
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.GENERAL);
+		sut.trainingCode(FREQUENCY, EpisodeType.GENERAL);
 	}
 
 	@Test
@@ -245,7 +245,7 @@ public class PatternsIdentifierTest {
 		episodes.add(ep);
 		patterns.put(2, episodes);
 
-		sut.trainingCode(FOLDNUM, FREQUENCY, ENTROPY, EpisodeType.PARALLEL);
+		sut.trainingCode(FREQUENCY, EpisodeType.PARALLEL);
 
 		assertLogContains(0, "Processed 2-node patterns!");
 	}

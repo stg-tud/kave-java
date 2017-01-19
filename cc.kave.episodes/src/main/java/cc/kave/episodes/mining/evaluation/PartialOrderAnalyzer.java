@@ -34,7 +34,7 @@ public class PartialOrderAnalyzer {
 
 	public void analyze(int foldNum, int frequency, double entropy) {
 		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, EpisodeType.GENERAL);
-		Map<Integer, Set<Episode>> patterns = processor.postprocess(episodes, frequency, entropy);
+		Map<Integer, Set<Episode>> patterns = processor.filter(episodes, frequency, entropy);
 		
 		Logger.log("Number of Nodes\tPartial\tSequential\tParallel");
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
