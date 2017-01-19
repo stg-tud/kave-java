@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.io.IndivReposParser;
 import cc.kave.episodes.io.RepoMethodsMapperIO;
-import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -93,7 +89,7 @@ public class PatternsValidation {
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(filteredEpisodes);
 
-		Map<String, Set<Event>> repoCtxMapper = reposIo.reader();
+		Map<String, Set<IMethodName>> repoCtxMapper = reposIo.reader();
 
 		List<Event> valData = validationIO.read(frequency);
 		Map<Event, Integer> mapEvents = mergeTrainingValidationEvents(
@@ -162,7 +158,7 @@ public class PatternsValidation {
 		Set<IMethodName> methodOcc = methodsOrderRelation
 				.getMethodNames(methodsOrderRelation.getOccurrences());
 		
-		Map<String, Set<Event>> repoCtxMapper = reposIo.reader();
+		Map<String, Set<IMethodName>> repoCtxMapper = reposIo.reader();
 		return 0;
 	}
 

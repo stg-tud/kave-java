@@ -13,6 +13,7 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
@@ -35,15 +36,15 @@ public class RepoMethodsMapperIO {
 	}
 	
 	public void writer(Map<String, EventStreamGenerator> repos) throws ZipException, IOException {
-		Map<String, Set<Event>> repoCtx = Maps.newLinkedHashMap();
+		Map<String, Set<IMethodName>> repoCtx = Maps.newLinkedHashMap();
 
 		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
 			List<Event> events = entry.getValue().getEventStream();
-			Set<Event> ctx = Sets.newLinkedHashSet();
+			Set<IMethodName> ctx = Sets.newLinkedHashSet();
 
 			for (Event e : events) {
 				if (e.getKind() == EventKind.METHOD_DECLARATION) {
-					ctx.add(e);
+					ctx.add(e.getMethod());
 				}
 			}
 			repoCtx.put(entry.getKey(), ctx);
@@ -51,9 +52,9 @@ public class RepoMethodsMapperIO {
 		}
 	}
 	
-	public Map<String, Set<Event>> reader() {
+	public Map<String, Set<IMethodName>> reader() {
 		@SuppressWarnings("serial")
-		Type type = new TypeToken<Map<String, Set<Event>>>() {
+		Type type = new TypeToken<Map<String, Set<IMethodName>>>() {
 		}.getType();
 		return JsonUtils.fromJson(new File(repoMethodsPath()), type);
 	}

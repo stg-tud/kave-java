@@ -82,7 +82,7 @@ public class ReposMethodsMapperIoTest {
 	@Test
 	public void fileContent() throws ZipException, IOException {
 		sut.writer(reposGenerators);
-		Map<String, Set<Event>> actMapper = sut.reader();
+		Map<String, Set<IMethodName>> actMapper = sut.reader();
 //		@SuppressWarnings("serial")
 //		Type type = new TypeToken<Map<String, Set<Event>>>() {
 //		}.getType();
@@ -93,8 +93,8 @@ public class ReposMethodsMapperIoTest {
 		assertMapEquality(generateReposMethods(), actMapper);
 	}
 
-	private void assertMapEquality(Map<String, Set<Event>> expected,
-			Map<String, Set<Event>> actuals) {
+	private void assertMapEquality(Map<String, Set<IMethodName>> expected,
+			Map<String, Set<IMethodName>> actuals) {
 		
 		if (expected.isEmpty() && actuals.isEmpty()) {
 			assertTrue(true);
@@ -102,31 +102,31 @@ public class ReposMethodsMapperIoTest {
 		if (expected.size() != actuals.size()) {
 			fail();
 		}
-		for (Map.Entry<String, Set<Event>> entry : expected.entrySet()) {
+		for (Map.Entry<String, Set<IMethodName>> entry : expected.entrySet()) {
 			if (!actuals.containsKey(entry.getKey())) {
 				fail();
 			}
-			Set<Event> expMethods = entry.getValue();
-			Set<Event> actMethods = actuals.get(entry.getKey());
+			Set<IMethodName> expMethods = entry.getValue();
+			Set<IMethodName> actMethods = actuals.get(entry.getKey());
 			
 			if (expMethods.isEmpty() && actMethods.isEmpty()) {
 				continue;
 			}
-			Iterator<Event> expIt = expMethods.iterator();
-			Iterator<Event> actIt = actMethods.iterator();
+			Iterator<IMethodName> expIt = expMethods.iterator();
+			Iterator<IMethodName> actIt = actMethods.iterator();
 			while (actIt.hasNext()) {
-				Event expEvent = expIt.next();
-				Event actEvent = actIt.next();
+				IMethodName expEvent = expIt.next();
+				IMethodName actEvent = actIt.next();
 				assertEquals(expEvent, actEvent);
 			}
  		}
 		assertTrue(true);
 	}
 
-	private Map<String, Set<Event>> generateReposMethods() {
-		Map<String, Set<Event>> mapper = Maps.newLinkedHashMap();
-		Set<Event> method = Sets.newLinkedHashSet();
-		method.add(enclCtx(0));
+	private Map<String, Set<IMethodName>> generateReposMethods() {
+		Map<String, Set<IMethodName>> mapper = Maps.newLinkedHashMap();
+		Set<IMethodName> method = Sets.newLinkedHashSet();
+		method.add(enclCtx(0).getMethod());
 
 		mapper.put("Github/usr1/repo1", method);
 		mapper.put("Github/usr1/repo2", method);
