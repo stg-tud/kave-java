@@ -4,7 +4,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +12,10 @@ import java.util.zip.ZipException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.json.JsonUtils;
@@ -21,7 +25,6 @@ import cc.kave.episodes.model.events.EventKind;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.reflect.TypeToken;
 
 public class RepoMethodsMapperIO {
 
@@ -52,11 +55,14 @@ public class RepoMethodsMapperIO {
 		}
 	}
 	
-	public Map<String, Set<IMethodName>> reader() {
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<Map<String, Set<IMethodName>>>() {
-		}.getType();
-		return JsonUtils.fromJson(new File(repoMethodsPath()), type);
+	public Map<String, Set<IMethodName>> reader() throws JsonParseException, JsonMappingException, IOException {
+		HashMap<String, Set<IMethodName>> result =
+		        new ObjectMapper().readValue(new File(repoMethodsPath()), HashMap.class);
+		return result;
+//		@SuppressWarnings("serial")
+//		Type type = new TypeToken<Map<String, Set<IMethodName>>>() {
+//		}.getType();
+//		return JsonUtils.fromJson(new File(repoMethodsPath()), type);
 	}
 	
 	private String repoMethodsPath() {

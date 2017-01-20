@@ -28,6 +28,7 @@ import javax.inject.Named;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
@@ -49,7 +50,7 @@ public class EpisodesParser {
 
 		List<String> lines = reader.readFile(getEpisodesFile(frequency, episodeType));
 
-		Map<Integer, Set<Episode>> episodeIndexed = new HashMap<Integer, Set<Episode>>();
+		Map<Integer, Set<Episode>> episodeIndexed = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
 
 		String[] rowValues;
@@ -68,7 +69,7 @@ public class EpisodesParser {
 				if (Integer.parseInt(rowValues[3]) > 0) {
 					String[] nodeString = rowValues[0].split("-");
 					numNodes = Integer.parseInt(nodeString[0]);
-					episodes = Sets.newHashSet();
+					episodes = Sets.newLinkedHashSet();
 				} else {
 					break;
 				}

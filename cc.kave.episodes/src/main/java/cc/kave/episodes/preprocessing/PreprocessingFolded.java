@@ -8,7 +8,6 @@ import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
-import cc.kave.episodes.io.RepoMethodsMapperIO;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
@@ -21,7 +20,6 @@ public class PreprocessingFolded {
 
 	private IndivReposParser reposParser;
 
-	private RepoMethodsMapperIO reposMethodsIO;
 	private EventStreamIo eventStreamIo;
 	private ValidationDataIO validationIO;
 	
@@ -29,12 +27,10 @@ public class PreprocessingFolded {
 
 	@Inject
 	public PreprocessingFolded(IndivReposParser repositories,
-			EventStreamIo trainingData, ValidationDataIO valIo,
-			RepoMethodsMapperIO repMeth) {
+			EventStreamIo trainingData, ValidationDataIO valIo) {
 		this.reposParser = repositories;
 		this.eventStreamIo = trainingData;
 		this.validationIO = valIo;
-		this.reposMethodsIO = repMeth;
 	}
 
 	public void runPreparation(int freq) throws IOException {
@@ -42,7 +38,6 @@ public class PreprocessingFolded {
 		Map<String, EventStreamGenerator> repos = reposParser.generateReposEvents();
 		Logger.log("Generating event stream data for freq = %d ...", freq);
 		Logger.log("\nWriting repositories - enclosing methods mapper ...");
-		reposMethodsIO.writer(repos);
 
 		for (int curFold = 0; curFold < NUM_FOLDS; curFold++) {
 			Logger.log("Generating foldNum %d/%d", (curFold + 1), NUM_FOLDS);

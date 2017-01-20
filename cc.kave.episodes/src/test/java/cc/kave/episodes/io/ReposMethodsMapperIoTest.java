@@ -89,6 +89,7 @@ public class ReposMethodsMapperIoTest {
 //		Map<String, Set<Event>> actMapper = JsonUtils.fromJson(new File(
 //				getReposMethodsPath()), type);
 
+		System.out.println(actMapper.toString());
 		assertTrue(generateReposMethods().size() == actMapper.size());
 		assertMapEquality(generateReposMethods(), actMapper);
 	}

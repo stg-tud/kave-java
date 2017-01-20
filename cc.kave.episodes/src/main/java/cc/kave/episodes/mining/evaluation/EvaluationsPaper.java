@@ -65,15 +65,15 @@ public class EvaluationsPaper {
 	public void part1(int frequency) throws IOException {
 		List<Event> events = eventStreamIo
 				.readMapping(getMappingFile(frequency));
-		List<Event> enclMethods = eventStreamIo
-				.readMethods(getMethodsPath(frequency));
 
 		Map<Integer, Set<Episode>> genEpisodes = episodeParser.parse(frequency,
 				EpisodeType.GENERAL);
 		Map<Integer, Set<Episode>> genPatterns = episodeFilter.filter(
 				genEpisodes, frequency, ENTROPY);
+		
 		Set<Set<Fact>> genEvents = getEpisodeEvents(genPatterns);
-
+//		Logger.log("Number of learned patterns is %d", genEvents.size());
+//
 		Map<Integer, Set<Episode>> seqPatterns = episodeParser.parse(frequency,
 				EpisodeType.SEQUENTIAL);
 		Set<Set<Fact>> seqEvents = getEpisodeEvents(seqPatterns);

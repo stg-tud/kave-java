@@ -14,9 +14,9 @@ import com.google.common.collect.Lists;
 
 public class PatternsMapper {
 
-	private EpisodesParser episodeParser;
-	private EpisodesFilter episodeFilter;
-	private MaximalEpisodes maxEpisodes;
+	private static EpisodesParser episodeParser;
+	private static EpisodesFilter episodeFilter;
+	private static MaximalEpisodes maxEpisodes;
 	
 	private static final double ENTROPY = 0.0;
 	
@@ -27,7 +27,7 @@ public class PatternsMapper {
 		this.maxEpisodes = maxis;
 	}
 	
-	public List<Episode> getMapper(int frequency, EpisodeType episodeType, boolean maximals) {
+	public static List<Episode> getMapper(int frequency, EpisodeType episodeType, boolean maximals) {
 		List<Episode> mapper = Lists.newLinkedList();
 		
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency, episodeType);
