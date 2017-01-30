@@ -151,9 +151,9 @@ public class PatternsIdentifierTest {
 				eventsFolder.getRoot(), processor, maxEpisodes, eventStream,
 				epParser, transClosure, episodeGraphConverter, graphWriter, null);
 
-		when(eventStream.parseStream(any(String.class))).thenReturn(stream);
-		when(eventStream.readMapping(any(String.class))).thenReturn(events);
-		when(eventStream.readMethods(any(String.class))).thenReturn(enclCtx);
+		when(eventStream.parseStream(anyInt())).thenReturn(stream);
+		when(eventStream.readMapping(anyInt())).thenReturn(events);
+		when(eventStream.readMethods(anyInt())).thenReturn(enclCtx);
 		when(epParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(patterns);
 		when(maxEpisodes.getMaximalEpisodes(any(Map.class))).thenReturn(
 				patterns);
@@ -209,8 +209,8 @@ public class PatternsIdentifierTest {
 	public void mocksAreCalledInTraining() throws Exception {
 		sut.trainingCode(FREQUENCY, EpisodeType.SEQUENTIAL);
 		
-		verify(eventStream).parseStream(any(String.class));
-		verify(eventStream).readMethods(any(String.class));
+		verify(eventStream).parseStream(anyInt());
+		verify(eventStream).readMethods(anyInt());
 		verify(epParser).parse(anyInt(), any(EpisodeType.class));
 		verify(maxEpisodes).getMaximalEpisodes(any(Map.class));
 		verify(processor).filter(any(Map.class), anyInt(), anyInt());

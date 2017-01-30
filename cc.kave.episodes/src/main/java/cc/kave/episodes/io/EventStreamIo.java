@@ -32,6 +32,8 @@ import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
@@ -39,41 +41,43 @@ import com.google.inject.Inject;
 
 public class EventStreamIo {
 
-	private File repoDir;
+	private File eventsDir;
 
 	public static final double TIMEOUT = 0.5;
 
 	@Inject
-	public EventStreamIo(@Named("repositories") File folder) {
-		assertTrue(folder.exists(), "Repositories folder does not exist");
-		assertTrue(folder.isDirectory(),
-				"Repositories is not a folder, but a file");
-		this.repoDir = folder;
+	public EventStreamIo(@Named("events") File folder) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.eventsDir = folder;
 	}
 
-	public void write(EventStream stream, int foldNum) {
+	public void write(EventStream stream, int freq) {
 		try {
-			FileUtils.writeStringToFile(new File(
-					getTrainPath(foldNum).streamPath), stream.getStream());
+			FileUtils
+					.writeStringToFile(new File(getTrainPath(freq).streamPath),
+							stream.getStream());
 			JsonUtils.toJson(stream.getMapping().keySet(), new File(
-					getTrainPath(foldNum).mappingPath));
+					getTrainPath(freq).mappingPath));
 			JsonUtils.toJson(stream.getEnclMethods(), new File(
-					getTrainPath(foldNum).methodsPath));
+					getTrainPath(freq).methodsPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public String readStream(String path) throws IOException {
-		String stream = FileUtils.readFileToString(new File(path));
+	public String readStream(int freq) throws IOException {
+		String streamFile = getTrainPath(freq).streamPath;
+		String stream = FileUtils.readFileToString(new File(streamFile));
 		return stream;
 	}
 
-	public List<List<Fact>> parseStream(String path) {
+	public List<List<Fact>> parseStream(int freq) {
 		List<List<Fact>> stream = Lists.newLinkedList();
 		List<Fact> method = Lists.newLinkedList();
 
-		List<String> lines = readlines(path);
+		String streamPath = getTrainPath(freq).streamPath;
+		List<String> lines = readlines(streamPath);
 
 		double timer = 0.0;
 
@@ -93,15 +97,40 @@ public class EventStreamIo {
 		return stream;
 	}
 
-	public List<Event> readMethods(String path) {
+	public List<Event> readMethods(int freq) {
+		String methodsPath = getTrainPath(freq).methodsPath;
+
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
-		List<Event> methods = JsonUtils.fromJson(new File(path), type);
+		List<Event> methods = JsonUtils.fromJson(new File(methodsPath), type);
 		assertMethods(methods);
 		return methods;
 	}
-	
+
+	public List<Tuple<List<Fact>, Event>> parseEventStream(int freq) {
+		List<Tuple<List<Fact>, Event>> result = Lists.newLinkedList();
+
+		Logger.log("Reading stream ...");
+		List<List<Fact>> stream = parseStream(freq);
+		Logger.log("Reading enclosing methods ...");
+		List<Event> methods = readMethods(freq);
+
+		assertTrue(stream.size() <= methods.size(),
+				"Wrong parsing of stream and method files!");
+
+		Logger.log("Merging stream with enclosing methods ....");
+		int streamId = 0;
+		for (int idx = 0; idx < stream.size(); idx++) {
+			if ((streamId % 100000) == 0) {
+				Logger.log("Stream method %d", streamId);
+			}
+			result.add(Tuple.newTuple(stream.get(idx), methods.get(idx)));
+			streamId++;
+		}
+		return result;
+	}
+
 	private void assertMethods(List<Event> methods) {
 		for (Event ctx : methods) {
 			assertTrue(ctx.getKind() == EventKind.METHOD_DECLARATION,
@@ -110,11 +139,13 @@ public class EventStreamIo {
 
 	}
 
-	public List<Event> readMapping(String path) {
+	public List<Event> readMapping(int freq) {
+		String mappingPath = getTrainPath(freq).mappingPath;
+
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
-		return JsonUtils.fromJson(new File(path), type);
+		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
 
 	private List<String> readlines(String path) {
@@ -134,9 +165,9 @@ public class EventStreamIo {
 		String methodsPath = "";
 	}
 
-	private TrainingPath getTrainPath(int fold) {
-		File path = new File(repoDir.getAbsolutePath() + "/TrainingData/fold"
-				+ fold);
+	private TrainingPath getTrainPath(int freq) {
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + freq
+				+ "/TrainingData/fold0");
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

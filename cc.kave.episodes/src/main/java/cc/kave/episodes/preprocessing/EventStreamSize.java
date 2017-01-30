@@ -26,12 +26,11 @@ public class EventStreamSize {
 		this.reposDir = folder;
 	}
 
-	public void printNumberOfEvents(int numFods) {
+	public void printNumberOfEvents(int frequency) {
 		int numEvents = 0;
 
-		for (int fold = 0; fold < numFods; fold++) {
-			String filePath = getPath(fold, "mapping.txt");
-			List<Event> mapping = eventStreamIo.readMapping(filePath);
+		for (int fold = 0; fold < frequency; fold++) {
+			List<Event> mapping = eventStreamIo.readMapping(frequency);
 
 			if (mapping.size() > numEvents) {
 				numEvents = mapping.size();
@@ -40,12 +39,11 @@ public class EventStreamSize {
 		Logger.log("Number of unique events is %d", numEvents);
 	}
 
-	public void printMethodSize(int numFolds, int sizeLimit) {
+	public void printMethodSize(int frequency, int sizeLimit) {
 
-		for (int fold = 0; fold < numFolds; fold++) {
-			List<List<Fact>> stream = eventStreamIo.parseStream(getPath(fold,
-					"stream.txt"));
-			List<Event> methods = eventStreamIo.readMethods(getPath(fold, "methods.txt"));
+		for (int fold = 0; fold < frequency; fold++) {
+			List<List<Fact>> stream = eventStreamIo.parseStream(frequency);
+			List<Event> methods = eventStreamIo.readMethods(frequency);
 			
 			assertTrue(stream.size() == methods.size(), "Inconsistency between number of methods!");
 			
@@ -65,11 +63,5 @@ public class EventStreamSize {
 		String methodName = event.getMethod().getDeclaringType().getFullName()
 				+ "." + event.getMethod().getName();
 		return methodName;
-	}
-
-	private String getPath(int fold, String file) {
-		String fileName = reposDir.getAbsolutePath() + "/TrainingData/fold"
-				+ fold + "/" + file;
-		return fileName;
 	}
 }

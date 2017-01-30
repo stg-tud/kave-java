@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -89,10 +88,8 @@ public class PatternsIdentifier {
 
 	public void trainingCode(int frequency, EpisodeType episodeType)
 			throws Exception {
-		List<List<Fact>> stream = eventStream.parseStream(getStreamPath(
-				"Training", frequency));
-		List<Event> enclMethods = eventStream.readMethods(getMethodsPath(
-				"Training", frequency));
+		List<List<Fact>> stream = eventStream.parseStream(frequency);
+		List<Event> enclMethods = eventStream.readMethods(frequency);
 		Logger.log("Stream size is: %d", stream.size());
 		Logger.log("Methods size is: %d", enclMethods.size());
 
@@ -166,11 +163,6 @@ public class PatternsIdentifier {
 		return methods;
 	}
 
-	private String getStreamPath(String foldType, int frequency) {
-		String fileName = getEventsPath(foldType, frequency) + "/stream.txt";
-		return fileName;
-	}
-
 	private String getEventsPath(String dataType, int frequency) {
 		String fileName = eventsFolder.getAbsolutePath() + "/freq" + frequency
 				+ "/" + dataType + "Data/fold0";
@@ -187,8 +179,7 @@ public class PatternsIdentifier {
 
 	public void validationCode(int frequency, EpisodeType episodeType)
 			throws Exception {
-		List<Event> trainEvents = eventStream.readMapping(getMethodsPath(
-				"Training", frequency));
+		List<Event> trainEvents = eventStream.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency,
 				episodeType);
 		Map<Integer, Set<Episode>> patterns = getFilteredEpisodes(episodes,

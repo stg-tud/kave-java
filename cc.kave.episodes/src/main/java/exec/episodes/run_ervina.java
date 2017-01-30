@@ -57,12 +57,12 @@ public class run_ervina {
 //		 load(PreprocessingFolded.class).runPreparation(FREQ);
 //		load(StreamAndMethodChecker.class).checkLengths();
 //		load(EventsReader.class).read(FREQ);
-//		load(PatternsValidation.class).validate(FREQ, EpisodeType.GENERAL);
+		load(PatternsValidation.class).validate(FREQ, EpisodeType.SEQUENTIAL);
 //		load(PatternsIdentifier.class).trainingCode(FREQ, EpisodeType.GENERAL);
 		
 //		load(EvaluationsPaper.class).diff(FREQ);
 //		load(EvaluationsPaper.class).part2(FREQ);
-		load(EvaluationsPaper.class).part1(FREQ);
+//		load(EvaluationsPaper.class).part1(FREQ);
 		
 //		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
 //		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,

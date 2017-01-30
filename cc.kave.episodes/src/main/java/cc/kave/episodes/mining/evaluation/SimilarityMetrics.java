@@ -63,8 +63,8 @@ public class SimilarityMetrics {
 		this.graphWriter = graphWriter;
 	}
 
-	public void validate() throws Exception {
-		List<Event> mapping = eventStreamIo.readMapping(getMappingPath());
+	public void validate(int frequency) throws Exception {
+		List<Event> mapping = eventStreamIo.readMapping(frequency);
 
 		Map<Integer, Set<Episode>> episodes = episodeProcessor.filter(
 				Maps.newHashMap(), 500, 0.6);
@@ -131,12 +131,6 @@ public class SimilarityMetrics {
 				}
 			}
 		}
-	}
-
-	private String getMappingPath() {
-		String mapping = eventsFolder.getAbsolutePath()
-				+ "/200Repos/mapping.txt";
-		return mapping;
 	}
 
 	private void storeProposals(Set<Tuple<Episode, Double>> proposals,

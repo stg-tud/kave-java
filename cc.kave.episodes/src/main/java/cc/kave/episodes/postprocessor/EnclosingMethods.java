@@ -24,9 +24,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
@@ -35,10 +37,11 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 public class EnclosingMethods {
-	
+
 	private boolean order;
 	private Map<IMethodName, Integer> methods = Maps.newLinkedHashMap();
-	
+	private IMethodName unknownMethod = Names.getUnknownMethod();
+
 	@Inject
 	public EnclosingMethods(boolean order) {
 		this.order = order;
@@ -53,13 +56,19 @@ public class EnclosingMethods {
 			counter = getSetCounter(episode, method);
 		}
 		if (counter > 0) {
-			methods.put(enclMethod.getMethod(), counter);
+			if ((enclMethod.getMethod().equals(unknownMethod))
+					&& (methods.containsKey(unknownMethod))) {
+				int occ = methods.get(unknownMethod);
+				methods.put(unknownMethod, occ + counter);
+			} else {
+				methods.put(enclMethod.getMethod(), counter);
+			}
 		}
 	}
-	
+
 	public Set<IMethodName> getMethodNames(int numberOfMethods) {
 		Set<IMethodName> someMethods = Sets.newLinkedHashSet();
-		
+
 		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
 			someMethods.add(entry.getKey());
 			if (someMethods.size() == numberOfMethods) {
@@ -67,11 +76,11 @@ public class EnclosingMethods {
 			}
 		}
 		return someMethods;
-	} 
-	
+	}
+
 	public int getOccurrences() {
 		int counter = 0;
-		
+
 		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
 			counter += entry.getValue();
 		}
@@ -83,16 +92,18 @@ public class EnclosingMethods {
 		Set<Fact> episodeRelations = episode.getRelations();
 		int previousCounter = getSetCounter(episode, method);
 		int counter = 0;
-		
+
 		for (Fact relation : episodeRelations) {
 			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
 			Set<Integer> firstEventIdices = eventIndices.get(tuple.getFirst());
-			Set<Integer> secondEventIndices = eventIndices.get(tuple.getSecond());
+			Set<Integer> secondEventIndices = eventIndices.get(tuple
+					.getSecond());
 			Set<Integer> countedIndices = Sets.newLinkedHashSet();
 
 			for (int firstIndex : firstEventIdices) {
 				for (int secondIndex : secondEventIndices) {
-					if ((firstIndex < secondIndex) && !countedIndices.contains(secondIndex)) {
+					if ((firstIndex < secondIndex)
+							&& !countedIndices.contains(secondIndex)) {
 						counter++;
 						countedIndices.add(secondIndex);
 					}
@@ -108,7 +119,8 @@ public class EnclosingMethods {
 		return previousCounter;
 	}
 
-	private Map<Fact, Set<Integer>> getEventIndices(Episode episode, List<Fact> method) {
+	private Map<Fact, Set<Integer>> getEventIndices(Episode episode,
+			List<Fact> method) {
 		Set<Fact> episodeEvents = episode.getEvents();
 		Map<Fact, Set<Integer>> eventIndices = Maps.newLinkedHashMap();
 
@@ -154,10 +166,11 @@ public class EnclosingMethods {
 		}
 		return minimum;
 	}
-	
+
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringBuilder.reflectionToString(this,
+				ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 	@Override

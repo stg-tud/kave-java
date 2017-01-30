@@ -19,7 +19,7 @@ public class ValidationDataIO {
 	private File repoDir;
 	
 	@Inject
-	public ValidationDataIO(@Named("repositories") File folder) {
+	public ValidationDataIO(@Named("events") File folder) {
 		assertTrue(folder.exists(), "Repositories folder does not exist");
 		assertTrue(folder.isDirectory(),
 				"Repositories is not a folder, but a file");
@@ -30,6 +30,14 @@ public class ValidationDataIO {
 		JsonUtils.toJson(stream, getValidationPath(frequency));
 	}
 
+	public List<Event> read(int frequency) {
+		@SuppressWarnings("serial")
+		Type type = new TypeToken<List<Event>>() {
+		}.getType();
+		List<Event> stream = JsonUtils.fromJson(getValidationPath(frequency), type);
+		return stream;
+	}
+	
 	private File getValidationPath(int frequency) {
 		File path = new File(repoDir.getAbsolutePath() + "/freq" + frequency + "/ValidationData");
 		if (!path.exists()) {
@@ -37,13 +45,5 @@ public class ValidationDataIO {
 		}
 		File fileName = new File(path.getAbsoluteFile() + "/stream0.json");
 		return fileName;
-	}
-	
-	public List<Event> read(int frequency) {
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<List<Event>>() {
-		}.getType();
-		List<Event> stream = JsonUtils.fromJson(getValidationPath(frequency), type);
-		return stream;
 	}
 }

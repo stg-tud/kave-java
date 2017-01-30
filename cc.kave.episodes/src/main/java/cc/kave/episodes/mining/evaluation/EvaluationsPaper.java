@@ -64,7 +64,7 @@ public class EvaluationsPaper {
 
 	public void part1(int frequency) throws IOException {
 		List<Event> events = eventStreamIo
-				.readMapping(getMappingFile(frequency));
+				.readMapping(frequency);
 
 		Map<Integer, Set<Episode>> genEpisodes = episodeParser.parse(frequency,
 				EpisodeType.GENERAL);
@@ -133,9 +133,9 @@ public class EvaluationsPaper {
 
 	public void part2(int frequency) {
 		List<List<Fact>> stream = eventStreamIo
-				.parseStream(getStreamPath(frequency));
+				.parseStream(frequency);
 		List<Event> enclMethods = eventStreamIo
-				.readMethods(getMethodsPath(frequency));
+				.readMethods(frequency);
 
 //		Episode genPattern = createEpisode("7", "8", "34", "7>8");
 //		EnclosingMethods genPatternMethods = new EnclosingMethods(true);
@@ -228,7 +228,7 @@ public class EvaluationsPaper {
 
 	public void diff(int frequency) throws IOException {
 		List<Event> events = eventStreamIo
-				.readMapping(getMappingFile(frequency));
+				.readMapping(frequency);
 
 		Map<Integer, Set<Episode>> genEpisodes = episodeParser.parse(frequency,
 				EpisodeType.GENERAL);

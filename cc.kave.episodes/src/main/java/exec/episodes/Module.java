@@ -54,8 +54,6 @@ public class Module extends AbstractModule {
 		Directory rootDir = new Directory(rootFile.getAbsolutePath());
 		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
-		File reposData = new File(eventsData.getAbsolutePath() + "/repositories/");
-		Directory reposDir = new Directory(reposData.getAbsolutePath());
 		File contexts = new File(rootFolder + "dataSet/SST/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
@@ -69,7 +67,6 @@ public class Module extends AbstractModule {
 		dirs.put("root", rootDir);
 		dirs.put("statistics", statDir);
 		dirs.put("events", eventsDir);
-		dirs.put("repositories", reposDir);
 		dirs.put("contexts", ctxtDir);
 		dirs.put("evaluation", evaluationDir);
 		dirs.put("patterns", patternsDir);
@@ -77,7 +74,6 @@ public class Module extends AbstractModule {
 
 		bind(File.class).annotatedWith(Names.named("root")).toInstance(rootFile);
 		bind(File.class).annotatedWith(Names.named("events")).toInstance(eventsData);
-		bind(File.class).annotatedWith(Names.named("repositories")).toInstance(reposData);
 		bind(File.class).annotatedWith(Names.named("contexts")).toInstance(contexts);
 		bind(File.class).annotatedWith(Names.named("evaluation")).toInstance(evaluationFile);
 		bind(File.class).annotatedWith(Names.named("statistics")).toInstance(statFile);

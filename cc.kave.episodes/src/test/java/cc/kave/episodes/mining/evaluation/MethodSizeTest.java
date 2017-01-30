@@ -4,7 +4,6 @@ import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +19,6 @@ import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
@@ -34,8 +32,7 @@ public class MethodSizeTest {
 	private EventStream eventStream = new EventStream();
 	private EventStreamIo streamIo;
 
-	private static final int NUMBREPOS = 5;
-	private static final int NUM_FOLDS = 2;
+	private static final int FREQUENCY = 5;
 
 	private MethodSize sut;
 
@@ -47,16 +44,16 @@ public class MethodSizeTest {
 		Logger.setCapturing(true);
 
 		MockitoAnnotations.initMocks(this);
-		
+
 		streamIo = new EventStreamIo(rootFolder.getRoot());
 
-		sut = new MethodSize(rootFolder.getRoot());
+		sut = new MethodSize();
 
-		eventStream.addEvent(first(1));	// 1
-		eventStream.addEvent(sup(2));	// 2
+		eventStream.addEvent(first(1)); // 1
+		eventStream.addEvent(sup(2)); // 2
 		eventStream.addEvent(ctx(3));
-		eventStream.addEvent(inv(4));	// 3
-		eventStream.addEvent(inv(5));	// 4
+		eventStream.addEvent(inv(4)); // 3
+		eventStream.addEvent(inv(5)); // 4
 		eventStream.addEvent(first(1));
 		eventStream.addEvent(ctx(6));
 		eventStream.addEvent(first(1));
@@ -75,31 +72,16 @@ public class MethodSizeTest {
 	}
 
 	@Test
-	public void cannotBeInitializedWithNonExistingFolder() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Events folder does not exist");
-		sut = new MethodSize(new File("does not exist"));
-	}
-
-	@Test
-	public void cannotBeInitializedWithFile() throws IOException {
-		File file = rootFolder.newFile("a");
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Events is not a folder, but a file");
-		sut = new MethodSize(file);
-	}
-
-	@Test
 	public void logger() {
 		Logger.clearLog();
 
-		streamIo.write(eventStream, NUM_FOLDS);
+		streamIo.write(eventStream, FREQUENCY);
 
-		assertTrue(new File(getStreamPath(NUMBREPOS)).exists());
-		assertTrue(new File(getMappingPath(NUMBREPOS)).exists());
-		assertTrue(new File(getMethodsPath(NUMBREPOS)).exists());
+		assertTrue(new File(getStreamPath(FREQUENCY)).exists());
+		assertTrue(new File(getMappingPath(FREQUENCY)).exists());
+		assertTrue(new File(getMethodsPath(FREQUENCY)).exists());
 
-		sut.statistics(NUMBREPOS, 3);
+		sut.statistics(FREQUENCY, 3);
 
 		assertLogContains(0, "Number of methods in stream data is 4");
 		assertLogContains(1, "Number of events in the event stream is 11");
@@ -128,8 +110,8 @@ public class MethodSizeTest {
 	}
 
 	private File getPath(int numRepos) {
-		File path = new File(rootFolder.getRoot().getAbsolutePath() + "/"
-				+ numRepos + "Repos");
+		File path = new File(rootFolder.getRoot().getAbsolutePath() + "/freq"
+				+ FREQUENCY + "/TrainingData/fold0");
 		return path;
 	}
 

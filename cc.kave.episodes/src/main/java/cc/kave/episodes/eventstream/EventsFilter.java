@@ -15,7 +15,6 @@
  */
 package cc.kave.episodes.eventstream;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +27,7 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.statistics.StreamStatistics;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class EventsFilter {
@@ -68,36 +68,36 @@ public class EventsFilter {
 	}
 
 	private static List<Event> removeMethodDublicates(List<Event> stream) {
-		List<Event> results = new LinkedList<Event>();
-		List<Event> method = new LinkedList<Event>();
+		List<Event> results = Lists.newLinkedList();
+		List<Event> methodStream = Lists.newLinkedList();
 		Set<IMethodName> observedMethods = Sets.newLinkedHashSet();
 		Set<List<Event>> obsUnknownMethods = Sets.newLinkedHashSet();
-		IMethodName currentMethod = null;
+		IMethodName methodName = null;
 
 		for (Event event : stream) {
 			if ((event.getKind() == EventKind.FIRST_DECLARATION)
-					&& (currentMethod != null)) {
-				if ((!observedMethods.contains(currentMethod))
-						&& (!obsUnknownMethods.contains(method))) {
-					results.addAll(method);
-					if (currentMethod.equals(Names.getUnknownMethod())) {
-						obsUnknownMethods.add(method);
+					&& (methodName != null)) {
+				if ((!observedMethods.contains(methodName))
+						&& (!obsUnknownMethods.contains(methodStream))) {
+					results.addAll(methodStream);
+					if (methodName.equals(Names.getUnknownMethod())) {
+						obsUnknownMethods.add(methodStream);
 					} else {
-						observedMethods.add(currentMethod);
+						observedMethods.add(methodName);
 					}
 				}
-				method.clear();
-				method = new LinkedList<Event>();
-				currentMethod = null;
+				methodStream.clear();
+				methodStream = Lists.newLinkedList();
+				methodName = null;
 			} else if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				currentMethod = event.getMethod();
+				methodName = event.getMethod();
 			}
-			method.add(event);
+			methodStream.add(event);
 		}
-		if ((currentMethod != null)
-				&& ((!observedMethods.contains(currentMethod)) && (!obsUnknownMethods
-						.contains(method)))) {
-			results.addAll(method);
+		if ((methodName != null)
+				&& ((!observedMethods.contains(methodName)) && (!obsUnknownMethods
+						.contains(methodStream)))) {
+			results.addAll(methodStream);
 		}
 		observedMethods.clear();
 		obsUnknownMethods.clear();

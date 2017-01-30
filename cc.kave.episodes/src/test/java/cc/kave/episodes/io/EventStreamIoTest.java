@@ -35,6 +35,7 @@ import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Lists;
@@ -50,28 +51,28 @@ public class EventStreamIoTest {
 	private static final IMethodName DUMMY_METHOD = Names
 			.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
-	
-	private static final int FOLDNUM = 2;
-	
+
+	private static final int FREQUENCY = 2;
+
 	File streamFile;
 	File mappingFile;
 	File methodsFile;
-	
+
 	private EventStreamIo sut;
-	
+
 	@Before
 	public void setup() {
 		streamFile = getStreamFile();
 		mappingFile = getMappingFile();
 		methodsFile = getMethodsFile();
-		
+
 		sut = new EventStreamIo(tmp.getRoot());
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories folder does not exist");
+		thrown.expectMessage("Events folder does not exist");
 		sut = new EventStreamIo(new File("does not exist"));
 	}
 
@@ -79,7 +80,7 @@ public class EventStreamIoTest {
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = tmp.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories is not a folder, but a file");
+		thrown.expectMessage("Events is not a folder, but a file");
 		sut = new EventStreamIo(file);
 	}
 
@@ -99,39 +100,49 @@ public class EventStreamIoTest {
 		expected.addEvent(ctx(4));
 		expected.addEvent(inv(2)); // 2
 		expected.addEvent(inv(5)); // 3
+		
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(3));
+		List<Fact> method3 = Lists.newLinkedList();
+		List<Fact> method4 = Lists.newArrayList(new Fact(2), new Fact(3));
+
+		List<Tuple<List<Fact>, Event>> expEventStream = Lists.newLinkedList();
+		expEventStream.add(Tuple.newTuple(method1, ctx(1)));
+		expEventStream.add(Tuple.newTuple(method2, ctx(2)));
+		expEventStream.add(Tuple.newTuple(method3, ctx(3)));
+		expEventStream.add(Tuple.newTuple(method4, ctx(4)));
 
 		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
-		expParseStream.add(Lists.newArrayList(new Fact(3)));
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newArrayList(new Fact(2), new Fact(3)));
+		expParseStream.add(method1);
+		expParseStream.add(method2);
+		expParseStream.add(method3);
+		expParseStream.add(method4);
 
-		sut.write(expected, FOLDNUM);
+		sut.write(expected, FREQUENCY);
 
 		assertTrue(streamFile.exists());
 		assertTrue(mappingFile.exists());
 		assertTrue(methodsFile.exists());
 
-		List<Event> actMapping = sut.readMapping(mappingFile
-				.getAbsolutePath());
-		List<Event> actMethods = sut.readMethods(methodsFile
-				.getAbsolutePath());
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(streamFile
-				.getAbsolutePath());
-		List<List<Fact>> actParserStream = sut.parseStream(streamFile
-				.getAbsolutePath());
+		String actStringStream = sut.readStream(FREQUENCY);
+		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
+		
+		List<Tuple<List<Fact>, Event>> actEventStream = sut.parseEventStream(FREQUENCY);
 
 		assertMapping(expected.getMapping().keySet(), actMapping);
-		
+
 		assertEquals(expected.getEnclMethods(), actMethods);
 
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
-		
+		assertEquals(expEventStream, actEventStream);
+
 		assertTrue(actParserStream.size() == actMethods.size());
 	}
-	
+
 	@Test
 	public void emptyMethods() throws IOException {
 
@@ -160,29 +171,25 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(2), new Fact(3)));
 
-		sut.write(expected, FOLDNUM);
+		sut.write(expected, FREQUENCY);
 
-		List<Event> actMapping = sut.readMapping(mappingFile
-				.getAbsolutePath());
-		List<Event> actMethods = sut.readMethods(methodsFile
-				.getAbsolutePath());
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(streamFile
-				.getAbsolutePath());
-		List<List<Fact>> actParserStream = sut.parseStream(streamFile
-				.getAbsolutePath());
+		String actStringStream = sut.readStream(FREQUENCY);
+		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
 		assertMapping(expected.getMapping().keySet(), actMapping);
-		
+
 		assertEquals(expected.getEnclMethods(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
-		
+
 		assertTrue(actParserStream.size() <= actMethods.size());
 		assertTrue(actParserStream.size() == 5);
 		assertTrue(actMethods.size() == 6);
 	}
-	
+
 	@Test
 	public void multipleEmptyMethodsInBeggining() throws IOException {
 
@@ -201,27 +208,23 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
 
-		sut.write(expected, FOLDNUM);
+		sut.write(expected, FREQUENCY);
 
-		List<Event> actMapping = sut.readMapping(mappingFile
-				.getAbsolutePath());
-		List<Event> actMethods = sut.readMethods(methodsFile
-				.getAbsolutePath());
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(streamFile
-				.getAbsolutePath());
-		List<List<Fact>> actParserStream = sut.parseStream(streamFile
-				.getAbsolutePath());
+		String actStringStream = sut.readStream(FREQUENCY);
+		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
 		assertMapping(expected.getMapping().keySet(), actMapping);
-		
+
 		assertEquals(expected.getEnclMethods(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
-		
+
 		assertTrue(actParserStream.size() == actMethods.size());
 	}
-	
+
 	@Test
 	public void multipleEmptyMethodsInMiddle() throws IOException {
 
@@ -230,15 +233,15 @@ public class EventStreamIoTest {
 		expected.addEvent(ctx(0));
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); 		// 1
+		expected.addEvent(inv(2)); // 1
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(1));
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(2));
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(3));
-		expected.addEvent(inv(2)); 		// 1
-		expected.addEvent(inv(5));		// 2
+		expected.addEvent(inv(2)); // 1
+		expected.addEvent(inv(5)); // 2
 
 		List<List<Fact>> expParseStream = Lists.newLinkedList();
 		expParseStream.add(Lists.newArrayList());
@@ -247,27 +250,23 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
 
-		sut.write(expected, FOLDNUM);
+		sut.write(expected, FREQUENCY);
 
-		List<Event> actMapping = sut.readMapping(mappingFile
-				.getAbsolutePath());
-		List<Event> actMethods = sut.readMethods(methodsFile
-				.getAbsolutePath());
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(streamFile
-				.getAbsolutePath());
-		List<List<Fact>> actParserStream = sut.parseStream(streamFile
-				.getAbsolutePath());
+		String actStringStream = sut.readStream(FREQUENCY);
+		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
 		assertMapping(expected.getMapping().keySet(), actMapping);
-		
+
 		assertEquals(expected.getEnclMethods(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
-		
+
 		assertTrue(actParserStream.size() == actMethods.size());
 	}
-	
+
 	@Test
 	public void multipleEmptyMethodsInEnd() throws IOException {
 
@@ -276,13 +275,13 @@ public class EventStreamIoTest {
 		expected.addEvent(ctx(0));
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); 		// 1
+		expected.addEvent(inv(2)); // 1
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(1));
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(3));
-		expected.addEvent(inv(2)); 		// 1
-		expected.addEvent(inv(5));		// 2
+		expected.addEvent(inv(2)); // 1
+		expected.addEvent(inv(5)); // 2
 		expected.addEvent(firstCtx(0));
 		expected.addEvent(ctx(5));
 		expected.addEvent(firstCtx(0));
@@ -294,24 +293,20 @@ public class EventStreamIoTest {
 		expParseStream.add(Lists.newLinkedList());
 		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
 
-		sut.write(expected, FOLDNUM);
+		sut.write(expected, FREQUENCY);
 
-		List<Event> actMapping = sut.readMapping(mappingFile
-				.getAbsolutePath());
-		List<Event> actMethods = sut.readMethods(methodsFile
-				.getAbsolutePath());
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(streamFile
-				.getAbsolutePath());
-		List<List<Fact>> actParserStream = sut.parseStream(streamFile
-				.getAbsolutePath());
+		String actStringStream = sut.readStream(FREQUENCY);
+		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
 		assertMapping(expected.getMapping().keySet(), actMapping);
-		
+
 		assertEquals(expected.getEnclMethods(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
-		
+
 		assertTrue(actParserStream.size() <= actMethods.size());
 		assertTrue(actParserStream.size() == 4);
 		assertTrue(actMethods.size() == 6);
@@ -328,7 +323,7 @@ public class EventStreamIoTest {
 		}
 		return true;
 	}
-	
+
 	private File getMethodsFile() {
 		File fileName = new File(getPath() + "/methods.txt");
 		return fileName;
@@ -345,7 +340,8 @@ public class EventStreamIoTest {
 	}
 
 	private String getPath() {
-		File path = new File(tmp.getRoot().getAbsolutePath() + "/TrainingData/fold" + FOLDNUM);
+		File path = new File(tmp.getRoot().getAbsolutePath() + "/freq"
+				+ FREQUENCY + "/TrainingData/fold0");
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

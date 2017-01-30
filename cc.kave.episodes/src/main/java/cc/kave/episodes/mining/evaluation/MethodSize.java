@@ -2,7 +2,6 @@ package cc.kave.episodes.mining.evaluation;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,28 +15,18 @@ import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class MethodSize {
 
-	private File directory;
 	private EventStreamIo eventStreamIo;
 
-	@Inject
-	public MethodSize(@Named("events") File folder) {
-		assertTrue(folder.exists(), "Events folder does not exist");
-		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
-		this.directory = folder;
-	}
-
-	public void statistics(int numbRepos, int methodLength) {
-		List<List<Fact>> stream = eventStreamIo.parseStream(getStreamPath(numbRepos));
+	public void statistics(int frequency, int methodLength) {
+		List<List<Fact>> stream = eventStreamIo.parseStream(frequency);
 		int streamLength = calcStreamLength(stream);
 		
-		List<Event> events = eventStreamIo.readMapping(getMappingPath(numbRepos));
+		List<Event> events = eventStreamIo.readMapping(frequency);
 
-		List<Event> methods = eventStreamIo.readMethods(getMethodsPath(numbRepos));
+		List<Event> methods = eventStreamIo.readMethods(frequency);
 		Set<Event> uniqMethods = listToSet(methods);
 		assertTrue(uniqMethods.size() <= methods.size(), "Error in converting List to Set!");
 
@@ -117,27 +106,6 @@ public class MethodSize {
 				break;
 			}
 		}
-		return fileName;
-	}
-
-	private File getPath(int numRepos) {
-		File path = new File(directory.getAbsolutePath() + "/" + numRepos
-				+ "Repos");
-		return path;
-	}
-	
-	private String getStreamPath(int numRepos) {
-		String fileName = getPath(numRepos).getAbsolutePath() + "/stream.txt";
-		return fileName;
-	}
-	
-	private String getMappingPath(int numRepos) {
-		String fileName = getPath(numRepos).getAbsolutePath() + "/mapping.txt";
-		return fileName;
-	}
-	
-	private String getMethodsPath(int numRepos) {
-		String fileName = getPath(numRepos).getAbsolutePath() + "/methods.txt";
 		return fileName;
 	}
 }

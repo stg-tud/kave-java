@@ -31,18 +31,23 @@
 package cc.kave.episodes.io;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -82,6 +87,28 @@ public class IndivReposParser {
 		}
 		allEvents.put(repoName, repoGen);
 		return allEvents;
+	}
+	
+	public Map<String, Set<IMethodName>> getRepoCtxMapper()
+			throws ZipException, IOException {
+		Map<String, Set<IMethodName>> results = Maps.newLinkedHashMap();
+
+		Map<String, EventStreamGenerator> repoCtxs = generateReposEvents();
+
+		for (Map.Entry<String, EventStreamGenerator> entry : repoCtxs
+				.entrySet()) {
+			List<Event> events = entry.getValue().getEventStream();
+			Set<IMethodName> ctx = Sets.newLinkedHashSet();
+
+			for (Event e : events) {
+				if (e.getKind() == EventKind.METHOD_DECLARATION) {
+					ctx.add(e.getMethod());
+				}
+			}
+			results.put(entry.getKey(), ctx);
+		}
+		repoCtxs.clear();
+		return results;
 	}
 	
 	private String getRepoName(String zipName) {

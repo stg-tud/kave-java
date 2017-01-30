@@ -56,6 +56,7 @@ import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class IndiviReposParserTest {
 
@@ -97,7 +98,7 @@ public class IndiviReposParserTest {
 
 		MethodDeclaration md2 = new MethodDeclaration();
 		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
-
+		
 		InvocationExpression ie1 = new InvocationExpression();
 		IMethodName methodName = Names
 				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
@@ -134,7 +135,7 @@ public class IndiviReposParserTest {
 		MethodDeclaration md4 = new MethodDeclaration();
 		md4.setName(Names.newMethod("[T,P] [T2,P].M3()"));
 		md4.getBody().add(new DoLoop());
-
+		
 		InvocationExpression ie3 = new InvocationExpression();
 		IMethodName methodName3 = Names
 				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
@@ -210,6 +211,22 @@ public class IndiviReposParserTest {
 
 		assertEquals(expReposGen.size(), actReposGen.size());
 		assertRepos(expReposGen, actReposGen);
+	}
+	
+	@Test
+	public void reposCtxMapper() throws ZipException, IOException {
+		String repName1 = "Github/usr1/repo1";
+		String repName3 = "Github/usr1/repo3";
+		String repName2 = "Github/usr1/repo2";
+		
+		Map<String, Set<IMethodName>> expected = Maps.newLinkedHashMap();
+		expected.put(repName1, Sets.newHashSet(Names.getUnknownMethod()));
+		expected.put(repName3, Sets.newHashSet(Names.getUnknownMethod()));
+		expected.put(repName2, Sets.newHashSet(Names.getUnknownMethod()));
+		
+		Map<String, Set<IMethodName>> actuals = sut.getRepoCtxMapper();
+		
+		assertEquals(expected, actuals);
 	}
 
 	private void assertRepos(Map<String, EventStreamGenerator> expReposGen,
