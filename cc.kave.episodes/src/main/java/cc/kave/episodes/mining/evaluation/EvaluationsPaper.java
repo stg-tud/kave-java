@@ -152,7 +152,8 @@ public class EvaluationsPaper {
 //				"34>8");
 //		EnclosingMethods seqPatternMethods3 = new EnclosingMethods(true);
 		
-		Episode pattern1 = createEpisode("5", "7", "8", "20", "5>20", "7>8");
+		Episode pattern1 = createEpisode(846, 0.950654, "70", "71", "672", "64",
+				"70>71", "70>672", "70>64", "71>64", "672>64");
 		EnclosingMethods genPatternMethods = new EnclosingMethods(true);
 
 		for (int i = 0; i < stream.size(); i++) {
@@ -220,8 +221,11 @@ public class EvaluationsPaper {
 		return fileName;
 	}
 
-	private Episode createEpisode(String... strings) {
+	private Episode createEpisode(int frequency, double entropy, String... strings) {
 		Episode episode = new Episode();
+		
+		episode.setFrequency(frequency);
+		episode.setEntropy(entropy);
 		episode.addStringsOfFacts(strings);
 		return episode;
 	}

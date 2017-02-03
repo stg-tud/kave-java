@@ -36,6 +36,7 @@ public class PreprocessingFolded {
 	public void runPreparation(int freq) throws IOException {
 
 		Map<String, EventStreamGenerator> repos = reposParser.generateReposEvents();
+		
 		Logger.log("Generating event stream data for freq = %d ...", freq);
 		Logger.log("\nWriting repositories - enclosing methods mapper ...");
 

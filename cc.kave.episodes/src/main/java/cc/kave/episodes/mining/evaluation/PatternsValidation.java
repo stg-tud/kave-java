@@ -12,8 +12,8 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
@@ -28,6 +28,7 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
+import cc.kave.episodes.preprocessing.OverlapingTypes;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
@@ -49,7 +50,9 @@ public class PatternsValidation {
 	private TransClosedEpisodes transClosure;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
-
+	
+	private OverlapingTypes overlaps;
+	
 	private IndivReposParser repoParser;
 
 	private static final double ENTROPY = 0.0;
@@ -60,7 +63,7 @@ public class PatternsValidation {
 			EpisodesParser epParser, TransClosedEpisodes transClosure,
 			EpisodeToGraphConverter episodeGraphConverter,
 			EpisodeAsGraphWriter graphWriter, ValidationDataIO validationIO,
-			IndivReposParser reposParser) {
+			IndivReposParser reposParser, OverlapingTypes overlaps) {
 		assertTrue(patternsFolder.exists(), "Patterns folder does not exist");
 		assertTrue(patternsFolder.isDirectory(),
 				"Patterns is not a folder, but a file");
@@ -73,12 +76,14 @@ public class PatternsValidation {
 		this.graphWriter = graphWriter;
 		this.validationIO = validationIO;
 		this.repoParser = reposParser;
+		this.overlaps = overlaps;
 	}
 
 	public void validate(int frequency, EpisodeType episodeType)
 			throws Exception {
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency);
+		
 		Logger.log("Reading training stream ...");
 		List<Tuple<List<Fact>, Event>> streamContexts = eventStream
 				.parseEventStream(frequency);
@@ -99,6 +104,8 @@ public class PatternsValidation {
 		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
 		Logger.log("Parsing validation stream ...");
 		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);
+		
+		Set<ITypeName> overlapingTypes = overlaps.getOverlaps(frequency);
 
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
@@ -125,7 +132,7 @@ public class PatternsValidation {
 
 				Logger.log("Validating from the test data ...");
 				int occValidation = getValOcc(episode, frequency, eventsList,
-						valStream);
+						valStream, overlapingTypes);
 				sb.append(occValidation + "\n");
 
 				Logger.log("Saving pattern %d ...", patternId);
@@ -134,11 +141,12 @@ public class PatternsValidation {
 			}
 			sb.append("\n");
 		}
-		FileUtils.writeStringToFile(getEvalPath(frequency, episodeType), sb.toString());
+		FileUtils.writeStringToFile(getEvalPath(frequency, episodeType),
+				sb.toString());
 	}
 
 	private int getValOcc(Episode episode, int frequency, List<Event> events,
-			List<List<Fact>> valStream) {
+			List<List<Fact>> valStream, Set<ITypeName> overlaps) {
 
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
 
@@ -149,6 +157,11 @@ public class PatternsValidation {
 			}
 			if (method.containsAll(episode.getEvents())) {
 				Event methodName = getMethodName(method, events);
+				
+				if (overlaps.contains(methodName.getMethod().getDeclaringType())) {
+					Logger.log("Skipping overlapping method from validation!");
+					continue;
+				}
 				enclMethods.addMethod(episode, method, methodName);
 			}
 		}
@@ -167,7 +180,8 @@ public class PatternsValidation {
 		Episode pattern = transClosure.remTransClosure(episode);
 		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
 				pattern, events);
-		graphWriter.write(graph, getGraphPath(frequency, epiosodeType, patternId));
+		graphWriter.write(graph,
+				getGraphPath(frequency, epiosodeType, patternId));
 	}
 
 	private String getGraphPath(int frequency, EpisodeType episodeType,
@@ -223,13 +237,6 @@ public class PatternsValidation {
 
 		Set<IMethodName> methodOcc = methodsOrderRelation
 				.getMethodNames(methodsOrderRelation.getOccurrences());
-		if (methodOcc.size() == 1) {
-			for (IMethodName methodName : methodOcc) {
-				if (methodName.equals(Names.getUnknownMethod())) {
-					return 0;
-				}
-			}
-		}
 		Set<String> repositories = Sets.newLinkedHashSet();
 
 		Logger.log("Number of repositories is %d!", repoCtxMapper.size());
@@ -237,9 +244,6 @@ public class PatternsValidation {
 				.entrySet()) {
 			Logger.log("Analyzing repo %s ...", entry.getKey());
 			for (IMethodName methodName : entry.getValue()) {
-				if (methodName.equals(Names.getUnknownMethod())) {
-					continue;
-				}
 				if (methodOcc.contains(methodName)) {
 					repositories.add(entry.getKey());
 					break;

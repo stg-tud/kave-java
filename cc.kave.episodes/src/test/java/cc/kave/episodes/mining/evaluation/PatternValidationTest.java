@@ -29,6 +29,7 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.IndivReposParser;
@@ -42,6 +43,7 @@ import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
+import cc.kave.episodes.preprocessing.OverlapingTypes;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
@@ -70,6 +72,8 @@ public class PatternValidationTest {
 	private EpisodeToGraphConverter episodeToGraph;
 	@Mock
 	private IndivReposParser reposParser;
+	@Mock
+	private OverlapingTypes overlaps;
 
 	private EpisodeAsGraphWriter graphWriter;
 
@@ -82,6 +86,8 @@ public class PatternValidationTest {
 	private List<Event> valStream;
 
 	private DirectedGraph<Fact, DefaultEdge> graph;
+
+	private Set<ITypeName> typeOverlaps;
 
 	private static final int FREQUENCY = 5;
 
@@ -129,15 +135,20 @@ public class PatternValidationTest {
 		episodes = Sets.newHashSet(ep);
 		patterns.put(2, episodes);
 
-		valStream = Lists.newArrayList(firstCtx(1), enclCtx(2), inv(3), inv(4),
+		valStream = Lists.newArrayList(firstCtx(1), enclCtx(3), inv(3), inv(4),
 				firstCtx(5), superCtx(6), enclCtx(7), inv(3), firstCtx(0),
-				enclCtx(8), inv(4), inv(3), firstCtx(5), enclCtx(9), inv(3));
+				enclCtx(4), inv(4), inv(3), firstCtx(5), enclCtx(9), inv(3),
+				firstCtx(0), enclCtx(7), inv(2), inv(3), firstCtx(2),
+				enclCtx2(4), inv(2), inv(3));
+
+		typeOverlaps = Sets.newHashSet(enclCtx(7).getMethod()
+				.getDeclaringType(), enclCtx(9).getMethod().getDeclaringType());
 
 		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 
 		sut = new PatternsValidation(patternsFolder.getRoot(), episodeFilter,
 				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser);
+				graphWriter, validationDataIo, reposParser, overlaps);
 
 		when(eventStream.parseEventStream(anyInt())).thenReturn(streamMethods);
 		when(eventStream.readMapping(anyInt())).thenReturn(trainEvents);
@@ -150,6 +161,7 @@ public class PatternValidationTest {
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
 		when(reposParser.getRepoCtxMapper()).thenReturn(repoMethods);
+		when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
 	}
 
 	@Test
@@ -158,7 +170,7 @@ public class PatternValidationTest {
 		thrown.expectMessage("Patterns folder does not exist");
 		sut = new PatternsValidation(new File("does not exist"), episodeFilter,
 				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser);
+				graphWriter, validationDataIo, reposParser, overlaps);
 	}
 
 	@Test
@@ -168,7 +180,7 @@ public class PatternValidationTest {
 		thrown.expectMessage("Patterns is not a folder, but a file");
 		sut = new PatternsValidation(patternsFile, episodeFilter, eventStream,
 				episodeParser, transClosure, episodeToGraph, graphWriter,
-				validationDataIo, reposParser);
+				validationDataIo, reposParser, overlaps);
 	}
 
 	@Test
@@ -184,6 +196,7 @@ public class PatternValidationTest {
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoCtxMapper();
+		verify(overlaps).getOverlaps(anyInt());
 	}
 
 	@Test
@@ -213,14 +226,15 @@ public class PatternValidationTest {
 
 		sut.validate(FREQUENCY, EpisodeType.SEQUENTIAL);
 
-		String actuals = FileUtils.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
+		String actuals = FileUtils
+				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Patterns with 2-nodes:\n");
 		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 		sb.append("0\t");
 		sb.append("[2, 3, 2>3]\t");
-		sb.append("1\t1.0\t1\t0\n\n");
+		sb.append("1\t1.0\t1\t1\n\n");
 
 		assertEquals(sb.toString(), actuals);
 	}
@@ -249,6 +263,10 @@ public class PatternValidationTest {
 	private static Event enclCtx(int i) {
 		return Events.newContext(m(i));
 	}
+	
+	private static Event enclCtx2(int i) {
+		return Events.newContext(m2(i));
+	}
 
 	private static Event dummy() {
 		return Events.newDummyEvent();
@@ -261,6 +279,14 @@ public class PatternValidationTest {
 			return Names.newMethod("[T,P] [T,P].m" + i + "()");
 		}
 	}
+	
+	private static IMethodName m2(int i) {
+		if (i == 0) {
+			return Names.getUnknownMethod();
+		} else {
+			return Names.newMethod("[T2,P2] [T2,P2].m" + i + "()");
+		}
+	}
 
 	private String getPath(EpisodeType episodeType) {
 		String path = patternsFolder.getRoot().getAbsolutePath() + "/freq"
@@ -269,7 +295,8 @@ public class PatternValidationTest {
 	}
 
 	private File getPatternFile(EpisodeType episodeType, int patternId) {
-		File patternFile = new File(getPath(episodeType) + "/pattern" + patternId + ".dot");
+		File patternFile = new File(getPath(episodeType) + "/pattern"
+				+ patternId + ".dot");
 		return patternFile;
 	}
 
