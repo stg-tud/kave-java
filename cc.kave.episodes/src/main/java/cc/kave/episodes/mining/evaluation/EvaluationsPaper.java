@@ -75,14 +75,14 @@ public class EvaluationsPaper {
 //		Logger.log("Number of learned patterns is %d", genEvents.size());
 //
 		Map<Integer, Set<Episode>> seqPatterns = episodeParser.parse(frequency,
-				EpisodeType.SEQUENTIAL);
+				EpisodeType.PARALLEL);
 		Set<Set<Fact>> seqEvents = getEpisodeEvents(seqPatterns);
 
 		Set<Episode> genNoSeq = getNotOverlaps(genPatterns, seqEvents);
 		Set<Episode> seqNoGen = getNotOverlaps(seqPatterns, genEvents);
 
 		storePatternsGraph(genNoSeq, frequency, events, EpisodeType.GENERAL);
-		storePatternsGraph(seqNoGen, frequency, events, EpisodeType.SEQUENTIAL);
+		storePatternsGraph(seqNoGen, frequency, events, EpisodeType.PARALLEL);
 	}
 
 	private void storePatternsGraph(Set<Episode> nonOverlapsPatterns,

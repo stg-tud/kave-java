@@ -144,25 +144,27 @@ public class PatternsComparison {
 		
 //		List<Tuple<List<Fact>, Event>> stream = eventStream
 //				.parseEventStream(frequency);
-		Episode pattern = getPattern(846, 0.950654, "70", "71", "672", "64",
-				"70>71", "70>672", "70>64", "71>64", "672>64");
+		Episode pattern = getPattern(643, 0.608086, "118", "121", "564");
 		
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
-		
+		int numMethods = 0;
 //		for (Tuple<List<Fact>, Event> tuple : stream) {
 		for (int idx = 0; idx < stream.size(); idx++) {
 //			List<Fact> method = tuple.getFirst();
 			List<Fact> method = stream.get(idx);
 //			Event methodCtx = tuple.getSecond();
 			
-			if (method.size() < 5) {
+			if (method.size() < 2) {
 				continue;
 			}
 			if (method.containsAll(pattern.getEvents())) {
 				enclMethods.addMethod(pattern, method, ctxs.get(idx));
+				numMethods = enclMethods.getOccurrences();
+			}
+			if (numMethods > 10) {
+				break;
 			}
 		}
-		int numMethods = enclMethods.getOccurrences();
 		Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
 		
 		for (IMethodName eventName : methodNames) {
