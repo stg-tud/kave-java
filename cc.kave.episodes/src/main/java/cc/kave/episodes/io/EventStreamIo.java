@@ -111,15 +111,12 @@ public class EventStreamIo {
 	public List<Tuple<List<Fact>, Event>> parseEventStream(int freq) {
 		List<Tuple<List<Fact>, Event>> result = Lists.newLinkedList();
 
-		Logger.log("Reading stream ...");
 		List<List<Fact>> stream = parseStream(freq);
-		Logger.log("Reading enclosing methods ...");
 		List<Event> methods = readMethods(freq);
 
 		assertTrue(stream.size() <= methods.size(),
 				"Wrong parsing of stream and method files!");
 
-		Logger.log("Merging stream with enclosing methods ....");
 		int streamId = 0;
 		for (int idx = 0; idx < stream.size(); idx++) {
 			if ((streamId % 100000) == 0) {

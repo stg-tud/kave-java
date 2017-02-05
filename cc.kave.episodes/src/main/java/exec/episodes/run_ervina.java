@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.EvaluationsPaper;
-import cc.kave.episodes.mining.evaluation.PatternsComparison;
+import cc.kave.episodes.mining.evaluation.PatternsValidation;
+import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -61,10 +61,10 @@ public class run_ervina {
 		
 //		load(StreamAndMethodChecker.class).checkLengths();
 //		load(EventsReader.class).read(FREQ);
-//		load(PatternsValidation.class).validate(FREQ, EpisodeType.GENERAL);
+		load(PatternsValidation.class).validate(FREQ, EpisodeType.GENERAL);
 //		load(PatternsComparison.class).coverage(FREQ, EpisodeType.PARALLEL, EpisodeType.SEQUENTIAL);
 //		load(PatternsComparison.class).printCommonPatterns(FREQ, EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
-		load(PatternsComparison.class).extractConcreteCode(FREQ);
+//		load(PatternsComparison.class).extractConcreteCode(FREQ);
 		
 //		load(PatternsIdentifier.class).trainingCode(FREQ, EpisodeType.GENERAL);
 		

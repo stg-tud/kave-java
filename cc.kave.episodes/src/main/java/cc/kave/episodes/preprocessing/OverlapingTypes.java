@@ -48,6 +48,14 @@ public class OverlapingTypes {
 			if ((event.getKind() == EventKind.METHOD_DECLARATION)
 					&& (!event.getMethod().equals(Names.getUnknownMethod()))) {
 				try {
+					ITypeName typeName = event.getMethod().getDeclaringType();
+					String fullName = typeName.getFullName();
+					String name = event.getMethod().getName();
+					String methodName = fullName + "." + name;
+					
+					Logger.log("Type name is: %s", typeName);
+					Logger.log("Method name: %s", methodName);
+					
 					valTypes.add(event.getMethod().getDeclaringType());
 				} catch (Exception e) {
 				}

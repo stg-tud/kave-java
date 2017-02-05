@@ -43,7 +43,6 @@ import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
-import cc.kave.episodes.preprocessing.OverlapingTypes;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
@@ -72,8 +71,8 @@ public class PatternValidationTest {
 	private EpisodeToGraphConverter episodeToGraph;
 	@Mock
 	private IndivReposParser reposParser;
-	@Mock
-	private OverlapingTypes overlaps;
+//	@Mock
+//	private OverlapingTypes overlaps;
 
 	private EpisodeAsGraphWriter graphWriter;
 
@@ -148,7 +147,7 @@ public class PatternValidationTest {
 
 		sut = new PatternsValidation(patternsFolder.getRoot(), episodeFilter,
 				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser, overlaps);
+				graphWriter, validationDataIo, reposParser);
 
 		when(eventStream.parseEventStream(anyInt())).thenReturn(streamMethods);
 		when(eventStream.readMapping(anyInt())).thenReturn(trainEvents);
@@ -161,7 +160,7 @@ public class PatternValidationTest {
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
 		when(reposParser.getRepoCtxMapper()).thenReturn(repoMethods);
-		when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
+//		when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
 	}
 
 	@Test
@@ -170,7 +169,7 @@ public class PatternValidationTest {
 		thrown.expectMessage("Patterns folder does not exist");
 		sut = new PatternsValidation(new File("does not exist"), episodeFilter,
 				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser, overlaps);
+				graphWriter, validationDataIo, reposParser);
 	}
 
 	@Test
@@ -180,7 +179,7 @@ public class PatternValidationTest {
 		thrown.expectMessage("Patterns is not a folder, but a file");
 		sut = new PatternsValidation(patternsFile, episodeFilter, eventStream,
 				episodeParser, transClosure, episodeToGraph, graphWriter,
-				validationDataIo, reposParser, overlaps);
+				validationDataIo, reposParser);
 	}
 
 	@Test
@@ -196,18 +195,7 @@ public class PatternValidationTest {
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoCtxMapper();
-		verify(overlaps).getOverlaps(anyInt());
-	}
-
-	@Test
-	public void excepsionIsCalled() throws Exception {
-		Episode ep = createEpisode(3, 0.8, "1", "2", "3", "1>2", "1>3");
-		patterns.put(3, Sets.newHashSet(ep));
-
-		thrown.expect(Exception.class);
-		thrown.expectMessage("Episode is not found sufficient number of times in the Training Data!");
-
-		sut.validate(FREQUENCY, EpisodeType.PARALLEL);
+//		verify(overlaps).getOverlaps(anyInt());
 	}
 
 	@Test
