@@ -88,6 +88,7 @@ public class PatternValidationTest {
 	private Set<ITypeName> typeOverlaps;
 
 	private static final int FREQUENCY = 5;
+	private static final int FOLDNUM = 0;
 
 	private PatternsValidation sut;
 
@@ -149,8 +150,8 @@ public class PatternValidationTest {
 				eventStream, episodeParser, transClosure, episodeToGraph,
 				graphWriter, validationDataIo, reposParser);
 
-		when(eventStream.parseStream(anyInt())).thenReturn(streamMethods);
-		when(eventStream.readMapping(anyInt())).thenReturn(trainEvents);
+		when(eventStream.parseStream(anyInt(), anyInt())).thenReturn(streamMethods);
+		when(eventStream.readMapping(anyInt(), anyInt())).thenReturn(trainEvents);
 		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(
 				patterns);
 		when(episodeFilter.filter(any(Map.class), anyInt(), anyDouble()))
@@ -187,8 +188,8 @@ public class PatternValidationTest {
 		sut.validate(FREQUENCY, EpisodeType.GENERAL);
 		;
 
-		verify(eventStream).parseStream(anyInt());
-		verify(eventStream).readMapping(anyInt());
+		verify(eventStream).parseStream(anyInt(), anyInt());
+		verify(eventStream).readMapping(anyInt(), anyInt());
 		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
 		verify(validationDataIo).read(anyInt());

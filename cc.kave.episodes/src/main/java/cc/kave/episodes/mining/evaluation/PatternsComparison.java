@@ -140,7 +140,7 @@ public class PatternsComparison {
 	}
 
 	public void extractConcreteCode(int frequency) {
-		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(frequency);
+		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(frequency, 0);
 		
 //		List<Tuple<List<Fact>, Event>> stream = eventStream
 //				.parseEventStream(frequency);
@@ -263,7 +263,7 @@ public class PatternsComparison {
 
 	private void store(int freq, Set<Episode> episodes, EpisodeType type,
 			int setNum) throws IOException {
-		List<Event> events = eventStream.readMapping(freq);
+		List<Event> events = eventStream.readMapping(freq, 0);
 		int episodeId = 0;
 
 		for (Episode ep : episodes) {

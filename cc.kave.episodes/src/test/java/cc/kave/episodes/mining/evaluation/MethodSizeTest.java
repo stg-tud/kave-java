@@ -33,6 +33,7 @@ public class MethodSizeTest {
 	private EventStreamIo streamIo;
 
 	private static final int FREQUENCY = 5;
+	private static final int FOLDNUM = 0;
 
 	private MethodSize sut;
 
@@ -75,7 +76,7 @@ public class MethodSizeTest {
 	public void logger() {
 		Logger.clearLog();
 
-		streamIo.write(eventStream, FREQUENCY);
+		streamIo.write(eventStream, FREQUENCY, FOLDNUM);
 
 		assertTrue(new File(getStreamPath(FREQUENCY)).exists());
 		assertTrue(new File(getMappingPath(FREQUENCY)).exists());

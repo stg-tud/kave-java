@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.preprocessing.Checkings;
 import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 
@@ -49,7 +50,8 @@ public class run {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(PreprocessingFolded.class).runPreparation(FREQTHRESH);;
+//		load(PreprocessingFolded.class).runPreparation(FREQTHRESH);
+		load(Checkings.class).methodsOverlap();
 		
 //		load(ReposPreprocess.class).generate(FREQTHRESH);
 		

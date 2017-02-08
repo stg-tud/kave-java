@@ -48,6 +48,7 @@ public class PreprocessingFoldedTest {
 	private ValidationDataIO validationIo;
 
 	private static final int NUM_FOLD = 10;
+	private static final int FOLDNUM = 10;
 	private static final int FREQTHRESH = 5;
 
 	private PreprocessingFolded sut;
@@ -60,7 +61,7 @@ public class PreprocessingFoldedTest {
 
 		when(repoParser.generateReposEvents()).thenReturn(generateMapper());
 
-		doNothing().when(trainingIo).write(any(EventStream.class), anyInt());
+		doNothing().when(trainingIo).write(any(EventStream.class), anyInt(), anyInt());
 		doNothing().when(validationIo).write(anyListOf(Event.class), anyInt());
 	}
 
@@ -70,7 +71,7 @@ public class PreprocessingFoldedTest {
 
 		verify(repoParser).generateReposEvents();
 
-		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt());
+		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt(), anyInt());
 		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt());
 	}
 

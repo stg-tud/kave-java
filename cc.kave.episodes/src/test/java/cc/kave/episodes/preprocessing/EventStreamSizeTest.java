@@ -33,7 +33,8 @@ public class EventStreamSizeTest {
 	private EventStream es1;
 	private EventStreamIo streamIo;
 
-	private static final int NUM_FOLDS = 2;
+	private static final int FREQUENCY = 2;
+	private static final int NUM_FOLDS = 0;
 	private static final int SIZELIMIT = 3;
 
 	private EventStreamSize sut;
@@ -52,8 +53,8 @@ public class EventStreamSizeTest {
 		es1 = addEvents(first(0), sup(2), ctx(3), inv(7), inv(5), first(8),
 				ctx(4), inv(4), inv(5));
 
-		streamIo.write(es0, NUM_FOLDS);
-		streamIo.write(es1, NUM_FOLDS);
+		streamIo.write(es0, FREQUENCY, NUM_FOLDS);
+		streamIo.write(es1, FREQUENCY, NUM_FOLDS);
 
 		sut = new EventStreamSize(rootFolder.getRoot());
 	}

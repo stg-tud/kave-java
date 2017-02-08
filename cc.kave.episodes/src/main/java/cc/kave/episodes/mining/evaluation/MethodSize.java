@@ -22,10 +22,10 @@ public class MethodSize {
 	private EventStreamIo eventStreamIo;
 
 	public void statistics(int frequency, int methodLength) {
-		List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency);
+		List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency, 0);
 		int streamLength = calcStreamLength(stream);
 		
-		List<Event> events = eventStreamIo.readMapping(frequency);
+		List<Event> events = eventStreamIo.readMapping(frequency, 0);
 
 		Set<Event> uniqMethods = numCtxs(stream);
 		assertTrue(uniqMethods.size() <= stream.size(), "Error in converting List to Set!");

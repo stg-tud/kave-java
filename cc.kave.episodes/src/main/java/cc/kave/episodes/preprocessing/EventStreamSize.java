@@ -31,7 +31,7 @@ public class EventStreamSize {
 		int numEvents = 0;
 
 		for (int fold = 0; fold < frequency; fold++) {
-			List<Event> mapping = eventStreamIo.readMapping(frequency);
+			List<Event> mapping = eventStreamIo.readMapping(frequency, 0);
 
 			if (mapping.size() > numEvents) {
 				numEvents = mapping.size();
@@ -43,7 +43,7 @@ public class EventStreamSize {
 	public void printMethodSize(int frequency, int sizeLimit) {
 
 		for (int fold = 0; fold < frequency; fold++) {
-			List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency);
+			List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency, 0);
 			
 			for (Tuple<Event, List<Fact>> m : stream) {
 				if (m.getSecond().size() > sizeLimit) {

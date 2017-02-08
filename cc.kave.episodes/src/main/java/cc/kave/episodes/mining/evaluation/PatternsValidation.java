@@ -78,10 +78,10 @@ public class PatternsValidation {
 	public void validate(int frequency, EpisodeType episodeType)
 			throws Exception {
 		Logger.log("Reading events ...");
-		List<Event> trainEvents = eventStream.readMapping(frequency);
+		List<Event> trainEvents = eventStream.readMapping(frequency, 0);
 		Logger.log("Reading training stream ...");
 		List<Tuple<Event, List<Fact>>> streamContexts = eventStream
-				.parseStream(frequency);
+				.parseStream(frequency, 0);
 
 		Logger.log("Reading episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency,

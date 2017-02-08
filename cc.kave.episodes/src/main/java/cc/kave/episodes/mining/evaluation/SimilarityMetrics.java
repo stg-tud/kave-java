@@ -64,7 +64,7 @@ public class SimilarityMetrics {
 	}
 
 	public void validate(int frequency) throws Exception {
-		List<Event> mapping = eventStreamIo.readMapping(frequency);
+		List<Event> mapping = eventStreamIo.readMapping(frequency, 0);
 
 		Map<Integer, Set<Episode>> episodes = episodeProcessor.filter(
 				Maps.newHashMap(), 500, 0.6);

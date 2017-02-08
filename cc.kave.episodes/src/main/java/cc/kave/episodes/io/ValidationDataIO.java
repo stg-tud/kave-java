@@ -20,9 +20,9 @@ public class ValidationDataIO {
 	
 	@Inject
 	public ValidationDataIO(@Named("events") File folder) {
-		assertTrue(folder.exists(), "Repositories folder does not exist");
+		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(),
-				"Repositories is not a folder, but a file");
+				"Events is not a folder, but a file");
 		this.repoDir = folder;
 	}
 	
@@ -43,7 +43,7 @@ public class ValidationDataIO {
 		if (!path.exists()) {
 			path.mkdir();
 		}
-		File fileName = new File(path.getAbsoluteFile() + "/stream0.json");
+		File fileName = new File(path.getAbsoluteFile() + "/stream0.txt");
 		return fileName;
 	}
 }

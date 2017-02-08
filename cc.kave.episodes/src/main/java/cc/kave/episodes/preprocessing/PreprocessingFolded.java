@@ -46,7 +46,7 @@ public class PreprocessingFolded {
 					repos);
 			EventStream trainingStream = EventsFilter.filterStream(
 					trainingData, frequency);
-			eventStreamIo.write(trainingStream, frequency);
+			eventStreamIo.write(trainingStream, frequency, curFold);
 			trainingData.clear();
 			trainingStream.delete();
 

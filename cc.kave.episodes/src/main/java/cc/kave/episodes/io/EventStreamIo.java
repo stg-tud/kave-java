@@ -50,46 +50,46 @@ public class EventStreamIo {
 		this.eventsDir = folder;
 	}
 
-	public void write(EventStream stream, int frequency) {
+	public void write(EventStream stream, int frequency, int foldNum) {
 		try {
-			FileUtils
-					.writeStringToFile(new File(getTrainPath(frequency).streamTextPath),
-							stream.getStreamText());
-			JsonUtils.toJson(stream.getMapping(), new File(
-					getTrainPath(frequency).mappingPath));
-			JsonUtils.toJson(stream.getStreamData(), new File(
-					getTrainPath(frequency).streamDataPath));
+			FileUtils.writeStringToFile(
+					new File(getTrainPath(frequency, foldNum).streamTextPath),
+					stream.getStreamText());
+			JsonUtils.toJson(stream.getMapping(),
+					new File(getTrainPath(frequency, foldNum).mappingPath));
+			JsonUtils.toJson(stream.getStreamData(),
+					new File(getTrainPath(frequency, foldNum).streamDataPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public List<Event> readMapping(int freq) {
-		String mappingPath = getTrainPath(freq).mappingPath;
+
+	public List<Event> readMapping(int freq, int foldNum) {
+		String mappingPath = getTrainPath(freq, foldNum).mappingPath;
 
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
 		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
-	
-	public String readStreamText(int frequency) throws IOException {
-		String streamPath = getTrainPath(frequency).streamTextPath;
-		
+
+	public String readStreamText(int frequency, int foldNum) throws IOException {
+		String streamPath = getTrainPath(frequency, foldNum).streamTextPath;
+
 		String stream = FileUtils.readFileToString(new File(streamPath));
-		
+
 		return stream;
 	}
 
-	public List<Tuple<Event, List<Fact>>> parseStream(int frequency) {
+	public List<Tuple<Event, List<Fact>>> parseStream(int frequency, int foldNum) {
 		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
-		
-		List<Tuple<Event, String>> stream = readStreamData(frequency);
-		
+
+		List<Tuple<Event, String>> stream = readStreamData(frequency, foldNum);
+
 		for (Tuple<Event, String> methodTuple : stream) {
 			List<Fact> methodFacts = Lists.newLinkedList();
 			String[] lines = methodTuple.getSecond().split("\n");
-			
+
 			for (String line : lines) {
 				String[] eventTime = line.split(",");
 				int eventID = Integer.parseInt(eventTime[0]);
@@ -100,34 +100,36 @@ public class EventStreamIo {
 		return results;
 	}
 
-	private List<Tuple<Event, String>> readStreamData(int frequency) {
-		String streamPath = getTrainPath(frequency).streamDataPath;
-		
+	private List<Tuple<Event, String>> readStreamData(int frequency, int foldNum) {
+		String streamPath = getTrainPath(frequency, foldNum).streamDataPath;
+
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Tuple<Event, String>>>() {
 		}.getType();
-		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(streamPath), type);
+		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(
+				streamPath), type);
 		assertMethods(stream);
 		return stream;
 	}
 
 	private void assertMethods(List<Tuple<Event, String>> stream) {
 		for (Tuple<Event, String> tuple : stream) {
-			assertTrue(tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
+			assertTrue(
+					tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
 					"Stream contexts contains invalid mehod contexts");
 		}
 
 	}
-	
+
 	private class TrainingPath {
 		String streamTextPath = "";
 		String mappingPath = "";
 		String streamDataPath = "";
 	}
 
-	private TrainingPath getTrainPath(int freq) {
+	private TrainingPath getTrainPath(int freq, int foldNum) {
 		File path = new File(eventsDir.getAbsolutePath() + "/freq" + freq
-				+ "/TrainingData/fold0");
+				+ "/TrainingData/fold" + foldNum);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

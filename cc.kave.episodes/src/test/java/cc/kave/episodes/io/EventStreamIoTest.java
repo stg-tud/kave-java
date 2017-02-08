@@ -54,6 +54,7 @@ public class EventStreamIoTest {
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
 	private static final int FREQUENCY = 2;
+	private static final int FOLDNUM = 0;
 
 	File mappingFile;
 	File streamTextFile;
@@ -94,11 +95,11 @@ public class EventStreamIoTest {
 		stream.add(Tuple.newTuple(inv(4), "2,1.503\n3,1.504\n"));
 
 		JsonUtils.toJson(stream, getStreamDataFile());
-		
+
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Stream contexts contains invalid mehod contexts");
-		
-		sut.parseStream(FREQUENCY);
+
+		sut.parseStream(FREQUENCY, FOLDNUM);
 	}
 
 	@Test
@@ -127,25 +128,25 @@ public class EventStreamIoTest {
 		expStreamData.add(Tuple.newTuple(ctx(2), method2));
 		expStreamData.add(Tuple.newTuple(ctx(4), method3));
 
-		sut.write(eventStream, FREQUENCY);
+		sut.write(eventStream, FREQUENCY, FOLDNUM);
 
 		assertTrue(streamTextFile.exists());
 		assertTrue(mappingFile.exists());
 		assertTrue(streamDataFile.exists());
 
-		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
 
-		String actStreamText = sut.readStreamText(FREQUENCY);
+		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
 
-		List<Tuple<Event, List<Fact>>> actStreamData = sut
-				.parseStream(FREQUENCY);
+		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
+				FREQUENCY, FOLDNUM);
 
 		assertMapping(eventStream.getMapping(), actMapping);
 
 		assertEquals(expStreamData, actStreamData);
 
 		assertEquals(eventStream.getStreamText(), actStreamText);
-		
+
 		assertTrue(actMapping.size() == 4);
 	}
 
@@ -179,21 +180,21 @@ public class EventStreamIoTest {
 		expStreamData.add(Tuple.newTuple(ctx(2), method2));
 		expStreamData.add(Tuple.newTuple(ctx(4), method3));
 
-		sut.write(eventStream, FREQUENCY);
+		sut.write(eventStream, FREQUENCY, FOLDNUM);
 
-		List<Event> actMapping = sut.readMapping(FREQUENCY);
+		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
 
-		String actStreamText = sut.readStreamText(FREQUENCY);
+		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
 
-		List<Tuple<Event, List<Fact>>> actStreamData = sut
-				.parseStream(FREQUENCY);
+		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
+				FREQUENCY, FOLDNUM);
 
 		assertMapping(eventStream.getMapping(), actMapping);
 
 		assertEquals(expStreamData, actStreamData);
 
 		assertEquals(eventStream.getStreamText(), actStreamText);
-		
+
 		assertTrue(actMapping.size() == 4);
 	}
 
@@ -226,7 +227,7 @@ public class EventStreamIoTest {
 
 	private String getPath() {
 		File path = new File(tmp.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY + "/TrainingData/fold0");
+				+ FREQUENCY + "/TrainingData/fold" + FOLDNUM);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

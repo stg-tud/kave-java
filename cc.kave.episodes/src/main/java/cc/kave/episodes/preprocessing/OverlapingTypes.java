@@ -32,7 +32,7 @@ public class OverlapingTypes {
 	}
 
 	public Set<ITypeName> getOverlaps(int frequency) {
-		List<Tuple<Event, List<Fact>>> trainCtx = trainStreamIo.parseStream(frequency);
+		List<Tuple<Event, List<Fact>>> trainCtx = trainStreamIo.parseStream(frequency, 0);
 		Set<ITypeName> trainTyes = Sets.newLinkedHashSet();
 		Set<ITypeName> valTypes = Sets.newLinkedHashSet();
 
