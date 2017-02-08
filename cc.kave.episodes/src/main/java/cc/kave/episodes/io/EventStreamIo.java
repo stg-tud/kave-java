@@ -55,19 +55,19 @@ public class EventStreamIo {
 	public void write(EventStream stream, int freq) {
 		try {
 			FileUtils
-					.writeStringToFile(new File(getTrainPath(freq).streamPath),
-							stream.getStream());
+					.writeStringToFile(new File(getTrainPath(freq).streamTextPath),
+							stream.getStreamText());
 			JsonUtils.toJson(stream.getMapping(), new File(
 					getTrainPath(freq).mappingPath));
-			JsonUtils.toJson(stream.getMethodCtxs(), new File(
-					getTrainPath(freq).methodsPath));
+			JsonUtils.toJson(stream.getStreamData(), new File(
+					getTrainPath(freq).streamDataPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public String readStream(int freq) throws IOException {
-		String streamFile = getTrainPath(freq).streamPath;
+		String streamFile = getTrainPath(freq).streamTextPath;
 		String stream = FileUtils.readFileToString(new File(streamFile));
 		return stream;
 	}
@@ -76,7 +76,7 @@ public class EventStreamIo {
 		List<List<Fact>> stream = Lists.newLinkedList();
 		List<Fact> method = Lists.newLinkedList();
 
-		String streamPath = getTrainPath(freq).streamPath;
+		String streamPath = getTrainPath(freq).streamTextPath;
 		List<String> lines = readlines(streamPath);
 
 		double timer = 0.0;
@@ -98,7 +98,7 @@ public class EventStreamIo {
 	}
 
 	public List<Event> readMethods(int freq) {
-		String methodsPath = getTrainPath(freq).methodsPath;
+		String methodsPath = getTrainPath(freq).streamDataPath;
 
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
@@ -135,7 +135,7 @@ public class EventStreamIo {
 		}
 
 	}
-
+	
 	public List<Event> readMapping(int freq) {
 		String mappingPath = getTrainPath(freq).mappingPath;
 
@@ -157,9 +157,9 @@ public class EventStreamIo {
 	}
 
 	private class TrainingPath {
-		String streamPath = "";
+		String streamTextPath = "";
 		String mappingPath = "";
-		String methodsPath = "";
+		String streamDataPath = "";
 	}
 
 	private TrainingPath getTrainPath(int freq) {
@@ -169,9 +169,9 @@ public class EventStreamIo {
 			path.mkdirs();
 		}
 		TrainingPath trainPath = new TrainingPath();
-		trainPath.streamPath = path.getAbsolutePath() + "/stream.txt";
+		trainPath.streamTextPath = path.getAbsolutePath() + "/stream.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
-		trainPath.methodsPath = path.getAbsolutePath() + "/methods.txt";
+		trainPath.streamDataPath = path.getAbsolutePath() + "/streamData.json";
 
 		return trainPath;
 	}

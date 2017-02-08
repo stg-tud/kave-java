@@ -115,8 +115,8 @@ public class EventsFilterTest {
 	public void filterStream1() {
 		EventStream actuals = EventsFilter.filterStream(events1, REMFREQS);
 
-		
-		assertEquals(expStream1.getStream(), actuals.getStream());
+		assertEquals(expStream1.getStreamData(), actuals.getStreamData());
+		assertEquals(expStream1.getStreamText(), actuals.getStreamText());
 		assertEquals(expStream1.getMapping(), actuals.getMapping());
 		assertTrue(expStream1.equals(actuals));
 	}
@@ -126,9 +126,9 @@ public class EventsFilterTest {
 		EventStream actuals = EventsFilter.filterStream(events2, REMFREQS);
 
 		
-		assertEquals(expStream2.getStream(), actuals.getStream());
-		assertEquals(expStream2.getMapping(), actuals.getMapping());
-		assertTrue(actuals.getMethodCtxs().size() == 6);
+		assertEquals(expStream1.getStreamData(), actuals.getStreamData());
+		assertEquals(expStream1.getStreamText(), actuals.getStreamText());
+		assertTrue(actuals.getStreamData().size() == 6);
 		assertTrue(expStream2.equals(actuals));
 	}
 

@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,10 +39,9 @@ public class EventStream {
 	private static final double TIMEOUT = 0.5;
 
 	private Map<Event, Integer> eventsMapper = Maps.newLinkedHashMap();
-	private Map<Event, StringBuilder> stream = Maps.newLinkedHashMap();
+	private List<Tuple<Event, String>> stream = Lists.newLinkedList();
+	private Event methodCtx = null;
 	private StringBuilder sb = new StringBuilder();
-	private List<Event> ctxs = Lists.newLinkedList();
-	private int numMethods = 0;
 
 	private boolean isFirstMethod = true;
 	private double time = 0.000;
@@ -50,20 +50,23 @@ public class EventStream {
 		this.eventsMapper.put(Events.newDummyEvent(), 0);
 	}
 
-	public String getStream() {
-		return this.sb.toString();
-	}
-
 	public Set<Event> getMapping() {
 		return this.eventsMapper.keySet();
 	}
 
-	public List<Event> getMethodCtxs() {
-		return this.ctxs;
+	public String getStreamText() {
+		StringBuilder streamBuilder = new StringBuilder();
+		IsLastMethodIncluded();
+		
+		for (Tuple<Event, String> tuple : stream) {
+			streamBuilder.append(tuple.getSecond());
+		}
+		return streamBuilder.toString();
 	}
-
-	public int getNumMethods() {
-		return this.numMethods;
+	
+	public List<Tuple<Event, String>> getStreamData() {
+		IsLastMethodIncluded();
+		return this.stream;
 	}
 
 	public void addEvent(Event event) {
@@ -71,16 +74,12 @@ public class EventStream {
 		possiblyIncreaseTimout(event);
 
 		if (event.getKind() == EventKind.METHOD_DECLARATION) {
-			ctxs.add(event);
-			assertTrue(this.numMethods == this.ctxs.size(),
-					"Mismatch between number of methods and enclosing methods!");
+			methodCtx = event;
 			return;
 		}
-		
 		if (event.getMethod().isUnknown()) {
 			return;
 		}
-
 		int idx = ensureEventExistsAndGetId(event);
 
 		addEventIdToStream(idx);
@@ -99,7 +98,7 @@ public class EventStream {
 		if (eventsMapper.containsKey(event)) {
 			return eventsMapper.get(event);
 		} else {
-			int idx = getMapping().size();
+			int idx = this.eventsMapper.size();
 			eventsMapper.put(event, idx);
 			return idx;
 		}
@@ -107,18 +106,43 @@ public class EventStream {
 
 	private void possiblyIncreaseTimout(Event event) {
 		if (event.getKind() == EventKind.FIRST_DECLARATION) {
-			numMethods++;
-			if (!isFirstMethod) {
-				time += TIMEOUT;
+			if (isFirstMethod) {
+				return;
 			}
+			addStream();
+			time += TIMEOUT;
 		}
 		isFirstMethod = false;
 	}
 	
+	private void addStream() {
+		if (!(sb.toString().isEmpty())) {
+			assertTrue(methodCtx != null, "Method element is null!");
+			
+			stream.add(Tuple.newTuple(methodCtx, sb.toString()));
+			methodCtx = null;
+			sb = new StringBuilder();
+		}
+	}
+	
+	private void IsLastMethodIncluded() {
+		if (!(sb.toString().isEmpty())) {
+			assertTrue(methodCtx != null, "Method element is null!");
+			Tuple<Event, String> lastMethod = Tuple.newTuple(methodCtx, sb.toString());
+			
+			if (!stream.contains(lastMethod)) {
+				stream.add(lastMethod);
+			}
+		}
+	}
+
 	public void delete() {
-		this.ctxs.clear();
-		this.eventsMapper.clear();
 		this.sb.delete(0, sb.length());
+		this.methodCtx = null;
+		this.isFirstMethod = true;
+		this.time = 0.000;
+		this.eventsMapper.clear();
+		this.stream.clear();
 	}
 
 	@Override
@@ -138,13 +162,13 @@ public class EventStream {
 	}
 
 	public boolean equals(EventStream sm) {
-		if (!this.eventsMapper.equals(sm.getMapping())) {
+		if (!(this.getMapping().equals(sm.getMapping()))) {
 			return false;
 		}
-		if (!this.sb.toString().equals(sm.getStream())) {
+		if (!(this.getStreamText().equals(sm.getStreamText()))) {
 			return false;
 		}
-		if (!this.getMethodCtxs().equals(sm.getMethodCtxs())) {
+		if (!(this.getStreamData().equals(sm.getStreamData()))) {
 			return false;
 		}
 		return true;
