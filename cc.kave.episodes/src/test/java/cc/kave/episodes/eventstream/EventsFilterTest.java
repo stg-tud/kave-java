@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 
 public class EventsFilterTest {
 
-	private static final int REMFREQS = 2;
+	private static final int FREQUENCY = 2;
 
 	private List<Event> events1;
 	private List<Event> events2;
@@ -51,13 +51,6 @@ public class EventsFilterTest {
 									firstCtx(1), enclCtx(6), inv(2), inv(3), 
 									firstCtx(3), superCtx(4), enclCtx(0), inv(3));
 		
-		events2 = Lists.newArrayList(firstCtx(1), enclCtx(0),
-									firstCtx(0), superCtx(2), enclCtx(7), inv(5), inv(0), 
-									firstCtx(1), enclCtx(6), inv(2), inv(3), 
-									firstCtx(0), enclCtx(8), 
-									firstCtx(1), enclCtx(9), inv(3), inv(2), 
-									firstCtx(3), superCtx(4), enclCtx(0));
-
 		expStream1 = new EventStream();
 		expStream1.addEvent(firstCtx(1));	// 1
 		expStream1.addEvent(enclCtx(0));  	
@@ -77,15 +70,27 @@ public class EventsFilterTest {
 		expStream1.addEvent(firstCtx(0));
 		expStream1.addEvent(enclCtx(8));
 		expStream1.addEvent(inv(2));		// 2
+		expStream1.addEvent(firstCtx(1));
+		expStream1.addEvent(enclCtx(6));
+		expStream1.addEvent(inv(2));
+		expStream1.addEvent(inv(3));
 		expStream1.addEvent(firstCtx(3)); 	// 4
 		expStream1.addEvent(enclCtx(0)); 
 		expStream1.addEvent(inv(3)); 		// 3
+		
+		events2 = Lists.newArrayList(firstCtx(1), enclCtx(0), inv(30),
+				firstCtx(0), superCtx(2), enclCtx(7), inv(20), inv(5), inv(10), 
+				firstCtx(1), enclCtx(6), inv(2), inv(3), 
+				firstCtx(0), enclCtx(8), inv(10), inv(30),
+				firstCtx(1), enclCtx(9), inv(3), inv(2), 
+				firstCtx(3), superCtx(4), enclCtx(0), inv(20));
 		
 		expStream2 = new EventStream();
 		expStream2.addEvent(firstCtx(1));	// 1	
 		expStream2.addEvent(enclCtx(0));  	
 		expStream2.addEvent(firstCtx(0));
-		expStream2.addEvent(enclCtx(7)); 	
+		expStream2.addEvent(enclCtx(7)); 
+		expStream2.addEvent(inv(20));
 		expStream2.addEvent(firstCtx(1));	// 1	
 		expStream2.addEvent(enclCtx(6));	
 		expStream2.addEvent(inv(2));		// 2
@@ -97,7 +102,8 @@ public class EventsFilterTest {
 		expStream2.addEvent(inv(3));		// 3
 		expStream2.addEvent(inv(2));		// 2
 		expStream2.addEvent(firstCtx(3)); 	// 4
-		expStream2.addEvent(enclCtx(0)); 
+		expStream2.addEvent(enclCtx(0));
+		expStream2.addEvent(inv(20));
 	}
 	
 	@Test
@@ -106,14 +112,14 @@ public class EventsFilterTest {
 		
 		EventStream expected = new EventStream();
 		
-		EventStream actuals = EventsFilter.filterStream(events, REMFREQS);
+		EventStream actuals = EventsFilter.filterStream(events, FREQUENCY);
 		
 		assertTrue(expected.equals(actuals));
 	}
 
 	@Test
 	public void filterStream1() {
-		EventStream actuals = EventsFilter.filterStream(events1, REMFREQS);
+		EventStream actuals = EventsFilter.filterStream(events1, FREQUENCY);
 
 		assertEquals(expStream1.getStreamData(), actuals.getStreamData());
 		assertEquals(expStream1.getStreamText(), actuals.getStreamText());
@@ -123,12 +129,13 @@ public class EventsFilterTest {
 	
 	@Test
 	public void filterStream2() {
-		EventStream actuals = EventsFilter.filterStream(events2, REMFREQS);
+		EventStream actuals = EventsFilter.filterStream(events2, FREQUENCY);
 
-		
-		assertEquals(expStream1.getStreamData(), actuals.getStreamData());
-		assertEquals(expStream1.getStreamText(), actuals.getStreamText());
-		assertTrue(actuals.getStreamData().size() == 6);
+		System.out.println(inv(20).getMethod().getDeclaringType().getFullName());
+		System.out.println(inv(20).getMethod().getDeclaringType().getAssembly().getVersion());
+		assertEquals(expStream2.getStreamData(), actuals.getStreamData());
+		assertEquals(expStream2.getStreamText(), actuals.getStreamText());
+		assertTrue(actuals.getStreamData().size() == 5);
 		assertTrue(expStream2.equals(actuals));
 	}
 
@@ -151,6 +158,12 @@ public class EventsFilterTest {
 	private static IMethodName m(int i) {
 		if (i == 0) {
 			return Names.getUnknownMethod();
+		} else if (i == 10) {
+			return Names.newMethod("[T,P] [T,P].m()");
+		} else if (i == 20) {
+			return Names.newMethod("[mscorlib,P, 4.0.0.0] [mscorlib,P, 4.0.0.0].m()");
+		} else if (i == 30) {
+			return Names.newMethod("[mscorlib,P] [mscorlib,P].m()");
 		} else {
 			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
