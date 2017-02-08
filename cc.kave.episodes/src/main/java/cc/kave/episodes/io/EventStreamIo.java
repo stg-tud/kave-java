@@ -20,7 +20,6 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -33,7 +32,6 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
@@ -52,88 +50,18 @@ public class EventStreamIo {
 		this.eventsDir = folder;
 	}
 
-	public void write(EventStream stream, int freq) {
+	public void write(EventStream stream, int frequency) {
 		try {
 			FileUtils
-					.writeStringToFile(new File(getTrainPath(freq).streamTextPath),
+					.writeStringToFile(new File(getTrainPath(frequency).streamTextPath),
 							stream.getStreamText());
 			JsonUtils.toJson(stream.getMapping(), new File(
-					getTrainPath(freq).mappingPath));
+					getTrainPath(frequency).mappingPath));
 			JsonUtils.toJson(stream.getStreamData(), new File(
-					getTrainPath(freq).streamDataPath));
+					getTrainPath(frequency).streamDataPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public String readStream(int freq) throws IOException {
-		String streamFile = getTrainPath(freq).streamTextPath;
-		String stream = FileUtils.readFileToString(new File(streamFile));
-		return stream;
-	}
-
-	public List<List<Fact>> parseStream(int freq) {
-		List<List<Fact>> stream = Lists.newLinkedList();
-		List<Fact> method = Lists.newLinkedList();
-
-		String streamPath = getTrainPath(freq).streamTextPath;
-		List<String> lines = readlines(streamPath);
-
-		double timer = 0.0;
-
-		for (String line : lines) {
-			String[] eventTime = line.split(",");
-			int eventID = Integer.parseInt(eventTime[0]);
-			double timestamp = Double.parseDouble(eventTime[1]);
-			while ((timestamp - timer) >= TIMEOUT) {
-				stream.add(method);
-				method = new LinkedList<Fact>();
-				timer += TIMEOUT;
-			}
-			timer = timestamp;
-			method.add(new Fact(eventID));
-		}
-		stream.add(method);
-		return stream;
-	}
-
-	public List<Event> readMethods(int freq) {
-		String methodsPath = getTrainPath(freq).streamDataPath;
-
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<List<Event>>() {
-		}.getType();
-		List<Event> methods = JsonUtils.fromJson(new File(methodsPath), type);
-		assertMethods(methods);
-		return methods;
-	}
-
-	public List<Tuple<List<Fact>, Event>> parseEventStream(int freq) {
-		List<Tuple<List<Fact>, Event>> result = Lists.newLinkedList();
-
-		List<List<Fact>> stream = parseStream(freq);
-		List<Event> methods = readMethods(freq);
-
-		assertTrue(stream.size() <= methods.size(),
-				"Wrong parsing of stream and method files!");
-
-		int streamId = 0;
-		for (int idx = 0; idx < stream.size(); idx++) {
-			if ((streamId % 100000) == 0) {
-				Logger.log("Stream method %d", streamId);
-			}
-			result.add(Tuple.newTuple(stream.get(idx), methods.get(idx)));
-			streamId++;
-		}
-		return result;
-	}
-
-	private void assertMethods(List<Event> methods) {
-		for (Event ctx : methods) {
-			assertTrue(ctx.getKind() == EventKind.METHOD_DECLARATION,
-					"List of methods does not contain only element cotexts!");
-		}
-
 	}
 	
 	public List<Event> readMapping(int freq) {
@@ -144,18 +72,53 @@ public class EventStreamIo {
 		}.getType();
 		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
-
-	private List<String> readlines(String path) {
-		List<String> lines = new LinkedList<String>();
-
-		try {
-			lines = FileUtils.readLines(new File(path));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return lines;
+	
+	public String readStreamText(int frequency) throws IOException {
+		String streamPath = getTrainPath(frequency).streamTextPath;
+		
+		String stream = FileUtils.readFileToString(new File(streamPath));
+		
+		return stream;
 	}
 
+	public List<Tuple<Event, List<Fact>>> parseStream(int frequency) {
+		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
+		
+		List<Tuple<Event, String>> stream = readStreamData(frequency);
+		
+		for (Tuple<Event, String> methodTuple : stream) {
+			List<Fact> methodFacts = Lists.newLinkedList();
+			String[] lines = methodTuple.getSecond().split("\n");
+			
+			for (String line : lines) {
+				String[] eventTime = line.split(",");
+				int eventID = Integer.parseInt(eventTime[0]);
+				methodFacts.add(new Fact(eventID));
+			}
+			results.add(Tuple.newTuple(methodTuple.getFirst(), methodFacts));
+		}
+		return results;
+	}
+
+	private List<Tuple<Event, String>> readStreamData(int frequency) {
+		String streamPath = getTrainPath(frequency).streamDataPath;
+		
+		@SuppressWarnings("serial")
+		Type type = new TypeToken<List<Tuple<Event, String>>>() {
+		}.getType();
+		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(streamPath), type);
+		assertMethods(stream);
+		return stream;
+	}
+
+	private void assertMethods(List<Tuple<Event, String>> stream) {
+		for (Tuple<Event, String> tuple : stream) {
+			assertTrue(tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
+					"Stream contexts contains invalid mehod contexts");
+		}
+
+	}
+	
 	private class TrainingPath {
 		String streamTextPath = "";
 		String mappingPath = "";
@@ -169,7 +132,7 @@ public class EventStreamIo {
 			path.mkdirs();
 		}
 		TrainingPath trainPath = new TrainingPath();
-		trainPath.streamTextPath = path.getAbsolutePath() + "/stream.txt";
+		trainPath.streamTextPath = path.getAbsolutePath() + "/streamText.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
 		trainPath.streamDataPath = path.getAbsolutePath() + "/streamData.json";
 

@@ -80,8 +80,8 @@ public class PatternsValidation {
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency);
 		Logger.log("Reading training stream ...");
-		List<Tuple<List<Fact>, Event>> streamContexts = eventStream
-				.parseEventStream(frequency);
+		List<Tuple<Event, List<Fact>>> streamContexts = eventStream
+				.parseStream(frequency);
 
 		Logger.log("Reading episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency,
@@ -91,8 +91,9 @@ public class PatternsValidation {
 
 		Logger.log("Reading repositories -  enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
-		Map<String, Set<ITypeName>> repoCtxMapper = repoParser.getRepoTypesMapper();
-		
+		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
+				.getRepoTypesMapper();
+
 		Logger.log("Reading validation data ...");
 		List<Event> valData = validationIO.read(frequency);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
@@ -139,7 +140,7 @@ public class PatternsValidation {
 
 	private int getValOcc(Episode episode, int frequency,
 			List<Event> eventsList, List<List<Fact>> valStream,
-			List<Tuple<List<Fact>, Event>> trainStream) {
+			List<Tuple<Event, List<Fact>>> trainStream) {
 
 		Set<ITypeName> trainTypes = getTrainTypeNames(trainStream);
 
@@ -165,13 +166,13 @@ public class PatternsValidation {
 	}
 
 	private Set<ITypeName> getTrainTypeNames(
-			List<Tuple<List<Fact>, Event>> trainStream) {
+			List<Tuple<Event, List<Fact>>> trainStream) {
 		Set<ITypeName> results = Sets.newLinkedHashSet();
 
-		for (Tuple<List<Fact>, Event> tuple : trainStream) {
+		for (Tuple<Event, List<Fact>> tuple : trainStream) {
 			ITypeName typeName = null;
 			try {
-				typeName = tuple.getSecond().getMethod().getDeclaringType();
+				typeName = tuple.getFirst().getMethod().getDeclaringType();
 			} catch (Exception e) {
 			}
 			results.add(typeName);
@@ -222,19 +223,19 @@ public class PatternsValidation {
 	}
 
 	private int getReposOcc(Episode episode, int frequency,
-			List<Tuple<List<Fact>, Event>> streamContexts,
+			List<Tuple<Event, List<Fact>>> streamContexts,
 			Map<String, Set<ITypeName>> repoCtxMapper) {
 
 		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 		Set<String> ctxs = Sets.newLinkedHashSet();
 
-		for (Tuple<List<Fact>, Event> tuple : streamContexts) {
-			List<Fact> method = tuple.getFirst();
+		for (Tuple<Event, List<Fact>> tuple : streamContexts) {
+			List<Fact> method = tuple.getSecond();
 			if (method.size() < 2) {
 				continue;
 			}
 			if (method.containsAll(episode.getEvents())) {
-				IMethodName methodCtx = tuple.getSecond().getMethod();
+				IMethodName methodCtx = tuple.getFirst().getMethod();
 				String typeName = "";
 				try {
 					typeName = methodCtx.getDeclaringType().getFullName();
@@ -251,7 +252,7 @@ public class PatternsValidation {
 				}
 				ctxs.add(ctxName);
 				methodsOrderRelation.addMethod(episode, method,
-						tuple.getSecond());
+						tuple.getFirst());
 			}
 		}
 		if (methodsOrderRelation.getOccurrences() < frequency) {
@@ -267,8 +268,7 @@ public class PatternsValidation {
 		Set<ITypeName> obsTypeNames = Sets.newLinkedHashSet();
 		Set<String> repositories = Sets.newLinkedHashSet();
 
-		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper
-				.entrySet()) {
+		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper.entrySet()) {
 			for (ITypeName methodName : entry.getValue()) {
 				ITypeName typeName = null;
 				try {

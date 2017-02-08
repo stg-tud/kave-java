@@ -131,8 +131,6 @@ public class EventsFilterTest {
 	public void filterStream2() {
 		EventStream actuals = EventsFilter.filterStream(events2, FREQUENCY);
 
-		System.out.println(inv(20).getMethod().getDeclaringType().getFullName());
-		System.out.println(inv(20).getMethod().getDeclaringType().getAssembly().getVersion());
 		assertEquals(expStream2.getStreamData(), actuals.getStreamData());
 		assertEquals(expStream2.getStreamText(), actuals.getStreamText());
 		assertTrue(actuals.getStreamData().size() == 5);

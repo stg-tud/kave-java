@@ -32,12 +32,12 @@ public class PreprocessingFolded {
 		this.validationIO = valIo;
 	}
 
-	public void runPreparation(int freq) throws Exception {
+	public void runPreparation(int frequency) throws Exception {
 
 		Map<String, EventStreamGenerator> repos = reposParser
 				.generateReposEvents();
 
-		Logger.log("Generating event stream data for freq = %d ...", freq);
+		Logger.log("Generating event stream data for freq = %d ...", frequency);
 
 		for (int curFold = 0; curFold < NUM_FOLDS; curFold++) {
 			Logger.log("Generating foldNum %d/%d", (curFold + 1), NUM_FOLDS);
@@ -45,8 +45,8 @@ public class PreprocessingFolded {
 			List<Event> trainingData = createTrainingData(curFold, NUM_FOLDS,
 					repos);
 			EventStream trainingStream = EventsFilter.filterStream(
-					trainingData, freq);
-			eventStreamIo.write(trainingStream, curFold);
+					trainingData, frequency);
+			eventStreamIo.write(trainingStream, frequency);
 			trainingData.clear();
 			trainingStream.delete();
 

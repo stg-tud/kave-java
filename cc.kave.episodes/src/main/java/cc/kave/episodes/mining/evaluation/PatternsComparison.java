@@ -27,6 +27,7 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
@@ -139,8 +140,7 @@ public class PatternsComparison {
 	}
 
 	public void extractConcreteCode(int frequency) {
-		List<List<Fact>> stream = eventStream.parseStream(frequency);
-		List<Event> ctxs = eventStream.readMethods(frequency);
+		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(frequency);
 		
 //		List<Tuple<List<Fact>, Event>> stream = eventStream
 //				.parseEventStream(frequency);
@@ -149,16 +149,16 @@ public class PatternsComparison {
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
 		int numMethods = 0;
 //		for (Tuple<List<Fact>, Event> tuple : stream) {
-		for (int idx = 0; idx < stream.size(); idx++) {
+		for (Tuple<Event, List<Fact>> tuple : stream) {
 //			List<Fact> method = tuple.getFirst();
-			List<Fact> method = stream.get(idx);
+			List<Fact> method = tuple.getSecond();
 //			Event methodCtx = tuple.getSecond();
 			
 			if (method.size() < 2) {
 				continue;
 			}
 			if (method.containsAll(pattern.getEvents())) {
-				enclMethods.addMethod(pattern, method, ctxs.get(idx));
+				enclMethods.addMethod(pattern, method, tuple.getFirst());
 				numMethods = enclMethods.getOccurrences();
 			}
 			if (numMethods > 10) {

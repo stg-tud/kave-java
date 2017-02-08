@@ -13,6 +13,8 @@ import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
@@ -30,14 +32,14 @@ public class OverlapingTypes {
 	}
 
 	public Set<ITypeName> getOverlaps(int frequency) {
-		List<Event> trainCtx = trainStreamIo.readMethods(frequency);
+		List<Tuple<Event, List<Fact>>> trainCtx = trainStreamIo.parseStream(frequency);
 		Set<ITypeName> trainTyes = Sets.newLinkedHashSet();
 		Set<ITypeName> valTypes = Sets.newLinkedHashSet();
 
-		for (Event ctx : trainCtx) {
-			if (!ctx.getMethod().equals(Names.getUnknownMethod())) {
+		for (Tuple<Event, List<Fact>> tuple : trainCtx) {
+			if (!tuple.getFirst().getMethod().equals(Names.getUnknownMethod())) {
 				try {
-					trainTyes.add(ctx.getMethod().getDeclaringType());
+					trainTyes.add(tuple.getFirst().getMethod().getDeclaringType());
 				} catch (Exception e) {
 				}
 			}

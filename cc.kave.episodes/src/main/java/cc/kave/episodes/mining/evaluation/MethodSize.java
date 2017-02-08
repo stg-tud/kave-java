@@ -11,6 +11,7 @@ import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
@@ -21,14 +22,13 @@ public class MethodSize {
 	private EventStreamIo eventStreamIo;
 
 	public void statistics(int frequency, int methodLength) {
-		List<List<Fact>> stream = eventStreamIo.parseStream(frequency);
+		List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency);
 		int streamLength = calcStreamLength(stream);
 		
 		List<Event> events = eventStreamIo.readMapping(frequency);
 
-		List<Event> methods = eventStreamIo.readMethods(frequency);
-		Set<Event> uniqMethods = listToSet(methods);
-		assertTrue(uniqMethods.size() <= methods.size(), "Error in converting List to Set!");
+		Set<Event> uniqMethods = numCtxs(stream);
+		assertTrue(uniqMethods.size() <= stream.size(), "Error in converting List to Set!");
 
 		Logger.log("Number of methods in stream data is %d", stream.size());
 		Logger.log("Number of events in the event stream is %d", streamLength);
@@ -38,20 +38,20 @@ public class MethodSize {
 //		checkMethodSize(stream, events, methodLength);
 	}
 
-	private int calcStreamLength(List<List<Fact>> stream) {
+	private int calcStreamLength(List<Tuple<Event, List<Fact>>> stream) {
 		int length = 0;
 		
-		for (List<Fact> method : stream) {
-			length += method.size();
+		for (Tuple<Event, List<Fact>> method : stream) {
+			length += method.getSecond().size();
 		}
 		return length;
 	}
 
-	private Set<Event> listToSet(List<Event> methods) {
+	private Set<Event> numCtxs(List<Tuple<Event, List<Fact>>> methods) {
 		Set<Event> result = Sets.newLinkedHashSet();
 		
-		for (Event m : methods) {
-			result.add(m);
+		for (Tuple<Event, List<Fact>> m : methods) {
+			result.add(m.getFirst());
 		}
 		return result;
 	}

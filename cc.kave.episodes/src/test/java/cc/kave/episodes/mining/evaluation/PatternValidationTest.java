@@ -70,12 +70,12 @@ public class PatternValidationTest {
 	private EpisodeToGraphConverter episodeToGraph;
 	@Mock
 	private RepositoriesParser reposParser;
-//	@Mock
-//	private OverlapingTypes overlaps;
+	// @Mock
+	// private OverlapingTypes overlaps;
 
 	private EpisodeAsGraphWriter graphWriter;
 
-	private List<Tuple<List<Fact>, Event>> streamMethods;
+	private List<Tuple<Event, List<Fact>>> streamMethods;
 	private List<Event> trainEvents;
 	private Map<String, Set<ITypeName>> repoMethods;
 
@@ -98,16 +98,14 @@ public class PatternValidationTest {
 		graphWriter = new EpisodeAsGraphWriter();
 
 		streamMethods = Lists.newLinkedList();
-		streamMethods.add(Tuple.newTuple(Lists.newArrayList(new Fact(1),
-				new Fact(2), new Fact(3), new Fact(4)), enclCtx(2)));
-		streamMethods.add(Tuple.newTuple(Lists.newArrayList(new Fact(5),
-				new Fact(6), new Fact(7), new Fact(3)), enclCtx(7)));
-		streamMethods.add(Tuple.newTuple(
-				Lists.newArrayList(new Fact(8), new Fact(4), new Fact(3)),
-				enclCtx(8)));
-		streamMethods.add(Tuple.newTuple(
-				Lists.newArrayList(new Fact(5), new Fact(9), new Fact(3)),
-				enclCtx(9)));
+		streamMethods.add(Tuple.newTuple(enclCtx(2), Lists.newArrayList(
+				new Fact(1), new Fact(2), new Fact(3), new Fact(4))));
+		streamMethods.add(Tuple.newTuple(enclCtx(7), Lists.newArrayList(
+				new Fact(5), new Fact(6), new Fact(7), new Fact(3))));
+		streamMethods.add(Tuple.newTuple(enclCtx(8),
+				Lists.newArrayList(new Fact(8), new Fact(4), new Fact(3))));
+		streamMethods.add(Tuple.newTuple(enclCtx(9),
+				Lists.newArrayList(new Fact(5), new Fact(9), new Fact(3))));
 
 		trainEvents = Lists.newArrayList(dummy(), firstCtx(1), inv(2), inv(3),
 				inv(4), firstCtx(5), superCtx(6), inv(6), inv(7), inv(5),
@@ -115,10 +113,13 @@ public class PatternValidationTest {
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
-				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod().getDeclaringType(),
-						enclCtx(9).getMethod().getDeclaringType()));
-		repoMethods.put("Repository2", Sets.newHashSet(enclCtx(7).getMethod().getDeclaringType()));
-		repoMethods.put("Repository3", Sets.newHashSet(enclCtx(8).getMethod().getDeclaringType()));
+				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod()
+						.getDeclaringType(), enclCtx(9).getMethod()
+						.getDeclaringType()));
+		repoMethods.put("Repository2",
+				Sets.newHashSet(enclCtx(7).getMethod().getDeclaringType()));
+		repoMethods.put("Repository3",
+				Sets.newHashSet(enclCtx(8).getMethod().getDeclaringType()));
 
 		patterns = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -148,7 +149,7 @@ public class PatternValidationTest {
 				eventStream, episodeParser, transClosure, episodeToGraph,
 				graphWriter, validationDataIo, reposParser);
 
-		when(eventStream.parseEventStream(anyInt())).thenReturn(streamMethods);
+		when(eventStream.parseStream(anyInt())).thenReturn(streamMethods);
 		when(eventStream.readMapping(anyInt())).thenReturn(trainEvents);
 		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(
 				patterns);
@@ -159,7 +160,7 @@ public class PatternValidationTest {
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
 		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
-//		when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
+		// when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
 	}
 
 	@Test
@@ -186,7 +187,7 @@ public class PatternValidationTest {
 		sut.validate(FREQUENCY, EpisodeType.GENERAL);
 		;
 
-		verify(eventStream).parseEventStream(anyInt());
+		verify(eventStream).parseStream(anyInt());
 		verify(eventStream).readMapping(anyInt());
 		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
@@ -194,7 +195,7 @@ public class PatternValidationTest {
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoTypesMapper();
-//		verify(overlaps).getOverlaps(anyInt());
+		// verify(overlaps).getOverlaps(anyInt());
 	}
 
 	@Test
@@ -250,7 +251,7 @@ public class PatternValidationTest {
 	private static Event enclCtx(int i) {
 		return Events.newContext(m(i));
 	}
-	
+
 	private static Event enclCtx2(int i) {
 		return Events.newContext(m2(i));
 	}
@@ -266,7 +267,7 @@ public class PatternValidationTest {
 			return Names.newMethod("[T,P] [T,P].m" + i + "()");
 		}
 	}
-	
+
 	private static IMethodName m2(int i) {
 		if (i == 0) {
 			return Names.getUnknownMethod();

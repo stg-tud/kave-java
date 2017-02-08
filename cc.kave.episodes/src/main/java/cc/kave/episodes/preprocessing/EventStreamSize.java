@@ -8,6 +8,7 @@ import java.util.List;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
@@ -42,18 +43,15 @@ public class EventStreamSize {
 	public void printMethodSize(int frequency, int sizeLimit) {
 
 		for (int fold = 0; fold < frequency; fold++) {
-			List<List<Fact>> stream = eventStreamIo.parseStream(frequency);
-			List<Event> methods = eventStreamIo.readMethods(frequency);
+			List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(frequency);
 			
-			assertTrue(stream.size() == methods.size(), "Inconsistency between number of methods!");
-			
-			for (List<Fact> m : stream) {
-				if (m.size() > sizeLimit) {
+			for (Tuple<Event, List<Fact>> m : stream) {
+				if (m.getSecond().size() > sizeLimit) {
 					int index = stream.indexOf(m);
-					Event event = methods.get(index);
+					Event event = m.getFirst();
 					String enclMethod = getMethodName(event);
 					
-					Logger.log("Method: %s\t has %d events", enclMethod, m.size());
+					Logger.log("Method: %s\t has %d events", enclMethod, m.getSecond().size());
 				}
 			}
 		}

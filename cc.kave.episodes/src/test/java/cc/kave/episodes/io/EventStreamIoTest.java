@@ -31,6 +31,7 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
@@ -54,17 +55,17 @@ public class EventStreamIoTest {
 
 	private static final int FREQUENCY = 2;
 
-	File streamFile;
 	File mappingFile;
-	File methodsFile;
+	File streamTextFile;
+	File streamDataFile;
 
 	private EventStreamIo sut;
 
 	@Before
 	public void setup() {
-		streamFile = getStreamFile();
+		streamTextFile = getStreamTextFile();
 		mappingFile = getMappingFile();
-		methodsFile = getMethodsFile();
+		streamDataFile = getStreamDataFile();
 
 		sut = new EventStreamIo(tmp.getRoot());
 	}
@@ -85,231 +86,115 @@ public class EventStreamIoTest {
 	}
 
 	@Test
+	public void invalidMethodCtx() {
+
+		List<Tuple<Event, String>> stream = Lists.newLinkedList();
+		stream.add(Tuple.newTuple(firstCtx(1), "1,0.000\n2,0.001\n"));
+		stream.add(Tuple.newTuple(inv(2), "3,0.502\n"));
+		stream.add(Tuple.newTuple(inv(4), "2,1.503\n3,1.504\n"));
+
+		JsonUtils.toJson(stream, getStreamDataFile());
+		
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Stream contexts contains invalid mehod contexts");
+		
+		sut.parseStream(FREQUENCY);
+	}
+
+	@Test
 	public void happyPath() throws IOException {
 
-		EventStream expected = new EventStream();
-		expected.addEvent(firstCtx(1)); // 1
-		expected.addEvent(ctx(1));
-		expected.addEvent(inv(2)); // 2
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(2));
-		expected.addEvent(inv(5)); // 3
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(3));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); // 2
-		expected.addEvent(inv(5)); // 3
-		
+		EventStream eventStream = new EventStream();
+		eventStream.addEvent(firstCtx(1)); // 1
+		eventStream.addEvent(ctx(1));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(2));
+		eventStream.addEvent(inv(5)); // 3
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(3));
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(4));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(inv(5)); // 3
+
 		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
 		List<Fact> method2 = Lists.newArrayList(new Fact(3));
-		List<Fact> method3 = Lists.newLinkedList();
-		List<Fact> method4 = Lists.newArrayList(new Fact(2), new Fact(3));
+		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
 
-		List<Tuple<List<Fact>, Event>> expEventStream = Lists.newLinkedList();
-		expEventStream.add(Tuple.newTuple(method1, ctx(1)));
-		expEventStream.add(Tuple.newTuple(method2, ctx(2)));
-		expEventStream.add(Tuple.newTuple(method3, ctx(3)));
-		expEventStream.add(Tuple.newTuple(method4, ctx(4)));
+		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
+		expStreamData.add(Tuple.newTuple(ctx(1), method1));
+		expStreamData.add(Tuple.newTuple(ctx(2), method2));
+		expStreamData.add(Tuple.newTuple(ctx(4), method3));
 
-		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(method1);
-		expParseStream.add(method2);
-		expParseStream.add(method3);
-		expParseStream.add(method4);
+		sut.write(eventStream, FREQUENCY);
 
-		sut.write(expected, FREQUENCY);
-
-		assertTrue(streamFile.exists());
+		assertTrue(streamTextFile.exists());
 		assertTrue(mappingFile.exists());
-		assertTrue(methodsFile.exists());
+		assertTrue(streamDataFile.exists());
 
 		List<Event> actMapping = sut.readMapping(FREQUENCY);
-		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(FREQUENCY);
-		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
+		String actStreamText = sut.readStreamText(FREQUENCY);
+
+		List<Tuple<Event, List<Fact>>> actStreamData = sut
+				.parseStream(FREQUENCY);
+
+		assertMapping(eventStream.getMapping(), actMapping);
+
+		assertEquals(expStreamData, actStreamData);
+
+		assertEquals(eventStream.getStreamText(), actStreamText);
 		
-		List<Tuple<List<Fact>, Event>> actEventStream = sut.parseEventStream(FREQUENCY);
-
-		assertMapping(expected.getMapping(), actMapping);
-
-//		assertEquals(expected.getMethodCtxs(), actMethods);
-
-//		assertEquals(expected.getStream(), actStringStream);
-		assertEquals(expParseStream, actParserStream);
-		assertEquals(expEventStream, actEventStream);
-
-		assertTrue(actParserStream.size() == actMethods.size());
+		assertTrue(actMapping.size() == 4);
 	}
 
 	@Test
 	public void emptyMethods() throws IOException {
 
-		EventStream expected = new EventStream();
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
-		expected.addEvent(firstCtx(1)); // 1
-		expected.addEvent(ctx(1));
-		expected.addEvent(inv(2)); // 2
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(2));
-		expected.addEvent(inv(5)); // 3
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); // 2
-		expected.addEvent(inv(5)); // 3
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
+		EventStream eventStream = new EventStream();
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(0));
+		eventStream.addEvent(firstCtx(1)); // 1
+		eventStream.addEvent(ctx(1));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(2));
+		eventStream.addEvent(inv(5)); // 3
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(0));
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(4));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(inv(5)); // 3
+		eventStream.addEvent(firstCtx(0));
+		eventStream.addEvent(ctx(0));
 
-		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(Lists.newArrayList());
-		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
-		expParseStream.add(Lists.newArrayList(new Fact(3)));
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newArrayList(new Fact(2), new Fact(3)));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(3));
+		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
 
-		sut.write(expected, FREQUENCY);
+		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
+		expStreamData.add(Tuple.newTuple(ctx(1), method1));
+		expStreamData.add(Tuple.newTuple(ctx(2), method2));
+		expStreamData.add(Tuple.newTuple(ctx(4), method3));
 
-		List<Event> actMapping = sut.readMapping(FREQUENCY);
-		List<Event> actMethods = sut.readMethods(FREQUENCY);
-
-		String actStringStream = sut.readStream(FREQUENCY);
-		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
-
-		assertMapping(expected.getMapping(), actMapping);
-
-//		assertEquals(expected.getMethodCtxs(), actMethods);
-//		assertEquals(expected.getStream(), actStringStream);
-		assertEquals(expParseStream, actParserStream);
-
-		assertTrue(actParserStream.size() <= actMethods.size());
-		assertTrue(actParserStream.size() == 5);
-		assertTrue(actMethods.size() == 6);
-	}
-
-	@Test
-	public void multipleEmptyMethodsInBeggining() throws IOException {
-
-		EventStream expected = new EventStream();
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(1));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); // 1
-		expected.addEvent(inv(5)); // 2
-
-		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(Lists.newArrayList());
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
-
-		sut.write(expected, FREQUENCY);
+		sut.write(eventStream, FREQUENCY);
 
 		List<Event> actMapping = sut.readMapping(FREQUENCY);
-		List<Event> actMethods = sut.readMethods(FREQUENCY);
 
-		String actStringStream = sut.readStream(FREQUENCY);
-		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
+		String actStreamText = sut.readStreamText(FREQUENCY);
 
-		assertMapping(expected.getMapping(), actMapping);
+		List<Tuple<Event, List<Fact>>> actStreamData = sut
+				.parseStream(FREQUENCY);
 
-//		assertEquals(expected.getMethodCtxs(), actMethods);
-//		assertEquals(expected.getStream(), actStringStream);
-		assertEquals(expParseStream, actParserStream);
+		assertMapping(eventStream.getMapping(), actMapping);
 
-		assertTrue(actParserStream.size() == actMethods.size());
-	}
+		assertEquals(expStreamData, actStreamData);
 
-	@Test
-	public void multipleEmptyMethodsInMiddle() throws IOException {
-
-		EventStream expected = new EventStream();
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); // 1
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(1));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(2));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(3));
-		expected.addEvent(inv(2)); // 1
-		expected.addEvent(inv(5)); // 2
-
-		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(Lists.newArrayList());
-		expParseStream.add(Lists.newArrayList(new Fact(1)));
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
-
-		sut.write(expected, FREQUENCY);
-
-		List<Event> actMapping = sut.readMapping(FREQUENCY);
-		List<Event> actMethods = sut.readMethods(FREQUENCY);
-
-		String actStringStream = sut.readStream(FREQUENCY);
-		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
-
-		assertMapping(expected.getMapping(), actMapping);
-
-//		assertEquals(expected.getMethodCtxs(), actMethods);
-//		assertEquals(expected.getStream(), actStringStream);
-		assertEquals(expParseStream, actParserStream);
-
-		assertTrue(actParserStream.size() == actMethods.size());
-	}
-
-	@Test
-	public void multipleEmptyMethodsInEnd() throws IOException {
-
-		EventStream expected = new EventStream();
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(0));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(4));
-		expected.addEvent(inv(2)); // 1
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(1));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(3));
-		expected.addEvent(inv(2)); // 1
-		expected.addEvent(inv(5)); // 2
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(5));
-		expected.addEvent(firstCtx(0));
-		expected.addEvent(ctx(2));
-
-		List<List<Fact>> expParseStream = Lists.newLinkedList();
-		expParseStream.add(Lists.newArrayList());
-		expParseStream.add(Lists.newArrayList(new Fact(1)));
-		expParseStream.add(Lists.newLinkedList());
-		expParseStream.add(Lists.newArrayList(new Fact(1), new Fact(2)));
-
-		sut.write(expected, FREQUENCY);
-
-		List<Event> actMapping = sut.readMapping(FREQUENCY);
-		List<Event> actMethods = sut.readMethods(FREQUENCY);
-
-		String actStringStream = sut.readStream(FREQUENCY);
-		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
-
-		assertMapping(expected.getMapping(), actMapping);
-
-//		assertEquals(expected.getMethodCtxs(), actMethods);
-//		assertEquals(expected.getStream(), actStringStream);
-		assertEquals(expParseStream, actParserStream);
-
-		assertTrue(actParserStream.size() <= actMethods.size());
-		assertTrue(actParserStream.size() == 4);
-		assertTrue(actMethods.size() == 6);
+		assertEquals(eventStream.getStreamText(), actStreamText);
+		
+		assertTrue(actMapping.size() == 4);
 	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {
@@ -324,8 +209,8 @@ public class EventStreamIoTest {
 		return true;
 	}
 
-	private File getMethodsFile() {
-		File fileName = new File(getPath() + "/methods.txt");
+	private File getStreamDataFile() {
+		File fileName = new File(getPath() + "/streamData.json");
 		return fileName;
 	}
 
@@ -334,8 +219,8 @@ public class EventStreamIoTest {
 		return fileName;
 	}
 
-	private File getStreamFile() {
-		File fileName = new File(getPath() + "/stream.txt");
+	private File getStreamTextFile() {
+		File fileName = new File(getPath() + "/streamText.txt");
 		return fileName;
 	}
 
