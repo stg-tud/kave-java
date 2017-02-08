@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.PatternsValidation;
-import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.preprocessing.Checkings;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -34,7 +33,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = 0;
-	private static final int FREQ = 500;
+	private static final int FREQUENCY = 400;
 	private static final double ENTROPY = 0.1;
 
 	private static final int METHODSIZE = 500;
@@ -52,8 +51,11 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-//		 load(PreprocessingFolded.class).runPreparation(FREQ);
-//		load(ProjectsOverlap.class).checkReposOverlaps();
+		load(Checkings.class).noTypeOverlaps();;
+//		load(RepositoriesParser.class).generateReposEvents();
+//		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
+		
+		//		load(ProjectsOverlap.class).checkReposOverlaps();
 //		load(ProjectsOverlap.class).checkFoldsOverlap();
 //		load(ProjectsOverlap.class).testCtxEventNames();
 		
@@ -61,8 +63,9 @@ public class run_ervina {
 		
 //		load(StreamAndMethodChecker.class).checkLengths();
 //		load(EventsReader.class).read(FREQ);
-		load(PatternsValidation.class).validate(FREQ, EpisodeType.GENERAL);
-//		load(PatternsComparison.class).coverage(FREQ, EpisodeType.PARALLEL, EpisodeType.SEQUENTIAL);
+//		load(PatternsValidation.class).validate(FREQ, EpisodeType.PARALLEL);
+//		load(EpisodeWriter.class).writeNewEpisodes(FREQ);
+//		load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL, EpisodeType.SEQUENTIAL);
 //		load(PatternsComparison.class).printCommonPatterns(FREQ, EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
 //		load(PatternsComparison.class).extractConcreteCode(FREQ);
 		

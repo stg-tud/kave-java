@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +41,7 @@ import org.mockito.stubbing.Answer;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -58,7 +58,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class IndiviReposParserTest {
+public class RepositoriesParserTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -73,11 +73,11 @@ public class IndiviReposParserTest {
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
 	
-	private Context context;
+	private Context context1;
 	private Context context3;
 	private Context context2;
 
-	private IndivReposParser sut;
+	private RepositoriesParser sut;
 
 	@Before
 	public void setup() throws IOException {
@@ -88,16 +88,17 @@ public class IndiviReposParserTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new IndivReposParser(rootDirectory);
+		sut = new RepositoriesParser(rootDirectory);
 
-		SST sst = new SST();
+		SST sst1 = new SST();
+		sst1.setEnclosingType(Names.newType("T1.T2.T3"));
 		MethodDeclaration md = new MethodDeclaration();
-		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
+		md.setName(Names.newMethod("[T1,P] [T2,P].M()"));
 		md.getBody().add(new ContinueStatement());
-		sst.getMethods().add(md);
+		sst1.getMethods().add(md);
 
 		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
+		md2.setName(Names.newMethod("[T1,P] [T3,P].M2()"));
 		
 		InvocationExpression ie1 = new InvocationExpression();
 		IMethodName methodName = Names
@@ -111,15 +112,16 @@ public class IndiviReposParserTest {
 		md2.getBody().add(wrap(ie1));
 		md2.getBody().add(wrap(ie2));
 		md2.getBody().add(wrap(ie2));
-		sst.getMethods().add(md2);
+		sst1.getMethods().add(md2);
 
-		context = new Context();
-		context.setSST(sst);
-		data.put(REPO1, context);
+		context1 = new Context();
+		context1.setSST(sst1);
+		data.put(REPO1, context1);
 
 		SST sst3 = new SST();
+		sst3.setEnclosingType(Names.newType("T1.T2.T3"));
 		MethodDeclaration md3 = new MethodDeclaration();
-		md3.setName(Names.newMethod("[T,P] [T4,P].M()"));
+		md3.setName(Names.newMethod("[T3,P] [T4,P].M()"));
 		InvocationExpression ie5 = new InvocationExpression();
 		IMethodName methodName5 = Names
 				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
@@ -132,8 +134,9 @@ public class IndiviReposParserTest {
 		data.put(REPO3, context3);
 
 		SST sst2 = new SST();
+		sst2.setEnclosingType(Names.newType("T2.T3.T4"));
 		MethodDeclaration md4 = new MethodDeclaration();
-		md4.setName(Names.newMethod("[T,P] [T2,P].M3()"));
+		md4.setName(Names.newMethod("[T2,P] [T2,P].M3()"));
 		md4.getBody().add(new DoLoop());
 		
 		InvocationExpression ie3 = new InvocationExpression();
@@ -188,7 +191,7 @@ public class IndiviReposParserTest {
 	}
 
 	@Test
-	public void contextTest() throws ZipException, IOException {
+	public void contextTest() throws Exception {
 		sut.generateReposEvents();
 
 		verify(rootDirectory).findFiles(anyPredicateOf(String.class));
@@ -205,7 +208,7 @@ public class IndiviReposParserTest {
 	}
 
 	@Test
-	public void readTwoArchives() throws IOException {
+	public void readTwoArchives() throws Exception {
 		Map<String, EventStreamGenerator> expReposGen = getRepoEvents();
 		Map<String, EventStreamGenerator> actReposGen = sut.generateReposEvents();
 
@@ -214,17 +217,16 @@ public class IndiviReposParserTest {
 	}
 	
 	@Test
-	public void reposCtxMapper() throws ZipException, IOException {
+	public void reposTypesMapper() throws Exception {
 		String repName1 = "Github/usr1/repo1";
-		String repName3 = "Github/usr1/repo3";
 		String repName2 = "Github/usr1/repo2";
 		
-		Map<String, Set<IMethodName>> expected = Maps.newLinkedHashMap();
-		expected.put(repName1, Sets.newHashSet(Names.getUnknownMethod()));
-		expected.put(repName3, Sets.newHashSet(Names.getUnknownMethod()));
-		expected.put(repName2, Sets.newHashSet(Names.getUnknownMethod()));
+		Map<String, Set<ITypeName>> expected = Maps.newLinkedHashMap();
+		expected.put(repName1, Sets.newHashSet(Names.newType("T1.T2.T3")));
+		expected.put(repName2, Sets.newHashSet(Names.newType("T2.T3.T4")));
 		
-		Map<String, Set<IMethodName>> actuals = sut.getRepoCtxMapper();
+		sut.generateReposEvents();
+		Map<String, Set<ITypeName>> actuals = sut.getRepoTypesMapper();
 		
 		assertEquals(expected, actuals);
 	}
@@ -265,17 +267,13 @@ public class IndiviReposParserTest {
 		Map<String, EventStreamGenerator> reposEvents = Maps.newLinkedHashMap();
 		EventStreamGenerator generator = new EventStreamGenerator();
 		
-		generator.add(context);
+		generator.add(context1);
 		reposEvents.put("Github/usr1/repo1", generator);
-		
-		generator = new EventStreamGenerator();
-		generator.add(context3);
-		reposEvents.put("Github/usr1/repo3", generator);
 		
 		generator = new EventStreamGenerator();
 		generator.add(context2);
 		reposEvents.put("Github/usr1/repo2", generator);
-
+		
 		return reposEvents;
 	}
 }

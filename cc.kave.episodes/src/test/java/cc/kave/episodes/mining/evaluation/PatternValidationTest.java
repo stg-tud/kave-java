@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
@@ -32,7 +31,7 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -70,7 +69,7 @@ public class PatternValidationTest {
 	@Mock
 	private EpisodeToGraphConverter episodeToGraph;
 	@Mock
-	private IndivReposParser reposParser;
+	private RepositoriesParser reposParser;
 //	@Mock
 //	private OverlapingTypes overlaps;
 
@@ -78,7 +77,7 @@ public class PatternValidationTest {
 
 	private List<Tuple<List<Fact>, Event>> streamMethods;
 	private List<Event> trainEvents;
-	private Map<String, Set<IMethodName>> repoMethods;
+	private Map<String, Set<ITypeName>> repoMethods;
 
 	private Map<Integer, Set<Episode>> patterns;
 
@@ -93,7 +92,7 @@ public class PatternValidationTest {
 	private PatternsValidation sut;
 
 	@Before
-	public void setup() throws ZipException, IOException {
+	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
 		graphWriter = new EpisodeAsGraphWriter();
@@ -116,10 +115,10 @@ public class PatternValidationTest {
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
-				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod(),
-						enclCtx(9).getMethod()));
-		repoMethods.put("Repository2", Sets.newHashSet(enclCtx(7).getMethod()));
-		repoMethods.put("Repository3", Sets.newHashSet(enclCtx(8).getMethod()));
+				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod().getDeclaringType(),
+						enclCtx(9).getMethod().getDeclaringType()));
+		repoMethods.put("Repository2", Sets.newHashSet(enclCtx(7).getMethod().getDeclaringType()));
+		repoMethods.put("Repository3", Sets.newHashSet(enclCtx(8).getMethod().getDeclaringType()));
 
 		patterns = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -159,7 +158,7 @@ public class PatternValidationTest {
 		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(ep);
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
-		when(reposParser.getRepoCtxMapper()).thenReturn(repoMethods);
+		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
 //		when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
 	}
 
@@ -194,7 +193,7 @@ public class PatternValidationTest {
 		verify(validationDataIo).read(anyInt());
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
-		verify(reposParser).getRepoCtxMapper();
+		verify(reposParser).getRepoTypesMapper();
 //		verify(overlaps).getOverlaps(anyInt());
 	}
 

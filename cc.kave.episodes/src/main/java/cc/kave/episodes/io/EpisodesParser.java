@@ -35,7 +35,7 @@ public class EpisodesParser {
 
 	private File eventsDir;
 	private FileReader reader;
-
+	
 	@Inject
 	public EpisodesParser(@Named("events") File rootFolder, FileReader reader) {
 		assertTrue(rootFolder.exists(), "Events folder does not exist");
@@ -44,7 +44,7 @@ public class EpisodesParser {
 		this.eventsDir = rootFolder;
 		this.reader = reader;
 	}
-
+	
 	public Map<Integer, Set<Episode>> parse(int frequency, EpisodeType episodeType) {
 
 		List<String> lines = reader.readFile(getEpisodesFile(frequency, episodeType));
@@ -98,6 +98,19 @@ public class EpisodesParser {
 			type = "Par";
 		}
 		File fileName = new File(getPath(frequency) + "/episodes" + type + ".txt");
+		return fileName;
+	}
+	
+	private File getEpisodesJsons(int frequency, EpisodeType episodeType) {
+		String type = "";
+		if (episodeType == EpisodeType.SEQUENTIAL) {
+			type = "Seq";
+		} else if (episodeType == EpisodeType.GENERAL) {
+			type = "Mix";
+		} else {
+			type = "Par";
+		}
+		File fileName = new File(getPath(frequency) + "/episodes" + type + "1.json");
 		return fileName;
 	}
 

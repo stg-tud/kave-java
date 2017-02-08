@@ -7,18 +7,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -52,7 +50,7 @@ public class PatternsValidation {
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private EpisodeAsGraphWriter graphWriter;
 
-	private IndivReposParser repoParser;
+	private RepositoriesParser repoParser;
 
 	private static final double ENTROPY = 0.0;
 
@@ -62,7 +60,7 @@ public class PatternsValidation {
 			EpisodesParser epParser, TransClosedEpisodes transClosure,
 			EpisodeToGraphConverter episodeGraphConverter,
 			EpisodeAsGraphWriter graphWriter, ValidationDataIO validationIO,
-			IndivReposParser reposParser) {
+			RepositoriesParser reposParser) {
 		assertTrue(patternsFolder.exists(), "Patterns folder does not exist");
 		assertTrue(patternsFolder.isDirectory(),
 				"Patterns is not a folder, but a file");
@@ -78,7 +76,7 @@ public class PatternsValidation {
 	}
 
 	public void validate(int frequency, EpisodeType episodeType)
-			throws ZipException, IOException {
+			throws Exception {
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency);
 		Logger.log("Reading training stream ...");
@@ -90,6 +88,16 @@ public class PatternsValidation {
 				episodeType);
 		Map<Integer, Set<Episode>> patterns = getFilteredEpisodes(episodes,
 				episodeType, frequency);
+
+		Logger.log("Reading repositories -  enclosing method declarations mapper!");
+		repoParser.generateReposEvents();
+		Map<String, Set<ITypeName>> repoCtxMapper = repoParser.getRepoTypesMapper();
+		
+		Logger.log("Reading validation data ...");
+		List<Event> valData = validationIO.read(frequency);
+		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
+		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
+		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);
 
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
@@ -104,22 +112,22 @@ public class PatternsValidation {
 			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
 			for (Episode episode : entry.getValue()) {
 				Logger.log("Processing pattern %d ...", patternId);
+
+				int occTraining = getReposOcc(episode, frequency,
+						streamContexts, repoCtxMapper);
+				if (occTraining == 0) {
+					continue;
+				}
 				sb.append(patternId + "\t");
 				sb.append(episode.getFacts().toString() + "\t");
 				sb.append(episode.getFrequency() + "\t");
 				sb.append(episode.getEntropy() + "\t");
-
-				Logger.log("Validating from the training data ...");
-				int occTraining = getReposOcc(episode, frequency,
-						streamContexts);
 				sb.append(occTraining + "\t");
 
-				Logger.log("Validating from the test data ...");
-				int occValidation = getValOcc(episode, frequency, trainEvents,
-						streamContexts);
+				int occValidation = getValOcc(episode, frequency, eventsList,
+						valStream, streamContexts);
 				sb.append(occValidation + "\n");
 
-				Logger.log("Saving pattern %d ...", patternId);
 				store(episode, episodeType, patternId, trainEvents, frequency);
 				patternId++;
 			}
@@ -129,16 +137,10 @@ public class PatternsValidation {
 				sb.toString());
 	}
 
-	private int getValOcc(Episode episode, int frequency, List<Event> trainEvents,
+	private int getValOcc(Episode episode, int frequency,
+			List<Event> eventsList, List<List<Fact>> valStream,
 			List<Tuple<List<Fact>, Event>> trainStream) {
-		Logger.log("Reading validation stream ...");
-		List<Event> valData = validationIO.read(frequency);
-		Logger.log("Merging events ...");
-		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
-		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
-		Logger.log("Parsing validation stream ...");
-		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);
-		
+
 		Set<ITypeName> trainTypes = getTrainTypeNames(trainStream);
 
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
@@ -149,12 +151,13 @@ public class PatternsValidation {
 			}
 			if (method.containsAll(episode.getEvents())) {
 				Event methodCtx = getMethodName(method, eventsList);
-				IMethodName methodName = methodCtx.getMethod();
-
-				if (!methodName.equals(Names.getUnknownMethod())) {
-					if (!trainTypes.contains(methodName.getDeclaringType())) {
-						enclMethods.addMethod(episode, method, methodCtx);
-					}
+				ITypeName typeName = null;
+				try {
+					typeName = methodCtx.getMethod().getDeclaringType();
+				} catch (Exception e) {
+				}
+				if (!trainTypes.contains(typeName)) {
+					enclMethods.addMethod(episode, method, methodCtx);
 				}
 			}
 		}
@@ -166,11 +169,12 @@ public class PatternsValidation {
 		Set<ITypeName> results = Sets.newLinkedHashSet();
 
 		for (Tuple<List<Fact>, Event> tuple : trainStream) {
-			IMethodName methodName = tuple.getSecond().getMethod();
-
-			if (!methodName.equals(Names.getUnknownMethod())) {
-				results.add(methodName.getDeclaringType());
+			ITypeName typeName = null;
+			try {
+				typeName = tuple.getSecond().getMethod().getDeclaringType();
+			} catch (Exception e) {
 			}
+			results.add(typeName);
 		}
 		return results;
 	}
@@ -218,11 +222,8 @@ public class PatternsValidation {
 	}
 
 	private int getReposOcc(Episode episode, int frequency,
-			List<Tuple<List<Fact>, Event>> streamContexts) throws ZipException,
-			IOException {
-		Logger.log("Reading repositories -  enclosing method declarations mapper!");
-		Map<String, Set<IMethodName>> repoCtxMapper = repoParser
-				.getRepoCtxMapper();
+			List<Tuple<List<Fact>, Event>> streamContexts,
+			Map<String, Set<ITypeName>> repoCtxMapper) {
 
 		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 		Set<String> ctxs = Sets.newLinkedHashSet();
@@ -233,15 +234,22 @@ public class PatternsValidation {
 				continue;
 			}
 			if (method.containsAll(episode.getEvents())) {
-				IMethodName methodName = tuple.getSecond().getMethod();
-				if (!methodName.equals(Names.getUnknownMethod())) {
-					String ctxName = methodName.getDeclaringType()
-							.getFullName() + "." + methodName.getName();
-					if (ctxs.contains(ctxName)) {
-						continue;
-					}
-					ctxs.add(ctxName);
+				IMethodName methodCtx = tuple.getSecond().getMethod();
+				String typeName = "";
+				try {
+					typeName = methodCtx.getDeclaringType().getFullName();
+				} catch (Exception e) {
 				}
+				String methodName = "";
+				try {
+					methodName = methodCtx.getName();
+				} catch (Exception e) {
+				}
+				String ctxName = typeName + "." + methodName;
+				if (ctxs.contains(ctxName)) {
+					continue;
+				}
+				ctxs.add(ctxName);
 				methodsOrderRelation.addMethod(episode, method,
 						tuple.getSecond());
 			}
@@ -251,6 +259,7 @@ public class PatternsValidation {
 			Logger.log("Frequencies: %d - %d",
 					methodsOrderRelation.getOccurrences(),
 					episode.getFrequency());
+			return 0;
 		}
 
 		Set<IMethodName> methodOcc = methodsOrderRelation
@@ -258,15 +267,18 @@ public class PatternsValidation {
 		Set<ITypeName> obsTypeNames = Sets.newLinkedHashSet();
 		Set<String> repositories = Sets.newLinkedHashSet();
 
-		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxMapper
+		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper
 				.entrySet()) {
-			for (IMethodName methodName : entry.getValue()) {
-				if (!methodName.equals(Names.getUnknownMethod())) {
-					if (obsTypeNames.contains(methodName.getDeclaringType())) {
-						continue;
-					}
-					obsTypeNames.add(methodName.getDeclaringType());
+			for (ITypeName methodName : entry.getValue()) {
+				ITypeName typeName = null;
+				try {
+					typeName = methodName.getDeclaringType();
+				} catch (Exception e) {
 				}
+				if (obsTypeNames.contains(typeName)) {
+					continue;
+				}
+				obsTypeNames.add(typeName);
 				if (methodOcc.contains(methodName)) {
 					repositories.add(entry.getKey());
 					break;
@@ -287,16 +299,13 @@ public class PatternsValidation {
 
 	private Map<Event, Integer> mergeEventsToMap(List<Event> lista,
 			List<Event> listb) {
-		Logger.log("Mergin into a map structure ...");
 		Map<Event, Integer> events = Maps.newLinkedHashMap();
 		int id = 0;
 
-		Logger.log("Copying list a ...");
 		for (Event event : lista) {
 			events.put(event, id);
 			id++;
 		}
-		Logger.log("Copying list b ...");
 		for (Event event : listb) {
 			if (!events.containsKey(event)) {
 				events.put(event, id);

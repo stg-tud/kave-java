@@ -1,13 +1,12 @@
 package cc.kave.episodes.preprocessing;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
@@ -18,27 +17,27 @@ import com.google.inject.Inject;
 
 public class PreprocessingFolded {
 
-	private IndivReposParser reposParser;
+	private RepositoriesParser reposParser;
 
 	private EventStreamIo eventStreamIo;
 	private ValidationDataIO validationIO;
-	
+
 	private static final int NUM_FOLDS = 10;
 
 	@Inject
-	public PreprocessingFolded(IndivReposParser repositories,
+	public PreprocessingFolded(RepositoriesParser repositories,
 			EventStreamIo trainingData, ValidationDataIO valIo) {
 		this.reposParser = repositories;
 		this.eventStreamIo = trainingData;
 		this.validationIO = valIo;
 	}
 
-	public void runPreparation(int freq) throws IOException {
+	public void runPreparation(int freq) throws Exception {
 
-		Map<String, EventStreamGenerator> repos = reposParser.generateReposEvents();
-		
+		Map<String, EventStreamGenerator> repos = reposParser
+				.generateReposEvents();
+
 		Logger.log("Generating event stream data for freq = %d ...", freq);
-		Logger.log("\nWriting repositories - enclosing methods mapper ...");
 
 		for (int curFold = 0; curFold < NUM_FOLDS; curFold++) {
 			Logger.log("Generating foldNum %d/%d", (curFold + 1), NUM_FOLDS);

@@ -12,10 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +30,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.io.IndivReposParser;
+import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
@@ -43,7 +41,7 @@ import com.google.common.collect.Maps;
 public class PreprocessingFoldedTest {
 
 	@Mock
-	private IndivReposParser repoParser;
+	private RepositoriesParser repoParser;
 	@Mock
 	private EventStreamIo trainingIo;
 	@Mock
@@ -55,7 +53,7 @@ public class PreprocessingFoldedTest {
 	private PreprocessingFolded sut;
 
 	@Before
-	public void setup() throws ZipException, IOException {
+	public void setup() throws Exception {
 		initMocks(this);
 
 		sut = new PreprocessingFolded(repoParser, trainingIo, validationIo);
@@ -67,7 +65,7 @@ public class PreprocessingFoldedTest {
 	}
 
 	@Test
-	public void checkCrossFold() throws IOException {
+	public void checkCrossFold() throws Exception {
 		sut.runPreparation(FREQTHRESH);
 
 		verify(repoParser).generateReposEvents();
