@@ -118,8 +118,6 @@ public class EventsFilterTest {
 		
 		assertEquals(expStream1.getStream(), actuals.getStream());
 		assertEquals(expStream1.getMapping(), actuals.getMapping());
-		assertEquals(expStream1.getStreamLength(), actuals.getStreamLength());
-		assertEquals(expStream1.getNumberEvents(), actuals.getNumberEvents());
 		assertTrue(expStream1.equals(actuals));
 	}
 	
@@ -130,9 +128,7 @@ public class EventsFilterTest {
 		
 		assertEquals(expStream2.getStream(), actuals.getStream());
 		assertEquals(expStream2.getMapping(), actuals.getMapping());
-		assertEquals(expStream2.getStreamLength(), actuals.getStreamLength());
-		assertEquals(expStream2.getNumberEvents(), actuals.getNumberEvents());
-		assertTrue(actuals.getEnclMethods().size() == 6);
+		assertTrue(actuals.getMethodCtxs().size() == 6);
 		assertTrue(expStream2.equals(actuals));
 	}
 

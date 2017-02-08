@@ -66,12 +66,10 @@ public class EventStreamTest {
 		expectedMap.put(dummy(), 0);
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(1, sut.getNumberEvents());
-		assertEquals(0, sut.getStreamLength());
 
 		assertTrue(sut.getStream().equals(""));
 		assertTrue(sut.getNumMethods() == 0);
-		assertTrue(sut.getEnclMethods().isEmpty());
+		assertTrue(sut.getMethodCtxs().isEmpty());
 	}
 
 	@Test
@@ -85,13 +83,11 @@ public class EventStreamTest {
 		expMethods.add(enclCtx(1));
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(1, sut.getNumberEvents());
-		assertEquals(0, sut.getStreamLength());
-		assertEquals(expMethods, sut.getEnclMethods());
+		assertEquals(expMethods, sut.getMethodCtxs());
 
 		assertTrue(sut.getStream().equals(""));
 		assertTrue(sut.getNumMethods() == 1);
-		assertTrue(sut.getEnclMethods().size() == 1);
+		assertTrue(sut.getMethodCtxs().size() == 1);
 	}
 
 	@Test
@@ -109,13 +105,11 @@ public class EventStreamTest {
 		String actualStream = sut.getStream();
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(2, sut.getNumberEvents());
-		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
-		assertEquals(expMethods, sut.getEnclMethods());
+		assertEquals(expMethods, sut.getMethodCtxs());
 
 		assertTrue(sut.getNumMethods() == 1);
-		assertTrue(sut.getEnclMethods().size() == 1);
+		assertTrue(sut.getMethodCtxs().size() == 1);
 	}
 
 	@Test
@@ -130,12 +124,10 @@ public class EventStreamTest {
 		String actualStream = sut.getStream();
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(2, sut.getNumberEvents());
-		assertEquals(1, sut.getStreamLength());
 		assertEquals(expectedStream, actualStream);
 
 		assertTrue(sut.getNumMethods() == 0);
-		assertTrue(sut.getEnclMethods().isEmpty());
+		assertTrue(sut.getMethodCtxs().isEmpty());
 	}
 
 	@Test
@@ -167,13 +159,11 @@ public class EventStreamTest {
 		expectedSb.append("3,0.504\n");
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(5, sut.getNumberEvents());
-		assertEquals(5, sut.getStreamLength());
 		assertEquals(expectedSb.toString(), sut.getStream());
-		assertEquals(expMethods, sut.getEnclMethods());
+		assertEquals(expMethods, sut.getMethodCtxs());
 
 		assertTrue(sut.getNumMethods() == 2);
-		assertTrue(sut.getEnclMethods().size() == 2);
+		assertTrue(sut.getMethodCtxs().size() == 2);
 	}
 
 	@Test
@@ -195,13 +185,11 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
-		assertEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() == b.getNumMethods());
-		assertTrue(a.getEnclMethods().size() == b.getEnclMethods().size());
+		assertTrue(a.getMethodCtxs().size() == b.getMethodCtxs().size());
 		assertTrue(a.equals(b));
 	}
 
@@ -218,13 +206,11 @@ public class EventStreamTest {
 		b.addEvent(inv(3));
 
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
-		assertEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() == b.getNumMethods());
-		assertTrue(a.getEnclMethods().size() == b.getEnclMethods().size());
+		assertTrue(a.getMethodCtxs().size() == b.getMethodCtxs().size());
 
 		assertFalse(a.equals(b));
 	}
@@ -243,10 +229,8 @@ public class EventStreamTest {
 		b.addEvent(inv(3));
 
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertNotEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
-		assertEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() == b.getNumMethods());
 
@@ -267,10 +251,8 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertNotEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
-		assertEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() == b.getNumMethods());
 
@@ -293,10 +275,8 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertNotEquals(a.getStream(), b.getStream());
-		assertEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() != b.getNumMethods());
 
@@ -318,10 +298,8 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getNumberEvents(), b.getNumberEvents());
-		assertEquals(a.getStreamLength(), b.getStreamLength());
 		assertEquals(a.getStream(), b.getStream());
-		assertNotEquals(a.getEnclMethods(), b.getEnclMethods());
+		assertNotEquals(a.getMethodCtxs(), b.getMethodCtxs());
 
 		assertTrue(a.getNumMethods() == b.getNumMethods());
 
@@ -343,7 +321,7 @@ public class EventStreamTest {
 		
 		sut.delete();
 
-		assertTrue(sut.getEnclMethods().isEmpty());
+		assertTrue(sut.getMethodCtxs().isEmpty());
 		assertTrue(sut.getMapping().isEmpty());
 		assertTrue(sut.getStream().isEmpty());
 	}

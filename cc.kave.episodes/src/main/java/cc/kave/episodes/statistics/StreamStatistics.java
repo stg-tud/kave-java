@@ -39,10 +39,10 @@ public class StreamStatistics {
 	}
 
 	public Map<Event, Integer> getFrequencies(List<Event> stream) {
-		Map<Event, Integer> occurrences = Maps.newHashMap();
+		Map<Event, Integer> occurrences = Maps.newLinkedHashMap();
 		
 		for (Event e : stream) {
-			if (occurrences.keySet().contains(e)) {
+			if (occurrences.containsKey(e)) {
 				int freq = occurrences.get(e);
 				occurrences.put(e, freq + 1);
 			} else {

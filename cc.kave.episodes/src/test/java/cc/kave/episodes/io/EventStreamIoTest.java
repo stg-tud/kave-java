@@ -132,9 +132,9 @@ public class EventStreamIoTest {
 		
 		List<Tuple<List<Fact>, Event>> actEventStream = sut.parseEventStream(FREQUENCY);
 
-		assertMapping(expected.getMapping().keySet(), actMapping);
+		assertMapping(expected.getMapping(), actMapping);
 
-		assertEquals(expected.getEnclMethods(), actMethods);
+		assertEquals(expected.getMethodCtxs(), actMethods);
 
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
@@ -179,9 +179,9 @@ public class EventStreamIoTest {
 		String actStringStream = sut.readStream(FREQUENCY);
 		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
-		assertMapping(expected.getMapping().keySet(), actMapping);
+		assertMapping(expected.getMapping(), actMapping);
 
-		assertEquals(expected.getEnclMethods(), actMethods);
+		assertEquals(expected.getMethodCtxs(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
 
@@ -216,9 +216,9 @@ public class EventStreamIoTest {
 		String actStringStream = sut.readStream(FREQUENCY);
 		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
-		assertMapping(expected.getMapping().keySet(), actMapping);
+		assertMapping(expected.getMapping(), actMapping);
 
-		assertEquals(expected.getEnclMethods(), actMethods);
+		assertEquals(expected.getMethodCtxs(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
 
@@ -258,9 +258,9 @@ public class EventStreamIoTest {
 		String actStringStream = sut.readStream(FREQUENCY);
 		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
-		assertMapping(expected.getMapping().keySet(), actMapping);
+		assertMapping(expected.getMapping(), actMapping);
 
-		assertEquals(expected.getEnclMethods(), actMethods);
+		assertEquals(expected.getMethodCtxs(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
 
@@ -301,9 +301,9 @@ public class EventStreamIoTest {
 		String actStringStream = sut.readStream(FREQUENCY);
 		List<List<Fact>> actParserStream = sut.parseStream(FREQUENCY);
 
-		assertMapping(expected.getMapping().keySet(), actMapping);
+		assertMapping(expected.getMapping(), actMapping);
 
-		assertEquals(expected.getEnclMethods(), actMethods);
+		assertEquals(expected.getMethodCtxs(), actMethods);
 		assertEquals(expected.getStream(), actStringStream);
 		assertEquals(expParseStream, actParserStream);
 

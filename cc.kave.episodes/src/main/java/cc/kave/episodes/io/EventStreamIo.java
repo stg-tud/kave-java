@@ -57,9 +57,9 @@ public class EventStreamIo {
 			FileUtils
 					.writeStringToFile(new File(getTrainPath(freq).streamPath),
 							stream.getStream());
-			JsonUtils.toJson(stream.getMapping().keySet(), new File(
+			JsonUtils.toJson(stream.getMapping(), new File(
 					getTrainPath(freq).mappingPath));
-			JsonUtils.toJson(stream.getEnclMethods(), new File(
+			JsonUtils.toJson(stream.getMethodCtxs(), new File(
 					getTrainPath(freq).methodsPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);

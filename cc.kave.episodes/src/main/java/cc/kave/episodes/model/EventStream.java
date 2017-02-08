@@ -19,6 +19,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -33,44 +34,36 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class EventStream {
-	public static final double DELTA = 0.001;
-	public static final double TIMEOUT = 0.5;
+	private static final double DELTA = 0.001;
+	private static final double TIMEOUT = 0.5;
 
-	private Map<Event, Integer> mappingData = Maps.newLinkedHashMap();
+	private Map<Event, Integer> eventsMapper = Maps.newLinkedHashMap();
+	private Map<Event, StringBuilder> stream = Maps.newLinkedHashMap();
 	private StringBuilder sb = new StringBuilder();
-	private List<Event> enclMethods = Lists.newLinkedList();
-	private int streamLength = 0;
+	private List<Event> ctxs = Lists.newLinkedList();
 	private int numMethods = 0;
 
-	boolean isFirstMethod = true;
-	double time = 0.000;
+	private boolean isFirstMethod = true;
+	private double time = 0.000;
 
 	public EventStream() {
-		this.mappingData.put(Events.newDummyEvent(), 0);
+		this.eventsMapper.put(Events.newDummyEvent(), 0);
 	}
 
 	public String getStream() {
 		return this.sb.toString();
 	}
 
-	public Map<Event, Integer> getMapping() {
-		return this.mappingData;
+	public Set<Event> getMapping() {
+		return this.eventsMapper.keySet();
 	}
 
-	public List<Event> getEnclMethods() {
-		return this.enclMethods;
+	public List<Event> getMethodCtxs() {
+		return this.ctxs;
 	}
 
 	public int getNumMethods() {
 		return this.numMethods;
-	}
-
-	public int getStreamLength() {
-		return this.streamLength;
-	}
-
-	public int getNumberEvents() {
-		return this.mappingData.size();
 	}
 
 	public void addEvent(Event event) {
@@ -78,8 +71,8 @@ public class EventStream {
 		possiblyIncreaseTimout(event);
 
 		if (event.getKind() == EventKind.METHOD_DECLARATION) {
-			enclMethods.add(event);
-			assertTrue(this.numMethods == this.enclMethods.size(),
+			ctxs.add(event);
+			assertTrue(this.numMethods == this.ctxs.size(),
 					"Mismatch between number of methods and enclosing methods!");
 			return;
 		}
@@ -100,15 +93,14 @@ public class EventStream {
 		sb.append('\n');
 
 		time += DELTA;
-		streamLength++;
 	}
 
 	private int ensureEventExistsAndGetId(Event event) {
-		if (mappingData.containsKey(event)) {
-			return mappingData.get(event);
+		if (eventsMapper.containsKey(event)) {
+			return eventsMapper.get(event);
 		} else {
-			int idx = getNumberEvents();
-			mappingData.put(event, idx);
+			int idx = getMapping().size();
+			eventsMapper.put(event, idx);
 			return idx;
 		}
 	}
@@ -124,8 +116,8 @@ public class EventStream {
 	}
 	
 	public void delete() {
-		this.enclMethods.clear();
-		this.mappingData.clear();
+		this.ctxs.clear();
+		this.eventsMapper.clear();
 		this.sb.delete(0, sb.length());
 	}
 
@@ -146,13 +138,13 @@ public class EventStream {
 	}
 
 	public boolean equals(EventStream sm) {
-		if (!this.mappingData.equals(sm.getMapping())) {
+		if (!this.eventsMapper.equals(sm.getMapping())) {
 			return false;
 		}
 		if (!this.sb.toString().equals(sm.getStream())) {
 			return false;
 		}
-		if (!this.getEnclMethods().equals(sm.getEnclMethods())) {
+		if (!this.getMethodCtxs().equals(sm.getMethodCtxs())) {
 			return false;
 		}
 		return true;

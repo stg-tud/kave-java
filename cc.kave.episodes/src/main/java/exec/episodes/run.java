@@ -32,7 +32,6 @@ public class run {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 	
-	private static final int NUMBREPOS = 200;
 	private static final int FREQTHRESH = 4;
 	private static final double BIDIRECTTHRESH = 0.6;
 	
