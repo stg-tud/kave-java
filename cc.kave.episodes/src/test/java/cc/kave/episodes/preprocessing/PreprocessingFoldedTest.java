@@ -48,7 +48,6 @@ public class PreprocessingFoldedTest {
 	private ValidationDataIO validationIo;
 
 	private static final int NUM_FOLD = 10;
-	private static final int FOLDNUM = 10;
 	private static final int FREQTHRESH = 5;
 
 	private PreprocessingFolded sut;

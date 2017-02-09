@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.Checkings;
+import cc.kave.episodes.postprocessor.PostChecking;
+import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -33,7 +34,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = 0;
-	private static final int FREQUENCY = 400;
+	private static final int FREQUENCY = 300;
 	private static final double ENTROPY = 0.1;
 
 	private static final int METHODSIZE = 500;
@@ -51,15 +52,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(Checkings.class).methodsOverlap();
-//		load(RepositoriesParser.class).generateReposEvents();
+//		load(Checkings.class).methodsOverlap();
 //		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
-		
-		//		load(ProjectsOverlap.class).checkReposOverlaps();
-//		load(ProjectsOverlap.class).checkFoldsOverlap();
-//		load(ProjectsOverlap.class).testCtxEventNames();
-		
-//		load(OverlapingTypes.class).getOverlaps(FREQ);
+		 
+//		 load(PostChecking.class).methodSize(FREQUENCY);
 		
 //		load(StreamAndMethodChecker.class).checkLengths();
 //		load(EventsReader.class).read(FREQ);

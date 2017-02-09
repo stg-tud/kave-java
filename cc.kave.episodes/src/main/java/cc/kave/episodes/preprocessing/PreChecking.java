@@ -21,12 +21,12 @@ import cc.recommenders.io.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class Checkings {
+public class PreChecking {
 
 	private RepositoriesParser reposParser;
 
 	@Inject
-	public Checkings(RepositoriesParser parser) {
+	public PreChecking(RepositoriesParser parser) {
 		this.reposParser = parser;
 	}
 
