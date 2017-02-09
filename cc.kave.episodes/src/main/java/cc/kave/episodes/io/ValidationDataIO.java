@@ -26,24 +26,24 @@ public class ValidationDataIO {
 		this.repoDir = folder;
 	}
 	
-	public void write(List<Event> stream, int frequency) {
-		JsonUtils.toJson(stream, getValidationPath(frequency));
+	public void write(List<Event> stream, int frequency, int foldNum) {
+		JsonUtils.toJson(stream, getValidationPath(frequency, foldNum));
 	}
 
-	public List<Event> read(int frequency) {
+	public List<Event> read(int frequency, int foldNum) {
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
-		List<Event> stream = JsonUtils.fromJson(getValidationPath(frequency), type);
+		List<Event> stream = JsonUtils.fromJson(getValidationPath(frequency, foldNum), type);
 		return stream;
 	}
 	
-	private File getValidationPath(int frequency) {
+	private File getValidationPath(int frequency, int foldNum) {
 		File path = new File(repoDir.getAbsolutePath() + "/freq" + frequency + "/ValidationData");
 		if (!path.exists()) {
 			path.mkdir();
 		}
-		File fileName = new File(path.getAbsoluteFile() + "/stream0.txt");
+		File fileName = new File(path.getAbsoluteFile() + "/stream" + foldNum + ".txt");
 		return fileName;
 	}
 }

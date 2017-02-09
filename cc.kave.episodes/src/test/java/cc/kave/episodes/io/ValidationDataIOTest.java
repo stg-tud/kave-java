@@ -25,6 +25,7 @@ public class ValidationDataIOTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private static final int FREQUENCY = 5;
+	private static final int FOLDNUM = 0;
 
 	private ValidationDataIO sut;
 
@@ -36,7 +37,7 @@ public class ValidationDataIOTest {
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories folder does not exist");
+		thrown.expectMessage("Events folder does not exist");
 		sut = new ValidationDataIO(new File("does not exist"));
 	}
 
@@ -44,7 +45,7 @@ public class ValidationDataIOTest {
 	public void cannotBeInitializedWithFile() throws IOException {
 		File file = tmp.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Repositories is not a folder, but a file");
+		thrown.expectMessage("Events is not a folder, but a file");
 		sut = new ValidationDataIO(file);
 	}
 
@@ -52,7 +53,7 @@ public class ValidationDataIOTest {
 	public void fileIsCreated() {
 		List<Event> stream = Lists.newLinkedList();
 
-		sut.write(stream, FREQUENCY);
+		sut.write(stream, FREQUENCY, FOLDNUM);
 
 		File validationData = getValidationPath();
 
@@ -62,9 +63,9 @@ public class ValidationDataIOTest {
 	@Test
 	public void readerCheck() {
 		List<Event> stream = Lists.newLinkedList();
-		sut.write(stream, FREQUENCY);
+		sut.write(stream, FREQUENCY, FOLDNUM);
 		
-		List<Event> actuals = sut.read(FREQUENCY);
+		List<Event> actuals = sut.read(FREQUENCY, FOLDNUM);
 		
 		assertTrue(actuals.isEmpty());
 		assertTrue(actuals.size() == 0);
@@ -72,7 +73,7 @@ public class ValidationDataIOTest {
 
 	private File getValidationPath() {
 		File fileName = new File(tmp.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY +"/ValidationData/stream0.json");
+				+ FREQUENCY +"/ValidationData/stream" + FOLDNUM + ".txt");
 		return fileName;
 	}
 }

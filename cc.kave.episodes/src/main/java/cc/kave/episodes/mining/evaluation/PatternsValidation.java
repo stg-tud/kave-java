@@ -95,7 +95,7 @@ public class PatternsValidation {
 				.getRepoTypesMapper();
 
 		Logger.log("Reading validation data ...");
-		List<Event> valData = validationIO.read(frequency);
+		List<Event> valData = validationIO.read(frequency, 0);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
 		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
 		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);

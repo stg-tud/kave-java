@@ -156,7 +156,7 @@ public class PatternValidationTest {
 				patterns);
 		when(episodeFilter.filter(any(Map.class), anyInt(), anyDouble()))
 				.thenReturn(patterns);
-		when(validationDataIo.read(anyInt())).thenReturn(valStream);
+		when(validationDataIo.read(anyInt(), anyInt())).thenReturn(valStream);
 		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(ep);
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
@@ -192,7 +192,7 @@ public class PatternValidationTest {
 		verify(eventStream).readMapping(anyInt(), anyInt());
 		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
-		verify(validationDataIo).read(anyInt());
+		verify(validationDataIo).read(anyInt(), anyInt());
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoTypesMapper();

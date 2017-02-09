@@ -1,4 +1,4 @@
-package cc.kave.episodes.preprocessing;
+package cc.kave.episodes.postprocessor;
 
 import java.io.File;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationDataIO;
@@ -31,50 +30,41 @@ public class OverlapingTypes {
 		this.valStream = validation;
 	}
 
+	private static final int FOLDNUM = 0;
+
 	public Set<ITypeName> getOverlaps(int frequency) {
-		List<Tuple<Event, List<Fact>>> trainCtx = trainStreamIo.parseStream(frequency, 0);
+		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
+				frequency, FOLDNUM);
 		Set<ITypeName> trainTyes = Sets.newLinkedHashSet();
 		Set<ITypeName> valTypes = Sets.newLinkedHashSet();
 
-		for (Tuple<Event, List<Fact>> tuple : trainCtx) {
-			if (!tuple.getFirst().getMethod().equals(Names.getUnknownMethod())) {
-				try {
-					trainTyes.add(tuple.getFirst().getMethod().getDeclaringType());
-				} catch (Exception e) {
-				}
+		for (Tuple<Event, List<Fact>> tuple : trainStream) {
+			try {
+				trainTyes.add(tuple.getFirst().getMethod().getDeclaringType());
+			} catch (Exception e) {
+				continue;
 			}
 		}
-		List<Event> valData = valStream.read(frequency);
+		List<Event> valData = valStream.read(frequency, FOLDNUM);
 
 		for (Event event : valData) {
-			if ((event.getKind() == EventKind.METHOD_DECLARATION)
-					&& (!event.getMethod().equals(Names.getUnknownMethod()))) {
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
 				try {
 					ITypeName typeName = event.getMethod().getDeclaringType();
-					String fullName = typeName.getFullName();
-					String name = event.getMethod().getName();
-					String methodName = fullName + "." + name;
-					
-					Logger.log("Type name is: %s", typeName);
-					Logger.log("Method name: %s", methodName);
-					
-					valTypes.add(event.getMethod().getDeclaringType());
+					valTypes.add(typeName);
 				} catch (Exception e) {
+					continue;
 				}
 			}
 		}
 
-		Set<ITypeName> overlaps = getSetOverlaps(trainTyes,
-				valTypes);
-		for (ITypeName type : overlaps) {
-			Logger.log("Type name: %s", type);
-			Logger.log("Namespace: %S", type.getNamespace());
-			Logger.log("");
-		}
-		Logger.log("Number of overlaping namespaces are: %d", overlaps.size());
+		Set<ITypeName> overlaps = getSetOverlaps(trainTyes, valTypes);
+		Logger.log(
+				"Number of overlaping types for training and validation data: %d",
+				overlaps.size());
 		Logger.log("Number of types in training stream: %d", trainTyes.size());
 		Logger.log("Number of types in validation stream: %d", valTypes.size());
-		
+
 		return overlaps;
 	}
 
@@ -82,9 +72,9 @@ public class OverlapingTypes {
 			Set<ITypeName> set2) {
 		Set<ITypeName> results = Sets.newLinkedHashSet();
 
-		for (ITypeName namespace : set1) {
-			if (set2.contains(namespace)) {
-				results.add(namespace);
+		for (ITypeName type : set1) {
+			if (set2.contains(type)) {
+				results.add(type);
 			}
 		}
 		return results;

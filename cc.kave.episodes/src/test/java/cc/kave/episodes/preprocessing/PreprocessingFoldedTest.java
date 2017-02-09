@@ -62,7 +62,7 @@ public class PreprocessingFoldedTest {
 		when(repoParser.generateReposEvents()).thenReturn(generateMapper());
 
 		doNothing().when(trainingIo).write(any(EventStream.class), anyInt(), anyInt());
-		doNothing().when(validationIo).write(anyListOf(Event.class), anyInt());
+		doNothing().when(validationIo).write(anyListOf(Event.class), anyInt(), anyInt());
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class PreprocessingFoldedTest {
 		verify(repoParser).generateReposEvents();
 
 		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt(), anyInt());
-		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt());
+		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt(), anyInt());
 	}
 
 	@Test

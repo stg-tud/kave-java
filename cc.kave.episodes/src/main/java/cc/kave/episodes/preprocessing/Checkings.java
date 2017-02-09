@@ -52,15 +52,17 @@ public class Checkings {
 	}
 
 	public void methodsOverlap() throws Exception {
+		Logger.log("Parsing repositories ...");
 		Map<String, EventStreamGenerator> repos = reposParser
 				.generateReposEvents();
 
+		Logger.log("Completed repositories parsing!");
 		List<Event> events = Lists.newLinkedList();
 
+		Logger.log("Getting stream data ...");
 		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
 			events.addAll(entry.getValue().getEventStream());
 		}
-
 		EventStream eventStream = EventsFilter.filterStream(events, 400);
 
 		List<Tuple<Event, String>> streamData = eventStream.getStreamData();
@@ -72,8 +74,7 @@ public class Checkings {
 					"Method context is not method element!");
 			assertTrue(!checkStream.contains(method), "Duplicate code in event stream!");
 			checkStream.add(method);
-			
-			Logger.log("Stream data size: %d - %d", streamData.size(), checkStream.size());
 		}
+		Logger.log("Stream data size: %d - %d", streamData.size(), checkStream.size());
 	}
 }

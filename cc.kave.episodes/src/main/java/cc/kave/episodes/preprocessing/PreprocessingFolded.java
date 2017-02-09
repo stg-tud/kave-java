@@ -47,13 +47,10 @@ public class PreprocessingFolded {
 			EventStream trainingStream = EventsFilter.filterStream(
 					trainingData, frequency);
 			eventStreamIo.write(trainingStream, frequency, curFold);
-			trainingData.clear();
-			trainingStream.delete();
 
 			List<Event> validationData = createValidationData(curFold,
 					NUM_FOLDS, repos);
-			validationIO.write(validationData, curFold);
-			validationData.clear();
+			validationIO.write(validationData, frequency, curFold);
 		}
 	}
 

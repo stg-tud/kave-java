@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Properties;
 
 import cc.kave.episodes.preprocessing.Checkings;
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;

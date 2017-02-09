@@ -51,7 +51,7 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(Checkings.class).noTypeOverlaps();;
+		load(Checkings.class).methodsOverlap();
 //		load(RepositoriesParser.class).generateReposEvents();
 //		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 		
