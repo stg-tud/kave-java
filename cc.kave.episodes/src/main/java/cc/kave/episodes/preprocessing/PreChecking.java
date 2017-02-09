@@ -30,7 +30,15 @@ public class PreChecking {
 		this.reposParser = parser;
 	}
 
-	public void noTypeOverlaps() throws Exception {
+	public void reposInfo() throws Exception {
+		reposParser.generateReposEvents();
+		Tuple<Integer, Integer> ctxOverlaps = reposParser.getReposInfo();
+
+		Logger.log("Unique contexts %d, duplicated contexts %d!",
+				ctxOverlaps.getFirst(), ctxOverlaps.getSecond());
+	}
+
+	public void typeOverlaps() throws Exception {
 		reposParser.generateReposEvents();
 		Map<String, Set<ITypeName>> reposTypesMapper = reposParser
 				.getRepoTypesMapper();
@@ -38,7 +46,12 @@ public class PreChecking {
 
 		for (Map.Entry<String, Set<ITypeName>> entry : reposTypesMapper
 				.entrySet()) {
+			int numTypes = entry.getValue().size();
 
+			if (entry.getValue().size() > 1) {
+				Logger.log("Repository %s contains %d types!", entry.getKey(),
+						numTypes);
+			}
 			for (ITypeName t : entry.getValue()) {
 
 				if (types.contains(t)) {
@@ -49,6 +62,7 @@ public class PreChecking {
 				}
 			}
 		}
+		Logger.log("There are no duplicated types in the repositories!");
 	}
 
 	public void methodsOverlap() throws Exception {
@@ -72,9 +86,11 @@ public class PreChecking {
 			assertTrue(
 					method.getFirst().getKind() == EventKind.METHOD_DECLARATION,
 					"Method context is not method element!");
-			assertTrue(!checkStream.contains(method), "Duplicate code in event stream!");
+			assertTrue(!checkStream.contains(method),
+					"Duplicate code in event stream!");
 			checkStream.add(method);
 		}
-		Logger.log("Stream data size: %d - %d", streamData.size(), checkStream.size());
+		Logger.log("Stream data size: %d - %d", streamData.size(),
+				checkStream.size());
 	}
 }

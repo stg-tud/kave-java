@@ -41,8 +41,6 @@ public class EventStreamIo {
 
 	private File eventsDir;
 
-	public static final double TIMEOUT = 0.5;
-
 	@Inject
 	public EventStreamIo(@Named("events") File folder) {
 		assertTrue(folder.exists(), "Events folder does not exist");

@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
 
 public class EventStream {
 	private static final double DELTA = 0.001;
-	private static final double TIMEOUT = 0.5;
+	private static final double TIMEOUT = 5.0;
 
 	private Map<Event, Integer> eventsMapper = Maps.newLinkedHashMap();
 	private List<Tuple<Event, String>> stream = Lists.newLinkedList();

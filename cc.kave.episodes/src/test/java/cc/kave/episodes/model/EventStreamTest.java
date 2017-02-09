@@ -114,7 +114,7 @@ public class EventStreamTest {
 		expectedMap.add(Events.newDummyEvent());
 		expectedMap.add(firstCtx(1));
 		
-		String expectedStream = "1,0.500\n";
+		String expectedStream = "1,5.000\n";
 		String actualStream = sut.getStreamText();
 		
 		List<Tuple<Event, String>> expStreamData = Lists.newLinkedList();
@@ -168,12 +168,12 @@ public class EventStreamTest {
 		expSb.append("2,0.001\n");
 		expSb.append("3,0.002\n");
 		expSb.append("4,0.003\n");
-		expSb.append("3,0.504\n");
+		expSb.append("3,5.004\n");
 
 		List<Tuple<Event, String>> expStream = Lists.newLinkedList();
 		expStream.add(Tuple.newTuple(enclCtx(3),
 				"1,0.000\n2,0.001\n3,0.002\n4,0.003\n"));
-		expStream.add(Tuple.newTuple(enclCtx(1), "3,0.504\n"));
+		expStream.add(Tuple.newTuple(enclCtx(1), "3,5.004\n"));
 
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(expStream, sut.getStreamData());

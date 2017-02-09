@@ -36,6 +36,7 @@ import java.util.Set;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -56,6 +57,7 @@ public class RepositoriesParser {
 	}
 
 	private Set<ITypeName> types = Sets.newLinkedHashSet();
+	private Set<ITypeName> duplicateTypes = Sets.newLinkedHashSet();
 	private Map<String, Set<ITypeName>> reposTypesMapper = Maps
 			.newLinkedHashMap();
 
@@ -84,6 +86,8 @@ public class RepositoriesParser {
 						repoGen.add(ctx);
 						types.add(typeName);
 						addToMapper(repoName, typeName);
+					} else {
+						duplicateTypes.add(typeName);
 					}
 				}
 			}
@@ -94,7 +98,12 @@ public class RepositoriesParser {
 		}
 		return results;
 	}
-
+	
+	public Tuple<Integer, Integer> getReposInfo() {
+		Tuple<Integer, Integer> tuple = Tuple.newTuple(types.size(), duplicateTypes.size());
+		return tuple;
+	}
+	
 	public Map<String, Set<ITypeName>> getRepoTypesMapper() {
 		return this.reposTypesMapper;
 	}

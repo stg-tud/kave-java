@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.postprocessor.PostChecking;
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
+import cc.kave.episodes.preprocessing.PreChecking;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -52,7 +51,7 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-//		load(Checkings.class).methodsOverlap();
+		load(PreChecking.class).reposInfo();
 //		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 		 
 //		 load(PostChecking.class).methodSize(FREQUENCY);

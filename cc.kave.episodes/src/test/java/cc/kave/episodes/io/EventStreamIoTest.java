@@ -91,8 +91,8 @@ public class EventStreamIoTest {
 
 		List<Tuple<Event, String>> stream = Lists.newLinkedList();
 		stream.add(Tuple.newTuple(firstCtx(1), "1,0.000\n2,0.001\n"));
-		stream.add(Tuple.newTuple(inv(2), "3,0.502\n"));
-		stream.add(Tuple.newTuple(inv(4), "2,1.503\n3,1.504\n"));
+		stream.add(Tuple.newTuple(inv(2), "3,5.002\n"));
+		stream.add(Tuple.newTuple(inv(4), "2,15.003\n3,15.004\n"));
 
 		JsonUtils.toJson(stream, getStreamDataFile());
 
