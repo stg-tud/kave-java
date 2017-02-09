@@ -1,8 +1,5 @@
 package cc.kave.episodes.preprocessing;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
-import java.io.File;
 import java.util.List;
 
 import cc.kave.episodes.io.EventStreamIo;
@@ -12,19 +9,14 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class EventStreamSize {
 
-	private File reposDir;
 	private EventStreamIo eventStreamIo;
 
 	@Inject
-	public EventStreamSize(@Named("repositories") File folder) {
-		assertTrue(folder.exists(), "Repositories folder does not exist");
-		assertTrue(folder.isDirectory(),
-				"Repositories is not a folder, but a file");
-		this.reposDir = folder;
+	public EventStreamSize(EventStreamIo eventStream) {
+		this.eventStreamIo = eventStream;
 	}
 
 	public void printNumberOfEvents(int frequency) {
@@ -47,7 +39,6 @@ public class EventStreamSize {
 			
 			for (Tuple<Event, List<Fact>> m : stream) {
 				if (m.getSecond().size() > sizeLimit) {
-					int index = stream.indexOf(m);
 					Event event = m.getFirst();
 					String enclMethod = getMethodName(event);
 					
