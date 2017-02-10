@@ -34,7 +34,7 @@ public class PreChecking {
 		reposParser.generateReposEvents();
 		Tuple<Integer, Integer> ctxOverlaps = reposParser.getReposInfo();
 
-		Logger.log("Unique contexts %d, duplicated contexts %d!",
+		Logger.log("Unique types %d, duplicated types %d!",
 				ctxOverlaps.getFirst(), ctxOverlaps.getSecond());
 	}
 

@@ -2,15 +2,18 @@ package cc.kave.episodes.postprocessor;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.ValidationDataIO;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -23,17 +26,26 @@ import com.google.common.collect.Sets;
 
 public class PostChecking {
 
+	private File eventsFolder;
+
 	private EventStreamIo trainStreamIo;
 	private ValidationDataIO valStreamIo;
+	private FileReader fileReader;
 
 	@Inject
-	public PostChecking(EventStreamIo streamIo, ValidationDataIO validation) {
+	public PostChecking(@Named("events") File folder, EventStreamIo streamIo,
+			ValidationDataIO validation, FileReader fileIo) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.eventsFolder = folder;
 		this.trainStreamIo = streamIo;
 		this.valStreamIo = validation;
+		this.fileReader = fileIo;
 	}
 
 	private static final int FOLDNUM = 0;
-	private static final int METHODSIZE = 500;
+	private static final int METHODSIZE = 5000;
+	private static final double TIMEOUT = 5.0;
 
 	public void numEvents(int frequency) {
 		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
@@ -78,16 +90,17 @@ public class PostChecking {
 				longMethodsCtxs.add(tuple.getFirst());
 			}
 		}
-		Logger.log("Number of methods with more than 500 events: %d", longMethodsCtxs.size());
+		Logger.log("Number of methods with more than %d events: %d",
+				METHODSIZE, longMethodsCtxs.size());
 		for (Tuple<Event, List<Fact>> tuple : trainStream) {
-			
+
 			if (longMethodsCtxs.contains(tuple.getFirst())) {
 				IMethodName method = tuple.getFirst().getMethod();
 				String typeName = method.getDeclaringType().getFullName();
 				String methodName = method.getName();
 				String fullName = typeName + "." + methodName;
 				Logger.log("%s: %d events", fullName, tuple.getSecond().size());
-			} 
+			}
 		}
 	}
 
@@ -108,6 +121,47 @@ public class PostChecking {
 			}
 		}
 		Logger.log("Method content is correct in training stream!");
+	}
+
+	public void streamSizes(int frequency) {
+		List<String> streamText = fileReader.readFile(new File(
+				getStreamTextPath(frequency)));
+		List<List<Fact>> streamFacts = parseStreamText(streamText);
+		List<Tuple<Event, List<Fact>>> streamData = trainStreamIo.parseStream(
+				frequency, FOLDNUM);
+		
+		Logger.log("%d - %d", streamFacts.size(), streamData.size());
+		assertTrue(streamFacts.size() == streamData.size(), "Missmatch in stream sizes!");
+	}
+
+	private List<List<Fact>> parseStreamText(List<String> stream) {
+		List<List<Fact>> streamResult = Lists.newLinkedList();
+		List<Fact> method = Lists.newLinkedList();
+		double prevTime = 0.0;
+
+		for (String entry : stream) {
+			String[] line = entry.split(",");
+			int eventId = Integer.parseInt(line[0]);
+			double time = Double.parseDouble(line[1]);
+			if ((time - prevTime) > TIMEOUT) {
+				if (!method.isEmpty()) {
+					streamResult.add(method);
+					method = Lists.newLinkedList();
+				}
+			}
+			prevTime = time;
+			method.add(new Fact(eventId));
+		}
+		if (!method.isEmpty()) {
+			streamResult.add(method);
+		}
+		return streamResult;
+	}
+
+	private String getStreamTextPath(int frequency) {
+		String fileName = eventsFolder.getAbsolutePath() + "/freq" + frequency
+				+ "/TrainingData/fold" + FOLDNUM + "/streamText.txt";
+		return fileName;
 	}
 
 	private List<Event> getInvocations(List<Fact> method, List<Event> events) {
