@@ -35,19 +35,20 @@ public class EpisodesParser {
 
 	private File eventsDir;
 	private FileReader reader;
-	
+
 	@Inject
-	public EpisodesParser(@Named("events") File rootFolder, FileReader reader) {
-		assertTrue(rootFolder.exists(), "Events folder does not exist");
-		assertTrue(rootFolder.isDirectory(),
-				"Events is not a folder, but a file");
-		this.eventsDir = rootFolder;
+	public EpisodesParser(@Named("events") File folder, FileReader reader) {
+		assertTrue(folder.exists(), "Events folder does not exist");
+		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
+		this.eventsDir = folder;
 		this.reader = reader;
 	}
-	
-	public Map<Integer, Set<Episode>> parse(int frequency, EpisodeType episodeType) {
 
-		List<String> lines = reader.readFile(getEpisodesFile(frequency, episodeType));
+	public Map<Integer, Set<Episode>> parse(int frequency,
+			EpisodeType episodeType) {
+
+		List<String> lines = reader.readFile(getEpisodesFile(frequency,
+				episodeType));
 
 		Map<Integer, Set<Episode>> episodeIndexed = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -79,9 +80,10 @@ public class EpisodesParser {
 		}
 		return episodeIndexed;
 	}
-	
+
 	private String getPath(int frequency) {
-		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency + "/TrainingData/fold0");
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency
+				+ "/TrainingData/fold0");
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}
@@ -97,20 +99,8 @@ public class EpisodesParser {
 		} else {
 			type = "Par";
 		}
-		File fileName = new File(getPath(frequency) + "/episodes" + type + ".txt");
-		return fileName;
-	}
-	
-	private File getEpisodesJsons(int frequency, EpisodeType episodeType) {
-		String type = "";
-		if (episodeType == EpisodeType.SEQUENTIAL) {
-			type = "Seq";
-		} else if (episodeType == EpisodeType.GENERAL) {
-			type = "Mix";
-		} else {
-			type = "Par";
-		}
-		File fileName = new File(getPath(frequency) + "/episodes" + type + "1.json");
+		File fileName = new File(getPath(frequency) + "/episodes" + type
+				+ ".txt");
 		return fileName;
 	}
 

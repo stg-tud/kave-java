@@ -54,10 +54,8 @@ public class run_ervina {
 //		load(PreChecking.class).methodsOverlap();
 //		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 		 
-		 load(PostChecking.class).streamSizes(FREQUENCY);
+//		 load(PostChecking.class).numEvents(FREQUENCY);
 		
-//		load(StreamAndMethodChecker.class).checkLengths();
-//		load(EventsReader.class).read(FREQ);
 //		load(PatternsValidation.class).validate(FREQ, EpisodeType.PARALLEL);
 //		load(EpisodeWriter.class).writeNewEpisodes(FREQ);
 //		load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL, EpisodeType.SEQUENTIAL);

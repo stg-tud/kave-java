@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.eventstream;
+package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.postprocessor.ThresholdsFrequency;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;

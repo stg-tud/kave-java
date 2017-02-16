@@ -42,7 +42,6 @@ public class EpisodesParserTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private static final int FREQUENCY = 100;
-	private static final EpisodeType EPISODETYPE = EpisodeType.GENERAL;
 
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
@@ -67,7 +66,7 @@ public class EpisodesParserTest {
 
 		String content = sb.toString();
 
-		File file = getFilePath();
+		File file = getFilePath(EpisodeType.GENERAL);
 
 		try {
 			FileUtils.writeStringToFile(file, content);
@@ -82,7 +81,7 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.GENERAL);
 
 		verify(reader).readFile(file);
 
@@ -100,7 +99,7 @@ public class EpisodesParserTest {
 
 		String content = sb.toString();
 
-		File file = getFilePath();
+		File file = getFilePath(EpisodeType.SEQUENTIAL);
 
 		try {
 			FileUtils.writeStringToFile(file, content);
@@ -115,7 +114,7 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.SEQUENTIAL);
 
 		verify(reader).readFile(file);
 
@@ -134,7 +133,7 @@ public class EpisodesParserTest {
 
 		String content = sb.toString();
 
-		File file = getFilePath();
+		File file = getFilePath(EpisodeType.PARALLEL);
 
 		try {
 			FileUtils.writeStringToFile(file, content);
@@ -159,7 +158,7 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EPISODETYPE);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.PARALLEL);
 
 		verify(reader).readFile(file);
 
@@ -176,11 +175,11 @@ public class EpisodesParserTest {
 		return episode;
 	}
 
-	private File getFilePath() {
+	private File getFilePath(EpisodeType type) {
 		String episodeType = "";
-		if (EPISODETYPE == EpisodeType.SEQUENTIAL) {
+		if (type == EpisodeType.SEQUENTIAL) {
 			episodeType = "Seq";
-		} else if (EPISODETYPE == EpisodeType.GENERAL) {
+		} else if (type == EpisodeType.GENERAL) {
 			episodeType = "Mix";
 		} else {
 			episodeType = "Par";

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.kave.episodes.eventstream;
+package cc.kave.episodes.postprocessor;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
