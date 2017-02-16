@@ -62,6 +62,7 @@ public class ThresholdsBidirectionalTest {
 	
 	private static final int NUMBREPOS = 2;
 	private static final int FREQTHRESH = 3;
+	private static final int FOLDNUM = 0;
 	
 	private ThresholdsBidirection sut;
 	
@@ -94,7 +95,7 @@ public class ThresholdsBidirectionalTest {
 		
 		sut = new ThresholdsBidirection(rootFolder.getRoot(), episodeParser, stats);
 		
-		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(episodes);
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
 	}
 	
 	@After
@@ -119,16 +120,16 @@ public class ThresholdsBidirectionalTest {
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(FREQTHRESH, EpisodeType.GENERAL);
+		sut.writer(EpisodeType.GENERAL, FREQTHRESH, FOLDNUM);
 
-		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(FREQTHRESH, any(EpisodeType.class));
+		sut.writer(any(EpisodeType.class), FREQTHRESH, FOLDNUM);
 
-		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 
 		File bdsFile = new File(getBdsPath());
 
@@ -137,9 +138,9 @@ public class ThresholdsBidirectionalTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(FREQTHRESH, EpisodeType.GENERAL);
+		sut.writer(EpisodeType.GENERAL, FREQTHRESH, FOLDNUM);
 
-		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 
 		File bdsFile = new File(getBdsPath());
 		

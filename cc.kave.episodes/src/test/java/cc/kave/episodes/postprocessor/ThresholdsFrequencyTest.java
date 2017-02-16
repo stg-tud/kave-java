@@ -41,7 +41,6 @@ import org.mockito.MockitoAnnotations;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.postprocessor.ThresholdsFrequency;
 import cc.kave.episodes.statistics.EpisodesStatistics;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
@@ -62,6 +61,7 @@ public class ThresholdsFrequencyTest {
 	private EpisodesStatistics stats;
 	
 	private static final int FREQUENCY = 2;
+	private static final int FOLDNUM = 0;
 	
 	private ThresholdsFrequency sut;
 	
@@ -94,7 +94,7 @@ public class ThresholdsFrequencyTest {
 		
 		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
-		when(parser.parse(anyInt(), any(EpisodeType.class))).thenReturn(episodes);
+		when(parser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
 	}
 	
 	@After
@@ -119,16 +119,16 @@ public class ThresholdsFrequencyTest {
 
 	@Test
 	public void mockIsCalled() throws ZipException, IOException {
-		sut.writer(FREQUENCY, EpisodeType.GENERAL);
+		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(anyInt(), any(EpisodeType.class));
+		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
-		sut.writer(FREQUENCY, EpisodeType.GENERAL);
+		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(anyInt(), any(EpisodeType.class));
+		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 
@@ -137,9 +137,9 @@ public class ThresholdsFrequencyTest {
 	
 	@Test
 	public void contentTest() throws IOException {
-		sut.writer(FREQUENCY, EpisodeType.GENERAL);
+		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(anyInt(), any(EpisodeType.class));
+		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 		

@@ -50,6 +50,7 @@ import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.model.events.Event;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -227,6 +228,17 @@ public class RepositoriesParserTest {
 		
 		sut.generateReposEvents();
 		Map<String, Set<ITypeName>> actuals = sut.getRepoTypesMapper();
+		
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void getTypes() throws Exception {
+		Tuple<Integer, Integer> expected = Tuple.newTuple(2, 1);
+		
+		sut.generateReposEvents();
+		
+		Tuple<Integer, Integer> actuals = sut.getReposInfo();
 		
 		assertEquals(expected, actuals);
 	}

@@ -106,7 +106,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
-		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(episodes);
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
 		when(mappingParser.parse(REPOS)).thenReturn(events);
 	}
 

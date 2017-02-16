@@ -40,7 +40,8 @@ public class ThresholdsFrequency {
 	private EpisodesStatistics statistics;
 
 	@Inject
-	public ThresholdsFrequency(@Named("patterns") File folder, EpisodesParser parse, EpisodesStatistics stats) {
+	public ThresholdsFrequency(@Named("patterns") File folder,
+			EpisodesParser parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -48,35 +49,42 @@ public class ThresholdsFrequency {
 		this.statistics = stats;
 	}
 
-	public void writer(int frequency, EpisodeType episodeType) throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, episodeType);
+	public void writer(EpisodeType episodeType, int frequency, int foldNum)
+			throws IOException {
+		Map<Integer, Set<Episode>> episodes = parser.parse(episodeType,
+				frequency, foldNum);
 		StringBuilder freqsBuilder = new StringBuilder();
-		
+
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() == 1) {
 				continue;
 			}
 			Logger.log("Writting %d - node episodes", entry.getKey());
-			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry.getValue());
+			Map<Integer, Integer> frequences = statistics.freqsEpisodes(entry
+					.getValue());
 			String freqsLevel = getFreqsStringRep(entry.getKey(), frequences);
 			freqsBuilder.append(freqsLevel);
 		}
-		FileUtils.writeStringToFile(new File(getFreqPath(frequency)), freqsBuilder.toString());
+		FileUtils.writeStringToFile(new File(getFreqPath(frequency)),
+				freqsBuilder.toString());
 	}
 
-	private String getFreqsStringRep(Integer epLevel, Map<Integer, Integer> frequences) {
-		String data = "Frequency distribution for " + epLevel + "-node episodes:\n";
+	private String getFreqsStringRep(Integer epLevel,
+			Map<Integer, Integer> frequences) {
+		String data = "Frequency distribution for " + epLevel
+				+ "-node episodes:\n";
 		data += "Frequency\tCounter\n";
-		
+
 		for (Map.Entry<Integer, Integer> entry : frequences.entrySet()) {
 			data += entry.getKey() + "\t" + entry.getValue() + "\n";
 		}
 		data += "\n";
 		return data;
 	}
-	
+
 	private String getFreqPath(int numbRepos) {
-		String freqPath = patternsFolder.getAbsolutePath() + "/freqs" + numbRepos + "Repos.txt";
+		String freqPath = patternsFolder.getAbsolutePath() + "/freqs"
+				+ numbRepos + "Repos.txt";
 
 		return freqPath;
 	}

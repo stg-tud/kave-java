@@ -48,8 +48,8 @@ public class ThresholdsBidirection {
 		this.statistics = stats;
 	}
 
-	public void writer(int frequency, EpisodeType episodeType) throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(frequency, episodeType);
+	public void writer(EpisodeType episodeType, int frequency, int foldNum) throws IOException {
+		Map<Integer, Set<Episode>> episodes = parser.parse(episodeType, frequency, foldNum);
 		StringBuilder bdsBuilder = new StringBuilder();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {

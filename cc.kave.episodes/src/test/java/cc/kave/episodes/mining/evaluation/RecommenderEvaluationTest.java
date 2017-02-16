@@ -148,7 +148,7 @@ public class RecommenderEvaluationTest {
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(patterns);
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(patterns);
 		when(mappingParser.parse(REPOS)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
@@ -182,7 +182,7 @@ public class RecommenderEvaluationTest {
 		Logger.clearLog();
 		sut.evaluate(REPOS);
 
-		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(mappingParser).parse(REPOS);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);

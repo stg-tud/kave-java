@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.postprocessor.PostChecking;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;

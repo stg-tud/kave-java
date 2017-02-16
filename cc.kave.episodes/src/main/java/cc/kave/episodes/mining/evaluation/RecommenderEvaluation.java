@@ -301,7 +301,7 @@ public class RecommenderEvaluation {
 
 	private Map<Integer, Set<Episode>> readPatterns() {
 		Logger.log("Reading the learned patterns");
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(100, EpisodeType.GENERAL);
+		Map<Integer, Set<Episode>> patterns = episodeParser.parse(EpisodeType.GENERAL, 100, 0);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		return maxPatterns;
 	}

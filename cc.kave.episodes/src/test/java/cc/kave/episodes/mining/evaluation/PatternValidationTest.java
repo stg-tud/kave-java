@@ -88,6 +88,7 @@ public class PatternValidationTest {
 	private Set<ITypeName> typeOverlaps;
 
 	private static final int FREQUENCY = 5;
+	private static final double ENTROPY = 0.5;
 	private static final int FOLDNUM = 0;
 
 	private PatternsValidation sut;
@@ -152,7 +153,7 @@ public class PatternValidationTest {
 
 		when(eventStream.parseStream(anyInt(), anyInt())).thenReturn(streamMethods);
 		when(eventStream.readMapping(anyInt(), anyInt())).thenReturn(trainEvents);
-		when(episodeParser.parse(anyInt(), any(EpisodeType.class))).thenReturn(
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(
 				patterns);
 		when(episodeFilter.filter(any(Map.class), anyInt(), anyDouble()))
 				.thenReturn(patterns);
@@ -185,12 +186,12 @@ public class PatternValidationTest {
 
 	@Test
 	public void mocksAreCalled() throws Exception {
-		sut.validate(FREQUENCY, EpisodeType.GENERAL);
+		sut.validate(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
 		;
 
 		verify(eventStream).parseStream(anyInt(), anyInt());
 		verify(eventStream).readMapping(anyInt(), anyInt());
-		verify(episodeParser).parse(anyInt(), any(EpisodeType.class));
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
 		verify(validationDataIo).read(anyInt(), anyInt());
 		verify(transClosure).remTransClosure(any(Episode.class));
@@ -204,7 +205,7 @@ public class PatternValidationTest {
 		File patternFile = getPatternFile(EpisodeType.SEQUENTIAL, 0);
 		File evalFile = getEvalFile(EpisodeType.SEQUENTIAL);
 
-		sut.validate(FREQUENCY, EpisodeType.SEQUENTIAL);
+		sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 
 		assertTrue(patternFile.exists());
 		assertTrue(evalFile.exists());
@@ -213,7 +214,7 @@ public class PatternValidationTest {
 	@Test
 	public void checkFileContent() throws Exception {
 
-		sut.validate(FREQUENCY, EpisodeType.SEQUENTIAL);
+		sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 
 		String actuals = FileUtils
 				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));

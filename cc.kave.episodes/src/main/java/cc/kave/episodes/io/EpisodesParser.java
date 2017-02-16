@@ -44,11 +44,11 @@ public class EpisodesParser {
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> parse(int frequency,
-			EpisodeType episodeType) {
+	public Map<Integer, Set<Episode>> parse(EpisodeType episodeType,
+			int frequency, int foldNum) {
 
-		List<String> lines = reader.readFile(getEpisodesFile(frequency,
-				episodeType));
+		List<String> lines = reader.readFile(getEpisodesFile(episodeType,
+				frequency, foldNum));
 
 		Map<Integer, Set<Episode>> episodeIndexed = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -81,16 +81,17 @@ public class EpisodesParser {
 		return episodeIndexed;
 	}
 
-	private String getPath(int frequency) {
+	private String getPath(int frequency, int foldNum) {
 		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency
-				+ "/TrainingData/fold0");
+				+ "/TrainingData/fold" + foldNum);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}
 		return path.getAbsolutePath();
 	}
 
-	private File getEpisodesFile(int frequency, EpisodeType episodeType) {
+	private File getEpisodesFile(EpisodeType episodeType, int frequency,
+			int foldNum) {
 		String type = "";
 		if (episodeType == EpisodeType.SEQUENTIAL) {
 			type = "Seq";
@@ -99,8 +100,8 @@ public class EpisodesParser {
 		} else {
 			type = "Par";
 		}
-		File fileName = new File(getPath(frequency) + "/episodes" + type
-				+ ".txt");
+		File fileName = new File(getPath(frequency, foldNum) + "/episodes"
+				+ type + ".txt");
 		return fileName;
 	}
 

@@ -42,6 +42,7 @@ public class EpisodesParserTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private static final int FREQUENCY = 100;
+	private static final int FOLDNUM = 0;
 
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
@@ -81,7 +82,8 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.GENERAL);
+		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.GENERAL,
+				FREQUENCY, FOLDNUM);
 
 		verify(reader).readFile(file);
 
@@ -114,7 +116,8 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.SEQUENTIAL);
+		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.SEQUENTIAL,
+				FREQUENCY, FOLDNUM);
 
 		verify(reader).readFile(file);
 
@@ -158,7 +161,8 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY, EpisodeType.PARALLEL);
+		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.PARALLEL,
+				FREQUENCY, FOLDNUM);
 
 		verify(reader).readFile(file);
 
@@ -185,8 +189,8 @@ public class EpisodesParserTest {
 			episodeType = "Par";
 		}
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath()
-				+ "/freq" + FREQUENCY + "/TrainingData/fold0/episodes" + episodeType
-				+ ".txt");
+				+ "/freq" + FREQUENCY + "/TrainingData/fold0/episodes"
+				+ episodeType + ".txt");
 		return fileName;
 	}
 }

@@ -52,8 +52,6 @@ public class PatternsValidation {
 
 	private RepositoriesParser repoParser;
 
-	private static final double ENTROPY = 0.0;
-
 	@Inject
 	public PatternsValidation(@Named("patterns") File patternsFolder,
 			EpisodesFilter epFilter, EventStreamIo eventStream,
@@ -75,19 +73,19 @@ public class PatternsValidation {
 		this.repoParser = reposParser;
 	}
 
-	public void validate(int frequency, EpisodeType episodeType)
-			throws Exception {
+	public void validate(EpisodeType episodeType, int frequency,
+			double entropy, int foldNum) throws Exception {
 		Logger.log("Reading events ...");
-		List<Event> trainEvents = eventStream.readMapping(frequency, 0);
+		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
 		Logger.log("Reading training stream ...");
 		List<Tuple<Event, List<Fact>>> streamContexts = eventStream
-				.parseStream(frequency, 0);
+				.parseStream(frequency, foldNum);
 
 		Logger.log("Reading episodes ...");
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency,
-				episodeType);
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(episodeType,
+				frequency, foldNum);
 		Map<Integer, Set<Episode>> patterns = getFilteredEpisodes(episodes,
-				episodeType, frequency);
+				episodeType, frequency, entropy);
 
 		Logger.log("Reading repositories -  enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
@@ -95,7 +93,7 @@ public class PatternsValidation {
 				.getRepoTypesMapper();
 
 		Logger.log("Reading validation data ...");
-		List<Event> valData = validationIO.read(frequency, 0);
+		List<Event> valData = validationIO.read(frequency, foldNum);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
 		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
 		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);
@@ -290,9 +288,9 @@ public class PatternsValidation {
 
 	private Map<Integer, Set<Episode>> getFilteredEpisodes(
 			Map<Integer, Set<Episode>> episodes, EpisodeType episodeType,
-			int frequency) {
+			int frequency, double entropy) {
 		if (episodeType == EpisodeType.GENERAL) {
-			return episodeFilter.filter(episodes, frequency, ENTROPY);
+			return episodeFilter.filter(episodes, frequency, entropy);
 		}
 		return episodes;
 	}
