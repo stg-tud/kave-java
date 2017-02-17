@@ -46,9 +46,7 @@ public class ValidationDataIOTest {
 		eventStream = Lists.newArrayList(firstCtx(1), enclCtx(0), inv(2), inv(3), 
 				firstCtx(0), superCtx(2), enclCtx(7), inv(5), inv(0), inv(2), 
 				firstCtx(1), enclCtx(6), inv(2), inv(3), 
-				firstCtx(1), enclCtx(0), inv(2), inv(3),
 				firstCtx(0), enclCtx(8), inv(2),
-				firstCtx(1), enclCtx(6), inv(2), inv(3), 
 				firstCtx(3), superCtx(4), enclCtx(0), inv(3));
 		
 		events = Maps.newLinkedHashMap();
@@ -117,13 +115,7 @@ public class ValidationDataIOTest {
 		method = Lists.newArrayList(new Fact(0), new Fact(9), new Fact(2), new Fact(3));
 		expected.add(method);
 		
-		method = Lists.newArrayList(new Fact(0), new Fact(1), new Fact(2), new Fact(3));
-		expected.add(method);
-		
 		method = Lists.newArrayList(new Fact(4), new Fact(10), new Fact(2));
-		expected.add(method);
-		
-		method = Lists.newArrayList(new Fact(0), new Fact(9), new Fact(2), new Fact(3));
 		expected.add(method);
 		
 		method = Lists.newArrayList(new Fact(11), new Fact(12), new Fact(1), new Fact(3));

@@ -96,7 +96,8 @@ public class PatternsValidation {
 		List<Event> valData = validationIO.read(frequency, foldNum);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
 		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
-		List<List<Fact>> valStream = validationIO.streamOfFacts(valData, eventsMap);
+		List<List<Fact>> valStream = validationIO.streamOfFacts(valData,
+				eventsMap);
 
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
@@ -110,8 +111,6 @@ public class PatternsValidation {
 
 			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
 			for (Episode episode : entry.getValue()) {
-				Logger.log("Processing pattern %d ...", patternId);
-
 				int occTraining = getReposOcc(episode, frequency,
 						streamContexts, repoCtxMapper);
 				if (occTraining == 0) {
@@ -225,7 +224,6 @@ public class PatternsValidation {
 			Map<String, Set<ITypeName>> repoCtxMapper) {
 
 		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
-		Set<String> ctxs = Sets.newLinkedHashSet();
 
 		for (Tuple<Event, List<Fact>> tuple : streamContexts) {
 			List<Fact> method = tuple.getSecond();
@@ -233,36 +231,16 @@ public class PatternsValidation {
 				continue;
 			}
 			if (method.containsAll(episode.getEvents())) {
-				IMethodName methodCtx = tuple.getFirst().getMethod();
-				String typeName = "";
-				try {
-					typeName = methodCtx.getDeclaringType().getFullName();
-				} catch (Exception e) {
-				}
-				String methodName = "";
-				try {
-					methodName = methodCtx.getName();
-				} catch (Exception e) {
-				}
-				String ctxName = typeName + "." + methodName;
-				if (ctxs.contains(ctxName)) {
-					continue;
-				}
-				ctxs.add(ctxName);
 				methodsOrderRelation.addMethod(episode, method,
 						tuple.getFirst());
 			}
 		}
-		if (methodsOrderRelation.getOccurrences() < frequency) {
-			Logger.log("Episode %s", episode.getFacts());
-			Logger.log("Frequencies: %d - %d",
-					methodsOrderRelation.getOccurrences(),
-					episode.getFrequency());
-			return 0;
-		}
+		int trainOcc = methodsOrderRelation.getOccurrences();
+		assertTrue(trainOcc == episode.getFrequency(),
+				"Episode has a different frequency in training data!");
 
 		Set<IMethodName> methodOcc = methodsOrderRelation
-				.getMethodNames(methodsOrderRelation.getOccurrences());
+				.getMethodNames(trainOcc);
 		Set<ITypeName> obsTypeNames = Sets.newLinkedHashSet();
 		Set<String> repositories = Sets.newLinkedHashSet();
 

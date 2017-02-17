@@ -17,6 +17,8 @@ package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import java.util.Set;
@@ -48,7 +50,7 @@ public class EnclosingMethodsTest {
 
 	@Test
 	public void defaultValues() {
-		assertEquals(0, sut0.getOccurrences());
+		assertTrue(sut0.getOccurrences() == 0);
 		assertEquals(Sets.newLinkedHashSet(), sut0.getMethodNames(5));
 	}
 
@@ -62,10 +64,11 @@ public class EnclosingMethodsTest {
 		sut0.addMethod(episode, method, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method, Events.newContext(m(3, 1)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod());
 
-		assertEquals(1, sut0.getOccurrences());
-		assertEquals(1, sut1.getOccurrences());
+		assertTrue(sut0.getOccurrences() == 1);
+		assertTrue(sut1.getOccurrences() == 1);
 		assertEquals(expected, sut0.getMethodNames(5));
 	}
 
@@ -74,16 +77,17 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3),
-				new Fact(2));
+		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
 
 		sut0.addMethod(episode, method, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method, Events.newContext(m(3, 1)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod());
 
-		assertEquals(2, sut0.getOccurrences());
-		assertEquals(2, sut1.getOccurrences());
+		assertTrue(sut0.getOccurrences() == 2);
+		assertTrue(sut1.getOccurrences() == 2);
 		assertEquals(expected, sut0.getMethodNames(5));
 	}
 
@@ -92,22 +96,23 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3),
-				new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
+				new Fact(3), new Fact(3), new Fact(2));
 
 		sut0.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut0.addMethod(episode, method2, Events.newContext(m(3, 2)));
-		
+
 		sut1.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(),
-				Events.newContext(m(3, 2)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod());
 
-		assertEquals(3, sut0.getOccurrences());
-		assertEquals(3, sut1.getOccurrences());
-		assertEquals(expected, sut0.getMethodNames(5));
+		assertTrue(sut0.getOccurrences() == 3);
+		assertTrue(sut1.getOccurrences() == 3);
+		assertEquals(expected, sut0.getMethodNames(1));
 	}
 
 	@Test
@@ -115,16 +120,18 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3),
-				new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(1), new Fact(5), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(1), new Fact(5),
+				new Fact(3), new Fact(3), new Fact(2));
 
 		sut0.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut0.addMethod(episode, method2, Events.newContext(m(3, 1)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod());
 
-		assertEquals(1, sut0.getOccurrences());
+		assertTrue(sut0.getOccurrences() == 1);
 		assertEquals(expected, sut0.getMethodNames(5));
 	}
 
@@ -133,17 +140,18 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3),
-				new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
+				new Fact(3), new Fact(3), new Fact(2));
 
 		sut1.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(),
-				Events.newContext(m(3, 2)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod(), Events.newContext(m(3, 2)).getMethod());
 
-		assertEquals(3, sut1.getOccurrences());
+		assertTrue(sut1.getOccurrences() == 3);
 		assertEquals(expected, sut1.getMethodNames(5));
 	}
 
@@ -152,16 +160,18 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3", "2>3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3),
-				new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
+		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
+				new Fact(3), new Fact(3), new Fact(2));
 
 		sut1.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod());
 
-		assertEquals(2, sut1.getOccurrences());
+		assertTrue(sut1.getOccurrences() == 2);
 		assertEquals(expected, sut1.getMethodNames(5));
 	}
 
@@ -170,18 +180,41 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3", "4", "2>3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(4), new Fact(2), new Fact(3),
-				new Fact(3), new Fact(2), new Fact(4), new Fact(3));
-		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4), new Fact(2), new Fact(3), new Fact(2),
-				new Fact(3));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(4), new Fact(2), new Fact(3), new Fact(3),
+				new Fact(2), new Fact(4), new Fact(3));
+		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4),
+				new Fact(2), new Fact(3), new Fact(2), new Fact(3));
 
 		sut1.addMethod(episode, method1, Events.newContext(m(3, 1)));
 		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
 
-		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1)).getMethod(),
-				Events.newContext(m(3, 2)).getMethod());
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(3, 1))
+				.getMethod(), Events.newContext(m(3, 2)).getMethod());
 
-		assertEquals(3, sut1.getOccurrences());
+		assertTrue(sut1.getOccurrences() == 3);
+		assertEquals(expected, sut1.getMethodNames(5));
+	}
+
+	@Test
+	public void unknownMethods() throws Exception {
+		Episode episode = new Episode();
+		episode.addStringsOfFacts("2", "3", "4", "2>3");
+
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(4), new Fact(2), new Fact(3), new Fact(3),
+				new Fact(2), new Fact(4), new Fact(3));
+		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4),
+				new Fact(2), new Fact(3), new Fact(2), new Fact(3));
+
+		sut1.addMethod(episode, method1, Events.newContext(m(0, 0)));
+		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
+		sut1.addMethod(episode, method2, Events.newContext(m(2, 0)));
+
+		Set<IMethodName> expected = Sets.newHashSet(Events.newContext(m(0, 0))
+				.getMethod(), Events.newContext(m(3, 2)).getMethod());
+
+		assertTrue(sut1.getOccurrences() == 4);
 		assertEquals(expected, sut1.getMethodNames(5));
 	}
 
@@ -190,9 +223,9 @@ public class EnclosingMethodsTest {
 		EnclosingMethods a = new EnclosingMethods(false);
 		EnclosingMethods b = new EnclosingMethods(false);
 
-		assertEquals(a, b);
+		assertTrue(a.equals(b));
+		assertTrue(a.getOccurrences() == b.getOccurrences());
 		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
-		assertEquals(a.getOccurrences(), b.getOccurrences());
 	}
 
 	@Test
@@ -208,9 +241,9 @@ public class EnclosingMethodsTest {
 		EnclosingMethods b = new EnclosingMethods(false);
 		b.addMethod(episode, method, Events.newContext(m(1, 2)));
 
-		assertEquals(a, b);
+		assertTrue(a.equals(b));
+		assertTrue(a.getOccurrences() == b.getOccurrences());
 		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
-		assertEquals(a.getOccurrences(), b.getOccurrences());
 	}
 
 	@Test
@@ -218,8 +251,10 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(3));
-		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(2), new Fact(3));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(3));
+		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(2),
+				new Fact(3));
 
 		EnclosingMethods a = new EnclosingMethods(false);
 		a.addMethod(episode, method1, Events.newContext(m(3, 1)));
@@ -227,9 +262,9 @@ public class EnclosingMethodsTest {
 		EnclosingMethods b = new EnclosingMethods(false);
 		b.addMethod(episode, method2, Events.newContext(m(3, 2)));
 
-		assertEquals(a.getOccurrences(), b.getOccurrences());
+		assertTrue(a.getOccurrences() == b.getOccurrences());
+		assertFalse(a.equals(b));
 		assertNotEquals(a.getMethodNames(5), b.getMethodNames(5));
-		assertNotEquals(a, b);
 	}
 
 	@Test
@@ -237,8 +272,10 @@ public class EnclosingMethodsTest {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
 
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(2), new Fact(3), new Fact(3));
-		List<Fact> method2 = Lists.newArrayList(new Fact(1), new Fact(2), new Fact(3));
+		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(2), new Fact(3), new Fact(3));
+		List<Fact> method2 = Lists.newArrayList(new Fact(1), new Fact(2),
+				new Fact(3));
 
 		EnclosingMethods a = new EnclosingMethods(false);
 		a.addMethod(episode, method1, Events.newContext(m(1, 2)));
@@ -246,16 +283,17 @@ public class EnclosingMethodsTest {
 		EnclosingMethods b = new EnclosingMethods(false);
 		b.addMethod(episode, method2, Events.newContext(m(1, 2)));
 
-		assertNotEquals(a.getOccurrences(), b.getOccurrences());
+		assertTrue(a.getOccurrences() != b.getOccurrences());
+		assertFalse(a.equals(b));
 		assertEquals(a.getMethodNames(5), b.getMethodNames(5));
-		assertNotEquals(a, b);
 	}
 
 	private IMethodName m(int typeNum, int methodNum) {
 		if ((typeNum == 0) || (methodNum == 0)) {
 			return Names.getUnknownMethod();
 		} else {
-			return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
+			return Names.newMethod(String.format("[R,P] [%s].m%d()",
+					t(typeNum), methodNum));
 		}
 	}
 

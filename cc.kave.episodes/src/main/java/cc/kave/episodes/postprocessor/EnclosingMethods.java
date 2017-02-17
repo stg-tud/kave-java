@@ -28,7 +28,6 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
@@ -90,8 +89,12 @@ public class EnclosingMethods {
 	private int getOrderCounter(Episode episode, List<Fact> method) {
 		Map<Fact, Set<Integer>> eventIndices = getEventIndices(episode, method);
 		Set<Fact> episodeRelations = episode.getRelations();
-		int previousCounter = getSetCounter(episode, method);
+		int setCounter = getSetCounter(episode, method);
 		int counter = 0;
+		
+		if (episodeRelations.isEmpty()) {
+			return setCounter;
+		}
 
 		for (Fact relation : episodeRelations) {
 			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
@@ -110,13 +113,13 @@ public class EnclosingMethods {
 				}
 			}
 			if (counter > 0) {
-				previousCounter = Math.min(previousCounter, counter);
+				setCounter = Math.min(setCounter, counter);
 				counter = 0;
 			} else {
 				return counter;
 			}
 		}
-		return previousCounter;
+		return setCounter;
 	}
 
 	private Map<Fact, Set<Integer>> getEventIndices(Episode episode,
