@@ -96,7 +96,7 @@ public class PatternsValidation {
 		List<Event> valData = validationIO.read(frequency, foldNum);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
 		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
-		List<List<Fact>> valStream = streamOfMethods(valData, eventsMap);
+		List<List<Fact>> valStream = validationIO.streamOfFacts(valData, eventsMap);
 
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
@@ -311,26 +311,5 @@ public class PatternsValidation {
 			}
 		}
 		return events;
-	}
-
-	private List<List<Fact>> streamOfMethods(List<Event> stream,
-			Map<Event, Integer> events) {
-		List<List<Fact>> result = Lists.newLinkedList();
-		List<Fact> method = Lists.newLinkedList();
-
-		for (Event event : stream) {
-			if (event.getKind() == EventKind.FIRST_DECLARATION) {
-				if (!method.isEmpty()) {
-					result.add(method);
-					method = Lists.newLinkedList();
-				}
-			}
-			int index = events.get(event);
-			method.add(new Fact(index));
-		}
-		if (!method.isEmpty()) {
-			result.add(method);
-		}
-		return result;
 	}
 }
