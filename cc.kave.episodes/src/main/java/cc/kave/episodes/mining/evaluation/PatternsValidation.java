@@ -12,7 +12,6 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
@@ -111,19 +110,15 @@ public class PatternsValidation {
 
 			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
 			for (Episode episode : entry.getValue()) {
-				int occTraining = getReposOcc(episode, frequency,
-						streamContexts, repoCtxMapper);
-				if (occTraining == 0) {
-					continue;
-				}
+				int numReposOccur = getReposOcc(episode, streamContexts,
+						repoCtxMapper);
 				sb.append(patternId + "\t");
 				sb.append(episode.getFacts().toString() + "\t");
 				sb.append(episode.getFrequency() + "\t");
 				sb.append(episode.getEntropy() + "\t");
-				sb.append(occTraining + "\t");
+				sb.append(numReposOccur + "\t");
 
-				int occValidation = getValOcc(episode, frequency, eventsList,
-						valStream, streamContexts);
+				int occValidation = getValOcc(episode, eventsList, valStream);
 				sb.append(occValidation + "\n");
 
 				store(episode, episodeType, patternId, trainEvents, frequency);
@@ -135,11 +130,8 @@ public class PatternsValidation {
 				sb.toString());
 	}
 
-	private int getValOcc(Episode episode, int frequency,
-			List<Event> eventsList, List<List<Fact>> valStream,
-			List<Tuple<Event, List<Fact>>> trainStream) {
-
-		Set<ITypeName> trainTypes = getTrainTypeNames(trainStream);
+	private int getValOcc(Episode episode, List<Event> eventsList,
+			List<List<Fact>> valStream) {
 
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
 
@@ -149,36 +141,14 @@ public class PatternsValidation {
 			}
 			if (method.containsAll(episode.getEvents())) {
 				Event methodCtx = getMethodName(method, eventsList);
-				ITypeName typeName = null;
-				try {
-					typeName = methodCtx.getMethod().getDeclaringType();
-				} catch (Exception e) {
-				}
-				if (!trainTypes.contains(typeName)) {
-					enclMethods.addMethod(episode, method, methodCtx);
-				}
+				enclMethods.addMethod(episode, method, methodCtx);
 			}
 		}
 		return enclMethods.getOccurrences();
 	}
 
-	private Set<ITypeName> getTrainTypeNames(
-			List<Tuple<Event, List<Fact>>> trainStream) {
-		Set<ITypeName> results = Sets.newLinkedHashSet();
-
-		for (Tuple<Event, List<Fact>> tuple : trainStream) {
-			ITypeName typeName = null;
-			try {
-				typeName = tuple.getFirst().getMethod().getDeclaringType();
-			} catch (Exception e) {
-			}
-			results.add(typeName);
-		}
-		return results;
-	}
-
 	private File getEvalPath(int frequency, EpisodeType episodeType) {
-		File fileName = new File(getPatternsPath(frequency, episodeType)
+		File fileName = new File(getResultPath(frequency, episodeType)
 				+ "/evaluations.txt");
 		return fileName;
 	}
@@ -200,9 +170,17 @@ public class PatternsValidation {
 		return fileName;
 	}
 
-	private String getPatternsPath(int frequency, EpisodeType episodeType) {
-		File path = new File(patternsFolder.getAbsoluteFile() + "/freq"
-				+ frequency + "/" + episodeType.toString());
+	private String getResultPath(int frequency, EpisodeType type) {
+		File path = new File(patternsFolder.getAbsolutePath() + "/freq"
+				+ frequency + "/" + type.toString());
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+		return path.getAbsolutePath();
+	}
+
+	private String getPatternsPath(int frequency, EpisodeType type) {
+		File path = new File(getResultPath(frequency, type) + "/allPatterns");
 		if (!path.exists()) {
 			path.mkdirs();
 		}
@@ -219,7 +197,7 @@ public class PatternsValidation {
 		return null;
 	}
 
-	private int getReposOcc(Episode episode, int frequency,
+	private int getReposOcc(Episode episode,
 			List<Tuple<Event, List<Fact>>> streamContexts,
 			Map<String, Set<ITypeName>> repoCtxMapper) {
 
@@ -239,22 +217,11 @@ public class PatternsValidation {
 		assertTrue(trainOcc == episode.getFrequency(),
 				"Episode has a different frequency in training data!");
 
-		Set<IMethodName> methodOcc = methodsOrderRelation
-				.getMethodNames(trainOcc);
-		Set<ITypeName> obsTypeNames = Sets.newLinkedHashSet();
+		Set<ITypeName> methodOcc = methodsOrderRelation.getTypeNames(trainOcc);
 		Set<String> repositories = Sets.newLinkedHashSet();
 
 		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper.entrySet()) {
 			for (ITypeName methodName : entry.getValue()) {
-				ITypeName typeName = null;
-				try {
-					typeName = methodName.getDeclaringType();
-				} catch (Exception e) {
-				}
-				if (obsTypeNames.contains(typeName)) {
-					continue;
-				}
-				obsTypeNames.add(typeName);
 				if (methodOcc.contains(methodName)) {
 					repositories.add(entry.getKey());
 					break;

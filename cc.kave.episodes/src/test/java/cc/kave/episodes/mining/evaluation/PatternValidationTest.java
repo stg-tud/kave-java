@@ -70,8 +70,6 @@ public class PatternValidationTest {
 	private EpisodeToGraphConverter episodeToGraph;
 	@Mock
 	private RepositoriesParser reposParser;
-	// @Mock
-	// private OverlapingTypes overlaps;
 
 	private EpisodeAsGraphWriter graphWriter;
 
@@ -82,10 +80,9 @@ public class PatternValidationTest {
 	private Map<Integer, Set<Episode>> patterns;
 
 	private List<Event> valStream;
+	private List<List<Fact>> valFactStream;
 
 	private DirectedGraph<Fact, DefaultEdge> graph;
-
-	private Set<ITypeName> typeOverlaps;
 
 	private static final int FREQUENCY = 5;
 	private static final double ENTROPY = 0.5;
@@ -142,8 +139,24 @@ public class PatternValidationTest {
 				firstCtx(0), enclCtx(7), inv(2), inv(3), firstCtx(2),
 				enclCtx2(4), inv(2), inv(3));
 
-		typeOverlaps = Sets.newHashSet(enclCtx(7).getMethod()
-				.getDeclaringType(), enclCtx(9).getMethod().getDeclaringType());
+		valFactStream = Lists.newLinkedList();
+		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(11),
+				new Fact(3), new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(5), new Fact(6), new Fact(12),
+				new Fact(3));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(13), new Fact(14), new Fact(4),
+				new Fact(3));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(5), new Fact(15), new Fact(3));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(13), new Fact(12), new Fact(2),
+				new Fact(3));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(16), new Fact(14), new Fact(2),
+				new Fact(3));
+		valFactStream.add(method);
 
 		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 
@@ -151,18 +164,21 @@ public class PatternValidationTest {
 				eventStream, episodeParser, transClosure, episodeToGraph,
 				graphWriter, validationDataIo, reposParser);
 
-		when(eventStream.parseStream(anyInt(), anyInt())).thenReturn(streamMethods);
-		when(eventStream.readMapping(anyInt(), anyInt())).thenReturn(trainEvents);
-		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(
-				patterns);
+		when(eventStream.parseStream(anyInt(), anyInt())).thenReturn(
+				streamMethods);
+		when(eventStream.readMapping(anyInt(), anyInt())).thenReturn(
+				trainEvents);
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt()))
+				.thenReturn(patterns);
 		when(episodeFilter.filter(any(Map.class), anyInt(), anyDouble()))
 				.thenReturn(patterns);
 		when(validationDataIo.read(anyInt(), anyInt())).thenReturn(valStream);
+		when(validationDataIo.streamOfFacts(any(List.class), any(Map.class)))
+				.thenReturn(valFactStream);
 		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(ep);
 		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
 				.thenReturn(graph);
 		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
-		// when(overlaps.getOverlaps(anyInt())).thenReturn(typeOverlaps);
 	}
 
 	@Test
@@ -187,17 +203,16 @@ public class PatternValidationTest {
 	@Test
 	public void mocksAreCalled() throws Exception {
 		sut.validate(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
-		;
 
 		verify(eventStream).parseStream(anyInt(), anyInt());
 		verify(eventStream).readMapping(anyInt(), anyInt());
 		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
 		verify(validationDataIo).read(anyInt(), anyInt());
+		verify(validationDataIo).streamOfFacts(any(List.class), any(Map.class));
 		verify(transClosure).remTransClosure(any(Episode.class));
 		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoTypesMapper();
-		// verify(overlaps).getOverlaps(anyInt());
 	}
 
 	@Test
@@ -224,7 +239,7 @@ public class PatternValidationTest {
 		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 		sb.append("0\t");
 		sb.append("[2, 3, 2>3]\t");
-		sb.append("1\t1.0\t1\t1\n\n");
+		sb.append("1\t1.0\t3\t2\n\n");
 
 		assertEquals(sb.toString(), actuals);
 	}
@@ -278,20 +293,26 @@ public class PatternValidationTest {
 		}
 	}
 
-	private String getPath(EpisodeType episodeType) {
+	private String getResultsPath(EpisodeType episodeType) {
 		String path = patternsFolder.getRoot().getAbsolutePath() + "/freq"
 				+ FREQUENCY + "/" + episodeType.toString();
 		return path;
 	}
 
+	private String getPatternsPath(EpisodeType type) {
+		String path = getResultsPath(type) + "/allPatterns";
+		return path;
+	}
+
 	private File getPatternFile(EpisodeType episodeType, int patternId) {
-		File patternFile = new File(getPath(episodeType) + "/pattern"
+		File patternFile = new File(getPatternsPath(episodeType) + "/pattern"
 				+ patternId + ".dot");
 		return patternFile;
 	}
 
 	private File getEvalFile(EpisodeType episodeType) {
-		File evalFile = new File(getPath(episodeType) + "/evaluations.txt");
+		File evalFile = new File(getResultsPath(episodeType)
+				+ "/evaluations.txt");
 		return evalFile;
 	}
 }

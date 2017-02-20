@@ -26,8 +26,10 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
@@ -38,8 +40,8 @@ import com.google.inject.Inject;
 public class EnclosingMethods {
 
 	private boolean order;
-	private Map<IMethodName, Integer> methods = Maps.newLinkedHashMap();
-	private IMethodName unknownMethod = Names.getUnknownMethod();
+	private Map<Event, Integer> contexts = Maps.newLinkedHashMap();
+	private Event unknownEvent = Events.newContext(Names.getUnknownMethod());
 
 	@Inject
 	public EnclosingMethods(boolean order) {
@@ -55,32 +57,43 @@ public class EnclosingMethods {
 			counter = getSetCounter(episode, method);
 		}
 		if (counter > 0) {
-			if ((enclMethod.getMethod().equals(unknownMethod))
-					&& (methods.containsKey(unknownMethod))) {
-				int occ = methods.get(unknownMethod);
-				methods.put(unknownMethod, occ + counter);
+			if ((enclMethod.equals(unknownEvent))
+					&& (contexts.containsKey(unknownEvent))) {
+				int occ = contexts.get(unknownEvent);
+				contexts.put(unknownEvent, occ + counter);
 			} else {
-				methods.put(enclMethod.getMethod(), counter);
+				contexts.put(enclMethod, counter);
 			}
 		}
 	}
 
 	public Set<IMethodName> getMethodNames(int numberOfMethods) {
-		Set<IMethodName> someMethods = Sets.newLinkedHashSet();
+		Set<IMethodName> results = Sets.newLinkedHashSet();
 
-		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
-			someMethods.add(entry.getKey());
-			if (someMethods.size() == numberOfMethods) {
+		for (Map.Entry<Event, Integer> entry : contexts.entrySet()) {
+			results.add(entry.getKey().getMethod());
+			if (results.size() == numberOfMethods) {
 				break;
 			}
 		}
-		return someMethods;
+		return results;
+	}
+	
+	public Set<ITypeName> getTypeNames(int numberOfMethods) {
+		Set<ITypeName> results = Sets.newLinkedHashSet();
+
+		Set<IMethodName> methods = getMethodNames(numberOfMethods);
+		
+		for (IMethodName methodNames : methods) {
+			results.add(methodNames.getDeclaringType());
+		} 
+		return results;
 	}
 
 	public int getOccurrences() {
 		int counter = 0;
 
-		for (Map.Entry<IMethodName, Integer> entry : methods.entrySet()) {
+		for (Map.Entry<Event, Integer> entry : contexts.entrySet()) {
 			counter += entry.getValue();
 		}
 		return counter;
@@ -187,7 +200,7 @@ public class EnclosingMethods {
 	}
 
 	public boolean equals(EnclosingMethods enclMethods) {
-		if (!this.methods.equals(enclMethods.methods)) {
+		if (!this.contexts.equals(enclMethods.contexts)) {
 			return false;
 		}
 		return true;
