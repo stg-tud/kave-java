@@ -72,8 +72,10 @@ public class PatternsValidation {
 		this.repoParser = reposParser;
 	}
 
-	public void validate(EpisodeType episodeType, int frequency,
+	public Map<Episode, Boolean> validate(EpisodeType episodeType, int frequency,
 			double entropy, int foldNum) throws Exception {
+		Map<Episode, Boolean> results = Maps.newLinkedHashMap();
+		
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
 		Logger.log("Reading training stream ...");
@@ -120,7 +122,12 @@ public class PatternsValidation {
 
 				int occValidation = getValOcc(episode, eventsList, valStream);
 				sb.append(occValidation + "\n");
-
+				
+				if ((occValidation == 0) && (numReposOccur < 2)) {
+					results.put(episode, false);
+				} else {
+					results.put(episode, true);
+				}
 				store(episode, episodeType, patternId, trainEvents, frequency);
 				patternId++;
 			}
@@ -128,6 +135,7 @@ public class PatternsValidation {
 		}
 		FileUtils.writeStringToFile(getEvalPath(frequency, episodeType),
 				sb.toString());
+		return results;
 	}
 
 	private int getValOcc(Episode episode, List<Event> eventsList,
@@ -214,8 +222,10 @@ public class PatternsValidation {
 			}
 		}
 		int trainOcc = methodsOrderRelation.getOccurrences();
-		assertTrue(trainOcc == episode.getFrequency(),
-				"Episode has a different frequency in training data!");
+		Logger.log("Episode: %s", episode.toString());
+		Logger.log("Frequency = %d, Trainning occurrence = %d", episode.getFrequency(), trainOcc);
+		assertTrue(trainOcc < episode.getFrequency(),
+				"Episode is not found sufficient number of times in the Training Data!");
 
 		Set<ITypeName> methodOcc = methodsOrderRelation.getTypeNames(trainOcc);
 		Set<String> repositories = Sets.newLinkedHashSet();

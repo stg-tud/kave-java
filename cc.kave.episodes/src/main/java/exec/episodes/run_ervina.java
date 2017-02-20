@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.mining.evaluation.PatternsValidation;
+import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -33,7 +35,7 @@ public class run_ervina {
 
 	private static final int FOLDNUM = 0;
 	private static final int FREQUENCY = 400;
-	private static final double ENTROPY = 0.1;
+	private static final double ENTROPY = 0.3;
 
 	private static final int METHODSIZE = 500;
 	private static final int NUM_FOLDS = 10;
@@ -49,28 +51,33 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
-		
-//		load(PreChecking.class).methodsOverlap();
-//		 load(PreprocessingFolded.class).runPreparation(FREQUENCY);
-		 
-//		 load(PostChecking.class).numEvents(FREQUENCY);
-		
-//		load(PatternsValidation.class).validate(FREQ, EpisodeType.PARALLEL);
-//		load(EpisodeWriter.class).writeNewEpisodes(FREQ);
-//		load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL, EpisodeType.SEQUENTIAL);
-//		load(PatternsComparison.class).printCommonPatterns(FREQ, EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
-//		load(PatternsComparison.class).extractConcreteCode(FREQ);
-		
-//		load(PatternsIdentifier.class).trainingCode(FREQ, EpisodeType.GENERAL);
-		
-//		load(EvaluationsPaper.class).diff(FREQ);
-//		load(EvaluationsPaper.class).part2(FREQ);
-//		load(EvaluationsPaper.class).part1(FREQ);
-		
-//		load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
-//		load(PatternsComparisons.class).compare(FOLDNUM, EpisodeKind.SEQUENTIAL,
-//				EpisodeKind.PARALLEL, FREQ, ENTROPY);
-//		load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
+
+		// load(PreChecking.class).methodsOverlap();
+		// load(PreprocessingFolded.class).runPreparation(FREQUENCY);
+
+		// load(PostChecking.class).numEvents(FREQUENCY);
+
+		load(PatternsValidation.class).validate(EpisodeType.PARALLEL,
+				FREQUENCY, ENTROPY, FOLDNUM);
+		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
+		// load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL,
+		// EpisodeType.SEQUENTIAL);
+		// load(PatternsComparison.class).printCommonPatterns(FREQ,
+		// EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
+		// load(PatternsComparison.class).extractConcreteCode(FREQ);
+
+		// load(PatternsIdentifier.class).trainingCode(FREQ,
+		// EpisodeType.GENERAL);
+
+		// load(EvaluationsPaper.class).diff(FREQ);
+		// load(EvaluationsPaper.class).part2(FREQ);
+		// load(EvaluationsPaper.class).part1(FREQ);
+
+		// load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
+		// load(PatternsComparisons.class).compare(FOLDNUM,
+		// EpisodeKind.SEQUENTIAL,
+		// EpisodeKind.PARALLEL, FREQ, ENTROPY);
+		// load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
 
 		// load(PatternsIdentifier.class).inRepos(NUMBREPOS, FREQ, ENTROPY);
 

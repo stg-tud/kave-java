@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -129,8 +130,10 @@ public class PatternValidationTest {
 		episodes.add(ep);
 		patterns.put(1, episodes);
 
-		ep = createEpisode(1, 1.0, "2", "3", "2>3");
+		ep = createEpisode(3, 1.0, "2", "3", "2>3");
 		episodes = Sets.newHashSet(ep);
+		ep = createEpisode(2, 0.5, "7", "8", "7>8");
+		episodes.add(ep);
 		patterns.put(2, episodes);
 
 		valStream = Lists.newArrayList(firstCtx(1), enclCtx(3), inv(3), inv(4),
@@ -210,26 +213,31 @@ public class PatternValidationTest {
 		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
 		verify(validationDataIo).read(anyInt(), anyInt());
 		verify(validationDataIo).streamOfFacts(any(List.class), any(Map.class));
-		verify(transClosure).remTransClosure(any(Episode.class));
-		verify(episodeToGraph).convert(any(Episode.class), any(List.class));
+		verify(transClosure, times(2)).remTransClosure(any(Episode.class));
+		verify(episodeToGraph, times(2)).convert(any(Episode.class), any(List.class));
 		verify(reposParser).getRepoTypesMapper();
 	}
 
 	@Test
 	public void fileIsCreated() throws Exception {
-		File patternFile = getPatternFile(EpisodeType.SEQUENTIAL, 0);
+		File patternFile1 = getPatternFile(EpisodeType.SEQUENTIAL, 0);
+		File patternFile2 = getPatternFile(EpisodeType.SEQUENTIAL, 1);
 		File evalFile = getEvalFile(EpisodeType.SEQUENTIAL);
 
 		sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 
-		assertTrue(patternFile.exists());
+		assertTrue(patternFile1.exists());
+		assertTrue(patternFile2.exists());
 		assertTrue(evalFile.exists());
 	}
 
 	@Test
 	public void checkFileContent() throws Exception {
 
-		sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		Map<Episode, Boolean> actVal = sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		Map<Episode, Boolean> expVal = Maps.newLinkedHashMap();
+		expVal.put(createEpisode(3, 1.0, "2", "3", "2>3"), true);
+		expVal.put(createEpisode(2, 0.5, "7", "8", "7>8"), false);
 
 		String actuals = FileUtils
 				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
@@ -239,9 +247,13 @@ public class PatternValidationTest {
 		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 		sb.append("0\t");
 		sb.append("[2, 3, 2>3]\t");
-		sb.append("1\t1.0\t3\t2\n\n");
+		sb.append("3\t1.0\t3\t2\n");
+		sb.append("1\t");
+		sb.append("[7, 8, 7>8]\t");
+		sb.append("2\t0.5\t0\t0\n\n");
 
 		assertEquals(sb.toString(), actuals);
+		assertEquals(expVal, actVal);
 	}
 
 	private Episode createEpisode(int frequency, double entropy,
