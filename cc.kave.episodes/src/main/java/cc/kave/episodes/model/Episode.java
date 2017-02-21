@@ -33,7 +33,7 @@ public class Episode {
 
 	private Set<Fact> facts = Sets.newLinkedHashSet();
 	private int frequency;
-	private double bidirectMeasure;
+	private double entropy;
 
 	public Set<Fact> getFacts() {
 		return this.facts;
@@ -44,7 +44,7 @@ public class Episode {
 	}
 
 	public double getEntropy() {
-		return this.bidirectMeasure;
+		return this.entropy;
 	}
 
 	public Set<Fact> getEvents() {
@@ -76,7 +76,7 @@ public class Episode {
 
 	public void setEntropy(double bidirect) {
 		assertTrue(bidirect >= 0.0 && bidirect <= 1.0, "Bidirectional measure should be a probability value!");
-		this.bidirectMeasure = bidirect;
+		this.entropy = bidirect;
 	}
 
 	public void addFact(Fact fact) {
@@ -133,7 +133,7 @@ public class Episode {
 		if (this.frequency != ep.frequency) {
 			return false;
 		}
-		if (this.bidirectMeasure != ep.bidirectMeasure) {
+		if (this.entropy != ep.entropy) {
 			return false;
 		}
 		if (!(this.facts.equals(ep.facts))) {
