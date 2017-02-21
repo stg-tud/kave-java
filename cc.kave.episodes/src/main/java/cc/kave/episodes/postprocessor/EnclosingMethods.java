@@ -24,12 +24,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
@@ -41,7 +39,6 @@ public class EnclosingMethods {
 
 	private boolean order;
 	private Map<Event, Integer> contexts = Maps.newLinkedHashMap();
-	private Event unknownEvent = Events.newContext(Names.getUnknownMethod());
 
 	@Inject
 	public EnclosingMethods(boolean order) {
@@ -57,10 +54,9 @@ public class EnclosingMethods {
 			counter = getSetCounter(episode, method);
 		}
 		if (counter > 0) {
-			if ((enclMethod.equals(unknownEvent))
-					&& (contexts.containsKey(unknownEvent))) {
-				int occ = contexts.get(unknownEvent);
-				contexts.put(unknownEvent, occ + counter);
+			if (contexts.containsKey(enclMethod)) {
+				int occ = contexts.get(enclMethod);
+				contexts.put(enclMethod, occ + counter);
 			} else {
 				contexts.put(enclMethod, counter);
 			}
@@ -85,7 +81,11 @@ public class EnclosingMethods {
 		Set<IMethodName> methods = getMethodNames(numberOfMethods);
 		
 		for (IMethodName methodNames : methods) {
-			results.add(methodNames.getDeclaringType());
+			try {
+				results.add(methodNames.getDeclaringType());
+			} catch (Exception e) {
+				continue;
+			}
 		} 
 		return results;
 	}
@@ -108,7 +108,6 @@ public class EnclosingMethods {
 		if (episodeRelations.isEmpty()) {
 			return setCounter;
 		}
-
 		for (Fact relation : episodeRelations) {
 			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
 			Set<Integer> firstEventIdices = eventIndices.get(tuple.getFirst());

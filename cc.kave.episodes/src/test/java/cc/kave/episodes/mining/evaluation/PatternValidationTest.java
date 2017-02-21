@@ -130,9 +130,10 @@ public class PatternValidationTest {
 		episodes.add(ep);
 		patterns.put(1, episodes);
 
-		ep = createEpisode(3, 1.0, "2", "3", "2>3");
-		episodes = Sets.newHashSet(ep);
-		ep = createEpisode(2, 0.5, "7", "8", "7>8");
+		ep = createEpisode(1, 1.0, "2", "3", "2>3");
+		episodes = Sets.newLinkedHashSet();
+		episodes.add(ep);
+		ep = createEpisode(0, 0.5, "7", "8", "7>8");
 		episodes.add(ep);
 		patterns.put(2, episodes);
 
@@ -236,8 +237,8 @@ public class PatternValidationTest {
 
 		Map<Episode, Boolean> actVal = sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 		Map<Episode, Boolean> expVal = Maps.newLinkedHashMap();
-		expVal.put(createEpisode(3, 1.0, "2", "3", "2>3"), true);
-		expVal.put(createEpisode(2, 0.5, "7", "8", "7>8"), false);
+		expVal.put(createEpisode(1, 1.0, "2", "3", "2>3"), true);
+		expVal.put(createEpisode(0, 0.5, "7", "8", "7>8"), false);
 
 		String actuals = FileUtils
 				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
@@ -247,10 +248,10 @@ public class PatternValidationTest {
 		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 		sb.append("0\t");
 		sb.append("[2, 3, 2>3]\t");
-		sb.append("3\t1.0\t3\t2\n");
+		sb.append("1\t1.0\t3\t2\n");
 		sb.append("1\t");
 		sb.append("[7, 8, 7>8]\t");
-		sb.append("2\t0.5\t0\t0\n\n");
+		sb.append("0\t0.5\t0\t0\n\n");
 
 		assertEquals(sb.toString(), actuals);
 		assertEquals(expVal, actVal);

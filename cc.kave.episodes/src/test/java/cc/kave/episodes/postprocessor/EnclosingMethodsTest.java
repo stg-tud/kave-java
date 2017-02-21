@@ -125,29 +125,6 @@ public class EnclosingMethodsTest {
 	}
 
 	@Test
-	public void dublicateMethods() throws Exception {
-		Episode episode = new Episode();
-		episode.addStringsOfFacts("2", "3");
-
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2),
-				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(1), new Fact(5),
-				new Fact(3), new Fact(3), new Fact(2));
-
-		sut0.addMethod(episode, method1, Events.newContext(m(3, 1)));
-		sut0.addMethod(episode, method2, Events.newContext(m(3, 1)));
-
-		IMethodName methodName = Events.newContext(m(3, 1)).getMethod();
-		Set<IMethodName> expMethods = Sets.newHashSet(methodName);
-		Set<ITypeName> expTypes = Sets
-				.newHashSet(methodName.getDeclaringType());
-
-		assertTrue(sut0.getOccurrences() == 1);
-		assertEquals(expMethods, sut0.getMethodNames(5));
-		assertEquals(expTypes, sut0.getTypeNames(5));
-	}
-
-	@Test
 	public void orderWithoutRelation() throws Exception {
 		Episode episode = new Episode();
 		episode.addStringsOfFacts("2", "3");
