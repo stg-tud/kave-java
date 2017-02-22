@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.PatternsValidation;
+import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
@@ -57,8 +57,11 @@ public class run_ervina {
 
 		// load(PostChecking.class).numEvents(FREQUENCY);
 
-		load(PatternsValidation.class).validate(EpisodeType.PARALLEL,
-				FREQUENCY, ENTROPY, FOLDNUM);
+		// load(PatternsValidation.class).validate(EpisodeType.PARALLEL,
+		// FREQUENCY, ENTROPY, FOLDNUM);
+		load(ThresholdsAnalyzer.class).analyze(EpisodeType.PARALLEL, FREQUENCY,
+				ENTROPY, FOLDNUM);
+
 		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
 		// load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL,
 		// EpisodeType.SEQUENTIAL);

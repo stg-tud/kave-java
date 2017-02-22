@@ -14,25 +14,25 @@ public class ThresholdsTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
-	private Thresholds sut;
+	private Threshold sut;
 	
 	@Before 
 	public void setup() {
-		sut = new Thresholds(2, 0.0);
+		sut = new Threshold(2, 0.0);
 	}
 	
 	@Test
 	public void invalidFrequency() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Not valid frequency value!");
-		sut = new Thresholds(0, 0.0);
+		sut = new Threshold(0, 0.0);
 	}
 	
 	@Test
 	public void invalidEntropy() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Entropy is a probability value!");
-		sut = new Thresholds(2, 3);
+		sut = new Threshold(2, 3);
 	}
 	
 	@Test
@@ -59,8 +59,8 @@ public class ThresholdsTest {
 	
 	@Test
 	public void equality() {
-		Thresholds a = new Thresholds(5, 0.3);
-		Thresholds b = new Thresholds(5, 0.3);
+		Threshold a = new Threshold(5, 0.3);
+		Threshold b = new Threshold(5, 0.3);
 		
 		assertEquals(a, b);
 		assertTrue(a.getFrequency() == b.getFrequency());
@@ -72,8 +72,8 @@ public class ThresholdsTest {
 	
 	@Test
 	public void different() {
-		Thresholds a = new Thresholds(7, 0.5);
-		Thresholds b = new Thresholds(4, 1.0);
+		Threshold a = new Threshold(7, 0.5);
+		Threshold b = new Threshold(4, 1.0);
 		
 		assertNotEquals(a, b);
 		assertTrue(a.getFrequency() != b.getFrequency());
@@ -85,8 +85,8 @@ public class ThresholdsTest {
 	
 	@Test
 	public void different_freq() {
-		Thresholds a = new Thresholds(7, 0.5);
-		Thresholds b = new Thresholds(4, 0.5);
+		Threshold a = new Threshold(7, 0.5);
+		Threshold b = new Threshold(4, 0.5);
 		
 		assertNotEquals(a, b);
 		assertTrue(a.getFrequency() != b.getFrequency());
@@ -98,8 +98,8 @@ public class ThresholdsTest {
 	
 	@Test
 	public void different_entropy() {
-		Thresholds a = new Thresholds(4, 0.5);
-		Thresholds b = new Thresholds(4, 1.0);
+		Threshold a = new Threshold(4, 0.5);
+		Threshold b = new Threshold(4, 1.0);
 		
 		assertNotEquals(a, b);
 		assertTrue(a.getFrequency() == b.getFrequency());

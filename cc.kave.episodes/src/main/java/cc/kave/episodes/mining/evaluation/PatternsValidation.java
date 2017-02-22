@@ -222,8 +222,6 @@ public class PatternsValidation {
 			}
 		}
 		int trainOcc = methodsOrderRelation.getOccurrences();
-		Logger.log("Episode: %s", episode.toString());
-		Logger.log("Frequency = %d, Trainning occurrence = %d", episode.getFrequency(), trainOcc);
 		assertTrue(trainOcc >= episode.getFrequency(),
 				"Episode is not found sufficient number of times in the Training Data!");
 

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-public class Thresholds {
+public class Threshold {
 
 	private int frequency;
 	private double entropy;
@@ -15,7 +15,7 @@ public class Thresholds {
 	private int noGens = 0;
 	private int noSpecs = 0;
 
-	public Thresholds(int freq, double ent) {
+	public Threshold(int freq, double ent) {
 		assertTrue(freq > 1, "Not valid frequency value!");
 		assertTrue(ent >= 0.0 && ent <= 1.0, "Entropy is a probability value!");
 		this.frequency = freq;
@@ -71,7 +71,7 @@ public class Thresholds {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
-	public boolean equals(Thresholds threshs) {
+	public boolean equals(Threshold threshs) {
 		if (this.frequency != threshs.frequency) {
 			return false;
 		}
