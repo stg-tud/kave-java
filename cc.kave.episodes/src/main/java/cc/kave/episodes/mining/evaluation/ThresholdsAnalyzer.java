@@ -1,5 +1,9 @@
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -8,21 +12,28 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.io.FileUtils;
 
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.Threshold;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 
 public class ThresholdsAnalyzer {
 
+	private File patternsFolder;
 	private PatternsValidation patternsValidation;
 
 	@Inject
-	public ThresholdsAnalyzer(PatternsValidation validation) {
+	public ThresholdsAnalyzer(@Named("patterns") File folder,
+			PatternsValidation validation) {
+		assertTrue(folder.exists(), "Patterns folder does not exist");
+		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
+		this.patternsFolder = folder;
 		this.patternsValidation = validation;
 	}
 
@@ -42,7 +53,7 @@ public class ThresholdsAnalyzer {
 				results.add(threshItem);
 			}
 		}
-		printResults(results);
+		printResults(results, type, frequency);
 	}
 
 	private Threshold getThreshResults(Map<Episode, Boolean> patterns,
@@ -65,29 +76,39 @@ public class ThresholdsAnalyzer {
 		return threshResults;
 	}
 
-	private void printResults(Set<Threshold> thresholds) {
+	private void printResults(Set<Threshold> thresholds, EpisodeType type,
+			int frequency) throws IOException {
 		Tuple<Integer, Double> bestThreshs = Tuple.newTuple(0, 0.0);
+		StringBuilder sb = new StringBuilder();
 		double bestFract = 0.0;
 
-		Logger.log("\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction");
+		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
 		for (Threshold item : thresholds) {
-			int frequency = item.getFrequency();
-			double entropy = item.getEntropy();
+			int itemFreq = item.getFrequency();
+			double itemEntropy = item.getEntropy();
 			int gens = item.getNoGenPatterns();
 			int specs = item.getNoSpecPatterns();
-			double fraction = item.getFraction();
+			double fraction = Math.floor(item.getFraction() * 1000) / 1000;
 
-			Logger.log("\t%d\t%.3f\t%d\t%d\t%.3f", frequency, entropy, gens, specs, fraction);
+			sb.append(itemFreq + "\t");
+			sb.append(itemEntropy + "\t");
+			sb.append(gens + "\t");
+			sb.append(specs + "\t");
+			sb.append(fraction + "\n");
 
 			if (fraction > bestFract) {
-				bestThreshs = Tuple.newTuple(frequency, entropy);
+				bestThreshs = Tuple.newTuple(itemFreq, itemEntropy);
 				bestFract = fraction;
 			}
 		}
-		Logger.log("\nBest results achieved for:");
-		Logger.log("Frequency = %d", bestThreshs.getFirst());
-		Logger.log("Entropy = %.3f", bestThreshs.getSecond());
-		Logger.log("Generalizability = %.3f", bestFract);
+		sb.append("\nBest results achieved for:\n");
+		sb.append("Frequency = " + bestThreshs.getFirst() + "\n");
+		sb.append("Entropy = " + bestThreshs.getSecond() + "\n");
+		sb.append("Generalizability = " + bestFract);
+
+		FileUtils.writeStringToFile(new File(getFilePath(frequency, type)),
+				sb.toString());
+		;
 	}
 
 	private SortedMap<Integer, Set<Double>> getThreshDist(
@@ -101,13 +122,24 @@ public class ThresholdsAnalyzer {
 			Episode episode = entry.getKey();
 			int epFreq = episode.getFrequency();
 			double epEntropy = episode.getEntropy();
-			
+			double roundEnt = Math.floor(epEntropy * 1000) / 1000;
+
 			frequencies.add(epFreq);
-			entropies.add(epEntropy);
+			entropies.add(roundEnt);
 		}
 		for (int freq : frequencies) {
 			thresholds.put(freq, entropies);
 		}
 		return thresholds;
+	}
+
+	private String getFilePath(int frequency, EpisodeType type) {
+		File path = new File(patternsFolder.getAbsolutePath() + "/freq"
+				+ frequency + "/" + type.toString());
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+		String fileName = path.getAbsolutePath() + "/thresholds.txt";
+		return fileName;
 	}
 }

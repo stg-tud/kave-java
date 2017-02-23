@@ -40,6 +40,9 @@ public class TestClass {
 		th2.addGenPattern();
 		
 		boolean test = thresholds.contains(th2);
-		System.out.println(test);
+//		System.out.println(test);
+		
+		double d = 0.45372;
+		System.out.println(Math.floor(d *1000) / 1000);
 	}
 }
