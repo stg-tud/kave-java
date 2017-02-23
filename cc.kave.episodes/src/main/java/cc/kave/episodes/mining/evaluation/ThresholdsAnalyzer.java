@@ -48,8 +48,14 @@ public class ThresholdsAnalyzer {
 				.entrySet()) {
 			int freq = threshEntry.getKey();
 
-			for (Double ent : threshEntry.getValue()) {
-				Threshold threshItem = getThreshResults(patterns, freq, ent);
+			Threshold threshItem;
+			if (type == EpisodeType.GENERAL) {
+				for (Double ent : threshEntry.getValue()) {
+					threshItem = getThreshResults(patterns, freq, ent);
+					results.add(threshItem);
+				}
+			} else {
+				threshItem = getThreshResults(patterns, freq, 0.0);
 				results.add(threshItem);
 			}
 		}
@@ -57,7 +63,7 @@ public class ThresholdsAnalyzer {
 	}
 
 	private Threshold getThreshResults(Map<Episode, Boolean> patterns,
-			int freq, Double ent) {
+			int freq, double ent) {
 		Threshold threshResults = new Threshold(freq, ent);
 
 		for (Map.Entry<Episode, Boolean> epEntry : patterns.entrySet()) {
@@ -103,7 +109,9 @@ public class ThresholdsAnalyzer {
 		}
 		sb.append("\nBest results achieved for:\n");
 		sb.append("Frequency = " + bestThreshs.getFirst() + "\n");
-		sb.append("Entropy = " + bestThreshs.getSecond() + "\n");
+		if (type == EpisodeType.GENERAL) {
+			sb.append("Entropy = " + bestThreshs.getSecond() + "\n");
+		}
 		sb.append("Generalizability = " + bestFract);
 
 		FileUtils.writeStringToFile(new File(getFilePath(frequency, type)),

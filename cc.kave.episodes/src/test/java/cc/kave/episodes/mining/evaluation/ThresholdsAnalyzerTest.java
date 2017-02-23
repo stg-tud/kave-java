@@ -100,7 +100,7 @@ public class ThresholdsAnalyzerTest {
 	}
 
 	@Test
-	public void fileContent() throws Exception {
+	public void fileContentGeneral() throws Exception {
 
 		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
 		
@@ -128,6 +128,26 @@ public class ThresholdsAnalyzerTest {
 		sb.append("Generalizability = 0.75");
 
 		String actuals = FileUtils.readFileToString(getFilePath(EpisodeType.GENERAL));
+		
+		assertEquals(sb.toString(), actuals);
+	}
+	
+	@Test
+	public void fileContentSequential() throws Exception {
+
+		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
+		sb.append("2\t0.0\t3\t1\t0.75\n");
+		sb.append("3\t0.0\t2\t1\t0.666\n");
+		sb.append("4\t0.0\t1\t1\t0.5\n");
+		sb.append("\nBest results achieved for:\n");
+		sb.append("Frequency = 2\n");
+		sb.append("Generalizability = 0.75");
+
+		String actuals = FileUtils.readFileToString(getFilePath(EpisodeType.SEQUENTIAL));
 		
 		assertEquals(sb.toString(), actuals);
 	}
