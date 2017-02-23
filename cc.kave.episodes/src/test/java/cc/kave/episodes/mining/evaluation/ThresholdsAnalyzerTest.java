@@ -78,7 +78,26 @@ public class ThresholdsAnalyzerTest {
 		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
 
 		assertLogContains(0,
-				"Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
+				"\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction");
+		assertLogContains(1, "\t2\t0.400\t3\t1\t0.750");
+		assertLogContains(2, "\t2\t0.500\t2\t1\t0.667");
+		assertLogContains(3, "\t2\t0.600\t1\t1\t0.500");
+		assertLogContains(4, "\t2\t0.700\t0\t1\t0.000");
+		
+		assertLogContains(5, "\t3\t0.400\t2\t1\t0.667");
+		assertLogContains(6, "\t3\t0.500\t1\t1\t0.500");
+		assertLogContains(7, "\t3\t0.600\t0\t1\t0.000");
+		assertLogContains(8, "\t3\t0.700\t0\t1\t0.000");
+		
+		assertLogContains(9, "\t4\t0.400\t1\t1\t0.500");
+		assertLogContains(10, "\t4\t0.500\t1\t1\t0.500");
+		assertLogContains(11, "\t4\t0.600\t0\t1\t0.000");
+		assertLogContains(12, "\t4\t0.700\t0\t1\t0.000");
+		
+		assertLogContains(13, "\nBest results achieved for:");
+		assertLogContains(14, "Frequency = 2");
+		assertLogContains(15, "Entropy = 0.400");
+		assertLogContains(16, "Generalizability = 0.750");
 
 	}
 

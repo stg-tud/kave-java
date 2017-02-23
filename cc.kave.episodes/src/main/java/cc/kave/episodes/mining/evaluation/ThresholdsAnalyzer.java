@@ -69,7 +69,7 @@ public class ThresholdsAnalyzer {
 		Tuple<Integer, Double> bestThreshs = Tuple.newTuple(0, 0.0);
 		double bestFract = 0.0;
 
-		Logger.log("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
+		Logger.log("\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction");
 		for (Threshold item : thresholds) {
 			int frequency = item.getFrequency();
 			double entropy = item.getEntropy();
@@ -77,36 +77,36 @@ public class ThresholdsAnalyzer {
 			int specs = item.getNoSpecPatterns();
 			double fraction = item.getFraction();
 
-			Logger.log("%d\t%.3f\t", frequency, entropy);
-			Logger.log("%d\t%d\t%.3f\n", gens, specs, fraction);
+			Logger.log("\t%d\t%.3f\t%d\t%d\t%.3f", frequency, entropy, gens, specs, fraction);
 
 			if (fraction > bestFract) {
 				bestThreshs = Tuple.newTuple(frequency, entropy);
 				bestFract = fraction;
 			}
 		}
-		Logger.log("\nBest results achieved for:\n");
-		Logger.log("Frequency = %d\n", bestThreshs.getFirst());
-		Logger.log("Entropy = %.3f\n", bestThreshs.getSecond());
+		Logger.log("\nBest results achieved for:");
+		Logger.log("Frequency = %d", bestThreshs.getFirst());
+		Logger.log("Entropy = %.3f", bestThreshs.getSecond());
 		Logger.log("Generalizability = %.3f", bestFract);
 	}
 
 	private SortedMap<Integer, Set<Double>> getThreshDist(
 			Map<Episode, Boolean> patterns) {
 		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
+		Set<Integer> frequencies = Sets.newHashSet();
+		SortedSet<Double> entropies = new TreeSet<Double>();
 
 		for (Map.Entry<Episode, Boolean> entry : patterns.entrySet()) {
 
 			Episode episode = entry.getKey();
 			int epFreq = episode.getFrequency();
 			double epEntropy = episode.getEntropy();
-			if (thresholds.containsKey(epFreq)) {
-				thresholds.get(epFreq).add(epEntropy);
-			} else {
-				SortedSet<Double> entGroup = new TreeSet<Double>();
-				entGroup.add(epEntropy);
-				thresholds.put(epFreq, entGroup);
-			}
+			
+			frequencies.add(epFreq);
+			entropies.add(epEntropy);
+		}
+		for (int freq : frequencies) {
+			thresholds.put(freq, entropies);
 		}
 		return thresholds;
 	}
