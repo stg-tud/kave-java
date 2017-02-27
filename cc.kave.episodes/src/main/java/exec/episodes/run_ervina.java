@@ -52,19 +52,19 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		// load(PreChecking.class).methodsOverlap();
-		// load(PreprocessingFolded.class).runPreparation(FREQUENCY);
+//		 load(PreChecking.class).methodsOverlap();
+//		// load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 
-		// load(PostChecking.class).numEvents(FREQUENCY);
+//		 load(PostChecking.class).streamSizes(FREQUENCY);
 
-		// load(PatternsValidation.class).validate(EpisodeType.PARALLEL,
-		// FREQUENCY, ENTROPY, FOLDNUM);
-		load(ThresholdsAnalyzer.class).analyze(EpisodeType.PARALLEL, FREQUENCY,
+//		load(PatternsValidation.class).validate(EpisodeType.SEQUENTIAL,
+//				FREQUENCY, ENTROPY, FOLDNUM);
+		load(ThresholdsAnalyzer.class).analyze(EpisodeType.SEQUENTIAL, FREQUENCY,
 				ENTROPY, FOLDNUM);
 
 		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
-		// load(PatternsComparison.class).coverage(FREQ, EpisodeType.GENERAL,
-		// EpisodeType.SEQUENTIAL);
+//		load(PatternsComparison.class).coverage(EpisodeType.GENERAL,
+//				EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 		// load(PatternsComparison.class).printCommonPatterns(FREQ,
 		// EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
 		// load(PatternsComparison.class).extractConcreteCode(FREQ);
