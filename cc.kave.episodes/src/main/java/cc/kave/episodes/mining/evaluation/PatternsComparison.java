@@ -76,9 +76,10 @@ public class PatternsComparison {
 		checkCoverage(patterns1, patterns2, type1, type2);
 	}
 
-	public void printCommonPatterns(EpisodeType type1, EpisodeType type2,
+	public void commonPatterns(EpisodeType type1, EpisodeType type2,
 			int frequency, double entropy, int foldNum) throws IOException {
-		int samer = 0;
+		int equal = 0;
+		int unequal = 0;
 		int set = 0;
 
 		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
@@ -94,15 +95,16 @@ public class PatternsComparison {
 				if (!equalEpisodes(episodes2, patterns1.get(events))) {
 					store(frequency, patterns1.get(events), type1, set, foldNum);
 					store(frequency, episodes2, type2, set, foldNum);
+					unequal++;
 					set++;
 				} else {
-					samer++;
+					equal++;
 				}
-			} 
+			}
 		}
 		Logger.log(
-				"There are %d equal patterns learned by configurations %s and %s!",
-				samer, type1.toString(), type2.toString());
+				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
+				type1.toString(), type2.toString(), equal, unequal);
 	}
 
 	public void extractOverlappingExamples(EpisodeType type1,
@@ -243,12 +245,11 @@ public class PatternsComparison {
 		int covered = 0;
 		int notConvered = 0;
 
-		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2
-				.entrySet()) {
+		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
 			if (patterns1.containsKey(entry.getKey())) {
-				covered++;
+				covered += entry.getValue().size();
 			} else {
-				notConvered++;
+				notConvered += entry.getValue().size();
 			}
 		}
 		Logger.log(

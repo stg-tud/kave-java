@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
+import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
@@ -52,19 +52,20 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-//		 load(PreChecking.class).methodsOverlap();
-//		// load(PreprocessingFolded.class).runPreparation(FREQUENCY);
+		// load(PreChecking.class).methodsOverlap();
+		// // load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 
-//		 load(PostChecking.class).streamSizes(FREQUENCY);
+		// load(PostChecking.class).streamSizes(FREQUENCY);
 
-//		load(PatternsValidation.class).validate(EpisodeType.SEQUENTIAL,
-//				FREQUENCY, ENTROPY, FOLDNUM);
-		load(ThresholdsAnalyzer.class).analyze(EpisodeType.SEQUENTIAL, FREQUENCY,
-				ENTROPY, FOLDNUM);
+		// load(PatternsValidation.class).validate(EpisodeType.SEQUENTIAL,
+		// FREQUENCY, ENTROPY, FOLDNUM);
+		// load(ThresholdsAnalyzer.class).analyze(EpisodeType.SEQUENTIAL,
+		// FREQUENCY,
+		// ENTROPY, FOLDNUM);
+		load(PatternsComparison.class).commonPatterns(EpisodeType.SEQUENTIAL,
+				EpisodeType.PARALLEL, FREQUENCY, ENTROPY, FOLDNUM);
 
 		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
-//		load(PatternsComparison.class).coverage(EpisodeType.GENERAL,
-//				EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 		// load(PatternsComparison.class).printCommonPatterns(FREQ,
 		// EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
 		// load(PatternsComparison.class).extractConcreteCode(FREQ);
