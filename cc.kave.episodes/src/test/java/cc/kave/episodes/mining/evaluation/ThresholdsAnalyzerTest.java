@@ -1,7 +1,7 @@
 package cc.kave.episodes.mining.evaluation;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -23,9 +24,11 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ThresholdsAnalyzerTest {
 
@@ -37,7 +40,7 @@ public class ThresholdsAnalyzerTest {
 	@Mock
 	private PatternsValidation patternsValidation;
 
-	private Map<Episode, Boolean> validation;
+	private Map<Integer, Set<Tuple<Episode, Boolean>>> validation;
 
 	private static final int FREQUENCY = 2;
 	private static final double ENTROPY = 0.4;
@@ -53,14 +56,20 @@ public class ThresholdsAnalyzerTest {
 				patternsValidation);
 
 		validation = Maps.newLinkedHashMap();
-		validation.put(createEpisode(4, 0.5345, "1", "2", "1>2"), true);
-		validation.put(createEpisode(3, 0.45, "1", "2", "3", "1>2", "1>3"),
-				true);
-		validation.put(createEpisode(4, 0.7, "1", "2", "4", "1>2", "1>4"),
-				false);
-		validation.put(
+		Set<Tuple<Episode, Boolean>> episodes = Sets.newLinkedHashSet();
+		episodes.add(Tuple.newTuple(createEpisode(4, 0.5345, "1", "2", "1>2"),
+				true));
+		validation.put(2, episodes);
+
+		episodes = Sets.newLinkedHashSet();
+		episodes.add(Tuple.newTuple(
+				createEpisode(3, 0.45, "1", "2", "3", "1>2", "1>3"), true));
+		episodes.add(Tuple.newTuple(
+				createEpisode(4, 0.7, "1", "2", "4", "1>2", "1>4"), false));
+		episodes.add(Tuple.newTuple(
 				createEpisode(2, 0.67894, "1", "3", "4", "1>3", "1>4", "3>4"),
-				true);
+				true));
+		validation.put(3, episodes);
 
 		when(
 				patternsValidation.validate(any(EpisodeType.class), anyInt(),
@@ -71,7 +80,8 @@ public class ThresholdsAnalyzerTest {
 	public void cannotBeInitializedWithNonExistingPatternsFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new ThresholdsAnalyzer(new File("does not exist"), patternsValidation);
+		sut = new ThresholdsAnalyzer(new File("does not exist"),
+				patternsValidation);
 	}
 
 	@Test
@@ -95,7 +105,7 @@ public class ThresholdsAnalyzerTest {
 		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
 
 		File file = getFilePath(EpisodeType.SEQUENTIAL);
-		
+
 		assertTrue(file.exists());
 	}
 
@@ -103,7 +113,7 @@ public class ThresholdsAnalyzerTest {
 	public void fileContentGeneral() throws Exception {
 
 		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
-		
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
@@ -127,16 +137,17 @@ public class ThresholdsAnalyzerTest {
 		sb.append("Entropy = 0.45\n");
 		sb.append("Generalizability = 0.75");
 
-		String actuals = FileUtils.readFileToString(getFilePath(EpisodeType.GENERAL));
-		
+		String actuals = FileUtils
+				.readFileToString(getFilePath(EpisodeType.GENERAL));
+
 		assertEquals(sb.toString(), actuals);
 	}
-	
+
 	@Test
 	public void fileContentSequential() throws Exception {
 
 		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
-		
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
@@ -147,8 +158,9 @@ public class ThresholdsAnalyzerTest {
 		sb.append("Frequency = 2\n");
 		sb.append("Generalizability = 0.75");
 
-		String actuals = FileUtils.readFileToString(getFilePath(EpisodeType.SEQUENTIAL));
-		
+		String actuals = FileUtils
+				.readFileToString(getFilePath(EpisodeType.SEQUENTIAL));
+
 		assertEquals(sb.toString(), actuals);
 	}
 

@@ -39,8 +39,8 @@ public class ThresholdsAnalyzer {
 
 	public void analyze(EpisodeType type, int frequency, double entropy,
 			int foldNum) throws Exception {
-		Map<Episode, Boolean> patterns = patternsValidation.validate(type,
-				frequency, entropy, foldNum);
+		Map<Integer, Set<Tuple<Episode, Boolean>>> patterns = patternsValidation
+				.validate(type, frequency, entropy, foldNum);
 		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(patterns);
 		Set<Threshold> results = Sets.newLinkedHashSet();
 
@@ -62,20 +62,26 @@ public class ThresholdsAnalyzer {
 		printResults(results, type, frequency);
 	}
 
-	private Threshold getThreshResults(Map<Episode, Boolean> patterns,
-			int freq, double ent) {
+	private Threshold getThreshResults(
+			Map<Integer, Set<Tuple<Episode, Boolean>>> patterns, int freq,
+			double ent) {
 		Threshold threshResults = new Threshold(freq, ent);
 
-		for (Map.Entry<Episode, Boolean> epEntry : patterns.entrySet()) {
-			Episode episode = epEntry.getKey();
+		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> epEntry : patterns
+				.entrySet()) {
+			Set<Tuple<Episode, Boolean>> episodeSet = epEntry.getValue();
 
-			if ((episode.getFrequency() >= freq)
-					&& (episode.getEntropy() >= ent)) {
+			for (Tuple<Episode, Boolean> tuple : episodeSet) {
+				Episode episode = tuple.getFirst();
 
-				if (epEntry.getValue()) {
-					threshResults.addGenPattern();
-				} else {
-					threshResults.addSpecPattern();
+				if ((episode.getFrequency() >= freq)
+						&& (episode.getEntropy() >= ent)) {
+
+					if (tuple.getSecond()) {
+						threshResults.addGenPattern();
+					} else {
+						threshResults.addSpecPattern();
+					}
 				}
 			}
 		}
@@ -120,20 +126,24 @@ public class ThresholdsAnalyzer {
 	}
 
 	private SortedMap<Integer, Set<Double>> getThreshDist(
-			Map<Episode, Boolean> patterns) {
+			Map<Integer, Set<Tuple<Episode, Boolean>>> patterns) {
 		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
 		Set<Integer> frequencies = Sets.newHashSet();
 		SortedSet<Double> entropies = new TreeSet<Double>();
 
-		for (Map.Entry<Episode, Boolean> entry : patterns.entrySet()) {
+		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
+				.entrySet()) {
+			Set<Tuple<Episode, Boolean>> episodeSet = entry.getValue();
 
-			Episode episode = entry.getKey();
-			int epFreq = episode.getFrequency();
-			double epEntropy = episode.getEntropy();
-			double roundEnt = Math.floor(epEntropy * 1000) / 1000;
+			for (Tuple<Episode, Boolean> tuple : episodeSet) {
+				Episode episode = tuple.getFirst();
+				int epFreq = episode.getFrequency();
+				double epEntropy = episode.getEntropy();
+				double roundEnt = Math.floor(epEntropy * 1000) / 1000;
 
-			frequencies.add(epFreq);
-			entropies.add(roundEnt);
+				frequencies.add(epFreq);
+				entropies.add(roundEnt);
+			}
 		}
 		for (int freq : frequencies) {
 			thresholds.put(freq, entropies);

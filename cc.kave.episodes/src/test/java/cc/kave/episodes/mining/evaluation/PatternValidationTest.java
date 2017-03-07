@@ -215,7 +215,8 @@ public class PatternValidationTest {
 		verify(validationDataIo).read(anyInt(), anyInt());
 		verify(validationDataIo).streamOfFacts(any(List.class), any(Map.class));
 		verify(transClosure, times(2)).remTransClosure(any(Episode.class));
-		verify(episodeToGraph, times(2)).convert(any(Episode.class), any(List.class));
+		verify(episodeToGraph, times(2)).convert(any(Episode.class),
+				any(List.class));
 		verify(reposParser).getRepoTypesMapper();
 	}
 
@@ -235,10 +236,14 @@ public class PatternValidationTest {
 	@Test
 	public void checkFileContent() throws Exception {
 
-		Map<Episode, Boolean> actVal = sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
-		Map<Episode, Boolean> expVal = Maps.newLinkedHashMap();
-		expVal.put(createEpisode(1, 1.0, "2", "3", "2>3"), true);
-		expVal.put(createEpisode(0, 0.5, "7", "8", "7>8"), false);
+		Map<Integer, Set<Tuple<Episode, Boolean>>> actVal = sut.validate(
+				EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		Map<Integer, Set<Tuple<Episode, Boolean>>> expVal = Maps
+				.newLinkedHashMap();
+		Set<Tuple<Episode, Boolean>> expPatterns = Sets.newLinkedHashSet();
+		expPatterns.add(Tuple.newTuple(createEpisode(1, 1.0, "2", "3", "2>3"), true));
+		expPatterns.add(Tuple.newTuple(createEpisode(0, 0.5, "7", "8", "7>8"), false));
+		expVal.put(2, expPatterns);
 
 		String actuals = FileUtils
 				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));

@@ -72,9 +72,9 @@ public class PatternsValidation {
 		this.repoParser = reposParser;
 	}
 
-	public Map<Episode, Boolean> validate(EpisodeType episodeType, int frequency,
+	public Map<Integer, Set<Tuple<Episode, Boolean>>> validate(EpisodeType episodeType, int frequency,
 			double entropy, int foldNum) throws Exception {
-		Map<Episode, Boolean> results = Maps.newLinkedHashMap();
+		Map<Integer, Set<Tuple<Episode, Boolean>>> results = Maps.newLinkedHashMap();
 		
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
@@ -107,6 +107,7 @@ public class PatternsValidation {
 			if (entry.getKey() < 2) {
 				continue;
 			}
+			Set<Tuple<Episode, Boolean>> pattsVal = Sets.newLinkedHashSet();
 			sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
 			sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 
@@ -124,13 +125,14 @@ public class PatternsValidation {
 				sb.append(occValidation + "\n");
 				
 				if ((occValidation == 0) && (numReposOccur < 2)) {
-					results.put(episode, false);
+					pattsVal.add(Tuple.newTuple(episode, false));
 				} else {
-					results.put(episode, true);
+					pattsVal.add(Tuple.newTuple(episode, true));
 				}
 				store(episode, episodeType, patternId, trainEvents, frequency);
 				patternId++;
 			}
+			results.put(entry.getKey(), pattsVal);
 			sb.append("\n");
 		}
 		FileUtils.writeStringToFile(getEvalPath(frequency, episodeType),
@@ -200,7 +202,7 @@ public class PatternsValidation {
 			Event event = events.get(fact.getFactID());
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
 				return event;
-			}
+			} 
 		}
 		return null;
 	}
