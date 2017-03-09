@@ -24,6 +24,7 @@ import java.util.Properties;
 import cc.kave.episodes.mining.evaluation.PatternsValidation;
 import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
 import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.postprocessor.SpecificPatterns;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -58,10 +59,9 @@ public class run_ervina {
 
 		// load(PostChecking.class).streamSizes(FREQUENCY);
 
-//		load(PatternsValidation.class).validate(EpisodeType.SEQUENTIAL,
-//				FREQUENCY, ENTROPY, FOLDNUM);
-		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL,
-				FREQUENCY, ENTROPY, FOLDNUM);
+		// load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL,
+		// FREQUENCY, ENTROPY, FOLDNUM);
+		load(SpecificPatterns.class).patternEvents(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 		// load(PatternsComparison.class).commonPatterns(EpisodeType.SEQUENTIAL,
 		// EpisodeType.PARALLEL, FREQUENCY, ENTROPY, FOLDNUM);
 		// load(SpecificPatterns.class).patternsInfo(EpisodeType.SEQUENTIAL,

@@ -43,6 +43,17 @@ public class TestClass {
 //		System.out.println(test);
 		
 		double d = 0.45372;
-		System.out.println(Math.floor(d *1000) / 1000);
+//		System.out.println(Math.floor(d *1000) / 1000);
+		
+		Set<Integer> set1 = Sets.newLinkedHashSet();
+		set1.add(5);
+		set1.add(2);
+		set1.add(3);
+		set1.add(1);
+		set1.add(4);
+		
+		Set<Integer> set2 = Sets.newHashSet(4, 2);
+		
+		System.out.println(set1.containsAll(set2));
 	}
 }

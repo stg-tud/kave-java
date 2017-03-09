@@ -6,6 +6,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.evaluation.PatternsValidation;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -24,12 +27,15 @@ public class SpecificPatterns {
 	private EventStreamIo eventStream;
 	private EpisodeToGraphConverter graph;
 
+	private EpisodesParser parser;
+
 	@Inject
 	public SpecificPatterns(PatternsValidation validate, EventStreamIo stream,
-			EpisodeToGraphConverter graphConv) {
+			EpisodeToGraphConverter graphConv, EpisodesParser parser) {
 		this.validation = validate;
 		this.eventStream = stream;
 		this.graph = graphConv;
+		this.parser = parser;
 	}
 
 	public void patternsInfo(EpisodeType type, int frequency, double entropy,
@@ -38,57 +44,89 @@ public class SpecificPatterns {
 				.validate(type, frequency, entropy, foldNum);
 		List<Event> events = eventStream.readMapping(frequency, foldNum);
 
-		Set<Integer> patternEvents = Sets.newLinkedHashSet();
-		Set<Integer> specificEvents = Sets.newLinkedHashSet();
+		Set<Fact> specPatterns = Sets.newLinkedHashSet();
+		Set<Fact> genPatterns = Sets.newLinkedHashSet();
 
 		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
 				.entrySet()) {
-			Logger.log("Episode size = %d", entry.getKey());
+			Logger.log("\tEpisode size = %d", entry.getKey());
 			Set<Tuple<Episode, Boolean>> episodes = entry.getValue();
 
 			for (Tuple<Episode, Boolean> tuple : episodes) {
 				Episode ep = tuple.getFirst();
 				Set<Fact> epEvents = ep.getEvents();
-				
+
 				if (!tuple.getSecond()) {
-					if (!patternEvents.containsAll(epEvents)) {
-						Logger.log("Episode: %s", ep.toString());
-						
+					if (!specPatterns.containsAll(epEvents)) {
+						Logger.log("\tEpisode: %s", ep.getFacts().toString());
+
 						for (Fact fact : epEvents) {
 							int id = fact.getFactID();
 							Event e = events.get(id);
-							String label = graph.toLabel(e.getMethod());
-							Logger.log("%s", label);
+							String label = id + ". ";
+							label += graph.toLabel(e.getMethod());
+							Logger.log("\t%s", label);
 
-							if (!patternEvents.contains(id)) {
-								patternEvents.add(id);
-								specificEvents.add(id);
-							}
+							specPatterns.add(fact);
 						}
-						Logger.log("");
 					}
 				} else {
 					for (Fact fact : epEvents) {
-						int id = fact.getFactID();
-						
-						if (specificEvents.contains(id)) {
-							specificEvents.remove(id);
-						}
+						genPatterns.add(fact);
 					}
 				}
 			}
 			Logger.log("");
 		}
+		Set<Fact> specEvents = getSpecEvents(specPatterns, genPatterns);
 		Logger.log("Printing patterns events ...");
-		printEventsInfo(patternEvents, events);
+		printEventsInfo(specPatterns, events);
 		Logger.log("Printing specific events ...");
-		printEventsInfo(specificEvents, events);
+		printEventsInfo(specEvents, events);
 	}
 
-	private void printEventsInfo(Set<Integer> specPattEvents, List<Event> events) {
-		for (int id : specPattEvents) {
+	public void patternEvents(EpisodeType type, int frequency, int foldNum) {
+		Map<Integer, Set<Episode>> episodes = parser.parse(type, frequency,
+				foldNum);
+		List<Event> events = eventStream.readMapping(frequency, foldNum);
+		Set<Episode> twoNodeEpisodes = episodes.get(2);
+		Set<Fact> patternEvents = Sets.newLinkedHashSet();
+
+		for (Episode twoNode : twoNodeEpisodes) {
+			Set<Fact> facts = twoNode.getEvents();
+
+			for (Fact f : facts) {
+				patternEvents.add(f);
+			}
+		}
+		for (Fact fact : patternEvents) {
+			int id = fact.getFactID();
+			IMethodName methodName = events.get(id).getMethod();
+			IAssemblyName asm = methodName.getDeclaringType().getAssembly();
+			Logger.log("\t%d.\t%s\t%s", id, asm.getName() + "."
+					+ asm.getVersion().getIdentifier(),
+					graph.toLabel(methodName));
+		}
+	}
+
+	private Set<Fact> getSpecEvents(Set<Fact> specPatterns,
+			Set<Fact> genPatterns) {
+		Set<Fact> result = Sets.newLinkedHashSet();
+
+		for (Fact fact : specPatterns) {
+			if (!genPatterns.contains(fact)) {
+				result.add(fact);
+			}
+		}
+		return result;
+	}
+
+	private void printEventsInfo(Set<Fact> pattEvents, List<Event> events) {
+		for (Fact fact : pattEvents) {
+			int id = fact.getFactID();
 			Event event = events.get(id);
-			String label = graph.toLabel(event.getMethod());
+			String label = id + ". ";
+			label += graph.toLabel(event.getMethod());
 			Logger.log("%s", label);
 		}
 		Logger.log("");
