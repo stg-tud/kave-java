@@ -16,9 +16,11 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.Threshold;
+import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
@@ -27,22 +29,26 @@ import com.google.common.collect.Sets;
 public class ThresholdsAnalyzer {
 
 	private File patternsFolder;
+	private EpisodesParser episodeParser;
 	private PatternsValidation patternsValidation;
 
 	@Inject
 	public ThresholdsAnalyzer(@Named("patterns") File folder,
-			PatternsValidation validation) {
+			PatternsValidation validation, EpisodesParser parser) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
+		this.episodeParser = parser;
 		this.patternsValidation = validation;
 	}
 
 	public void analyze(EpisodeType type, int frequency, double entropy,
 			int foldNum) throws Exception {
-		Map<Integer, Set<Tuple<Episode, Boolean>>> patterns = patternsValidation
-				.validate(type, frequency, entropy, foldNum);
-		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(patterns);
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
+				frequency, foldNum);
+		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
+				.validate(episodes, frequency, foldNum);
+		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(validations);
 		Set<Threshold> results = Sets.newLinkedHashSet();
 
 		for (Map.Entry<Integer, Set<Double>> threshEntry : threshDist
@@ -51,7 +57,7 @@ public class ThresholdsAnalyzer {
 
 			Threshold threshItem;
 			for (Double ent : threshEntry.getValue()) {
-				threshItem = getThreshResults(type, patterns, freq, ent);
+				threshItem = getThreshResults(type, validations, freq, ent);
 				results.add(threshItem);
 			}
 		}
@@ -59,31 +65,31 @@ public class ThresholdsAnalyzer {
 	}
 
 	private Threshold getThreshResults(EpisodeType type,
-			Map<Integer, Set<Tuple<Episode, Boolean>>> patterns, int freq,
-			double ent) {
+			Map<Integer, Set<Triplet<Episode, Integer, Integer>>> patterns,
+			int freq, double ent) {
 		Threshold threshResults = new Threshold(freq, ent);
 
-		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> epEntry : patterns
+		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> epEntry : patterns
 				.entrySet()) {
-			Set<Tuple<Episode, Boolean>> episodeSet = epEntry.getValue();
+			Set<Triplet<Episode, Integer, Integer>> episodeSet = epEntry.getValue();
 
-			for (Tuple<Episode, Boolean> tuple : episodeSet) {
-				Episode episode = tuple.getFirst();
+			for (Triplet<Episode, Integer, Integer> triplet : episodeSet) {
+				Episode episode = triplet.getFirst();
 
 				if (episode.getFrequency() >= freq) {
 					if (type == EpisodeType.GENERAL) {
 						if (valid(episode) && (episode.getEntropy() >= ent)) {
-							if (tuple.getSecond()) {
-								threshResults.addGenPattern();
-							} else {
+							if ((triplet.getThird() == 0) && (triplet.getSecond() < 2)) {
 								threshResults.addSpecPattern();
+							} else {
+								threshResults.addGenPattern();;
 							}
 						}
 					} else {
-						if (tuple.getSecond()) {
-							threshResults.addGenPattern();
-						} else {
+						if ((triplet.getThird() == 0) && (triplet.getSecond() < 2)) {
 							threshResults.addSpecPattern();
+						} else {
+							threshResults.addGenPattern();;
 						}
 					}
 				}
@@ -149,21 +155,21 @@ public class ThresholdsAnalyzer {
 	}
 
 	private SortedMap<Integer, Set<Double>> getThreshDist(
-			Map<Integer, Set<Tuple<Episode, Boolean>>> patterns) {
+			Map<Integer, Set<Triplet<Episode, Integer, Integer>>> patterns) {
 		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
 		Set<Integer> frequencies = Sets.newHashSet();
 		SortedSet<Double> entropies = new TreeSet<Double>();
 
-		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
+		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> entry : patterns
 				.entrySet()) {
 			if (entry.getKey() < 3) {
 				continue;
 			}
-			Set<Tuple<Episode, Boolean>> episodeSet = entry.getValue();
+			Set<Triplet<Episode, Integer, Integer>> episodeSet = entry
+					.getValue();
+			for (Triplet<Episode, Integer, Integer> triplet : episodeSet) {
+				Episode episode = triplet.getFirst();
 
-			for (Tuple<Episode, Boolean> tuple : episodeSet) {
-				Episode episode = tuple.getFirst();
-				
 				if (!valid(episode)) {
 					continue;
 				}

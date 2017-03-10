@@ -1,50 +1,32 @@
 package cc.kave.episodes.mining.evaluation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.io.ValidationDataIO;
-import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
-import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EpisodesFilter;
-import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -52,27 +34,12 @@ import com.google.common.collect.Sets;
 
 public class PatternValidationTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-	@Rule
-	public TemporaryFolder patternsFolder = new TemporaryFolder();
-
 	@Mock
 	private EventStreamIo eventStream;
 	@Mock
-	private EpisodesParser episodeParser;
-	@Mock
-	private EpisodesFilter episodeFilter;
-	@Mock
 	private ValidationDataIO validationDataIo;
 	@Mock
-	private TransClosedEpisodes transClosure;
-	@Mock
-	private EpisodeToGraphConverter episodeToGraph;
-	@Mock
 	private RepositoriesParser reposParser;
-
-	private EpisodeAsGraphWriter graphWriter;
 
 	private List<Tuple<Event, List<Fact>>> streamMethods;
 	private List<Event> trainEvents;
@@ -83,10 +50,7 @@ public class PatternValidationTest {
 	private List<Event> valStream;
 	private List<List<Fact>> valFactStream;
 
-	private DirectedGraph<Fact, DefaultEdge> graph;
-
 	private static final int FREQUENCY = 5;
-	private static final double ENTROPY = 0.5;
 	private static final int FOLDNUM = 0;
 
 	private PatternsValidation sut;
@@ -94,8 +58,6 @@ public class PatternValidationTest {
 	@Before
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
-
-		graphWriter = new EpisodeAsGraphWriter();
 
 		streamMethods = Lists.newLinkedList();
 		streamMethods.add(Tuple.newTuple(enclCtx(2), Lists.newArrayList(
@@ -162,103 +124,71 @@ public class PatternValidationTest {
 				new Fact(3));
 		valFactStream.add(method);
 
-		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
-
-		sut = new PatternsValidation(patternsFolder.getRoot(), episodeFilter,
-				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser);
+		sut = new PatternsValidation(eventStream, validationDataIo, reposParser);
 
 		when(eventStream.parseStream(anyInt(), anyInt())).thenReturn(
 				streamMethods);
 		when(eventStream.readMapping(anyInt(), anyInt())).thenReturn(
 				trainEvents);
-		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt()))
-				.thenReturn(patterns);
-		when(episodeFilter.filter(any(Map.class), anyInt(), anyDouble()))
-				.thenReturn(patterns);
 		when(validationDataIo.read(anyInt(), anyInt())).thenReturn(valStream);
 		when(validationDataIo.streamOfFacts(any(List.class), any(Map.class)))
 				.thenReturn(valFactStream);
-		when(transClosure.remTransClosure(any(Episode.class))).thenReturn(ep);
-		when(episodeToGraph.convert(any(Episode.class), any(List.class)))
-				.thenReturn(graph);
 		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
 	}
 
 	@Test
-	public void cannotBeInitializedWithNonExistingPatternsFolder() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Patterns folder does not exist");
-		sut = new PatternsValidation(new File("does not exist"), episodeFilter,
-				eventStream, episodeParser, transClosure, episodeToGraph,
-				graphWriter, validationDataIo, reposParser);
-	}
-
-	@Test
-	public void cannotBeInitializedWithPatternsFile() throws IOException {
-		File patternsFile = patternsFolder.newFile("a");
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Patterns is not a folder, but a file");
-		sut = new PatternsValidation(patternsFile, episodeFilter, eventStream,
-				episodeParser, transClosure, episodeToGraph, graphWriter,
-				validationDataIo, reposParser);
-	}
-
-	@Test
 	public void mocksAreCalled() throws Exception {
-		sut.validate(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
+		sut.validate(patterns, FREQUENCY, FOLDNUM);
 
 		verify(eventStream).parseStream(anyInt(), anyInt());
 		verify(eventStream).readMapping(anyInt(), anyInt());
-		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
-		verify(episodeFilter).filter(any(Map.class), anyInt(), anyDouble());
 		verify(validationDataIo).read(anyInt(), anyInt());
 		verify(validationDataIo).streamOfFacts(any(List.class), any(Map.class));
-		verify(transClosure, times(2)).remTransClosure(any(Episode.class));
-		verify(episodeToGraph, times(2)).convert(any(Episode.class),
-				any(List.class));
 		verify(reposParser).getRepoTypesMapper();
 	}
 
-	@Test
-	public void fileIsCreated() throws Exception {
-		File patternFile1 = getPatternFile(EpisodeType.SEQUENTIAL, 0);
-		File patternFile2 = getPatternFile(EpisodeType.SEQUENTIAL, 1);
-		File evalFile = getEvalFile(EpisodeType.SEQUENTIAL);
-
-		sut.validate(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
-
-		assertTrue(patternFile1.exists());
-		assertTrue(patternFile2.exists());
-		assertTrue(evalFile.exists());
-	}
+//	@Test
+//	public void fileIsCreated() throws Exception {
+//		File patternFile1 = getPatternFile(EpisodeType.SEQUENTIAL, 0);
+//		File patternFile2 = getPatternFile(EpisodeType.SEQUENTIAL, 1);
+//		File evalFile = getEvalFile(EpisodeType.SEQUENTIAL);
+//
+//		sut.validate(patterns, FREQUENCY, FOLDNUM);
+//
+//		assertTrue(patternFile1.exists());
+//		assertTrue(patternFile2.exists());
+//		assertTrue(evalFile.exists());
+//	}
 
 	@Test
 	public void checkFileContent() throws Exception {
 
-		Map<Integer, Set<Tuple<Episode, Boolean>>> actVal = sut.validate(
-				EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
-		Map<Integer, Set<Tuple<Episode, Boolean>>> expVal = Maps
+		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> actVal = sut
+				.validate(patterns, FREQUENCY, FOLDNUM);
+		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> expVal = Maps
 				.newLinkedHashMap();
-		Set<Tuple<Episode, Boolean>> expPatterns = Sets.newLinkedHashSet();
-		expPatterns.add(Tuple.newTuple(createEpisode(1, 1.0, "2", "3", "2>3"), true));
-		expPatterns.add(Tuple.newTuple(createEpisode(0, 0.5, "7", "8", "7>8"), false));
+		Set<Triplet<Episode, Integer, Integer>> expPatterns = Sets
+				.newLinkedHashSet();
+		expPatterns.add(new Triplet<Episode, Integer, Integer>(createEpisode(1,
+				1.0, "2", "3", "2>3"), 3, 2));
+		expPatterns.add(new Triplet<Episode, Integer, Integer>(createEpisode(0,
+				0.5, "7", "8", "7>8"), 0, 0));
 		expVal.put(2, expPatterns);
 
-		String actuals = FileUtils
-				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
+//		String actuals = FileUtils
+//				.readFileToString(getEvalFile(EpisodeType.SEQUENTIAL));
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("Patterns with 2-nodes:\n");
-		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
-		sb.append("0\t");
-		sb.append("[2, 3, 2>3]\t");
-		sb.append("1\t1.0\t3\t2\n");
-		sb.append("1\t");
-		sb.append("[7, 8, 7>8]\t");
-		sb.append("0\t0.5\t0\t0\n\n");
-
-		assertEquals(sb.toString(), actuals);
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("Patterns with 2-nodes:\n");
+//		sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
+//		sb.append("0\t");
+//		sb.append("[2, 3, 2>3]\t");
+//		sb.append("1\t1.0\t3\t2\n");
+//		sb.append("1\t");
+//		sb.append("[7, 8, 7>8]\t");
+//		sb.append("0\t0.5\t0\t0\n\n");
+//
+//		assertEquals(sb.toString(), actuals);
 		assertEquals(expVal, actVal);
 	}
 
@@ -311,26 +241,26 @@ public class PatternValidationTest {
 		}
 	}
 
-	private String getResultsPath(EpisodeType episodeType) {
-		String path = patternsFolder.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY + "/" + episodeType.toString();
-		return path;
-	}
+//	private String getResultsPath(EpisodeType episodeType) {
+//		String path = patternsFolder.getRoot().getAbsolutePath() + "/freq"
+//				+ FREQUENCY + "/" + episodeType.toString();
+//		return path;
+//	}
 
-	private String getPatternsPath(EpisodeType type) {
-		String path = getResultsPath(type) + "/allPatterns";
-		return path;
-	}
+//	private String getPatternsPath(EpisodeType type) {
+//		String path = getResultsPath(type) + "/allPatterns";
+//		return path;
+//	}
 
-	private File getPatternFile(EpisodeType episodeType, int patternId) {
-		File patternFile = new File(getPatternsPath(episodeType) + "/pattern"
-				+ patternId + ".dot");
-		return patternFile;
-	}
+//	private File getPatternFile(EpisodeType episodeType, int patternId) {
+//		File patternFile = new File(getPatternsPath(episodeType) + "/pattern"
+//				+ patternId + ".dot");
+//		return patternFile;
+//	}
 
-	private File getEvalFile(EpisodeType episodeType) {
-		File evalFile = new File(getResultsPath(episodeType)
-				+ "/evaluations.txt");
-		return evalFile;
-	}
+//	private File getEvalFile(EpisodeType episodeType) {
+//		File evalFile = new File(getResultsPath(episodeType)
+//				+ "/evaluations.txt");
+//		return evalFile;
+//	}
 }
