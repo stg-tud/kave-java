@@ -3,7 +3,6 @@ package cc.kave.episodes.mining.evaluation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,9 +21,10 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.recommenders.datastructures.Tuple;
+import cc.kave.episodes.model.Triplet;
 import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Maps;
@@ -38,9 +38,12 @@ public class ThresholdsAnalyzerTest {
 	public TemporaryFolder patternsFolder = new TemporaryFolder();
 
 	@Mock
+	private EpisodesParser episodeParser;
+	@Mock
 	private PatternsValidation patternsValidation;
 
-	private Map<Integer, Set<Tuple<Episode, Boolean>>> validation;
+	private Map<Integer, Set<Episode>> episodes;
+	private Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validation;
 
 	private static final int FREQUENCY = 2;
 	private static final double ENTROPY = 0.4;
@@ -52,35 +55,34 @@ public class ThresholdsAnalyzerTest {
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		sut = new ThresholdsAnalyzer(patternsFolder.getRoot(),
+		sut = new ThresholdsAnalyzer(patternsFolder.getRoot(), episodeParser,
 				patternsValidation);
 
 		validation = Maps.newLinkedHashMap();
-		Set<Tuple<Episode, Boolean>> episodes = Sets.newLinkedHashSet();
-		episodes.add(Tuple.newTuple(createEpisode(4, 0.5345, "1", "2", "1>2"),
-				true));
+		Set<Triplet<Episode, Integer, Integer>> episodes = Sets
+				.newLinkedHashSet();
+		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(4,
+				0.5345, "1", "2", "1>2"), 4, 2));
 		validation.put(2, episodes);
 
 		episodes = Sets.newLinkedHashSet();
-		episodes.add(Tuple.newTuple(
-				createEpisode(3, 0.45, "1", "2", "3", "1>2", "1>3"), true));
-		episodes.add(Tuple.newTuple(
-				createEpisode(4, 0.7, "1", "2", "4", "1>2", "1>4"), false));
-		episodes.add(Tuple.newTuple(
-				createEpisode(2, 0.67894, "1", "3", "4", "1>3", "1>4", "3>4"),
-				true));
+		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(3,
+				0.45, "1", "2", "3", "1>2", "1>3"), 3, 0));
+		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(4,
+				0.7, "1", "2", "4", "1>2", "1>4"), 1, 0));
+		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(2,
+				0.67894, "1", "3", "4", "1>3", "1>4", "3>4"), 1, 2));
 		validation.put(3, episodes);
 
-		when(
-				patternsValidation.validate(any(EpisodeType.class), anyInt(),
-						anyDouble(), anyInt())).thenReturn(validation);
+		when(patternsValidation.validate(any(Map.class), anyInt(), anyInt()))
+				.thenReturn(validation);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingPatternsFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist");
-		sut = new ThresholdsAnalyzer(new File("does not exist"),
+		sut = new ThresholdsAnalyzer(new File("does not exist"), episodeParser,
 				patternsValidation);
 	}
 
@@ -89,15 +91,15 @@ public class ThresholdsAnalyzerTest {
 		File patternsFile = patternsFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns is not a folder, but a file");
-		sut = new ThresholdsAnalyzer(patternsFile, patternsValidation);
+		sut = new ThresholdsAnalyzer(patternsFile, episodeParser,
+				patternsValidation);
 	}
 
 	@Test
 	public void mocksAreCalled() throws Exception {
 		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
 
-		verify(patternsValidation).validate(any(EpisodeType.class), anyInt(),
-				anyDouble(), anyInt());
+		verify(patternsValidation).validate(any(Map.class), anyInt(), anyInt());
 	}
 
 	@Test

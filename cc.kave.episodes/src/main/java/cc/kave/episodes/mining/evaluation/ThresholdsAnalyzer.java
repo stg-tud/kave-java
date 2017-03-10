@@ -34,7 +34,7 @@ public class ThresholdsAnalyzer {
 
 	@Inject
 	public ThresholdsAnalyzer(@Named("patterns") File folder,
-			PatternsValidation validation, EpisodesParser parser) {
+			EpisodesParser parser, PatternsValidation validation) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -71,7 +71,8 @@ public class ThresholdsAnalyzer {
 
 		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> epEntry : patterns
 				.entrySet()) {
-			Set<Triplet<Episode, Integer, Integer>> episodeSet = epEntry.getValue();
+			Set<Triplet<Episode, Integer, Integer>> episodeSet = epEntry
+					.getValue();
 
 			for (Triplet<Episode, Integer, Integer> triplet : episodeSet) {
 				Episode episode = triplet.getFirst();
@@ -79,17 +80,19 @@ public class ThresholdsAnalyzer {
 				if (episode.getFrequency() >= freq) {
 					if (type == EpisodeType.GENERAL) {
 						if (valid(episode) && (episode.getEntropy() >= ent)) {
-							if ((triplet.getThird() == 0) && (triplet.getSecond() < 2)) {
+							if ((triplet.getThird() == 0)
+									&& (triplet.getSecond() < 2)) {
 								threshResults.addSpecPattern();
 							} else {
-								threshResults.addGenPattern();;
+								threshResults.addGenPattern();
 							}
 						}
 					} else {
-						if ((triplet.getThird() == 0) && (triplet.getSecond() < 2)) {
+						if ((triplet.getThird() == 0)
+								&& (triplet.getSecond() < 2)) {
 							threshResults.addSpecPattern();
 						} else {
-							threshResults.addGenPattern();;
+							threshResults.addGenPattern();
 						}
 					}
 				}
