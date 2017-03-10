@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.Threshold;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Sets;
@@ -49,20 +50,15 @@ public class ThresholdsAnalyzer {
 			int freq = threshEntry.getKey();
 
 			Threshold threshItem;
-			if (type == EpisodeType.GENERAL) {
-				for (Double ent : threshEntry.getValue()) {
-					threshItem = getThreshResults(patterns, freq, ent);
-					results.add(threshItem);
-				}
-			} else {
-				threshItem = getThreshResults(patterns, freq, 0.0);
+			for (Double ent : threshEntry.getValue()) {
+				threshItem = getThreshResults(type, patterns, freq, ent);
 				results.add(threshItem);
 			}
 		}
 		printResults(results, type, frequency);
 	}
 
-	private Threshold getThreshResults(
+	private Threshold getThreshResults(EpisodeType type,
 			Map<Integer, Set<Tuple<Episode, Boolean>>> patterns, int freq,
 			double ent) {
 		Threshold threshResults = new Threshold(freq, ent);
@@ -74,18 +70,45 @@ public class ThresholdsAnalyzer {
 			for (Tuple<Episode, Boolean> tuple : episodeSet) {
 				Episode episode = tuple.getFirst();
 
-				if ((episode.getFrequency() >= freq)
-						&& (episode.getEntropy() >= ent)) {
-
-					if (tuple.getSecond()) {
-						threshResults.addGenPattern();
+				if (episode.getFrequency() >= freq) {
+					if (type == EpisodeType.GENERAL) {
+						if (valid(episode) && (episode.getEntropy() >= ent)) {
+							if (tuple.getSecond()) {
+								threshResults.addGenPattern();
+							} else {
+								threshResults.addSpecPattern();
+							}
+						}
 					} else {
-						threshResults.addSpecPattern();
+						if (tuple.getSecond()) {
+							threshResults.addGenPattern();
+						} else {
+							threshResults.addSpecPattern();
+						}
 					}
 				}
 			}
 		}
 		return threshResults;
+	}
+
+	private boolean valid(Episode episode) {
+		Set<Fact> events = episode.getEvents();
+		Set<Fact> relations = episode.getRelations();
+		int numRels = relations.size();
+
+		if ((numRels != 0) && (numRels < maxRels(events.size()))) {
+			return true;
+		}
+		return false;
+	}
+
+	private int maxRels(int numEvents) {
+		if (numEvents < 3) {
+			return 1;
+		} else {
+			return (numEvents - 1) + maxRels(numEvents - 1);
+		}
 	}
 
 	private void printResults(Set<Threshold> thresholds, EpisodeType type,
@@ -133,10 +156,17 @@ public class ThresholdsAnalyzer {
 
 		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
 				.entrySet()) {
+			if (entry.getKey() < 3) {
+				continue;
+			}
 			Set<Tuple<Episode, Boolean>> episodeSet = entry.getValue();
 
 			for (Tuple<Episode, Boolean> tuple : episodeSet) {
 				Episode episode = tuple.getFirst();
+				
+				if (!valid(episode)) {
+					continue;
+				}
 				int epFreq = episode.getFrequency();
 				double epEntropy = episode.getEntropy();
 				double roundEnt = Math.floor(epEntropy * 1000) / 1000;

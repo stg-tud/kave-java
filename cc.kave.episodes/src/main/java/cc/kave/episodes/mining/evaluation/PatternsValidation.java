@@ -85,8 +85,8 @@ public class PatternsValidation {
 		Logger.log("Reading episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(episodeType,
 				frequency, foldNum);
-		Map<Integer, Set<Episode>> patterns = getFilteredEpisodes(episodes,
-				episodeType, frequency, entropy);
+//		Map<Integer, Set<Episode>> patterns = getFilteredEpisodes(episodes,
+//				episodeType, frequency, entropy);
 
 		Logger.log("Reading repositories -  enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
@@ -103,7 +103,7 @@ public class PatternsValidation {
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;
 
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() < 2) {
 				continue;
 			}
