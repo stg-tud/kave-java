@@ -16,6 +16,7 @@ import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
@@ -49,8 +50,8 @@ public class SimilarityMetrics {
 	public SimilarityMetrics(@Named("events") File folder,
 			EpisodesFilter postprocess, MaximalEpisodes maxEp,
 			QueryGeneration qGenerator, ProposalsSorter propSorter,
-			TransClosedEpisodes closedEp,
-			EpisodeToGraphConverter epToGraph, EpisodeAsGraphWriter graphWriter) {
+			TransClosedEpisodes closedEp, EpisodeToGraphConverter epToGraph,
+			EpisodeAsGraphWriter graphWriter) {
 		assertTrue(folder.exists(), "Events folder does not exist!");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file!");
 		this.eventsFolder = folder;
@@ -67,7 +68,7 @@ public class SimilarityMetrics {
 		List<Event> mapping = eventStreamIo.readMapping(frequency, 0);
 
 		Map<Integer, Set<Episode>> episodes = episodeProcessor.filter(
-				Maps.newHashMap(), 500, 0.6);
+				EpisodeType.GENERAL, Maps.newHashMap(), 500, 0.6);
 		Map<Integer, Set<Episode>> patterns = maxEpisodes
 				.getMaximalEpisodes(episodes);
 		Set<Episode> patternsSet = getAllPatterns(patterns);

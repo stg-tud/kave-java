@@ -327,7 +327,7 @@ public class PatternsComparison {
 				frequency, foldNum);
 
 		if (type == EpisodeType.GENERAL) {
-			return episodeFilter.filter(episodes, frequency, entropy);
+			return episodeFilter.filter(type, episodes, frequency, entropy);
 		}
 		return episodes;
 	}

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
@@ -28,8 +29,8 @@ import com.google.common.collect.Sets;
 
 public class EpisodesFilter {
 
-	public Map<Integer, Set<Episode>> filter(
-			Map<Integer, Set<Episode>> episodes, int freqThresh, double entropy) {
+	public Map<Integer, Set<Episode>> filter(EpisodeType type,
+			Map<Integer, Set<Episode>> episodes, int frequency, double entropy) {
 		Map<Integer, Set<Episode>> patterns = Maps.newLinkedHashMap();
 
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
@@ -37,31 +38,47 @@ public class EpisodesFilter {
 				continue;
 			}
 			Logger.log("Postprocessing %d-node episodes!", entry.getKey());
-			Map<Set<Fact>, Episode> filtered = Maps.newLinkedHashMap();
+			Set<Episode> threshFilter = Sets.newLinkedHashSet();
 
 			for (Episode ep : entry.getValue()) {
 				int freq = ep.getFrequency();
 				double bidirect = ep.getEntropy();
 
-				if ((freq >= freqThresh) && (bidirect >= entropy)) {
+				if ((freq >= frequency) && (bidirect >= entropy)) {
+					threshFilter.add(ep);
+				}
+			}
+			patterns.put(entry.getKey(), threshFilter);
+		}
+		if (type == EpisodeType.GENERAL) {
+			return repPatterns(patterns);
+		}
+		return patterns;
+	}
 
-					if (filtered.containsKey(ep.getEvents())) {
-						Set<Fact> events = ep.getEvents();
-						Episode filterEp = filtered.get(events);
-						filtered.remove(events);
+	private Map<Integer, Set<Episode>> repPatterns(
+			Map<Integer, Set<Episode>> patterns) {
+		Map<Integer, Set<Episode>> results = Maps.newLinkedHashMap();
 
-						Episode repEp = getRepresentative(filterEp, ep,
-								freqThresh, entropy);
-						filtered.put(repEp.getEvents(), repEp);
-					} else {
-						filtered.put(ep.getEvents(), ep);
-					}
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			Map<Set<Fact>, Episode> filtered = Maps.newLinkedHashMap();
+
+			for (Episode episode : entry.getValue()) {
+				if (filtered.containsKey(episode.getEvents())) {
+					Set<Fact> events = episode.getEvents();
+					Episode filterEp = filtered.get(events);
+					filtered.remove(events);
+
+					Episode repEp = getRepresentative(filterEp, episode);
+					filtered.put(repEp.getEvents(), repEp);
+				} else {
+					filtered.put(episode.getEvents(), episode);
 				}
 			}
 			Set<Episode> repEpisodes = getfilteredEp(filtered);
-			patterns.put(entry.getKey(), repEpisodes);
+			results.put(entry.getKey(), repEpisodes);
 		}
-		return patterns;
+		return results;
 	}
 
 	private Set<Episode> getfilteredEp(Map<Set<Fact>, Episode> filtered) {
@@ -73,8 +90,7 @@ public class EpisodesFilter {
 		return episodes;
 	}
 
-	private Episode getRepresentative(Episode filterEp, Episode currEp,
-			int freqThresh, double bidirectThresh) {
+	private Episode getRepresentative(Episode filterEp, Episode currEp) {
 		int ffreq = filterEp.getFrequency();
 		double fentropy = filterEp.getEntropy();
 
@@ -94,11 +110,12 @@ public class EpisodesFilter {
 				Set<Fact> e1Order = filterEp.getRelations();
 				Set<Fact> e2Order = currEp.getRelations();
 				Set<Fact> repFacts = Sets.newHashSet();
-				
+
 				for (Fact fact : e1Order) {
 					Tuple<Fact, Fact> orderFacts = fact.getRelationFacts();
-					Fact repFact = new Fact(orderFacts.getSecond(), orderFacts.getFirst());
-					
+					Fact repFact = new Fact(orderFacts.getSecond(),
+							orderFacts.getFirst());
+
 					if (!e2Order.contains(repFact)) {
 						repFacts.add(fact);
 					}
@@ -113,7 +130,7 @@ public class EpisodesFilter {
 		Episode episode = new Episode();
 		episode.setFrequency(filterEp.getFrequency());
 		episode.setEntropy(filterEp.getEntropy());
-		
+
 		for (Fact event : filterEp.getEvents()) {
 			episode.addFact(event);
 		}
