@@ -22,7 +22,6 @@ import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.Threshold;
 import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Sets;
 
@@ -35,33 +34,37 @@ public class ThresholdsAnalyzer {
 	@Inject
 	public ThresholdsAnalyzer(@Named("patterns") File folder,
 			EpisodesParser parser, PatternsValidation validation) {
-		assertTrue(folder.exists(), "Patterns folder does not exist");
-		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
+		assertTrue(folder.exists(), "Patterns folder does not exist!");
+		assertTrue(folder.isDirectory(),
+				"Patterns is not a folder, but a file!");
 		this.patternsFolder = folder;
 		this.episodeParser = parser;
 		this.patternsValidation = validation;
 	}
 
-	public void analyze(EpisodeType type, int frequency, double entropy,
-			int foldNum) throws Exception {
+	public void analyze(EpisodeType type, int frequency, int foldNum)
+			throws Exception {
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
 				frequency, foldNum);
 		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
 				.validate(episodes, frequency, foldNum);
-		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(validations);
-		Set<Threshold> results = Sets.newLinkedHashSet();
+		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(episodes);
+		Set<Threshold> frequencies = Sets.newLinkedHashSet();
+		Set<Threshold> freqEntropy = Sets.newLinkedHashSet();
 
 		for (Map.Entry<Integer, Set<Double>> threshEntry : threshDist
 				.entrySet()) {
 			int freq = threshEntry.getKey();
+			Threshold threshItem = getThreshResults(type, validations, freq,
+					0.0);
+			frequencies.add(threshItem);
 
-			Threshold threshItem;
 			for (Double ent : threshEntry.getValue()) {
 				threshItem = getThreshResults(type, validations, freq, ent);
-				results.add(threshItem);
+				freqEntropy.add(threshItem);
 			}
 		}
-		printResults(results, type, frequency);
+		printResults(type, frequency, episodes, frequencies, freqEntropy);
 	}
 
 	private Threshold getThreshResults(EpisodeType type,
@@ -77,23 +80,12 @@ public class ThresholdsAnalyzer {
 			for (Triplet<Episode, Integer, Integer> triplet : episodeSet) {
 				Episode episode = triplet.getFirst();
 
-				if (episode.getFrequency() >= freq) {
-					if (type == EpisodeType.GENERAL) {
-						if (valid(episode) && (episode.getEntropy() >= ent)) {
-							if ((triplet.getThird() == 0)
-									&& (triplet.getSecond() < 2)) {
-								threshResults.addSpecPattern();
-							} else {
-								threshResults.addGenPattern();
-							}
-						}
+				if ((episode.getFrequency() >= freq)
+						&& (episode.getEntropy() >= ent)) {
+					if ((triplet.getThird() == 0) && (triplet.getSecond() < 2)) {
+						threshResults.addSpecPattern();
 					} else {
-						if ((triplet.getThird() == 0)
-								&& (triplet.getSecond() < 2)) {
-							threshResults.addSpecPattern();
-						} else {
-							threshResults.addGenPattern();
-						}
+						threshResults.addGenPattern();
 					}
 				}
 			}
@@ -101,7 +93,33 @@ public class ThresholdsAnalyzer {
 		return threshResults;
 	}
 
-	private boolean valid(Episode episode) {
+	private SortedMap<Integer, Set<Double>> getThreshDist(
+			Map<Integer, Set<Episode>> patterns) {
+		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
+		Set<Integer> frequencies = Sets.newHashSet();
+		SortedSet<Double> entropies = new TreeSet<Double>();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			if (entry.getKey() < 2) {
+				continue;
+			}
+			Set<Episode> episodeSet = entry.getValue();
+			for (Episode episode : episodeSet) {
+				int epFreq = episode.getFrequency();
+				double epEntropy = episode.getEntropy();
+				double roundEnt = Math.floor(epEntropy * 1000) / 1000;
+
+				frequencies.add(epFreq);
+				entropies.add(roundEnt);
+			}
+		}
+		for (int freq : frequencies) {
+			thresholds.put(freq, entropies);
+		}
+		return thresholds;
+	}
+
+	private boolean isPartial(Episode episode) {
 		Set<Fact> events = episode.getEvents();
 		Set<Fact> relations = episode.getRelations();
 		int numRels = relations.size();
@@ -120,13 +138,47 @@ public class ThresholdsAnalyzer {
 		}
 	}
 
-	private void printResults(Set<Threshold> thresholds, EpisodeType type,
-			int frequency) throws IOException {
-		Tuple<Integer, Double> bestThreshs = Tuple.newTuple(0, 0.0);
+	private void printResults(EpisodeType type, int frequency,
+			Map<Integer, Set<Episode>> episodes, Set<Threshold> frequencies,
+			Set<Threshold> freqEntropies) throws IOException {
 		StringBuilder sb = new StringBuilder();
-		double bestFract = 0.0;
+		sb.append("Frequency\tNumGens\tNumSpecs\tFraction");
 
-		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
+		if (type == EpisodeType.GENERAL) {
+			sb.append("\tNumPartials");
+		}
+		sb.append("\n");
+
+		for (Threshold item : frequencies) {
+			int itemFreq = item.getFrequency();
+			int gens = item.getNoGenPatterns();
+			int specs = item.getNoSpecPatterns();
+			double fraction = Math.floor(item.getFraction() * 1000) / 1000;
+
+			sb.append(itemFreq + "\t");
+			sb.append(gens + "\t");
+			sb.append(specs + "\t");
+			sb.append(fraction);
+
+			if (type == EpisodeType.GENERAL) {
+				int numPartials = partialsCounter(episodes, itemFreq, 0.0);
+				sb.append("\t" + numPartials);
+			}
+			sb.append("\n");
+		}
+		if (type == EpisodeType.GENERAL) {
+			StringBuilder entropySb = entropyInfo(episodes, freqEntropies);
+			sb.append(entropySb.toString());
+		}
+		FileUtils.writeStringToFile(new File(getFilePath(frequency, type)),
+				sb.toString());
+	}
+
+	private StringBuilder entropyInfo(Map<Integer, Set<Episode>> episodes,
+			Set<Threshold> thresholds) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\nFrequency\tEntropy\tNumGens\tNumSpecs\tFraction\tNumPartials\n");
+
 		for (Threshold item : thresholds) {
 			int itemFreq = item.getFrequency();
 			double itemEntropy = item.getEntropy();
@@ -138,56 +190,29 @@ public class ThresholdsAnalyzer {
 			sb.append(itemEntropy + "\t");
 			sb.append(gens + "\t");
 			sb.append(specs + "\t");
-			sb.append(fraction + "\n");
-
-			if (fraction > bestFract) {
-				bestThreshs = Tuple.newTuple(itemFreq, itemEntropy);
-				bestFract = fraction;
-			}
+			sb.append(fraction + "\t");
+			int numPartials = partialsCounter(episodes, itemFreq, itemEntropy);
+			sb.append(numPartials + "\n");
 		}
-		sb.append("\nBest results achieved for:\n");
-		sb.append("Frequency = " + bestThreshs.getFirst() + "\n");
-		if (type == EpisodeType.GENERAL) {
-			sb.append("Entropy = " + bestThreshs.getSecond() + "\n");
-		}
-		sb.append("Generalizability = " + bestFract);
-
-		FileUtils.writeStringToFile(new File(getFilePath(frequency, type)),
-				sb.toString());
-		;
+		return sb;
 	}
 
-	private SortedMap<Integer, Set<Double>> getThreshDist(
-			Map<Integer, Set<Triplet<Episode, Integer, Integer>>> patterns) {
-		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
-		Set<Integer> frequencies = Sets.newHashSet();
-		SortedSet<Double> entropies = new TreeSet<Double>();
+	private int partialsCounter(Map<Integer, Set<Episode>> episodes,
+			int frequency, double entropy) {
+		int counter = 0;
 
-		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> entry : patterns
-				.entrySet()) {
-			if (entry.getKey() < 3) {
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			if (entry.getKey() < 2) {
 				continue;
 			}
-			Set<Triplet<Episode, Integer, Integer>> episodeSet = entry
-					.getValue();
-			for (Triplet<Episode, Integer, Integer> triplet : episodeSet) {
-				Episode episode = triplet.getFirst();
-
-				if (!valid(episode)) {
-					continue;
+			for (Episode episode : entry.getValue()) {
+				if (isPartial(episode) && (episode.getFrequency() >= frequency)
+						&& (episode.getEntropy() >= entropy)) {
+					counter++;
 				}
-				int epFreq = episode.getFrequency();
-				double epEntropy = episode.getEntropy();
-				double roundEnt = Math.floor(epEntropy * 1000) / 1000;
-
-				frequencies.add(epFreq);
-				entropies.add(roundEnt);
 			}
 		}
-		for (int freq : frequencies) {
-			thresholds.put(freq, entropies);
-		}
-		return thresholds;
+		return counter;
 	}
 
 	private String getFilePath(int frequency, EpisodeType type) {

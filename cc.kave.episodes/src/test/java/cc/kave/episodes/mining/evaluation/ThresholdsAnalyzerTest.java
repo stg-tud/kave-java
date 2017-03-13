@@ -58,22 +58,30 @@ public class ThresholdsAnalyzerTest {
 		sut = new ThresholdsAnalyzer(patternsFolder.getRoot(), episodeParser,
 				patternsValidation);
 
+		Episode episode2 = createEpisode(4, 0.5345, "1", "2", "1>2");
+
+		Episode episode31 = createEpisode(3, 0.45, "1", "2", "3", "1>2", "1>3");
+		Episode episode32 = createEpisode(4, 0.7, "1", "2", "4", "1>2", "1>4");
+		Episode episode33 = createEpisode(2, 0.67894, "1", "3", "4");
+
+		episodes = Maps.newLinkedHashMap();
+		episodes.put(2, Sets.newHashSet(episode2));
+		episodes.put(3, Sets.newHashSet(episode31, episode32, episode33));
+
 		validation = Maps.newLinkedHashMap();
-		Set<Triplet<Episode, Integer, Integer>> episodes = Sets
+		Set<Triplet<Episode, Integer, Integer>> episodeSet = Sets
 				.newLinkedHashSet();
-		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(4,
-				0.5345, "1", "2", "1>2"), 4, 2));
-		validation.put(2, episodes);
+		episodeSet.add(new Triplet<Episode, Integer, Integer>(episode2, 4, 2));
+		validation.put(2, episodeSet);
 
-		episodes = Sets.newLinkedHashSet();
-		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(3,
-				0.45, "1", "2", "3", "1>2", "1>3"), 3, 0));
-		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(4,
-				0.7, "1", "2", "4", "1>2", "1>4"), 1, 0));
-		episodes.add(new Triplet<Episode, Integer, Integer>(createEpisode(2,
-				0.67894, "1", "3", "4", "1>3", "1>4", "3>4"), 1, 2));
-		validation.put(3, episodes);
+		episodeSet = Sets.newLinkedHashSet();
+		episodeSet.add(new Triplet<Episode, Integer, Integer>(episode31, 3, 0));
+		episodeSet.add(new Triplet<Episode, Integer, Integer>(episode32, 1, 0));
+		episodeSet.add(new Triplet<Episode, Integer, Integer>(episode33, 1, 2));
+		validation.put(3, episodeSet);
 
+		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt()))
+				.thenReturn(episodes);
 		when(patternsValidation.validate(any(Map.class), anyInt(), anyInt()))
 				.thenReturn(validation);
 	}
@@ -81,7 +89,7 @@ public class ThresholdsAnalyzerTest {
 	@Test
 	public void cannotBeInitializedWithNonExistingPatternsFolder() {
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Patterns folder does not exist");
+		thrown.expectMessage("Patterns folder does not exist!");
 		sut = new ThresholdsAnalyzer(new File("does not exist"), episodeParser,
 				patternsValidation);
 	}
@@ -90,21 +98,22 @@ public class ThresholdsAnalyzerTest {
 	public void cannotBeInitializedWithPatternsFile() throws IOException {
 		File patternsFile = patternsFolder.newFile("a");
 		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Patterns is not a folder, but a file");
+		thrown.expectMessage("Patterns is not a folder, but a file!");
 		sut = new ThresholdsAnalyzer(patternsFile, episodeParser,
 				patternsValidation);
 	}
 
 	@Test
 	public void mocksAreCalled() throws Exception {
-		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
+		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
+		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(patternsValidation).validate(any(Map.class), anyInt(), anyInt());
 	}
 
 	@Test
 	public void fileIsCreated() throws Exception {
-		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, FOLDNUM);
 
 		File file = getFilePath(EpisodeType.SEQUENTIAL);
 
@@ -114,30 +123,30 @@ public class ThresholdsAnalyzerTest {
 	@Test
 	public void fileContentGeneral() throws Exception {
 
-		sut.analyze(EpisodeType.GENERAL, FREQUENCY, ENTROPY, FOLDNUM);
+		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
-		sb.append("2\t0.45\t3\t1\t0.75\n");
-		sb.append("2\t0.534\t2\t1\t0.666\n");
-		sb.append("2\t0.678\t1\t1\t0.5\n");
-		sb.append("2\t0.7\t0\t1\t0.0\n");
+		sb.append("Frequency\tNumGens\tNumSpecs\tFraction\tNumPartials\n");
+		sb.append("2\t3\t1\t0.75\t2\n");
+		sb.append("3\t2\t1\t0.666\t2\n");
+		sb.append("4\t1\t1\t0.5\t1\n\n");
 
-		sb.append("3\t0.45\t2\t1\t0.666\n");
-		sb.append("3\t0.534\t1\t1\t0.5\n");
-		sb.append("3\t0.678\t0\t1\t0.0\n");
-		sb.append("3\t0.7\t0\t1\t0.0\n");
+		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\tNumPartials\n");
+		sb.append("2\t0.45\t3\t1\t0.75\t2\n");
+		sb.append("2\t0.534\t2\t1\t0.666\t1\n");
+		sb.append("2\t0.678\t1\t1\t0.5\t1\n");
+		sb.append("2\t0.7\t0\t1\t0.0\t1\n");
 
-		sb.append("4\t0.45\t1\t1\t0.5\n");
-		sb.append("4\t0.534\t1\t1\t0.5\n");
-		sb.append("4\t0.678\t0\t1\t0.0\n");
-		sb.append("4\t0.7\t0\t1\t0.0\n");
+		sb.append("3\t0.45\t2\t1\t0.666\t2\n");
+		sb.append("3\t0.534\t1\t1\t0.5\t1\n");
+		sb.append("3\t0.678\t0\t1\t0.0\t1\n");
+		sb.append("3\t0.7\t0\t1\t0.0\t1\n");
 
-		sb.append("\nBest results achieved for:\n");
-		sb.append("Frequency = 2\n");
-		sb.append("Entropy = 0.45\n");
-		sb.append("Generalizability = 0.75");
+		sb.append("4\t0.45\t1\t1\t0.5\t1\n");
+		sb.append("4\t0.534\t1\t1\t0.5\t1\n");
+		sb.append("4\t0.678\t0\t1\t0.0\t1\n");
+		sb.append("4\t0.7\t0\t1\t0.0\t1\n");
 
 		String actuals = FileUtils
 				.readFileToString(getFilePath(EpisodeType.GENERAL));
@@ -148,17 +157,14 @@ public class ThresholdsAnalyzerTest {
 	@Test
 	public void fileContentSequential() throws Exception {
 
-		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, ENTROPY, FOLDNUM);
+		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, FOLDNUM);
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("Frequency\tEntropy\tNumGens\tNumSpecs\tFraction\n");
-		sb.append("2\t0.0\t3\t1\t0.75\n");
-		sb.append("3\t0.0\t2\t1\t0.666\n");
-		sb.append("4\t0.0\t1\t1\t0.5\n");
-		sb.append("\nBest results achieved for:\n");
-		sb.append("Frequency = 2\n");
-		sb.append("Generalizability = 0.75");
+		sb.append("Frequency\tNumGens\tNumSpecs\tFraction\n");
+		sb.append("2\t3\t1\t0.75\n");
+		sb.append("3\t2\t1\t0.666\n");
+		sb.append("4\t1\t1\t0.5\n");
 
 		String actuals = FileUtils
 				.readFileToString(getFilePath(EpisodeType.SEQUENTIAL));

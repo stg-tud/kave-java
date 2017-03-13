@@ -40,49 +40,49 @@ public class SpecificPatterns {
 
 	public void patternsInfo(EpisodeType type, int frequency, double entropy,
 			int foldNum) throws Exception {
-		Map<Integer, Set<Tuple<Episode, Boolean>>> patterns = validation
-				.validate(type, frequency, entropy, foldNum);
-		List<Event> events = eventStream.readMapping(frequency, foldNum);
-
-		Set<Fact> specPatterns = Sets.newLinkedHashSet();
-		Set<Fact> genPatterns = Sets.newLinkedHashSet();
-
-		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
-				.entrySet()) {
-			Logger.log("\tEpisode size = %d", entry.getKey());
-			Set<Tuple<Episode, Boolean>> episodes = entry.getValue();
-
-			for (Tuple<Episode, Boolean> tuple : episodes) {
-				Episode ep = tuple.getFirst();
-				Set<Fact> epEvents = ep.getEvents();
-
-				if (!tuple.getSecond()) {
-					if (!specPatterns.containsAll(epEvents)) {
-						Logger.log("\tEpisode: %s", ep.getFacts().toString());
-
-						for (Fact fact : epEvents) {
-							int id = fact.getFactID();
-							Event e = events.get(id);
-							String label = id + ". ";
-							label += graph.toLabel(e.getMethod());
-							Logger.log("\t%s", label);
-
-							specPatterns.add(fact);
-						}
-					}
-				} else {
-					for (Fact fact : epEvents) {
-						genPatterns.add(fact);
-					}
-				}
-			}
-			Logger.log("");
-		}
-		Set<Fact> specEvents = getSpecEvents(specPatterns, genPatterns);
-		Logger.log("Printing patterns events ...");
-		printEventsInfo(specPatterns, events);
-		Logger.log("Printing specific events ...");
-		printEventsInfo(specEvents, events);
+//		Map<Integer, Set<Tuple<Episode, Boolean>>> patterns = validation
+//				.validate(type, frequency, entropy, foldNum);
+//		List<Event> events = eventStream.readMapping(frequency, foldNum);
+//
+//		Set<Fact> specPatterns = Sets.newLinkedHashSet();
+//		Set<Fact> genPatterns = Sets.newLinkedHashSet();
+//
+//		for (Map.Entry<Integer, Set<Tuple<Episode, Boolean>>> entry : patterns
+//				.entrySet()) {
+//			Logger.log("\tEpisode size = %d", entry.getKey());
+//			Set<Tuple<Episode, Boolean>> episodes = entry.getValue();
+//
+//			for (Tuple<Episode, Boolean> tuple : episodes) {
+//				Episode ep = tuple.getFirst();
+//				Set<Fact> epEvents = ep.getEvents();
+//
+//				if (!tuple.getSecond()) {
+//					if (!specPatterns.containsAll(epEvents)) {
+//						Logger.log("\tEpisode: %s", ep.getFacts().toString());
+//
+//						for (Fact fact : epEvents) {
+//							int id = fact.getFactID();
+//							Event e = events.get(id);
+//							String label = id + ". ";
+//							label += graph.toLabel(e.getMethod());
+//							Logger.log("\t%s", label);
+//
+//							specPatterns.add(fact);
+//						}
+//					}
+//				} else {
+//					for (Fact fact : epEvents) {
+//						genPatterns.add(fact);
+//					}
+//				}
+//			}
+//			Logger.log("");
+//		}
+//		Set<Fact> specEvents = getSpecEvents(specPatterns, genPatterns);
+//		Logger.log("Printing patterns events ...");
+//		printEventsInfo(specPatterns, events);
+//		Logger.log("Printing specific events ...");
+//		printEventsInfo(specEvents, events);
 	}
 
 	public void patternEvents(EpisodeType type, int frequency, int foldNum) {
