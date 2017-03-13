@@ -29,9 +29,6 @@ public class PatternsValidation {
 	private EventStreamIo eventStream;
 	private ValidationDataIO validationIO;
 	private RepositoriesParser repoParser;
-	// private TransClosedEpisodes transClosure;
-	// private EpisodeToGraphConverter episodeGraphConverter;
-	// private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
 	public PatternsValidation(EventStreamIo eventStream,
@@ -65,43 +62,23 @@ public class PatternsValidation {
 		List<List<Fact>> valStream = validationIO.streamOfFacts(valData,
 				eventsMap);
 
-		// StringBuilder sb = new StringBuilder();
-		// int patternId = 0;
-
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			if (entry.getKey() < 2) {
 				continue;
 			}
 			Set<Triplet<Episode, Integer, Integer>> pattsVal = Sets
 					.newLinkedHashSet();
-			// sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
-			// sb.append("PatternId\tEvents\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
-
 			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
 			for (Episode episode : entry.getValue()) {
 				int numReposOccur = getReposOcc(episode, streamContexts,
 						repoCtxMapper);
-				// sb.append(patternId + "\t");
-				// sb.append(episode.getFacts().toString() + "\t");
-				// sb.append(episode.getFrequency() + "\t");
-				// sb.append(episode.getEntropy() + "\t");
-				// sb.append(numReposOccur + "\t");
-
 				int valOccs = getValOcc(episode, eventsList, valStream);
-				// sb.append(occValidation + "\n");
 
 				pattsVal.add(new Triplet<Episode, Integer, Integer>(episode,
 						numReposOccur, valOccs));
-
-				// store(episode, episodeType, patternId, trainEvents,
-				// frequency);
-				// patternId++;
 			}
 			results.put(entry.getKey(), pattsVal);
-			// sb.append("\n");
 		}
-		// FileUtils.writeStringToFile(getEvalPath(frequency, episodeType),
-		// sb.toString());
 		return results;
 	}
 
@@ -121,46 +98,6 @@ public class PatternsValidation {
 		}
 		return enclMethods.getOccurrences();
 	}
-
-//	private File getEvalPath(int frequency, EpisodeType episodeType) {
-//		File fileName = new File(getResultPath(frequency, episodeType)
-//				+ "/evaluations.txt");
-//		return fileName;
-//	}
-
-//	private void store(Episode episode, EpisodeType epiosodeType,
-//			int patternId, List<Event> events, int frequency)
-//			throws IOException {
-//		Episode pattern = transClosure.remTransClosure(episode);
-//		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
-//				pattern, events);
-//		graphWriter.write(graph,
-//				getGraphPath(frequency, epiosodeType, patternId));
-//	}
-
-//	private String getGraphPath(int frequency, EpisodeType episodeType,
-//			int patternId) {
-//		String fileName = getPatternsPath(frequency, episodeType) + "/pattern"
-//				+ patternId + ".dot";
-//		return fileName;
-//	}
-
-//	private String getResultPath(int frequency, EpisodeType type) {
-//		File path = new File(patternsFolder.getAbsolutePath() + "/freq"
-//				+ frequency + "/" + type.toString());
-//		if (!path.exists()) {
-//			path.mkdirs();
-//		}
-//		return path.getAbsolutePath();
-//	}
-
-//	private String getPatternsPath(int frequency, EpisodeType type) {
-//		File path = new File(getResultPath(frequency, type) + "/allPatterns");
-//		if (!path.exists()) {
-//			path.mkdirs();
-//		}
-//		return path.getAbsolutePath();
-//	}
 
 	private Event getMethodName(List<Fact> method, List<Event> events) {
 		for (Fact fact : method) {
@@ -205,15 +142,6 @@ public class PatternsValidation {
 		}
 		return repositories.size();
 	}
-
-	// private Map<Integer, Set<Episode>> getFilteredEpisodes(
-	// Map<Integer, Set<Episode>> episodes, EpisodeType episodeType,
-	// int frequency, double entropy) {
-	// if (episodeType == EpisodeType.GENERAL) {
-	// return episodeFilter.filter(episodes, frequency, entropy);
-	// }
-	// return episodes;
-	// }
 
 	private Map<Event, Integer> mergeEventsToMap(List<Event> lista,
 			List<Event> listb) {
