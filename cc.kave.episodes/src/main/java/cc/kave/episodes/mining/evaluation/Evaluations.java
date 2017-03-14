@@ -5,34 +5,32 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.io.RepositoriesParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
-import cc.recommenders.io.Logger;
 
 public class Evaluations {
 
 	private File patternsFolder;
 
+	private RepositoriesParser repoParser;
 	private EventStreamIo eventStream;
+
 	private EpisodesParser episodeParser;
 	private EpisodesFilter episodeFilter;
 
@@ -43,7 +41,8 @@ public class Evaluations {
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
-	public Evaluations(@Named("patterns") File folder, EventStreamIo eventsIo,
+	public Evaluations(@Named("patterns") File folder,
+			RepositoriesParser repoParser, EventStreamIo eventsIo,
 			EpisodesParser parser, EpisodesFilter filters,
 			PatternsValidation validations, TransClosedEpisodes closures,
 			EpisodeToGraphConverter graphConverter,
@@ -52,6 +51,7 @@ public class Evaluations {
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
 		this.patternsFolder = folder;
+		this.repoParser = repoParser;
 		this.eventStream = eventsIo;
 		this.episodeParser = parser;
 		this.episodeFilter = filters;
@@ -63,6 +63,22 @@ public class Evaluations {
 
 //	public void patternsOutput(EpisodeType type, int freqEpisode, int foldNum,
 //			int freqThresh, double entropy) throws Exception {
+//		Logger.log("Reading repositories - enclosing method declarations mapper!");
+//		repoParser.generateReposEvents();
+//		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
+//				.getRepoTypesMapper();
+//		Logger.log("Reading events ...");
+//		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
+//		Logger.log("Reading training stream ...");
+//		List<Tuple<Event, List<Fact>>> streamContexts = eventStream
+//				.parseStream(frequency, foldNum);
+//		Logger.log("Reading validation data ...");
+//		List<Event> valData = validationIo.read(frequency, foldNum);
+//		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
+//		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
+//		List<List<Fact>> valStream = validationIo.streamOfFacts(valData,
+//				eventsMap);
+//
 //		List<Event> events = eventStream.readMapping(freqEpisode, foldNum);
 //		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
 //				freqEpisode, foldNum);
