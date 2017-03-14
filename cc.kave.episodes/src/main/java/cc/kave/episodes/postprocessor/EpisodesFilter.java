@@ -22,7 +22,6 @@ import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -37,7 +36,6 @@ public class EpisodesFilter {
 			if (entry.getKey() == 1) {
 				continue;
 			}
-			Logger.log("Postprocessing %d-node episodes!", entry.getKey());
 			Set<Episode> threshFilter = Sets.newLinkedHashSet();
 
 			for (Episode ep : entry.getValue()) {

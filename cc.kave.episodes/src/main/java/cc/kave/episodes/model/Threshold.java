@@ -5,8 +5,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
 public class Threshold {
 
 	private int frequency;
@@ -15,19 +13,25 @@ public class Threshold {
 	private int noGens = 0;
 	private int noSpecs = 0;
 
-	public Threshold(int freq, double ent) {
-		assertTrue(freq > 1, "Not valid frequency value!");
-		assertTrue(ent >= 0.0 && ent <= 1.0, "Entropy is a probability value!");
-		this.frequency = freq;
-		this.entropy = ent;
+	public Threshold() {
+		this.frequency = 1;
+		this.entropy = 0.0;
 	}
-
+	
 	public void addGenPattern() {
 		this.noGens++;
 	}
 
 	public void addSpecPattern() {
 		this.noSpecs++;
+	}
+	
+	public void setFrequency(int freq) {
+		this.frequency = freq;
+	}
+	 
+	public void setEntropy(double ent) {
+		this.entropy = ent;
 	}
 
 	public int getFrequency() {

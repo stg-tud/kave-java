@@ -61,45 +61,45 @@ public class Evaluations {
 		this.graphWriter = graphWriter;
 	}
 
-	public void patternsOutput(EpisodeType type, int freqEpisode, int foldNum,
-			int freqThresh, double entropy) throws Exception {
-		List<Event> events = eventStream.readMapping(freqEpisode, foldNum);
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				freqEpisode, foldNum);
-		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
-				episodes, freqThresh, entropy);
-		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> valPatterns = validation
-				.validate(patterns, freqEpisode, foldNum);
-
-		StringBuilder sb = new StringBuilder();
-		int patternId = 0;
-
-		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> entry : valPatterns
-				.entrySet()) {
-			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
-			sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
-			sb.append("PatternId\tFacts\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
-
-			Set<Triplet<Episode, Integer, Integer>> patternSet = entry
-					.getValue();
-			for (Triplet<Episode, Integer, Integer> triplet : patternSet) {
-				Episode ep = triplet.getFirst();
-
-				sb.append(patternId + "\t");
-				sb.append(ep.getFacts().toString() + "\t");
-				sb.append(ep.getFrequency() + "\t");
-				sb.append(ep.getEntropy() + "\t");
-				sb.append(triplet.getSecond() + "\t");
-				sb.append(triplet.getThird() + "\n");
-
-				store(ep, type, patternId, events, freqEpisode);
-				patternId++;
-			}
-			sb.append("\n");
-		}
-		FileUtils.writeStringToFile(getEvalPath(freqEpisode, type),
-				sb.toString());
-	}
+//	public void patternsOutput(EpisodeType type, int freqEpisode, int foldNum,
+//			int freqThresh, double entropy) throws Exception {
+//		List<Event> events = eventStream.readMapping(freqEpisode, foldNum);
+//		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
+//				freqEpisode, foldNum);
+//		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
+//				episodes, freqThresh, entropy);
+//		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> valPatterns = validation
+//				.validate(patterns, freqEpisode, foldNum);
+//
+//		StringBuilder sb = new StringBuilder();
+//		int patternId = 0;
+//
+//		for (Map.Entry<Integer, Set<Triplet<Episode, Integer, Integer>>> entry : valPatterns
+//				.entrySet()) {
+//			Logger.log("Processing episodes with %d-nodes ...", entry.getKey());
+//			sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
+//			sb.append("PatternId\tFacts\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
+//
+//			Set<Triplet<Episode, Integer, Integer>> patternSet = entry
+//					.getValue();
+//			for (Triplet<Episode, Integer, Integer> triplet : patternSet) {
+//				Episode ep = triplet.getFirst();
+//
+//				sb.append(patternId + "\t");
+//				sb.append(ep.getFacts().toString() + "\t");
+//				sb.append(ep.getFrequency() + "\t");
+//				sb.append(ep.getEntropy() + "\t");
+//				sb.append(triplet.getSecond() + "\t");
+//				sb.append(triplet.getThird() + "\n");
+//
+//				store(ep, type, patternId, events, freqEpisode);
+//				patternId++;
+//			}
+//			sb.append("\n");
+//		}
+//		FileUtils.writeStringToFile(getEvalPath(freqEpisode, type),
+//				sb.toString());
+//	}
 
 	private void store(Episode episode, EpisodeType type, int patternId,
 			List<Event> events, int frequency) throws IOException {
