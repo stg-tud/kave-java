@@ -81,6 +81,7 @@ public class ThresholdsAnalyzer {
 		Logger.log("\t%s", title);
 
 		if (threshold == 0) {
+			Logger.log("Number of frequency thresholds: %d", threshDist.size());
 			for (Map.Entry<Integer, Set<Double>> entry : threshDist.entrySet()) {
 				int freqThresh = entry.getKey();
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
@@ -94,7 +95,9 @@ public class ThresholdsAnalyzer {
 				printInfo(type, threshItem, patterns);
 			}
 		} else {
-			for (double entropy : threshDist.get(threshold)) {
+			Set<Double> entropies = threshDist.get(threshold);
+			Logger.log("Number of entropy thresholds: %d", entropies.size());
+			for (double entropy : entropies) {
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
 						type, episodes, threshold, entropy);
 				Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
