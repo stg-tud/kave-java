@@ -64,7 +64,6 @@ public class ThresholdsAnalyzerTest {
 	private Map<Integer, Set<Triplet<Episode, Integer, Integer>>> valResults;
 
 	private static final int FREQUENCY = 2;
-	private static final double ENTROPY = 0.4;
 	private static final int FOLDNUM = 0;
 
 	private ThresholdsAnalyzer sut;
@@ -184,7 +183,7 @@ public class ThresholdsAnalyzerTest {
 
 	@Test
 	public void mocksAreCalled() throws Exception {
-		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM, FREQUENCY);
+		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM, 0, 0.2);
 
 		verify(eventStream).parseStream(anyInt(), anyInt());
 		verify(eventStream).readMapping(anyInt(), anyInt());
@@ -203,7 +202,7 @@ public class ThresholdsAnalyzerTest {
 	public void fileContentGeneral() throws Exception {
 		Logger.clearLog();
 
-		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM, 0);
+		sut.analyze(EpisodeType.GENERAL, FREQUENCY, FOLDNUM, 0, 0.2);
 
 		assertLogContains(0,
 				"Reading repositories - enclosing method declarations mapper!");
@@ -213,17 +212,17 @@ public class ThresholdsAnalyzerTest {
 		assertLogContains(4,
 				"\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction\tNumPartials");
 		assertLogContains(5, "Number of frequency thresholds: 4");
-		assertLogContains(6, "\t1\t0.0\t2\t2\t0.5\t1");
-		assertLogContains(7, "\t2\t0.0\t2\t2\t0.5\t1");
-		assertLogContains(8, "\t3\t0.0\t2\t2\t0.5\t1");
-		assertLogContains(9, "\t4\t0.0\t2\t2\t0.5\t1");
+		assertLogContains(6, "\t1\t0.2\t2\t2\t0.5\t1");
+		assertLogContains(7, "\t2\t0.2\t2\t2\t0.5\t1");
+		assertLogContains(8, "\t3\t0.2\t2\t2\t0.5\t1");
+		assertLogContains(9, "\t4\t0.2\t2\t2\t0.5\t1");
 	}
 	
 	@Test
 	public void fileContentSequential() throws Exception {
 		Logger.clearLog();
 
-		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, FOLDNUM, FREQUENCY);
+		sut.analyze(EpisodeType.SEQUENTIAL, FREQUENCY, FOLDNUM, FREQUENCY, 0.0);
 
 		assertLogContains(0,
 				"Reading repositories - enclosing method declarations mapper!");
@@ -232,11 +231,10 @@ public class ThresholdsAnalyzerTest {
 		assertLogContains(3, "Reading validation data ...");
 		assertLogContains(4,
 				"\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction");
-		assertLogContains(5, "Number of entropy thresholds: 4");
+		assertLogContains(5, "Number of entropy thresholds: 3");
 		assertLogContains(6, "\t2\t0.3\t2\t2\t0.5");
 		assertLogContains(7, "\t2\t0.5\t2\t2\t0.5");
-		assertLogContains(8, "\t2\t0.7\t2\t2\t0.5");
-		assertLogContains(9, "\t2\t1.0\t2\t2\t0.5");
+		assertLogContains(8, "\t2\t1.0\t2\t2\t0.5");
 	}
 
 	private Episode createEpisode(int frequency, double entropy,

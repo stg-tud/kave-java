@@ -3,9 +3,7 @@ package cc.kave.episodes.mining.evaluation;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -27,7 +25,6 @@ import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class ThresholdsAnalyzer {
 
@@ -53,7 +50,7 @@ public class ThresholdsAnalyzer {
 	}
 
 	public void analyze(EpisodeType type, int frequency, int foldNum,
-			int threshold) throws Exception {
+			int freqThresh, double entThresh) throws Exception {
 		Logger.log("Reading repositories - enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
 		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
@@ -72,43 +69,71 @@ public class ThresholdsAnalyzer {
 
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
 				frequency, foldNum);
-		SortedMap<Integer, Set<Double>> threshDist = getThreshDist(episodes);
-
 		String title = "Frequency\tEntropy\tNumGens\tNumSpecs\tFraction";
 		if (type == EpisodeType.GENERAL) {
 			title += "\tNumPartials";
 		}
 		Logger.log("\t%s", title);
 
-		if (threshold == 0) {
-			Logger.log("Number of frequency thresholds: %d", threshDist.size());
-			for (Map.Entry<Integer, Set<Double>> entry : threshDist.entrySet()) {
-				int freqThresh = entry.getKey();
+		if ((freqThresh > 0) && (entThresh == 0.0)) {
+			Set<Double> entropies = getEntropies(episodes, freqThresh);
+			Logger.log("Number of entropy thresholds: %d", entropies.size());
+			for (double entropy : entropies) {
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
-						type, episodes, freqThresh, 0.0);
+						type, episodes, freqThresh, entropy);
 				Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
 						.validate(patterns, streamContexts, repoCtxMapper,
 								eventsList, valStream);
 				Threshold threshItem = getThreshResults(validations);
 				threshItem.setFrequency(freqThresh);
-				threshItem.setEntropy(0.0);
+				threshItem.setEntropy(entropy);
 				printInfo(type, threshItem, patterns);
 			}
-		} else {
-			Set<Double> entropies = threshDist.get(threshold);
-			Logger.log("Number of entropy thresholds: %d", entropies.size());
-			for (double entropy : entropies) {
+		} else if ((freqThresh == 0) && (entThresh > 0.0)) {
+			Set<Integer> frequencies = getFrequencies(episodes, entThresh);
+			Logger.log("Number of frequency thresholds: %d", frequencies.size());
+			for (int freq : frequencies) {
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
-						type, episodes, threshold, entropy);
+						type, episodes, freq, entThresh);
 				Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
 						.validate(patterns, streamContexts, repoCtxMapper,
 								eventsList, valStream);
 				Threshold threshItem = getThreshResults(validations);
-				threshItem.setFrequency(threshold);
-				threshItem.setEntropy(entropy);
+				threshItem.setFrequency(freq);
+				threshItem.setEntropy(entThresh);
 				printInfo(type, threshItem, patterns);
 			}
 		}
+	}
+
+	private Set<Integer> getFrequencies(Map<Integer, Set<Episode>> episodes,
+			double entThresh) {
+		SortedSet<Integer> frequencies = new TreeSet<Integer>();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			for (Episode episode : entry.getValue()) {
+				if (episode.getEntropy() >= entThresh) {
+					frequencies.add(episode.getFrequency());
+				}
+			}
+		}
+		return frequencies;
+	}
+
+	private Set<Double> getEntropies(Map<Integer, Set<Episode>> episodes,
+			int frequency) {
+		SortedSet<Double> entropies = new TreeSet<Double>();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			for (Episode episode : entry.getValue()) {
+				if (episode.getFrequency() >= frequency) {
+					double entropy = episode.getEntropy();
+					double roundEnt = Math.floor(entropy * 100) / 100;
+					entropies.add(roundEnt);
+				}
+			}
+		}
+		return entropies;
 	}
 
 	private void printInfo(EpisodeType type, Threshold item,
@@ -142,32 +167,6 @@ public class ThresholdsAnalyzer {
 			}
 		}
 		return item;
-	}
-
-	private SortedMap<Integer, Set<Double>> getThreshDist(
-			Map<Integer, Set<Episode>> patterns) {
-		SortedMap<Integer, Set<Double>> thresholds = new TreeMap<Integer, Set<Double>>();
-		Set<Integer> frequencies = Sets.newHashSet();
-		SortedSet<Double> entropies = new TreeSet<Double>();
-
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			if (entry.getKey() < 2) {
-				continue;
-			}
-			Set<Episode> episodeSet = entry.getValue();
-			for (Episode episode : episodeSet) {
-				int epFreq = episode.getFrequency();
-				double epEntropy = episode.getEntropy();
-				double roundEnt = Math.floor(epEntropy * 1000) / 1000;
-
-				frequencies.add(epFreq);
-				entropies.add(roundEnt);
-			}
-		}
-		for (int freq : frequencies) {
-			thresholds.put(freq, entropies);
-		}
-		return thresholds;
 	}
 
 	private boolean isPartial(Episode episode) {
