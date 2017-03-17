@@ -63,45 +63,47 @@ public class PatternsComparison {
 		this.graphWriter = graphWriter;
 	}
 
-	public void coverage(EpisodeType type1, EpisodeType type2, int frequency,
-			double entropy, int foldNum) {
+	public void coverage(EpisodeType type1, EpisodeType type2, int freqEpisode,
+			int foldNum, int freqThresh, double entThresh) {
 		Logger.log("Comparing %s with %s patterns ...", type1.toString(),
 				type2.toString());
 
-		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
-				frequency, entropy, foldNum);
-		Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
-				frequency, entropy, foldNum);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns1 = patternsSetFact(
+				type1, freqEpisode, foldNum, freqThresh, entThresh);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2 = patternsSetFact(
+				type2, freqEpisode, foldNum, freqThresh, entThresh);
 
 		checkCoverage(patterns1, patterns2, type1, type2);
 	}
 
 	public void commonPatterns(EpisodeType type1, EpisodeType type2,
-			int frequency, double entropy, int foldNum) throws IOException {
+			int freqEpisode, int foldNum, int freqThresh, double entropy)
+			throws IOException {
 		int equal = 0;
 		int unequal = 0;
 		int set = 0;
 
-		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
-				frequency, entropy, foldNum);
-		Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
-				frequency, entropy, foldNum);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns1 = patternsSetFact(
+				type1, freqEpisode, foldNum, freqThresh, entropy);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2 = patternsSetFact(
+				type2, freqEpisode, foldNum, freqThresh, entropy);
 
-		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
-			Set<Fact> events = entry.getKey();
-			Set<Episode> episodes2 = entry.getValue();
-
-			if (patterns1.containsKey(events)) {
-				if (!equalEpisodes(episodes2, patterns1.get(events))) {
-					store(frequency, patterns1.get(events), type1, set, foldNum);
-					store(frequency, episodes2, type2, set, foldNum);
-					unequal++;
-					set++;
-				} else {
-					equal++;
-				}
-			}
-		}
+//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
+//			Set<Fact> events = entry.getKey();
+//			Set<Episode> episodes2 = entry.getValue();
+//
+//			if (patterns1.containsKey(events)) {
+//				if (!equalEpisodes(episodes2, patterns1.get(events))) {
+//					store(freqEpisode, patterns1.get(events), type1, set,
+//							foldNum);
+//					store(freqEpisode, episodes2, type2, set, foldNum);
+//					unequal++;
+//					set++;
+//				} else {
+//					equal++;
+//				}
+//			}
+//		}
 		Logger.log(
 				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
 				type1.toString(), type2.toString(), equal, unequal);
@@ -109,35 +111,35 @@ public class PatternsComparison {
 
 	public void extractOverlappingExamples(EpisodeType type1,
 			EpisodeType type2, int frequency, double entropy, int foldNum) {
-		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
-				frequency, entropy, foldNum);
-		Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
-				frequency, entropy, foldNum);
-
-		Map<Set<Fact>, Set<Episode>> overlaps = Maps.newLinkedHashMap();
-
-		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns1.entrySet()) {
-			Set<Fact> events = entry.getKey();
-			if (patterns2.containsKey(events)) {
-				boolean validCand = checkValidity(events, entry.getValue(),
-						patterns2.get(events));
-				if (validCand) {
-					if (entry.getValue().size() > patterns2.get(events).size()) {
-						overlaps.put(events, entry.getValue());
-						Logger.log("General pattern: %s", patterns2.get(events)
-								.toString());
-						Logger.log("Sequential patterns: %s", entry.getValue()
-								.toString());
-					} else {
-						overlaps.put(events, patterns2.get(events));
-						Logger.log("General pattern: %s", entry.getValue()
-								.toString());
-						Logger.log("Sequential patterns: %s",
-								patterns2.get(events).toString());
-					}
-				}
-			}
-		}
+//		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
+//				frequency, entropy, foldNum);
+//		Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
+//				frequency, entropy, foldNum);
+//
+//		Map<Set<Fact>, Set<Episode>> overlaps = Maps.newLinkedHashMap();
+//
+//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns1.entrySet()) {
+//			Set<Fact> events = entry.getKey();
+//			if (patterns2.containsKey(events)) {
+//				boolean validCand = checkValidity(events, entry.getValue(),
+//						patterns2.get(events));
+//				if (validCand) {
+//					if (entry.getValue().size() > patterns2.get(events).size()) {
+//						overlaps.put(events, entry.getValue());
+//						Logger.log("General pattern: %s", patterns2.get(events)
+//								.toString());
+//						Logger.log("Sequential patterns: %s", entry.getValue()
+//								.toString());
+//					} else {
+//						overlaps.put(events, patterns2.get(events));
+//						Logger.log("General pattern: %s", entry.getValue()
+//								.toString());
+//						Logger.log("Sequential patterns: %s",
+//								patterns2.get(events).toString());
+//					}
+//				}
+//			}
+//		}
 	}
 
 	public void extractConcreteCode(int frequency) {
@@ -239,26 +241,38 @@ public class PatternsComparison {
 		return false;
 	}
 
-	private int checkCoverage(Map<Set<Fact>, Set<Episode>> patterns1,
-			Map<Set<Fact>, Set<Episode>> patterns2, EpisodeType type1,
-			EpisodeType type2) {
-		int covered = 0;
-		int notConvered = 0;
+	private void checkCoverage(
+			Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns1,
+			Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2,
+			EpisodeType type1, EpisodeType type2) {
 
-		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
-			if (patterns1.containsKey(entry.getKey())) {
-				covered += entry.getValue().size();
-			} else {
-				notConvered += entry.getValue().size();
+		Logger.log("Checking coverage between type %s and type %s!",
+				type1.toString(), type2.toString());
+		for (Map.Entry<Integer, Map<Set<Fact>, Set<Episode>>> entry : patterns2
+				.entrySet()) {
+			Logger.log("Pattern size: %d-nodes", entry.getKey());
+			Map<Set<Fact>, Set<Episode>> factPatts1 = patterns1.get(entry
+					.getKey());
+			int covered = 0;
+			int notConvered = 0;
+
+			Logger.log("Printing uncovered patterns ...");
+			for (Map.Entry<Set<Fact>, Set<Episode>> entryFacts : entry
+					.getValue().entrySet()) {
+				if (factPatts1.containsKey(entryFacts.getKey())) {
+					covered += entry.getValue().size();
+				} else {
+					notConvered += entry.getValue().size();
+					Logger.log("%s", entryFacts.getKey().toString());
+				}
 			}
+			Logger.log(
+					"Configuration %s coveres %d patterns from configuration %s!",
+					type1.toString(), covered, type2.toString());
+			Logger.log(
+					"Configuration %s does not cover %d patterns from configuration %s!",
+					type1.toString(), notConvered, type2.toString());
 		}
-		Logger.log(
-				"Configuration %s coveres %d patterns from configuration %s!",
-				type1.toString(), covered, type2.toString());
-		Logger.log(
-				"Configuration %s does not cover %d patterns from configuration %s!",
-				type1.toString(), notConvered, type2.toString());
-		return covered;
 	}
 
 	private void store(int freq, Set<Episode> episodes, EpisodeType type,
@@ -292,12 +306,14 @@ public class PatternsComparison {
 		return path.getAbsolutePath();
 	}
 
-	private Map<Set<Fact>, Set<Episode>> getPatternsSet(EpisodeType type,
-			int frequency, double entropy, int foldNum) {
-		Map<Integer, Set<Episode>> patterns = getPatterns(type, frequency,
-				entropy, foldNum);
-
-		Map<Set<Fact>, Set<Episode>> results = Maps.newLinkedHashMap();
+	private Map<Integer, Map<Set<Fact>, Set<Episode>>> patternsSetFact(
+			EpisodeType type, int freqEpisode, int foldNum, int freqThresh,
+			double entropy) {
+		Map<Integer, Set<Episode>> patterns = getPatterns(type, freqEpisode,
+				foldNum, freqThresh, entropy);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> results = Maps
+				.newLinkedHashMap();
+		// Map<Set<Fact>, Set<Episode>> results = Maps.newLinkedHashMap();
 		int numPatterns = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
@@ -305,16 +321,18 @@ public class PatternsComparison {
 				continue;
 			}
 			numPatterns += entry.getValue().size();
+			Map<Set<Fact>, Set<Episode>> currPatts = Maps.newLinkedHashMap();
 
 			for (Episode episode : entry.getValue()) {
 				Set<Fact> episodeEvents = episode.getEvents();
 
-				if (results.containsKey(episodeEvents)) {
-					results.get(episodeEvents).add(episode);
+				if (currPatts.containsKey(episodeEvents)) {
+					currPatts.get(episodeEvents).add(episode);
 				} else {
-					results.put(episodeEvents, Sets.newHashSet(episode));
+					currPatts.put(episodeEvents, Sets.newHashSet(episode));
 				}
 			}
+			results.put(entry.getKey(), currPatts);
 		}
 		Logger.log("Configuration %s learns %d patterns!", type.toString(),
 				numPatterns);
@@ -322,13 +340,9 @@ public class PatternsComparison {
 	}
 
 	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
-			int frequency, double entropy, int foldNum) {
+			int freqEpisode, int foldNum, int freqThresh, double entropy) {
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				frequency, foldNum);
-
-		if (type == EpisodeType.GENERAL) {
-			return episodeFilter.filter(type, episodes, frequency, entropy);
-		}
-		return episodes;
+				freqEpisode, foldNum);
+		return episodeFilter.filter(type, episodes, freqThresh, entropy);
 	}
 }
