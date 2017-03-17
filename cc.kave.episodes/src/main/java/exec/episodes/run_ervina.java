@@ -35,7 +35,7 @@ public class run_ervina {
 
 	private static final int FOLDNUM = 0;
 	private static final int FREQUENCY = 400;
-	private static final double ENTROPY = 0.0;
+	private static final double ENTROPY = 0.017;
 
 	private static final int METHODSIZE = 5000;
 	private static final int NUM_FOLDS = 10;
@@ -58,7 +58,7 @@ public class run_ervina {
 		// load(PostChecking.class).streamSizes(FREQUENCY);
 
 		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
-				FOLDNUM, FREQUENCY, ENTROPY);
+				FOLDNUM, 0, ENTROPY);
 //		load(Evaluations.class).patternsOutput(EpisodeType.GENERAL, FREQUENCY,
 //				FOLDNUM, FREQUENCY, ENTROPY);
 		// load(SpecificPatterns.class).patternEvents(EpisodeType.GENERAL,
