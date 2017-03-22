@@ -4,6 +4,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class PostChecking {
@@ -47,10 +49,30 @@ public class PostChecking {
 	private static final int METHODSIZE = 5000;
 	private static final double TIMEOUT = 5.0;
 
-	public void numEvents(int frequency) {
+	public void streamData(int frequency) {
+		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
+				frequency, 0);
 		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
+		Set<ITypeName> types = Sets.newLinkedHashSet();
 
-		Logger.log("Number of events in event stream: %d", events.size());
+		for (Tuple<Event, List<Fact>> tuple : stream) {
+			for (Fact fact : tuple.getSecond()) {
+				int factId = fact.getFactID();
+				Event e = events.get(factId);
+
+				ITypeName type = null;
+				try {
+					type = e.getMethod().getDeclaringType();
+				} catch (Exception e1) {
+					continue;
+				}
+				types.add(type);
+			}
+		}
+		Logger.log("Event stream information:");
+		Logger.log("Number of API types: %d", types.size());
+		Logger.log("Number of events: %d", events.size());
+		Logger.log("Number of methods: %d", stream.size());
 	}
 
 	public void trainValOverlaps(int frequency) {
@@ -129,9 +151,10 @@ public class PostChecking {
 		List<List<Fact>> streamFacts = parseStreamText(streamText);
 		List<Tuple<Event, List<Fact>>> streamData = trainStreamIo.parseStream(
 				frequency, FOLDNUM);
-		
+
 		Logger.log("%d - %d", streamFacts.size(), streamData.size());
-		assertTrue(streamFacts.size() == streamData.size(), "Missmatch in stream sizes!");
+		assertTrue(streamFacts.size() == streamData.size(),
+				"Missmatch in stream sizes!");
 	}
 
 	private List<List<Fact>> parseStreamText(List<String> stream) {

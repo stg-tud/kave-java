@@ -40,38 +40,39 @@ public class EpisodesFilter {
 
 			for (Episode ep : entry.getValue()) {
 				int freq = ep.getFrequency();
-				double bidirect = ep.getEntropy();
 
-				if ((freq >= frequency) && (bidirect >= entropy)) {
+				if (freq >= frequency) {
 					threshFilter.add(ep);
 				}
 			}
 			patterns.put(entry.getKey(), threshFilter);
 		}
 		if (type == EpisodeType.GENERAL) {
-			return repPatterns(patterns);
+			return repPatterns(patterns, entropy);
 		}
 		return patterns;
 	}
 
 	private Map<Integer, Set<Episode>> repPatterns(
-			Map<Integer, Set<Episode>> patterns) {
+			Map<Integer, Set<Episode>> patterns, double entropy) {
 		Map<Integer, Set<Episode>> results = Maps.newLinkedHashMap();
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			Map<Set<Fact>, Episode> filtered = Maps.newLinkedHashMap();
 
 			for (Episode episode : entry.getValue()) {
-				if (filtered.containsKey(episode.getEvents())) {
-					Set<Fact> events = episode.getEvents();
-					Episode filterEp = filtered.get(events);
-					filtered.remove(events);
+				if (episode.getEntropy() >= entropy) {
+					if (filtered.containsKey(episode.getEvents())) {
+						Set<Fact> events = episode.getEvents();
+						Episode filterEp = filtered.get(events);
+						filtered.remove(events);
 
-					Episode repEp = getRepresentative(filterEp, episode);
-					filtered.put(repEp.getEvents(), repEp);
-				} else {
-					filtered.put(episode.getEvents(), episode);
-				}
+						Episode repEp = getRepresentative(filterEp, episode);
+						filtered.put(repEp.getEvents(), repEp);
+					} else {
+						filtered.put(episode.getEvents(), episode);
+					}
+				} 
 			}
 			Set<Episode> repEpisodes = getfilteredEp(filtered);
 			results.put(entry.getKey(), repEpisodes);

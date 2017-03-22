@@ -110,20 +110,20 @@ public class ThresholdsAnalyzer {
 			double entThresh) {
 		SortedSet<Integer> frequencies = new TreeSet<Integer>();
 
-//		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
-//			for (Episode episode : entry.getValue()) {
-//				if (episode.getEntropy() >= entThresh) {
-//					frequencies.add(episode.getFrequency());
-//				}
-//			}
-//		}
-		
-		
-		int frequency = 400;
-		while (frequency < 2960) {
-			frequencies.add(frequency);
-			frequency += 10;
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			for (Episode episode : entry.getValue()) {
+				if (episode.getEntropy() >= entThresh) {
+					frequencies.add(episode.getFrequency());
+				}
+			}
 		}
+		
+		
+//		int frequency = 400;
+//		while (frequency < 2964) {
+//			frequencies.add(frequency);
+//			frequency += 10;
+//		}
 		
 		
 		return frequencies;

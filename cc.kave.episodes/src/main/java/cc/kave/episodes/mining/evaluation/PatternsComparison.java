@@ -88,75 +88,104 @@ public class PatternsComparison {
 		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2 = patternsSetFact(
 				type2, freqEpisode, foldNum, freqThresh, entropy);
 
-//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
-//			Set<Fact> events = entry.getKey();
-//			Set<Episode> episodes2 = entry.getValue();
-//
-//			if (patterns1.containsKey(events)) {
-//				if (!equalEpisodes(episodes2, patterns1.get(events))) {
-//					store(freqEpisode, patterns1.get(events), type1, set,
-//							foldNum);
-//					store(freqEpisode, episodes2, type2, set, foldNum);
-//					unequal++;
-//					set++;
-//				} else {
-//					equal++;
-//				}
-//			}
-//		}
+		for (Map.Entry<Integer, Map<Set<Fact>, Set<Episode>>> entry : patterns2
+				.entrySet()) {
+			for (Map.Entry<Set<Fact>, Set<Episode>> entryPatterns : entry
+					.getValue().entrySet()) {
+				Set<Fact> events = entryPatterns.getKey();
+				Set<Episode> episodes2 = entryPatterns.getValue();
+				Map<Set<Fact>, Set<Episode>> pattMap1 = patterns1.get(entry
+						.getKey());
+
+				if (pattMap1.containsKey(events)) {
+					if (!equalEpisodes(episodes2, pattMap1.get(events))) {
+						store(freqEpisode, pattMap1.get(events), type1, set,
+								foldNum);
+						store(freqEpisode, episodes2, type2, set, foldNum);
+						unequal++;
+						set++;
+					} else {
+						equal++;
+					}
+				}
+			}
+		}
 		Logger.log(
 				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
 				type1.toString(), type2.toString(), equal, unequal);
 	}
 
-	public void extractOverlappingExamples(EpisodeType type1,
-			EpisodeType type2, int frequency, double entropy, int foldNum) {
-//		Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
-//				frequency, entropy, foldNum);
-//		Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
-//				frequency, entropy, foldNum);
-//
-//		Map<Set<Fact>, Set<Episode>> overlaps = Maps.newLinkedHashMap();
-//
-//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns1.entrySet()) {
-//			Set<Fact> events = entry.getKey();
-//			if (patterns2.containsKey(events)) {
-//				boolean validCand = checkValidity(events, entry.getValue(),
-//						patterns2.get(events));
-//				if (validCand) {
-//					if (entry.getValue().size() > patterns2.get(events).size()) {
-//						overlaps.put(events, entry.getValue());
-//						Logger.log("General pattern: %s", patterns2.get(events)
-//								.toString());
-//						Logger.log("Sequential patterns: %s", entry.getValue()
-//								.toString());
-//					} else {
-//						overlaps.put(events, patterns2.get(events));
-//						Logger.log("General pattern: %s", entry.getValue()
-//								.toString());
-//						Logger.log("Sequential patterns: %s",
-//								patterns2.get(events).toString());
-//					}
-//				}
-//			}
-//		}
+	public void nonoverlappings(EpisodeType type1, EpisodeType type2,
+			int freqEpisode, int foldNum, int freqThresh, double entropy)
+			throws IOException {
+		int id = 0;
+
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns1 = patternsSetFact(
+				type1, freqEpisode, foldNum, freqThresh, entropy);
+		Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2 = patternsSetFact(
+				type2, freqEpisode, foldNum, freqThresh, entropy);
+
+		for (Map.Entry<Integer, Map<Set<Fact>, Set<Episode>>> entry : patterns2
+				.entrySet()) {
+			for (Map.Entry<Set<Fact>, Set<Episode>> entryPatterns : entry
+					.getValue().entrySet()) {
+				Set<Fact> events = entryPatterns.getKey();
+				Set<Episode> episodes2 = entryPatterns.getValue();
+				Map<Set<Fact>, Set<Episode>> pattMap1 = patterns1.get(entry
+						.getKey());
+
+				if (!pattMap1.containsKey(events)) {
+					saveUniques(freqEpisode, episodes2, type2, id, foldNum);
+					id++;
+				} 
+			}
+		}
 	}
 
-	public void extractConcreteCode(int frequency) {
-		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
-				frequency, 0);
+	public void extractOverlappingExamples(EpisodeType type1,
+			EpisodeType type2, int frequency, double entropy, int foldNum) {
+		// Map<Set<Fact>, Set<Episode>> patterns1 = getPatternsSet(type1,
+		// frequency, entropy, foldNum);
+		// Map<Set<Fact>, Set<Episode>> patterns2 = getPatternsSet(type2,
+		// frequency, entropy, foldNum);
+		//
+		// Map<Set<Fact>, Set<Episode>> overlaps = Maps.newLinkedHashMap();
+		//
+		// for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns1.entrySet())
+		// {
+		// Set<Fact> events = entry.getKey();
+		// if (patterns2.containsKey(events)) {
+		// boolean validCand = checkValidity(events, entry.getValue(),
+		// patterns2.get(events));
+		// if (validCand) {
+		// if (entry.getValue().size() > patterns2.get(events).size()) {
+		// overlaps.put(events, entry.getValue());
+		// Logger.log("General pattern: %s", patterns2.get(events)
+		// .toString());
+		// Logger.log("Sequential patterns: %s", entry.getValue()
+		// .toString());
+		// } else {
+		// overlaps.put(events, patterns2.get(events));
+		// Logger.log("General pattern: %s", entry.getValue()
+		// .toString());
+		// Logger.log("Sequential patterns: %s",
+		// patterns2.get(events).toString());
+		// }
+		// }
+		// }
+		// }
+	}
 
-		// List<Tuple<List<Fact>, Event>> stream = eventStream
-		// .parseEventStream(frequency);
-		Episode pattern = getPattern(643, 0.608086, "118", "121", "564");
+	public void extractConcreteCode(int frequency, int foldNum) {
+		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
+				frequency, foldNum);
+		Episode pattern = getPattern(459, 0.672295, "4", "6", "7", "17", "4>6",
+				"4>7", "4>17", "6>17", "6>7", "17>7");
 
 		EnclosingMethods enclMethods = new EnclosingMethods(true);
 		int numMethods = 0;
-		// for (Tuple<List<Fact>, Event> tuple : stream) {
 		for (Tuple<Event, List<Fact>> tuple : stream) {
-			// List<Fact> method = tuple.getFirst();
 			List<Fact> method = tuple.getSecond();
-			// Event methodCtx = tuple.getSecond();
 
 			if (method.size() < 2) {
 				continue;
@@ -165,7 +194,7 @@ public class PatternsComparison {
 				enclMethods.addMethod(pattern, method, tuple.getFirst());
 				numMethods = enclMethods.getOccurrences();
 			}
-			if (numMethods > 10) {
+			if (numMethods > 30) {
 				break;
 			}
 		}
@@ -260,9 +289,9 @@ public class PatternsComparison {
 			for (Map.Entry<Set<Fact>, Set<Episode>> entryFacts : entry
 					.getValue().entrySet()) {
 				if (factPatts1.containsKey(entryFacts.getKey())) {
-					covered += entry.getValue().size();
+					covered += entryFacts.getValue().size();
 				} else {
-					notConvered += entry.getValue().size();
+					notConvered += entryFacts.getValue().size();
 					Logger.log("%s", entryFacts.getKey().toString());
 				}
 			}
@@ -287,6 +316,18 @@ public class PatternsComparison {
 			graphWriter.write(graph,
 					getGraphPath(freq, type, setNum, episodeId));
 			episodeId++;
+		}
+	}
+
+	private void saveUniques(int freq, Set<Episode> episodes, EpisodeType type,
+			int id, int foldNum) throws IOException {
+		List<Event> events = eventStream.readMapping(freq, foldNum);
+
+		for (Episode ep : episodes) {
+			Episode epGraph = transClosure.remTransClosure(ep);
+			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter
+					.convert(epGraph, events);
+			graphWriter.write(graph, getGraphPath(freq, type, -1, id));
 		}
 	}
 
