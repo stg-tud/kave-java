@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
 import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.postprocessor.PostChecking;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -55,10 +56,10 @@ public class run_ervina {
 		// load(PreChecking.class).methodsOverlap();
 		// load(PreprocessingFolded.class).runPreparation(FREQUENCY);
 
-//		 load(PostChecking.class).streamData(FREQUENCY);
+		 load(PostChecking.class).streamData(FREQUENCY);
 
-		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
-				FOLDNUM, 0, ENTROPY);
+//		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
+//				FOLDNUM, 0, ENTROPY);
 		// load(Evaluations.class).patternsOutput(EpisodeType.GENERAL,
 		// FREQUENCY,
 		// FOLDNUM, FREQUENCY, ENTROPY);

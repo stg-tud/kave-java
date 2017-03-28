@@ -46,6 +46,7 @@ public class PreprocessingFoldedTest {
 	private EventStreamIo trainingIo;
 	@Mock
 	private ValidationDataIO validationIo;
+	
 
 	private static final int NUM_FOLD = 10;
 	private static final int FREQTHRESH = 5;
@@ -72,6 +73,14 @@ public class PreprocessingFoldedTest {
 
 		verify(trainingIo, times(10)).write(any(EventStream.class), anyInt(), anyInt());
 		verify(validationIo, times(10)).write(anyListOf(Event.class), anyInt(), anyInt());
+	}
+	
+	@Test
+	public void checkAllRepos() throws Exception {
+		sut.allRepos(FREQTHRESH);
+		
+		verify(repoParser).generateReposEvents();
+		verify(trainingIo).write(any(EventStream.class), anyInt(), anyInt());
 	}
 
 	@Test

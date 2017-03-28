@@ -23,6 +23,7 @@ public class PreprocessingFolded {
 	private ValidationDataIO validationIO;
 
 	private static final int NUM_FOLDS = 10;
+	private static final int STATIC_FOLD = -1;
 
 	@Inject
 	public PreprocessingFolded(RepositoriesParser repositories,
@@ -52,6 +53,20 @@ public class PreprocessingFolded {
 					NUM_FOLDS, repos);
 			validationIO.write(validationData, frequency, curFold);
 		}
+	}
+	
+	public void allRepos(int frequency) throws Exception {
+
+		Map<String, EventStreamGenerator> repos = reposParser
+				.generateReposEvents();
+		List<Event> data = Lists.newLinkedList();
+		
+		Logger.log("Generating event stream data for freq = %d ...", frequency);
+		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
+			data.addAll(entry.getValue().getEventStream());
+		}		
+		EventStream stream = EventsFilter.filterStream(data, frequency);
+		eventStreamIo.write(stream, frequency, STATIC_FOLD);
 	}
 
 	public List<Event> createTrainingData(int curFold, int numFolds,

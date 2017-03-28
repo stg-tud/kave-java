@@ -4,7 +4,6 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -23,7 +22,6 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class PostChecking {
@@ -54,12 +52,28 @@ public class PostChecking {
 				frequency, 0);
 		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
 		Set<ITypeName> types = Sets.newLinkedHashSet();
+		int numbEvents = 0;
+		int numbDecls = 0;
+		int numbInvs = 0;
+		Set<Event> declarations = Sets.newLinkedHashSet();
+		Set<Event> invocations = Sets.newLinkedHashSet();
 
 		for (Tuple<Event, List<Fact>> tuple : stream) {
+			if (tuple.getSecond().isEmpty()) {
+				Logger.log("empty method");
+			}
 			for (Fact fact : tuple.getSecond()) {
+				numbEvents++;
 				int factId = fact.getFactID();
 				Event e = events.get(factId);
 
+				if (e.getKind() == EventKind.INVOCATION) {
+					numbInvs++;
+					invocations.add(e);
+				} else {
+					numbDecls++;
+					declarations.add(e);
+				}
 				ITypeName type = null;
 				try {
 					type = e.getMethod().getDeclaringType();
@@ -73,6 +87,12 @@ public class PostChecking {
 		Logger.log("Number of API types: %d", types.size());
 		Logger.log("Number of events: %d", events.size());
 		Logger.log("Number of methods: %d", stream.size());
+
+		Logger.log("Number of events in event stream: %d", numbEvents);
+		Logger.log("Number of method declarations: total = %d, unique = %d",
+				numbDecls, declarations.size());
+		Logger.log("Number of method invocations: total = %d, unique = %d",
+				numbInvs, invocations.size());
 	}
 
 	public void trainValOverlaps(int frequency) {
