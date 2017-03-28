@@ -43,7 +43,7 @@ public class PostChecking {
 		this.fileReader = fileIo;
 	}
 
-	private static final int FOLDNUM = 0;
+	private static final int FOLDNUM = -1;
 	private static final int METHODSIZE = 5000;
 	private static final double TIMEOUT = 5.0;
 
