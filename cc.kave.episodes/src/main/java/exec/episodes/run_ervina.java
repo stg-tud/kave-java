@@ -51,10 +51,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 
-		// load(PreChecking.class).methodsOverlap();
+//		 load(PreChecking.class).reposInfo();
 //		 load(PreprocessingFolded.class).allRepos(FREQUENCY);;
 
-		 load(PostChecking.class).streamSizes(FREQUENCY);
+		 load(PostChecking.class).streamData(FREQUENCY);
 
 //		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
 //				FOLDNUM, 0, ENTROPY);

@@ -27,6 +27,7 @@ import cc.kave.episodes.statistics.StreamStatistics;
 public class EventsFilter {
 
 	private static StreamStatistics statistics = new StreamStatistics();
+
 	// private static final String FRAMEWORKNAME = "mscorlib, 4.0.0.0";
 
 	public static EventStream filterStream(List<Event> stream, int freqThresh) {

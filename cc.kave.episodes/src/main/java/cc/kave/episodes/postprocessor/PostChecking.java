@@ -12,6 +12,7 @@ import javax.inject.Named;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.ValidationDataIO;
@@ -49,14 +50,15 @@ public class PostChecking {
 
 	public void streamData(int frequency) {
 		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
-				frequency, 0);
+				frequency, FOLDNUM);
 		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
-		Set<ITypeName> types = Sets.newLinkedHashSet();
 		int numbEvents = 0;
 		int numbDecls = 0;
 		int numbInvs = 0;
 		Set<Event> declarations = Sets.newLinkedHashSet();
 		Set<Event> invocations = Sets.newLinkedHashSet();
+		Set<ITypeName> declTypes = Sets.newLinkedHashSet();
+		Set<ITypeName> invTypes = Sets.newLinkedHashSet();
 
 		for (Tuple<Event, List<Fact>> tuple : stream) {
 			if (tuple.getSecond().isEmpty()) {
@@ -67,24 +69,48 @@ public class PostChecking {
 				int factId = fact.getFactID();
 				Event e = events.get(factId);
 
+//				IAssemblyName asm = null;
+//				try {
+//					asm = e.getMethod().getDeclaringType().getAssembly();
+//				} catch (Exception e1) {
+//					continue;
+//				}
+//				// predefined types have always an unknown version, but come
+//				// from mscorlib, so they should be included
+//				if (!asm.getName().equals("mscorlib")
+//						&& asm.getVersion().isUnknown()) {
+//					if (e.getKind() == EventKind.FIRST_DECLARATION) {
+//						continue;
+//					}
+//					else {
+//						Logger.log("Event kind: %s", e.getKind().toString());
+//						continue;
+//					}
+//				}
+
+				ITypeName type = null;
+//				try {
+					type = e.getMethod().getDeclaringType();
+//				} catch (Exception e1) {
+					Logger.log("Method name: %s", e.getMethod().getDeclaringType().getFullName());
+//					continue;
+//				}
 				if (e.getKind() == EventKind.INVOCATION) {
 					numbInvs++;
 					invocations.add(e);
+					if (!type.isUnknown()) {
+						invTypes.add(type);
+					}
 				} else {
 					numbDecls++;
 					declarations.add(e);
+					if (!type.isUnknown()) {
+						declTypes.add(type);
+					}
 				}
-				ITypeName type = null;
-				try {
-					type = e.getMethod().getDeclaringType();
-				} catch (Exception e1) {
-					continue;
-				}
-				types.add(type);
 			}
 		}
 		Logger.log("Event stream information:");
-		Logger.log("Number of API types: %d", types.size());
 		Logger.log("Number of events: %d", events.size());
 		Logger.log("Number of methods: %d", stream.size());
 
@@ -93,6 +119,8 @@ public class PostChecking {
 				numbDecls, declarations.size());
 		Logger.log("Number of method invocations: total = %d, unique = %d",
 				numbInvs, invocations.size());
+		Logger.log("Number of unique declaration types: %d", declTypes.size());
+		Logger.log("Number of unique invocation types: %d", invTypes.size());
 	}
 
 	public void trainValOverlaps(int frequency) {
