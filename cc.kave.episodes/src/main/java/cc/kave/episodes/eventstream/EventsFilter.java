@@ -18,7 +18,6 @@ package cc.kave.episodes.eventstream;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -41,18 +40,6 @@ public class EventsFilter {
 				continue;
 			}
 			if (occurrences.get(e) >= freqThresh) {
-				IAssemblyName asm = null;
-				try {
-					asm = e.getMethod().getDeclaringType().getAssembly();
-				} catch (Exception e1) {
-					continue;
-				}
-				// predefined types have always an unknown version, but come
-				// from mscorlib, so they should be included
-				if (!asm.getName().equals("mscorlib")
-						&& asm.getVersion().isUnknown()) {
-					continue;
-				}
 				es.addEvent(e);
 			}
 		}

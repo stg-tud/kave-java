@@ -108,17 +108,27 @@ public class EventStreamTest {
 	public void addContext() {
 		sut.addEvent(firstCtx(0));
 		sut.addEvent(enclCtx(0));
-		sut.addEvent(firstCtx(1));
-		sut.addEvent(enclCtx(1));
+		sut.addEvent(firstCtx(1));	// 1
+		sut.addEvent(enclCtx(1));	
+		sut.addEvent(inv(10));		
+		sut.addEvent(firstCtx(20));	// 2
+		sut.addEvent(superCtx(30));	// 3
+		sut.addEvent(enclCtx(3));
 
 		expectedMap.add(Events.newDummyEvent());
 		expectedMap.add(firstCtx(1));
+		expectedMap.add(firstCtx(20));
+		expectedMap.add(superCtx(30));
 		
-		String expectedStream = "1,5.000\n";
+		String expectedStream1 = "1,5.000\n";
+		String expectedStream2 = "2,10.001\n3,10.002\n";
+		String expectedStream = "1,5.000\n2,10.001\n3,10.002\n";
+		
 		String actualStream = sut.getStreamText();
 		
 		List<Tuple<Event, String>> expStreamData = Lists.newLinkedList();
-		expStreamData.add(Tuple.newTuple(enclCtx(1), expectedStream));
+		expStreamData.add(Tuple.newTuple(enclCtx(1), expectedStream1));
+		expStreamData.add(Tuple.newTuple(enclCtx(3), expectedStream2));
 
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(expectedStream, actualStream);
@@ -352,12 +362,18 @@ public class EventStreamTest {
 	private static Event dummy() {
 		return Events.newDummyEvent();
 	}
-
+	
 	private static IMethodName m(int i) {
 		if (i == 0) {
 			return Names.getUnknownMethod();
+		} else if (i == 10) {
+			return Names.newMethod("[T,P] [T,P].m()");
+		} else if (i == 20) {
+			return Names.newMethod("[T,mscorlib, 4.0.0.0] [T,mscorlib, 4.0.0.0].m()");
+		} else if (i == 30) {
+			return Names.newMethod("[T,mscorlib] [T,mscorlib].m()");
 		} else {
-			return Names.newMethod("[T,P] [T,P].m" + i + "()");
+			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
 	}
 }

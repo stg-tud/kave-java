@@ -26,6 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Events;
@@ -77,12 +78,28 @@ public class EventStream {
 			methodCtx = event;
 			return;
 		}
+		
+		if (isLocal(event)) {
+			return;
+		}
+		
 		if (event.getMethod().isUnknown()) {
 			return;
 		}
 		int idx = ensureEventExistsAndGetId(event);
 
 		addEventIdToStream(idx);
+	}
+	
+	private boolean isLocal(Event e) {
+		// predefined types have always an unknown version, but come
+		// from mscorlib, so they should be included
+		IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
+		if (!asm.getName().equals("mscorlib")
+				&& asm.getVersion().isUnknown()) {
+			return true;
+		}
+		return false;
 	}
 
 	private void addEventIdToStream(int idx) {
