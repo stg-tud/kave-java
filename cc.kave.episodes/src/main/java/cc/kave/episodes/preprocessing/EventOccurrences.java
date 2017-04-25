@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.RepositoriesParser;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -27,16 +28,20 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 public class EventOccurrences {
-	
+
 	private File eventsDir;
 	private RepositoriesParser reposParser;
+	private EpisodeToGraphConverter graphConverter;
 
 	@Inject
-	public EventOccurrences(@Named("events") File folder, RepositoriesParser repositories) {
+	public EventOccurrences(@Named("events") File folder,
+			RepositoriesParser repositories,
+			EpisodeToGraphConverter graphConverter) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsDir = folder;
 		this.reposParser = repositories;
+		this.graphConverter = graphConverter;
 	}
 
 	public void generate(int frequency) throws Exception {
@@ -44,26 +49,27 @@ public class EventOccurrences {
 		Map<String, EventStreamGenerator> repos = reposParser
 				.generateReposEvents();
 		List<Event> data = Lists.newLinkedList();
-		
+
 		Logger.log("Generating event stream data for freq = %d ...", frequency);
 		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
 			data.addAll(entry.getValue().getEventStream());
-		}		
+		}
 		EventStream stream = EventsFilter.filterStream(data, frequency);
 		List<Tuple<Event, String>> streamData = stream.getStreamData();
 		List<Tuple<Event, List<Fact>>> parsedStream = parseStream(streamData);
 		List<Event> events = new ArrayList<Event>(stream.getMapping());
-		Logger.log("Event at position 0: %s", events.get(0).getMethod().getDeclaringType().getFullName());
+		Logger.log("Event at position 0: %s", events.get(0).getMethod()
+				.getDeclaringType().getFullName());
 		Logger.log("Number of events: %d", events.size());
-		
+
 		Map<Fact, Integer> declOccs = Maps.newLinkedHashMap();
 		Map<Fact, Integer> invOccs = Maps.newLinkedHashMap();
-		
+
 		for (Tuple<Event, List<Fact>> method : parsedStream) {
 			for (Fact fact : method.getSecond()) {
 				int factId = fact.getFactID();
 				Event event = events.get(factId);
-				
+
 				if (event.getKind() == EventKind.INVOCATION) {
 					if (invOccs.containsKey(fact)) {
 						int occurrence = invOccs.get(fact);
@@ -83,7 +89,7 @@ public class EventOccurrences {
 		}
 		Logger.log("Number of method declarations: %d", declOccs.size());
 		Logger.log("Number of method invocations: %d", invOccs.size());
-		
+
 		storeOccurrences(declOccs, events, "declarations");
 		storeOccurrences(invOccs, events, "invocations");
 	}
@@ -93,18 +99,20 @@ public class EventOccurrences {
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<Fact, Integer> entry : occurrences.entrySet()) {
 			Event event = events.get(entry.getKey().getFactID());
-			sb.append(event.getMethod().getDeclaringType().getFullName());
+			sb.append(graphConverter.toLabel(event.getMethod()));
 			sb.append("\t" + entry.getValue() + "\n");
 		}
 		FileUtils.writeStringToFile(getFilePath(fileName), sb.toString());
 	}
-	
+
 	private File getFilePath(String fileName) {
-		File file = new File(eventsDir.getAbsolutePath() + "/" + fileName + ".txt");
+		File file = new File(eventsDir.getAbsolutePath() + "/" + fileName
+				+ ".txt");
 		return file;
 	}
 
-	private List<Tuple<Event, List<Fact>>> parseStream(List<Tuple<Event, String>> streamData) {
+	private List<Tuple<Event, List<Fact>>> parseStream(
+			List<Tuple<Event, String>> streamData) {
 		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
 
 		for (Tuple<Event, String> methodTuple : streamData) {
