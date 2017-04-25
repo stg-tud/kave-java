@@ -82,6 +82,8 @@ public class TypeErasure {
 					String complete = id.substring(open, close);
 					replacements.put(complete, param);
 				}
+				
+				open = close + 1;
 			}
 			tick = FindNext(id, tick + 1, '`');
 		}

@@ -118,7 +118,7 @@ public class TypeErasureTest {
 		assertEquals(exp, act);
 	}
 
-	public static Object[][] createGenericArrays() {
+	public static Object[][] createTypesWithGenericArrays() {
 		ParameterData pd = new ParameterData();
 
 		pd.add("Demo.G1`1[][[T -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
@@ -140,11 +140,35 @@ public class TypeErasureTest {
 	}
 
 	@Test
-	@Parameters(method = "createGenericArrays")
+	@Parameters(method = "createTypesWithGenericArrays")
 	public void typeRemoveGenericsFromArray1(String boundId, String expected) {
 		ITypeName inp = Names.newType(boundId);
 		ITypeName exp = Names.newType(expected);
 		ITypeName act = TypeErasure.of(inp);
+		assertEquals(exp, act);
+	}
+
+	public static Object[][] createMethods() {
+		ParameterData pd = new ParameterData();
+
+		pd.add("[p:double] [i:Accord.Math.Distances.IDistance`2[[T -> System.Collections.BitArray, mscorlib, 4.0.0.0],[U -> System.Collections.BitArray, mscorlib, 4.0.0.0]], Accord.Math].Distance([T] x, [U] y)",
+				"[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U]], Accord.Math].Distance([T] x, [U] y)");
+		pd.add("[p:double] [i:Accord.Math.Distances.IDistance`2[[T -> System.Tuple`2[[T1 -> p:double],[T2 -> p:double]], mscorlib, 4.0.0.0],[U -> System.Tuple`2[[T1 -> p:double],[T2 -> p:double]], mscorlib, 4.0.0.0]], Accord.Math].Distance([T] x, [U] y)",
+				"[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U]], Accord.Math].Distance([T] x, [U] y)");
+		pd.add("[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U -> System.Tuple`2[[T1],[U1]], mscorlib, 4.0.0.0]], Accord.Math].Distance([T] x, [U] y)",
+				"[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U]], Accord.Math].Distance([T] x, [U] y)");
+		pd.add("[p:double] [Accord.Math.ADistance`2[[A -> T],[B -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo].Distance([A] x, [B] y)",
+				"[p:double] [Accord.Math.ADistance`2[[A],[B]], Demo].Distance([A] x, [B] y)");
+
+		return pd.toArray();
+	}
+
+	@Test
+	@Parameters(method = "createMethods")
+	public void methodRemoveGenerics(String boundId, String expected) {
+		IMethodName inp = Names.newMethod(boundId);
+		IMethodName exp = Names.newMethod(expected);
+		IMethodName act = TypeErasure.of(inp);
 		assertEquals(exp, act);
 	}
 
