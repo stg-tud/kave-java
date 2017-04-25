@@ -29,6 +29,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.recommenders.assertions.Asserts;
 
 public class TypeErasure {
 	public static ITypeName of(ITypeName type) {
@@ -67,6 +68,10 @@ public class TypeErasure {
 						id);
 			}
 
+			while (IsArray(id, open)) {
+				open = FindNext(id, open + 1, '[');
+			}
+
 			for (int i = 0; i < numGenerics; i++) {
 				open = FindNext(id, open + 1, '[');
 				int close = FindCorrespondingCloseBracket(id, open);
@@ -86,6 +91,13 @@ public class TypeErasure {
 			res = res.replace(k, with);
 		}
 		return res;
+	}
+
+	private static boolean IsArray(String id, int open) {
+		Asserts.assertTrue(id.charAt(open) == '[', "not pointed to opening brace");
+		boolean is1DArr = id.charAt(open + 1) == ']';
+		boolean isNdArr = id.charAt(open + 1) == ',';
+		return is1DArr || isNdArr;
 	}
 
 	public static boolean HasParameters(String identifierWithparameters) {

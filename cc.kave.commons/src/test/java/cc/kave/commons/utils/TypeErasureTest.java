@@ -19,11 +19,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.recommenders.testutils.ParameterData;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
+@RunWith(JUnitParamsRunner.class)
 public class TypeErasureTest {
 
 	@Test
@@ -110,6 +115,36 @@ public class TypeErasureTest {
 		IMethodName inp = Names.newMethod("[T,P] [T,P].M`1[[G1 -> T,P]]()");
 		IMethodName exp = Names.newMethod("[T,P] [T,P].M`1[[G1]]()");
 		IMethodName act = TypeErasure.of(inp);
+		assertEquals(exp, act);
+	}
+
+	public static Object[][] createGenericArrays() {
+		ParameterData pd = new ParameterData();
+
+		pd.add("Demo.G1`1[][[T -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
+				"Demo.G1`1[][[T]], Demo");
+
+		pd.add("Demo.G1`2[][[S],[T -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
+				"Demo.G1`2[][[S],[T]], Demo");
+
+		pd.add("Demo.G1`2[][][[S],[T -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
+				"Demo.G1`2[][][[S],[T]], Demo");
+
+		pd.add("Demo.G1`2[,][[S],[T -> System.Tuple`2[[T1 -> p:int],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
+				"Demo.G1`2[,][[S],[T]], Demo");
+
+		pd.add("Demo.G1`2[][[S],[T -> System.Tuple`2[[T1],[T2 -> p:bool]], mscorlib, 4.0.0.0]], Demo",
+				"Demo.G1`2[][[S],[T]], Demo");
+
+		return pd.toArray();
+	}
+
+	@Test
+	@Parameters(method = "createGenericArrays")
+	public void typeRemoveGenericsFromArray1(String boundId, String expected) {
+		ITypeName inp = Names.newType(boundId);
+		ITypeName exp = Names.newType(expected);
+		ITypeName act = TypeErasure.of(inp);
 		assertEquals(exp, act);
 	}
 
