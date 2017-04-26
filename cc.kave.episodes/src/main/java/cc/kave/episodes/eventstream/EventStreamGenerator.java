@@ -92,14 +92,14 @@ public class EventStreamGenerator {
 
 		private IMethodName erase(IMethodName methodName) {
 			IMethodName erased = TypeErasure.of(methodName);
-			String crashingId = "[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U -> System.Tuple`2[[T1], mscorlib, 4.0.0.0]], Accord.Math].Distance([T] x, [U] y)";
-			String crashingPart = "Accord.Math.Distances.IDistance";
-			if(erased.getIdentifier().equals(crashingId)){
-				System.out.println("!!!! problem !!!!");
-				System.out.println("input: " + methodName.getIdentifier());
-				System.out.println("erased: " + erased.getIdentifier());
-				System.out.println();
-			}
+//			String crashingId = "[p:double] [i:Accord.Math.Distances.IDistance`2[[T],[U -> System.Tuple`2[[T1], mscorlib, 4.0.0.0]], Accord.Math].Distance([T] x, [U] y)";
+//			String crashingPart = "Accord.Math.Distances.IDistance";
+//			if(erased.getIdentifier().equals(crashingId)){
+//				System.out.println("!!!! problem !!!!");
+//				System.out.println("input: " + methodName.getIdentifier());
+//				System.out.println("erased: " + erased.getIdentifier());
+//				System.out.println();
+//			}
 			return erased;
 		}
 

@@ -249,7 +249,14 @@ public class EventStreamIoTest {
 	private static IMethodName m(int i) {
 		if (i == 0) {
 			return Names.getUnknownMethod();
+		} else if (i == 10) {
+			return Names.newMethod("[T,P] [T,P].m()");
+		} else if (i == 20) {
+			return Names.newMethod("[T,mscorlib, 4.0.0.0] [T,mscorlib, 4.0.0.0].m()");
+		} else if (i == 30) {
+			return Names.newMethod("[T,mscorlib] [T,mscorlib].m()");
+		} else {
+			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
-		return Names.newMethod("[T,P] [T,P].m" + i + "()");
 	}
 }

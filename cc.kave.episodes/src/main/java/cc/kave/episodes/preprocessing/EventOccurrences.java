@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -25,6 +26,7 @@ import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 public class EventOccurrences {
@@ -90,8 +92,43 @@ public class EventOccurrences {
 		Logger.log("Number of method declarations: %d", declOccs.size());
 		Logger.log("Number of method invocations: %d", invOccs.size());
 
-		storeOccurrences(declOccs, events, "declarations");
-		storeOccurrences(invOccs, events, "invocations");
+		storeOccurrences(declOccs, events, "declOccs");
+		storeOccurrences(invOccs, events, "invOccs");
+		
+		Map<Integer, Integer> declHistogram = getHistogram(declOccs);
+		storeHistogram(declHistogram, "declHistogram");
+		Map<Integer, Integer> invHistogram = getHistogram(invOccs);
+		storeHistogram(invHistogram, "invHistogram");
+	}
+
+	private void storeHistogram(Map<Integer, Integer> declHistogram,
+			String fileName) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Occurrence\tNumber of events\n");
+		for (Map.Entry<Integer, Integer> entry : declHistogram.entrySet()) {
+			sb.append(entry.getKey() + "\t" + entry.getValue() + "\n");
+		}
+		FileUtils.writeStringToFile(getFilePath(fileName), sb.toString());
+		
+	}
+
+	private Map<Integer, Integer> getHistogram(Map<Fact, Integer> declOccs) {
+		Map<Integer, Integer> results = Maps.newLinkedHashMap();
+		Set<Integer> occurrences = Sets.newLinkedHashSet();
+		
+		for (Map.Entry<Fact, Integer> entry : declOccs.entrySet()) {
+			occurrences.add(entry.getValue());
+		}
+		for (Integer occ : occurrences) {
+			int numbEvents = 0;
+			for (Map.Entry<Fact, Integer> entry : declOccs.entrySet()) {
+				if (entry.getValue() >= occ) {
+					numbEvents++;
+				}
+			}
+			results.put(occ, numbEvents);
+		}
+		return results;
 	}
 
 	private void storeOccurrences(Map<Fact, Integer> occurrences,

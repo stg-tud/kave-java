@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.postprocessor.PostChecking;
-import cc.kave.episodes.preprocessing.EventOccurrences;
+import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -34,7 +33,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = 0;
-	private static final int FREQUENCY = 1;
+	private static final int FREQUENCY = 300;
 	private static final double ENTROPY = 0.6;
 
 	private static final int METHODSIZE = 5000;
@@ -53,8 +52,8 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 
 //		 load(PreChecking.class).reposInfo();
-		load(EventOccurrences.class).generate(FREQUENCY);
-//		 load(PreprocessingFolded.class).allRepos(FREQUENCY);;
+//		load(EventOccurrences.class).generate(FREQUENCY);
+		 load(PreprocessingFolded.class).allRepos(FREQUENCY);;
 
 //		 load(PostChecking.class).streamData(FREQUENCY);
 
