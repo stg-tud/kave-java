@@ -12,7 +12,7 @@ import javax.inject.Named;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.ValidationDataIO;
@@ -33,20 +33,54 @@ public class PostChecking {
 	private ValidationDataIO valStreamIo;
 	private FileReader fileReader;
 
+	private EpisodesParser episodeParser;
+
 	@Inject
 	public PostChecking(@Named("events") File folder, EventStreamIo streamIo,
-			ValidationDataIO validation, FileReader fileIo) {
+			ValidationDataIO validation, FileReader fileIo,
+			EpisodesParser parser) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsFolder = folder;
 		this.trainStreamIo = streamIo;
 		this.valStreamIo = validation;
 		this.fileReader = fileIo;
+		this.episodeParser = parser;
 	}
 
 	private static final int FOLDNUM = -1;
 	private static final int METHODSIZE = 5000;
 	private static final double TIMEOUT = 5.0;
+
+//	public void updatedEvent(int frequency) {
+//		Map<Integer, Set<Episode>> episodes = episodeParser.parse(
+//				EpisodeType.PARALLEL, frequency, -2);
+//		List<Event> events = trainStreamIo.readMapping(frequency, -2);
+//		Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
+//		
+//		Logger.log("Extracting episode types ...");
+//		for (Episode episode : episodes.get(2)) {
+//			Set<Fact> facts = episode.getEvents();
+//			
+//			for (Fact fact : facts) {
+//				Event event = events.get(fact.getFactID());
+//				episodeTypes.add(event.getMethod().getDeclaringType());
+//			}
+//		}
+//		
+//		List<Event> updatedEvents = trainStreamIo.readMapping(frequency, FOLDNUM);
+//		Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
+//		Logger.log("Extracting updated types ... ");
+//		for (Event event : updatedEvents) {
+//			updatedTypes.add(event.getMethod().getDeclaringType());
+//		}
+//		Logger.log("Comparing types ...");
+//		for (ITypeName type : episodeTypes) {
+//			if (!updatedTypes.contains(type)) {
+//				Logger.log("Missed type: %s", type.getIdentifier());
+//			}
+//		}
+//	}
 
 	public void streamData(int frequency) {
 		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
@@ -69,32 +103,7 @@ public class PostChecking {
 				int factId = fact.getFactID();
 				Event e = events.get(factId);
 
-//				IAssemblyName asm = null;
-//				try {
-//					asm = e.getMethod().getDeclaringType().getAssembly();
-//				} catch (Exception e1) {
-//					continue;
-//				}
-//				// predefined types have always an unknown version, but come
-//				// from mscorlib, so they should be included
-//				if (!asm.getName().equals("mscorlib")
-//						&& asm.getVersion().isUnknown()) {
-//					if (e.getKind() == EventKind.FIRST_DECLARATION) {
-//						continue;
-//					}
-//					else {
-//						Logger.log("Event kind: %s", e.getKind().toString());
-//						continue;
-//					}
-//				}
-
-				ITypeName type = null;
-//				try {
-					type = e.getMethod().getDeclaringType();
-//				} catch (Exception e1) {
-					Logger.log("Method name: %s", e.getMethod().getDeclaringType().getFullName());
-//					continue;
-//				}
+				ITypeName type = e.getMethod().getDeclaringType();
 				if (e.getKind() == EventKind.INVOCATION) {
 					numbInvs++;
 					invocations.add(e);

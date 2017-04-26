@@ -74,7 +74,8 @@ public class EventsFilterTest {
 		expStream1.addEvent(enclCtx(6));
 		expStream1.addEvent(inv(2));
 		expStream1.addEvent(inv(3));
-		expStream1.addEvent(firstCtx(3)); 	// 4
+//		expStream1.addEvent(firstCtx(3)); 	// 4
+		expStream1.increaseTimeout();
 		expStream1.addEvent(enclCtx(0)); 
 		expStream1.addEvent(inv(3)); 		// 3
 		
@@ -101,7 +102,7 @@ public class EventsFilterTest {
 		expStream2.addEvent(enclCtx(9));	
 		expStream2.addEvent(inv(3));		// 3
 		expStream2.addEvent(inv(2));		// 2
-		expStream2.addEvent(firstCtx(3)); 	// 4
+		expStream2.increaseTimeout();
 		expStream2.addEvent(enclCtx(0));
 		expStream2.addEvent(inv(20));
 	}

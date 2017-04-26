@@ -58,13 +58,13 @@ public class EventStream {
 	public String getStreamText() {
 		StringBuilder streamBuilder = new StringBuilder();
 		IsLastMethodIncluded();
-		
+
 		for (Tuple<Event, String> tuple : stream) {
 			streamBuilder.append(tuple.getSecond());
 		}
 		return streamBuilder.toString();
 	}
-	
+
 	public List<Tuple<Event, String>> getStreamData() {
 		IsLastMethodIncluded();
 		return this.stream;
@@ -78,11 +78,11 @@ public class EventStream {
 			methodCtx = event;
 			return;
 		}
-		
+
 		if (isLocal(event)) {
 			return;
 		}
-		
+
 		if (event.getMethod().isUnknown()) {
 			return;
 		}
@@ -90,13 +90,12 @@ public class EventStream {
 
 		addEventIdToStream(idx);
 	}
-	
+
 	private boolean isLocal(Event e) {
 		// predefined types have always an unknown version, but come
 		// from mscorlib, so they should be included
 		IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-		if (!asm.getName().equals("mscorlib")
-				&& asm.getVersion().isUnknown()) {
+		if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
 			return true;
 		}
 		return false;
@@ -123,30 +122,35 @@ public class EventStream {
 
 	private void possiblyIncreaseTimout(Event event) {
 		if (event.getKind() == EventKind.FIRST_DECLARATION) {
-			if (isFirstMethod) {
-				return;
-			}
-			addStream();
-			time += TIMEOUT;
+			increaseTimeout();
 		}
 		isFirstMethod = false;
 	}
-	
+
+	public void increaseTimeout() {
+		if (isFirstMethod) {
+			return;
+		}
+		addStream();
+		time += TIMEOUT;
+	}
+
 	private void addStream() {
 		if (!(sb.toString().isEmpty())) {
 			assertTrue(methodCtx != null, "Method element is null!");
-			
+
 			stream.add(Tuple.newTuple(methodCtx, sb.toString()));
 			methodCtx = null;
 			sb = new StringBuilder();
 		}
 	}
-	
+
 	private void IsLastMethodIncluded() {
 		if (!(sb.toString().isEmpty())) {
 			assertTrue(methodCtx != null, "Method element is null!");
-			Tuple<Event, String> lastMethod = Tuple.newTuple(methodCtx, sb.toString());
-			
+			Tuple<Event, String> lastMethod = Tuple.newTuple(methodCtx,
+					sb.toString());
+
 			if (!stream.contains(lastMethod)) {
 				stream.add(lastMethod);
 			}

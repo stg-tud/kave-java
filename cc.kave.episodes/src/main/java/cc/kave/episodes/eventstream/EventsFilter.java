@@ -34,13 +34,14 @@ public class EventsFilter {
 		EventStream es = new EventStream();
 
 		for (Event e : stream) {
-			if ((e.getKind() == EventKind.FIRST_DECLARATION)
-					|| (e.getKind() == EventKind.METHOD_DECLARATION)) {
+			if (e.getKind() == EventKind.METHOD_DECLARATION) {
 				es.addEvent(e);
 				continue;
 			}
 			if (occurrences.get(e) >= freqThresh) {
 				es.addEvent(e);
+			} else if (e.getKind() == EventKind.FIRST_DECLARATION) {
+				es.increaseTimeout();
 			}
 		}
 		occurrences.clear();
