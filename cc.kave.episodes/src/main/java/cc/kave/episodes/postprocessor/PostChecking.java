@@ -52,35 +52,56 @@ public class PostChecking {
 	private static final int METHODSIZE = 5000;
 	private static final double TIMEOUT = 5.0;
 
-//	public void updatedEvent(int frequency) {
-//		Map<Integer, Set<Episode>> episodes = episodeParser.parse(
-//				EpisodeType.PARALLEL, frequency, -2);
-//		List<Event> events = trainStreamIo.readMapping(frequency, -2);
-//		Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
-//		
-//		Logger.log("Extracting episode types ...");
-//		for (Episode episode : episodes.get(2)) {
-//			Set<Fact> facts = episode.getEvents();
-//			
-//			for (Fact fact : facts) {
-//				Event event = events.get(fact.getFactID());
-//				episodeTypes.add(event.getMethod().getDeclaringType());
-//			}
+	// public void updatedEvent(int frequency) {
+	// Map<Integer, Set<Episode>> episodes = episodeParser.parse(
+	// EpisodeType.PARALLEL, frequency, -2);
+	// List<Event> events = trainStreamIo.readMapping(frequency, -2);
+	// Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
+	//
+	// Logger.log("Extracting episode types ...");
+	// for (Episode episode : episodes.get(2)) {
+	// Set<Fact> facts = episode.getEvents();
+	//
+	// for (Fact fact : facts) {
+	// Event event = events.get(fact.getFactID());
+	// episodeTypes.add(event.getMethod().getDeclaringType());
+	// }
+	// }
+	//
+	// List<Event> updatedEvents = trainStreamIo.readMapping(frequency,
+	// FOLDNUM);
+	// Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
+	// Logger.log("Extracting updated types ... ");
+	// for (Event event : updatedEvents) {
+	// updatedTypes.add(event.getMethod().getDeclaringType());
+	// }
+	// Logger.log("Comparing types ...");
+	// for (ITypeName type : episodeTypes) {
+	// if (!updatedTypes.contains(type)) {
+	// Logger.log("Missed type: %s", type.getIdentifier());
+	// }
+	// }
+	// }
+
+	public void eventsVersions(int frequency) {
+		List<Event> eventsNew = trainStreamIo.readMapping(frequency, -1);
+		List<Event> eventsCurrent = trainStreamIo.readMapping(frequency, -11);
+		Logger.log("Number of events in the new version: %d", eventsNew.size());
+		Logger.log("Number of events in the current version: %d", eventsCurrent.size());
+
+//		if (eventsNew.containsAll(eventsCurrent)) {
+//			Logger.log("All events are icluded in the new contexts version!");
+//		} else {
+//			Logger.log("The new contexts version misses some of the events from the previous version!");
 //		}
-//		
-//		List<Event> updatedEvents = trainStreamIo.readMapping(frequency, FOLDNUM);
-//		Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
-//		Logger.log("Extracting updated types ... ");
-//		for (Event event : updatedEvents) {
-//			updatedTypes.add(event.getMethod().getDeclaringType());
-//		}
-//		Logger.log("Comparing types ...");
-//		for (ITypeName type : episodeTypes) {
-//			if (!updatedTypes.contains(type)) {
-//				Logger.log("Missed type: %s", type.getIdentifier());
-//			}
-//		}
-//	}
+		
+		for (Event event : eventsCurrent) {
+			if (!eventsNew.contains(event)) {
+				Logger.log("Kind: %s", event.getKind());
+				Logger.log("Name: %s\n", event.getMethod().getIdentifier());
+			}
+		}
+	}
 
 	public void streamData(int frequency) {
 		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
