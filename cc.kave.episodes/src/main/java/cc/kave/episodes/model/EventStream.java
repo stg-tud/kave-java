@@ -26,6 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -90,17 +91,26 @@ public class EventStream {
 
 		addEventIdToStream(idx);
 	}
-
+	
 	private boolean isLocal(Event e) {
-		// predefined types have always an unknown version, but come
-		// from mscorlib, so they should be included
-		IAssemblyName asm = e.getMethod().getDeclaringType().getAssembly();
-		if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
-			return true;
-		}
-		return false;
+	    // predefined types have always an unknown version, but come
+	    // from mscorlib, so they should be included
+	    boolean oldVal = false;
+	    boolean newVal = false;
+	    ITypeName type = e.getMethod().getDeclaringType();
+	    IAssemblyName asm = type.getAssembly();
+	    if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
+	        oldVal = true;
+	    }
+	    if (asm.isLocalProject()) {
+	        newVal = true;
+	    }
+	    if (oldVal != newVal) {
+	        System.out.printf("different localness for: %s\n", type);
+	    }
+	    return newVal;
 	}
-
+	
 	private void addEventIdToStream(int idx) {
 		sb.append(idx);
 		sb.append(',');

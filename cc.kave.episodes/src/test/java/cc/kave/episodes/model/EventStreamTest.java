@@ -371,7 +371,7 @@ public class EventStreamTest {
 		} else if (i == 20) {
 			return Names.newMethod("[T,mscorlib, 4.0.0.0] [T,mscorlib, 4.0.0.0].m()");
 		} else if (i == 30) {
-			return Names.newMethod("[T,mscorlib] [T,mscorlib].m()");
+			return Names.newMethod("[p:int] [p:int].m()");
 		} else {
 			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 		}
