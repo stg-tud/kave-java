@@ -171,10 +171,7 @@ public class ReposStatistics {
 		List<Event> results = Lists.newLinkedList();
 
 		for (Event event : events) {
-			IAssemblyName asm = event.getMethod().getDeclaringType()
-					.getAssembly();
-			if (!asm.getName().equals("mscorlib")
-					&& asm.getVersion().isUnknown()) {
+			if (isLocal(event)) {
 				continue;
 			}
 			results.add(event);
@@ -182,6 +179,25 @@ public class ReposStatistics {
 		Logger.log("After filtering local types ...");
 		printEventStats(results);
 		return results;
+	}
+	
+	private boolean isLocal(Event e) {
+	    // predefined types have always an unknown version, but come
+	    // from mscorlib, so they should be included
+	    boolean oldVal = false;
+	    boolean newVal = false;
+	    ITypeName type = e.getMethod().getDeclaringType();
+	    IAssemblyName asm = type.getAssembly();
+	    if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
+	        oldVal = true;
+	    }
+	    if (asm.isLocalProject()) {
+	        newVal = true;
+	    }
+	    if (oldVal != newVal) {
+	        System.out.printf("different localness for: %s\n", type);
+	    }
+	    return newVal;
 	}
 
 	private void filterGeneratedCode(EventStreamGenerator generator) {
@@ -318,13 +334,13 @@ public class ReposStatistics {
 		Logger.log("");
 	}
 
-	private boolean isLocal(Event event) {
-		IAssemblyName asm = event.getMethod().getDeclaringType().getAssembly();
-		if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
-			return true;
-		}
-		return false;
-	}
+//	private boolean isLocal(Event event) {
+//		IAssemblyName asm = event.getMethod().getDeclaringType().getAssembly();
+//		if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
+//			return true;
+//		}
+//		return false;
+//	}
 
 	private List<List<Event>> parse(List<Event> stream) {
 		List<List<Event>> results = Lists.newLinkedList();
