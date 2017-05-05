@@ -31,6 +31,7 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
+import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 
@@ -57,6 +58,21 @@ public class EpisodesParserTest {
 		episodes = Sets.newHashSet();
 
 		sut = new EpisodesParser(rootFolder.getRoot(), reader);
+	}
+	
+	@Test
+	public void cannotBeInitializedWithNonExistingFolder() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events folder does not exist");
+		sut = new EpisodesParser(new File("does not exist"), reader);
+	}
+
+	@Test
+	public void cannotBeInitializedWithFile() throws IOException {
+		File file = rootFolder.newFile("a");
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events is not a folder, but a file");
+		sut = new EpisodesParser(file, reader);
 	}
 
 	@Test

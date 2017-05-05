@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 
 public class EpisodesFilterTest {
 
-	private static final int FREQUENCY = 5;
+	private static final int FREQUENCY = 4;
 	private static final double ENTROPY = 0.5;
 
 	private Map<Integer, Set<Episode>> episodes;
@@ -146,28 +146,30 @@ public class EpisodesFilterTest {
 
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();
 		twoNodes.add(createEpisode(8, 0.6, "1", "2", "1>2"));
-		twoNodes.add(createEpisode(5, 0.2, "1", "3", "1>3"));
 		twoNodes.add(createEpisode(3, 0.6, "1", "2", "1>2"));
-		twoNodes.add(createEpisode(5, 0.8, "2", "3", "2>3"));
 		twoNodes.add(createEpisode(8, 0.8, "1", "2", "2>1"));
 		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
+		twoNodes.add(createEpisode(5, 0.7, "1", "3", "1>3"));
+		twoNodes.add(createEpisode(5, 0.8, "2", "3", "2>3"));
 		episodes.put(2, twoNodes);
 
 		Set<Episode> threeNodes = Sets.newLinkedHashSet();
 		threeNodes = Sets.newLinkedHashSet();
 		threeNodes.add(createEpisode(7, 0.9, "1", "2", "3", "1>2", "1>3"));
-		threeNodes.add(createEpisode(3, 1.0, "1", "3", "4", "1>3", "1>4"));
-		threeNodes.add(createEpisode(6, 0.9, "1", "2", "3"));
+		threeNodes.add(createEpisode(6, 0.9, "1", "2", "3", "2>1", "2>3"));
+		threeNodes.add(createEpisode(4, 1.0, "1", "3", "4", "1>3", "1>4"));
 		episodes.put(3, threeNodes);
 
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		Set<Episode> set2 = Sets.newLinkedHashSet();
-		set2.add(createEpisode(8, 0.6, "1", "2", "1>2"));
+		set2.add(createEpisode(8, 0.7, "1", "2"));
+		set2.add(createEpisode(5, 0.7, "1", "3", "1>3"));
 		set2.add(createEpisode(5, 0.8, "2", "3", "2>3"));
 		expected.put(2, set2);
 
 		Set<Episode> set3 = Sets.newLinkedHashSet();
-		set3.add(createEpisode(7, 0.9, "1", "2", "3", "1>2", "1>3"));
+		set3.add(createEpisode(7, 0.9, "1", "2", "3", "1>3", "2>3"));
+		set3.add(createEpisode(3, 1.0, "1", "3", "4", "1>3", "1>4"));
 		expected.put(3, set3);
 
 		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.GENERAL,

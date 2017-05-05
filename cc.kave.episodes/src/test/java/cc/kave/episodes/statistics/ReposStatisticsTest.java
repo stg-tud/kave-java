@@ -8,13 +8,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -30,6 +34,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
@@ -39,6 +44,11 @@ import com.google.common.collect.Maps;
 
 public class ReposStatisticsTest {
 
+	@Rule
+	public TemporaryFolder rootFolder = new TemporaryFolder();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	@Mock
 	private Directory rootDirectory;
 
@@ -66,7 +76,7 @@ public class ReposStatisticsTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ReposStatistics(rootDirectory);
+		sut = new ReposStatistics(rootDirectory, rootFolder.getRoot());
 
 		SST sst1 = new SST();
 		sst1.setEnclosingType(Names.newType("T1.T2.T3"));
@@ -80,7 +90,7 @@ public class ReposStatisticsTest {
 
 		InvocationExpression ie1 = new InvocationExpression();
 		IMethodName methodName = Names
-				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+				.newMethod("[System.Void, T.P, 4.0.0.0] [T, P].MI1()");
 		ie1.setMethodName(methodName);
 		InvocationExpression ie2 = new InvocationExpression();
 		IMethodName methodName2 = Names
@@ -102,7 +112,7 @@ public class ReposStatisticsTest {
 		md3.setName(Names.newMethod("[T3,P] [T4,P].M()"));
 		InvocationExpression ie5 = new InvocationExpression();
 		IMethodName methodName5 = Names
-				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
+				.newMethod("[System.Void, T.P, 4.0.0.0] [T, P].MI1()");
 		ie5.setMethodName(methodName5);
 		md3.getBody().add(wrap(ie5));
 		sst3.getMethods().add(md3);
@@ -167,6 +177,21 @@ public class ReposStatisticsTest {
 	public void teardown() {
 		Logger.reset();
 	}
+	
+	@Test
+	public void cannotBeInitializedWithNonExistingFolder() {
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events folder does not exist");
+		sut = new ReposStatistics(rootDirectory, new File("does not exist"));
+	}
+
+	@Test
+	public void cannotBeInitializedWithFile() throws IOException {
+		File file = rootFolder.newFile("a");
+		thrown.expect(AssertionException.class);
+		thrown.expectMessage("Events is not a folder, but a file");
+		sut = new ReposStatistics(rootDirectory, file);
+	}
 
 	@Test
 	public void contextTest() throws Exception {
@@ -212,47 +237,55 @@ public class ReposStatisticsTest {
 		assertLogContains(9, "Number of method invocation occurrences: 6");
 		assertLogContains(10, "");
 		
-		assertLogContains(11, "After filtering overlaping types between different repositories ...");
-		assertLogContains(12, "Number of unique method declarations: 2");
-		assertLogContains(13, "Number of method declaration occurrences: 4");
-		assertLogContains(14, "Number of unique method invocations: 3");
-		assertLogContains(15, "Number of method invocation occurrences: 5");
+		assertLogContains(11, "Generating Sebastian's statistics ...");
+		assertLogContains(12, "Number of methods in event stream: 3");
+		assertLogContains(13, "Number of method elements: 3");
+		assertLogContains(14, "Occurrences of first or super method declarations: 0");
+		assertLogContains(15, "Number of non-local method invocations: 2");
 		assertLogContains(16, "");
 		
-		assertLogContains(17, "After filtering auto-generated code ...");
-		assertLogContains(18, "Number of unique method declarations: 2");
-		assertLogContains(19, "Number of method declaration occurrences: 4");
-		assertLogContains(20, "Number of unique method invocations: 3");
-		assertLogContains(21, "Number of method invocation occurrences: 5");
-		assertLogContains(22, "");
+		assertLogContains(17, "After filtering overlaping types between different repositories ...");
+		assertLogContains(18, "Number of unique context types: 2");
+		assertLogContains(19, "Number of unique method declarations: 2");
+		assertLogContains(20, "Number of method declaration occurrences: 4");
+		assertLogContains(21, "Number of unique method invocations: 3");
+		assertLogContains(22, "Number of method invocation occurrences: 5");
+		assertLogContains(23, "");
 		
-		assertLogContains(23, "After filtering unknown methods ...");
-		assertLogContains(24, "Number of unique method declarations: 0");
-		assertLogContains(25, "Number of method declaration occurrences: 0");
-		assertLogContains(26, "Number of unique method invocations: 3");
-		assertLogContains(27, "Number of method invocation occurrences: 5");
-		assertLogContains(28, "");
+		assertLogContains(24, "After filtering auto-generated code ...");
+		assertLogContains(25, "Number of unique method declarations: 2");
+		assertLogContains(26, "Number of method declaration occurrences: 4");
+		assertLogContains(27, "Number of unique method invocations: 3");
+		assertLogContains(28, "Number of method invocation occurrences: 5");
+		assertLogContains(29, "");
 		
-		assertLogContains(29, "After filtering local types ...");
-		assertLogContains(30, "Number of unique method declarations: 0");
-		assertLogContains(31, "Number of method declaration occurrences: 0");
-		assertLogContains(32, "Number of unique method invocations: 3");
-		assertLogContains(33, "Number of method invocation occurrences: 5");
-		assertLogContains(34, "");
+		assertLogContains(30, "After filtering unknown methods ...");
+		assertLogContains(31, "Number of unique method declarations: 0");
+		assertLogContains(32, "Number of method declaration occurrences: 0");
+		assertLogContains(33, "Number of unique method invocations: 3");
+		assertLogContains(34, "Number of method invocation occurrences: 5");
+		assertLogContains(35, "");
 		
-		assertLogContains(35, "After filtering element contexts ...");
-		assertLogContains(36, "Number of unique method declarations: 0");
-		assertLogContains(37, "Number of method declaration occurrences: 0");
-		assertLogContains(38, "Number of unique method invocations: 3");
-		assertLogContains(39, "Number of method invocation occurrences: 5");
-		assertLogContains(40, "");
+		assertLogContains(36, "After filtering local types ...");
+		assertLogContains(37, "Number of unique method declarations: 0");
+		assertLogContains(38, "Number of method declaration occurrences: 0");
+		assertLogContains(39, "Number of unique method invocations: 2");
+		assertLogContains(40, "Number of method invocation occurrences: 4");
+		assertLogContains(41, "");
 		
-		assertLogContains(41, "After filtering for frequency = 2 ...");
-		assertLogContains(42, "Number of unique method declarations: 0");
-		assertLogContains(43, "Number of method declaration occurrences: 0");
-		assertLogContains(44, "Number of unique method invocations: 2");
-		assertLogContains(45, "Number of method invocation occurrences: 4");
-		assertLogContains(46, "");
+		assertLogContains(42, "After filtering element contexts ...");
+		assertLogContains(43, "Number of unique method declarations: 0");
+		assertLogContains(44, "Number of method declaration occurrences: 0");
+		assertLogContains(45, "Number of unique method invocations: 2");
+		assertLogContains(46, "Number of method invocation occurrences: 4");
+		assertLogContains(47, "");
+		
+		assertLogContains(48, "After filtering for frequency = 2 ...");
+		assertLogContains(49, "Number of unique method declarations: 0");
+		assertLogContains(50, "Number of method declaration occurrences: 0");
+		assertLogContains(51, "Number of unique method invocations: 2");
+		assertLogContains(52, "Number of method invocation occurrences: 4");
+		assertLogContains(53, "");
 	}
 
 	private static ExpressionStatement wrap(InvocationExpression ie1) {

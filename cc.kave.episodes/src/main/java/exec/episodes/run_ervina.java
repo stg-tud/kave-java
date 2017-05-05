@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.PreprocessingFolded;
 import cc.kave.episodes.statistics.ReposStatistics;
 import cc.recommenders.io.Logger;
 
@@ -34,7 +33,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = -1;
-	private static final int FREQUENCY = 1;
+	private static final int FREQUENCY = 300;
 	private static final double ENTROPY = 0.6;
 
 	private static final int METHODSIZE = 5000;

@@ -16,6 +16,7 @@
 package cc.kave.episodes.eventstream;
 
 import java.util.List;
+import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
@@ -32,9 +33,11 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class EventStreamGenerator {
 
+	private Set<IMethodName> uniqueMethods = Sets.newHashSet();
 	private List<Event> events = Lists.newLinkedList();
 
 	public void add(Context ctx) {
@@ -43,17 +46,17 @@ public class EventStreamGenerator {
 			String fileName = sst.getPartialClassIdentifier();
 			if (!(fileName.contains(".designer") || fileName
 					.contains(".Designer"))) {
-				sst.accept(new EventStreamGenerationVisitor(),
+				sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
 						ctx.getTypeShape());
 			}
 		} else {
-			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+			sst.accept(new EventStreamGenerationVisitor(uniqueMethods), ctx.getTypeShape());
 		}
 	}
 
 	public void addAny(Context ctx) {
 		ISST sst = ctx.getSST();
-		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+		sst.accept(new EventStreamGenerationVisitor(uniqueMethods), ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
@@ -63,9 +66,15 @@ public class EventStreamGenerator {
 	private class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
+		private final Set<IMethodName> uniqueMethods;
+		
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
+
+		public EventStreamGenerationVisitor(Set<IMethodName> uniqueMethods) {
+			this.uniqueMethods = uniqueMethods;
+		}
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
@@ -74,6 +83,11 @@ public class EventStreamGenerator {
 			superCtx = Names.getUnknownMethod();
 			elementCtx = Names.getUnknownMethod();
 			IMethodName name = decl.getName();
+			if(uniqueMethods.contains(name)) {
+				return super.visit(decl, context);
+			}
+			uniqueMethods.add(name);
+			
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
 					if (h.getFirst() != null) {

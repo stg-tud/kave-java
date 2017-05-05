@@ -65,6 +65,7 @@ public class RepositoriesParser {
 			throws Exception {
 		EventStreamGenerator repoGen = new EventStreamGenerator();
 		Map<String, EventStreamGenerator> results = Maps.newLinkedHashMap();
+		Set<ITypeName> repoTypes = Sets.newLinkedHashSet();
 		String repoName = "";
 
 		for (String zip : findZips(contextsDir)) {
@@ -74,6 +75,8 @@ public class RepositoriesParser {
 					results.put(repoName, repoGen);
 					repoGen = new EventStreamGenerator();
 				}
+				types.addAll(repoTypes);
+				repoTypes = Sets.newLinkedHashSet();
 				repoName = getRepoName(zip);
 			}
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
@@ -84,7 +87,7 @@ public class RepositoriesParser {
 					ITypeName typeName = ctx.getSST().getEnclosingType();
 					if (!types.contains(typeName)) {
 						repoGen.add(ctx);
-						types.add(typeName);
+						repoTypes.add(typeName);
 						addToMapper(repoName, typeName);
 					} else {
 						duplicateTypes.add(typeName);
@@ -93,6 +96,7 @@ public class RepositoriesParser {
 			}
 			ra.close();
 		}
+		types.addAll(repoTypes);
 		if (!repoGen.getEventStream().isEmpty()) {
 			results.put(repoName, repoGen);
 		}

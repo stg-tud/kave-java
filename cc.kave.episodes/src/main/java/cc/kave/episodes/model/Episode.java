@@ -32,8 +32,8 @@ import cc.kave.episodes.model.events.Fact;
 public class Episode {
 
 	private Set<Fact> facts = Sets.newLinkedHashSet();
-	private int frequency;
-	private double entropy;
+	private int frequency = 0;
+	private double entropy = 0.0;
 
 	public Set<Fact> getFacts() {
 		return this.facts;
