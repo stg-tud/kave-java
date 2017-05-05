@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
 import cc.recommenders.exceptions.ValidationException;
@@ -102,6 +103,12 @@ public class AssemblyNameTest {
 		assertEquals("mscorlib", mscoreAssembly.getName());
 		assertEquals("4.0.0.0", mscoreAssembly.getVersion().getIdentifier());
 		assertEquals(identifier, mscoreAssembly.getIdentifier());
+	}
+
+	@Test
+	public void mscorlibIsNotLocal() {
+		IAssemblyName a = Names.newType("p:int").getAssembly();
+		assertFalse(a.isLocalProject());
 	}
 
 	private static void AssertName(IAssemblyName assemblyName, String expected) {
