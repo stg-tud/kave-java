@@ -61,4 +61,11 @@ public class Events {
 		Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 		return DUMMY_EVENT;
 	}
+
+	public static Event newType(ITypeName type) {
+		Event event = new Event();
+		event.setKind(EventKind.TYPE);
+		event.setType(type);
+		return event;
+	}
 }
