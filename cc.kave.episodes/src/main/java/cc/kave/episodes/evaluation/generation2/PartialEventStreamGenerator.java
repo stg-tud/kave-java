@@ -68,10 +68,8 @@ public class PartialEventStreamGenerator {
 			}
 
 			ITypeName type = sst.getEnclosingType();
-			if (!sst.isPartialClass()) {
-				if (!seenTypes.add(type)) {
-					return null;
-				}
+			if (!seenTypes.add(type) && !sst.isPartialClass()) {
+				return null;
 			}
 
 			events.add(Events.newType(type));
@@ -92,7 +90,7 @@ public class PartialEventStreamGenerator {
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
 			IMethodName m = decl.getName();
-			if (!seenMethods.add(m)) {
+			if (!seenMethods.add(TypeErasure.of(m))) {
 				return null;
 			}
 
@@ -127,15 +125,15 @@ public class PartialEventStreamGenerator {
 
 		private void addEnclosingMethodIfAvailable() {
 			if (ctxFirst != null) {
-				events.add(Events.newFirstContext(ctxFirst));
+				events.add(Events.newFirstContext(TypeErasure.of(ctxFirst)));
 				ctxFirst = null;
 			}
 			if (ctxSuper != null) {
-				events.add(Events.newSuperContext(ctxSuper));
+				events.add(Events.newSuperContext(TypeErasure.of(ctxSuper)));
 				ctxSuper = null;
 			}
 			if (ctxElem != null) {
-				events.add(Events.newContext(ctxElem));
+				events.add(Events.newContext(TypeErasure.of(ctxElem)));
 				ctxElem = null;
 			}
 		}
