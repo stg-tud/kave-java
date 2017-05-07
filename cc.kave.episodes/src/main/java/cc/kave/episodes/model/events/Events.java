@@ -26,7 +26,7 @@ public class Events {
 		event.setType(type);
 		return event;
 	}
-	
+
 	public static Event newContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.METHOD_DECLARATION);
@@ -60,12 +60,5 @@ public class Events {
 		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 		Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 		return DUMMY_EVENT;
-	}
-
-	public static Event newType(ITypeName type) {
-		Event event = new Event();
-		event.setKind(EventKind.TYPE);
-		event.setType(type);
-		return event;
 	}
 }
