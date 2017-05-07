@@ -20,8 +20,8 @@ import java.util.concurrent.ExecutionException;
 
 public class RunMe {
 	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
-		// String path = "/Users/seb/some-contexts/";
-		String path = "/Volumes/Data/Contexts-161031/";
+		String path = "/Users/seb/some-contexts/";
+		// String path = "/Volumes/Data/Contexts-161031/";
 		new EventStreamGenerator(path).run();
 	}
 }

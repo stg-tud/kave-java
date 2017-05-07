@@ -72,7 +72,10 @@ public class EventStreamGenerator {
 		pool.shutdown();
 
 		createStats();
+		writeEventStream();
+	}
 
+	private void writeEventStream() throws IOException {
 		System.out.printf("writing event stream (%s)\n", new Date());
 		File esFile = new File(dirZips + "es.txt");
 		try (FileWriter fw = new FileWriter(esFile)) {
