@@ -21,9 +21,9 @@ import org.junit.Test;
 public class TypeUtilTest {
 
 	@Test
-	public void testSSTTypeToJaveTypeName() {
+	public void doesNotChangeNameDeclarations() {
 		String type = "[SST:Expressions.Simple.UnknownExpression]";
-		String expected = "KaVE.Commons.Model.SSTs.Impl.Expressions.Simple.UnknownExpression, KaVE.Commons";
+		String expected = "[SST:Expressions.Simple.UnknownExpression]";
 		String actual = TypeUtil.fromSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}
@@ -32,14 +32,6 @@ public class TypeUtilTest {
 	public void testContextToJavaTypeName() {
 		String type = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
 		String expected = "\"cc.kave.commons.model.events.completionevents.Context\"";
-		String actual = TypeUtil.fromSerializedNames(type);
-		Assert.assertEquals(expected, actual);
-	}
-
-	@Test
-	public void testSSTType() {
-		String type = "[SST:Declarations.FieldDeclaration]";
-		String expected = "KaVE.Commons.Model.SSTs.Impl.Declarations.FieldDeclaration, KaVE.Commons";
 		String actual = TypeUtil.fromSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}

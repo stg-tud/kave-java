@@ -16,6 +16,8 @@
 package cc.kave.commons.utils.json;
 
 import java.lang.reflect.Type;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -30,15 +32,43 @@ import cc.kave.commons.utils.naming.NameSerialization;
 
 public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerializer<IName> {
 
+	private static Pattern sstDeserializationPattern = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
+
 	@Override
 	public IName deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
+
 		String str = json.getAsString();
-		return NameSerialization.deserialize(str);
+		StringBuffer sb = new StringBuffer();
+
+		Matcher m = sstDeserializationPattern.matcher(str);
+		while (m.find()) {
+			@SuppressWarnings("unused")
+			String srch = m.group(0);
+			String repl = "KaVE.Commons.Model.SSTs.Impl." + m.group(1) + ", KaVE.Commons";
+			m.appendReplacement(sb, repl);
+		}
+		m.appendTail(sb);
+		return NameSerialization.deserialize(sb.toString());
 	}
+
+	private static Pattern sstSerializationPattern = Pattern
+			.compile("KaVE\\.Commons\\.Model\\.SSTs\\.Impl\\.([.a-zA-Z0-9_]+), KaVE.Commons");
 
 	@Override
 	public JsonElement serialize(IName src, Type typeOfSrc, JsonSerializationContext context) {
-		return new JsonPrimitive(NameSerialization.serialize(src));
+
+		String json = NameSerialization.serialize(src);
+		StringBuffer sb = new StringBuffer();
+
+		Matcher m = sstSerializationPattern.matcher(json);
+		while (m.find()) {
+			@SuppressWarnings("unused")
+			String srch = m.group(0);
+			String repl = "[SST:" + m.group(1) + "]";
+			m.appendReplacement(sb, repl);
+		}
+		m.appendTail(sb);
+		return new JsonPrimitive(sb.toString());
 	}
 }

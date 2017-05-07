@@ -29,28 +29,24 @@ public class TypeUtil {
 	private static Pattern regex6 = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
 
 	private static Pattern typeAnnotationSerializationPattern = Pattern
-			.compile("((\"\\$type\": ?)\"cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)\")");
-	private static Pattern sstSerializationPattern = Pattern
-			.compile("(KaVE\\.Commons\\.Model\\.SSTs\\.Impl\\.([.a-zA-Z0-9_]+), KaVE.Commons)");
+			.compile("(\"\\$type\": ?)\"cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)\"");
 
 	public static String toSerializedNames(String json) {
 		// TODO: ugly hack to handle type conversion that is both slow and hard
 		// to maintain... improve solution!
 
-		String sstReplaced = json;
-		Matcher typeMatcher = typeAnnotationSerializationPattern.matcher(json);
-		while (typeMatcher.find()) {
-			String srch = typeMatcher.group(1);
-			String repl = typeMatcher.group(2) + "\"[SST:" + toUpperCaseNamespace(typeMatcher.group(3)) + "]\"";
-			sstReplaced = sstReplaced.replace(srch, repl);
+		StringBuffer sb = new StringBuffer();
+		Matcher m = typeAnnotationSerializationPattern.matcher(json);
+		while (m.find()) {
+			@SuppressWarnings("unused")
+			String srch = m.group(0);
+			// "$" is special char for appendReplacement
+			String opening = m.group(1).replace("$", "\\$");
+			String repl = opening + "\"[SST:" + toUpperCaseNamespace(m.group(2)) + "]\"";
+			m.appendReplacement(sb, repl);
 		}
-
-		Matcher nameMatcher = sstSerializationPattern.matcher(json);
-		while (nameMatcher.find()) {
-			String srch = nameMatcher.group(1);
-			String repl = "[SST:" + nameMatcher.group(2) + "]";
-			sstReplaced = sstReplaced.replace(srch, repl);
-		}
+		m.appendTail(sb);
+		String sstReplaced = sb.toString();
 
 		String vsReplaced = replacePattern(sstReplaced,
 				"cc\\.kave\\.commons\\.model\\.events\\.visualstudio\\.([.a-zA-Z0-9_]+)",
@@ -89,26 +85,22 @@ public class TypeUtil {
 	}
 
 	private static Pattern sstDeserializationPattern = Pattern
-			.compile("((\"\\$type\": ?\")?\\[SST:([.a-zA-Z0-9_]+)\\](\")?)");
+			.compile("(\"\\$type\": ?\")\\[SST:([.a-zA-Z0-9_]+)\\]\"");
 
 	private static String fromSerializedName(String json) {
 
-		String sstRepl = json;
+		StringBuffer sb = new StringBuffer();
 		Matcher m = sstDeserializationPattern.matcher(json);
 		while (m.find()) {
-			String srch = m.group(1);
-			String repl;
-			String closingQuote = m.group(4) == null ? "" : m.group(4);
-			if (m.group(2) == null) {
-				repl = "KaVE.Commons.Model.SSTs.Impl." + m.group(3) + ", KaVE.Commons" + closingQuote;
-			} else {
-				repl = m.group(2) + "cc.kave.commons.model.ssts.impl." + allToLowerCaseNamespace(m.group(3))
-						+ closingQuote;
-			}
-			sstRepl = sstRepl.replace(srch, repl);
+			@SuppressWarnings("unused")
+			String srch = m.group(0);
+			// "$" is special char for appendReplacement
+			String opening = m.group(1).replace("$", "\\$");
+			String repl = opening + "cc.kave.commons.model.ssts.impl." + allToLowerCaseNamespace(m.group(2)) + "\"";
+			m.appendReplacement(sb, repl);
 		}
-
-		return sstRepl;
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 	private static String replacePattern(String type, String pattern, String prefix, String suffix, boolean lower) {
