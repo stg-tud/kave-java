@@ -28,11 +28,39 @@ public class TypeUtil {
 	private static Pattern regex5 = Pattern.compile("\"KaVE([.a-zA-Z0-9_]+), KaVE.Commons\"");
 	private static Pattern regex6 = Pattern.compile("\\[SST:([.a-zA-Z0-9_]+)\\]");
 
-	public static String toCSharpTypeNames(String json) {
+	private static Pattern typePattern = Pattern.compile(
+			".*((\"\\$type\": ?)\"cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)\").*", Pattern.DOTALL);
+	private static Pattern namePattern = Pattern
+			.compile(".*(KaVE\\.Commons\\.Model\\.SSTs\\.Impl\\.([.a-zA-Z0-9_]+), KaVE.Commons).*", Pattern.DOTALL);
+
+	public static String toSerializedNames(String json) {
 		// TODO: ugly hack to handle type conversion that is both slow and hard
 		// to maintain... improve solution!
-		String sstReplaced = replacePattern(json, "cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)",
-				"[SST:", "]", false);
+
+		boolean repeat = true;
+		while (repeat) {
+			repeat = false;
+			Matcher typeMatcher = typePattern.matcher(json);
+			if (typeMatcher.matches()) {
+				String srch = typeMatcher.group(1);
+				String repl = typeMatcher.group(2) + "\"[SST:" + toUpperCaseNamespace(typeMatcher.group(3)) + "]\"";
+				json = json.replace(srch, repl);
+				repeat = true;
+			}
+
+			Matcher nameMatcher = namePattern.matcher(json);
+			if (nameMatcher.matches()) {
+				String srch = nameMatcher.group(1);
+				String repl = "[SST:" + nameMatcher.group(2) + "]";
+				json = json.replace(srch, repl);
+				repeat = true;
+			}
+		}
+
+		String sstReplaced = json;
+		// replacePattern(json,
+		// "cc\\.kave\\.commons\\.model\\.ssts\\.impl\\.([.a-zA-Z0-9_]+)",
+		// "[SST:", "]", false);
 		String vsReplaced = replacePattern(sstReplaced,
 				"cc\\.kave\\.commons\\.model\\.events\\.visualstudio\\.([.a-zA-Z0-9_]+)",
 				"KaVE.Commons.Model.Events.VisualStudio.", ", KaVE.Commons", false);
@@ -50,12 +78,11 @@ public class TypeUtil {
 		return modelClassesReplaced;
 	}
 
-	public static String toJavaTypeNames(String json) {
+	public static String fromSerializedNames(String json) {
 		String legacySupport_PackageNames = legacySupport_PackageNames(json);
 		String javaPackages = toJavaPackages(legacySupport_PackageNames);
 		String completionEvent_formatting = completionEvent_formatting(javaPackages);
 		return legacySupport_CompletionEvents(completionEvent_formatting);
-
 	}
 
 	private static String legacySupport_PackageNames(String json) {
@@ -70,8 +97,37 @@ public class TypeUtil {
 		return replacePattern(json, regex5, "\"cc.kave", "\"", true);
 	}
 
+	private static Pattern typePattern2 = Pattern.compile(".*((\"\\$type\": ?)\"\\[SST:([.a-zA-Z0-9_]+)\\]\").*",
+			Pattern.DOTALL);
+	private static Pattern namePattern2 = Pattern.compile(".*((?<!\"\\$type\": ?\")\\[SST:([.a-zA-Z0-9_]+)\\]).*",
+			Pattern.DOTALL);
+
 	private static String toJavaPackages(String json) {
-		return replacePattern(json, regex6, "cc.kave.commons.model.ssts.impl.", "", true);
+
+		boolean repeat = true;
+		while (repeat) {
+			repeat = false;
+
+			Matcher tMatcher = typePattern2.matcher(json);
+			if (tMatcher.matches()) {
+				String srch = tMatcher.group(1);
+				String repl = tMatcher.group(2) + "\"cc.kave.commons.model.ssts.impl."
+						+ allToLowerCaseNamespace(tMatcher.group(3)) + "\"";
+				// String repl = "KaVE.Commons.Model.SSTs"
+				json = json.replace(srch, repl);
+				repeat = true;
+			}
+
+			Matcher nMatcher = namePattern2.matcher(json);
+			if (nMatcher.matches()) {
+				String srch = nMatcher.group(1);
+				String repl = "KaVE.Commons.Model.SSTs.Impl." + nMatcher.group(2) + ", KaVE.Commons";
+				json = json.replace(srch, repl);
+				repeat = true;
+			}
+		}
+
+		return json;
 	}
 
 	private static String replacePattern(String type, String pattern, String prefix, String suffix, boolean lower) {

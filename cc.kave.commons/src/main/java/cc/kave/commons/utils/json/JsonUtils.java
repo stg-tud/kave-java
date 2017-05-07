@@ -349,23 +349,23 @@ public abstract class JsonUtils {
 	}
 
 	public static <T> T fromJson(String json, Type targetType) {
-		json = TypeUtil.toJavaTypeNames(json);
+		json = TypeUtil.fromSerializedNames(json);
 		return gson.fromJson(json, targetType);
 	}
 
 	public static <T> String toJson(Object obj, Type targetType) {
 		String json = gson.toJsonTree(obj, targetType).toString();
-		return TypeUtil.toCSharpTypeNames(json);
+		return TypeUtil.toSerializedNames(json);
 	}
 
 	public static <T> String toJson(Object obj) {
 		String json = gson.toJson(obj);
-		return TypeUtil.toCSharpTypeNames(json);
+		return TypeUtil.toSerializedNames(json);
 	}
 
 	public static <T> String toJsonFormatted(Object obj) {
 		String json = gsonPretty.toJson(obj).replace("  ", "    ");
-		return TypeUtil.toCSharpTypeNames(json);
+		return TypeUtil.toSerializedNames(json);
 	}
 
 	public static <T> T fromJson(File file, Type classOfT) {

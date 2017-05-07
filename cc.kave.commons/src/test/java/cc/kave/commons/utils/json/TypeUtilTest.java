@@ -23,8 +23,8 @@ public class TypeUtilTest {
 	@Test
 	public void testSSTTypeToJaveTypeName() {
 		String type = "[SST:Expressions.Simple.UnknownExpression]";
-		String expected = "cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression";
-		String actual = TypeUtil.toJavaTypeNames(type);
+		String expected = "KaVE.Commons.Model.SSTs.Impl.Expressions.Simple.UnknownExpression, KaVE.Commons";
+		String actual = TypeUtil.fromSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}
 
@@ -32,15 +32,15 @@ public class TypeUtilTest {
 	public void testContextToJavaTypeName() {
 		String type = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
 		String expected = "\"cc.kave.commons.model.events.completionevents.Context\"";
-		String actual = TypeUtil.toJavaTypeNames(type);
+		String actual = TypeUtil.fromSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}
 
 	@Test
 	public void testSSTType() {
 		String type = "[SST:Declarations.FieldDeclaration]";
-		String expected = "cc.kave.commons.model.ssts.impl.declarations.FieldDeclaration";
-		String actual = TypeUtil.toJavaTypeNames(type);
+		String expected = "KaVE.Commons.Model.SSTs.Impl.Declarations.FieldDeclaration, KaVE.Commons";
+		String actual = TypeUtil.fromSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}
 
@@ -48,7 +48,7 @@ public class TypeUtilTest {
 	public void testJavaTypeNameToCsharp() {
 		String type = "\"cc.kave.commons.model.events.completionevents.Context\"";
 		String expected = "\"KaVE.Commons.Model.Events.CompletionEvents.Context, KaVE.Commons\"";
-		String actual = TypeUtil.toCSharpTypeNames(type);
+		String actual = TypeUtil.toSerializedNames(type);
 		Assert.assertEquals(expected, actual);
 	}
 
@@ -95,7 +95,7 @@ public class TypeUtilTest {
 	}
 
 	private static void assertTypeAnnotationConversion(String java, String csharp) {
-		Assert.assertEquals(csharp, TypeUtil.toCSharpTypeNames(java));
-		Assert.assertEquals(java, TypeUtil.toJavaTypeNames(csharp));
+		Assert.assertEquals(csharp, TypeUtil.toSerializedNames(java));
+		Assert.assertEquals(java, TypeUtil.fromSerializedNames(csharp));
 	}
 }
