@@ -16,6 +16,8 @@
 package cc.kave.episodes.evaluation.generation2;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +36,7 @@ import com.google.common.collect.Sets;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
@@ -54,7 +57,7 @@ public class EventStreamGenerator {
 		this.dirZips = dirZips;
 	}
 
-	public void run() throws InterruptedException, ExecutionException {
+	public void run() throws InterruptedException, ExecutionException, IOException {
 		zips = findZips(dirZips);
 
 		List<Future<?>> futures = Lists.newLinkedList();
@@ -69,6 +72,27 @@ public class EventStreamGenerator {
 		pool.shutdown();
 
 		createStats();
+
+		System.out.printf("writing event stream (%s)\n", new Date());
+		File esFile = new File(dirZips + "es.txt");
+		try (FileWriter fw = new FileWriter(esFile)) {
+			fw.write('[');
+			fw.write('\n');
+
+			boolean isFirst = true;
+			for (Event e : eventsAll) {
+				if (!isFirst) {
+					fw.write(',');
+					fw.write('\n');
+				}
+				isFirst = false;
+				fw.write(JsonUtils.toJson(e));
+			}
+
+			fw.write('\n');
+			fw.write(']');
+		}
+		System.out.printf("done (%s)\n", new Date());
 	}
 
 	private void createStats() {

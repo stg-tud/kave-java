@@ -15,13 +15,13 @@
  */
 package cc.kave.episodes.evaluation.generation2;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class RunMe {
-	public static void main(String[] args) throws InterruptedException, ExecutionException {
+	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 		// String path = "/Users/seb/some-contexts/";
 		String path = "/Volumes/Data/Contexts-161031/";
-		EventStreamGenerator gen = new EventStreamGenerator(path);
-		gen.run();
+		new EventStreamGenerator(path).run();
 	}
 }
