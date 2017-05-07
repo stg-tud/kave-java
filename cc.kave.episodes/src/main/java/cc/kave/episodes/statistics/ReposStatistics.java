@@ -169,9 +169,13 @@ public class ReposStatistics {
 
 	private List<Event> filterLocalTypes(List<Event> events) {
 		List<Event> results = Lists.newLinkedList();
-
+		String elementCtx = "";
+		
 		for (Event event : events) {
-			if (isLocal(event)) {
+			if (event.getKind() == EventKind.METHOD_DECLARATION) {
+				elementCtx = event.getMethod().getIdentifier();
+			}
+			if (isLocal(event, elementCtx)) {
 				continue;
 			}
 			results.add(event);
@@ -181,7 +185,7 @@ public class ReposStatistics {
 		return results;
 	}
 	
-	private boolean isLocal(Event e) {
+	private boolean isLocal(Event e, String elementCtx) {
 	    // predefined types have always an unknown version, but come
 	    // from mscorlib, so they should be included
 	    boolean oldVal = false;
@@ -195,7 +199,9 @@ public class ReposStatistics {
 	        newVal = true;
 	    }
 	    if (oldVal != newVal) {
-	        System.out.printf("different localness for: %s\n", type);
+	    	System.out.printf("element context: %s\n", elementCtx);
+	        System.out.printf("different localness for: %s\n", e.getMethod().getIdentifier());
+	        System.out.printf("\n");
 	    }
 	    return newVal;
 	}
@@ -292,7 +298,7 @@ public class ReposStatistics {
 //		reposTypes.addAll(currTypes);
 
 		reposData(types, streamGen0);
-//		sebStats(streamGen0);
+		sebStats(streamGen0);
 		filterTypeOverlaps(types.keySet(), streamGen1);
 		filterGeneratedCode(streamGen2);
 		return streamGen2.getEventStream();
@@ -317,7 +323,7 @@ public class ReposStatistics {
 						}
 					}
 					if ((event.getKind() == EventKind.INVOCATION)
-							&& !isLocal(event)) {
+							&& !isLocal(event, "")) {
 						invocations.add(event);
 					}
 				}

@@ -17,8 +17,16 @@ package cc.kave.episodes.model.events;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class Events {
+	public static Event newType(ITypeName type) {
+		Event event = new Event();
+		event.setKind(EventKind.TYPE);
+		event.setType(type);
+		return event;
+	}
+	
 	public static Event newContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.METHOD_DECLARATION);

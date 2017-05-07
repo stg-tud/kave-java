@@ -32,7 +32,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FOLDNUM = -1;
+	private static final int FOLDNUM = 0;
 	private static final int FREQUENCY = 300;
 	private static final double ENTROPY = 0.6;
 
@@ -50,6 +50,8 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
+		
+//		load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
 
 		load(ReposStatistics.class).generate(FREQUENCY);
 //		 load(PreChecking.class).reposInfo();
