@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -53,10 +54,8 @@ public class PartialEventStreamGenerator {
 			}
 
 			ITypeName type = sst.getEnclosingType();
-			if (!sst.isPartialClass()) {
-				if (!seenTypes.add(type)) {
-					return null;
-				}
+			if (!seenTypes.add(type) && !sst.isPartialClass()) {
+				return null;
 			}
 
 			events.add(Events.newType(type));
@@ -75,9 +74,11 @@ public class PartialEventStreamGenerator {
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
+			ctxElem = Names.getUnknownMethod();
+			ctxFirst = Names.getUnknownMethod();
 
 			IMethodName m = decl.getName();
-			if (!seenMethods.add(m)) {
+			if (!seenMethods.add(TypeErasure.of(m))) {
 				return null;
 			}
 
@@ -109,18 +110,18 @@ public class PartialEventStreamGenerator {
 			}
 			return !name.getDeclaringType().getAssembly().isLocalProject();
 		}
-
+		
 		private void addEnclosingMethodIfAvailable() {
 			if (ctxFirst != null) {
-				events.add(Events.newFirstContext(ctxFirst));
+				events.add(Events.newFirstContext(TypeErasure.of(ctxFirst)));
 				ctxFirst = null;
 			}
 			if (ctxSuper != null) {
-				events.add(Events.newSuperContext(ctxSuper));
+				events.add(Events.newSuperContext(TypeErasure.of(ctxSuper)));
 				ctxSuper = null;
 			}
 			if (ctxElem != null) {
-				events.add(Events.newContext(ctxElem));
+				events.add(Events.newContext(TypeErasure.of(ctxElem)));
 				ctxElem = null;
 			}
 		}
