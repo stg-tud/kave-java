@@ -3,12 +3,14 @@ package cc.kave.episodes.statistics;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
@@ -20,42 +22,106 @@ import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class StreamGenerator3 {
+public class StreamGenerator4 {
 
 	private Directory contextsDir;
 	private EventStreamIo eventStreamIo;
 
-	private Set<ITypeName> seenTypes = Sets.newConcurrentHashSet();
-	private Set<IMethodName> seenMethods = Sets.newConcurrentHashSet();
+	private Map<ITypeName, Integer> reposType = Maps.newLinkedHashMap();
 	private List<Event> eventsAll = Lists.newLinkedList();
 
 	@Inject
-	public StreamGenerator3(@Named("contexts") Directory directory,
+	public StreamGenerator4(@Named("contexts") Directory directory,
 			EventStreamIo streamIo) {
 		this.contextsDir = directory;
 		this.eventStreamIo = streamIo;
 	}
 
 	public void generate(int frequency, int foldNum) throws IOException {
+		EventStreamGenerator generator = new EventStreamGenerator();
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 
-			List<Event> events = new PartialEventStreamGenerator().extract(
-					ra.getAll(Context.class), seenTypes, seenMethods);
+			while (ra.hasNext()) {
+				Context ctx = ra.getNext(Context.class);
+				if (ctx != null) {
+					ITypeName type = ctx.getSST().getEnclosingType();
+					if (reposType.containsKey(type)) {
+						int counter = reposType.get(type);
+						reposType.put(type, counter + 1);
+					} else {
+						reposType.put(type, 1);
+					}
+					generator.add(ctx);
+				}
+			}
 			ra.close();
-			eventsAll.addAll(events);
 		}
-		createStats();
+		eventsAll = generator.getEventStream();
+
+		System.out.printf("\n\nRepository information:\n");
+		System.out.printf("typeDecls: %d (%d unique)\n", occurrences(reposType),
+				reposType.keySet().size());
+		System.out.printf("-------");
+
+		System.out.printf("\nAfter filtering overlapping types and generated code:\n");
+		createStats(eventsAll);
+
+		List<Event> events = filterLocalsAndUnknown();
+		System.out.printf("\nFinal filterings:\n");
+		createStats(events);
+
 		EventStream stream = EventsFilter.filterStream(eventsAll, frequency);
 		eventStreamIo.write(stream, frequency, foldNum);
 	}
 
-	private void createStats() {
+	private List<Event> filterLocalsAndUnknown() {
+		List<Event> results = Lists.newLinkedList();
+		String element = "";
+		for (Event e : eventsAll) {
+			if (isUnknown(e)) {
+				continue;
+			}
+			if (e.getKind() == EventKind.TYPE) {
+				results.add(e);
+				continue;
+			}
+			if (e.getKind() == EventKind.METHOD_DECLARATION) {
+				element = e.getMethod().getIdentifier();
+				results.add(e);
+				continue;
+			}
+			if (isLocal(e, element)) {
+				continue;
+			}
+			results.add(e);
+		}
+		return results;
+	}
+
+	private boolean isUnknown(Event e) {
+		if (e.getKind() == EventKind.TYPE) {
+			return e.getType().isUnknown();
+		} else {
+			return e.getMethod().isUnknown();
+		}
+	}
+
+	private int occurrences(Map<ITypeName, Integer> cumulator) {
+		int occurrences = 0;
+		for (Map.Entry<ITypeName, Integer> entry : cumulator.entrySet()) {
+			occurrences += entry.getValue();
+		}
+		return occurrences;
+	}
+
+	private void createStats(List<Event> events) {
 		System.out.printf("finished at %s\n", new Date());
 
 		Set<ITypeName> uniqueTypes = Sets.newHashSet();
@@ -72,8 +138,7 @@ public class StreamGenerator3 {
 		int numCtxs = 0;
 		int numInv = 0;
 
-		for (Event e : eventsAll) {
-			isLocal(e, element);
+		for (Event e : events) {
 			switch (e.getKind()) {
 			case TYPE:
 				uniqueTypes.add(e.getType());
@@ -99,6 +164,7 @@ public class StreamGenerator3 {
 			default:
 				System.err.println("should not happen");
 			}
+			isLocal(e, element);
 		}
 
 		System.out.printf("typeDecls\t%d (%d unique)\n", numType,
@@ -122,7 +188,7 @@ public class StreamGenerator3 {
 		// from mscorlib, so they should be included
 		boolean oldVal = false;
 		boolean newVal = false;
-		ITypeName type;
+		ITypeName type = null;
 		if (e.getKind() == EventKind.TYPE) {
 			type = e.getType();
 		} else {
@@ -135,10 +201,16 @@ public class StreamGenerator3 {
 		if (asm.isLocalProject()) {
 			newVal = true;
 		}
-		if (oldVal != newVal) {
+		if ((oldVal != newVal) && (!isUnknown(e))) {
 			System.out.printf("element context: %s\n", elementCtx);
-			System.out.printf("different localness for: %s\n", e.getMethod()
-					.getIdentifier());
+			System.out.printf("event kind: %s\n", e.getKind().toString());
+			if (e.getKind() == EventKind.TYPE) {
+				System.out.printf("different localness for: %s\n",
+						type.getIdentifier());
+			} else {
+				System.out.printf("different localness for: %s\n", e
+						.getMethod().getIdentifier());
+			}
 			System.out.printf("\n");
 		}
 		return newVal;

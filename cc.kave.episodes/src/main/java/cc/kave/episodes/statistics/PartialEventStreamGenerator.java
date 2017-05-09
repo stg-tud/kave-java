@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -74,8 +73,6 @@ public class PartialEventStreamGenerator {
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
-			ctxElem = Names.getUnknownMethod();
-			ctxFirst = Names.getUnknownMethod();
 
 			IMethodName m = decl.getName();
 			if (!seenMethods.add(TypeErasure.of(m))) {

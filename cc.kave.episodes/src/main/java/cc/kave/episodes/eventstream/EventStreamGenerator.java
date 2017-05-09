@@ -21,6 +21,7 @@ import java.util.Set;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -39,24 +40,31 @@ public class EventStreamGenerator {
 
 	private Set<IMethodName> uniqueMethods = Sets.newHashSet();
 	private List<Event> events = Lists.newLinkedList();
+	private Set<ITypeName> seenTypes = Sets.newLinkedHashSet();
 
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
+		if (!isGenerated(sst)) {
+			sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
+					ctx.getTypeShape());
+		}
+	}
+
+	private boolean isGenerated(ISST sst) {
 		if (sst.isPartialClass()) {
 			String fileName = sst.getPartialClassIdentifier();
-			if (!(fileName.contains(".designer") || fileName
-					.contains(".Designer"))) {
-				sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
-						ctx.getTypeShape());
+			if (fileName.contains(".designer")
+					|| fileName.contains(".Designer")) {
+				return true;
 			}
-		} else {
-			sst.accept(new EventStreamGenerationVisitor(uniqueMethods), ctx.getTypeShape());
 		}
+		return false;
 	}
 
 	public void addAny(Context ctx) {
 		ISST sst = ctx.getSST();
-		sst.accept(new EventStreamGenerationVisitor(uniqueMethods), ctx.getTypeShape());
+		sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
+				ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
@@ -66,8 +74,23 @@ public class EventStreamGenerator {
 	private class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
-		private final Set<IMethodName> uniqueMethods;
+			@Override
+			public Void visit(ISST sst, ITypeShape context) {
+
+				if (isGenerated(sst)) {
+					return null;
+				}
+
+				ITypeName type = sst.getEnclosingType();
+				if (!seenTypes.add(type) && !sst.isPartialClass()) {
+					return null;
+				}
+				events.add(Events.newType(type));
+				return super.visit(sst, context);
+			}
 		
+		private final Set<IMethodName> uniqueMethods;
+
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
 		private IMethodName elementCtx;
@@ -83,11 +106,11 @@ public class EventStreamGenerator {
 			superCtx = Names.getUnknownMethod();
 			elementCtx = Names.getUnknownMethod();
 			IMethodName name = decl.getName();
-			if(uniqueMethods.contains(name)) {
+			if (uniqueMethods.contains(name)) {
 				return super.visit(decl, context);
 			}
 			uniqueMethods.add(name);
-			
+
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
 					if (h.getFirst() != null) {

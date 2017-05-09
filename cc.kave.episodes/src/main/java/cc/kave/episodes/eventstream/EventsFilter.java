@@ -34,6 +34,9 @@ public class EventsFilter {
 		EventStream es = new EventStream();
 
 		for (Event e : stream) {
+			if (e.getKind() == EventKind.TYPE) {
+				continue;
+			}
 			if (e.getKind() == EventKind.METHOD_DECLARATION) {
 				es.addEvent(e);
 				continue;

@@ -79,14 +79,15 @@ public class EventStream {
 			methodCtx = event;
 			return;
 		}
+		
+		if (event.getMethod().isUnknown()) {
+			return;
+		}
 
 		if (isLocal(event)) {
 			return;
 		}
 
-		if (event.getMethod().isUnknown()) {
-			return;
-		}
 		int idx = ensureEventExistsAndGetId(event);
 
 		addEventIdToStream(idx);

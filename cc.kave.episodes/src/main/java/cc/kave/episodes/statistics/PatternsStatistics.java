@@ -11,7 +11,6 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 
@@ -37,7 +36,7 @@ public class PatternsStatistics {
 		for (Tuple<Event, List<Fact>> method : stream) {
 			Event elementCtx = method.getFirst();
 			if (elementCtx.getKind() != EventKind.METHOD_DECLARATION) {
-				Logger.log("Invalid method declaration element!");
+				System.out.printf("\nInvalid method declaration element!\n");
 			} else {
 				addEvent(elementCtx, ctxElement);
 			}
@@ -55,19 +54,19 @@ public class PatternsStatistics {
 					addEvent(event, invExpr);
 					continue;
 				}
-				Logger.log("Invalid event in event stream!");
+				System.out.printf("Invalid event in event stream!\n");
 			}
 		}
 		printStatistics();
-		Logger.log("Number of full methods in event stream: %d", stream.size());
-		Logger.log("Number of unique events in event stream: %d", events.size());
+		System.out.printf("Number of full methods in event stream: %d\n", stream.size());
+		System.out.printf("Number of unique events in event stream: %d\n", events.size());
 	}
 
 	private void printStatistics() {
-		Logger.log("ctxFirst: %d (%d unique)", getOccs(ctxFirst), ctxFirst.size());
-		Logger.log("ctxSuper: %d (%d unique)", getOccs(ctxSuper), ctxSuper.size());
-		Logger.log("ctxElem: %d (%d unique)", getOccs(ctxElement), ctxElement.size());
-		Logger.log("invExpr: %d (%d unique)\n", getOccs(invExpr), invExpr.size());
+		System.out.printf("ctxFirst: %d (%d unique)\n", getOccs(ctxFirst), ctxFirst.size());
+		System.out.printf("ctxSuper: %d (%d unique)\n", getOccs(ctxSuper), ctxSuper.size());
+		System.out.printf("ctxElem: %d (%d unique)\n", getOccs(ctxElement), ctxElement.size());
+		System.out.printf("invExpr: %d (%d unique)\n", getOccs(invExpr), invExpr.size());
 	}
 
 	private int getOccs(Map<IMethodName, Integer> cumulator) {
