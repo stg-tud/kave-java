@@ -133,6 +133,7 @@ public class EpisodesFilterTest {
 		twoNodes.add(createEpisode(8, 0.8, "1", "2", "2>1"));
 		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
 		twoNodes.add(createEpisode(5, 0.7, "1", "3", "1>3"));
+		twoNodes.add(createEpisode(5, 0.7, "1", "3", "3>1"));
 		twoNodes.add(createEpisode(5, 0.8, "2", "3", "2>3"));
 		episodes.put(2, twoNodes);
 
@@ -147,6 +148,7 @@ public class EpisodesFilterTest {
 		Set<Episode> set2 = Sets.newLinkedHashSet();
 		set2.add(createEpisode(8, 0.7, "1", "2"));
 		set2.add(createEpisode(5, 0.7, "1", "3", "1>3"));
+		set2.add(createEpisode(5, 0.7, "1", "3", "3>1"));
 		set2.add(createEpisode(5, 0.8, "2", "3", "2>3"));
 		expected.put(2, set2);
 

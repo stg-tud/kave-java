@@ -84,9 +84,9 @@ public class RepositoriesParser {
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				if (ctx != null) {
+					repoGen.add(ctx);
 					ITypeName typeName = ctx.getSST().getEnclosingType();
 					if (!types.contains(typeName)) {
-						repoGen.add(ctx);
 						repoTypes.add(typeName);
 						addToMapper(repoName, typeName);
 					} else {

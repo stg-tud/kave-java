@@ -4,6 +4,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -16,6 +17,8 @@ import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.ValidationDataIO;
+import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
@@ -48,40 +51,46 @@ public class PostChecking {
 		this.episodeParser = parser;
 	}
 
-	private static final int FOLDNUM = -1;
+	private static final int FOLDNUM = 0;
 	private static final int METHODSIZE = 5000;
 	private static final double TIMEOUT = 5.0;
 
-	// public void updatedEvent(int frequency) {
-	// Map<Integer, Set<Episode>> episodes = episodeParser.parse(
-	// EpisodeType.PARALLEL, frequency, -2);
-	// List<Event> events = trainStreamIo.readMapping(frequency, -2);
-	// Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
-	//
-	// Logger.log("Extracting episode types ...");
-	// for (Episode episode : episodes.get(2)) {
-	// Set<Fact> facts = episode.getEvents();
-	//
-	// for (Fact fact : facts) {
-	// Event event = events.get(fact.getFactID());
-	// episodeTypes.add(event.getMethod().getDeclaringType());
-	// }
-	// }
-	//
-	// List<Event> updatedEvents = trainStreamIo.readMapping(frequency,
-	// FOLDNUM);
-	// Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
-	// Logger.log("Extracting updated types ... ");
-	// for (Event event : updatedEvents) {
-	// updatedTypes.add(event.getMethod().getDeclaringType());
-	// }
-	// Logger.log("Comparing types ...");
-	// for (ITypeName type : episodeTypes) {
-	// if (!updatedTypes.contains(type)) {
-	// Logger.log("Missed type: %s", type.getIdentifier());
-	// }
-	// }
-	// }
+	public void updatedEvent(int frequency) {
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(
+				EpisodeType.PARALLEL, frequency, -2);
+		List<Event> events = trainStreamIo.readMapping(frequency, -2);
+		Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
+
+		Logger.log("Extracting episode types ...");
+		for (Episode episode : episodes.get(2)) {
+			Set<Fact> facts = episode.getEvents();
+
+			for (Fact fact : facts) {
+				Event event = events.get(fact.getFactID());
+				episodeTypes.add(event.getMethod().getDeclaringType());
+			}
+		}
+
+		List<Event> updatedEvents = trainStreamIo.readMapping(frequency,
+				FOLDNUM);
+		Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
+		Logger.log("Extracting updated types ... ");
+		for (Event event : updatedEvents) {
+			ITypeName type;
+			try {
+				type = event.getMethod().getDeclaringType();
+			} catch (Exception exc) {
+				continue;
+			}
+			updatedTypes.add(type);
+		}
+		Logger.log("Comparing types ...");
+		for (ITypeName type : episodeTypes) {
+			if (!updatedTypes.contains(type)) {
+				Logger.log("Missed type: %s", type.getIdentifier());
+			}
+		}
+	}
 
 	public void eventsVersions(int frequency) {
 		List<Event> eventsNew = trainStreamIo.readMapping(frequency, -1);
@@ -89,11 +98,11 @@ public class PostChecking {
 		Logger.log("Number of events in the new version: %d", eventsNew.size());
 		Logger.log("Number of events in the current version: %d", eventsCurrent.size());
 
-//		if (eventsNew.containsAll(eventsCurrent)) {
-//			Logger.log("All events are icluded in the new contexts version!");
-//		} else {
-//			Logger.log("The new contexts version misses some of the events from the previous version!");
-//		}
+		if (eventsNew.containsAll(eventsCurrent)) {
+			Logger.log("All events are included in the new contexts version!");
+		} else {
+			Logger.log("The new contexts version misses some of the events from the previous version!");
+		}
 		
 		for (Event event : eventsCurrent) {
 			if (!eventsNew.contains(event)) {
@@ -124,7 +133,12 @@ public class PostChecking {
 				int factId = fact.getFactID();
 				Event e = events.get(factId);
 
-				ITypeName type = e.getMethod().getDeclaringType();
+				ITypeName type;
+				try {
+					type = e.getMethod().getDeclaringType();
+				} catch (Exception exc) {
+					continue;
+				}
 				if (e.getKind() == EventKind.INVOCATION) {
 					numbInvs++;
 					invocations.add(e);
