@@ -283,6 +283,10 @@ public class RepositoriesParserTest {
 		reposEvents.put("Github/usr1/repo1", generator);
 		
 		generator = new EventStreamGenerator();
+		generator.add(context3);
+		reposEvents.put("Github/usr1/repo3", generator);
+		
+		generator = new EventStreamGenerator();
 		generator.add(context2);
 		reposEvents.put("Github/usr1/repo2", generator);
 		

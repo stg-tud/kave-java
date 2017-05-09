@@ -55,15 +55,18 @@ public class ThresholdsAnalyzer {
 		repoParser.generateReposEvents();
 		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
 				.getRepoTypesMapper();
+		
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
+		
 		Logger.log("Reading training stream ...");
 		List<Tuple<Event, List<Fact>>> streamContexts = eventStream
 				.parseStream(frequency, foldNum);
+		
 		Logger.log("Reading validation data ...");
 		List<Event> valData = validationIo.read(frequency, foldNum);
 		Map<Event, Integer> eventsMap = mergeEventsToMap(trainEvents, valData);
-		List<Event> eventsList = Lists.newArrayList(eventsMap.keySet());
+		List<Event> allEvents = Lists.newArrayList(eventsMap.keySet());
 		List<List<Fact>> valStream = validationIo.streamOfFacts(valData,
 				eventsMap);
 
@@ -76,14 +79,14 @@ public class ThresholdsAnalyzer {
 		Logger.log("\t%s", title);
 
 		if ((freqThresh > 0) && (entThresh == 0.0)) {
-			Set<Double> entropies = getEntropies(episodes, freqThresh);
-			Logger.log("Number of entropy thresholds: %d", entropies.size());
-			for (double entropy : entropies) {
+//			Set<Double> entropies = getEntropies(episodes, freqThresh);
+//			Logger.log("Number of entropy thresholds: %d", entropies.size());
+			for (double entropy = 0.0; entropy <= 1.0; entropy += 0.1) {
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
 						type, episodes, freqThresh, entropy);
 				Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
 						.validate(patterns, streamContexts, repoCtxMapper,
-								eventsList, valStream);
+								allEvents, valStream);
 				Threshold threshItem = getThreshResults(validations);
 				threshItem.setFrequency(freqThresh);
 				threshItem.setEntropy(entropy);
@@ -91,13 +94,16 @@ public class ThresholdsAnalyzer {
 			}
 		} else if ((freqThresh == 0) && (entThresh > 0.0)) {
 			Set<Integer> frequencies = getFrequencies(episodes, entThresh);
-			Logger.log("Number of frequency thresholds: %d", frequencies.size());
+//			Logger.log("Number of frequency thresholds: %d", frequencies.size());
 			for (int freq : frequencies) {
+				Logger.log("Before filtering");
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
 						type, episodes, freq, entThresh);
+//				Logger.log("Validating the patterns ...");
 				Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validations = patternsValidation
 						.validate(patterns, streamContexts, repoCtxMapper,
-								eventsList, valStream);
+								allEvents, valStream);
+//				Logger.log("Generating threshold item ...");
 				Threshold threshItem = getThreshResults(validations);
 				threshItem.setFrequency(freq);
 				threshItem.setEntropy(entThresh);
@@ -112,7 +118,7 @@ public class ThresholdsAnalyzer {
 
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			for (Episode episode : entry.getValue()) {
-				if (episode.getEntropy() >= entThresh) {
+				if (episode.getFrequency() <= 491) {
 					frequencies.add(episode.getFrequency());
 				}
 			}
