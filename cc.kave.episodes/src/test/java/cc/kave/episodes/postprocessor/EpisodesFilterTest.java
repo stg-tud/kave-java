@@ -78,23 +78,6 @@ public class EpisodesFilterTest {
 	}
 
 	@Test
-	public void threNodeEqualEpisodes() throws Exception {
-
-		Set<Episode> twoNodes = Sets.newLinkedHashSet();
-		twoNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "2>3"));
-		twoNodes.add(createEpisode(8, 0.6, "1", "2", "3", "1>2", "3>2"));
-		episodes.put(2, twoNodes);
-
-		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.GENERAL,
-				episodes, FREQUENCY, ENTROPY);
-		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
-		expected.put(2,
-				Sets.newHashSet(createEpisode(8, 0.6, "1", "2", "3", "1>2")));
-
-		assertEquals(expected, actuals);
-	}
-
-	@Test
 	public void freqRepr() throws Exception {
 
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();
@@ -119,7 +102,7 @@ public class EpisodesFilterTest {
 
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();
 		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
-		twoNodes.add(createEpisode(4, 0.5, "1", "3"));
+		twoNodes.add(createEpisode(3, 0.5, "1", "3"));
 		episodes.put(2, twoNodes);
 
 		Set<Episode> threeNodes = Sets.newLinkedHashSet();
@@ -155,7 +138,7 @@ public class EpisodesFilterTest {
 
 		Set<Episode> threeNodes = Sets.newLinkedHashSet();
 		threeNodes = Sets.newLinkedHashSet();
-		threeNodes.add(createEpisode(7, 0.9, "1", "2", "3", "1>2", "1>3"));
+		threeNodes.add(createEpisode(7, 0.4, "1", "2", "3", "1>2", "1>3"));
 		threeNodes.add(createEpisode(6, 0.9, "1", "2", "3", "2>1", "2>3"));
 		threeNodes.add(createEpisode(4, 1.0, "1", "3", "4", "1>3", "1>4"));
 		episodes.put(3, threeNodes);
@@ -168,8 +151,8 @@ public class EpisodesFilterTest {
 		expected.put(2, set2);
 
 		Set<Episode> set3 = Sets.newLinkedHashSet();
-		set3.add(createEpisode(7, 0.9, "1", "2", "3", "1>3", "2>3"));
-		set3.add(createEpisode(3, 1.0, "1", "3", "4", "1>3", "1>4"));
+		set3.add(createEpisode(6, 0.9, "1", "2", "3", "2>1", "2>3"));
+		set3.add(createEpisode(4, 1.0, "1", "3", "4", "1>3", "1>4"));
 		expected.put(3, set3);
 
 		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.GENERAL,
