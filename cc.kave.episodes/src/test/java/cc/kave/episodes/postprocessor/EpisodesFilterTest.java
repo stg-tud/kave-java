@@ -98,6 +98,39 @@ public class EpisodesFilterTest {
 	}
 
 	@Test
+	public void multiRepr() {
+		Set<Episode> threNodes = Sets.newLinkedHashSet();
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34",
+				"8>34"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>34", "7>8",
+				"34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8",
+				"7>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>8", "34>7",
+				"8>7"));
+		episodes.put(3, threNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "34>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
+		expected.put(3, set);
+
+		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.GENERAL,
+				episodes, FREQUENCY, ENTROPY);
+
+		assertEquals(expected, actuals);
+	}
+
+	@Test
 	public void bidirectRepr() throws Exception {
 
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();

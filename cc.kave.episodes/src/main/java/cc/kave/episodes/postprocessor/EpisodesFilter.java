@@ -21,6 +21,7 @@ import java.util.Set;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -61,18 +62,22 @@ public class EpisodesFilter {
 			Map<Integer, Set<Episode>> episodes) {
 		Map<Integer, Set<Episode>> results = Maps.newLinkedHashMap();
 
-		for (Map.Entry<Integer, Set<Episode>> entryEpisodes : episodes.entrySet()) {
-			Map<Set<Fact>, Set<Episode>> epGroups = grouping(entryEpisodes.getValue());
+		for (Map.Entry<Integer, Set<Episode>> entryEpisodes : episodes
+				.entrySet()) {
+			Map<Set<Fact>, Set<Episode>> epGroups = grouping(entryEpisodes
+					.getValue());
 			Set<Episode> patterns = Sets.newLinkedHashSet();
-			
-			for (Map.Entry<Set<Fact>, Set<Episode>> entryGroups : epGroups.entrySet()) {
+
+			for (Map.Entry<Set<Fact>, Set<Episode>> entryGroups : epGroups
+					.entrySet()) {
 				if (entryGroups.getValue().size() == 1) {
 					for (Episode episode : entryGroups.getValue()) {
 						patterns.add(episode);
 						break;
 					}
 				} else {
-					Set<Episode> epFilter = filter(entryGroups.getValue());
+					Set<Episode> group = entryGroups.getValue();
+					Set<Episode> epFilter = filter(group);
 					patterns.addAll(epFilter);
 				}
 			}
@@ -83,21 +88,78 @@ public class EpisodesFilter {
 
 	private Set<Episode> filter(Set<Episode> episodes) {
 		Set<Episode> results = Sets.newLinkedHashSet();
-		int minRelations = getMinRels(episodes);
-		
-		for (Episode ep : episodes) {
-			if (ep.getRelations().size() == minRelations) {
-				results.add(ep);
+		Map<Integer, Set<Episode>> relsLevels = getRelLevels(episodes);
+
+		while (!representative(results, relsLevels)) {
+			if (relsLevels.size() == 1) {
+				results.addAll(getSingleValue(relsLevels));
+				return results;
+			}
+			int minRelations = getMinRels(relsLevels);
+			results.addAll(relsLevels.get(minRelations));
+			relsLevels.remove(minRelations);
+		}
+		return results;
+	}
+
+	private Set<Episode> getSingleValue(Map<Integer, Set<Episode>> relsLevels) {
+		for (Map.Entry<Integer, Set<Episode>> entry : relsLevels.entrySet()) {
+			return entry.getValue();
+		}
+		return null;
+	}
+
+	private boolean representative(Set<Episode> repr,
+			Map<Integer, Set<Episode>> episodes) {
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			for (Episode episode : entry.getValue()) {
+				if (!isCovered(episode, repr)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean isCovered(Episode episode, Set<Episode> reprs) {
+		for (Episode rep : reprs) {
+			if (represents(rep, episode)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean represents(Episode rep, Episode episode) {
+		Set<Fact> relations = episode.getRelations();
+		for (Fact rel : relations) {
+			Tuple<Fact, Fact> facts = rel.getRelationFacts();
+			Fact opp = new Fact(facts.getSecond() + ">" + facts.getFirst());
+			if (rep.getRelations().contains(opp)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private Map<Integer, Set<Episode>> getRelLevels(Set<Episode> episodes) {
+		Map<Integer, Set<Episode>> results = Maps.newLinkedHashMap();
+		for (Episode episode : episodes) {
+			int numbRels = episode.getRelations().size();
+			if (results.containsKey(numbRels)) {
+				results.get(numbRels).add(episode);
+			} else {
+				results.put(numbRels, Sets.newHashSet(episode));
 			}
 		}
 		return results;
 	}
 
-	private int getMinRels(Set<Episode> episodes) {
+	private int getMinRels(Map<Integer, Set<Episode>> episodes) {
 		int min = Integer.MAX_VALUE;
-		
-		for (Episode ep : episodes) {
-			int numRels = ep.getRelations().size();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			int numRels = entry.getKey();
 			if (numRels < min) {
 				min = numRels;
 			}
@@ -107,7 +169,7 @@ public class EpisodesFilter {
 
 	private Map<Set<Fact>, Set<Episode>> grouping(Set<Episode> episodes) {
 		Map<Set<Fact>, Set<Episode>> results = Maps.newLinkedHashMap();
-		
+
 		for (Episode ep : episodes) {
 			Set<Fact> events = ep.getEvents();
 			if (results.containsKey(events)) {

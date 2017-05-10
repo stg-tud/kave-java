@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
+import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
@@ -38,7 +38,7 @@ public class run_ervina {
 	private static final double ENTROPY = 0.0;
 
 	private static final int THF = 0;
-	private static final double THE = 0.1;
+	private static final double THE = 0.0;
 
 	private static final int METHODSIZE = 5000;
 	private static final int NUM_FOLDS = 10;
@@ -65,16 +65,16 @@ public class run_ervina {
 
 		// load(PostChecking.class).updatedEvent(FREQUENCY);
 
-		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
-				FOLDNUM, THF, THE);
+		// load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL,
+		// FREQUENCY,
+		// FOLDNUM, THF, THE);
 		// load(Evaluations.class).patternsOutput(EpisodeType.GENERAL,
 		// FREQUENCY,
 		// FOLDNUM, FREQUENCY, ENTROPY);
 		// load(SpecificPatterns.class).patternEvents(EpisodeType.GENERAL,
 		// FREQUENCY, FOLDNUM);
 
-		// load(PatternsComparison.class).coverage(EpisodeType.PARALLEL,
-		// EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
+		load(PatternsComparison.class).coverage(EpisodeType.GENERAL, EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
 		// load(SpecificPatterns.class).patternsInfo(EpisodeType.GENERAL,
 		// FREQUENCY, FOLDNUM, FREQUENCY, ENTROPY);
 		// load(PatternsEvents.class).getEventsType(EpisodeType.PARALLEL,
