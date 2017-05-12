@@ -117,10 +117,7 @@ public class EpisodesFilterTest {
 
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		Set<Episode> set = Sets.newLinkedHashSet();
-		set.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8"));
 		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
-		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "34>8"));
-		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34"));
 		set.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
 		expected.put(3, set);
 
@@ -152,6 +149,26 @@ public class EpisodesFilterTest {
 		expected.put(3, set3);
 
 		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.PARALLEL,
+				episodes, FREQUENCY, ENTROPY);
+
+		assertEquals(expected, actuals);
+	}
+
+	@Test
+	public void reprPatterns() {
+		Set<Episode> threeNodes = Sets.newLinkedHashSet();
+		threeNodes.add(createEpisode(5, 0.5, "1", "2", "3", "1>2"));
+		threeNodes.add(createEpisode(5, 0.5, "1", "2", "3", "2>1", "2>3"));
+		threeNodes.add(createEpisode(5, 0.5, "1", "2", "3", "1>2", "3>2"));
+		episodes.put(3, threeNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(5, 0.5, "1", "2", "3", "1>2"));
+		set.add(createEpisode(5, 0.5, "1", "2", "3", "2>1", "2>3"));
+		expected.put(3, set);
+
+		Map<Integer, Set<Episode>> actuals = sut.filter(EpisodeType.GENERAL,
 				episodes, FREQUENCY, ENTROPY);
 
 		assertEquals(expected, actuals);

@@ -45,7 +45,7 @@ public class PatternsComparison {
 	private EpisodeAsGraphWriter graphWriter;
 
 	private static final int THRESHFREQ = 300;
-	private static final double THRESHENT = 0.66;
+	private static final double THRESHENT = 0.73;
 
 	@Inject
 	public PatternsComparison(@Named("patterns") File folder,
@@ -168,6 +168,32 @@ public class PatternsComparison {
 		}
 	}
 
+	public void entropyMedium(int foldNum, int frequency) {
+		Logger.log("\tEntropy analyzes for partial-order configuration!");
+		Logger.log("\tFrequency\tEntropy\t#Patterns");
+
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
+				EpisodeType.GENERAL, frequency, foldNum);
+		Set<Integer> frequencies = getFrequencies(episodeGens);
+		int maxFreq = getMax(frequencies);
+		int prevValue = 0;
+
+		for (int freq = 300; freq <= 1700; freq++) {
+			double entropy = 0.0;
+			int numPatterns = 0;
+			for (double ent = 0.0; ent <= 1.0; ent += 0.01) {
+				Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
+						EpisodeType.GENERAL, episodeGens, freq, ent);
+				int counter = getNumbPatterns(patternGens);
+				if (counter >= numPatterns) {
+					numPatterns = counter;
+					entropy = ent;
+				}
+			}
+			Logger.log("\t%d\t%.2f\t%d", freq, entropy, numPatterns);
+		}
+	}
+
 	public void frequencyAnalyzer(int foldNum, int frequency, double entropy) {
 		Logger.log("\tNumber of patterns not covered");
 		Logger.log("\tConfiguration: %s-order", EpisodeType.SEQUENTIAL);
@@ -222,7 +248,7 @@ public class PatternsComparison {
 			// if (prevValue != numbPatterns) {
 			prevValue = numbPatterns;
 			Logger.log("\t%d\t%d", freq, numbPatterns);
-			// }      
+			// }
 		}
 	}
 
@@ -314,6 +340,58 @@ public class PatternsComparison {
 				type1, result.getSecond(), type2);
 	}
 
+	public void compStats(EpisodeType type1, EpisodeType type2, int foldNum,
+			int frequency) {
+		Logger.log("Producing statistics for %s and %s-configurations ...",
+				type1.toString(), type2.toString());
+		Logger.log("Frequency threshold = %d", THRESHFREQ);
+		Logger.log("Entropy threshold = %.2f", THRESHENT);
+
+		Map<Set<Fact>, Set<Episode>> set1 = patternsSetFact(getPatterns(type1,
+				foldNum, frequency));
+		Map<Set<Fact>, Set<Episode>> set2 = patternsSetFact(getPatterns(type2,
+				foldNum, frequency));
+		int numbEquals = 0;
+		int numbRepr = 0;
+		int numbNew = 0;
+
+		for (Map.Entry<Set<Fact>, Set<Episode>> entry : set1.entrySet()) {
+			Set<Fact> events = entry.getKey();
+			Set<Episode> patterns1 = entry.getValue();
+			if (set2.containsKey(events)) {
+				Set<Episode> patterns2 = set2.get(events);
+
+				for (Episode p1 : patterns1) {
+					boolean isCounted = false;
+					for (Episode p2 : patterns2) {
+						if (assertFactSets(p1.getFacts(), p2.getFacts())) {
+							numbEquals++;
+							isCounted = true;
+							break;
+						}
+						if (represents(p1, p2)) {
+							numbRepr++;
+							isCounted = true;
+							break;
+						}
+					}
+					if (!isCounted) {
+						numbNew++;
+					}
+				}
+			} else {
+				numbNew += patterns1.size();
+			}
+		}
+		Logger.log(
+				"Number of equal patterns between %s and %s-configurations: %d",
+				type1.toString(), type2.toString(), numbEquals);
+		Logger.log(
+				"%s-configurations has %d representative patterns for %s-configuration",
+				type1.toString(), numbRepr, type2.toString());
+		Logger.log("%s-configuration learns %d new patterns", type1.toString(), numbNew);
+	}
+
 	private Tuple<Integer, Integer> getCoverage(
 			Map<Integer, Set<Episode>> patterns1,
 			Map<Integer, Set<Episode>> patterns2) {
@@ -327,9 +405,10 @@ public class PatternsComparison {
 			Set<Fact> events = entry.getKey();
 
 			if (!sets1.containsKey(events)) {
+				Logger.log("Not covered events");
 				notCovered += entry.getValue().size();
 				for (Episode pattern : entry.getValue()) {
-					 Logger.log("%s", pattern.getFacts().toString());
+					Logger.log("%s", pattern.getFacts().toString());
 				}
 				continue;
 			} else {
@@ -338,7 +417,8 @@ public class PatternsComparison {
 						covered++;
 					} else {
 						notCovered++;
-						 Logger.log("%s", pattern.getFacts().toString());
+						Logger.log("Not covered order constraints");
+						Logger.log("%s", pattern.getFacts().toString());
 					}
 				}
 			}
@@ -384,44 +464,50 @@ public class PatternsComparison {
 		return results;
 	}
 
-	// public void commonPatterns(EpisodeType type1, EpisodeType type2,
-	// int freqEpisode, int foldNum, int freqThresh, double entropy)
-	// throws IOException {
-	// int equal = 0;
-	// int unequal = 0;
-	// int set = 0;
-	//
-	// Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns1 = patternsSetFact(
-	// type1, freqEpisode, foldNum, freqThresh, entropy);
-	// Map<Integer, Map<Set<Fact>, Set<Episode>>> patterns2 = patternsSetFact(
-	// type2, freqEpisode, foldNum, freqThresh, entropy);
-	//
-	// for (Map.Entry<Integer, Map<Set<Fact>, Set<Episode>>> entry : patterns2
-	// .entrySet()) {
-	// for (Map.Entry<Set<Fact>, Set<Episode>> entryPatterns : entry
-	// .getValue().entrySet()) {
-	// Set<Fact> events = entryPatterns.getKey();
-	// Set<Episode> episodes2 = entryPatterns.getValue();
-	// Map<Set<Fact>, Set<Episode>> pattMap1 = patterns1.get(entry
-	// .getKey());
-	//
-	// if (pattMap1.containsKey(events)) {
-	// if (!equalEpisodes(episodes2, pattMap1.get(events))) {
-	// store(freqEpisode, pattMap1.get(events), type1, set,
-	// foldNum);
-	// store(freqEpisode, episodes2, type2, set, foldNum);
-	// unequal++;
-	// set++;
-	// } else {
-	// equal++;
-	// }
-	// }
-	// }
-	// }
-	// Logger.log(
-	// "Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
-	// type1.toString(), type2.toString(), equal, unequal);
-	// }
+	public void overlappingPatterns(EpisodeType type1, EpisodeType type2,
+			int frequency, int foldNum) throws IOException {
+		int equal = 0;
+		int noRepres = 0;
+		int set = 0;
+
+		Map<Set<Fact>, Set<Episode>> patterns1 = patternsSetFact(getPatterns(
+				type1, foldNum, frequency));
+		Map<Set<Fact>, Set<Episode>> patterns2 = patternsSetFact(getPatterns(
+				type2, foldNum, frequency));
+
+		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
+			Set<Fact> events = entry.getKey();
+			Set<Episode> episodes2 = entry.getValue();
+
+			if (patterns1.containsKey(events)) {
+				if (!equalEpisodes(episodes2, patterns1.get(events))) {
+					store(frequency, patterns1.get(events), type1, set, foldNum);
+					store(frequency, episodes2, type2, set, foldNum);
+					noRepres++;
+					set++;
+				} else {
+					equal += episodes2.size();
+				}
+			}
+		}
+		Logger.log(
+				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
+				type1.toString(), type2.toString(), equal, noRepres);
+	}
+
+	private boolean equalEpisodes(Set<Episode> set1, Set<Episode> set2) {
+		if (set1.size() != set2.size()) {
+			return false;
+		}
+		Iterator<Episode> it1 = set1.iterator();
+		Iterator<Episode> it2 = set2.iterator();
+		while (it1.hasNext()) {
+			if (!assertFactSets(it1.next().getFacts(), it2.next().getFacts())) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	// public void nonoverlappings(EpisodeType type1, EpisodeType type2,
 	// int freqEpisode, int foldNum, int freqThresh, double entropy)
@@ -515,20 +601,6 @@ public class PatternsComparison {
 	// }
 	// }
 
-	private boolean equalEpisodes(Set<Episode> set1, Set<Episode> set2) {
-		if (set1.size() != set2.size()) {
-			return false;
-		}
-		Iterator<Episode> it1 = set1.iterator();
-		Iterator<Episode> it2 = set2.iterator();
-		while (it1.hasNext()) {
-			if (!assertFactSets(it1.next().getFacts(), it2.next().getFacts())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	private boolean assertFactSets(Set<Fact> facts1, Set<Fact> facts2) {
 		if (facts1.size() != facts2.size()) {
 			return false;
@@ -613,9 +685,9 @@ public class PatternsComparison {
 		}
 	}
 
-	private void store(int freq, Set<Episode> episodes, EpisodeType type,
+	private void store(int frequency, Set<Episode> episodes, EpisodeType type,
 			int setNum, int foldNum) throws IOException {
-		List<Event> events = eventStream.readMapping(freq, foldNum);
+		List<Event> events = eventStream.readMapping(frequency, foldNum);
 		int episodeId = 0;
 
 		for (Episode ep : episodes) {
@@ -623,7 +695,7 @@ public class PatternsComparison {
 			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter
 					.convert(epGraph, events);
 			graphWriter.write(graph,
-					getGraphPath(freq, type, setNum, episodeId));
+					getGraphPath(frequency, type, setNum, episodeId));
 			episodeId++;
 		}
 	}
@@ -648,8 +720,9 @@ public class PatternsComparison {
 	}
 
 	private String getSetPath(int freq, EpisodeType type, int setNum) {
-		File path = new File(patternsFile.getAbsolutePath() + "/freq" + freq
-				+ "/" + type.toString() + "/set" + setNum);
+		File path = new File(patternsFile.getAbsolutePath() + "/freq"
+				+ THRESHFREQ + "/entropy" + THRESHENT + "/" + type.toString()
+				+ "/set" + setNum);
 		if (!path.exists()) {
 			path.mkdirs();
 		}

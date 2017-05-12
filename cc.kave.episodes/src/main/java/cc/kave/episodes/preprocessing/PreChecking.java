@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.RepositoriesParser;
@@ -40,11 +40,11 @@ public class PreChecking {
 
 	public void typeOverlaps() throws Exception {
 		reposParser.generateReposEvents();
-		Map<String, Set<ITypeName>> reposTypesMapper = reposParser
-				.getRepoTypesMapper();
-		Set<ITypeName> types = Sets.newLinkedHashSet();
+		Map<String, Set<IMethodName>> reposTypesMapper = reposParser
+				.getRepoMethodsMapper();
+		Set<IMethodName> types = Sets.newLinkedHashSet();
 
-		for (Map.Entry<String, Set<ITypeName>> entry : reposTypesMapper
+		for (Map.Entry<String, Set<IMethodName>> entry : reposTypesMapper
 				.entrySet()) {
 			int numTypes = entry.getValue().size();
 
@@ -52,7 +52,7 @@ public class PreChecking {
 				Logger.log("Repository %s contains %d types!", entry.getKey(),
 						numTypes);
 			}
-			for (ITypeName t : entry.getValue()) {
+			for (IMethodName t : entry.getValue()) {
 
 				if (types.contains(t)) {
 					throw new Exception(

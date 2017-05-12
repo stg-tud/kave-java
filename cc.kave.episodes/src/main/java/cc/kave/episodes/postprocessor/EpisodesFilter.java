@@ -91,12 +91,17 @@ public class EpisodesFilter {
 		Map<Integer, Set<Episode>> relsLevels = getRelLevels(episodes);
 
 		while (!representative(results, relsLevels)) {
-			if (relsLevels.size() == 1) {
+			if ((relsLevels.size() == 1) && (results.size() == 0)) {
 				results.addAll(getSingleValue(relsLevels));
 				return results;
 			}
 			int minRelations = getMinRels(relsLevels);
-			results.addAll(relsLevels.get(minRelations));
+			Set<Episode> candidates = relsLevels.get(minRelations);
+			for (Episode ep : candidates) {
+				if (!isCovered(ep, results)) {
+					results.add(ep);
+				}
+			}
 			relsLevels.remove(minRelations);
 		}
 		return results;
@@ -111,6 +116,9 @@ public class EpisodesFilter {
 
 	private boolean representative(Set<Episode> repr,
 			Map<Integer, Set<Episode>> episodes) {
+		if (repr.size() == 0) {
+			return false;
+		}
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
 			for (Episode episode : entry.getValue()) {
 				if (!isCovered(episode, repr)) {

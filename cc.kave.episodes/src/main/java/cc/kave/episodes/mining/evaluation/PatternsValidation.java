@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Event;
@@ -23,7 +23,7 @@ public class PatternsValidation {
 	public Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validate(
 			Map<Integer, Set<Episode>> episodes,
 			List<Tuple<Event, List<Fact>>> streamContexts,
-			Map<String, Set<ITypeName>> repoCtxMapper, List<Event> events,
+			Map<String, Set<IMethodName>> repoCtxMapper, List<Event> events,
 			List<List<Fact>> valStream) throws Exception {
 		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> results = Maps
 				.newLinkedHashMap();
@@ -73,7 +73,7 @@ public class PatternsValidation {
 
 	private int getReposOcc(Episode episode,
 			List<Tuple<Event, List<Fact>>> streamContexts,
-			Map<String, Set<ITypeName>> repoCtxMapper) {
+			Map<String, Set<IMethodName>> repoCtxMapper) {
 
 		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
@@ -83,19 +83,20 @@ public class PatternsValidation {
 				continue;
 			}
 			if (method.containsAll(episode.getEvents())) {
-				methodsOrderRelation.addMethod(episode, method,
-						tuple.getFirst());
+				Event ctx = tuple.getFirst();
+				methodsOrderRelation.addMethod(episode, method, ctx);
 			}
 		}
 		int trainOcc = methodsOrderRelation.getOccurrences();
 		assertTrue(trainOcc >= episode.getFrequency(),
 				"Episode is not found sufficient number of times in the Training Data!");
 
-		Set<ITypeName> methodOcc = methodsOrderRelation.getTypeNames(trainOcc);
+		Set<IMethodName> methodOcc = methodsOrderRelation.getMethodNames(trainOcc);
 		Set<String> repositories = Sets.newLinkedHashSet();
 
-		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper.entrySet()) {
-			for (ITypeName methodName : entry.getValue()) {
+		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxMapper
+				.entrySet()) {
+			for (IMethodName methodName : entry.getValue()) {
 				if (methodOcc.contains(methodName)) {
 					repositories.add(entry.getKey());
 					break;

@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
-import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.RepositoriesParser;
@@ -53,8 +53,8 @@ public class ThresholdsAnalyzer {
 			int freqThresh, double entThresh) throws Exception {
 		Logger.log("Reading repositories - enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
-		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
-				.getRepoTypesMapper();
+		Map<String, Set<IMethodName>> repoCtxMapper = repoParser
+				.getRepoMethodsMapper();
 		
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(frequency, foldNum);
@@ -94,9 +94,8 @@ public class ThresholdsAnalyzer {
 			}
 		} else if ((freqThresh == 0) && (entThresh > 0.0)) {
 			Set<Integer> frequencies = getFrequencies(episodes, entThresh);
-//			Logger.log("Number of frequency thresholds: %d", frequencies.size());
+			Logger.log("Number of frequency thresholds: %d", frequencies.size());
 			for (int freq : frequencies) {
-				Logger.log("Before filtering");
 				Map<Integer, Set<Episode>> patterns = episodeFilter.filter(
 						type, episodes, freq, entThresh);
 //				Logger.log("Validating the patterns ...");

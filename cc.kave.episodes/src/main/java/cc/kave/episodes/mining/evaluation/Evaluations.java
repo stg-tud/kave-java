@@ -15,7 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.RepositoriesParser;
@@ -79,8 +79,8 @@ public class Evaluations {
 			int freqThresh, double entropy) throws Exception {
 		Logger.log("Reading repositories - enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
-		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
-				.getRepoTypesMapper();
+		Map<String, Set<IMethodName>> repoCtxMapper = repoParser
+				.getRepoMethodsMapper();
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(freqEpisode, foldNum);
 		Logger.log("Reading training stream ...");

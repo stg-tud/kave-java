@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.Triplet;
 import cc.kave.episodes.model.events.Event;
@@ -27,7 +26,7 @@ public class PatternValidationTest {
 
 	private Map<Integer, Set<Episode>> patterns;
 	private List<Tuple<Event, List<Fact>>> streamMethods;
-	private Map<String, Set<ITypeName>> repoMethods;
+	private Map<String, Set<IMethodName>> repoMethods;
 	private List<Event> events;
 
 	private List<Event> valStream;
@@ -65,22 +64,21 @@ public class PatternValidationTest {
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
-				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod()
-						.getDeclaringType(), enclCtx(9).getMethod()
-						.getDeclaringType()));
-		repoMethods.put("Repository2",
-				Sets.newHashSet(enclCtx2(5).getMethod().getDeclaringType()));
+				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod(),
+						enclCtx(9).getMethod()));
+		repoMethods
+				.put("Repository2", Sets.newHashSet(enclCtx2(5).getMethod()));
 
 		events = Lists.newArrayList(dummy(), firstCtx(1), enclCtx(2), inv(3),
 				inv(4), enclCtx(5), inv(6), inv(7), inv(8), enclCtx(9),
 				firstCtx(10), firstCtx(11), superCtx(12), firstCtx(13),
 				enclCtx(14), enclCtx2(15));
 
-		valStream = Lists.newArrayList(firstCtx(10), enclCtx(5), inv(3), inv(4),
-				firstCtx(11), superCtx(12), enclCtx(9), inv(4), firstCtx(13),
-				enclCtx(5), inv(3), inv(4), firstCtx(11), enclCtx(14), inv(4),
-				firstCtx(11), enclCtx(9), inv(3), inv(4), firstCtx(13),
-				enclCtx2(15), inv(3), inv(4));
+		valStream = Lists.newArrayList(firstCtx(10), enclCtx(5), inv(3),
+				inv(4), firstCtx(11), superCtx(12), enclCtx(9), inv(4),
+				firstCtx(13), enclCtx(5), inv(3), inv(4), firstCtx(11),
+				enclCtx(14), inv(4), firstCtx(11), enclCtx(9), inv(3), inv(4),
+				firstCtx(13), enclCtx2(15), inv(3), inv(4));
 
 		valFactStream = Lists.newLinkedList();
 		List<Fact> method = Lists.newArrayList(new Fact(10), new Fact(5),

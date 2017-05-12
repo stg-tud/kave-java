@@ -59,8 +59,8 @@ public class SpecificPatterns {
 			int freqThresh, double entropy) throws Exception {
 		Logger.log("Reading repositories - enclosing method declarations mapper!");
 		repoParser.generateReposEvents();
-		Map<String, Set<ITypeName>> repoCtxMapper = repoParser
-				.getRepoTypesMapper();
+		Map<String, Set<IMethodName>> repoCtxMapper = repoParser
+				.getRepoMethodsMapper();
 		Logger.log("Reading events ...");
 		List<Event> trainEvents = eventStream.readMapping(freqEpisode, foldNum);
 		Logger.log("Reading training stream ...");
@@ -150,7 +150,7 @@ public class SpecificPatterns {
 
 	private void occInfo(Episode episode,
 			List<Tuple<Event, List<Fact>>> streamContexts,
-			Map<String, Set<ITypeName>> repoCtxMapper) {
+			Map<String, Set<IMethodName>> repoCtxMapper) {
 
 		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
@@ -178,8 +178,8 @@ public class SpecificPatterns {
 		Logger.log("");
 		
 		Set<String> repositories = Sets.newLinkedHashSet();
-		for (Map.Entry<String, Set<ITypeName>> entry : repoCtxMapper.entrySet()) {
-			for (ITypeName methodName : entry.getValue()) {
+		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxMapper.entrySet()) {
+			for (IMethodName methodName : entry.getValue()) {
 				if (methods.contains(methodName)) {
 					repositories.add(entry.getKey());
 					break;

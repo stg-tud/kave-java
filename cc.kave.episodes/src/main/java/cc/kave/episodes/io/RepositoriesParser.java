@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.eventstream.EventStreamGenerator;
 import cc.recommenders.datastructures.Tuple;
@@ -58,7 +59,7 @@ public class RepositoriesParser {
 
 	private Set<ITypeName> types = Sets.newLinkedHashSet();
 	private Set<ITypeName> duplicateTypes = Sets.newLinkedHashSet();
-	private Map<String, Set<ITypeName>> reposTypesMapper = Maps
+	private Map<String, Set<IMethodName>> reposMethodsMapper = Maps
 			.newLinkedHashMap();
 
 	public Map<String, EventStreamGenerator> generateReposEvents()
@@ -73,6 +74,7 @@ public class RepositoriesParser {
 			if ((repoName.equalsIgnoreCase("")) || (!zip.startsWith(repoName))) {
 				if (!repoGen.getEventStream().isEmpty()) {
 					results.put(repoName, repoGen);
+					reposMethodsMapper.put(repoName, repoGen.getMethodNames());
 					repoGen = new EventStreamGenerator();
 				}
 				types.addAll(repoTypes);
@@ -88,7 +90,6 @@ public class RepositoriesParser {
 					ITypeName typeName = ctx.getSST().getEnclosingType();
 					if (!types.contains(typeName)) {
 						repoTypes.add(typeName);
-						addToMapper(repoName, typeName);
 					} else {
 						duplicateTypes.add(typeName);
 					}
@@ -99,28 +100,19 @@ public class RepositoriesParser {
 		types.addAll(repoTypes);
 		if (!repoGen.getEventStream().isEmpty()) {
 			results.put(repoName, repoGen);
+			reposMethodsMapper.put(repoName, repoGen.getMethodNames());
 		}
 		return results;
 	}
-	
+
 	public Tuple<Integer, Integer> getReposInfo() {
-		Tuple<Integer, Integer> tuple = Tuple.newTuple(types.size(), duplicateTypes.size());
+		Tuple<Integer, Integer> tuple = Tuple.newTuple(types.size(),
+				duplicateTypes.size());
 		return tuple;
 	}
-	
-	public Map<String, Set<ITypeName>> getRepoTypesMapper() {
-		return this.reposTypesMapper;
-	}
 
-	private void addToMapper(String repoName, ITypeName typeName) {
-
-		if (reposTypesMapper.containsKey(repoName)) {
-			Set<ITypeName> types = reposTypesMapper.get(repoName);
-			types.add(typeName);
-			reposTypesMapper.put(repoName, types);
-		} else {
-			reposTypesMapper.put(repoName, Sets.newHashSet(typeName));
-		}
+	public Map<String, Set<IMethodName>> getRepoMethodsMapper() {
+		return this.reposMethodsMapper;
 	}
 
 	private String getRepoName(String zipName) {

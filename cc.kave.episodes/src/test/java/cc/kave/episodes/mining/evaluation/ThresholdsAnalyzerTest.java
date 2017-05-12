@@ -20,7 +20,6 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.RepositoriesParser;
@@ -57,7 +56,7 @@ public class ThresholdsAnalyzerTest {
 
 	private Map<Integer, Set<Episode>> patterns;
 	private List<Tuple<Event, List<Fact>>> streamMethods;
-	private Map<String, Set<ITypeName>> repoMethods;
+	private Map<String, Set<IMethodName>> repoMethods;
 	private List<Event> trainEvents;
 	private List<Event> valStream;
 	private List<List<Fact>> valFactStream;
@@ -105,14 +104,13 @@ public class ThresholdsAnalyzerTest {
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
-				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod()
-						.getDeclaringType(), enclCtx(9).getMethod()
-						.getDeclaringType()));
-		repoMethods.put("Repository2",
-				Sets.newHashSet(enclCtx2(5).getMethod().getDeclaringType()));
+				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod(),
+						enclCtx(9).getMethod()));
+		repoMethods
+				.put("Repository2", Sets.newHashSet(enclCtx2(5).getMethod()));
 
-		trainEvents = Lists.newArrayList(dummy(), firstCtx(1), enclCtx(2), inv(3),
-				inv(4), enclCtx(5), inv(6), inv(7), inv(8), enclCtx(9));
+		trainEvents = Lists.newArrayList(dummy(), firstCtx(1), enclCtx(2),
+				inv(3), inv(4), enclCtx(5), inv(6), inv(7), inv(8), enclCtx(9));
 
 		valStream = Lists.newArrayList(firstCtx(10), enclCtx(5), inv(3),
 				inv(4), firstCtx(11), superCtx(12), enclCtx(9), inv(4),
@@ -160,13 +158,14 @@ public class ThresholdsAnalyzerTest {
 
 		when(eventStream.parseStream(FREQUENCY, FOLDNUM)).thenReturn(
 				streamMethods);
-		when(eventStream.readMapping(FREQUENCY, FOLDNUM)).thenReturn(trainEvents);
+		when(eventStream.readMapping(FREQUENCY, FOLDNUM)).thenReturn(
+				trainEvents);
 		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt()))
 				.thenReturn(patterns);
 		when(
 				episodeFilter.filter(any(EpisodeType.class), any(Map.class),
 						anyInt(), anyDouble())).thenReturn(patterns);
-		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
+		when(reposParser.getRepoMethodsMapper()).thenReturn(repoMethods);
 		when(validatioIo.read(anyInt(), anyInt())).thenReturn(valStream);
 		when(validatioIo.streamOfFacts(any(List.class), any(Map.class)))
 				.thenReturn(valFactStream);
@@ -190,7 +189,7 @@ public class ThresholdsAnalyzerTest {
 		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(episodeFilter, times(4)).filter(any(EpisodeType.class),
 				any(Map.class), anyInt(), anyDouble());
-		verify(reposParser).getRepoTypesMapper();
+		verify(reposParser).getRepoMethodsMapper();
 		verify(validatioIo).read(anyInt(), anyInt());
 		verify(validatioIo).streamOfFacts(any(List.class), any(Map.class));
 		verify(patternsValidation, times(4)).validate(any(Map.class),
@@ -217,7 +216,7 @@ public class ThresholdsAnalyzerTest {
 		assertLogContains(8, "\t3\t0.2\t2\t2\t0.5\t1");
 		assertLogContains(9, "\t4\t0.2\t2\t2\t0.5\t1");
 	}
-	
+
 	@Test
 	public void fileContentSequential() throws Exception {
 		Logger.clearLog();
@@ -231,7 +230,7 @@ public class ThresholdsAnalyzerTest {
 		assertLogContains(3, "Reading validation data ...");
 		assertLogContains(4,
 				"\tFrequency\tEntropy\tNumGens\tNumSpecs\tFraction");
-//		assertLogContains(5, "Number of entropy thresholds: 3");
+		// assertLogContains(5, "Number of entropy thresholds: 3");
 		assertLogContains(5, "\t2\t0.0\t2\t2\t0.5");
 		assertLogContains(6, "\t2\t0.1\t2\t2\t0.5");
 		assertLogContains(7, "\t2\t0.2\t2\t2\t0.5");

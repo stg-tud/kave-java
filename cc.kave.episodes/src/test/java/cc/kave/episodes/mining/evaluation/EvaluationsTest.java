@@ -29,7 +29,6 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.RepositoriesParser;
@@ -79,7 +78,7 @@ public class EvaluationsTest {
 
 	private Map<Integer, Set<Episode>> patterns;
 	private List<Tuple<Event, List<Fact>>> streamMethods;
-	private Map<String, Set<ITypeName>> repoMethods;
+	private Map<String, Set<IMethodName>> repoMethods;
 	private List<Event> trainEvents;
 	private List<Event> valStream;
 	private List<List<Fact>> valFactStream;
@@ -128,11 +127,10 @@ public class EvaluationsTest {
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
-				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod()
-						.getDeclaringType(), enclCtx(9).getMethod()
-						.getDeclaringType()));
+				.put("Repository1", Sets.newHashSet(enclCtx(2).getMethod(),
+						enclCtx(9).getMethod()));
 		repoMethods.put("Repository2",
-				Sets.newHashSet(enclCtx2(5).getMethod().getDeclaringType()));
+				Sets.newHashSet(enclCtx2(5).getMethod()));
 
 		trainEvents = Lists.newArrayList(dummy(), firstCtx(1), enclCtx(2),
 				inv(3), inv(4), enclCtx(5), inv(6), inv(7), inv(8), enclCtx(9));
@@ -191,7 +189,7 @@ public class EvaluationsTest {
 		when(
 				episodeFilter.filter(any(EpisodeType.class), any(Map.class),
 						anyInt(), anyDouble())).thenReturn(patterns);
-		when(reposParser.getRepoTypesMapper()).thenReturn(repoMethods);
+		when(reposParser.getRepoMethodsMapper()).thenReturn(repoMethods);
 		when(validationIo.read(anyInt(), anyInt())).thenReturn(valStream);
 		when(validationIo.streamOfFacts(any(List.class), any(Map.class)))
 				.thenReturn(valFactStream);
@@ -233,7 +231,7 @@ public class EvaluationsTest {
 		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
 		verify(episodeFilter).filter(any(EpisodeType.class), any(Map.class),
 				anyInt(), anyDouble());
-		verify(reposParser).getRepoTypesMapper();
+		verify(reposParser).getRepoMethodsMapper();
 		verify(validationIo).read(anyInt(), anyInt());
 		verify(validationIo).streamOfFacts(any(List.class), any(Map.class));
 		verify(patternsValidation).validate(any(Map.class), any(List.class),
@@ -276,16 +274,16 @@ public class EvaluationsTest {
 		sb.append("0\t");
 		sb.append("[3, 4, 3>4]\t");
 		sb.append("4\t1.0\t1\t4\n");
-		
+
 		sb.append("1\t");
 		sb.append("[6, 7, 6>7]\t");
 		sb.append("3\t0.5\t2\t0\n\n");
-		
+
 		sb.append("Patterns with 3-nodes:\n");
 		sb.append("PatternId\tFacts\tFrequency\tEntropy\tNoRepos\tOccValidation\n");
 		sb.append("2\t[1, 3, 4]\t");
 		sb.append("2\t0.3\t1\t0\n");
-		
+
 		sb.append("3\t[3, 4, 7, 3>4, 3>7]\t");
 		sb.append("1\t0.7\t1\t0\n\n");
 

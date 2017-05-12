@@ -41,7 +41,6 @@ import org.mockito.stubbing.Answer;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.blocks.DoLoop;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
@@ -73,7 +72,7 @@ public class RepositoriesParserTest {
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
-	
+
 	private Context context1;
 	private Context context3;
 	private Context context2;
@@ -100,7 +99,7 @@ public class RepositoriesParserTest {
 
 		MethodDeclaration md2 = new MethodDeclaration();
 		md2.setName(Names.newMethod("[T1,P] [T3,P].M2()"));
-		
+
 		InvocationExpression ie1 = new InvocationExpression();
 		IMethodName methodName = Names
 				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()");
@@ -139,7 +138,7 @@ public class RepositoriesParserTest {
 		MethodDeclaration md4 = new MethodDeclaration();
 		md4.setName(Names.newMethod("[T2,P] [T2,P].M3()"));
 		md4.getBody().add(new DoLoop());
-		
+
 		InvocationExpression ie3 = new InvocationExpression();
 		IMethodName methodName3 = Names
 				.newMethod("[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()");
@@ -199,7 +198,7 @@ public class RepositoriesParserTest {
 		verify(rootDirectory).getReadingArchive(REPO1);
 		verify(rootDirectory).getReadingArchive(REPO3);
 		verify(rootDirectory).getReadingArchive(REPO2);
-		
+
 		verify(ras.get(REPO1), times(2)).hasNext();
 		verify(ras.get(REPO1)).getNext(Context.class);
 		verify(ras.get(REPO3), times(2)).hasNext();
@@ -211,52 +210,61 @@ public class RepositoriesParserTest {
 	@Test
 	public void readTwoArchives() throws Exception {
 		Map<String, EventStreamGenerator> expReposGen = getRepoEvents();
-		Map<String, EventStreamGenerator> actReposGen = sut.generateReposEvents();
+		Map<String, EventStreamGenerator> actReposGen = sut
+				.generateReposEvents();
 
 		assertEquals(expReposGen.size(), actReposGen.size());
 		assertRepos(expReposGen, actReposGen);
 	}
-	
+
 	@Test
 	public void reposTypesMapper() throws Exception {
 		String repName1 = "Github/usr1/repo1";
+		String repName3 = "Github/usr1/repo3";
 		String repName2 = "Github/usr1/repo2";
-		
-		Map<String, Set<ITypeName>> expected = Maps.newLinkedHashMap();
-		expected.put(repName1, Sets.newHashSet(Names.newType("T1.T2.T3")));
-		expected.put(repName2, Sets.newHashSet(Names.newType("T2.T3.T4")));
-		
+
+		Map<String, Set<IMethodName>> expected = Maps.newLinkedHashMap();
+		expected.put(
+				repName1,
+				Sets.newHashSet(Names.newMethod("[T1,P] [T3,P].M2()"),
+						Names.newMethod("[T1,P] [T2,P].M()")));
+		expected.put(repName3,
+				Sets.newHashSet(Names.newMethod("[T3,P] [T4,P].M()")));
+		expected.put(repName2,
+				Sets.newHashSet(Names.newMethod("[T2,P] [T2,P].M3()")));
+
 		sut.generateReposEvents();
-		Map<String, Set<ITypeName>> actuals = sut.getRepoTypesMapper();
-		
+		Map<String, Set<IMethodName>> actuals = sut.getRepoMethodsMapper();
+
+		assertEquals(expected.size(), actuals.size());
 		assertEquals(expected, actuals);
 	}
-	
+
 	@Test
 	public void getTypes() throws Exception {
 		Tuple<Integer, Integer> expected = Tuple.newTuple(2, 1);
-		
+
 		sut.generateReposEvents();
-		
+
 		Tuple<Integer, Integer> actuals = sut.getReposInfo();
-		
+
 		assertEquals(expected, actuals);
 	}
 
 	private void assertRepos(Map<String, EventStreamGenerator> expReposGen,
 			Map<String, EventStreamGenerator> actReposGen) {
-		
+
 		Map<String, List<Event>> expReposEvents = generateEvents(expReposGen);
 		Map<String, List<Event>> actReposEvents = generateEvents(actReposGen);
-		
+
 		assertEquals(expReposEvents, actReposEvents);
 	}
 
 	private Map<String, List<Event>> generateEvents(
 			Map<String, EventStreamGenerator> repos) {
-		
+
 		Map<String, List<Event>> results = Maps.newLinkedHashMap();
-		
+
 		for (Map.Entry<String, EventStreamGenerator> entry : repos.entrySet()) {
 			results.put(entry.getKey(), entry.getValue().getEventStream());
 		}
@@ -278,18 +286,18 @@ public class RepositoriesParserTest {
 	private Map<String, EventStreamGenerator> getRepoEvents() {
 		Map<String, EventStreamGenerator> reposEvents = Maps.newLinkedHashMap();
 		EventStreamGenerator generator = new EventStreamGenerator();
-		
+
 		generator.add(context1);
 		reposEvents.put("Github/usr1/repo1", generator);
-		
+
 		generator = new EventStreamGenerator();
 		generator.add(context3);
 		reposEvents.put("Github/usr1/repo3", generator);
-		
+
 		generator = new EventStreamGenerator();
 		generator.add(context2);
 		reposEvents.put("Github/usr1/repo2", generator);
-		
+
 		return reposEvents;
 	}
 }

@@ -42,12 +42,13 @@ public class EventStreamGenerator {
 	private List<Event> events = Lists.newLinkedList();
 	private Set<ITypeName> seenTypes = Sets.newLinkedHashSet();
 
-	public void add(Context ctx) {
+	public Set<IMethodName> add(Context ctx) {
 		ISST sst = ctx.getSST();
 		if (!isGenerated(sst)) {
 			sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
 					ctx.getTypeShape());
 		}
+		return uniqueMethods;
 	}
 
 	private boolean isGenerated(ISST sst) {
@@ -70,7 +71,11 @@ public class EventStreamGenerator {
 	public List<Event> getEventStream() {
 		return events;
 	}
-
+	
+	public Set<IMethodName> getMethodNames() {
+		return uniqueMethods;
+	}
+	
 	private class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
