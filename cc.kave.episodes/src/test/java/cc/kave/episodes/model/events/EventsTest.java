@@ -24,9 +24,20 @@ import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EventsTest {
 
+	@Test
+	public void typeDecl() {
+		ITypeName type = mock(ITypeName.class);
+		Event actual = Events.newType(type);
+		
+		assertEquals(EventKind.TYPE, actual.getKind());
+		assertSame(type, actual.getType());
+		assertNull(actual.getMethod());
+	}
+	
 	@Test
 	public void methodDecl() {
 		IMethodName m = mock(IMethodName.class);

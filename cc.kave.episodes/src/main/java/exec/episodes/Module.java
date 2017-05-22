@@ -54,7 +54,7 @@ public class Module extends AbstractModule {
 		Directory rootDir = new Directory(rootFile.getAbsolutePath());
 		File eventsData = new File(rootFolder + "dataSet/events/");
 		Directory eventsDir = new Directory(eventsData.getAbsolutePath());
-		File contexts = new File(rootFolder + "dataSet/SST/");
+		File contexts = new File(rootFolder + "dataSet/SSTs/");
 		Directory ctxtDir = new Directory(contexts.getAbsolutePath());
 		File evaluationFile = new File(rootFolder + "Evaluations/");
 		Directory evaluationDir = new Directory(evaluationFile.getAbsolutePath());

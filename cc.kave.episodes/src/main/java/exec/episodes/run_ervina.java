@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.Evaluations;
+import cc.kave.episodes.data.ContextsParser;
+import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
@@ -53,6 +54,10 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
+		
+		load(ContextsParser.class).parse();
+		
+		
 
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
 
@@ -67,9 +72,18 @@ public class run_ervina {
 		// load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL,
 		// FREQUENCY,
 		// FOLDNUM, THF, THE);
-		load(Evaluations.class).patternsOutput(EpisodeType.GENERAL, FREQUENCY, FOLDNUM, THF, THE);
+//		load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL, FREQUENCY,
+//				FOLDNUM, THF, THE);
 
-//		load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL, EpisodeType.GENERAL, FOLDNUM, FREQUENCY);
+		// load(PatternsComparison.class).extractConcreteCode(FREQUENCY,
+		// FOLDNUM);
+//		load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL,
+//				EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
+//		 load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
+//		 EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
+//		load(PatternsComparison.class).overlappingPatterns(
+//				EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL, FREQUENCY, FOLDNUM);
+
 		// load(SpecificPatterns.class).patternsInfo(EpisodeType.GENERAL,
 		// FREQUENCY, FOLDNUM, FREQUENCY, ENTROPY);
 		// load(PatternsEvents.class).getEventsType(EpisodeType.PARALLEL,
