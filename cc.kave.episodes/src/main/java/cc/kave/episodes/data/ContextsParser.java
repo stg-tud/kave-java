@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mahout.classifier.df.mapreduce.inmem.InMemBuilder;
-
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
@@ -89,55 +87,55 @@ public class ContextsParser {
 	}
 
 	private void calcStats(List<Event> eventStream) {
-		Map<ITypeName, Integer> typeDecls = Maps.newLinkedHashMap();
-		Map<IMethodName, Integer> ctxFirst = Maps.newLinkedHashMap();
-		Map<IMethodName, Integer> ctxSuper = Maps.newLinkedHashMap();
-		Map<IMethodName, Integer> ctxElement = Maps.newLinkedHashMap();
-		Map<IMethodName, Integer> invExpr = Maps.newLinkedHashMap();
+		Set<ITypeName> typeDecls = Sets.newHashSet();
+		Set<IMethodName> ctxFirst = Sets.newHashSet();
+		Set<IMethodName> ctxSuper = Sets.newHashSet();
+		Set<IMethodName> ctxElement = Sets.newHashSet();
+		Set<IMethodName> invExpr = Sets.newHashSet();
+
+		int numbTypes = 0;
+		int numbFirst = 0;
+		int numbSuper = 0;
+		int numbElement = 0;
+		int numbInv = 0;
 
 		for (Event event : eventStream) {
 			if (event.getKind() == EventKind.TYPE) {
-				ITypeName type = event.getType();
-				if (typeDecls.containsKey(type)) {
-					int counter = typeDecls.get(type);
-					typeDecls.put(type, counter + 1);
-				} else {
-					typeDecls.put(type, 1);
-				}
+				typeDecls.add(event.getType());
+				numbTypes++;
 				continue;
 			}
-			IMethodName name = event.getMethod();
 			if (event.getKind() == EventKind.FIRST_DECLARATION) {
-				if (ctxFirst.containsKey(name)) {
-					int counter = ctxFirst.get(name);
-					ctxFirst.put(name, counter + 1);
-				} else {
-					ctxFirst.put(name, 1);
-				}
+				ctxFirst.add(event.getMethod());
+				numbFirst++;
 				continue;
 			}
 			if (event.getKind() == EventKind.SUPER_DECLARATION) {
-				if (ctxSuper.containsKey(name)) {
-					int counter = ctxSuper.get(name);
-					ctxSuper.put(name, counter + 1);
-				} else {
-					ctxSuper.put(name, 1);
-				}
+				ctxSuper.add(event.getMethod());
+				numbSuper++;
 				continue;
 			}
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				if (ctxElement.containsKey(name)) {
-					int counter = ctxElement.get(name);
-					ctxElement.put(name, counter + 1);
-				} else {
-					ctxElement.put(name, 1);
-				}
+				ctxElement.add(event.getMethod());
+				numbElement++;
 				continue;
 			}
 			if (event.getKind() == EventKind.INVOCATION) {
-				
+				invExpr.add(event.getMethod());
+				numbInv++;
 			}
 		}
+		Logger.log("Number of repositories: %d", repoDecls.size());
+		Logger.log("Number of visited classes: %d", types.size());
+		Logger.log("------");
+		Logger.log("typeDecls:\t%d (%d unique)", numbTypes, typeDecls.size());
+		Logger.log("ctxFirst:\t%d (%d unique)", numbFirst, ctxFirst.size());
+		Logger.log("ctxSuper:\t%d (%d unique)", numbSuper, ctxSuper.size());
+		Logger.log("ctxElement:\t%d (%d unique)", numbElement, ctxElement.size());
+		Logger.log("invExpr:\t%d (%d unique)", numbInv, invExpr.size());
+		Logger.log("------");
+		int length = numbFirst + numbSuper + numbElement + numbInv;
+		Logger.log("full stream:\t%d events (excl. types)", length);
 	}
 
 	private Set<IMethodName> getElementMethod(Context ctx) {
@@ -175,10 +173,5 @@ public class ContextsParser {
 			}
 		});
 		return zips;
-	}
-
-	private void printStatistics() {
-		Logger.log("Number of repositories: %d", repoDecls.size());
-		Logger.log("Number of visited classes: %d", types.size());
 	}
 }
