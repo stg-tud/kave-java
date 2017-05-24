@@ -48,7 +48,7 @@ public class ReposStatisticsTest {
 	public TemporaryFolder rootFolder = new TemporaryFolder();
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Mock
 	private Directory rootDirectory;
 
@@ -177,7 +177,7 @@ public class ReposStatisticsTest {
 	public void teardown() {
 		Logger.reset();
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
@@ -215,15 +215,12 @@ public class ReposStatisticsTest {
 		sut.generate(FREQUENCY);
 
 		EventStreamGenerator generator = new EventStreamGenerator();
-		generator.addAny(context1);
-		generator.addAny(context3);
-		generator.addAny(context2);
-		
-//		for (Event event : generator.getEventStream()) {
-//			if (event.getKind() != EventKind.INVOCATION) {
-//				System.out.println(event.toString());
-//			}
-//		}
+
+		// for (Event event : generator.getEventStream()) {
+		// if (event.getKind() != EventKind.INVOCATION) {
+		// System.out.println(event.toString());
+		// }
+		// }
 
 		assertLogContains(0, "Reading zip file Github/usr1/repo1/ws.zip");
 		assertLogContains(1, "Reading zip file Github/usr1/repo3/ws.zip");
@@ -236,50 +233,52 @@ public class ReposStatisticsTest {
 		assertLogContains(8, "Number of unique method invocations: 3");
 		assertLogContains(9, "Number of method invocation occurrences: 6");
 		assertLogContains(10, "");
-		
+
 		assertLogContains(11, "Generating Sebastian's statistics ...");
 		assertLogContains(12, "Number of methods in event stream: 3");
 		assertLogContains(13, "Number of method elements: 3");
-		assertLogContains(14, "Occurrences of first or super method declarations: 0");
+		assertLogContains(14,
+				"Occurrences of first or super method declarations: 0");
 		assertLogContains(15, "Number of non-local method invocations: 2");
 		assertLogContains(16, "");
-		
-		assertLogContains(17, "After filtering overlaping types between different repositories ...");
+
+		assertLogContains(17,
+				"After filtering overlaping types between different repositories ...");
 		assertLogContains(18, "Number of unique context types: 2");
 		assertLogContains(19, "Number of unique method declarations: 2");
 		assertLogContains(20, "Number of method declaration occurrences: 4");
 		assertLogContains(21, "Number of unique method invocations: 3");
 		assertLogContains(22, "Number of method invocation occurrences: 5");
 		assertLogContains(23, "");
-		
+
 		assertLogContains(24, "After filtering auto-generated code ...");
 		assertLogContains(25, "Number of unique method declarations: 2");
 		assertLogContains(26, "Number of method declaration occurrences: 4");
 		assertLogContains(27, "Number of unique method invocations: 3");
 		assertLogContains(28, "Number of method invocation occurrences: 5");
 		assertLogContains(29, "");
-		
+
 		assertLogContains(30, "After filtering unknown methods ...");
 		assertLogContains(31, "Number of unique method declarations: 0");
 		assertLogContains(32, "Number of method declaration occurrences: 0");
 		assertLogContains(33, "Number of unique method invocations: 3");
 		assertLogContains(34, "Number of method invocation occurrences: 5");
 		assertLogContains(35, "");
-		
+
 		assertLogContains(36, "After filtering local types ...");
 		assertLogContains(37, "Number of unique method declarations: 0");
 		assertLogContains(38, "Number of method declaration occurrences: 0");
 		assertLogContains(39, "Number of unique method invocations: 2");
 		assertLogContains(40, "Number of method invocation occurrences: 4");
 		assertLogContains(41, "");
-		
+
 		assertLogContains(42, "After filtering element contexts ...");
 		assertLogContains(43, "Number of unique method declarations: 0");
 		assertLogContains(44, "Number of method declaration occurrences: 0");
 		assertLogContains(45, "Number of unique method invocations: 2");
 		assertLogContains(46, "Number of method invocation occurrences: 4");
 		assertLogContains(47, "");
-		
+
 		assertLogContains(48, "After filtering for frequency = 2 ...");
 		assertLogContains(49, "Number of unique method declarations: 0");
 		assertLogContains(50, "Number of method declaration occurrences: 0");

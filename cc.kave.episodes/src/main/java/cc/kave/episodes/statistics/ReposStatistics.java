@@ -284,11 +284,9 @@ public class ReposStatistics {
 					} else {
 						types.put(typeName, 1);
 					}
-					streamGen0.addAny(ctx);
 
 //					if (!reposTypes.contains(typeName)) {
 //						currTypes.add(typeName);
-						streamGen1.addAny(ctx);
 						streamGen2.add(ctx);
 //					}
 				}

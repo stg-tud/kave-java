@@ -42,15 +42,31 @@ public class EventStreamGenerator {
 	private List<Event> events = Lists.newLinkedList();
 	private Set<ITypeName> seenTypes = Sets.newLinkedHashSet();
 
+	private int numbGenerated = 0;
+
 	public Set<IMethodName> add(Context ctx) {
 		ISST sst = ctx.getSST();
-		if (!isGenerated(sst)) {
+		if (isGenerated(sst)) {
+			numbGenerated++;
+		} else {
 			sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
 					ctx.getTypeShape());
 		}
 		return uniqueMethods;
 	}
 
+	public List<Event> getEventStream() {
+		return events;
+	}
+
+	public Set<IMethodName> getMethodNames() {
+		return uniqueMethods;
+	}
+	
+	public int getNumbGenerated() {
+		return numbGenerated;
+	}
+	
 	private boolean isGenerated(ISST sst) {
 		if (sst.isPartialClass()) {
 			String fileName = sst.getPartialClassIdentifier();
@@ -62,38 +78,24 @@ public class EventStreamGenerator {
 		return false;
 	}
 
-	public void addAny(Context ctx) {
-		ISST sst = ctx.getSST();
-		sst.accept(new EventStreamGenerationVisitor(uniqueMethods),
-				ctx.getTypeShape());
-	}
-
-	public List<Event> getEventStream() {
-		return events;
-	}
-	
-	public Set<IMethodName> getMethodNames() {
-		return uniqueMethods;
-	}
-	
 	private class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
-			@Override
-			public Void visit(ISST sst, ITypeShape context) {
+		@Override
+		public Void visit(ISST sst, ITypeShape context) {
 
-				if (isGenerated(sst)) {
-					return null;
-				}
-
-				ITypeName type = sst.getEnclosingType();
-				if (!seenTypes.add(type) && !sst.isPartialClass()) {
-					return null;
-				}
-				events.add(Events.newType(type));
-				return super.visit(sst, context);
+			if (isGenerated(sst)) {
+				return null;
 			}
-		
+
+			ITypeName type = sst.getEnclosingType();
+			if (!seenTypes.add(type) && !sst.isPartialClass()) {
+				return null;
+			}
+			events.add(Events.newType(type));
+			return super.visit(sst, context);
+		}
+
 		private final Set<IMethodName> uniqueMethods;
 
 		private IMethodName firstCtx;

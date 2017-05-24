@@ -20,7 +20,6 @@ import java.util.List;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
@@ -37,26 +36,38 @@ import com.google.common.collect.Lists;
 public class EventStreamRepository {
 
 	private List<Event> events = Lists.newLinkedList();
+	private int numbGeneratedMethods = 0;
 
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
-		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+		if (isGenerated(sst)) {
+			numbGeneratedMethods += sst.getMethods().size();
+		} else {
+			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
+		}
 	}
 
 	public List<Event> getEventStream() {
 		return events;
 	}
 
+	public int getNumbGeneratedMethods() {
+		return numbGeneratedMethods;
+	}
+
+	private boolean isGenerated(ISST sst) {
+		if (sst.isPartialClass()) {
+			String fileName = sst.getPartialClassIdentifier();
+			if (fileName.contains(".designer")
+					|| fileName.contains(".Designer")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
-
-		@Override
-		public Void visit(ISST sst, ITypeShape context) {
-
-			ITypeName type = sst.getEnclosingType();
-			events.add(Events.newType(type));
-			return super.visit(sst, context);
-		}
 
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
@@ -104,6 +115,10 @@ public class EventStreamRepository {
 		}
 
 		private void addEnclosingMethodIfAvailable() {
+			if (elementCtx != null) {
+				events.add(Events.newContext(erase(elementCtx)));
+				elementCtx = null;
+			}
 			if (firstCtx != null) {
 				events.add(Events.newFirstContext(erase(firstCtx)));
 				firstCtx = null;
@@ -112,10 +127,6 @@ public class EventStreamRepository {
 				Event superEvent = Events.newSuperContext(erase(superCtx));
 				events.add(superEvent);
 				superCtx = null;
-			}
-			if (elementCtx != null) {
-				events.add(Events.newContext(erase(elementCtx)));
-				elementCtx = null;
 			}
 		}
 	}

@@ -16,6 +16,7 @@
 package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -62,9 +63,7 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
-
+		assertStream(Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
 	}
 
 	@Test
@@ -79,11 +78,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(
-				Events.newType(t(1)), //
+		assertStream(Events.newContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)),
 				Events.newInvocation(mGenericFree(2, 3)));
 
 	}
@@ -100,12 +97,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newFirstContext(mGenericFree(21, 22)), //
-				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)), //
-				Events.newInvocation(mGenericFree(2, 3)));
-
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -120,12 +113,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newFirstContext(mGenericFree(21, 22)), //
-				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)), //
-				Events.newInvocation(mGenericFree(2, 3)));
-
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -140,11 +129,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(
-				Events.newType(t(1)), //
+		assertStream(Events.newContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)),
 				Events.newInvocation(mGenericFree(2, 3)));
 
 	}
@@ -161,11 +148,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(
-				Events.newType(t(1)), //
+		assertStream(Events.newContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)),
 				Events.newInvocation(mGenericFree(2, 3)));
 
 	}
@@ -182,12 +167,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(
-				Events.newType(t(1)), //
-				Events.newFirstContext(mGenericFree(21, 22)), //
-				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)), //
-				Events.newInvocation(mGenericFree(2, 3)));
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 
 	}
 
@@ -203,12 +184,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newFirstContext(mGenericFree(21, 22)), //
-				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)), //
-				Events.newInvocation(mGenericFree(2, 3)));
-
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -223,11 +200,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(
-				Events.newType(t(1)), //
+		assertStream(Events.newContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
-				Events.newContext(mGenericFree(1, 2)),
 				Events.newInvocation(mGenericFree(2, 3)));
 
 	}
@@ -243,9 +218,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newSuperContext(m(3, 1)), //
-				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
+				Events.newInvocation(m(2, 3)));
 
 	}
 
@@ -260,10 +235,10 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newFirstContext(m(4, 1)), //
 				Events.newSuperContext(m(3, 1)), //
-				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
+				Events.newInvocation(m(2, 3)));
 
 	}
 
@@ -274,9 +249,6 @@ public class EventStreamRepositoryTest {
 		ctx.setSST(sst(1, methodDecl(1, 1)));
 
 		sut.add(ctx);
-
-		assertStream(Events.newType(t(1)));
-
 	}
 
 	@Test
@@ -291,8 +263,7 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newContext(m(1, 1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newInvocation(Names.getUnknownMethod()));
 	}
@@ -308,8 +279,7 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
-				Events.newContext(m(1, 1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newInvocation(Names.getUnknownMethod()));
 	}
 
@@ -327,11 +297,12 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newType(t(1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
-				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)), //
+				Events.newInvocation(m(2, 3)), //
+				Events.newContext(m(1, 2)),
 				Events.newFirstContext(m(12, 2)), //
-				Events.newContext(m(1, 2)), Events.newInvocation(m(3, 4)) //
+				Events.newInvocation(m(3, 4)) //
 		);
 	}
 
@@ -352,12 +323,12 @@ public class EventStreamRepositoryTest {
 		sut.add(ctx1);
 		sut.add(ctx2);
 
-		assertStream(Events.newType(t(1)), //
+		assertStream(Events.newContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
-				Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)), //
-				Events.newType(t(2)), //
+				Events.newInvocation(m(2, 3)), //
+				Events.newContext(m(2, 1)), //
 				Events.newFirstContext(m(12, 1)), //
-				Events.newContext(m(2, 1)), Events.newInvocation(m(3, 4))//
+				Events.newInvocation(m(3, 4))//
 		);
 	}
 
