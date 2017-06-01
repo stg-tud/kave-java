@@ -29,7 +29,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.kave.episodes.eventstream.EventStreamNotGenerated;
 import cc.kave.episodes.eventstream.ToFactsVisitor;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
@@ -54,7 +54,7 @@ public class DoSomething {
 
 			int i = 0;
 
-			EventStreamGenerator gen = new EventStreamGenerator();
+			EventStreamNotGenerated gen = new EventStreamNotGenerated();
 			System.out.println("found contexts for the following classes:");
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);

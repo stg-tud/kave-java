@@ -10,7 +10,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
-import cc.kave.episodes.eventstream.EventStreamGenerator;
+import cc.kave.episodes.eventstream.EventStreamNotGenerated;
 import cc.kave.episodes.eventstream.EventsFilter;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
@@ -43,7 +43,7 @@ public class StreamGenerator4 {
 	}
 
 	public void generate(int frequency, int foldNum) throws IOException {
-		EventStreamGenerator generator = new EventStreamGenerator();
+		EventStreamNotGenerated generator = new EventStreamNotGenerated();
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);

@@ -56,8 +56,8 @@ public class PartialEventStreamGenerator {
 			if (!seenTypes.add(type) && !sst.isPartialClass()) {
 				return null;
 			}
-
 			events.add(Events.newType(type));
+			
 			return super.visit(sst, context);
 		}
 
@@ -109,6 +109,10 @@ public class PartialEventStreamGenerator {
 		}
 		
 		private void addEnclosingMethodIfAvailable() {
+			if (ctxElem != null) {
+				events.add(Events.newContext(TypeErasure.of(ctxElem)));
+				ctxElem = null;
+			}
 			if (ctxFirst != null) {
 				events.add(Events.newFirstContext(TypeErasure.of(ctxFirst)));
 				ctxFirst = null;
@@ -116,10 +120,6 @@ public class PartialEventStreamGenerator {
 			if (ctxSuper != null) {
 				events.add(Events.newSuperContext(TypeErasure.of(ctxSuper)));
 				ctxSuper = null;
-			}
-			if (ctxElem != null) {
-				events.add(Events.newContext(TypeErasure.of(ctxElem)));
-				ctxElem = null;
 			}
 		}
 

@@ -22,6 +22,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
@@ -33,40 +34,20 @@ import cc.kave.episodes.model.events.Events;
 
 import com.google.common.collect.Lists;
 
-public class EventStreamRepository {
+public abstract class EventStreamRepository {
 
 	private List<Event> events = Lists.newLinkedList();
-	private int numbGeneratedMethods = 0;
 
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
-		if (isGenerated(sst)) {
-			numbGeneratedMethods += sst.getMethods().size();
-		} else {
-			sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
-		}
+		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
 	}
 
 	public List<Event> getEventStream() {
 		return events;
 	}
 
-	public int getNumbGeneratedMethods() {
-		return numbGeneratedMethods;
-	}
-
-	private boolean isGenerated(ISST sst) {
-		if (sst.isPartialClass()) {
-			String fileName = sst.getPartialClassIdentifier();
-			if (fileName.contains(".designer")
-					|| fileName.contains(".Designer")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private class EventStreamGenerationVisitor extends
+	public class EventStreamGenerationVisitor extends
 			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
 		private IMethodName firstCtx;
@@ -75,12 +56,12 @@ public class EventStreamRepository {
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
-
+			
 			firstCtx = null;
 			superCtx = null;
 			elementCtx = Names.getUnknownMethod();
 			IMethodName name = decl.getName();
-
+			elementCtx = name;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
 					if (h.getFirst() != null) {
@@ -89,10 +70,10 @@ public class EventStreamRepository {
 					if (h.getSuper() != null) {
 						superCtx = h.getSuper();
 					}
-					elementCtx = h.getElement();
+//					elementCtx = h.getElement();
 				}
 			}
-			return super.visit(decl, context);
+ 			return super.visit(decl, context);
 		}
 
 		@Override
@@ -113,6 +94,11 @@ public class EventStreamRepository {
 			// stop here for now!
 			return null;
 		}
+		
+//		@Override
+//		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
+//			return null;
+//		}
 
 		private void addEnclosingMethodIfAvailable() {
 			if (elementCtx != null) {
@@ -124,8 +110,7 @@ public class EventStreamRepository {
 				firstCtx = null;
 			}
 			if (superCtx != null) {
-				Event superEvent = Events.newSuperContext(erase(superCtx));
-				events.add(superEvent);
+				events.add(Events.newSuperContext(erase(superCtx)));
 				superCtx = null;
 			}
 		}

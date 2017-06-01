@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.PreChecking;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -50,7 +49,7 @@ public class run {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(PreprocessingFolded.class).runPreparation(FREQTHRESH);
-		load(PreChecking.class).methodsOverlap();
+//		load(PreChecking.class).methodsOverlap();
 		
 //		load(ReposPreprocess.class).generate(FREQTHRESH);
 		

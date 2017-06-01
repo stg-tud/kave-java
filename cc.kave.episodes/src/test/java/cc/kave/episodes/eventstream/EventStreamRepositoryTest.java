@@ -16,7 +16,6 @@
 package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -37,6 +36,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
+import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 
@@ -49,7 +49,8 @@ public class EventStreamRepositoryTest {
 
 	@Before
 	public void setup() {
-		sut = new EventStreamRepository();
+		sut = new EventStreamRepository(){
+		};
 	}
 
 	@Test
@@ -97,8 +98,10 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream();
-		assertTrue(sut.getNumbGeneratedMethods() == 1);
+		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
+				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
+				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
+				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
 	}
 
 	@Test
@@ -113,8 +116,10 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream();
-		assertTrue(sut.getNumbGeneratedMethods() == 1);
+		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
+				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
+				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
+				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
 	}
 
 	@Test
@@ -167,9 +172,10 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream();
-		assertTrue(sut.getNumbGeneratedMethods() == 1);
-
+		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
+				Events.newFirstContext(erase(mGenericFree(21, 22))), //
+				Events.newSuperContext(erase(mGenericFree(11, 12))), //
+				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
 	}
 
 	@Test
@@ -184,8 +190,10 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream();
-		assertTrue(sut.getNumbGeneratedMethods() == 1);
+		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
+				Events.newFirstContext(erase(mGenericFree(21, 22))), //
+				Events.newSuperContext(erase(mGenericFree(11, 12))), //
+				Events.newInvocation(erase(mGenericFree(2, 3))));
 	}
 
 	@Test
@@ -447,5 +455,10 @@ public class EventStreamRepositoryTest {
 	private ITypeName tGenericBound(int typeNum, int typeParamNum) {
 		return Names.newType(String.format("T%d`1[[T -> %s]],P", typeNum,
 				t(typeParamNum)));
+	}
+	
+	private IMethodName erase(IMethodName methodName) {
+		IMethodName erased = TypeErasure.of(methodName);
+		return erased;
 	}
 }

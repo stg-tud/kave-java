@@ -35,18 +35,24 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.episodes.eventstream.EventStreamNotGenerated;
 import cc.kave.episodes.eventstream.EventStreamRepository;
 import cc.kave.episodes.eventstream.Filters;
+import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -65,32 +71,30 @@ public class ContextsParser {
 	}
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
-	private Set<IMethodName> allDecls = Sets.newLinkedHashSet();
+	private List<Tuple<Event, List<Event>>> eventStream = Lists.newLinkedList();
+	private Set<IMethodName> allMethods = Sets.newLinkedHashSet();
 
-	private Set<ITypeName> typeDecls = Sets.newHashSet();
-	private Set<IMethodName> ctxFirst = Sets.newHashSet();
-	private Set<IMethodName> ctxSuper = Sets.newHashSet();
-	private Set<IMethodName> ctxElement = Sets.newHashSet();
-	private Set<IMethodName> invExpr = Sets.newHashSet();
+	Statistics statRepos = new Statistics();
+	Statistics statGenerated = new Statistics();
+	Statistics statOverlaps = new Statistics();
+	Statistics statUnknowns = new Statistics();
+	Statistics statLocals = new Statistics();
 
-	int numbFirst = 0;
-	int numbSuper = 0;
-	int numbElement = 0;
-	int numbInv = 0;
-
-	int numGenerated = 0;
-
-	public void parse() throws Exception {
-		EventStreamRepository eventStream = new EventStreamRepository();
+	public List<Tuple<Event, List<Event>>> parse() throws Exception {
+		EventStreamRepository eventStreamRepo = new EventStreamRepository() {
+		};
+		EventStreamNotGenerated eventStreamFilter = new EventStreamNotGenerated();
 		String repoName = "";
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if (repoName.isEmpty() || !zip.startsWith(repoName)) {
-				if (!eventStream.getEventStream().isEmpty()) {
-					processStream(repoName, eventStream.getEventStream());
-					numGenerated += eventStream.getNumbGeneratedMethods();
-					eventStream = new EventStreamRepository();
+				if (!eventStreamRepo.getEventStream().isEmpty()) {
+					processStreamRepo(eventStreamRepo.getEventStream());
+					processStreamFilter(eventStreamFilter.getEventStream());
+					eventStreamRepo = new EventStreamRepository() {
+					};
+					eventStreamFilter = new EventStreamNotGenerated();
 				}
 				repoName = getRepoName(zip);
 				repoDecls.put(repoName, Sets.newHashSet());
@@ -99,14 +103,24 @@ public class ContextsParser {
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
 				repoDecls.get(repoName).addAll(getElementMethod(ctx));
-				eventStream.add(ctx);
+				eventStreamRepo.add(ctx);
+				eventStreamFilter.add(ctx);
 			}
 			ra.close();
 		}
-		processStream(repoName, eventStream.getEventStream());
-		numGenerated += eventStream.getNumbGeneratedMethods();
+		processStreamRepo(eventStreamRepo.getEventStream());
+		Set<ITypeName> types = processStreamFilter(eventStreamFilter
+				.getEventStream());
 		printStats();
 		checkForEmptyRepos();
+		return eventStream;
+	}
+
+	private void debug(EventStreamRepository eventStreamRepo) {
+		List<Event> events = eventStreamRepo.getEventStream();
+		String crashingId = "[p:void] [ACAT.Lib.Core.AbbreviationsManagement.Abbreviations, Core]..init()";
+		Event eventCheck = Events.newContext(Names.newMethod(crashingId));
+		System.out.println("\n" + events.contains(eventCheck) + "\n");
 	}
 
 	private void checkForEmptyRepos() {
@@ -122,61 +136,56 @@ public class ContextsParser {
 		Logger.log("Empty repositories counted: %d", numbEmptyRepos);
 	}
 
-	private void processStream(String repoName, List<Event> eventStream) {
-		Map<Event, List<Event>> streamFilters = filters.apply(
-				repoDecls.get(repoName), eventStream);
-		addStats(streamFilters);
+	private List<Tuple<Event, List<Event>>> processStreamRepo(
+			List<Event> eventStream) {
+		List<Tuple<Event, List<Event>>> streamStruct = filters
+				.getStructStream(eventStream);
+		statRepos.addStats(streamStruct);
+
+		return streamStruct;
 	}
 
-	private void addStats(Map<Event, List<Event>> eventStream) {
-		for (Map.Entry<Event, List<Event>> entry : eventStream.entrySet()) {
-			IMethodName decl = entry.getKey().getMethod();
-			ctxElement.add(decl);
-			numbElement++;
+	private Set<ITypeName> processStreamFilter(List<Event> eventStream) {
+		List<Tuple<Event, List<Event>>> streamStruct = filters
+				.getStructStream(eventStream);
+		statGenerated.addStats(streamStruct);
 
-			typeDecls.add(decl.getDeclaringType());
+		List<Tuple<Event, List<Event>>> streamOverlaps = filters
+				.overlaps(streamStruct);
+		statOverlaps.addStats(streamOverlaps);
 
-			for (Event event : entry.getValue()) {
-				switch (event.getKind()) {
-				case FIRST_DECLARATION:
-					ctxFirst.add(event.getMethod());
-					numbFirst++;
-					break;
-				case SUPER_DECLARATION:
-					ctxSuper.add(event.getMethod());
-					numbSuper++;
-					break;
-				case INVOCATION:
-					invExpr.add(event.getMethod());
-					numbInv++;
-					break;
-				default:
-					System.err.println("should not happen");
-				}
-			}
-		}
+		List<Tuple<Event, List<Event>>> streamUnknowns = filters
+				.unknowns(streamOverlaps);
+		statUnknowns.addStats(streamUnknowns);
+
+		List<Tuple<Event, List<Event>>> streamLocals = filters
+				.locals(streamUnknowns);
+
+		return statLocals.addStats(streamLocals);
 	}
 
 	private void printStats() {
 		Logger.log("Number of repositories: %d", repoDecls.size());
-		
 		Logger.log("------");
-		Logger.log("typeDecls:\t\t(%d unique)", typeDecls.size());
-		Logger.log("ctxFirst:\t%d (%d unique)", numbFirst, ctxFirst.size());
-		Logger.log("ctxSuper:\t%d (%d unique)", numbSuper, ctxSuper.size());
-		Logger.log("ctxElement:\t%d (%d unique)", numbElement,
-				ctxElement.size());
-		Logger.log("invExpr:\t%d (%d unique)", numbInv, invExpr.size());
-		Logger.log("------");
-		int length = numbFirst + numbSuper + numbElement + numbInv;
-		Logger.log("full stream:\t%d events (excl. types)", length);
-		
-		Logger.log("-----");
-		Logger.log("Generated methods:\t%d", numGenerated);
-		Logger.log("Overlapping methods:\t%d", filters.getNumOverlaps());
-		Logger.log("Unknown events:\t%d", filters.getNumUnknowns());
-		Logger.log("Local events:\t%d", filters.getNumLocals());
-		Logger.log("Removed events:\t%d", filters.getNumRemovals());
+
+		Logger.log("Repository statistics ...");
+		statRepos.printStats();
+		Logger.log("");
+
+		Logger.log("Filter generated code ...");
+		statGenerated.printStats();
+		Logger.log("");
+
+		Logger.log("Filter overlapping methods ...");
+		statOverlaps.printStats();
+		Logger.log("");
+
+		Logger.log("Filter unknown events ...");
+		statUnknowns.printStats();
+		Logger.log("");
+
+		Logger.log("Filter local events ...");
+		statLocals.printStats();
 	}
 
 	private Set<IMethodName> getElementMethod(Context ctx) {
@@ -184,10 +193,9 @@ public class ContextsParser {
 
 		ISST sst = ctx.getSST();
 		Set<IMethodDeclaration> decls = sst.getMethods();
-
 		for (IMethodDeclaration d : decls) {
 			IMethodName name = d.getName();
-			if (allDecls.add(name)) {
+			if (allMethods.add(name)) {
 				methods.add(name);
 			}
 		}

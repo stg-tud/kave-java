@@ -1,7 +1,6 @@
 package cc.kave.episodes.eventstream;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -9,112 +8,91 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class Filters {
-	
-	private int numRemovals = 0;
-	private int numOverlaps = 0;
-	private int numUnknowns = 0;
-	private int numLocals = 0;
 
-	public Map<Event, List<Event>> apply(Set<IMethodName> repoMethods,
-			List<Event> stream) {
-		Map<Event, List<Event>> streamStruct = getStructStream(stream);
-		Map<Event, List<Event>> streamRemOverlaps = overlaps(repoMethods,
-				streamStruct);
-		Map<Event, List<Event>> streamRemUnknownLocals = unknownAndLocals(
-				repoMethods, streamRemOverlaps);
-		return streamRemUnknownLocals;
-	}
-	
-	public int getNumRemovals() {
-		return numRemovals;
-	}
-	
-	public int getNumOverlaps() {
-		return numOverlaps;
-	}
-	
-	public int getNumUnknowns() {
-		return numUnknowns;
-	}
-	
-	public int getNumLocals() {
-		return numLocals;
-	}
+	private Set<IMethodName> seenMethods = Sets.newHashSet();
 
-	private Map<Event, List<Event>> getStructStream(
-			List<Event> stream) {
-		Map<Event, List<Event>> result = Maps.newLinkedHashMap();
-		List<Event> method = Lists.newLinkedList();
-		Event eventElement = null;
+	public List<Tuple<Event, List<Event>>> getStructStream(List<Event> stream) {
+		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
+		Tuple<Event, List<Event>> method = null;
 
 		for (Event event : stream) {
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				if (eventElement != null) {
-					if ((!method.isEmpty()) && validMethod(method)) {
-						result.put(eventElement, method);
-					} else {
-						numRemovals += method.size() + 1;
-					}
+				if (method != null) {
+					result.add(method);
 				}
-				eventElement = event;
-				method = Lists.newLinkedList();
-				continue;
-			}
-			method.add(event);
-		}
-		return result;
-	}
-
-	private Map<Event, List<Event>> overlaps(
-			Set<IMethodName> repoMethods, Map<Event, List<Event>> stream) {
-		Map<Event, List<Event>> result = Maps.newLinkedHashMap();
-		Set<Event> seenMethods = Sets.newHashSet();
-
-		for (Map.Entry<Event, List<Event>> entry : stream.entrySet()) {
-			Event method = entry.getKey();
-			if (repoMethods.contains(method.getMethod()) && seenMethods.add(method)) {
-				result.put(method, entry.getValue());
+				method = Tuple.newTuple(event, Lists.newLinkedList());
 			} else {
-				numOverlaps += entry.getValue().size() + 1;
+				method.getSecond().add(event);
+			}
+		}
+		result.add(method);
+		return result;
+	}
+
+	public List<Tuple<Event, List<Event>>> overlaps(
+			List<Tuple<Event, List<Event>>> stream) {
+		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
+
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			IMethodName methodName = tuple.getFirst().getMethod();
+			if (seenMethods.add(methodName)) {
+				result.add(tuple);
 			}
 		}
 		return result;
 	}
 
-	private Map<Event, List<Event>> unknownAndLocals(
-			Set<IMethodName> repoMethods, Map<Event, List<Event>> stream) {
-		Map<Event, List<Event>> result = Maps.newLinkedHashMap();
+	public List<Tuple<Event, List<Event>>> locals(
+			List<Tuple<Event, List<Event>>> stream) {
+		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
 		List<Event> method = Lists.newLinkedList();
 
-		for (Map.Entry<Event, List<Event>> entry : stream.entrySet()) {
-			for (Event event : entry.getValue()) {
-				if (event.getMethod().isUnknown()) {
-					numUnknowns++;
-					continue;
-				}
-				if (isLocal(event)) {
-					numLocals++;
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			for (Event event : tuple.getSecond()) {
+				// if (!isLocal(event)) {
+				// method.add(event);
+				// }
+				if ((event.getKind() == EventKind.INVOCATION) && isLocal(event)) {
 					continue;
 				}
 				method.add(event);
 			}
 			if (validMethod(method)) {
-				result.put(entry.getKey(), method);
-			} else {
-				numRemovals += method.size() + 1;
+				result.add(Tuple.newTuple(tuple.getFirst(), method));
 			}
 			method = Lists.newLinkedList();
 		}
 		return result;
 	}
 
+	public List<Tuple<Event, List<Event>>> unknowns(
+			List<Tuple<Event, List<Event>>> stream) {
+		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
+
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			List<Event> method = Lists.newLinkedList();
+			for (Event event : tuple.getSecond()) {
+				if (!event.getMethod().isUnknown()) {
+					method.add(event);
+				}
+			}
+			if (validMethod(method)) {
+				result.add(Tuple.newTuple(tuple.getFirst(), method));
+			}
+		}
+		return result;
+	}
+
 	private boolean validMethod(List<Event> method) {
+		if (method.size() == 0) {
+			return false;
+		}
 		for (Event event : method) {
 			if (event.getKind() == EventKind.INVOCATION) {
 				return true;
@@ -137,7 +115,7 @@ public class Filters {
 			newVal = true;
 		}
 		if (oldVal != newVal) {
-			System.out.printf("different localness for: %s\n", type);
+			System.err.printf("different localness for: %s\n", type);
 		}
 		return newVal;
 	}

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.data.CompareStreams;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.kave.episodes.model.EpisodeType;
@@ -55,8 +56,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(ContextsParser.class).parse();
-		
+//		load(ContextsParser.class).parse();
+		load(CompareStreams.class).compare();
 		
 
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);

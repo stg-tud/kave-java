@@ -54,7 +54,7 @@ public class EventsFrequencies {
 	}
 
 	public void frequencies() throws ZipException, IOException {
-		EventStreamGenerator generator = new EventStreamGenerator();
+		EventStreamNotGenerated generator = new EventStreamNotGenerated();
 
 		for (String zip : findZips()) {
 			Logger.log("Reading zip file %s", zip.toString());
