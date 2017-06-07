@@ -35,9 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.episodes.eventstream.EventStreamNotGenerated;
@@ -45,7 +43,6 @@ import cc.kave.episodes.eventstream.EventStreamRepository;
 import cc.kave.episodes.eventstream.Filters;
 import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -91,36 +88,30 @@ public class ContextsParser {
 			if (repoName.isEmpty() || !zip.startsWith(repoName)) {
 				if (!eventStreamRepo.getEventStream().isEmpty()) {
 					processStreamRepo(eventStreamRepo.getEventStream());
-					processStreamFilter(eventStreamFilter.getEventStream());
+					List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
+							.getEventStream());
+					eventStream.addAll(stream);
 					eventStreamRepo = new EventStreamRepository() {
 					};
 					eventStreamFilter = new EventStreamNotGenerated();
 				}
 				repoName = getRepoName(zip);
-				repoDecls.put(repoName, Sets.newHashSet());
 			}
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				repoDecls.get(repoName).addAll(getElementMethod(ctx));
 				eventStreamRepo.add(ctx);
 				eventStreamFilter.add(ctx);
 			}
 			ra.close();
 		}
 		processStreamRepo(eventStreamRepo.getEventStream());
-		Set<ITypeName> types = processStreamFilter(eventStreamFilter
+		List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
 				.getEventStream());
+		eventStream.addAll(stream);
 		printStats();
 		checkForEmptyRepos();
 		return eventStream;
-	}
-
-	private void debug(EventStreamRepository eventStreamRepo) {
-		List<Event> events = eventStreamRepo.getEventStream();
-		String crashingId = "[p:void] [ACAT.Lib.Core.AbbreviationsManagement.Abbreviations, Core]..init()";
-		Event eventCheck = Events.newContext(Names.newMethod(crashingId));
-		System.out.println("\n" + events.contains(eventCheck) + "\n");
 	}
 
 	private void checkForEmptyRepos() {
@@ -145,7 +136,8 @@ public class ContextsParser {
 		return streamStruct;
 	}
 
-	private Set<ITypeName> processStreamFilter(List<Event> eventStream) {
+	private List<Tuple<Event, List<Event>>> processStreamFilter(
+			List<Event> eventStream) {
 		List<Tuple<Event, List<Event>>> streamStruct = filters
 				.getStructStream(eventStream);
 		statGenerated.addStats(streamStruct);
@@ -160,8 +152,9 @@ public class ContextsParser {
 
 		List<Tuple<Event, List<Event>>> streamLocals = filters
 				.locals(streamUnknowns);
+		statLocals.addStats(streamLocals);
 
-		return statLocals.addStats(streamLocals);
+		return streamLocals;
 	}
 
 	private void printStats() {

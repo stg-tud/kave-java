@@ -56,7 +56,7 @@ public abstract class EventStreamRepository {
 
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
-			
+
 			firstCtx = null;
 			superCtx = null;
 			elementCtx = Names.getUnknownMethod();
@@ -64,16 +64,16 @@ public abstract class EventStreamRepository {
 			elementCtx = name;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
-					if (h.getFirst() != null) {
-						firstCtx = h.getFirst();
-					}
-					if (h.getSuper() != null) {
-						superCtx = h.getSuper();
-					}
-//					elementCtx = h.getElement();
+					firstCtx = h.getFirst();
+					superCtx = h.getSuper();
 				}
 			}
- 			return super.visit(decl, context);
+			return super.visit(decl, context);
+		}
+		
+		@Override
+		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
+			return null;
 		}
 
 		@Override
@@ -94,11 +94,6 @@ public abstract class EventStreamRepository {
 			// stop here for now!
 			return null;
 		}
-		
-//		@Override
-//		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
-//			return null;
-//		}
 
 		private void addEnclosingMethodIfAvailable() {
 			if (elementCtx != null) {

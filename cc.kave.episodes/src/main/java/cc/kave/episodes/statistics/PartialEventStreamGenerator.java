@@ -8,6 +8,7 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
@@ -90,6 +91,11 @@ public class PartialEventStreamGenerator {
 
 			return super.visit(decl, context);
 		}
+		
+		@Override
+		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
+			return null;
+		}
 
 		@Override
 		public Void visit(IInvocationExpression inv, ITypeShape context) {
@@ -98,6 +104,12 @@ public class PartialEventStreamGenerator {
 				addEnclosingMethodIfAvailable();
 				events.add(Events.newInvocation(m));
 			}
+			return null;
+		}
+		
+		@Override
+		public Void visit(ILambdaExpression inv, ITypeShape context) {
+			// stop here for now!
 			return null;
 		}
 
@@ -121,12 +133,6 @@ public class PartialEventStreamGenerator {
 				events.add(Events.newSuperContext(TypeErasure.of(ctxSuper)));
 				ctxSuper = null;
 			}
-		}
-
-		@Override
-		public Void visit(ILambdaExpression inv, ITypeShape context) {
-			// stop here for now!
-			return null;
 		}
 	}
 }
