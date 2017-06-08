@@ -1,12 +1,12 @@
 package cc.kave.episodes.data;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.statistics.EventStreamGenerator2;
@@ -28,13 +28,60 @@ public class CompareStreams {
 		String path = "/Users/ervinacergani/Documents/EpisodeMining/dataSet/SSTs/";
 		EventStreamGenerator2 gen = new EventStreamGenerator2(path);
 		List<Event> stream = gen.run();
+		List<Tuple<Event, List<Event>>> stream1 = classStruct(stream);
 
 		System.out.println();
 
-		List<Tuple<Event, List<Event>>> stream1 = classStruct(stream);
 		typesCounter(stream1);
+		localCtxCounter(stream);
 
-		List<Tuple<Event, List<Event>>> stream2 = parser.parse();
+//		parser.parse();
+	}
+
+	private void localCtxCounter(List<Event> stream) {
+		Set<Event> ctxFirst = Sets.newHashSet();
+		Set<Event> ctxSuper = Sets.newHashSet();
+
+		int numLocalFirst = 0;
+		int numLocalSuper = 0;
+
+		for (Event event : stream) {
+			if (event.getKind() == EventKind.TYPE) {
+				continue;
+			}
+			if (isLocal(event)) {
+				if (event.getKind() == EventKind.FIRST_DECLARATION) {
+					ctxFirst.add(event);
+					numLocalFirst++;
+					continue;
+				}
+				if (event.getKind() == EventKind.SUPER_DECLARATION) {
+					ctxSuper.add(event);
+					numLocalSuper++;
+				}
+			}
+		}
+		System.out.printf("ctxFirst locals: %d (%d unique)\n", numLocalFirst, ctxFirst.size());
+		System.out.printf("ctxSuper locals: %d (%d unique)\n", numLocalSuper, ctxSuper.size());
+	}
+
+	private boolean isLocal(Event e) {
+		// predefined types have always an unknown version, but come
+		// from mscorlib, so they should be included
+		boolean oldVal = false;
+		boolean newVal = false;
+		ITypeName type = e.getMethod().getDeclaringType();
+		IAssemblyName asm = type.getAssembly();
+		if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
+			oldVal = true;
+		}
+		if (asm.isLocalProject()) {
+			newVal = true;
+		}
+		if (oldVal != newVal) {
+			System.err.printf("different localness for: %s\n", type);
+		}
+		return newVal;
 	}
 
 	private void typesCounter(List<Tuple<Event, List<Event>>> stream1) {
@@ -72,29 +119,6 @@ public class CompareStreams {
 				emptyClasses.size());
 	}
 
-	private void convCompare(List<Event> stream, Map<Event, List<Event>> stream1) {
-		int numTypes = 0;
-		for (Event event : stream) {
-			System.out.println(event.getKind());
-			if (event.getKind() == EventKind.TYPE) {
-				numTypes++;
-			}
-			if (numTypes == 10) {
-				break;
-			}
-		}
-
-		numTypes = 0;
-		System.out.println();
-		for (Map.Entry<Event, List<Event>> entry : stream1.entrySet()) {
-			System.out.println(entry.toString());
-			numTypes++;
-			if (numTypes == 10) {
-				break;
-			}
-		}
-	}
-
 	private List<Tuple<Event, List<Event>>> classStruct(List<Event> stream) {
 		List<Tuple<Event, List<Event>>> classStruct = Lists.newLinkedList();
 		Tuple<Event, List<Event>> className = null;
@@ -111,33 +135,5 @@ public class CompareStreams {
 		}
 		classStruct.add(className);
 		return classStruct;
-	}
-
-	private void compareTypes(Map<Event, List<Event>> stream1,
-			List<Tuple<Event, List<Event>>> stream2) {
-
-		Set<ITypeName> typesStream = Sets.newHashSet();
-		System.out.println("Printing methods comming from empty classes: ...");
-		for (Tuple<Event, List<Event>> tuple : stream2) {
-			ITypeName type = tuple.getFirst().getMethod().getDeclaringType();
-			typesStream.add(type);
-		}
-
-		Set<ITypeName> typesEmpty = Sets.newHashSet();
-		Set<ITypeName> typesFull = Sets.newHashSet();
-
-		System.out.println("Printing empty classes ...");
-		for (Map.Entry<Event, List<Event>> entry : stream1.entrySet()) {
-			if ((entry.getValue().isEmpty())
-					&& (typesStream.contains(entry.getKey().getType()))) {
-				typesEmpty.add(entry.getKey().getType());
-				System.out.println(entry.toString());
-			} else {
-				typesFull.add(entry.getKey().getType());
-			}
-		}
-
-		System.out.printf("Number of empty classes: %d\n", typesEmpty.size());
-		System.out.println("Number of full classes: " + typesFull.size());
 	}
 }

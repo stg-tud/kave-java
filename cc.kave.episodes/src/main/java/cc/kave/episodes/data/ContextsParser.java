@@ -36,8 +36,6 @@ import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.episodes.eventstream.EventStreamNotGenerated;
 import cc.kave.episodes.eventstream.EventStreamRepository;
 import cc.kave.episodes.eventstream.Filters;
@@ -51,7 +49,6 @@ import cc.recommenders.io.ReadingArchive;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -69,7 +66,6 @@ public class ContextsParser {
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
 	private List<Tuple<Event, List<Event>>> eventStream = Lists.newLinkedList();
-	private Set<IMethodName> allMethods = Sets.newLinkedHashSet();
 
 	Statistics statRepos = new Statistics();
 	Statistics statGenerated = new Statistics();
@@ -179,20 +175,6 @@ public class ContextsParser {
 
 		Logger.log("Filter local events ...");
 		statLocals.printStats();
-	}
-
-	private Set<IMethodName> getElementMethod(Context ctx) {
-		Set<IMethodName> methods = Sets.newHashSet();
-
-		ISST sst = ctx.getSST();
-		Set<IMethodDeclaration> decls = sst.getMethods();
-		for (IMethodDeclaration d : decls) {
-			IMethodName name = d.getName();
-			if (allMethods.add(name)) {
-				methods.add(name);
-			}
-		}
-		return methods;
 	}
 
 	private String getRepoName(String zipName) {

@@ -58,10 +58,9 @@ public class Filters {
 				// if (!isLocal(event)) {
 				// method.add(event);
 				// }
-				if ((event.getKind() == EventKind.INVOCATION) && isLocal(event)) {
-					continue;
+				if (!isLocal(event)) {
+					method.add(event);
 				}
-				method.add(event);
 			}
 			if (validMethod(method)) {
 				result.add(Tuple.newTuple(tuple.getFirst(), method));
