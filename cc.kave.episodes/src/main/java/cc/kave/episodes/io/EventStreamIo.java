@@ -55,8 +55,6 @@ public class EventStreamIo {
 					stream.getStreamText());
 			JsonUtils.toJson(stream.getMapping(),
 					new File(getTrainPath(frequency, foldNum).mappingPath));
-			JsonUtils.toJson(stream.getStreamData(),
-					new File(getTrainPath(frequency, foldNum).streamDataPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

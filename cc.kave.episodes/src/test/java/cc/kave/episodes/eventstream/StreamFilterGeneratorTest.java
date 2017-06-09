@@ -16,6 +16,7 @@
 package cc.kave.episodes.eventstream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -43,14 +44,13 @@ import cc.kave.episodes.model.events.Events;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class EventStreamRepositoryTest {
+public class StreamFilterGeneratorTest {
 
-	private EventStreamRepository sut;
+	private StreamFilterGenerator sut;
 
 	@Before
 	public void setup() {
-		sut = new EventStreamRepository(){
-		};
+		sut = new StreamFilterGenerator();
 	}
 
 	@Test
@@ -64,7 +64,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
+		assertStream(Events.newContext(erase(m(1, 1))), //
+				Events.newInvocation(erase(m(2, 3))));
+
 	}
 
 	@Test
@@ -83,7 +85,6 @@ public class EventStreamRepositoryTest {
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
-
 	}
 
 	@Test
@@ -98,10 +99,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
-				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
-				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
-				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
+		assertStream();
+
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -116,10 +116,9 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
-				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
-				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
-				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
+		assertStream();
+
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -172,10 +171,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
-				Events.newFirstContext(erase(mGenericFree(21, 22))), //
-				Events.newSuperContext(erase(mGenericFree(11, 12))), //
-				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -190,10 +187,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
-				Events.newFirstContext(erase(mGenericFree(21, 22))), //
-				Events.newSuperContext(erase(mGenericFree(11, 12))), //
-				Events.newInvocation(erase(mGenericFree(2, 3))));
+		assertStream();
+		assertTrue(sut.getNumbGeneratedMethods() == 1);
 	}
 
 	@Test
@@ -257,6 +252,9 @@ public class EventStreamRepositoryTest {
 		ctx.setSST(sst(1, methodDecl(1, 1)));
 
 		sut.add(ctx);
+
+		assertStream();
+
 	}
 
 	@Test
@@ -273,7 +271,7 @@ public class EventStreamRepositoryTest {
 
 		assertStream(Events.newContext(m(1, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newInvocation(Names.getUnknownMethod()));
+				Events.newInvocation(unknown()));
 	}
 
 	@Test
@@ -287,8 +285,8 @@ public class EventStreamRepositoryTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
-				Events.newInvocation(Names.getUnknownMethod()));
+		assertStream(Events.newContext(m(1, 1)),
+				Events.newInvocation(unknown()));
 	}
 
 	@Test
@@ -308,7 +306,7 @@ public class EventStreamRepositoryTest {
 		assertStream(Events.newContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(1, 2)),
+				Events.newContext(m(1, 2)), //
 				Events.newFirstContext(m(12, 2)), //
 				Events.newInvocation(m(3, 4)) //
 		);

@@ -3,7 +3,7 @@ package cc.kave.episodes.eventstream;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 
-public class EventStreamNotGenerated extends EventStreamRepository{
+public class StreamFilterGenerator extends StreamRepoGenerator{
 
 	private int numbGeneratedMethods = 0;
 

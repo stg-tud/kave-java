@@ -55,29 +55,6 @@ public class EventStreamTest {
 		sut = new EventStream();
 	}
 	
-	@Test
-	public void nullMethodContext1() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Method element is null!");
-		sut.addEvent(inv(1));
-		sut.addEvent(firstCtx(0));
-	}
-	
-	@Test
-	public void nullMethodContext2() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Method element is null!");
-		sut.addEvent(inv(1));
-		sut.getStreamData();
-	}
-	
-	@Test
-	public void nullMethodContext3() {
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Method element is null!");
-		sut.addEvent(inv(1));
-		sut.getStreamText();
-	}
 	
 	@Test
 	public void defaultValues() {
@@ -86,84 +63,49 @@ public class EventStreamTest {
 		assertEquals(expectedMap, sut.getMapping());
 
 		assertTrue(sut.getStreamText().equals(""));
-		assertTrue(sut.getStreamData().isEmpty());
-	}
-
-	@Test
-	public void addUnknownEvent() {
-		sut.addEvent(firstCtx(0));
-		sut.addEvent(enclCtx(1));
-
-		expectedMap.add(Events.newDummyEvent());
-
-		expMethods.add(enclCtx(1));
-
-		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(Lists.newLinkedList(), sut.getStreamData());
-
-		assertTrue(sut.getStreamText().equals(""));
 	}
 
 	@Test
 	public void addContext() {
-		sut.addEvent(firstCtx(0));
-		sut.addEvent(enclCtx(0));
 		sut.addEvent(firstCtx(1));	// 1
-		sut.addEvent(enclCtx(1));	
 		sut.addEvent(inv(10));		
-		sut.addEvent(firstCtx(20));	// 2
-		sut.addEvent(superCtx(30));	// 3
-		sut.addEvent(enclCtx(3));
 
 		expectedMap.add(Events.newDummyEvent());
 		expectedMap.add(firstCtx(1));
-		expectedMap.add(firstCtx(20));
-		expectedMap.add(superCtx(30));
+		expectedMap.add(inv(10));
 		
-		String expectedStream1 = "1,5.000\n";
-		String expectedStream2 = "2,10.001\n3,10.002\n";
-		String expectedStream = "1,5.000\n2,10.001\n3,10.002\n";
+		String expectedStream = "1,0.000\n2,0.001\n";
 		
 		String actualStream = sut.getStreamText();
 		
-		List<Tuple<Event, String>> expStreamData = Lists.newLinkedList();
-		expStreamData.add(Tuple.newTuple(enclCtx(1), expectedStream1));
-		expStreamData.add(Tuple.newTuple(enclCtx(3), expectedStream2));
-
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(expectedStream, actualStream);
-		assertEquals(expStreamData, sut.getStreamData());
 	}
 
 	@Test
 	public void addInvocation() {
 		sut.addEvent(firstCtx(0));
-		sut.addEvent(enclCtx(1));
 		sut.addEvent(inv(1));
 
 		expectedMap.add(Events.newDummyEvent());
+		expectedMap.add(firstCtx(0));
 		expectedMap.add(inv(1));
 
-		String streamText = "1,0.000\n";
+		String streamText = "1,0.000\n2,0.001\n";
 		String actualStreamText = sut.getStreamText();
-
-		List<Tuple<Event, String>> expStream = Lists.newLinkedList();
-		expStream.add(Tuple.newTuple(enclCtx(1), streamText));
 
 		assertEquals(expectedMap, sut.getMapping());
 		assertEquals(streamText, actualStreamText);
-		assertEquals(expStream, sut.getStreamData());
 	}
 
 	@Test
 	public void addMultipleEvents() {
 		sut.addEvent(firstCtx(1)); // 1
 		sut.addEvent(superCtx(2)); // 2
-		sut.addEvent(enclCtx(3));
 		sut.addEvent(inv(2)); // 3
 		sut.addEvent(inv(3)); // 4
-		sut.addEvent(firstCtx(0));
-		sut.addEvent(enclCtx(1));
+		sut.increaseTimeout();
+		sut.addEvent(firstCtx(0)); // 5
 		sut.addEvent(inv(2)); // 3
 
 		Set<Event> expectedMap = Sets.newLinkedHashSet();
@@ -172,21 +114,17 @@ public class EventStreamTest {
 		expectedMap.add(superCtx(2));
 		expectedMap.add(inv(2));
 		expectedMap.add(inv(3));
+		expectedMap.add(firstCtx(0));
 
 		StringBuilder expSb = new StringBuilder();
 		expSb.append("1,0.000\n");
 		expSb.append("2,0.001\n");
 		expSb.append("3,0.002\n");
 		expSb.append("4,0.003\n");
-		expSb.append("3,5.004\n");
-
-		List<Tuple<Event, String>> expStream = Lists.newLinkedList();
-		expStream.add(Tuple.newTuple(enclCtx(3),
-				"1,0.000\n2,0.001\n3,0.002\n4,0.003\n"));
-		expStream.add(Tuple.newTuple(enclCtx(1), "3,5.004\n"));
+		expSb.append("5,5.004\n");
+		expSb.append("3,5.005\n");
 
 		assertEquals(expectedMap, sut.getMapping());
-		assertEquals(expStream, sut.getStreamData());
 		assertEquals(expSb.toString(), sut.getStreamText());
 	}
 
@@ -211,10 +149,8 @@ public class EventStreamTest {
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getStreamData(), b.getStreamData());
 		assertEquals(a.getStreamText(), b.getStreamText());
 
-		assertTrue(a.getStreamData().size() == b.getStreamData().size());
 		assertTrue(a.equals(b));
 	}
 
@@ -231,10 +167,7 @@ public class EventStreamTest {
 		b.addEvent(inv(3));
 
 		assertNotEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getStreamData(), b.getStreamData());
 		assertEquals(a.getStreamText(), b.getStreamText());
-
-		assertTrue(a.getStreamData().size() == b.getStreamData().size());
 
 		assertFalse(a.equals(b));
 	}
@@ -254,7 +187,6 @@ public class EventStreamTest {
 
 		assertNotEquals(a.getMapping(), b.getMapping());
 		assertNotEquals(a.getStreamText(), b.getStreamText());
-		assertNotEquals(a.getStreamData(), b.getStreamData());
 
 		assertFalse(a.equals(b));
 	}
@@ -274,7 +206,6 @@ public class EventStreamTest {
 
 		assertEquals(a.getMapping(), b.getMapping());
 		assertNotEquals(a.getStreamText(), b.getStreamText());
-		assertNotEquals(a.getStreamData(), b.getStreamData());
 
 		assertFalse(a.equals(b));
 	}
@@ -283,42 +214,18 @@ public class EventStreamTest {
 	public void notEqualNumMethods() {
 		EventStream a = new EventStream();
 		a.addEvent(firstCtx(1));
-		a.addEvent(enclCtx(1));
 		a.addEvent(inv(2));
 		a.addEvent(inv(2));
 
 		EventStream b = new EventStream();
 		b.addEvent(firstCtx(1));
-		b.addEvent(enclCtx(1));
 		b.addEvent(inv(2));
-		b.addEvent(firstCtx(0));
-		b.addEvent(enclCtx(0));
+		b.increaseTimeout();
+		b.addEvent(firstCtx(1));
 		b.addEvent(inv(2));
 
 		assertEquals(a.getMapping(), b.getMapping());
 		assertNotEquals(a.getStreamText(), b.getStreamText());
-		assertNotEquals(a.getStreamData(), b.getStreamData());
-
-		assertFalse(a.equals(b));
-	}
-
-	@Test
-	public void notEqualEnclMethods() {
-		EventStream a = new EventStream();
-		a.addEvent(firstCtx(1));
-		a.addEvent(enclCtx(1));
-		a.addEvent(inv(2));
-		a.addEvent(inv(2));
-
-		EventStream b = new EventStream();
-		b.addEvent(firstCtx(1));
-		b.addEvent(enclCtx(2));
-		b.addEvent(inv(2));
-		b.addEvent(inv(2));
-
-		assertEquals(a.getMapping(), b.getMapping());
-		assertEquals(a.getStreamText(), b.getStreamText());
-		assertNotEquals(a.getStreamData(), b.getStreamData());
 
 		assertFalse(a.equals(b));
 	}
@@ -340,7 +247,6 @@ public class EventStreamTest {
 
 		assertTrue(sut.getMapping().isEmpty());
 		assertTrue(sut.getStreamText().isEmpty());
-		assertTrue(sut.getStreamData().isEmpty());
 	}
 
 	private static Event inv(int i) {

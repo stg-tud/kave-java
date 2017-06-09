@@ -15,9 +15,6 @@
  */
 package cc.kave.episodes.model;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
-
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,14 +23,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Events;
-import cc.recommenders.datastructures.Tuple;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class EventStream {
@@ -41,11 +33,8 @@ public class EventStream {
 	private static final double TIMEOUT = 5.0;
 
 	private Map<Event, Integer> eventsMapper = Maps.newLinkedHashMap();
-	private List<Tuple<Event, String>> stream = Lists.newLinkedList();
-	private Event methodCtx = null;
 	private StringBuilder sb = new StringBuilder();
 
-	private boolean isFirstMethod = true;
 	private double time = 0.000;
 
 	public EventStream() {
@@ -57,59 +46,14 @@ public class EventStream {
 	}
 
 	public String getStreamText() {
-		StringBuilder streamBuilder = new StringBuilder();
-		IsLastMethodIncluded();
-
-		for (Tuple<Event, String> tuple : stream) {
-			streamBuilder.append(tuple.getSecond());
-		}
-		return streamBuilder.toString();
-	}
-
-	public List<Tuple<Event, String>> getStreamData() {
-		IsLastMethodIncluded();
-		return this.stream;
+		return sb.toString();
 	}
 
 	public void addEvent(Event event) {
 
-		possiblyIncreaseTimout(event);
-
-		if (event.getKind() == EventKind.METHOD_DECLARATION) {
-			methodCtx = event;
-			return;
-		}
-		
-		if (event.getMethod().isUnknown()) {
-			return;
-		}
-
-		if (isLocal(event)) {
-			return;
-		}
-
 		int idx = ensureEventExistsAndGetId(event);
 
 		addEventIdToStream(idx);
-	}
-	
-	private boolean isLocal(Event e) {
-	    // predefined types have always an unknown version, but come
-	    // from mscorlib, so they should be included
-	    boolean oldVal = false;
-	    boolean newVal = false;
-	    ITypeName type = e.getMethod().getDeclaringType();
-	    IAssemblyName asm = type.getAssembly();
-	    if (!asm.getName().equals("mscorlib") && asm.getVersion().isUnknown()) {
-	        oldVal = true;
-	    }
-	    if (asm.isLocalProject()) {
-	        newVal = true;
-	    }
-	    if (oldVal != newVal) {
-	        System.out.printf("different localness for: %s\n", type);
-	    }
-	    return newVal;
 	}
 	
 	private void addEventIdToStream(int idx) {
@@ -131,50 +75,14 @@ public class EventStream {
 		}
 	}
 
-	private void possiblyIncreaseTimout(Event event) {
-		if (event.getKind() == EventKind.FIRST_DECLARATION) {
-			increaseTimeout();
-		}
-		isFirstMethod = false;
-	}
-
 	public void increaseTimeout() {
-		if (isFirstMethod) {
-			return;
-		}
-		addStream();
 		time += TIMEOUT;
-	}
-
-	private void addStream() {
-		if (!(sb.toString().isEmpty())) {
-			assertTrue(methodCtx != null, "Method element is null!");
-
-			stream.add(Tuple.newTuple(methodCtx, sb.toString()));
-			methodCtx = null;
-			sb = new StringBuilder();
-		}
-	}
-
-	private void IsLastMethodIncluded() {
-		if (!(sb.toString().isEmpty())) {
-			assertTrue(methodCtx != null, "Method element is null!");
-			Tuple<Event, String> lastMethod = Tuple.newTuple(methodCtx,
-					sb.toString());
-
-			if (!stream.contains(lastMethod)) {
-				stream.add(lastMethod);
-			}
-		}
 	}
 
 	public void delete() {
 		this.sb.delete(0, sb.length());
-		this.methodCtx = null;
-		this.isFirstMethod = true;
 		this.time = 0.000;
 		this.eventsMapper.clear();
-		this.stream.clear();
 	}
 
 	@Override
@@ -198,9 +106,6 @@ public class EventStream {
 			return false;
 		}
 		if (!(this.getStreamText().equals(sm.getStreamText()))) {
-			return false;
-		}
-		if (!(this.getStreamData().equals(sm.getStreamData()))) {
 			return false;
 		}
 		return true;

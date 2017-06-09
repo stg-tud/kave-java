@@ -36,8 +36,11 @@ import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.eventstream.EventStreamNotGenerated;
-import cc.kave.episodes.eventstream.EventStreamRepository;
+import cc.kave.commons.model.ssts.ISST;
+import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
+import cc.kave.commons.utils.TypeErasure;
+import cc.kave.episodes.eventstream.StreamFilterGenerator;
+import cc.kave.episodes.eventstream.StreamRepoGenerator;
 import cc.kave.episodes.eventstream.Filters;
 import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.model.events.Event;
@@ -47,8 +50,8 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -65,7 +68,7 @@ public class ContextsParser {
 	}
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
-	private List<Tuple<Event, List<Event>>> eventStream = Lists.newLinkedList();
+	private Set<IMethodName> seenMethods = Sets.newHashSet();
 
 	Statistics statRepos = new Statistics();
 	Statistics statGenerated = new Statistics();
@@ -74,28 +77,21 @@ public class ContextsParser {
 	Statistics statLocals = new Statistics();
 
 	public List<Tuple<Event, List<Event>>> parse() throws Exception {
-		EventStreamRepository eventStreamRepo = new EventStreamRepository() {
+		StreamRepoGenerator eventStreamRepo = new StreamRepoGenerator() {
 		};
-		EventStreamNotGenerated eventStreamFilter = new EventStreamNotGenerated();
+		StreamFilterGenerator eventStreamFilter = new StreamFilterGenerator();
 		String repoName = "";
 
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if (repoName.isEmpty() || !zip.startsWith(repoName)) {
-				if (!eventStreamRepo.getEventStream().isEmpty()) {
-					processStreamRepo(eventStreamRepo.getEventStream());
-					List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
-							.getEventStream());
-					eventStream.addAll(stream);
-					eventStreamRepo = new EventStreamRepository() {
-					};
-					eventStreamFilter = new EventStreamNotGenerated();
-				}
 				repoName = getRepoName(zip);
+				repoDecls.put(repoName, Sets.newHashSet());
 			}
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
+				saveElementCtx(repoName, ctx);
 				eventStreamRepo.add(ctx);
 				eventStreamFilter.add(ctx);
 			}
@@ -104,10 +100,43 @@ public class ContextsParser {
 		processStreamRepo(eventStreamRepo.getEventStream());
 		List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
 				.getEventStream());
-		eventStream.addAll(stream);
 		printStats();
 		checkForEmptyRepos();
-		return eventStream;
+		checkElementCtxs(stream);
+		return stream;
+	}
+	
+	public Map<String, Set<IMethodName>> getRepoCtxMapper() {
+		return repoDecls;
+	}
+
+	private void checkElementCtxs(List<Tuple<Event, List<Event>>> stream) {
+		Set<IMethodName> ctxsStream = Sets.newHashSet();
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			ctxsStream.add(tuple.getFirst().getMethod());
+		}
+		Set<IMethodName> ctxsRepos = Sets.newHashSet();
+		for (Map.Entry<String, Set<IMethodName>> entry : repoDecls.entrySet()) {
+			ctxsRepos.addAll(entry.getValue());
+		}
+		System.out.println("Number of ctxs in stream: " + ctxsStream.size());
+		System.out.println("Number of ctxs in repos: " + ctxsRepos.size());
+		System.out.println("Repo-ctx mapper includes all stream ctx? "
+				+ ctxsRepos.containsAll(ctxsStream));
+	}
+
+	private void saveElementCtx(String repoName, Context ctx) {
+		Set<IMethodName> methods = Sets.newHashSet();
+
+		ISST sst = ctx.getSST();
+		Set<IMethodDeclaration> decls = sst.getMethods();
+		for (IMethodDeclaration d : decls) {
+			IMethodName name = d.getName();
+			if (seenMethods.add(name)) {
+				methods.add(TypeErasure.of(name));
+			}
+		}
+		repoDecls.get(repoName).addAll(methods);
 	}
 
 	private void checkForEmptyRepos() {
@@ -120,7 +149,7 @@ public class ContextsParser {
 			}
 		}
 		Logger.log("------");
-		Logger.log("Empty repositories counted: %d", numbEmptyRepos);
+		Logger.log("Empty repositories counted: %d\n", numbEmptyRepos);
 	}
 
 	private List<Tuple<Event, List<Event>>> processStreamRepo(

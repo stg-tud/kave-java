@@ -13,7 +13,7 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.episodes.eventstream.EventStreamNotGenerated;
+import cc.kave.episodes.eventstream.StreamFilterGenerator;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.recommenders.io.Directory;
@@ -206,7 +206,7 @@ public class ReposStatistics {
 	    return newVal;
 	}
 
-	private void filterGeneratedCode(EventStreamNotGenerated generator) {
+	private void filterGeneratedCode(StreamFilterGenerator generator) {
 		Logger.log("After filtering auto-generated code ...");
 		printEventStats(generator.getEventStream());
 	}
@@ -255,13 +255,13 @@ public class ReposStatistics {
 	private List<Event> reposParser() throws Exception {
 		// repository data
 		Map<ITypeName, Integer> types = Maps.newLinkedHashMap();
-		EventStreamNotGenerated streamGen0 = new EventStreamNotGenerated();
+		StreamFilterGenerator streamGen0 = new StreamFilterGenerator();
 		// filter overlapping types
 //		Set<ITypeName> reposTypes = Sets.newLinkedHashSet();
 //		Set<ITypeName> currTypes = Sets.newLinkedHashSet();
-		EventStreamNotGenerated streamGen1 = new EventStreamNotGenerated();
+		StreamFilterGenerator streamGen1 = new StreamFilterGenerator();
 		// filter auto-generated code
-		EventStreamNotGenerated streamGen2 = new EventStreamNotGenerated();
+		StreamFilterGenerator streamGen2 = new StreamFilterGenerator();
 
 		String repoName = "";
 
@@ -302,7 +302,7 @@ public class ReposStatistics {
 		return streamGen2.getEventStream();
 	}
 
-	private void sebStats(EventStreamNotGenerated generator) {
+	private void sebStats(StreamFilterGenerator generator) {
 		List<Event> stream = generator.getEventStream();
 		List<List<Event>> parsedStream = parse(stream);
 		List<Event> declarations = Lists.newLinkedList();
@@ -368,7 +368,7 @@ public class ReposStatistics {
 	}
 
 	private void reposData(Map<ITypeName, Integer> types,
-			EventStreamNotGenerated streamGen) {
+			StreamFilterGenerator streamGen) {
 		int typeCounter = 0;
 
 		for (Map.Entry<ITypeName, Integer> entry : types.entrySet()) {
@@ -381,7 +381,7 @@ public class ReposStatistics {
 	}
 
 	private void filterTypeOverlaps(Set<ITypeName> types,
-			EventStreamNotGenerated generator) {
+			StreamFilterGenerator generator) {
 		Logger.log("After filtering overlaping types between different repositories ...");
 		Logger.log("Number of unique context types: %d", types.size());
 		printEventStats(generator.getEventStream());

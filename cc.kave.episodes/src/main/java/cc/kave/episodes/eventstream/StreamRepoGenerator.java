@@ -34,7 +34,7 @@ import cc.kave.episodes.model.events.Events;
 
 import com.google.common.collect.Lists;
 
-public abstract class EventStreamRepository {
+public abstract class StreamRepoGenerator {
 
 	private List<Event> events = Lists.newLinkedList();
 

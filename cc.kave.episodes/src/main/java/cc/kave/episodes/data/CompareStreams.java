@@ -86,20 +86,14 @@ public class CompareStreams {
 
 	private void typesCounter(List<Tuple<Event, List<Event>>> stream1) {
 
-		Set<ITypeName> emptyClasses = Sets.newHashSet();
 		Set<ITypeName> classes = Sets.newHashSet();
-
-		int numEmpties = 0;
 		int numClasses = 0;
 		for (Tuple<Event, List<Event>> tuple : stream1) {
 			ITypeName type = tuple.getFirst().getType();
 
 			if (tuple.getSecond().size() == 0) {
-				emptyClasses.add(type);
-				numEmpties++;
 				continue;
 			}
-
 			for (Event event : tuple.getSecond()) {
 				if (event.getKind() == EventKind.METHOD_DECLARATION) {
 					if (!event.getMethod().getDeclaringType().equals(type)) {
@@ -115,8 +109,6 @@ public class CompareStreams {
 		}
 		System.out.printf("non-empty types: %d (%d unique)\n", numClasses,
 				classes.size());
-		System.out.printf("empty types: %d (%d unique)\n", numEmpties,
-				emptyClasses.size());
 	}
 
 	private List<Tuple<Event, List<Event>>> classStruct(List<Event> stream) {
