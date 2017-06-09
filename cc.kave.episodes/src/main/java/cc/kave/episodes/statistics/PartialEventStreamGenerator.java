@@ -53,7 +53,7 @@ public class PartialEventStreamGenerator {
 				return null;
 			}
 
-			ITypeName type = sst.getEnclosingType();
+			ITypeName type = TypeErasure.of(sst.getEnclosingType());
 			if (!seenTypes.add(type) && !sst.isPartialClass()) {
 				return null;
 			}

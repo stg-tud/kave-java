@@ -41,12 +41,10 @@ public class Statistics {
 				switch (event.getKind()) {
 				case FIRST_DECLARATION:
 					ctxFirst.add(methodName);
-//					typeDecls.add(methodName.getDeclaringType());
 					numbFirst++;
 					break;
 				case SUPER_DECLARATION:
 					ctxSuper.add(methodName);
-//					typeDecls.add(methodName.getDeclaringType());
 					numbSuper++;
 					break;
 				case INVOCATION:
