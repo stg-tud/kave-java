@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.ISST;
@@ -29,7 +30,8 @@ public class PartialEventStreamGenerator {
 	private Set<IMethodName> seenMethods;
 	private List<Event> events;
 
-	public List<Event> extract(List<Context> ctxs, Set<ITypeName> seenTypes, Set<IMethodName> seenMethods) {
+	public List<Event> extract(List<Context> ctxs, Set<ITypeName> seenTypes,
+			Set<IMethodName> seenMethods) {
 		this.seenTypes = seenTypes;
 		this.seenMethods = seenMethods;
 		events = Lists.newLinkedList();
@@ -44,7 +46,8 @@ public class PartialEventStreamGenerator {
 		return events;
 	}
 
-	private class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
+	private class EventStreamGenerationVisitor extends
+			AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
 		@Override
 		public Void visit(ISST sst, ITypeShape context) {
@@ -54,18 +57,20 @@ public class PartialEventStreamGenerator {
 			}
 
 			ITypeName type = TypeErasure.of(sst.getEnclosingType());
-			if (!seenTypes.add(type) && !sst.isPartialClass()) {
-				return null;
-			}
+//			if (!seenTypes.add(type) && !sst.isPartialClass()) {
+//				return null;
+//			}
 			events.add(Events.newType(type));
-			
+
 			return super.visit(sst, context);
 		}
 
 		private boolean isGenerated(ISST td) {
 			String partId = td.getPartialClassIdentifier();
-			return td.isPartialClass() && partId != null
-					&& (partId.contains(".Designer") || partId.contains(".designer"));
+			return td.isPartialClass()
+					&& partId != null
+					&& (partId.contains(".Designer") || partId
+							.contains(".designer"));
 		}
 
 		private IMethodName ctxElem;
@@ -79,7 +84,6 @@ public class PartialEventStreamGenerator {
 			if (!seenMethods.add(TypeErasure.of(m))) {
 				return null;
 			}
-
 			IMethodName name = decl.getName();
 			ctxElem = name;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
@@ -91,7 +95,7 @@ public class PartialEventStreamGenerator {
 
 			return super.visit(decl, context);
 		}
-		
+
 		@Override
 		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
 			return null;
@@ -106,7 +110,7 @@ public class PartialEventStreamGenerator {
 			}
 			return null;
 		}
-		
+
 		@Override
 		public Void visit(ILambdaExpression inv, ITypeShape context) {
 			// stop here for now!
@@ -119,7 +123,7 @@ public class PartialEventStreamGenerator {
 			}
 			return !name.getDeclaringType().getAssembly().isLocalProject();
 		}
-		
+
 		private void addEnclosingMethodIfAvailable() {
 			if (ctxElem != null) {
 				events.add(Events.newContext(TypeErasure.of(ctxElem)));
@@ -134,5 +138,11 @@ public class PartialEventStreamGenerator {
 				ctxSuper = null;
 			}
 		}
+	}
+
+	private ITypeName debug() {
+		String name = "[i:Arp.log4net.Psi.Tree.IParameterDescriptor, Arp] [Arp.log4net.Psi.Tree.Impl.AppenderImpl, Arp].GetParameterDescriptor([p:string] name)";
+		IMethodName methodName = Names.newMethod(name);
+		return methodName.getDeclaringType();
 	}
 }

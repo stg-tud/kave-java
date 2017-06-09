@@ -97,7 +97,7 @@ public class ContextsParser {
 			}
 			ra.close();
 		}
-		processStreamRepo(eventStreamRepo.getEventStream());
+//		processStreamRepo(eventStreamRepo.getEventStream());
 		List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
 				.getEventStream());
 		printStats();
@@ -167,19 +167,19 @@ public class ContextsParser {
 				.getStructStream(eventStream);
 		statGenerated.addStats(streamStruct);
 
-		List<Tuple<Event, List<Event>>> streamOverlaps = filters
-				.overlaps(streamStruct);
-		statOverlaps.addStats(streamOverlaps);
-
 		List<Tuple<Event, List<Event>>> streamUnknowns = filters
-				.unknowns(streamOverlaps);
+				.unknowns(streamStruct);
 		statUnknowns.addStats(streamUnknowns);
-
+		
 		List<Tuple<Event, List<Event>>> streamLocals = filters
 				.locals(streamUnknowns);
 		statLocals.addStats(streamLocals);
+		
+		List<Tuple<Event, List<Event>>> streamOverlaps = filters
+				.overlaps(streamLocals);
+		statOverlaps.addStats(streamOverlaps);
 
-		return streamLocals;
+		return streamOverlaps;
 	}
 
 	private void printStats() {
@@ -193,17 +193,17 @@ public class ContextsParser {
 		Logger.log("Filter generated code ...");
 		statGenerated.printStats();
 		Logger.log("");
+		
+		Logger.log("Filter unknown events ...");
+		statUnknowns.printStats();
+		Logger.log("");
+		
+		Logger.log("Filter local events ...");
+		statLocals.printStats();
 
 		Logger.log("Filter overlapping methods ...");
 		statOverlaps.printStats();
 		Logger.log("");
-
-		Logger.log("Filter unknown events ...");
-		statUnknowns.printStats();
-		Logger.log("");
-
-		Logger.log("Filter local events ...");
-		statLocals.printStats();
 	}
 
 	private String getRepoName(String zipName) {

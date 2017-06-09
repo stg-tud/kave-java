@@ -3,11 +3,13 @@ package cc.kave.episodes.eventstream;
 import java.util.List;
 import java.util.Set;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;
@@ -23,7 +25,7 @@ public class Filters {
 
 		for (Event event : stream) {
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				if (method != null) {
+				if ((method != null) && (method.getSecond().size() != 0)) {
 					result.add(method);
 				}
 				method = Tuple.newTuple(event, Lists.newLinkedList());
@@ -31,7 +33,9 @@ public class Filters {
 				method.getSecond().add(event);
 			}
 		}
-		result.add(method);
+		if ((method != null) && (method.getSecond().size() != 0)) {
+			result.add(method);
+		}
 		return result;
 	}
 
@@ -41,6 +45,7 @@ public class Filters {
 
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			IMethodName methodName = tuple.getFirst().getMethod();
+			
 			if (seenMethods.add(methodName)) {
 				result.add(tuple);
 			}
@@ -55,9 +60,6 @@ public class Filters {
 
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			for (Event event : tuple.getSecond()) {
-				// if (!isLocal(event)) {
-				// method.add(event);
-				// }
 				if (!isLocal(event)) {
 					method.add(event);
 				}

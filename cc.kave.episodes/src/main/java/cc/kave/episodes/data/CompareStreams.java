@@ -43,38 +43,30 @@ public class CompareStreams {
 		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
 		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
-		compareTypes(streamSeb, streamEr);
+		compareTypes(stream1, stream2);
 		// compareStreams(stream1, stream2);
 	}
 
-	private void compareTypes(List<Tuple<Event, List<Event>>> classStruct,
-			List<Tuple<Event, List<Event>>> methodStruct) {
-		Set<ITypeName> emptyTypes = Sets.newHashSet();
-		Set<ITypeName> types = Sets.newHashSet();
-		for (Tuple<Event, List<Event>> tuple : classStruct) {
-			if (tuple.getSecond().size() == 0) {
-				emptyTypes.add(tuple.getFirst().getType());
-			} else {
-				types.add(tuple.getFirst().getType());
-			}
-		}
-		Set<ITypeName> types2 = Sets.newHashSet();
-		for (Tuple<Event, List<Event>> tuple : methodStruct) {
-			String typeName = "Arp.Common.Psi.Daemon.References.IdentifierHighlighting";
-			types2.add(tuple.getFirst().getMethod().getDeclaringType());
-		}
+	private void compareTypes(Map<Event, List<Event>> stream1,
+			Map<Event, List<Event>> stream2) {
 		System.out.println();
-		System.out.println("Empty types: " + emptyTypes.size());
-		System.out.println("Types with events: " + types.size());
-		System.out.println("Ervina stream size: " + types2.size());
-		System.out.println("Ervina types include Sebastian types? "
-				+ types2.containsAll(types));
-
-		for (ITypeName type : types2) {
-			if (emptyTypes.contains(type) && (!types.contains(type))) {
-				System.out.println("Type: " + type.getFullName());
+		System.out.println("Number of methods in stream1: " + stream1.size());
+		System.out.println("Number of methods in stream2: " + stream2.size());
+		
+		System.out.println("Compare stream2 to stream1 ...");
+		int numOverlaps = 0;
+		int numDiff = 0;
+		for (Map.Entry<Event, List<Event>> entry : stream2.entrySet()) {
+			if (stream1.containsKey(entry.getKey())) {
+				numOverlaps++;
+			} else {
+				numDiff++;
+				System.out.println("Event: " + entry.getKey().toString());
+				System.out.println("Method: " + entry.getValue().toString());
 			}
 		}
+		System.out.println("Number of decls overlaps: " + numOverlaps);
+		System.out.println("Number of decls different: " + numDiff);
 	}
 
 	private Map<Event, List<Event>> mapConverter(

@@ -18,7 +18,6 @@ package cc.kave.episodes.eventstream;
 import java.util.List;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
@@ -59,7 +58,6 @@ public abstract class StreamRepoGenerator {
 
 			firstCtx = null;
 			superCtx = null;
-			elementCtx = Names.getUnknownMethod();
 			IMethodName name = decl.getName();
 			elementCtx = name;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
@@ -78,8 +76,8 @@ public abstract class StreamRepoGenerator {
 
 		@Override
 		public Void visit(IInvocationExpression inv, ITypeShape context) {
-			addEnclosingMethodIfAvailable();
 			IMethodName erased = erase(inv.getMethodName());
+			addEnclosingMethodIfAvailable();
 			events.add(Events.newInvocation(erased));
 			return null;
 		}
