@@ -91,6 +91,7 @@ public class StreamFileGeneratorTest {
 		expStream1.increaseTimeout();
 		expStream1.addEvent(inv(3)); // 3
 
+		events2 = Lists.newLinkedList();
 		events2.add(Tuple.newTuple(enclCtx(20),
 				Lists.newArrayList(firstCtx(1), inv(30))));
 		events2.add(Tuple.newTuple(enclCtx(7), Lists.newArrayList(firstCtx(2),
@@ -141,9 +142,7 @@ public class StreamFileGeneratorTest {
 		EventStream actuals = StreamFileGenerator.generate(events,
 				FREQUENCY);
 
-		System.out.println("expected: " + expected.toString());
-		System.out.println("actuals: " + actuals.toString());
-		assertEquals(expected, actuals);
+		assertTrue(expected.equals(actuals));
 	}
 
 	@Test

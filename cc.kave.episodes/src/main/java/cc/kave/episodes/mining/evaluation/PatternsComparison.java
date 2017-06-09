@@ -605,35 +605,35 @@ public class PatternsComparison {
 		// }
 	}
 
-	public void extractConcreteCode(int frequency, int foldNum) {
-		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
-				frequency, foldNum);
-		Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
-
-		EnclosingMethods enclMethods = new EnclosingMethods(true);
-		int numMethods = 0;
-		for (Tuple<Event, List<Fact>> tuple : stream) {
-			List<Fact> method = tuple.getSecond();
-
-			if (method.size() < 2) {
-				continue;
-			}
-			if (method.containsAll(pattern.getEvents())) {
-				enclMethods.addMethod(pattern, method, tuple.getFirst());
-				numMethods = enclMethods.getOccurrences();
-			}
-			if (numMethods > 500) {
-				break;
-			}
-		}
-		Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
-
-		for (IMethodName eventName : methodNames) {
-			Logger.log("General pattern occurrences: %s",
-					eventName.getDeclaringType().getFullName() + "."
-							+ eventName.getName());
-		}
-	}
+//	public void extractConcreteCode(int frequency, int foldNum) {
+//		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
+//				frequency, foldNum);
+//		Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
+//
+//		EnclosingMethods enclMethods = new EnclosingMethods(true);
+//		int numMethods = 0;
+//		for (Tuple<Event, List<Fact>> tuple : stream) {
+//			List<Fact> method = tuple.getSecond();
+//
+//			if (method.size() < 2) {
+//				continue;
+//			}
+//			if (method.containsAll(pattern.getEvents())) {
+//				enclMethods.addMethod(pattern, method, tuple.getFirst());
+//				numMethods = enclMethods.getOccurrences();
+//			}
+//			if (numMethods > 500) {
+//				break;
+//			}
+//		}
+//		Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
+//
+//		for (IMethodName eventName : methodNames) {
+//			Logger.log("General pattern occurrences: %s",
+//					eventName.getDeclaringType().getFullName() + "."
+//							+ eventName.getName());
+//		}
+//	}
 
 	private boolean assertFactSets(Set<Fact> facts1, Set<Fact> facts2) {
 		if (facts1.size() != facts2.size()) {

@@ -20,7 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -32,10 +31,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class EventStreamTest {
@@ -44,15 +40,12 @@ public class EventStreamTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private Set<Event> expectedMap;
-	private List<Event> expMethods;
 
 	private EventStream sut;
 
 	@Before
 	public void setup() {
 		expectedMap = Sets.newLinkedHashSet();
-		expMethods = Lists.newLinkedList();
-		sut = new EventStream();
 	}
 	
 	

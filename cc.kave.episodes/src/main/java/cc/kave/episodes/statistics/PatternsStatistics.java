@@ -28,39 +28,39 @@ public class PatternsStatistics {
 		this.eventStreamIo = streamIo;
 	}
 
-	public void generate(int frequency, int foldNum) {
-		List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(
-				frequency, foldNum);
-		List<Event> events = eventStreamIo.readMapping(frequency, foldNum);
-		
-		for (Tuple<Event, List<Fact>> method : stream) {
-			Event elementCtx = method.getFirst();
-			if (elementCtx.getKind() != EventKind.METHOD_DECLARATION) {
-				System.out.printf("\nInvalid method declaration element!\n");
-			} else {
-				addEvent(elementCtx, ctxElement);
-			}
-			for (Fact fact : method.getSecond()) {
-				Event event = events.get(fact.getFactID());
-				if (event.getKind() == EventKind.FIRST_DECLARATION) {
-					addEvent(event, ctxFirst);
-					continue;
-				}
-				if (event.getKind() == EventKind.SUPER_DECLARATION) {
-					addEvent(event, ctxSuper);
-					continue;
-				}
-				if (event.getKind() == EventKind.INVOCATION) {
-					addEvent(event, invExpr);
-					continue;
-				}
-				System.out.printf("Invalid event in event stream!\n");
-			}
-		}
-		printStatistics();
-		System.out.printf("Number of full methods in event stream: %d\n", stream.size());
-		System.out.printf("Number of unique events in event stream: %d\n", events.size());
-	}
+//	public void generate(int frequency, int foldNum) {
+//		List<Tuple<Event, List<Fact>>> stream = eventStreamIo.parseStream(
+//				frequency, foldNum);
+//		List<Event> events = eventStreamIo.readMapping(frequency, foldNum);
+//		
+//		for (Tuple<Event, List<Fact>> method : stream) {
+//			Event elementCtx = method.getFirst();
+//			if (elementCtx.getKind() != EventKind.METHOD_DECLARATION) {
+//				System.out.printf("\nInvalid method declaration element!\n");
+//			} else {
+//				addEvent(elementCtx, ctxElement);
+//			}
+//			for (Fact fact : method.getSecond()) {
+//				Event event = events.get(fact.getFactID());
+//				if (event.getKind() == EventKind.FIRST_DECLARATION) {
+//					addEvent(event, ctxFirst);
+//					continue;
+//				}
+//				if (event.getKind() == EventKind.SUPER_DECLARATION) {
+//					addEvent(event, ctxSuper);
+//					continue;
+//				}
+//				if (event.getKind() == EventKind.INVOCATION) {
+//					addEvent(event, invExpr);
+//					continue;
+//				}
+//				System.out.printf("Invalid event in event stream!\n");
+//			}
+//		}
+//		printStatistics();
+//		System.out.printf("Number of full methods in event stream: %d\n", stream.size());
+//		System.out.printf("Number of unique events in event stream: %d\n", events.size());
+//	}
 
 	private void printStatistics() {
 		System.out.printf("ctxFirst: %d (%d unique)\n", getOccs(ctxFirst), ctxFirst.size());

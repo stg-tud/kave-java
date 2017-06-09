@@ -112,142 +112,142 @@ public class PostChecking {
 		}
 	}
 
-	public void streamData(int frequency) {
-		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
-				frequency, FOLDNUM);
-		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
-		int numbEvents = 0;
-		int numbDecls = 0;
-		int numbInvs = 0;
-		Set<Event> declarations = Sets.newLinkedHashSet();
-		Set<Event> invocations = Sets.newLinkedHashSet();
-		Set<ITypeName> declTypes = Sets.newLinkedHashSet();
-		Set<ITypeName> invTypes = Sets.newLinkedHashSet();
-
-		for (Tuple<Event, List<Fact>> tuple : stream) {
-			if (tuple.getSecond().isEmpty()) {
-				Logger.log("empty method");
-			}
-			for (Fact fact : tuple.getSecond()) {
-				numbEvents++;
-				int factId = fact.getFactID();
-				Event e = events.get(factId);
-
-				ITypeName type;
-				try {
-					type = e.getMethod().getDeclaringType();
-				} catch (Exception exc) {
-					continue;
-				}
-				if (e.getKind() == EventKind.INVOCATION) {
-					numbInvs++;
-					invocations.add(e);
-					if (!type.isUnknown()) {
-						invTypes.add(type);
-					}
-				} else {
-					numbDecls++;
-					declarations.add(e);
-					if (!type.isUnknown()) {
-						declTypes.add(type);
-					}
-				}
-			}
-		}
-		Logger.log("Event stream information:");
-		Logger.log("Number of events: %d", events.size());
-		Logger.log("Number of methods: %d", stream.size());
-
-		Logger.log("Number of events in event stream: %d", numbEvents);
-		Logger.log("Number of method declarations: total = %d, unique = %d",
-				numbDecls, declarations.size());
-		Logger.log("Number of method invocations: total = %d, unique = %d",
-				numbInvs, invocations.size());
-		Logger.log("Number of unique declaration types: %d", declTypes.size());
-		Logger.log("Number of unique invocation types: %d", invTypes.size());
-	}
-
-	public void trainValOverlaps(int frequency) {
-		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
-				frequency, FOLDNUM);
-		List<Event> valStream = valStreamIo.read(frequency, FOLDNUM);
-
-		Set<ITypeName> trainTypes = getTrainCtxs(trainStream);
-		Set<ITypeName> valTypes = getValCtxs(valStream);
-
-		Set<ITypeName> overlaps = getSetOverlaps(trainTypes, valTypes);
-		Logger.log(
-				"Number of overlaping types for training and validation stream: %d",
-				overlaps.size());
-		Logger.log("Number of types in training stream: %d", trainTypes.size());
-		Logger.log("Number of types in validation stream: %d", valTypes.size());
-
-		if (overlaps.size() > 0) {
-			for (ITypeName type : overlaps) {
-				Logger.log("Type name: %s", type.getFullName());
-				Logger.log("Is it unknown type? %s",
-						type.equals(Names.getUnknownType()));
-			}
-		}
-	}
-
-	public void methodSize(int frequency) {
-		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
-				frequency, FOLDNUM);
-		List<Event> longMethodsCtxs = Lists.newLinkedList();
-
-		for (Tuple<Event, List<Fact>> tuple : trainStream) {
-
-			if ((tuple.getSecond().size() > METHODSIZE)
-					&& !(tuple.getFirst().getMethod().equals(Names
-							.getUnknownMethod()))) {
-				longMethodsCtxs.add(tuple.getFirst());
-			}
-		}
-		Logger.log("Number of methods with more than %d events: %d",
-				METHODSIZE, longMethodsCtxs.size());
-		for (Tuple<Event, List<Fact>> tuple : trainStream) {
-
-			if (longMethodsCtxs.contains(tuple.getFirst())) {
-				IMethodName method = tuple.getFirst().getMethod();
-				String typeName = method.getDeclaringType().getFullName();
-				String methodName = method.getName();
-				String fullName = typeName + "." + methodName;
-				Logger.log("%s: %d events", fullName, tuple.getSecond().size());
-			}
-		}
-	}
-
-	public void methodContent(int frequency) {
-		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
-				frequency, FOLDNUM);
-		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
-
-		for (Tuple<Event, List<Fact>> method : trainStream) {
-			assertTrue(
-					method.getFirst().getKind() == EventKind.METHOD_DECLARATION,
-					"Method contexts is not the element!");
-			List<Event> invocations = getInvocations(method.getSecond(), events);
-
-			for (Event event : invocations) {
-				assertTrue(event.getKind() != EventKind.METHOD_DECLARATION,
-						"There is method element in method body!");
-			}
-		}
-		Logger.log("Method content is correct in training stream!");
-	}
-
-	public void streamSizes(int frequency) {
-		List<String> streamText = fileReader.readFile(new File(
-				getStreamTextPath(frequency)));
-		List<List<Fact>> streamFacts = parseStreamText(streamText);
-		List<Tuple<Event, List<Fact>>> streamData = trainStreamIo.parseStream(
-				frequency, FOLDNUM);
-
-		Logger.log("%d - %d", streamFacts.size(), streamData.size());
-		assertTrue(streamFacts.size() == streamData.size(),
-				"Missmatch in stream sizes!");
-	}
+//	public void streamData(int frequency) {
+//		List<Tuple<Event, List<Fact>>> stream = trainStreamIo.parseStream(
+//				frequency, FOLDNUM);
+//		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
+//		int numbEvents = 0;
+//		int numbDecls = 0;
+//		int numbInvs = 0;
+//		Set<Event> declarations = Sets.newLinkedHashSet();
+//		Set<Event> invocations = Sets.newLinkedHashSet();
+//		Set<ITypeName> declTypes = Sets.newLinkedHashSet();
+//		Set<ITypeName> invTypes = Sets.newLinkedHashSet();
+//
+//		for (Tuple<Event, List<Fact>> tuple : stream) {
+//			if (tuple.getSecond().isEmpty()) {
+//				Logger.log("empty method");
+//			}
+//			for (Fact fact : tuple.getSecond()) {
+//				numbEvents++;
+//				int factId = fact.getFactID();
+//				Event e = events.get(factId);
+//
+//				ITypeName type;
+//				try {
+//					type = e.getMethod().getDeclaringType();
+//				} catch (Exception exc) {
+//					continue;
+//				}
+//				if (e.getKind() == EventKind.INVOCATION) {
+//					numbInvs++;
+//					invocations.add(e);
+//					if (!type.isUnknown()) {
+//						invTypes.add(type);
+//					}
+//				} else {
+//					numbDecls++;
+//					declarations.add(e);
+//					if (!type.isUnknown()) {
+//						declTypes.add(type);
+//					}
+//				}
+//			}
+//		}
+//		Logger.log("Event stream information:");
+//		Logger.log("Number of events: %d", events.size());
+//		Logger.log("Number of methods: %d", stream.size());
+//
+//		Logger.log("Number of events in event stream: %d", numbEvents);
+//		Logger.log("Number of method declarations: total = %d, unique = %d",
+//				numbDecls, declarations.size());
+//		Logger.log("Number of method invocations: total = %d, unique = %d",
+//				numbInvs, invocations.size());
+//		Logger.log("Number of unique declaration types: %d", declTypes.size());
+//		Logger.log("Number of unique invocation types: %d", invTypes.size());
+//	}
+//
+//	public void trainValOverlaps(int frequency) {
+//		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
+//				frequency, FOLDNUM);
+//		List<Event> valStream = valStreamIo.read(frequency, FOLDNUM);
+//
+//		Set<ITypeName> trainTypes = getTrainCtxs(trainStream);
+//		Set<ITypeName> valTypes = getValCtxs(valStream);
+//
+//		Set<ITypeName> overlaps = getSetOverlaps(trainTypes, valTypes);
+//		Logger.log(
+//				"Number of overlaping types for training and validation stream: %d",
+//				overlaps.size());
+//		Logger.log("Number of types in training stream: %d", trainTypes.size());
+//		Logger.log("Number of types in validation stream: %d", valTypes.size());
+//
+//		if (overlaps.size() > 0) {
+//			for (ITypeName type : overlaps) {
+//				Logger.log("Type name: %s", type.getFullName());
+//				Logger.log("Is it unknown type? %s",
+//						type.equals(Names.getUnknownType()));
+//			}
+//		}
+//	}
+//
+//	public void methodSize(int frequency) {
+//		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
+//				frequency, FOLDNUM);
+//		List<Event> longMethodsCtxs = Lists.newLinkedList();
+//
+//		for (Tuple<Event, List<Fact>> tuple : trainStream) {
+//
+//			if ((tuple.getSecond().size() > METHODSIZE)
+//					&& !(tuple.getFirst().getMethod().equals(Names
+//							.getUnknownMethod()))) {
+//				longMethodsCtxs.add(tuple.getFirst());
+//			}
+//		}
+//		Logger.log("Number of methods with more than %d events: %d",
+//				METHODSIZE, longMethodsCtxs.size());
+//		for (Tuple<Event, List<Fact>> tuple : trainStream) {
+//
+//			if (longMethodsCtxs.contains(tuple.getFirst())) {
+//				IMethodName method = tuple.getFirst().getMethod();
+//				String typeName = method.getDeclaringType().getFullName();
+//				String methodName = method.getName();
+//				String fullName = typeName + "." + methodName;
+//				Logger.log("%s: %d events", fullName, tuple.getSecond().size());
+//			}
+//		}
+//	}
+//
+//	public void methodContent(int frequency) {
+//		List<Tuple<Event, List<Fact>>> trainStream = trainStreamIo.parseStream(
+//				frequency, FOLDNUM);
+//		List<Event> events = trainStreamIo.readMapping(frequency, FOLDNUM);
+//
+//		for (Tuple<Event, List<Fact>> method : trainStream) {
+//			assertTrue(
+//					method.getFirst().getKind() == EventKind.METHOD_DECLARATION,
+//					"Method contexts is not the element!");
+//			List<Event> invocations = getInvocations(method.getSecond(), events);
+//
+//			for (Event event : invocations) {
+//				assertTrue(event.getKind() != EventKind.METHOD_DECLARATION,
+//						"There is method element in method body!");
+//			}
+//		}
+//		Logger.log("Method content is correct in training stream!");
+//	}
+//
+//	public void streamSizes(int frequency) {
+//		List<String> streamText = fileReader.readFile(new File(
+//				getStreamTextPath(frequency)));
+//		List<List<Fact>> streamFacts = parseStreamText(streamText);
+//		List<Tuple<Event, List<Fact>>> streamData = trainStreamIo.parseStream(
+//				frequency, FOLDNUM);
+//
+//		Logger.log("%d - %d", streamFacts.size(), streamData.size());
+//		assertTrue(streamFacts.size() == streamData.size(),
+//				"Missmatch in stream sizes!");
+//	}
 
 	private List<List<Fact>> parseStreamText(List<String> stream) {
 		List<List<Fact>> streamResult = Lists.newLinkedList();

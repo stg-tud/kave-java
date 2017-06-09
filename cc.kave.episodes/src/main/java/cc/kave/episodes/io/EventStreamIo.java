@@ -29,11 +29,7 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.EventKind;
-import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.datastructures.Tuple;
 
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
@@ -69,58 +65,57 @@ public class EventStreamIo {
 		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
 
-	public String readStreamText(int frequency, int foldNum) throws IOException {
-		String streamPath = getTrainPath(frequency, foldNum).streamTextPath;
+//	public String readStreamText(int frequency, int foldNum) throws IOException {
+//		String streamPath = getTrainPath(frequency, foldNum).streamTextPath;
+//
+//		String stream = FileUtils.readFileToString(new File(streamPath));
+//
+//		return stream;
+//	}
+//
+//	public List<Tuple<Event, List<Fact>>> parseStream(int frequency, int foldNum) {
+//		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
+//
+//		List<Tuple<Event, String>> stream = readStreamData(frequency, foldNum);
+//
+//		for (Tuple<Event, String> methodTuple : stream) {
+//			List<Fact> methodFacts = Lists.newLinkedList();
+//			String[] lines = methodTuple.getSecond().split("\n");
+//
+//			for (String line : lines) {
+//				String[] eventTime = line.split(",");
+//				int eventID = Integer.parseInt(eventTime[0]);
+//				methodFacts.add(new Fact(eventID));
+//			}
+//			results.add(Tuple.newTuple(methodTuple.getFirst(), methodFacts));
+//		}
+//		return results;
+//	}
 
-		String stream = FileUtils.readFileToString(new File(streamPath));
+//	private List<Tuple<Event, String>> readStreamData(int frequency, int foldNum) {
+//		String streamPath = getTrainPath(frequency, foldNum).streamDataPath;
+//
+//		@SuppressWarnings("serial")
+//		Type type = new TypeToken<List<Tuple<Event, String>>>() {
+//		}.getType();
+//		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(
+//				streamPath), type);
+//		assertMethods(stream);
+//		return stream;
+//	}
 
-		return stream;
-	}
-
-	public List<Tuple<Event, List<Fact>>> parseStream(int frequency, int foldNum) {
-		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
-
-		List<Tuple<Event, String>> stream = readStreamData(frequency, foldNum);
-
-		for (Tuple<Event, String> methodTuple : stream) {
-			List<Fact> methodFacts = Lists.newLinkedList();
-			String[] lines = methodTuple.getSecond().split("\n");
-
-			for (String line : lines) {
-				String[] eventTime = line.split(",");
-				int eventID = Integer.parseInt(eventTime[0]);
-				methodFacts.add(new Fact(eventID));
-			}
-			results.add(Tuple.newTuple(methodTuple.getFirst(), methodFacts));
-		}
-		return results;
-	}
-
-	private List<Tuple<Event, String>> readStreamData(int frequency, int foldNum) {
-		String streamPath = getTrainPath(frequency, foldNum).streamDataPath;
-
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<List<Tuple<Event, String>>>() {
-		}.getType();
-		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(
-				streamPath), type);
-		assertMethods(stream);
-		return stream;
-	}
-
-	private void assertMethods(List<Tuple<Event, String>> stream) {
-		for (Tuple<Event, String> tuple : stream) {
-			assertTrue(
-					tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
-					"Stream contexts contains invalid mehod contexts");
-		}
-
-	}
+//	private void assertMethods(List<Tuple<Event, String>> stream) {
+//		for (Tuple<Event, String> tuple : stream) {
+//			assertTrue(
+//					tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
+//					"Stream contexts contains invalid mehod contexts");
+//		}
+//
+//	}
 
 	private class TrainingPath {
 		String streamTextPath = "";
 		String mappingPath = "";
-		String streamDataPath = "";
 	}
 
 	private TrainingPath getTrainPath(int freq, int foldNum) {
@@ -132,7 +127,6 @@ public class EventStreamIo {
 		TrainingPath trainPath = new TrainingPath();
 		trainPath.streamTextPath = path.getAbsolutePath() + "/streamText.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
-		trainPath.streamDataPath = path.getAbsolutePath() + "/streamData.json";
 
 		return trainPath;
 	}

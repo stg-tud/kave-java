@@ -86,117 +86,117 @@ public class EventStreamIoTest {
 		sut = new EventStreamIo(file);
 	}
 
-	@Test
-	public void invalidMethodCtx() {
+//	@Test
+//	public void invalidMethodCtx() {
+//
+//		List<Tuple<Event, String>> stream = Lists.newLinkedList();
+//		stream.add(Tuple.newTuple(firstCtx(1), "1,0.000\n2,0.001\n"));
+//		stream.add(Tuple.newTuple(inv(2), "3,5.002\n"));
+//		stream.add(Tuple.newTuple(inv(4), "2,15.003\n3,15.004\n"));
+//
+//		JsonUtils.toJson(stream, getStreamDataFile());
+//
+//		thrown.expect(AssertionException.class);
+//		thrown.expectMessage("Stream contexts contains invalid mehod contexts");
+//
+//		sut.parseStream(FREQUENCY, FOLDNUM);
+//	}
 
-		List<Tuple<Event, String>> stream = Lists.newLinkedList();
-		stream.add(Tuple.newTuple(firstCtx(1), "1,0.000\n2,0.001\n"));
-		stream.add(Tuple.newTuple(inv(2), "3,5.002\n"));
-		stream.add(Tuple.newTuple(inv(4), "2,15.003\n3,15.004\n"));
+//	@Test
+//	public void happyPath() throws IOException {
+//
+//		EventStream eventStream = new EventStream();
+//		eventStream.addEvent(firstCtx(1)); // 1
+//		eventStream.addEvent(ctx(1));
+//		eventStream.addEvent(inv(2)); // 2
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(2));
+//		eventStream.addEvent(inv(5)); // 3
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(3));
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(4));
+//		eventStream.addEvent(inv(2)); // 2
+//		eventStream.addEvent(inv(5)); // 3
+//
+//		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
+//		List<Fact> method2 = Lists.newArrayList(new Fact(3));
+//		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
+//
+//		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
+//		expStreamData.add(Tuple.newTuple(ctx(1), method1));
+//		expStreamData.add(Tuple.newTuple(ctx(2), method2));
+//		expStreamData.add(Tuple.newTuple(ctx(4), method3));
+//
+//		sut.write(eventStream, FREQUENCY, FOLDNUM);
+//
+//		assertTrue(streamTextFile.exists());
+//		assertTrue(mappingFile.exists());
+//		assertTrue(streamDataFile.exists());
+//
+//		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
+//
+//		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
+//
+//		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
+//				FREQUENCY, FOLDNUM);
+//
+//		assertMapping(eventStream.getMapping(), actMapping);
+//
+//		assertEquals(expStreamData, actStreamData);
+//
+//		assertEquals(eventStream.getStreamText(), actStreamText);
+//
+//		assertTrue(actMapping.size() == 4);
+//	}
 
-		JsonUtils.toJson(stream, getStreamDataFile());
-
-		thrown.expect(AssertionException.class);
-		thrown.expectMessage("Stream contexts contains invalid mehod contexts");
-
-		sut.parseStream(FREQUENCY, FOLDNUM);
-	}
-
-	@Test
-	public void happyPath() throws IOException {
-
-		EventStream eventStream = new EventStream();
-		eventStream.addEvent(firstCtx(1)); // 1
-		eventStream.addEvent(ctx(1));
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(2));
-		eventStream.addEvent(inv(5)); // 3
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(3));
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(4));
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(inv(5)); // 3
-
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(3));
-		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
-
-		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
-		expStreamData.add(Tuple.newTuple(ctx(1), method1));
-		expStreamData.add(Tuple.newTuple(ctx(2), method2));
-		expStreamData.add(Tuple.newTuple(ctx(4), method3));
-
-		sut.write(eventStream, FREQUENCY, FOLDNUM);
-
-		assertTrue(streamTextFile.exists());
-		assertTrue(mappingFile.exists());
-		assertTrue(streamDataFile.exists());
-
-		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
-
-		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
-
-		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
-				FREQUENCY, FOLDNUM);
-
-		assertMapping(eventStream.getMapping(), actMapping);
-
-		assertEquals(expStreamData, actStreamData);
-
-		assertEquals(eventStream.getStreamText(), actStreamText);
-
-		assertTrue(actMapping.size() == 4);
-	}
-
-	@Test
-	public void emptyMethods() throws IOException {
-
-		EventStream eventStream = new EventStream();
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(0));
-		eventStream.addEvent(firstCtx(1)); // 1
-		eventStream.addEvent(ctx(1));
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(2));
-		eventStream.addEvent(inv(5)); // 3
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(0));
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(4));
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(inv(5)); // 3
-		eventStream.addEvent(firstCtx(0));
-		eventStream.addEvent(ctx(0));
-
-		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
-		List<Fact> method2 = Lists.newArrayList(new Fact(3));
-		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
-
-		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
-		expStreamData.add(Tuple.newTuple(ctx(1), method1));
-		expStreamData.add(Tuple.newTuple(ctx(2), method2));
-		expStreamData.add(Tuple.newTuple(ctx(4), method3));
-
-		sut.write(eventStream, FREQUENCY, FOLDNUM);
-
-		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
-
-		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
-
-		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
-				FREQUENCY, FOLDNUM);
-
-		assertMapping(eventStream.getMapping(), actMapping);
-
-		assertEquals(expStreamData, actStreamData);
-
-		assertEquals(eventStream.getStreamText(), actStreamText);
-
-		assertTrue(actMapping.size() == 4);
-	}
+//	@Test
+//	public void emptyMethods() throws IOException {
+//
+//		EventStream eventStream = new EventStream();
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(0));
+//		eventStream.addEvent(firstCtx(1)); // 1
+//		eventStream.addEvent(ctx(1));
+//		eventStream.addEvent(inv(2)); // 2
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(2));
+//		eventStream.addEvent(inv(5)); // 3
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(0));
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(4));
+//		eventStream.addEvent(inv(2)); // 2
+//		eventStream.addEvent(inv(5)); // 3
+//		eventStream.addEvent(firstCtx(0));
+//		eventStream.addEvent(ctx(0));
+//
+//		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
+//		List<Fact> method2 = Lists.newArrayList(new Fact(3));
+//		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
+//
+//		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
+//		expStreamData.add(Tuple.newTuple(ctx(1), method1));
+//		expStreamData.add(Tuple.newTuple(ctx(2), method2));
+//		expStreamData.add(Tuple.newTuple(ctx(4), method3));
+//
+//		sut.write(eventStream, FREQUENCY, FOLDNUM);
+//
+//		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
+//
+//		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
+//
+//		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
+//				FREQUENCY, FOLDNUM);
+//
+//		assertMapping(eventStream.getMapping(), actMapping);
+//
+//		assertEquals(expStreamData, actStreamData);
+//
+//		assertEquals(eventStream.getStreamText(), actStreamText);
+//
+//		assertTrue(actMapping.size() == 4);
+//	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {
 		if (expMapping.size() != actMapping.size()) {

@@ -42,7 +42,9 @@ public class StreamFileGenerator {
 				}
 			}
 			if (validMethod(method)) {
-				if (!isFirst) {
+				if (isFirst) {
+					isFirst = false;
+				} else {
 					es.increaseTimeout();
 				}
 				for (Event e : method) {
