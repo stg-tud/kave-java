@@ -44,20 +44,20 @@ public class EventStreamIo {
 		this.eventsDir = folder;
 	}
 
-	public void write(EventStream stream, int frequency, int foldNum) {
+	public void write(EventStream stream, int frequency) {
 		try {
 			FileUtils.writeStringToFile(
-					new File(getTrainPath(frequency, foldNum).streamTextPath),
+					new File(getTrainPath(frequency).streamTextPath),
 					stream.getStreamText());
 			JsonUtils.toJson(stream.getMapping(),
-					new File(getTrainPath(frequency, foldNum).mappingPath));
+					new File(getTrainPath(frequency).mappingPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public List<Event> readMapping(int freq, int foldNum) {
-		String mappingPath = getTrainPath(freq, foldNum).mappingPath;
+		String mappingPath = getTrainPath(freq).mappingPath;
 
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
@@ -118,9 +118,8 @@ public class EventStreamIo {
 		String mappingPath = "";
 	}
 
-	private TrainingPath getTrainPath(int freq, int foldNum) {
-		File path = new File(eventsDir.getAbsolutePath() + "/freq" + freq
-				+ "/TrainingData/fold" + foldNum);
+	private TrainingPath getTrainPath(int freq) {
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + freq);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

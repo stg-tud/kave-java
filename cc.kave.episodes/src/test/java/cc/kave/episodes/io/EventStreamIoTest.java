@@ -15,9 +15,6 @@
  */
 package cc.kave.episodes.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -31,15 +28,9 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
-
-import com.google.common.collect.Lists;
 
 public class EventStreamIoTest {
 
@@ -54,7 +45,6 @@ public class EventStreamIoTest {
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
 	private static final int FREQUENCY = 2;
-	private static final int FOLDNUM = 0;
 
 	File mappingFile;
 	File streamTextFile;
@@ -227,7 +217,7 @@ public class EventStreamIoTest {
 
 	private String getPath() {
 		File path = new File(tmp.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY + "/TrainingData/fold" + FOLDNUM);
+				+ FREQUENCY);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}

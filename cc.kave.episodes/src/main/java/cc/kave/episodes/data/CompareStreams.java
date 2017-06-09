@@ -35,7 +35,7 @@ public class CompareStreams {
 		typesCounter(stream1);
 		localCtxCounter(stream);
 
-//		parser.parse();
+		parser.parse();
 	}
 
 	private void localCtxCounter(List<Event> stream) {

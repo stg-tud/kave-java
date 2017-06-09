@@ -56,8 +56,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(ContextsParser.class).parse();
-//		load(CompareStreams.class).compare();
+//		load(ContextsParser.class).parse();
+		load(CompareStreams.class).compare();
 		
 
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
