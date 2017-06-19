@@ -64,6 +64,7 @@ public abstract class StreamRepoGenerator {
 				if (h.getElement().equals(name)) {
 					firstCtx = h.getFirst();
 					superCtx = h.getSuper();
+					break;
 				}
 			}
 			return super.visit(decl, context);

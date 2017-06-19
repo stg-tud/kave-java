@@ -81,13 +81,12 @@ public class PartialEventStreamGenerator {
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
 			IMethodName m = decl.getName();
-			if (!seenMethods.add(TypeErasure.of(m))) {
-				return null;
-			}
-			IMethodName name = decl.getName();
-			ctxElem = name;
+//			if (!seenMethods.add(TypeErasure.of(m))) {
+//				return null;
+//			}
+			ctxElem = m;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
-				if (h.getElement().equals(name)) {
+				if (h.getElement().equals(m)) {
 					ctxSuper = h.getSuper();
 					ctxFirst = h.getFirst();
 				}
@@ -104,8 +103,7 @@ public class PartialEventStreamGenerator {
 		@Override
 		public Void visit(IInvocationExpression inv, ITypeShape context) {
 			IMethodName m = TypeErasure.of(inv.getMethodName());
-			if (shouldInclude(m)) {
-				addEnclosingMethodIfAvailable();
+			if (shouldInclude(m) && addEnclosingMethodIfAvailable()) {
 				events.add(Events.newInvocation(m));
 			}
 			return null;
@@ -124,8 +122,11 @@ public class PartialEventStreamGenerator {
 			return !name.getDeclaringType().getAssembly().isLocalProject();
 		}
 
-		private void addEnclosingMethodIfAvailable() {
+		private boolean addEnclosingMethodIfAvailable() {
 			if (ctxElem != null) {
+				if (!seenMethods.add(TypeErasure.of(ctxElem))) {
+					return false;
+				}
 				events.add(Events.newContext(TypeErasure.of(ctxElem)));
 				ctxElem = null;
 			}
@@ -137,6 +138,7 @@ public class PartialEventStreamGenerator {
 				events.add(Events.newSuperContext(TypeErasure.of(ctxSuper)));
 				ctxSuper = null;
 			}
+			return true;
 		}
 	}
 

@@ -3,13 +3,11 @@ package cc.kave.episodes.eventstream;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
-import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;

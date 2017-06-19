@@ -6,12 +6,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
-import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.statistics.EventStreamGenerator2;
 import cc.recommenders.datastructures.Tuple;
 
@@ -37,22 +35,40 @@ public class CompareStreams {
 
 		System.out.println();
 
-		typesCounter(streamSeb);
+		Set<ITypeName> types1 = typesCounter(streamSeb);
 		localCtxCounter(stream);
 
 		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
 		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
-		compareTypes(stream1, stream2);
+		compareTypeDecls(types1, streamEr);
+		// compareCtxElems(stream1, stream2);
 		// compareStreams(stream1, stream2);
 	}
 
-	private void compareTypes(Map<Event, List<Event>> stream1,
+	private void compareTypeDecls(Set<ITypeName> types,
+			List<Tuple<Event, List<Event>>> stream) {
+
+		Set<ITypeName> newTypes = Sets.newHashSet();
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			ITypeName typeName = tuple.getFirst().getMethod()
+					.getDeclaringType();
+			if (!types.contains(typeName)) {
+				newTypes.add(typeName);
+			}
+		}
+		System.out.println("Non-overlapping types: " + newTypes.size());
+		for (ITypeName type : newTypes) {
+			System.out.println(type.getFullName());
+		}
+	}
+
+	private void compareCtxElems(Map<Event, List<Event>> stream1,
 			Map<Event, List<Event>> stream2) {
 		System.out.println();
 		System.out.println("Number of methods in stream1: " + stream1.size());
 		System.out.println("Number of methods in stream2: " + stream2.size());
-		
+
 		System.out.println("Compare stream2 to stream1 ...");
 		int numOverlaps = 0;
 		int numDiff = 0;
@@ -61,6 +77,9 @@ public class CompareStreams {
 				numOverlaps++;
 			} else {
 				numDiff++;
+				System.out.println("typeDecl: "
+						+ entry.getKey().getMethod().getDeclaringType()
+								.getFullName());
 				System.out.println("Event: " + entry.getKey().toString());
 				System.out.println("Method: " + entry.getValue().toString());
 			}
@@ -142,7 +161,7 @@ public class CompareStreams {
 		return newVal;
 	}
 
-	private void typesCounter(List<Tuple<Event, List<Event>>> stream1) {
+	private Set<ITypeName> typesCounter(List<Tuple<Event, List<Event>>> stream1) {
 
 		Set<ITypeName> classes = Sets.newHashSet();
 		int numClasses = 0;
@@ -152,21 +171,12 @@ public class CompareStreams {
 			if (tuple.getSecond().size() == 0) {
 				continue;
 			}
-			for (Event event : tuple.getSecond()) {
-				if (event.getKind() == EventKind.METHOD_DECLARATION) {
-					if (!event.getMethod().getDeclaringType().equals(type)) {
-						System.out.println("Type: " + type.getFullName());
-						System.out.println("Method: "
-								+ event.getMethod().getDeclaringType()
-										.getFullName());
-					}
-				}
-			}
 			classes.add(type);
 			numClasses++;
 		}
 		System.out.printf("non-empty types: %d (%d unique)\n", numClasses,
 				classes.size());
+		return classes;
 	}
 
 	private List<Tuple<Event, List<Event>>> classStruct(List<Event> stream) {
