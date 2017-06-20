@@ -6,12 +6,15 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.statistics.EventStreamGenerator2;
 import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +28,14 @@ public class CompareStreams {
 	public CompareStreams(ContextsParser parser) {
 		this.parser = parser;
 	}
+
+	private String name0 = "[p:string] [p:object].ToString()";
+	private String name1 = "Arp.Generator.Preprocessing.Impl.AttributesGroupGenerationInfo, Arp.Generator]..init()";
+	private String name2 = "Arp.Generator.Preprocessing.Impl.PreprocesingVisitor, Arp.Generator]..init()";
+
+	private IMethodName ctxSuper = Names.newMethod(name0);
+	private IMethodName ctxElem1 = Names.newMethod(name1);
+	private IMethodName ctxElem2 = Names.newMethod(name2);
 
 	public void compare() throws Exception {
 		String path = "/Users/ervinacergani/Documents/EpisodeMining/dataSet/SSTs/";
@@ -41,9 +52,26 @@ public class CompareStreams {
 		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
 		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
-		compareTypeDecls(types1, streamEr);
+		// compareTypeDecls(types1, streamEr);
+		compareSupers(stream1, stream2);
 		// compareCtxElems(stream1, stream2);
 		// compareStreams(stream1, stream2);
+	}
+
+	private void compareSupers(Map<Event, List<Event>> stream1,
+			Map<Event, List<Event>> stream2) {
+		Logger.log("Printing method declarations from stream1 ...");
+		extractDecls(stream1);
+		Logger.log("Printing method declarations from stream2 ...");
+		extractDecls(stream2);
+	}
+
+	private void extractDecls(Map<Event, List<Event>> stream) {
+		for (Map.Entry<Event, List<Event>> entry : stream.entrySet()) {
+			if (entry.getKey().getMethod().toString().equalsIgnoreCase(name1)) {
+				Logger.log("%s", entry.getValue().toString());
+			}
+		}
 	}
 
 	private void compareTypeDecls(Set<ITypeName> types,
