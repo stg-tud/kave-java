@@ -41,16 +41,16 @@ public class CompareStreams {
 		String path = "/Users/ervinacergani/Documents/EpisodeMining/dataSet/SSTs/";
 		EventStreamGenerator2 gen = new EventStreamGenerator2(path);
 		List<Event> stream = gen.run();
-		List<Tuple<Event, List<Event>>> streamSeb = classStruct(stream);
-		Map<Event, List<Event>> stream1 = methodStruct(stream);
-
-		System.out.println();
-
-		Set<ITypeName> types1 = typesCounter(streamSeb);
-		localCtxCounter(stream);
-
-		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
-		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
+//		List<Tuple<Event, List<Event>>> streamSeb = classStruct(stream);
+//		Map<Event, List<Event>> stream1 = methodStruct(stream);
+//
+//		System.out.println();
+//
+//		Set<ITypeName> types1 = typesCounter(streamSeb);
+//		localCtxCounter(stream);
+//
+//		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
+//		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
 		// compareTypeDecls(types1, streamEr);
 //		compareSupers(stream1);

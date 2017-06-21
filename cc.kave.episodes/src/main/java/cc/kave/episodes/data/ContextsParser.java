@@ -97,15 +97,15 @@ public class ContextsParser {
 			}
 			ra.close();
 		}
-		List<Tuple<Event, List<Event>>> stream = processStreamRepo(eventStreamRepo.getEventStream());
-		processStreamFilter(eventStreamFilter
+		List<Tuple<Event, List<Event>>> stream = processStreamRepo(eventStreamRepo
 				.getEventStream());
+		processStreamFilter(eventStreamFilter.getEventStream());
 		printStats();
 		checkForEmptyRepos();
 		checkElementCtxs(stream);
 		return stream;
 	}
-	
+
 	public Map<String, Set<IMethodName>> getRepoCtxMapper() {
 		return repoDecls;
 	}
@@ -170,11 +170,11 @@ public class ContextsParser {
 		List<Tuple<Event, List<Event>>> streamUnknowns = filters
 				.unknowns(streamStruct);
 		statUnknowns.addStats(streamUnknowns);
-		
+
 		List<Tuple<Event, List<Event>>> streamLocals = filters
 				.locals(streamUnknowns);
 		statLocals.addStats(streamLocals);
-		
+
 		List<Tuple<Event, List<Event>>> streamOverlaps = filters
 				.overlaps(streamLocals);
 		statOverlaps.addStats(streamOverlaps);
@@ -193,11 +193,11 @@ public class ContextsParser {
 		Logger.log("Filter generated code ...");
 		statGenerated.printStats();
 		Logger.log("");
-		
+
 		Logger.log("Filter unknown events ...");
 		statUnknowns.printStats();
 		Logger.log("");
-		
+
 		Logger.log("Filter local events ...");
 		statLocals.printStats();
 
