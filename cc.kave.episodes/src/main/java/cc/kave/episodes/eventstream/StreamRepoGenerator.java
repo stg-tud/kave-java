@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 public abstract class StreamRepoGenerator {
 
 	private List<Event> events = Lists.newLinkedList();
-
+	
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
 		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
@@ -64,7 +64,6 @@ public abstract class StreamRepoGenerator {
 				if (h.getElement().equals(name)) {
 					firstCtx = h.getFirst();
 					superCtx = h.getSuper();
-					break;
 				}
 			}
 			return super.visit(decl, context);

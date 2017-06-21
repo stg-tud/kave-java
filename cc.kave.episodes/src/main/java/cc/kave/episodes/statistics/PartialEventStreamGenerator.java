@@ -19,10 +19,14 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 
 public class PartialEventStreamGenerator {
+	
+	private String name1 = "[p:void] [Arp.Generator.Preprocessing.Impl.AttributesGroupGenerationInfo, Arp.Generator]..init()";
+	private IMethodName decl1 = Names.newMethod(name1);
 
 	private final ISSTNodeVisitor<ITypeShape, Void> visitor = new EventStreamGenerationVisitor();
 
@@ -80,18 +84,22 @@ public class PartialEventStreamGenerator {
 		@Override
 		public Void visit(IMethodDeclaration decl, ITypeShape context) {
 
+			ctxFirst = null;
+			ctxSuper = null;
 			IMethodName m = decl.getName();
 //			if (!seenMethods.add(TypeErasure.of(m))) {
 //				return null;
 //			}
 			ctxElem = m;
+//			if (m.equals(decl1)) {
+//				Logger.log("stop for now");
+//			}
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(m)) {
 					ctxSuper = h.getSuper();
 					ctxFirst = h.getFirst();
 				}
 			}
-
 			return super.visit(decl, context);
 		}
 

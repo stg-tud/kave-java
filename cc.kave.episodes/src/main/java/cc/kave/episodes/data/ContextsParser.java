@@ -97,8 +97,8 @@ public class ContextsParser {
 			}
 			ra.close();
 		}
-//		processStreamRepo(eventStreamRepo.getEventStream());
-		List<Tuple<Event, List<Event>>> stream = processStreamFilter(eventStreamFilter
+		List<Tuple<Event, List<Event>>> stream = processStreamRepo(eventStreamRepo.getEventStream());
+		processStreamFilter(eventStreamFilter
 				.getEventStream());
 		printStats();
 		checkForEmptyRepos();

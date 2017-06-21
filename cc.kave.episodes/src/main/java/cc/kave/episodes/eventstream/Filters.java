@@ -16,7 +16,7 @@ import com.google.common.collect.Sets;
 public class Filters {
 
 	private Set<IMethodName> seenMethods = Sets.newHashSet();
-
+	
 	public List<Tuple<Event, List<Event>>> getStructStream(List<Event> stream) {
 		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
 		Tuple<Event, List<Event>> method = null;

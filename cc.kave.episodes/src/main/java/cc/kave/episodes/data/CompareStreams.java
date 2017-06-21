@@ -30,12 +30,12 @@ public class CompareStreams {
 	}
 
 	private String name0 = "[p:string] [p:object].ToString()";
-	private String name1 = "Arp.Generator.Preprocessing.Impl.AttributesGroupGenerationInfo, Arp.Generator]..init()";
-	private String name2 = "Arp.Generator.Preprocessing.Impl.PreprocesingVisitor, Arp.Generator]..init()";
+	private String name1 = "[p:void] [Arp.Generator.Preprocessing.Impl.AttributesGroupGenerationInfo, Arp.Generator]..init()";
+	private String name2 = "[p:void] [Arp.Generator.Preprocessing.Impl.PreprocesingVisitor, Arp.Generator]..init()";
 
-	private IMethodName ctxSuper = Names.newMethod(name0);
-	private IMethodName ctxElem1 = Names.newMethod(name1);
-	private IMethodName ctxElem2 = Names.newMethod(name2);
+	private IMethodName ctxSuper0 = Names.newMethod(name0);
+	private IMethodName decl1 = Names.newMethod(name1);
+	private IMethodName decl2 = Names.newMethod(name2);
 
 	public void compare() throws Exception {
 		String path = "/Users/ervinacergani/Documents/EpisodeMining/dataSet/SSTs/";
@@ -53,23 +53,25 @@ public class CompareStreams {
 		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
 		// compareTypeDecls(types1, streamEr);
-		compareSupers(stream1, stream2);
+//		compareSupers(stream1);
 		// compareCtxElems(stream1, stream2);
 		// compareStreams(stream1, stream2);
 	}
 
-	private void compareSupers(Map<Event, List<Event>> stream1,
-			Map<Event, List<Event>> stream2) {
-		Logger.log("Printing method declarations from stream1 ...");
-		extractDecls(stream1);
-		Logger.log("Printing method declarations from stream2 ...");
-		extractDecls(stream2);
-	}
-
-	private void extractDecls(Map<Event, List<Event>> stream) {
+	private void compareSupers(Map<Event, List<Event>> stream) {
+		Logger.log("Printing from stream1 ...\n");
 		for (Map.Entry<Event, List<Event>> entry : stream.entrySet()) {
-			if (entry.getKey().getMethod().toString().equalsIgnoreCase(name1)) {
-				Logger.log("%s", entry.getValue().toString());
+			if (entry.getKey().getMethod().equals(decl1)) {
+				System.out.println(entry.getKey().toString());
+				System.out.println(entry.getValue().toString());
+				Logger.log("Decl: %s", entry.getKey().getMethod()
+						.getDeclaringType().getFullName());
+				for (Event event : entry.getValue()) {
+					if (event.getKind() == EventKind.SUPER_DECLARATION) {
+						Logger.log("Super: %s", event.getMethod()
+								.getDeclaringType().getFullName());
+					}
+				}
 			}
 		}
 	}
