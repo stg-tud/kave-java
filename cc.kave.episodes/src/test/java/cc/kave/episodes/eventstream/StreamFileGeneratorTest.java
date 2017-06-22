@@ -108,27 +108,27 @@ public class StreamFileGeneratorTest {
 		expStream2 = new EventStream();
 		expStream2.addEvent(firstCtx(1));
 		expStream2.addEvent(inv(30));
-		
+
 		expStream2.increaseTimeout();
 		expStream2.addEvent(firstCtx(2)); // 1
 		expStream2.addEvent(inv(20)); // 2
 		expStream2.addEvent(inv(30)); // 3
-		
+
 		expStream2.increaseTimeout();
 		expStream2.addEvent(firstCtx(1));
 		expStream2.addEvent(inv(2));
 		expStream2.addEvent(inv(3));
-		
+
 		expStream2.increaseTimeout();
 		expStream2.addEvent(firstCtx(2)); // 1
 		expStream2.addEvent(inv(30)); // 3
 		expStream2.addEvent(inv(30)); // 2
-		
+
 		expStream2.increaseTimeout();
 		expStream2.addEvent(firstCtx(1));
 		expStream2.addEvent(inv(3));
 		expStream2.addEvent(inv(2));
-		
+
 		expStream2.increaseTimeout();
 		expStream2.addEvent(inv(20));
 	}
@@ -139,16 +139,14 @@ public class StreamFileGeneratorTest {
 
 		EventStream expected = new EventStream();
 
-		EventStream actuals = StreamFileGenerator.generate(events,
-				FREQUENCY);
+		EventStream actuals = StreamFileGenerator.generate(events, FREQUENCY);
 
 		assertTrue(expected.equals(actuals));
 	}
 
 	@Test
 	public void filterStream1() {
-		EventStream actuals = StreamFileGenerator.generate(events1,
-				FREQUENCY);
+		EventStream actuals = StreamFileGenerator.generate(events1, FREQUENCY);
 
 		assertEquals(expStream1.getStreamText(), actuals.getStreamText());
 		assertEquals(expStream1.getMapping(), actuals.getMapping());
@@ -157,8 +155,7 @@ public class StreamFileGeneratorTest {
 
 	@Test
 	public void filterStream2() {
-		EventStream actuals = StreamFileGenerator.generate(events2,
-				FREQUENCY);
+		EventStream actuals = StreamFileGenerator.generate(events2, FREQUENCY);
 
 		assertEquals(expStream2.getStreamText(), actuals.getStreamText());
 		assertTrue(expStream2.equals(actuals));
@@ -181,11 +178,13 @@ public class StreamFileGeneratorTest {
 	}
 
 	private static IMethodName m(int i) {
-		if (i == 20) {
+		if (i == 10) {
 			return Names
 					.newMethod("[mscorlib,P, 4.0.0.0] [mscorlib,P, 4.0.0.0].m()");
-		} else if (i == 30) {
+		} else if (i == 20) {
 			return Names.newMethod("[mscorlib,P] [mscorlib,P].m()");
+		} else if (i == 30) {
+			return Names.newMethod("[T,P] [T,P].m" + i + "()");
 		} else {
 			return Names
 					.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");

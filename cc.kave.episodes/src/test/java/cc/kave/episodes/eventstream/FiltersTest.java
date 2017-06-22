@@ -1,56 +1,215 @@
 package cc.kave.episodes.eventstream;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Test;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class FiltersTest {
-	
-	private Set<IMethodName> decls;
+
 	private List<Event> stream;
-	
+
+	private List<Tuple<Event, List<Event>>> expected;
+
 	private Filters sut;
-	
+
 	@Before
 	public void setup() {
-		decls = Sets.newHashSet();
-		decls.add(Events.newContext(m(1, 1)).getMethod());
-		decls.add(Events.newContext(m(1, 2)).getMethod());
-		decls.add(Events.newContext(mGenericFree(1, 2)).getMethod());
-		decls.add(Events.newContext(m(2, 1)).getMethod());
-		decls.add(Events.newContext(m(3, 1)).getMethod());
-		decls.add(Events.newContext(m(4, 1)).getMethod());
-		
 		stream = Lists.newLinkedList();
-		
+		expected = Lists.newLinkedList();
+
 		sut = new Filters();
 	}
-	
-	private IMethodName m(int typeNum, int methodNum) {
-		return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum),
-				methodNum));
-	}
-	
-	private ITypeName t(int typeNum) {
-		return Names.newType(String.format("T%d,P", typeNum));
-	}
-	
-	private IMethodName mGenericFree(int typeNum, int methodNum) {
-		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T]]()",
-				tGenericFree(typeNum), methodNum));
+
+	@Test
+	public void testStruct() {
+		stream.add(Events.newContext(m(11)));
+		stream.add(Events.newFirstContext(m(21)));
+		stream.add(Events.newSuperContext(m(30)));
+		stream.add(Events.newInvocation(m(41)));
+		stream.add(Events.newInvocation(m(42)));
+		stream.add(Events.newInvocation(m(43)));
+
+		stream.add(Events.newContext(m(30)));
+		stream.add(Events.newFirstContext(m(22)));
+		stream.add(Events.newSuperContext(m(32)));
+		
+		stream.add(Events.newContext(m(12)));
+		
+		stream.add(Events.newContext(m(30)));
+		stream.add(Events.newInvocation(m(44)));
+
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(30)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(42)));
+		method.add(Events.newInvocation(m(43)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		
+		method = Lists.newLinkedList();
+		method.add(Events.newInvocation(m(44)));
+		expected.add(Tuple.newTuple(Events.newContext(m(30)), method));
+
+		List<Tuple<Event, List<Event>>> actual = sut.getStructStream(stream);
+
+		assertEquals(expected, actual);
 	}
 
-	private ITypeName tGenericFree(int typeNum) {
-		return Names.newType(String.format("T%d`1[[T]],P", typeNum));
+	@Test
+	public void testLocals() {
+		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(30)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(30)));
+		method.add(Events.newInvocation(m(43)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(30)));
+		method.add(Events.newInvocation(m(44)));
+		input.add(Tuple.newTuple(Events.newContext(m(30)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(43)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newInvocation(m(44)));
+		expected.add(Tuple.newTuple(Events.newContext(m(30)), method));
+
+		List<Tuple<Event, List<Event>>> actual = sut.locals(input);
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testUnknowns() {
+		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(0)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(0)));
+		method.add(Events.newInvocation(m(43)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(0)));
+		method.add(Events.newInvocation(m(44)));
+		input.add(Tuple.newTuple(Events.newContext(m(0)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(43)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newInvocation(m(44)));
+		expected.add(Tuple.newTuple(Events.newContext(m(0)), method));
+
+		List<Tuple<Event, List<Event>>> actual = sut.unknowns(input);
+
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testOverlaps() {
+		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(31)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(42)));
+		method.add(Events.newInvocation(m(43)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(22)));
+		method.add(Events.newInvocation(m(44)));
+		input.add(Tuple.newTuple(Events.newContext(m(12)), method));
+		
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(31)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(42)));
+		method.add(Events.newInvocation(m(43)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(22)));
+		method.add(Events.newInvocation(m(44)));
+		expected.add(Tuple.newTuple(Events.newContext(m(12)), method));
+
+		List<Tuple<Event, List<Event>>> actual = sut.overlaps(input);
+
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testErrMsg() {
+		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(31)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(0)));
+		method.add(Events.newInvocation(m(43)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(31)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(0)));
+		method.add(Events.newInvocation(m(43)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		
+		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+		System.setErr(new PrintStream(outContent));
+		
+		List<Tuple<Event, List<Event>>> actual = sut.locals(input);
+		
+		assertEquals("different localness for: TypeName(?)\n", outContent.toString());
+		assertEquals(expected, actual);
+	}
+
+	private static IMethodName m(int i) {
+		if (i == 0) {
+			return Names.getUnknownMethod();
+		} else if (i == 10) {
+			return Names
+					.newMethod("[mscorlib,P, 4.0.0.0] [mscorlib,P, 4.0.0.0].m()");
+		} else if (i == 20) {
+			return Names.newMethod("[mscorlib,P] [mscorlib,P].m()");
+		} else if (i == 30) {
+			return Names.newMethod("[T,P] [T,P].m" + i + "()");
+		} else {
+			return Names
+					.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
+		}
 	}
 }

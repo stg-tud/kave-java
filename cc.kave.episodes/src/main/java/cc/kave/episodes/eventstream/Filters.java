@@ -16,14 +16,14 @@ import com.google.common.collect.Sets;
 public class Filters {
 
 	private Set<IMethodName> seenMethods = Sets.newHashSet();
-	
+
 	public List<Tuple<Event, List<Event>>> getStructStream(List<Event> stream) {
 		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
 		Tuple<Event, List<Event>> method = null;
 
 		for (Event event : stream) {
 			if (event.getKind() == EventKind.METHOD_DECLARATION) {
-				if ((method != null) && (method.getSecond().size() != 0)) {
+				if ((method != null) && validMethod(method.getSecond())) {
 					result.add(method);
 				}
 				method = Tuple.newTuple(event, Lists.newLinkedList());
@@ -31,22 +31,8 @@ public class Filters {
 				method.getSecond().add(event);
 			}
 		}
-		if ((method != null) && (method.getSecond().size() != 0)) {
+		if ((method != null) && validMethod(method.getSecond())) {
 			result.add(method);
-		}
-		return result;
-	}
-
-	public List<Tuple<Event, List<Event>>> overlaps(
-			List<Tuple<Event, List<Event>>> stream) {
-		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
-
-		for (Tuple<Event, List<Event>> tuple : stream) {
-			IMethodName methodName = tuple.getFirst().getMethod();
-			
-			if (seenMethods.add(methodName)) {
-				result.add(tuple);
-			}
 		}
 		return result;
 	}
@@ -83,6 +69,20 @@ public class Filters {
 			}
 			if (validMethod(method)) {
 				result.add(Tuple.newTuple(tuple.getFirst(), method));
+			}
+		}
+		return result;
+	}
+
+	public List<Tuple<Event, List<Event>>> overlaps(
+			List<Tuple<Event, List<Event>>> stream) {
+		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
+
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			IMethodName methodName = tuple.getFirst().getMethod();
+
+			if (seenMethods.add(methodName)) {
+				result.add(tuple);
 			}
 		}
 		return result;

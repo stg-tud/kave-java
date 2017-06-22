@@ -50,6 +50,7 @@ import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -70,11 +71,15 @@ public class ContextsParser {
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
 	private Set<IMethodName> seenMethods = Sets.newHashSet();
 
+	private List<Tuple<Event, List<Event>>> streamRepos = Lists.newLinkedList();
+	private List<Tuple<Event, List<Event>>> streamFilters = Lists
+			.newLinkedList();
+
 	Statistics statRepos = new Statistics();
 	Statistics statGenerated = new Statistics();
-	Statistics statOverlaps = new Statistics();
 	Statistics statUnknowns = new Statistics();
 	Statistics statLocals = new Statistics();
+	Statistics statOverlaps = new Statistics();
 
 	public List<Tuple<Event, List<Event>>> parse() throws Exception {
 		StreamRepoGenerator eventStreamRepo = new StreamRepoGenerator() {
@@ -87,6 +92,15 @@ public class ContextsParser {
 			if (repoName.isEmpty() || !zip.startsWith(repoName)) {
 				repoName = getRepoName(zip);
 				repoDecls.put(repoName, Sets.newHashSet());
+
+				streamRepos.addAll(processStreamRepo(eventStreamRepo
+						.getEventStream()));
+				streamFilters.addAll(processStreamFilter(eventStreamFilter
+						.getEventStream()));
+
+				eventStreamRepo = new StreamRepoGenerator() {
+				};
+				eventStreamFilter = new StreamFilterGenerator();
 			}
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 			while (ra.hasNext()) {
@@ -97,13 +111,13 @@ public class ContextsParser {
 			}
 			ra.close();
 		}
-		List<Tuple<Event, List<Event>>> stream = processStreamRepo(eventStreamRepo
-				.getEventStream());
-		processStreamFilter(eventStreamFilter.getEventStream());
+		streamRepos.addAll(processStreamRepo(eventStreamRepo.getEventStream()));
+		streamFilters.addAll(processStreamFilter(eventStreamFilter
+				.getEventStream()));
 		printStats();
 		checkForEmptyRepos();
-		checkElementCtxs(stream);
-		return stream;
+		checkElementCtxs(streamFilters);
+		return streamFilters;
 	}
 
 	public Map<String, Set<IMethodName>> getRepoCtxMapper() {
