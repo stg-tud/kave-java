@@ -19,7 +19,6 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
 

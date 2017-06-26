@@ -26,7 +26,7 @@ public class Statistics {
 	int numbElement = 0;
 	int numbInv = 0;
 	
-	public Set<ITypeName> addStats(List<Tuple<Event, List<Event>>> eventStream) {
+	public void addStats(List<Tuple<Event, List<Event>>> eventStream) {
 		for (Tuple<Event, List<Event>> tuple : eventStream) {
 			IMethodName decl = tuple.getFirst().getMethod();
 			ctxElement.add(decl);
@@ -56,7 +56,6 @@ public class Statistics {
 				}
 			}
 		}
-		return typeDecls;
 	}
 	
 	public void printStats() {

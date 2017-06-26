@@ -44,13 +44,13 @@ public class CompareStreams {
 		List<Tuple<Event, List<Event>>> streamSeb = classStruct(stream);
 		Map<Event, List<Event>> stream1 = methodStruct(stream);
 
-		System.out.println();
-
-		Set<ITypeName> types1 = typesCounter(streamSeb);
-		localCtxCounter(stream);
-
-		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
-		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
+//		System.out.println();
+//
+//		Set<ITypeName> types1 = typesCounter(streamSeb);
+//		localCtxCounter(stream);
+//
+//		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
+//		Map<Event, List<Event>> stream2 = mapConverter(streamEr);
 
 		// compareTypeDecls(types1, streamEr);
 //		compareSupers(stream1);
@@ -147,28 +147,28 @@ public class CompareStreams {
 		Set<Event> ctxFirst = Sets.newHashSet();
 		Set<Event> ctxSuper = Sets.newHashSet();
 
-		int numLocalFirst = 0;
-		int numLocalSuper = 0;
+		int nonLocalsFirst = 0;
+		int nonLocalsSuper = 0;
 
 		for (Event event : stream) {
 			if (event.getKind() == EventKind.TYPE) {
 				continue;
 			}
-			if (isLocal(event)) {
+			if (!isLocal(event)) {
 				if (event.getKind() == EventKind.FIRST_DECLARATION) {
 					ctxFirst.add(event);
-					numLocalFirst++;
+					nonLocalsFirst++;
 					continue;
 				}
 				if (event.getKind() == EventKind.SUPER_DECLARATION) {
 					ctxSuper.add(event);
-					numLocalSuper++;
+					nonLocalsSuper++;
 				}
 			}
 		}
-		System.out.printf("ctxFirst locals: %d (%d unique)\n", numLocalFirst,
+		System.out.printf("ctxFirst non-locals: %d (%d unique)\n", nonLocalsFirst,
 				ctxFirst.size());
-		System.out.printf("ctxSuper locals: %d (%d unique)\n", numLocalSuper,
+		System.out.printf("ctxSuper non-locals: %d (%d unique)\n", nonLocalsSuper,
 				ctxSuper.size());
 	}
 
