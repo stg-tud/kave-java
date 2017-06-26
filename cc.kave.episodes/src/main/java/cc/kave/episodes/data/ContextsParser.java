@@ -202,22 +202,18 @@ public class ContextsParser {
 
 		Logger.log("Repository statistics ...");
 		statRepos.printStats();
-		Logger.log("");
 
 		Logger.log("Filter generated code ...");
 		statGenerated.printStats();
-		Logger.log("");
 
 		Logger.log("Filter unknown events ...");
 		statUnknowns.printStats();
-		Logger.log("");
 
 		Logger.log("Filter local events ...");
 		statLocals.printStats();
 
 		Logger.log("Filter overlapping methods ...");
 		statOverlaps.printStats();
-		Logger.log("");
 	}
 
 	private String getRepoName(String zipName) {

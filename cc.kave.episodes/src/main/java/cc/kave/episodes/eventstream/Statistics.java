@@ -68,6 +68,6 @@ public class Statistics {
 		Logger.log("invExpr:\t%d (%d unique)", numbInv, invExpr.size());
 		Logger.log("------");
 		int length = numbFirst + numbSuper + numbElement + numbInv;
-		Logger.log("full stream:\t%d events (excl. types)", length);
+		Logger.log("full stream:\t%d events (excl. types)\n", length);
 	}
 }

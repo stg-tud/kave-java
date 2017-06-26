@@ -18,6 +18,7 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.IReadingArchive;
+import cc.recommenders.io.Logger;
 import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.collect.Lists;
@@ -42,17 +43,22 @@ public class EventStreamGenerator2 {
 
 	public List<Event> run() throws InterruptedException, ExecutionException {
 		zips = findZips(dirZips);
-
-		List<Future<?>> futures = Lists.newLinkedList();
-		for (int i = 0; i < NUM_CORES; i++) {
-			futures.add(pool.submit(new Worker(i)));
+		
+		for (String zip : zips) {
+			Logger.log("Reading zip file %s", zip.toString());
+			process(zip);
 		}
 
-		// block until done
-		for (Future<?> f : futures) {
-			f.get();
-		}
-		pool.shutdown();
+//		List<Future<?>> futures = Lists.newLinkedList();
+//		for (int i = 0; i < NUM_CORES; i++) {
+//			futures.add(pool.submit(new Worker(i)));
+//		}
+//
+//		// block until done
+//		for (Future<?> f : futures) {
+//			f.get();
+//		}
+//		pool.shutdown();
 		createStats();
 
 		return eventsAll;
