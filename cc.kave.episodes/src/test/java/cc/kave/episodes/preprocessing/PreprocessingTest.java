@@ -19,8 +19,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
-import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
@@ -36,13 +34,13 @@ import com.google.common.collect.Sets;
 public class PreprocessingTest {
 
 	@Mock
-	private ContextsParser repoParser;
+	private ContextsParser ctxParser;
 	@Mock
 	private EventStreamIo trainingIo;
 	
 	private List<Tuple<Event, List<Event>>> stream;
 
-	private static final int FREQTHRESH = 5;
+	private static final int FREQUENCY = 5;
 
 	private Preprocessing sut;
 
@@ -51,7 +49,7 @@ public class PreprocessingTest {
 		initMocks(this);
 		stream = Lists.newLinkedList();
 		
-		sut = new Preprocessing(repoParser, trainingIo);
+		sut = new Preprocessing(ctxParser, trainingIo);
 		
 		stream.add(Tuple.newTuple(enclCtx(20),
 				Lists.newArrayList(firstCtx(1), inv(2), inv(3))));
@@ -68,16 +66,16 @@ public class PreprocessingTest {
 		stream.add(Tuple.newTuple(enclCtx(20),
 				Lists.newArrayList(firstCtx(3), superCtx(4), inv(3))));
 		
-		when(repoParser.getRepoCtxMapper()).thenReturn(generateMapper());
+		when(ctxParser.getRepoCtxMapper()).thenReturn(generateMapper());
 
 		doNothing().when(trainingIo).write(any(EventStream.class), anyInt());
 	}
 
 	@Test
 	public void checkAllRepos() throws Exception {
-		sut.run(FREQTHRESH);
+		sut.run(FREQUENCY);
 		
-		verify(repoParser).parse();
+		verify(ctxParser).parse(FREQUENCY);
 		verify(trainingIo).write(any(EventStream.class), anyInt());
 	}
 
@@ -98,12 +96,6 @@ public class PreprocessingTest {
 		return mapper;
 	}
 
-	private static ExpressionStatement wrap(InvocationExpression ie1) {
-		ExpressionStatement expressionStatement = new ExpressionStatement();
-		expressionStatement.setExpression(ie1);
-		return expressionStatement;
-	}
-	
 	private static Event inv(int i) {
 		return Events.newInvocation(m(i));
 	}

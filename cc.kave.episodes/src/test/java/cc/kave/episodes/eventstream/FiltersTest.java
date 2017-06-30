@@ -20,8 +20,9 @@ import com.google.common.collect.Lists;
 public class FiltersTest {
 
 	private List<Event> stream;
-
 	private List<Tuple<Event, List<Event>>> expected;
+	
+	private static final int FREQUENCY = 2;
 
 	private Filters sut;
 
@@ -165,6 +166,47 @@ public class FiltersTest {
 		expected.add(Tuple.newTuple(Events.newContext(m(12)), method));
 
 		List<Tuple<Event, List<Event>>> actual = sut.overlaps(input);
+
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testFreqs() {
+		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
+		List<Event> method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newSuperContext(m(31)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(42)));
+		method.add(Events.newInvocation(m(43)));
+		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(22)));
+		method.add(Events.newInvocation(m(42)));
+		input.add(Tuple.newTuple(Events.newContext(m(12)), method));
+		
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		input.add(Tuple.newTuple(Events.newContext(m(13)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		method.add(Events.newInvocation(m(42)));
+		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newInvocation(m(42)));
+		expected.add(Tuple.newTuple(Events.newContext(m(12)), method));
+		
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(21)));
+		method.add(Events.newInvocation(m(41)));
+		expected.add(Tuple.newTuple(Events.newContext(m(13)), method));
+
+		List<Tuple<Event, List<Event>>> actual = sut.freqEvents(input, FREQUENCY);
 
 		assertEquals(expected, actual);
 	}

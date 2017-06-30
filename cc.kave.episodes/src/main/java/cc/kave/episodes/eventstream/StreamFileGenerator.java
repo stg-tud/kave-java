@@ -30,20 +30,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class StreamFileGenerator {
-	
-	private ContextsParser ctxParser;
-	
+
+	private static ContextsParser ctxParser;
+
 	@Inject
 	public StreamFileGenerator(ContextsParser parser) {
 		this.ctxParser = parser;
 	}
 
-	public static EventStream generate(List<Tuple<Event, List<Event>>> stream,
-			int frequency) {
+	public static EventStream generate(int frequency) throws Exception {
+		List<Tuple<Event, List<Event>>> stream = ctxParser.parse(frequency);
 		Map<Event, Integer> occurrences = getEventFrequencies(stream);
 		EventStream es = new EventStream();
 		boolean isFirst = true;
-		
+
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			List<Event> method = Lists.newLinkedList();
 			for (Event event : tuple.getSecond()) {

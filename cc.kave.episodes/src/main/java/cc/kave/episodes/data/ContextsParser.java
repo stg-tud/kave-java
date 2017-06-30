@@ -80,8 +80,10 @@ public class ContextsParser {
 	Statistics statUnknowns = new Statistics();
 	Statistics statLocals = new Statistics();
 	Statistics statOverlaps = new Statistics();
+	Statistics statFrequent = new Statistics();
 
-	public List<Tuple<Event, List<Event>>> parse() throws Exception {
+	public List<Tuple<Event, List<Event>>> parse(int frequency)
+			throws Exception {
 		StreamRepoGenerator eventStreamRepo = new StreamRepoGenerator() {
 		};
 		StreamFilterGenerator eventStreamFilter = new StreamFilterGenerator();
@@ -95,8 +97,8 @@ public class ContextsParser {
 
 				streamRepos.addAll(processStreamRepo(eventStreamRepo
 						.getEventStream()));
-				streamFilters.addAll(processStreamFilter(eventStreamFilter
-						.getEventStream()));
+				streamFilters.addAll(processStreamFilter(
+						eventStreamFilter.getEventStream(), frequency));
 
 				eventStreamRepo = new StreamRepoGenerator() {
 				};
@@ -113,7 +115,7 @@ public class ContextsParser {
 		}
 		streamRepos.addAll(processStreamRepo(eventStreamRepo.getEventStream()));
 		streamFilters.addAll(processStreamFilter(eventStreamFilter
-				.getEventStream()));
+				.getEventStream(), frequency));
 		printStats();
 		checkForEmptyRepos();
 		checkElementCtxs(streamFilters);
@@ -176,7 +178,7 @@ public class ContextsParser {
 	}
 
 	private List<Tuple<Event, List<Event>>> processStreamFilter(
-			List<Event> eventStream) {
+			List<Event> eventStream, int frequency) {
 		List<Tuple<Event, List<Event>>> streamStruct = filters
 				.getStructStream(eventStream);
 		statGenerated.addStats(streamStruct);
@@ -193,7 +195,11 @@ public class ContextsParser {
 				.overlaps(streamLocals);
 		statOverlaps.addStats(streamOverlaps);
 
-		return streamOverlaps;
+		List<Tuple<Event, List<Event>>> streamFreq = filters.freqEvents(
+				streamOverlaps, frequency);
+		statFrequent.addStats(streamFreq);
+
+		return streamFreq;
 	}
 
 	private void printStats() {
