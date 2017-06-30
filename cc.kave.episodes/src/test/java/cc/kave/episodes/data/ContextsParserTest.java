@@ -1,13 +1,13 @@
 package cc.kave.episodes.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +29,7 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.eventstream.Filters;
 import cc.kave.episodes.eventstream.Statistics;
-import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
@@ -42,25 +40,24 @@ import cc.recommenders.io.ReadingArchive;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ContextsParserTest {
 
 	@Mock
 	private Directory rootDirectory;
 	@Mock
-	private FileReader reader;
-	@Mock
-	private Filters filters;
-	@Mock
 	private Statistics statistics;
 
+	private static final String REPO0 = "Github/usr1/repo0/ws.zip";
 	private static final String REPO1 = "Github/usr1/repo1/ws.zip";
 	private static final String REPO3 = "Github/usr1/repo3/ws.zip";
 	private static final String REPO2 = "Github/usr1/repo2/ws.zip";
+	
+	private static final int FREQUENCY = 2;
 
 	private Map<String, Context> data;
 	private Map<String, ReadingArchive> ras;
-	private List<String> repositories;
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
 	private List<Tuple<Event, List<Event>>> streamRepos = Lists.newLinkedList();
@@ -78,16 +75,16 @@ public class ContextsParserTest {
 
 		data = Maps.newLinkedHashMap();
 		ras = Maps.newLinkedHashMap();
-		sut = new ContextsParser(rootDirectory, filters);
+		sut = new ContextsParser(rootDirectory);
 
 		SST sst = new SST();
 		MethodDeclaration md = new MethodDeclaration();
 		md.setName(Names.newMethod("[T,P] [T2,P].M()"));
 		md.getBody().add(new ContinueStatement());
 		sst.getMethods().add(md);
-
+		
 		MethodDeclaration md2 = new MethodDeclaration();
-		md2.setName(Names.newMethod("[T,P] [T3,P].M2()"));
+		md2.setName(Names.newMethod("[T,P] [T1,P].M2()"));
 
 		InvocationExpression ie1 = new InvocationExpression();
 		IMethodName methodName = Names
@@ -99,7 +96,6 @@ public class ContextsParserTest {
 		ie2.setMethodName(methodName2);
 
 		md2.getBody().add(wrap(ie1));
-		md2.getBody().add(wrap(ie2));
 		md2.getBody().add(wrap(ie2));
 		sst.getMethods().add(md2);
 
@@ -123,7 +119,7 @@ public class ContextsParserTest {
 
 		SST sst2 = new SST();
 		MethodDeclaration md4 = new MethodDeclaration();
-		md4.setName(Names.newMethod("[T,P] [T2,P].M3()"));
+		md4.setName(Names.newMethod("[T,P] [T3,P].M3()"));
 		md4.getBody().add(new DoLoop());
 
 		InvocationExpression ie3 = new InvocationExpression();
@@ -145,10 +141,6 @@ public class ContextsParserTest {
 		context2.setSST(sst2);
 
 		data.put(REPO2, context2);
-
-		repositories = new LinkedList<>();
-		repositories.add("Github/usr1/repo1");
-		repositories.add("Github/usr1/repo3");
 
 		when(rootDirectory.findFiles(anyPredicateOf(String.class))).thenAnswer(
 				new Answer<Set<String>>() {
@@ -172,7 +164,6 @@ public class ContextsParserTest {
 						return ra;
 					}
 				});
-		when(reader.readFile(any(File.class))).thenReturn(repositories);
 
 		Logger.setPrinting(false);
 	}
@@ -183,16 +174,14 @@ public class ContextsParserTest {
 	}
 
 	@Test
-	public void testStream() throws IOException {
+	public void testStream() throws Exception {
 		List<Tuple<Event, List<Event>>> expected = Lists.newLinkedList();
 
 		List<Event> method = Lists.newLinkedList();
-		IMethodName decl1 = Names.newMethod("[T,P] [T3,P].M2()");
+		IMethodName decl1 = Names.newMethod("[T,P] [T1,P].M2()");
+		
 		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
-		String inv2 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI2()";
-
 		method.add(Events.newInvocation(Names.newMethod(inv1)));
-		method.add(Events.newInvocation(Names.newMethod(inv2)));
 		expected.add(Tuple.newTuple(Events.newContext(decl1), method));
 
 		IMethodName decl2 = Names.newMethod("[T,P] [T2,P].M()");
@@ -200,6 +189,55 @@ public class ContextsParserTest {
 		method.add(Events.newInvocation(Names.newMethod(inv1)));
 		expected.add(Tuple.newTuple(Events.newContext(decl2), method));
 
+		IMethodName decl3 = Names.newMethod("[T,P] [T3,P].M3()");
+		String inv3 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
+		method = Lists.newLinkedList();
+		method.add(Events.newInvocation(Names.newMethod(inv3)));
+		method.add(Events.newInvocation(Names.newMethod(inv3)));
+		expected.add(Tuple.newTuple(Events.newContext(decl3), method));
+		
+		List<Tuple<Event, List<Event>>> actuals = sut.parse(FREQUENCY);
+		
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void testRepoCtxMapper() throws Exception {
+		Map<String, Set<IMethodName>> expected = Maps.newLinkedHashMap();
+		
+		String repo1 = "Github/usr1/repo1";
+		String repo3 = "Github/usr1/repo3";
+		String repo2 = "Github/usr1/repo2";
+		
+		IMethodName decl1 = Names.newMethod("[T,P] [T1,P].M2()");
+		IMethodName decl2 = Names.newMethod("[T,P] [T2,P].M()");
+		IMethodName decl3 = Names.newMethod("[T,P] [T3,P].M3()");
+		
+		expected.put(repo1, Sets.newHashSet(decl1));
+		expected.put(repo3, Sets.newHashSet(decl2));
+		expected.put(repo2, Sets.newHashSet(decl3));
+		
+		sut.parse(FREQUENCY);
+		Map<String, Set<IMethodName>> actuals = sut.getRepoCtxMapper();
+		
+		assertRepoCtxs(expected, actuals);
+	}
+	
+	private void assertRepoCtxs(Map<String, Set<IMethodName>> expected,
+			Map<String, Set<IMethodName>> actuals) {
+		if (expected.size() != actuals.size()) {
+			assertTrue(false);
+		} else {
+			for (Map.Entry<String, Set<IMethodName>> entry : expected.entrySet()) {
+				String repoName = entry.getKey();
+				if (!actuals.containsKey(repoName)) {
+					assertTrue(false);
+				} else {
+					assertEquals(entry.getValue(), actuals.get(repoName));
+				}
+			}
+		}
+		
 	}
 
 	private static ExpressionStatement wrap(InvocationExpression ie1) {

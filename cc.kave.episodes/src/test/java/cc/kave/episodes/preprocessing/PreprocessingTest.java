@@ -37,7 +37,7 @@ public class PreprocessingTest {
 	private ContextsParser ctxParser;
 	@Mock
 	private EventStreamIo trainingIo;
-	
+
 	private List<Tuple<Event, List<Event>>> stream;
 
 	private static final int FREQUENCY = 5;
@@ -48,9 +48,9 @@ public class PreprocessingTest {
 	public void setup() throws Exception {
 		initMocks(this);
 		stream = Lists.newLinkedList();
-		
+
 		sut = new Preprocessing(ctxParser, trainingIo);
-		
+
 		stream.add(Tuple.newTuple(enclCtx(20),
 				Lists.newArrayList(firstCtx(1), inv(2), inv(3))));
 		stream.add(Tuple.newTuple(enclCtx(7), Lists.newArrayList(firstCtx(2),
@@ -65,7 +65,7 @@ public class PreprocessingTest {
 				Lists.newArrayList(firstCtx(1), inv(2), inv(3))));
 		stream.add(Tuple.newTuple(enclCtx(20),
 				Lists.newArrayList(firstCtx(3), superCtx(4), inv(3))));
-		
+
 		when(ctxParser.getRepoCtxMapper()).thenReturn(generateMapper());
 
 		doNothing().when(trainingIo).write(any(EventStream.class), anyInt());
@@ -74,7 +74,7 @@ public class PreprocessingTest {
 	@Test
 	public void checkAllRepos() throws Exception {
 		sut.run(FREQUENCY);
-		
+
 		verify(ctxParser).parse(FREQUENCY);
 		verify(trainingIo).write(any(EventStream.class), anyInt());
 	}
@@ -91,7 +91,8 @@ public class PreprocessingTest {
 		mapper.put("Github/usr1/repo7", Sets.newHashSet(enclCtx(7).getMethod()));
 		mapper.put("Github/usr1/repo8", Sets.newHashSet(enclCtx(8).getMethod()));
 		mapper.put("Github/usr1/repo9", Sets.newHashSet(enclCtx(9).getMethod()));
-		mapper.put("Github/usr1/repo10", Sets.newHashSet(enclCtx(10).getMethod()));
+		mapper.put("Github/usr1/repo10",
+				Sets.newHashSet(enclCtx(10).getMethod()));
 
 		return mapper;
 	}
@@ -113,14 +114,6 @@ public class PreprocessingTest {
 	}
 
 	private static IMethodName m(int i) {
-		if (i == 20) {
-			return Names
-					.newMethod("[mscorlib,P, 4.0.0.0] [mscorlib,P, 4.0.0.0].m()");
-		} else if (i == 30) {
-			return Names.newMethod("[mscorlib,P] [mscorlib,P].m()");
-		} else {
-			return Names
-					.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
-		}
+		return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 	}
 }

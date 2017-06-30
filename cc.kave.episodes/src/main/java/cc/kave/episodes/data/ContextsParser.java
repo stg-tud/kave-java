@@ -59,13 +59,10 @@ import com.google.inject.name.Named;
 public class ContextsParser {
 
 	private Directory contextsDir;
-	private Filters filters;
 
 	@Inject
-	public ContextsParser(@Named("contexts") Directory directory,
-			Filters filters) {
+	public ContextsParser(@Named("contexts") Directory directory) {
 		this.contextsDir = directory;
-		this.filters = filters;
 	}
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
@@ -74,6 +71,7 @@ public class ContextsParser {
 	private List<Tuple<Event, List<Event>>> streamRepos = Lists.newLinkedList();
 	private List<Tuple<Event, List<Event>>> streamFilters = Lists
 			.newLinkedList();
+	private Filters filters = new Filters();
 
 	Statistics statRepos = new Statistics();
 	Statistics statGenerated = new Statistics();
@@ -92,34 +90,40 @@ public class ContextsParser {
 		for (String zip : findZips(contextsDir)) {
 			Logger.log("Reading zip file %s", zip.toString());
 			if (repoName.isEmpty() || !zip.startsWith(repoName)) {
-				repoName = getRepoName(zip);
-				repoDecls.put(repoName, Sets.newHashSet());
-
 				streamRepos.addAll(processStreamRepo(eventStreamRepo
 						.getEventStream()));
-				streamFilters.addAll(processStreamFilter(
-						eventStreamFilter.getEventStream(), frequency));
+				List<Tuple<Event, List<Event>>> partStream = processStreamFilter(eventStreamFilter
+						.getEventStream());
+				saveRepoCtx(repoName, partStream);
+				streamFilters.addAll(partStream);
 
 				eventStreamRepo = new StreamRepoGenerator() {
 				};
 				eventStreamFilter = new StreamFilterGenerator();
+				repoName = getRepoName(zip);
 			}
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				saveElementCtx(repoName, ctx);
+				// saveElementCtx(repoName, ctx);
 				eventStreamRepo.add(ctx);
 				eventStreamFilter.add(ctx);
 			}
 			ra.close();
 		}
 		streamRepos.addAll(processStreamRepo(eventStreamRepo.getEventStream()));
-		streamFilters.addAll(processStreamFilter(eventStreamFilter
-				.getEventStream(), frequency));
+		List<Tuple<Event, List<Event>>> partStream = processStreamFilter(eventStreamFilter
+				.getEventStream());
+		saveRepoCtx(repoName, partStream);
+		streamFilters.addAll(partStream);
+		List<Tuple<Event, List<Event>>> streamFreq = filters.freqEvents(
+				streamFilters, frequency);
+		statFrequent.addStats(streamFreq);
+
 		printStats();
 		checkForEmptyRepos();
-		checkElementCtxs(streamFilters);
-		return streamFilters;
+		checkElementCtxs(streamFreq);
+		return streamFreq;
 	}
 
 	public Map<String, Set<IMethodName>> getRepoCtxMapper() {
@@ -155,6 +159,19 @@ public class ContextsParser {
 		repoDecls.get(repoName).addAll(methods);
 	}
 
+	private void saveRepoCtx(String repoName,
+			List<Tuple<Event, List<Event>>> stream) {
+		if (repoName.isEmpty() && stream.isEmpty()) {
+			return;
+		}
+		Set<IMethodName> methodNames = Sets.newHashSet();
+
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			methodNames.add(tuple.getFirst().getMethod());
+		}
+		repoDecls.put(repoName, methodNames);
+	}
+
 	private void checkForEmptyRepos() {
 		int numbEmptyRepos = 0;
 
@@ -178,7 +195,7 @@ public class ContextsParser {
 	}
 
 	private List<Tuple<Event, List<Event>>> processStreamFilter(
-			List<Event> eventStream, int frequency) {
+			List<Event> eventStream) {
 		List<Tuple<Event, List<Event>>> streamStruct = filters
 				.getStructStream(eventStream);
 		statGenerated.addStats(streamStruct);
@@ -195,11 +212,7 @@ public class ContextsParser {
 				.overlaps(streamLocals);
 		statOverlaps.addStats(streamOverlaps);
 
-		List<Tuple<Event, List<Event>>> streamFreq = filters.freqEvents(
-				streamOverlaps, frequency);
-		statFrequent.addStats(streamFreq);
-
-		return streamFreq;
+		return streamOverlaps;
 	}
 
 	private void printStats() {
@@ -220,6 +233,9 @@ public class ContextsParser {
 
 		Logger.log("Filter overlapping methods ...");
 		statOverlaps.printStats();
+
+		Logger.log("Filter infrequent events ...");
+		statFrequent.printStats();
 	}
 
 	private String getRepoName(String zipName) {

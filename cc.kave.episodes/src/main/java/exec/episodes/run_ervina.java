@@ -25,6 +25,7 @@ import cc.kave.episodes.data.CompareStreams;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -36,7 +37,7 @@ public class run_ervina {
 	private static final String PROPERTY_FILE = "episode.properties";
 
 	private static final int FOLDNUM = 0;
-	private static final int FREQUENCY = 300;
+	private static final int FREQUENCY = 2;
 
 	private static final int THF = 300;
 	private static final double THE = 0.73;
@@ -56,8 +57,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
+		load(Preprocessing.class).run(FREQUENCY);
+		
 //		load(ContextsParser.class).parse();
-		load(CompareStreams.class).compare();
+//		load(CompareStreams.class).compare();
 		
 
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
