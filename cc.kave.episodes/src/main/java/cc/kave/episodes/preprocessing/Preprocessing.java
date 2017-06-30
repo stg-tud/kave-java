@@ -22,7 +22,7 @@ public class Preprocessing {
 		this.eventStreamIo = streamData;
 	}
 
-	public void run(int frequency) throws Exception {
+	public EventStream run(int frequency) throws Exception {
 
 		List<Tuple<Event, List<Event>>> stream = ctxParser.parse(frequency);
 		EventStream es = new EventStream();
@@ -35,5 +35,6 @@ public class Preprocessing {
 			es.increaseTimeout();
 		}
 		eventStreamIo.write(es, frequency);
+		return es;
 	}
 }
