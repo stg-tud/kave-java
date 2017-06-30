@@ -35,7 +35,7 @@ public class PatternsEvents {
 
 	public void getEventsType(EpisodeType type, int frequency, double entropy,
 			int foldNum) {
-		List<Event> events = eventsStream.readMapping(frequency, foldNum);
+		List<Event> events = eventsStream.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
 				frequency, foldNum);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,

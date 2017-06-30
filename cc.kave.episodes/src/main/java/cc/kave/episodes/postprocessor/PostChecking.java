@@ -10,8 +10,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import cc.kave.commons.model.naming.Names;
-import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
@@ -58,7 +56,7 @@ public class PostChecking {
 	public void updatedEvent(int frequency) {
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(
 				EpisodeType.PARALLEL, frequency, -2);
-		List<Event> events = trainStreamIo.readMapping(frequency, -2);
+		List<Event> events = trainStreamIo.readMapping(frequency);
 		Set<ITypeName> episodeTypes = Sets.newLinkedHashSet();
 
 		Logger.log("Extracting episode types ...");
@@ -71,8 +69,7 @@ public class PostChecking {
 			}
 		}
 
-		List<Event> updatedEvents = trainStreamIo.readMapping(frequency,
-				FOLDNUM);
+		List<Event> updatedEvents = trainStreamIo.readMapping(frequency);
 		Set<ITypeName> updatedTypes = Sets.newLinkedHashSet();
 		Logger.log("Extracting updated types ... ");
 		for (Event event : updatedEvents) {
@@ -93,8 +90,8 @@ public class PostChecking {
 	}
 
 	public void eventsVersions(int frequency) {
-		List<Event> eventsNew = trainStreamIo.readMapping(frequency, -1);
-		List<Event> eventsCurrent = trainStreamIo.readMapping(frequency, -11);
+		List<Event> eventsNew = trainStreamIo.readMapping(frequency);
+		List<Event> eventsCurrent = trainStreamIo.readMapping(frequency);
 		Logger.log("Number of events in the new version: %d", eventsNew.size());
 		Logger.log("Number of events in the current version: %d", eventsCurrent.size());
 

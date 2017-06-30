@@ -15,7 +15,6 @@ import javax.inject.Named;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -24,7 +23,6 @@ import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
-import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.datastructures.Tuple;
@@ -68,9 +66,8 @@ public class PatternsComparison {
 
 	public void storePatterns(EpisodeType type, int foldNum, int frequency)
 			throws IOException {
-		List<Event> events = eventStream.readMapping(frequency, foldNum);
-		Map<Integer, Set<Episode>> patterns = getPatterns(type, foldNum,
-				frequency);
+		List<Event> events = eventStream.readMapping(frequency);
+		Map<Integer, Set<Episode>> patterns = getPatterns(type, frequency);
 		int patternId = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
@@ -89,9 +86,9 @@ public class PatternsComparison {
 	}
 
 	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
-			int foldNum, int frequency) {
+			int frequency) {
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				frequency, foldNum);
+				frequency, 0);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
 				episodes, THRESHFREQ, THRESHENT);
 		return patterns;
@@ -110,41 +107,41 @@ public class PatternsComparison {
 		return fileName;
 	}
 
-//	public void thresholdAnalyzer(int foldNum, int frequency) {
-//		Logger.log("\tNumber of patterns not covered");
-//		Logger.log("\tFrequency\tEntropy\tSequentials\tParallels");
-//
-//		Map<Integer, Set<Episode>> episodeSeqs = episodeParser.parse(
-//				EpisodeType.SEQUENTIAL, frequency, foldNum);
-//		Map<Integer, Set<Episode>> episodePars = episodeParser.parse(
-//				EpisodeType.PARALLEL, frequency, foldNum);
-//		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
-//				EpisodeType.GENERAL, frequency, foldNum);
-//		Set<Integer> frequencies = getFrequencies(episodePars);
-//
-//		for (int freq : frequencies) {
-//			Map<Integer, Set<Episode>> patternSeqs = episodeFilter.filter(
-//					EpisodeType.SEQUENTIAL, episodeSeqs, freq, 0.0);
-//			Map<Integer, Set<Episode>> patternPars = episodeFilter.filter(
-//					EpisodeType.PARALLEL, episodePars, freq, 0.0);
-//
-//			for (double ent = 0.1; ent <= 1.0; ent += 0.1) {
-//				Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
-//						EpisodeType.GENERAL, episodeGens, freq, ent);
-//
-////				Tuple<Integer, Integer> withSeqs = getCoverage(patternGens,
-////						patternSeqs);
-////				Tuple<Integer, Integer> withPars = getCoverage(patternGens,
-////						patternPars);
-//
-//				int numbPS = getNumbPatterns(patternSeqs);
-//				int numPP = getNumbPatterns(patternPars);
-//
-//				Logger.log("\t%d\t%.3f\t%d\t%d", freq, ent,
-//						withSeqs.getSecond(), withPars.getSecond());
-//			}
-//		}
-//	}
+	// public void thresholdAnalyzer(int foldNum, int frequency) {
+	// Logger.log("\tNumber of patterns not covered");
+	// Logger.log("\tFrequency\tEntropy\tSequentials\tParallels");
+	//
+	// Map<Integer, Set<Episode>> episodeSeqs = episodeParser.parse(
+	// EpisodeType.SEQUENTIAL, frequency, foldNum);
+	// Map<Integer, Set<Episode>> episodePars = episodeParser.parse(
+	// EpisodeType.PARALLEL, frequency, foldNum);
+	// Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
+	// EpisodeType.GENERAL, frequency, foldNum);
+	// Set<Integer> frequencies = getFrequencies(episodePars);
+	//
+	// for (int freq : frequencies) {
+	// Map<Integer, Set<Episode>> patternSeqs = episodeFilter.filter(
+	// EpisodeType.SEQUENTIAL, episodeSeqs, freq, 0.0);
+	// Map<Integer, Set<Episode>> patternPars = episodeFilter.filter(
+	// EpisodeType.PARALLEL, episodePars, freq, 0.0);
+	//
+	// for (double ent = 0.1; ent <= 1.0; ent += 0.1) {
+	// Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
+	// EpisodeType.GENERAL, episodeGens, freq, ent);
+	//
+	// // Tuple<Integer, Integer> withSeqs = getCoverage(patternGens,
+	// // patternSeqs);
+	// // Tuple<Integer, Integer> withPars = getCoverage(patternGens,
+	// // patternPars);
+	//
+	// int numbPS = getNumbPatterns(patternSeqs);
+	// int numPP = getNumbPatterns(patternPars);
+	//
+	// Logger.log("\t%d\t%.3f\t%d\t%d", freq, ent,
+	// withSeqs.getSecond(), withPars.getSecond());
+	// }
+	// }
+	// }
 
 	public void thresholdPartials(int foldNum, int frequency) {
 		Logger.log("\tThreshold analyzes for partial-order configuration!");
@@ -196,42 +193,43 @@ public class PatternsComparison {
 		}
 	}
 
-//	public void frequencyAnalyzer(int foldNum, int frequency, double entropy) {
-//		Logger.log("\tNumber of patterns not covered");
-//		Logger.log("\tConfiguration: %s-order", EpisodeType.SEQUENTIAL);
-//		Logger.log("\tEntropy = %.1f", entropy);
-//		Logger.log("\tFrequency\tGenerals\tPercentage\tParallels\tPercentage");
-//
-//		Map<Integer, Set<Episode>> episodeSeqs = episodeParser.parse(
-//				EpisodeType.SEQUENTIAL, frequency, foldNum);
-//		Map<Integer, Set<Episode>> episodePars = episodeParser.parse(
-//				EpisodeType.PARALLEL, frequency, foldNum);
-//		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
-//				EpisodeType.GENERAL, frequency, foldNum);
-//		Set<Integer> frequencies = getFrequencies(episodePars);
-//
-//		for (int freq : frequencies) {
-//			Map<Integer, Set<Episode>> patternSeqs = episodeFilter.filter(
-//					EpisodeType.SEQUENTIAL, episodeSeqs, freq, 0.0);
-//			Map<Integer, Set<Episode>> patternPars = episodeFilter.filter(
-//					EpisodeType.PARALLEL, episodePars, freq, 0.0);
-//			Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
-//					EpisodeType.GENERAL, episodeGens, freq, entropy);
-//
-//			Tuple<Integer, Integer> withGens = getCoverage(patternSeqs,
-//					patternGens);
-//			Tuple<Integer, Integer> withPars = getCoverage(patternSeqs,
-//					patternPars);
-//
-//			int numbPG = getNumbPatterns(patternGens);
-//			int numbPP = getNumbPatterns(patternPars);
-//
-//			Logger.log("\t%d\t%d\t%.3f\t%d\t%.3f", freq, withGens.getSecond(),
-//					getPercentage(withGens.getSecond(), numbPG),
-//					withPars.getSecond(),
-//					getPercentage(withPars.getSecond(), numbPP));
-//		}
-//	}
+	// public void frequencyAnalyzer(int foldNum, int frequency, double entropy)
+	// {
+	// Logger.log("\tNumber of patterns not covered");
+	// Logger.log("\tConfiguration: %s-order", EpisodeType.SEQUENTIAL);
+	// Logger.log("\tEntropy = %.1f", entropy);
+	// Logger.log("\tFrequency\tGenerals\tPercentage\tParallels\tPercentage");
+	//
+	// Map<Integer, Set<Episode>> episodeSeqs = episodeParser.parse(
+	// EpisodeType.SEQUENTIAL, frequency, foldNum);
+	// Map<Integer, Set<Episode>> episodePars = episodeParser.parse(
+	// EpisodeType.PARALLEL, frequency, foldNum);
+	// Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
+	// EpisodeType.GENERAL, frequency, foldNum);
+	// Set<Integer> frequencies = getFrequencies(episodePars);
+	//
+	// for (int freq : frequencies) {
+	// Map<Integer, Set<Episode>> patternSeqs = episodeFilter.filter(
+	// EpisodeType.SEQUENTIAL, episodeSeqs, freq, 0.0);
+	// Map<Integer, Set<Episode>> patternPars = episodeFilter.filter(
+	// EpisodeType.PARALLEL, episodePars, freq, 0.0);
+	// Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
+	// EpisodeType.GENERAL, episodeGens, freq, entropy);
+	//
+	// Tuple<Integer, Integer> withGens = getCoverage(patternSeqs,
+	// patternGens);
+	// Tuple<Integer, Integer> withPars = getCoverage(patternSeqs,
+	// patternPars);
+	//
+	// int numbPG = getNumbPatterns(patternGens);
+	// int numbPP = getNumbPatterns(patternPars);
+	//
+	// Logger.log("\t%d\t%d\t%.3f\t%d\t%.3f", freq, withGens.getSecond(),
+	// getPercentage(withGens.getSecond(), numbPG),
+	// withPars.getSecond(),
+	// getPercentage(withPars.getSecond(), numbPP));
+	// }
+	// }
 
 	public void createHistogram(EpisodeType type, int foldNum, int frequency) {
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
@@ -328,10 +326,8 @@ public class PatternsComparison {
 		Logger.log("Frequency threshold = %d", THRESHFREQ);
 		Logger.log("Entropy threshold = %.2f", THRESHENT);
 
-		Map<Integer, Set<Episode>> patterns1 = getPatterns(type1, foldNum,
-				frequency);
-		Map<Integer, Set<Episode>> patterns2 = getPatterns(type2, foldNum,
-				frequency);
+		Map<Integer, Set<Episode>> patterns1 = getPatterns(type1, frequency);
+		Map<Integer, Set<Episode>> patterns2 = getPatterns(type2, frequency);
 
 		Tuple<Integer, Integer> result = getCoverage(type1, type2, patterns1,
 				patterns2);
@@ -351,9 +347,9 @@ public class PatternsComparison {
 		Logger.log("Entropy threshold = %.2f", THRESHENT);
 
 		Map<Set<Fact>, Set<Episode>> set1 = patternsSetFact(getPatterns(type1,
-				foldNum, frequency));
+				frequency));
 		Map<Set<Fact>, Set<Episode>> set2 = patternsSetFact(getPatterns(type2,
-				foldNum, frequency));
+				frequency));
 		int numbEquals = 0;
 		int numbRepr = 0;
 		int numbNew = 0;
@@ -392,11 +388,12 @@ public class PatternsComparison {
 		Logger.log(
 				"%s-configurations has %d representative patterns for %s-configuration",
 				type1.toString(), numbRepr, type2.toString());
-		Logger.log("%s-configuration learns %d new patterns", type1.toString(), numbNew);
+		Logger.log("%s-configuration learns %d new patterns", type1.toString(),
+				numbNew);
 	}
 
-	private Tuple<Integer, Integer> getCoverage(EpisodeType type1, EpisodeType type2,
-			Map<Integer, Set<Episode>> patterns1,
+	private Tuple<Integer, Integer> getCoverage(EpisodeType type1,
+			EpisodeType type2, Map<Integer, Set<Episode>> patterns1,
 			Map<Integer, Set<Episode>> patterns2) throws IOException {
 		Map<Set<Fact>, Set<Episode>> sets1 = patternsSetFact(patterns1);
 		Map<Set<Fact>, Set<Episode>> sets2 = patternsSetFact(patterns2);
@@ -433,18 +430,17 @@ public class PatternsComparison {
 		}
 		return Tuple.newTuple(covered, notCovered);
 	}
-	
-	private void storeUniques(EpisodeType type, int foldNum, Episode pattern, int patternId) throws IOException {
-		List<Event> events = eventStream.readMapping(300, 0);
-		
+
+	private void storeUniques(EpisodeType type, int foldNum, Episode pattern,
+			int patternId) throws IOException {
+		List<Event> events = eventStream.readMapping(300);
+
 		Episode epGraph = transClosure.remTransClosure(pattern);
-		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter
-				.convert(epGraph, events);
-		
-		graphWriter.write(
-				graph,
-				getGraphPath(type, foldNum, THRESHFREQ, THRESHENT,
-						patternId));
+		DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter.convert(
+				epGraph, events);
+
+		graphWriter.write(graph,
+				getGraphPath(type, foldNum, THRESHFREQ, THRESHENT, patternId));
 	}
 
 	private boolean isCovered(Episode pattern, Set<Episode> others) {
@@ -485,50 +481,50 @@ public class PatternsComparison {
 		return results;
 	}
 
-	public void overlappingPatterns(EpisodeType type1, EpisodeType type2,
-			int frequency, int foldNum) throws IOException {
-		int equal = 0;
-		int noRepres = 0;
-		int set = 0;
-
-		int onePattern = 0;
-		int twoPatterns = 0;
-		Map<Set<Fact>, Set<Episode>> patterns1 = patternsSetFact(getPatterns(
-				type1, foldNum, frequency));
-		Map<Set<Fact>, Set<Episode>> patterns2 = patternsSetFact(getPatterns(
-				type2, foldNum, frequency));
-
-		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
-			Set<Fact> events = entry.getKey();
-			Set<Episode> episodes2 = entry.getValue();
-
-			if (patterns1.containsKey(events)) {
-				if (!equalEpisodes(episodes2, patterns1.get(events))) {
-					store(frequency, patterns1.get(events), type1, set, foldNum);
-					store(frequency, episodes2, type2, set, foldNum);
-					noRepres++;
-					set++;
-					
-					int numb = patterns1.get(events).size();
-					if (numb == 1) {
-						onePattern++;
-					} 
-					if (entry.getKey().size() == 2) {
-						if (numb == 2) {
-							twoPatterns++;
-						}
-					}
-				} else {
-					equal += episodes2.size();
-				}
-			}
-		}
-		Logger.log(
-				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
-				type1.toString(), type2.toString(), equal, noRepres);
-		Logger.log("Number of single patterns: %d", onePattern);
-		Logger.log("Number of two patterns: %d", twoPatterns);
-	}
+//	public void overlappingPatterns(EpisodeType type1, EpisodeType type2,
+//			int frequency, int foldNum) throws IOException {
+//		int equal = 0;
+//		int noRepres = 0;
+//		int set = 0;
+//
+//		int onePattern = 0;
+//		int twoPatterns = 0;
+//		Map<Set<Fact>, Set<Episode>> patterns1 = patternsSetFact(getPatterns(
+//				type1, frequency));
+//		Map<Set<Fact>, Set<Episode>> patterns2 = patternsSetFact(getPatterns(
+//				type2, foldNum, frequency));
+//
+//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
+//			Set<Fact> events = entry.getKey();
+//			Set<Episode> episodes2 = entry.getValue();
+//
+//			if (patterns1.containsKey(events)) {
+//				if (!equalEpisodes(episodes2, patterns1.get(events))) {
+//					store(frequency, patterns1.get(events), type1, set, foldNum);
+//					store(frequency, episodes2, type2, set, foldNum);
+//					noRepres++;
+//					set++;
+//
+//					int numb = patterns1.get(events).size();
+//					if (numb == 1) {
+//						onePattern++;
+//					}
+//					if (entry.getKey().size() == 2) {
+//						if (numb == 2) {
+//							twoPatterns++;
+//						}
+//					}
+//				} else {
+//					equal += episodes2.size();
+//				}
+//			}
+//		}
+//		Logger.log(
+//				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
+//				type1.toString(), type2.toString(), equal, noRepres);
+//		Logger.log("Number of single patterns: %d", onePattern);
+//		Logger.log("Number of two patterns: %d", twoPatterns);
+//	}
 
 	private boolean equalEpisodes(Set<Episode> set1, Set<Episode> set2) {
 		if (set1.size() != set2.size()) {
@@ -605,35 +601,35 @@ public class PatternsComparison {
 		// }
 	}
 
-//	public void extractConcreteCode(int frequency, int foldNum) {
-//		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
-//				frequency, foldNum);
-//		Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
-//
-//		EnclosingMethods enclMethods = new EnclosingMethods(true);
-//		int numMethods = 0;
-//		for (Tuple<Event, List<Fact>> tuple : stream) {
-//			List<Fact> method = tuple.getSecond();
-//
-//			if (method.size() < 2) {
-//				continue;
-//			}
-//			if (method.containsAll(pattern.getEvents())) {
-//				enclMethods.addMethod(pattern, method, tuple.getFirst());
-//				numMethods = enclMethods.getOccurrences();
-//			}
-//			if (numMethods > 500) {
-//				break;
-//			}
-//		}
-//		Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
-//
-//		for (IMethodName eventName : methodNames) {
-//			Logger.log("General pattern occurrences: %s",
-//					eventName.getDeclaringType().getFullName() + "."
-//							+ eventName.getName());
-//		}
-//	}
+	// public void extractConcreteCode(int frequency, int foldNum) {
+	// List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
+	// frequency, foldNum);
+	// Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
+	//
+	// EnclosingMethods enclMethods = new EnclosingMethods(true);
+	// int numMethods = 0;
+	// for (Tuple<Event, List<Fact>> tuple : stream) {
+	// List<Fact> method = tuple.getSecond();
+	//
+	// if (method.size() < 2) {
+	// continue;
+	// }
+	// if (method.containsAll(pattern.getEvents())) {
+	// enclMethods.addMethod(pattern, method, tuple.getFirst());
+	// numMethods = enclMethods.getOccurrences();
+	// }
+	// if (numMethods > 500) {
+	// break;
+	// }
+	// }
+	// Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
+	//
+	// for (IMethodName eventName : methodNames) {
+	// Logger.log("General pattern occurrences: %s",
+	// eventName.getDeclaringType().getFullName() + "."
+	// + eventName.getName());
+	// }
+	// }
 
 	private boolean assertFactSets(Set<Fact> facts1, Set<Fact> facts2) {
 		if (facts1.size() != facts2.size()) {
@@ -649,7 +645,8 @@ public class PatternsComparison {
 		return true;
 	}
 
-	private Episode createEpisode(int frequency, double entropy, String... strings) {
+	private Episode createEpisode(int frequency, double entropy,
+			String... strings) {
 		Episode episode = new Episode();
 
 		episode.setFrequency(frequency);
@@ -720,7 +717,7 @@ public class PatternsComparison {
 
 	private void store(int frequency, Set<Episode> episodes, EpisodeType type,
 			int setNum, int foldNum) throws IOException {
-		List<Event> events = eventStream.readMapping(frequency, foldNum);
+		List<Event> events = eventStream.readMapping(frequency);
 		int episodeId = 0;
 
 		for (Episode ep : episodes) {
@@ -735,7 +732,7 @@ public class PatternsComparison {
 
 	private void saveUniques(int freq, Set<Episode> episodes, EpisodeType type,
 			int id, int foldNum) throws IOException {
-		List<Event> events = eventStream.readMapping(freq, foldNum);
+		List<Event> events = eventStream.readMapping(freq);
 
 		for (Episode ep : episodes) {
 			Episode epGraph = transClosure.remTransClosure(ep);

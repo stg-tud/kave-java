@@ -15,6 +15,9 @@
  */
 package cc.kave.episodes.io;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +31,8 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.recommenders.exceptions.AssertionException;
@@ -48,7 +53,6 @@ public class EventStreamIoTest {
 
 	File mappingFile;
 	File streamTextFile;
-	File streamDataFile;
 
 	private EventStreamIo sut;
 
@@ -56,7 +60,6 @@ public class EventStreamIoTest {
 	public void setup() {
 		streamTextFile = getStreamTextFile();
 		mappingFile = getMappingFile();
-		streamDataFile = getStreamDataFile();
 
 		sut = new EventStreamIo(tmp.getRoot());
 	}
@@ -76,117 +79,46 @@ public class EventStreamIoTest {
 		sut = new EventStreamIo(file);
 	}
 
-//	@Test
-//	public void invalidMethodCtx() {
-//
-//		List<Tuple<Event, String>> stream = Lists.newLinkedList();
-//		stream.add(Tuple.newTuple(firstCtx(1), "1,0.000\n2,0.001\n"));
-//		stream.add(Tuple.newTuple(inv(2), "3,5.002\n"));
-//		stream.add(Tuple.newTuple(inv(4), "2,15.003\n3,15.004\n"));
-//
-//		JsonUtils.toJson(stream, getStreamDataFile());
-//
-//		thrown.expect(AssertionException.class);
-//		thrown.expectMessage("Stream contexts contains invalid mehod contexts");
-//
-//		sut.parseStream(FREQUENCY, FOLDNUM);
-//	}
+	@Test
+	public void invalidMethodCtx() throws IOException {
+		String expected = "";
+		expected += "1,0.000\n2,0.001\n";
+		expected += "3,5.002\n";
+		expected += "2,15.003\n3,15.004\n";
 
-//	@Test
-//	public void happyPath() throws IOException {
-//
-//		EventStream eventStream = new EventStream();
-//		eventStream.addEvent(firstCtx(1)); // 1
-//		eventStream.addEvent(ctx(1));
-//		eventStream.addEvent(inv(2)); // 2
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(2));
-//		eventStream.addEvent(inv(5)); // 3
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(3));
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(4));
-//		eventStream.addEvent(inv(2)); // 2
-//		eventStream.addEvent(inv(5)); // 3
-//
-//		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
-//		List<Fact> method2 = Lists.newArrayList(new Fact(3));
-//		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
-//
-//		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
-//		expStreamData.add(Tuple.newTuple(ctx(1), method1));
-//		expStreamData.add(Tuple.newTuple(ctx(2), method2));
-//		expStreamData.add(Tuple.newTuple(ctx(4), method3));
-//
-//		sut.write(eventStream, FREQUENCY, FOLDNUM);
-//
-//		assertTrue(streamTextFile.exists());
-//		assertTrue(mappingFile.exists());
-//		assertTrue(streamDataFile.exists());
-//
-//		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
-//
-//		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
-//
-//		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
-//				FREQUENCY, FOLDNUM);
-//
-//		assertMapping(eventStream.getMapping(), actMapping);
-//
-//		assertEquals(expStreamData, actStreamData);
-//
-//		assertEquals(eventStream.getStreamText(), actStreamText);
-//
-//		assertTrue(actMapping.size() == 4);
-//	}
+		JsonUtils.toJson(expected, getStreamTextFile());
 
-//	@Test
-//	public void emptyMethods() throws IOException {
-//
-//		EventStream eventStream = new EventStream();
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(0));
-//		eventStream.addEvent(firstCtx(1)); // 1
-//		eventStream.addEvent(ctx(1));
-//		eventStream.addEvent(inv(2)); // 2
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(2));
-//		eventStream.addEvent(inv(5)); // 3
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(0));
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(4));
-//		eventStream.addEvent(inv(2)); // 2
-//		eventStream.addEvent(inv(5)); // 3
-//		eventStream.addEvent(firstCtx(0));
-//		eventStream.addEvent(ctx(0));
-//
-//		List<Fact> method1 = Lists.newArrayList(new Fact(1), new Fact(2));
-//		List<Fact> method2 = Lists.newArrayList(new Fact(3));
-//		List<Fact> method3 = Lists.newArrayList(new Fact(2), new Fact(3));
-//
-//		List<Tuple<Event, List<Fact>>> expStreamData = Lists.newLinkedList();
-//		expStreamData.add(Tuple.newTuple(ctx(1), method1));
-//		expStreamData.add(Tuple.newTuple(ctx(2), method2));
-//		expStreamData.add(Tuple.newTuple(ctx(4), method3));
-//
-//		sut.write(eventStream, FREQUENCY, FOLDNUM);
-//
-//		List<Event> actMapping = sut.readMapping(FREQUENCY, FOLDNUM);
-//
-//		String actStreamText = sut.readStreamText(FREQUENCY, FOLDNUM);
-//
-//		List<Tuple<Event, List<Fact>>> actStreamData = sut.parseStream(
-//				FREQUENCY, FOLDNUM);
-//
-//		assertMapping(eventStream.getMapping(), actMapping);
-//
-//		assertEquals(expStreamData, actStreamData);
-//
-//		assertEquals(eventStream.getStreamText(), actStreamText);
-//
-//		assertTrue(actMapping.size() == 4);
-//	}
+		String actuals = sut.readStreamText(FREQUENCY);
+
+		assertEquals(actuals, actuals);
+	}
+
+	@Test
+	public void happyPath() throws IOException {
+
+		EventStream eventStream = new EventStream();
+		eventStream.addEvent(firstCtx(1)); // 1
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(5)); // 4
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(inv(5)); // 4
+
+		sut.write(eventStream, FREQUENCY);
+
+		assertTrue(streamTextFile.exists());
+		assertTrue(mappingFile.exists());
+
+		List<Event> actMapping = sut.readMapping(FREQUENCY);
+
+		String actStreamText = sut.readStreamText(FREQUENCY);
+
+		assertMapping(eventStream.getMapping(), actMapping);
+		assertEquals(eventStream.getStreamText(), actStreamText);
+		assertTrue(actMapping.size() == 5);
+	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {
 		if (expMapping.size() != actMapping.size()) {
@@ -200,18 +132,13 @@ public class EventStreamIoTest {
 		return true;
 	}
 
-	private File getStreamDataFile() {
-		File fileName = new File(getPath() + "/streamData.json");
-		return fileName;
-	}
-
 	private File getMappingFile() {
 		File fileName = new File(getPath() + "/mapping.txt");
 		return fileName;
 	}
 
 	private File getStreamTextFile() {
-		File fileName = new File(getPath() + "/streamText.txt");
+		File fileName = new File(getPath() + "/stream.txt");
 		return fileName;
 	}
 
@@ -228,25 +155,11 @@ public class EventStreamIoTest {
 		return Events.newInvocation(m(i));
 	}
 
-	private static Event ctx(int i) {
-		return Events.newContext(m(i));
-	}
-
 	private static Event firstCtx(int i) {
 		return Events.newFirstContext(m(i));
 	}
 
 	private static IMethodName m(int i) {
-		if (i == 0) {
-			return Names.getUnknownMethod();
-		} else if (i == 10) {
-			return Names.newMethod("[T,P] [T,P].m()");
-		} else if (i == 20) {
-			return Names.newMethod("[T,mscorlib, 4.0.0.0] [T,mscorlib, 4.0.0.0].m()");
-		} else if (i == 30) {
-			return Names.newMethod("[T,mscorlib] [T,mscorlib].m()");
-		} else {
-			return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
-		}
+		return Names.newMethod("[T,P, 1.2.3.4] [T,P, 1.2.3.4].m" + i + "()");
 	}
 }

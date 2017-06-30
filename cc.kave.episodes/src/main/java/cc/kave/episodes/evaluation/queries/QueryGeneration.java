@@ -36,7 +36,7 @@ public class QueryGeneration {
 		assertTrue(pattern.getNumEvents() > 1,
 				"Pattern is non-valid, few events!");
 
-		List<Event> mapping = eventStreamIo.readMapping(0, 0);
+		List<Event> mapping = eventStreamIo.readMapping(0);
 
 		Tuple<Set<Fact>, Set<Fact>> mdmi = separateEvents(pattern, mapping);
 

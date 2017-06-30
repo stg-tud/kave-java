@@ -35,7 +35,7 @@ public class PatternsStructure {
 
 	public void analyzeTypes(EpisodeType type, int freqEpisode, int foldNum,
 			int freqThresh, double entropy) {
-		List<Event> events = eventStream.readMapping(freqEpisode, foldNum);
+		List<Event> events = eventStream.readMapping(freqEpisode);
 		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
 				freqEpisode, foldNum);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,

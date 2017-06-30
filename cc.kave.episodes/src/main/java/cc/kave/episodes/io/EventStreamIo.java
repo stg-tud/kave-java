@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -29,7 +30,9 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
+import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
@@ -46,18 +49,19 @@ public class EventStreamIo {
 
 	public void write(EventStream stream, int frequency) {
 		try {
-			FileUtils.writeStringToFile(
-					new File(getTrainPath(frequency).streamTextPath),
-					stream.getStreamText());
-			JsonUtils.toJson(stream.getMapping(),
-					new File(getTrainPath(frequency).mappingPath));
+			FileUtils
+					.writeStringToFile(new File(
+							getTrainPath(frequency).streamPath), stream
+							.getStreamText());
+			JsonUtils.toJson(stream.getMapping(), new File(
+					getTrainPath(frequency).mappingPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public List<Event> readMapping(int freq, int foldNum) {
-		String mappingPath = getTrainPath(freq).mappingPath;
+	public List<Event> readMapping(int frequency) {
+		String mappingPath = getTrainPath(frequency).mappingPath;
 
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<List<Event>>() {
@@ -65,66 +69,67 @@ public class EventStreamIo {
 		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
 
-//	public String readStreamText(int frequency, int foldNum) throws IOException {
-//		String streamPath = getTrainPath(frequency, foldNum).streamTextPath;
-//
-//		String stream = FileUtils.readFileToString(new File(streamPath));
-//
-//		return stream;
-//	}
-//
-//	public List<Tuple<Event, List<Fact>>> parseStream(int frequency, int foldNum) {
-//		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
-//
-//		List<Tuple<Event, String>> stream = readStreamData(frequency, foldNum);
-//
-//		for (Tuple<Event, String> methodTuple : stream) {
-//			List<Fact> methodFacts = Lists.newLinkedList();
-//			String[] lines = methodTuple.getSecond().split("\n");
-//
-//			for (String line : lines) {
-//				String[] eventTime = line.split(",");
-//				int eventID = Integer.parseInt(eventTime[0]);
-//				methodFacts.add(new Fact(eventID));
-//			}
-//			results.add(Tuple.newTuple(methodTuple.getFirst(), methodFacts));
-//		}
-//		return results;
-//	}
+	public String readStreamText(int frequency) throws IOException {
+		String streamPath = getTrainPath(frequency).streamPath;
 
-//	private List<Tuple<Event, String>> readStreamData(int frequency, int foldNum) {
-//		String streamPath = getTrainPath(frequency, foldNum).streamDataPath;
-//
-//		@SuppressWarnings("serial")
-//		Type type = new TypeToken<List<Tuple<Event, String>>>() {
-//		}.getType();
-//		List<Tuple<Event, String>> stream = JsonUtils.fromJson(new File(
-//				streamPath), type);
-//		assertMethods(stream);
-//		return stream;
-//	}
+		String stream = FileUtils.readFileToString(new File(streamPath));
 
-//	private void assertMethods(List<Tuple<Event, String>> stream) {
-//		for (Tuple<Event, String> tuple : stream) {
-//			assertTrue(
-//					tuple.getFirst().getKind() == EventKind.METHOD_DECLARATION,
-//					"Stream contexts contains invalid mehod contexts");
-//		}
-//
-//	}
+		return stream;
+	}
+
+	public void streamStats(int frequency) throws IOException {
+		String stream = readStreamText(frequency);
+		List<Event> events = readMapping(frequency);
+		
+		Set<Event> ctxFirst = Sets.newHashSet();
+		Set<Event> ctxSuper = Sets.newHashSet();
+		Set<Event> invs = Sets.newHashSet();
+		
+		int numFirst = 0;
+		int numSuper = 0;
+		int numInvs = 0;
+
+		String[] lines = stream.split("\n");
+		for (String line : lines) {
+			String[] eventTime = line.split(",");
+			int eventID = Integer.parseInt(eventTime[0]);
+			Event event = events.get(eventID);
+			
+			switch (event.getKind()) {
+			case FIRST_DECLARATION:
+				ctxFirst.add(event);
+				numFirst++;
+				break;
+			case SUPER_DECLARATION:
+				ctxSuper.add(event);
+				numSuper++;
+				break;
+			case INVOCATION:
+				invs.add(event);
+				numInvs++;
+				break;
+			default:
+				System.err.println("should not happen");
+			}
+		}
+		Logger.log("Statistics from event stream:");
+		Logger.log("ctxFirst: %d (%d unique)", numFirst, ctxFirst.size());
+		Logger.log("ctxSuper %d (%d unique)", numSuper, ctxSuper.size());
+		Logger.log("invs: %d (%d unique)", numInvs, invs.size());
+	}
 
 	private class TrainingPath {
-		String streamTextPath = "";
+		String streamPath = "";
 		String mappingPath = "";
 	}
 
-	private TrainingPath getTrainPath(int freq) {
-		File path = new File(eventsDir.getAbsolutePath() + "/freq" + freq);
+	private TrainingPath getTrainPath(int frequency) {
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency);
 		if (!path.isDirectory()) {
-			path.mkdirs();
+			path.mkdir();
 		}
 		TrainingPath trainPath = new TrainingPath();
-		trainPath.streamTextPath = path.getAbsolutePath() + "/streamText.txt";
+		trainPath.streamPath = path.getAbsolutePath() + "/stream.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
 
 		return trainPath;
