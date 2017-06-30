@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.data.CompareStreams;
-import cc.kave.episodes.data.ContextsParser;
-import cc.kave.episodes.mining.evaluation.PatternsComparison;
-import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
@@ -36,14 +32,12 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FOLDNUM = 0;
 	private static final int FREQUENCY = 2;
 
 	private static final int THF = 300;
 	private static final double THE = 0.73;
 
 	private static final int METHODSIZE = 5000;
-	private static final int NUM_FOLDS = 10;
 
 	private static Injector injector;
 
@@ -59,17 +53,9 @@ public class run_ervina {
 		
 		load(Preprocessing.class).run(FREQUENCY);
 		
-//		load(ContextsParser.class).parse();
-//		load(CompareStreams.class).compare();
-		
-
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
-
-		// load(ReposStatistics.class).generate(FREQUENCY);
 		// load(PreChecking.class).reposInfo();
 		// load(EventOccurrences.class).generate(FREQUENCY);
-		// load(PreprocessingFolded.class).allRepos(FREQUENCY);
-		// load(StreamGenerator4.class).generate(FREQUENCY, FOLDNUM);
 
 		// load(PostChecking.class).updatedEvent(FREQUENCY);
 
@@ -85,17 +71,12 @@ public class run_ervina {
 //				EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
 //		 load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
 //		 EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
-//		load(PatternsComparison.class).overlappingPatterns(
-//				EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL, FREQUENCY, FOLDNUM);
 
 		// load(SpecificPatterns.class).patternsInfo(EpisodeType.GENERAL,
 		// FREQUENCY, FOLDNUM, FREQUENCY, ENTROPY);
 		// load(PatternsEvents.class).getEventsType(EpisodeType.PARALLEL,
 		// FREQUENCY, ENTROPY, FOLDNUM);
 		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
-		// load(PatternsComparison.class).printCommonPatterns(FREQ,
-		// EpisodeType.SEQUENTIAL, EpisodeType.PARALLEL);
-		// load(PatternsComparison.class).extractConcreteCode(FREQ);
 
 		// load(PatternsIdentifier.class).trainingCode(FREQ,
 		// EpisodeType.GENERAL);
@@ -105,7 +86,6 @@ public class run_ervina {
 		// load(EvaluationsPaper.class).part1(FREQ);
 
 		// load(EventStreamSize.class).printNumberOfEvents(NUM_FOLDS);
-		// load(PatternsComparisons.class).compare(FOLDNUM,
 		// EpisodeKind.SEQUENTIAL,
 		// EpisodeKind.PARALLEL, FREQ, ENTROPY);
 		// load(PartialOrderAnalyzer.class).analyze(FOLDNUM, FREQ, ENTROPY);
@@ -123,8 +103,6 @@ public class run_ervina {
 		// load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH,
 		// BIDIRECTTHRESH);
 		// load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH,
-		// BIDIRECTTHRESH);
-		// load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH,
 		// BIDIRECTTHRESH);
 		// load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS,
 		// FREQTHRESH, BIDIRECTTHRESH);
@@ -147,10 +125,6 @@ public class run_ervina {
 		// load(TargetsCategorization.class).categorize();
 
 		// load(Suggestions.class).run();
-		// load(EventStreamModifier.class).modify();
-		// load(EventStreamReader.class).read();
-		// load(MappingReader.class).read();
-
 		// load(PatternAnalyzer.class).readPatterns();
 
 		Logger.log("done");
