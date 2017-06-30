@@ -90,9 +90,6 @@ public class PartialEventStreamGenerator {
 //				return null;
 //			}
 			ctxElem = m;
-//			if (m.equals(decl1)) {
-//				Logger.log("stop for now");
-//			}
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(m)) {
 					ctxSuper = h.getSuper();

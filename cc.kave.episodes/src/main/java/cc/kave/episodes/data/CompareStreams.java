@@ -44,10 +44,10 @@ public class CompareStreams {
 		List<Tuple<Event, List<Event>>> streamSeb = classStruct(stream);
 		Map<Event, List<Event>> stream1 = methodStruct(stream);
 
-//		System.out.println();
-//
-//		Set<ITypeName> types1 = typesCounter(streamSeb);
-//		localCtxCounter(stream);
+		System.out.println();
+
+		Set<ITypeName> types1 = typesCounter(streamSeb);
+		localCtxCounter(stream);
 //
 //		List<Tuple<Event, List<Event>>> streamEr = parser.parse();
 //		Map<Event, List<Event>> stream2 = mapConverter(streamEr);

@@ -18,6 +18,9 @@ package cc.kave.episodes.eventstream;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
@@ -27,6 +30,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class StreamFileGenerator {
+	
+	private ContextsParser ctxParser;
+	
+	@Inject
+	public StreamFileGenerator(ContextsParser parser) {
+		this.ctxParser = parser;
+	}
 
 	public static EventStream generate(List<Tuple<Event, List<Event>>> stream,
 			int frequency) {

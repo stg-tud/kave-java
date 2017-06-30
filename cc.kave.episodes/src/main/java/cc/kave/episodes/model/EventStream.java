@@ -56,6 +56,16 @@ public class EventStream {
 		addEventIdToStream(idx);
 	}
 	
+	public void increaseTimeout() {
+		time += TIMEOUT;
+	}
+
+	public void delete() {
+		this.sb.delete(0, sb.length());
+		this.time = 0.000;
+		this.eventsMapper.clear();
+	}
+	
 	private void addEventIdToStream(int idx) {
 		sb.append(idx);
 		sb.append(',');
@@ -73,16 +83,6 @@ public class EventStream {
 			eventsMapper.put(event, idx);
 			return idx;
 		}
-	}
-
-	public void increaseTimeout() {
-		time += TIMEOUT;
-	}
-
-	public void delete() {
-		this.sb.delete(0, sb.length());
-		this.time = 0.000;
-		this.eventsMapper.clear();
 	}
 
 	@Override
