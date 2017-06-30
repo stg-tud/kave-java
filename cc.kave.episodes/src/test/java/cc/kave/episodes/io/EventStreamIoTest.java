@@ -18,16 +18,21 @@ package cc.kave.episodes.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -35,7 +40,11 @@ import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
+import cc.recommenders.io.Logger;
+import cc.recommenders.utils.LocaleUtils;
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 
 public class EventStreamIoTest {
 
@@ -51,17 +60,39 @@ public class EventStreamIoTest {
 
 	private static final int FREQUENCY = 2;
 
-	File mappingFile;
-	File streamTextFile;
+	private File mappingFile;
+	private File streamTextFile;
+	
+	private EventStream eventStream;
 
 	private EventStreamIo sut;
 
 	@Before
 	public void setup() {
+		LocaleUtils.setDefaultLocale();
+		Logger.reset();
+		Logger.setCapturing(true);
+		
 		streamTextFile = getStreamTextFile();
 		mappingFile = getMappingFile();
+		
+		eventStream = new EventStream();
+		eventStream.addEvent(firstCtx(1)); // 1
+		eventStream.addEvent(superCtx(3));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(5)); // 4
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(inv(5)); // 4
 
 		sut = new EventStreamIo(tmp.getRoot());
+	}
+	
+	@After
+	public void teardown() {
+		Logger.reset();
 	}
 
 	@Test
@@ -96,16 +127,6 @@ public class EventStreamIoTest {
 	@Test
 	public void happyPath() throws IOException {
 
-		EventStream eventStream = new EventStream();
-		eventStream.addEvent(firstCtx(1)); // 1
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(firstCtx(0)); // 3
-		eventStream.addEvent(inv(5)); // 4
-		eventStream.addEvent(firstCtx(0)); // 3
-		eventStream.addEvent(firstCtx(0)); // 3
-		eventStream.addEvent(inv(2)); // 2
-		eventStream.addEvent(inv(5)); // 4
-
 		sut.write(eventStream, FREQUENCY);
 
 		assertTrue(streamTextFile.exists());
@@ -117,7 +138,33 @@ public class EventStreamIoTest {
 
 		assertMapping(eventStream.getMapping(), actMapping);
 		assertEquals(eventStream.getStreamText(), actStreamText);
-		assertTrue(actMapping.size() == 5);
+		assertTrue(actMapping.size() == 6);
+	}
+	
+	@Test
+	public void testStats() throws IOException {
+
+		sut.write(eventStream, FREQUENCY);
+		sut.streamStats(FREQUENCY);
+		
+		assertLogContains(0, "Statistics from event stream:");
+		assertLogContains(1, "ctxFirst: 4 (2 unique)");
+		assertLogContains(2, "ctxSuper 1 (1 unique)");
+		assertLogContains(3, "invs: 4 (2 unique)");
+	}
+	
+	@Test
+	public void testErrMsg() throws IOException {
+		eventStream.addEvent(Events.newDummyEvent());
+
+		sut.write(eventStream, FREQUENCY);
+		
+		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+		System.setErr(new PrintStream(outContent));
+		
+		sut.streamStats(FREQUENCY);
+		
+		assertEquals("should not happen\n", outContent.toString());
 	}
 
 	private boolean assertMapping(Set<Event> expMapping, List<Event> actMapping) {
@@ -157,6 +204,10 @@ public class EventStreamIoTest {
 
 	private static Event firstCtx(int i) {
 		return Events.newFirstContext(m(i));
+	}
+	
+	private static Event superCtx(int i) {
+		return Events.newSuperContext(m(i));
 	}
 
 	private static IMethodName m(int i) {
