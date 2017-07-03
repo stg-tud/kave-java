@@ -21,11 +21,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
@@ -34,11 +31,14 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 public class TrainingDataGraphGenerator {
 
 	private EpisodesParser episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -47,7 +47,7 @@ public class TrainingDataGraphGenerator {
 
 	@Inject
 	public TrainingDataGraphGenerator(@Named("graph") File directory, EpisodesParser episodeParser,
-			MaximalEpisodes episodeLearned, MappingParser mappingParser,
+			MaximalEpisodes episodeLearned, EventStreamIo streamIo,
 			TransClosedEpisodes transitivityClosure, EpisodeAsGraphWriter writer,
 			EpisodeToGraphConverter graphConverter) {
 
@@ -57,7 +57,7 @@ public class TrainingDataGraphGenerator {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.maxEpisodeTracker = episodeLearned;
-		this.mappingParser = mappingParser;
+		this.streamIo = streamIo;
 		this.episodeGraphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
 		this.writer = writer;

@@ -24,32 +24,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
-import com.google.inject.Inject;
-
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Logger;
 
+import com.google.inject.Inject;
+
 public class ValidationSetAnalyzer {
 
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private ValidationContextsParser validationParser;
 	
 	private Map<Integer, Integer> structure = new HashMap<Integer, Integer>();
 	
 	@Inject
-	public ValidationSetAnalyzer(MappingParser mParser, ValidationContextsParser vParser) {
-		this.mappingParser = mParser;
+	public ValidationSetAnalyzer(EventStreamIo streamIo, ValidationContextsParser vParser) {
+		this.streamIo = streamIo;
 		this.validationParser = vParser;
 	}
 	
-	public void categorize(int numbRepos) throws ZipException, IOException {
+	public void categorize(int frequency) throws ZipException, IOException {
 		Logger.setPrinting(true);
 		
 		Logger.log("Reading the events mapping file ...");
-		List<Event> events = mappingParser.parse(numbRepos);
+		List<Event> events = streamIo.readMapping(frequency);
 		
 		Logger.log("Reading validation data ...");
 		Set<Episode> targets = validationParser.parse(events);

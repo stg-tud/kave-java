@@ -25,11 +25,8 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -39,10 +36,13 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.io.Logger;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 public class QueriesGraphGenerator {
 
 	private ValidationContextsParser validationParser;
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -52,7 +52,7 @@ public class QueriesGraphGenerator {
 
 	@Inject
 	public QueriesGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
-			MappingParser mappingParser,  TransClosedEpisodes transitivityClosure, 
+			EventStreamIo streamIo,  TransClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator) {
 
@@ -61,19 +61,19 @@ public class QueriesGraphGenerator {
 
 		this.rootFolder = directory;
 		this.validationParser = parser;
-		this.mappingParser = mappingParser;
+		this.streamIo = streamIo;
 		this.episodeGraphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
 		this.writer = writer;
 		this.queryGenerator = queryGenerator;
 	}
 
-	public void generateGraphs(int numbRepos) throws Exception {
+	public void generateGraphs(int frequency) throws Exception {
 		
 		Logger.setPrinting(true);
 		
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse(numbRepos);
+		List<Event> eventMapping = streamIo.readMapping(frequency);
 		
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);

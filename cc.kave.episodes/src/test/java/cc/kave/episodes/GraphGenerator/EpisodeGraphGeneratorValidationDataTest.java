@@ -36,14 +36,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -55,6 +51,9 @@ import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 public class EpisodeGraphGeneratorValidationDataTest {
 
 	@Rule
@@ -65,11 +64,11 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	@Mock
 	private ValidationContextsParser contextParser;
 	@Mock
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	@Mock
 	private Directory episodeDirectory;
 
-	private static final int REPOS = 2;
+	private static final int FREQUENCY = 2;
 
 	private String tmpFolderName;
 	private EpisodeToGraphConverter graphConverter;
@@ -93,12 +92,12 @@ public class EpisodeGraphGeneratorValidationDataTest {
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 
-		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, mappingParser, transitivityClosure,
+		sut = new ValidationDataGraphGenerator(rootFolder.getRoot(), contextParser, streamIo, transitivityClosure,
 				writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/ValidationData/");
 
-		when(mappingParser.parse(REPOS)).thenReturn(events);
+		when(streamIo.readMapping(FREQUENCY)).thenReturn(events);
 		when(contextParser.parse(eq(events))).thenReturn(episodes);
 	}
 
@@ -106,7 +105,7 @@ public class EpisodeGraphGeneratorValidationDataTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Validation data folder does not exist");
-		sut = new ValidationDataGraphGenerator(new File("does not exist"), contextParser, mappingParser,
+		sut = new ValidationDataGraphGenerator(new File("does not exist"), contextParser, streamIo,
 				transitivityClosure, writer, graphConverter);
 	}
 
@@ -115,28 +114,28 @@ public class EpisodeGraphGeneratorValidationDataTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Validation data folder is not a folder, but a file");
-		sut = new ValidationDataGraphGenerator(file, contextParser, mappingParser, transitivityClosure, writer,
+		sut = new ValidationDataGraphGenerator(file, contextParser, streamIo, transitivityClosure, writer,
 				graphConverter);
 	}
 
 	@Test
 	public void structureIsCreated() throws Exception {
 
-		sut.generateGraphs(REPOS);
+		sut.generateGraphs(FREQUENCY);
 
 		assertTrue(folderStructure.exists());
 		assertTrue(folderStructure.isDirectory());
 
-		verify(mappingParser).parse(REPOS);
+		verify(streamIo).readMapping(FREQUENCY);
 		verify(contextParser).parse(events);
 	}
 
 	@Test
 	public void validationGraphStored() throws Exception {
 
-		sut.generateGraphs(REPOS);
+		sut.generateGraphs(FREQUENCY);
 
-		verify(mappingParser).parse(REPOS);
+		verify(streamIo).readMapping(FREQUENCY);
 		verify(contextParser).parse(events);
 
 		File fileName;

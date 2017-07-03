@@ -43,7 +43,7 @@ import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
@@ -74,7 +74,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	@Mock
 	private EpisodesParser episodeParser;
 	@Mock
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	@Mock
 	private Directory episodeDirectory;
 
@@ -101,20 +101,20 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 				eventMethodDeclGeneralAPI("M5"), eventMethodDeclGeneralAPI("M6"));
 		episodes = createEpisodes();
 
-		sut = new TrainingDataGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, mappingParser,
+		sut = new TrainingDataGraphGenerator(rootFolder.getRoot(), episodeParser, episodeLearned, streamIo,
 				transitivityClosure, writer, graphConverter);
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
 		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
-		when(mappingParser.parse(REPOS)).thenReturn(events);
+		when(streamIo.readMapping(FREQ)).thenReturn(events);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder does not exist");
-		sut = new TrainingDataGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, mappingParser,
+		sut = new TrainingDataGraphGenerator(new File("does not exist"), episodeParser, episodeLearned, streamIo,
 				transitivityClosure, writer, graphConverter);
 	}
 
@@ -123,7 +123,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Episode-miner folder is not a folder, but a file");
-		sut = new TrainingDataGraphGenerator(file, episodeParser, episodeLearned, mappingParser, transitivityClosure,
+		sut = new TrainingDataGraphGenerator(file, episodeParser, episodeLearned, streamIo, transitivityClosure,
 				writer, graphConverter);
 	}
 
@@ -137,7 +137,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		assertTrue(folderStructure.isDirectory());
 
 		// verify(episodeParser).parse(eq(FREQ), eq(BD));
-		verify(mappingParser).parse(REPOS);
+		verify(streamIo).readMapping(FREQ);
 	}
 
 	@Ignore
@@ -147,7 +147,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		// sut.generateGraphs(FREQ, BD);
 
 		// verify(episodeParser).parse(eq(FREQ), eq(BD));
-		verify(mappingParser).parse(REPOS);
+		verify(streamIo).readMapping(FREQ);
 
 		File fileName;
 		int epCounter = 0;

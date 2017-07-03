@@ -25,10 +25,7 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -38,10 +35,13 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.io.Logger;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 public class ValidationDataGraphGenerator {
 
 	private ValidationContextsParser validationParser;
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private EpisodeToGraphConverter episodeGraphConverter;
 	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -50,7 +50,7 @@ public class ValidationDataGraphGenerator {
 
 	@Inject
 	public ValidationDataGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
-			MappingParser mappingParser,  TransClosedEpisodes transitivityClosure, 
+			EventStreamIo streamIo,  TransClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
@@ -58,18 +58,18 @@ public class ValidationDataGraphGenerator {
 
 		this.rootFolder = directory;
 		this.validationParser = parser;
-		this.mappingParser = mappingParser;
+		this.streamIo = streamIo;
 		this.episodeGraphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
 		this.writer = writer;
 	}
 
-	public void generateGraphs(int numbRepos) throws Exception {
+	public void generateGraphs(int frequency) throws Exception {
 		
 		Logger.setPrinting(false);
 		
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse(numbRepos);
+		List<Event> eventMapping = streamIo.readMapping(frequency);
 		
 		Logger.log("Readng Contexts");
 		Set<Episode> validationData = validationParser.parse(eventMapping);

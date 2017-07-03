@@ -22,10 +22,11 @@ import com.google.common.collect.Maps;
 
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 
-public class StreamStatistics {
+public class EventsStatistics {
 
-	public int minFreq(Map<Event, Integer> occ) {
+	public static int minFreq(Map<Event, Integer> occ) {
 		int min = Integer.MAX_VALUE;
 		
 		for (Map.Entry<Event, Integer> entry : occ.entrySet()) {
@@ -38,17 +39,20 @@ public class StreamStatistics {
 		return min;
 	}
 
-	public Map<Event, Integer> getFrequencies(List<Event> stream) {
-		Map<Event, Integer> occurrences = Maps.newLinkedHashMap();
-		
-		for (Event e : stream) {
-			if (occurrences.containsKey(e)) {
-				int freq = occurrences.get(e);
-				occurrences.put(e, freq + 1);
-			} else {
-				occurrences.put(e, 1);
+	public static Map<Event, Integer> getFrequencies(
+			List<Tuple<Event, List<Event>>> stream) {
+		Map<Event, Integer> results = Maps.newHashMap();
+
+		for (Tuple<Event, List<Event>> tuple : stream) {
+			for (Event event : tuple.getSecond()) {
+				if (results.containsKey(event)) {
+					int counter = results.get(event);
+					results.put(event, counter + 1);
+				} else {
+					results.put(event, 1);
+				}
 			}
 		}
-		return occurrences;
+		return results;
 	}
 }

@@ -19,12 +19,9 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -32,12 +29,15 @@ import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 public class RecommenderGraphGenerator {
 	
 	private static final int PROPOSALS = 3;
 
 	private ValidationContextsParser validationParser;
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private EpisodeToGraphConverter graphConverter;
 	private TransClosedEpisodes transitivityClosure;
 	private EpisodeAsGraphWriter writer;
@@ -50,7 +50,7 @@ public class RecommenderGraphGenerator {
 
 	@Inject
 	public RecommenderGraphGenerator(@Named("graph") File directory, ValidationContextsParser parser,
-			MappingParser mappingParser,  TransClosedEpisodes transitivityClosure, 
+			EventStreamIo streamIo,  TransClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator, EpisodeRecommender recommender, 
 			EpisodesParser episodeParser, MaximalEpisodes maxEpisodeTracker) {
@@ -60,7 +60,7 @@ public class RecommenderGraphGenerator {
 
 		this.rootFolder = directory;
 		this.validationParser = parser;
-		this.mappingParser = mappingParser;
+		this.streamIo = streamIo;
 		this.graphConverter = graphConverter;
 		this.transitivityClosure = transitivityClosure;
 		this.writer = writer;

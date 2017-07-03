@@ -14,22 +14,22 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 
+import com.google.inject.name.Named;
+
 public class Suggestions {
 
 	private EpisodesParser episodeParser;
 	private MaximalEpisodes maximalEpisodes;
 	private TransClosedEpisodes transitivityClosure;
-	private MappingParser eventMappingParser;
+	private EventStreamIo streamIo;
 	private EpisodeRecommender recommender;
 	private EpisodeToGraphConverter graphConverter;
 	private EpisodeAsGraphWriter graphWriter;
@@ -38,13 +38,13 @@ public class Suggestions {
 
 	@Inject
 	public Suggestions(@Named("graph") File directory, EpisodesParser episodeParser, MaximalEpisodes maximalEpisodes,
-			TransClosedEpisodes transitivityClosure, MappingParser eventMapping,
+			TransClosedEpisodes transitivityClosure, EventStreamIo streamIo,
 			EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
 		this.episodeParser = episodeParser;
 		this.maximalEpisodes = maximalEpisodes;
 		this.transitivityClosure = transitivityClosure;
-		this.eventMappingParser = eventMapping;
+		this.streamIo = streamIo;
 		this.recommender = recommender;
 		this.graphConverter = graphConverter;
 		this.graphWriter = graphWriter;

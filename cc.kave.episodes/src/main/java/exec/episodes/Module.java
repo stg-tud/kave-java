@@ -22,8 +22,8 @@ import cc.kave.episodes.GraphGenerator.TrainingDataGraphGenerator;
 import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
-import cc.kave.episodes.io.MappingParser;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.evaluation.RecommenderEvaluation;
@@ -80,10 +80,8 @@ public class Module extends AbstractModule {
 		bind(File.class).annotatedWith(Names.named("patterns")).toInstance(patternsFile);
 
 		File eventStreamRoot = eventsData;
-		bind(MappingParser.class).toInstance(new MappingParser(eventStreamRoot));
-		
-		MappingParser mappingParser = new MappingParser(eventStreamRoot);
 		File graphRoot = rootFile;
+		EventStreamIo streamParser = new EventStreamIo(eventStreamRoot);
 
 		Directory vcr = new Directory(contexts.getAbsolutePath());
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
@@ -102,14 +100,14 @@ public class Module extends AbstractModule {
 		ValidationContextsParser validationParser = new ValidationContextsParser(vcr);
 		EpisodeRecommender recommender = new EpisodeRecommender();
 		bind(ValidationDataGraphGenerator.class).toInstance(new ValidationDataGraphGenerator(graphRoot,
-				validationParser, mappingParser, transitivityClosure, graphWriter, graphConverter));
+				validationParser, streamParser, transitivityClosure, graphWriter, graphConverter));
 		bind(TrainingDataGraphGenerator.class).toInstance(new TrainingDataGraphGenerator(graphRoot, episodeParser,
-				episodeLearned, mappingParser, transitivityClosure, graphWriter, graphConverter));
+				episodeLearned, streamParser, transitivityClosure, graphWriter, graphConverter));
 
 		File evaluationRoot = evaluationFile;
 		QueryStrategy queryGenerator = new QueryStrategy();
 		TargetsCategorization categorizer = new TargetsCategorization();
-		bind(RecommenderEvaluation.class).toInstance(new RecommenderEvaluation(evaluationRoot, validationParser, mappingParser,
+		bind(RecommenderEvaluation.class).toInstance(new RecommenderEvaluation(evaluationRoot, validationParser, streamParser,
 				queryGenerator, recommender, episodeParser, episodeLearned, categorizer));
 	}
 

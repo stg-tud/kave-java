@@ -47,7 +47,7 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -70,7 +70,7 @@ public class RecommenderEvaluationTest {
 	@Mock
 	private ValidationContextsParser validationParser;
 	@Mock
-	private MappingParser mappingParser;
+	private EventStreamIo pisodePa;
 	@Mock
 	private EpisodesParser episodeParser;
 	@Mock
@@ -104,7 +104,7 @@ public class RecommenderEvaluationTest {
 		recommender = new EpisodeRecommender();
 
 		MockitoAnnotations.initMocks(this);
-		sut = new RecommenderEvaluation(rootFolder.getRoot(), validationParser, mappingParser, queryGenerator, recommender,
+		sut = new RecommenderEvaluation(rootFolder.getRoot(), validationParser, pisodePa, queryGenerator, recommender,
 				episodeParser, maxEpisodeTracker, categorizer);
 
 		validationData.add(createQuery("11"));
@@ -149,7 +149,7 @@ public class RecommenderEvaluationTest {
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
 		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(patterns);
-		when(mappingParser.parse(REPOS)).thenReturn(events);
+		when(pisodePa.readMapping(FREQUENCY)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
 	}
@@ -163,7 +163,7 @@ public class RecommenderEvaluationTest {
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder does not exist");
-		sut = new RecommenderEvaluation(new File("does not exist"), validationParser, mappingParser, queryGenerator, recommender,
+		sut = new RecommenderEvaluation(new File("does not exist"), validationParser, pisodePa, queryGenerator, recommender,
 				episodeParser, maxEpisodeTracker, categorizer);
 	}
 
@@ -172,7 +172,7 @@ public class RecommenderEvaluationTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Evaluations folder is not a folder, but a file");
-		sut = new RecommenderEvaluation(file, validationParser, mappingParser, queryGenerator, recommender, episodeParser,
+		sut = new RecommenderEvaluation(file, validationParser, pisodePa, queryGenerator, recommender, episodeParser,
 				maxEpisodeTracker, categorizer);
 	}
 
@@ -183,7 +183,7 @@ public class RecommenderEvaluationTest {
 		sut.evaluate(REPOS);
 
 		verify(episodeParser).parse(any(EpisodeType.class), anyInt(), anyInt());
-		verify(mappingParser).parse(REPOS);
+		verify(pisodePa).readMapping(FREQUENCY);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);
 

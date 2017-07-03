@@ -9,10 +9,10 @@ import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.statistics.EventsStatistics;
 import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class Filters {
@@ -93,7 +93,7 @@ public class Filters {
 	public List<Tuple<Event, List<Event>>> freqEvents(
 			List<Tuple<Event, List<Event>>> stream, int frequency) {
 		List<Tuple<Event, List<Event>>> results = Lists.newLinkedList();
-		Map<Event, Integer> occurrences = getEventFrequencies(stream);
+		Map<Event, Integer> occurrences = EventsStatistics.getFrequencies(stream);
 		
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			List<Event> method = Lists.newLinkedList();
@@ -109,23 +109,6 @@ public class Filters {
 		return results;
 	}
 	
-	private static Map<Event, Integer> getEventFrequencies(
-			List<Tuple<Event, List<Event>>> stream) {
-		Map<Event, Integer> results = Maps.newHashMap();
-
-		for (Tuple<Event, List<Event>> tuple : stream) {
-			for (Event event : tuple.getSecond()) {
-				if (results.containsKey(event)) {
-					int counter = results.get(event);
-					results.put(event, counter + 1);
-				} else {
-					results.put(event, 1);
-				}
-			}
-		}
-		return results;
-	}
-
 	private boolean validMethod(List<Event> method) {
 		if (method.size() == 0) {
 			return false;

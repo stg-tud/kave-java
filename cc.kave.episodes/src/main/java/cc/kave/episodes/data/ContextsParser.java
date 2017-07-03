@@ -145,20 +145,6 @@ public class ContextsParser {
 				+ ctxsRepos.containsAll(ctxsStream));
 	}
 
-	private void saveElementCtx(String repoName, Context ctx) {
-		Set<IMethodName> methods = Sets.newHashSet();
-
-		ISST sst = ctx.getSST();
-		Set<IMethodDeclaration> decls = sst.getMethods();
-		for (IMethodDeclaration d : decls) {
-			IMethodName name = d.getName();
-			if (seenMethods.add(name)) {
-				methods.add(TypeErasure.of(name));
-			}
-		}
-		repoDecls.get(repoName).addAll(methods);
-	}
-
 	private void saveRepoCtx(String repoName,
 			List<Tuple<Event, List<Event>>> stream) {
 		if (repoName.isEmpty() && stream.isEmpty()) {

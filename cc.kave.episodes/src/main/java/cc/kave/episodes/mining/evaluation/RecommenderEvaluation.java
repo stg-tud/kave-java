@@ -32,12 +32,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.apache.mahout.math.Arrays;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Averager;
 import cc.kave.episodes.model.Episode;
@@ -49,6 +46,9 @@ import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 public class RecommenderEvaluation {
 
 	private File rootFolder;
@@ -58,7 +58,7 @@ public class RecommenderEvaluation {
 	private static final double BIDIRECTIONAL = 0.01;
 
 	private ValidationContextsParser validationParser;
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
 	private EpisodesParser episodeParser;
@@ -79,14 +79,14 @@ public class RecommenderEvaluation {
 
 	@Inject
 	public RecommenderEvaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
-			MappingParser mappingParser, QueryStrategy queryGenerator, EpisodeRecommender recommender,
+			EventStreamIo streamIo, QueryStrategy queryGenerator, EpisodeRecommender recommender,
 			EpisodesParser episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
 		assertTrue(directory.exists(), "Evaluations folder does not exist");
 		assertTrue(directory.isDirectory(), "Evaluations folder is not a folder, but a file");
 		this.rootFolder = directory;
 		this.validationParser = parser;
-		this.mappingParser = mappingParser;
+		this.streamIo = streamIo;
 		this.queryGenerator = queryGenerator;
 		this.recommender = recommender;
 		this.episodeParser = episodeParser;
@@ -293,9 +293,9 @@ public class RecommenderEvaluation {
 		return validationData;
 	}
 
-	private List<Event> readMapper(int numbRepos) {
+	private List<Event> readMapper(int frequency) {
 		Logger.log("Reading the mapping file");
-		List<Event> eventMapping = mappingParser.parse(numbRepos);
+		List<Event> eventMapping = streamIo.readMapping(frequency);
 		return eventMapping;
 	}
 

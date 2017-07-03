@@ -29,23 +29,22 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.Sets;
-
-import cc.kave.episodes.GraphGenerator.ValidationSetAnalyzer;
-import cc.kave.episodes.io.MappingParser;
+import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Sets;
+
 public class ValidationSetAnalyzerTest {
 
 	@Mock
-	private MappingParser mappingParser;
+	private EventStreamIo streamIo;
 	@Mock
 	private ValidationContextsParser validationParser;
 	
-	private static final int REPOS = 2;
+	private static final int FREQUENCY = 2;
 	
 	private LinkedList<Event> events;
 	
@@ -60,9 +59,9 @@ public class ValidationSetAnalyzerTest {
 		
 		events = new LinkedList<Event>();
 		
-		sut = new ValidationSetAnalyzer(mappingParser, validationParser);
+		sut = new ValidationSetAnalyzer(streamIo, validationParser);
 		
-		when(mappingParser.parse(REPOS)).thenReturn(events);
+		when(streamIo.readMapping(FREQUENCY)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(Sets.newHashSet(createTarget("11"),
 				createTarget("11", "12", "11>12"), createTarget("11", "13", "11>13"),
 				createTarget("11", "12", "13", "11>12", "11>13", "12>13")));
@@ -77,9 +76,9 @@ public class ValidationSetAnalyzerTest {
 	public void logTest() throws ZipException, IOException {
 		Logger.clearLog();
 		
-		sut.categorize(REPOS);
+		sut.categorize(FREQUENCY);
 		
-		verify(mappingParser).parse(REPOS);
+		verify(streamIo).readMapping(FREQUENCY);
 		verify(validationParser).parse(events);
 		
 		assertLogContains(0, "Reading the events mapping file ...");

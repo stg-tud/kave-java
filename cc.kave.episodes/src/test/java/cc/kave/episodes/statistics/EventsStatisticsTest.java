@@ -23,52 +23,49 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.recommenders.datastructures.Tuple;
 
-public class StreamStatisticsTest {
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+public class EventsStatisticsTest {
 
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
 	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
 
-	private List<Event> events;
+	private List<Tuple<Event, List<Event>>> stream;
 	private Map<Event, Integer> occurrences;
-
-	private StreamStatistics sut;
 
 	@Before
 	public void setup() {
-		events = Lists.newArrayList(ctx(1), inv(2), inv(3), ctx(4), inv(5), inv(2), ctx(1), inv(3));
+		stream = Lists.newLinkedList();
+		stream.add(Tuple.newTuple(ctx(1), Lists.newArrayList(inv(2), inv(3))));
+		stream.add(Tuple.newTuple(ctx(4), Lists.newArrayList(inv(5), inv(2))));
+		stream.add(Tuple.newTuple(ctx(1), Lists.newArrayList(inv(3))));
 
 		occurrences = Maps.newHashMap();
-		occurrences.put(ctx(1), 2);
 		occurrences.put(inv(2), 2);
 		occurrences.put(inv(3), 2);
-		occurrences.put(ctx(4), 1);
 		occurrences.put(inv(5), 1);
-
-		sut = new StreamStatistics();
 	}
 
 	@Test
 	public void aggregationTest() {
-		Map<Event, Integer> actuals = sut.getFrequencies(events);
+		Map<Event, Integer> actuals = EventsStatistics.getFrequencies(stream);
 
 		assertEquals(occurrences, actuals);
 	}
 
 	@Test
 	public void freqTest() {
-		int actuals = sut.minFreq(occurrences);
+		int actuals = EventsStatistics.minFreq(occurrences);
 
 		assertEquals(1, actuals);
-		;
 	}
 
 	private static Event inv(int i) {
