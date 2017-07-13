@@ -102,7 +102,7 @@ public class Filters {
 					method.add(event);
 				}
 			}
-			if (validMethod(method)) {
+			if (validMethod(method) && (method.size() > 1)) {
 				results.add(Tuple.newTuple(tuple.getFirst(), method));
 			}
 		}

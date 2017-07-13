@@ -198,10 +198,6 @@ public class FiltersTest {
 		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
 
 		method = Lists.newLinkedList();
-		method.add(Events.newInvocation(m(42)));
-		expected.add(Tuple.newTuple(Events.newContext(m(12)), method));
-		
-		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
 		expected.add(Tuple.newTuple(Events.newContext(m(13)), method));
