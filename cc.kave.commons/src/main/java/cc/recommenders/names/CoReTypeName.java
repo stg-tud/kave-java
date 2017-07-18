@@ -10,9 +10,6 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Checks.ensureIsFalse;
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
-import static cc.recommenders.assertions.Checks.ensureIsTrue;
 import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
 import static cc.recommenders.assertions.Throws.throwUnreachable;
 
@@ -21,6 +18,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
+
+import cc.recommenders.assertions.Asserts;
 
 public class CoReTypeName implements ICoReTypeName {
 	private static Map<String /* vmTypeName */, CoReTypeName> index = new MapMaker().weakValues().makeMap();
@@ -82,8 +81,8 @@ public class CoReTypeName implements ICoReTypeName {
 	 * @see #get(String)
 	 */
 	protected CoReTypeName(final String vmTypeName) {
-		ensureIsNotNull(vmTypeName);
-		ensureIsFalse(vmTypeName.length() == 0, "empty size for type name not permitted");
+		Asserts.assertNotNull(vmTypeName);
+		Asserts.assertFalse(vmTypeName.length() == 0, "empty size for type name not permitted");
 		if (vmTypeName.length() == 1) {
 			switch (vmTypeName.charAt(0)) {
 			case 'B':
@@ -125,7 +124,7 @@ public class CoReTypeName implements ICoReTypeName {
 
 	@Override
 	public ICoReTypeName getArrayBaseType() {
-		ensureIsTrue(isArrayType(), "only array-types have a base type!");
+		Asserts.assertTrue(isArrayType(), "only array-types have a base type!");
 		int start = 0;
 		while (identifier.charAt(++start) == '[') {
 			// start counter gets increased
@@ -209,7 +208,7 @@ public class CoReTypeName implements ICoReTypeName {
 
 	@Override
 	public ICoReMethodName getDeclaringMethod() {
-		ensureIsTrue(isNestedType(), "only valid on nested types");
+		Asserts.assertTrue(isNestedType(), "only valid on nested types");
 		final int lastPathSegmentSeparator = identifier.lastIndexOf('/');
 		final String path = identifier.substring(0, lastPathSegmentSeparator);
 		final int bracket = path.lastIndexOf('(');
@@ -220,7 +219,7 @@ public class CoReTypeName implements ICoReTypeName {
 
 	@Override
 	public ICoReTypeName getDeclaringType() {
-		ensureIsTrue(isNestedType(), "only valid on nested types");
+		Asserts.assertTrue(isNestedType(), "only valid on nested types");
 		final int lastIndexOf = identifier.lastIndexOf('$');
 		final String declaringTypeName = identifier.substring(0, lastIndexOf);
 		return get(declaringTypeName);

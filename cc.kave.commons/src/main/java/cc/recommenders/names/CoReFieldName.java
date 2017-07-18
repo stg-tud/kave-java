@@ -10,82 +10,83 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
-
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
+import cc.recommenders.assertions.Asserts;
+
 public class CoReFieldName implements ICoReFieldName {
-    private static final long serialVersionUID = 5067244907255465328L;
+	private static final long serialVersionUID = 5067244907255465328L;
 
-    private static Map<String /* vmTypeName */, CoReFieldName> index = new MapMaker().weakValues().makeMap();
+	private static Map<String /* vmTypeName */, CoReFieldName> index = new MapMaker().weakValues().makeMap();
 
-    /**
-     * Format: DeclaringType'.'fieldName;FieldType, i.e., &lt;VmTypeName&gt;.&lt;String&gt;;&lt;VmTypeName&gt;
-     * 
-     * @param fieldName
-     * @return
-     */
-    public static CoReFieldName get(final String fieldName) {
-        // typeName = removeGenerics(typeName);
-        CoReFieldName res = index.get(fieldName);
-        if (res == null) {
-            res = new CoReFieldName(fieldName);
-            index.put(fieldName, res);
-        }
-        return res;
-    }
+	/**
+	 * Format: DeclaringType'.'fieldName;FieldType, i.e.,
+	 * &lt;VmTypeName&gt;.&lt;String&gt;;&lt;VmTypeName&gt;
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static CoReFieldName get(final String fieldName) {
+		// typeName = removeGenerics(typeName);
+		CoReFieldName res = index.get(fieldName);
+		if (res == null) {
+			res = new CoReFieldName(fieldName);
+			index.put(fieldName, res);
+		}
+		return res;
+	}
 
-    private String identifier;
+	private String identifier;
 
-    protected CoReFieldName() {
-        // no-one should instantiate this class. O
-    }
+	protected CoReFieldName() {
+		// no-one should instantiate this class. O
+	}
 
-    /**
-     * @see #get(String)
-     */
-    protected CoReFieldName(final String vmFieldName) {
-        identifier = vmFieldName;
-        ensureIsNotNull(identifier);
-        ensureIsNotNull(getDeclaringType());
-        ensureIsNotNull(getFieldName());
-        ensureIsNotNull(getFieldType());
-    }
+	/**
+	 * @see #get(String)
+	 */
+	protected CoReFieldName(final String vmFieldName) {
+		identifier = vmFieldName;
+		Asserts.assertNotNull(identifier);
+		Asserts.assertNotNull(getDeclaringType());
+		Asserts.assertNotNull(getFieldName());
+		Asserts.assertNotNull(getFieldType());
+	}
 
-    @Override
-    public ICoReTypeName getDeclaringType() {
-        final String declaringType = StringUtils.substringBeforeLast(identifier, ".");
-        return CoReTypeName.get(declaringType);
-    }
+	@Override
+	public ICoReTypeName getDeclaringType() {
+		final String declaringType = StringUtils.substringBeforeLast(identifier, ".");
+		return CoReTypeName.get(declaringType);
+	}
 
-    @Override
-    public String getFieldName() {
-        final String fieldName = StringUtils.substringBetween(identifier, ".", ";");
-        return fieldName;
-    }
+	@Override
+	public String getFieldName() {
+		final String fieldName = StringUtils.substringBetween(identifier, ".", ";");
+		return fieldName;
+	}
 
-    @Override
-    public ICoReTypeName getFieldType() {
-        final String fieldType = StringUtils.substringAfter(identifier, ";");
-        return CoReTypeName.get(fieldType);
-    }
+	@Override
+	public ICoReTypeName getFieldType() {
+		final String fieldType = StringUtils.substringAfter(identifier, ";");
+		return CoReTypeName.get(fieldType);
+	}
 
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
 
-    @Override
-    public int compareTo(final ICoReFieldName other) {
-        return identifier.compareTo(other.getIdentifier());
-    }
+	@Override
+	public int compareTo(final ICoReFieldName other) {
+		return identifier.compareTo(other.getIdentifier());
+	}
 
-    @Override
-    public String toString() {
-        return getIdentifier();
-    }
+	@Override
+	public String toString() {
+		return getIdentifier();
+	}
 }

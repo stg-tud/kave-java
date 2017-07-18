@@ -11,9 +11,6 @@
  */
 package cc.recommenders.mining.calls;
 
-import static cc.recommenders.assertions.Checks.ensureEquals;
-import static cc.recommenders.assertions.Checks.ensureIsGreaterOrEqualTo;
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
 import static cc.recommenders.assertions.Throws.throwIllegalStateException;
 import static java.lang.Math.abs;
@@ -24,6 +21,8 @@ import java.util.Arrays;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.eclipse.recommenders.commons.bayesnet.Node;
+
+import cc.recommenders.assertions.Asserts;
 
 public class NetworkMathUtils {
 
@@ -56,7 +55,8 @@ public class NetworkMathUtils {
 		// return;
 		// }
 		// if (isDeltaTooHigh(delta)) {
-		// throwIllegalArgumentException("sum of values is too far away from '1.0': %6.6f",
+		// throwIllegalArgumentException("sum of values is too far away from
+		// '1.0': %6.6f",
 		// sum);
 		// }
 		// for (int i = values.length; i-- > 0;) {
@@ -72,19 +72,22 @@ public class NetworkMathUtils {
 		// }
 		//
 		// // TODO re-enable exception, but include further handling here!
-		// Logger.err("Scaling Error: failed to scale double array. Delta '%.6f' couldn't "
+		// Logger.err("Scaling Error: failed to scale double array. Delta '%.6f'
+		// couldn't "
 		// +
-		// "be added to any other value AND keeping min/max constraints intact.\n",
+		// "be added to any other value AND keeping min/max constraints
+		// intact.\n",
 		// delta);
 
 		// throwIllegalArgumentException(
-		// "failed to scale double array. Delta '%.6f' couldn't be added to any other value in '%s' AND keeping min/max constraints intact.",
+		// "failed to scale double array. Delta '%.6f' couldn't be added to any
+		// other value in '%s' AND keeping min/max constraints intact.",
 		// delta, Arrays.toString(values));
 	}
 
 	public static void ensureAllProbabilitiesInValidRange(final double[] values) {
-		ensureIsNotNull(values);
-		ensureIsGreaterOrEqualTo(values.length, 1, "zero length arrays not allowed.");
+		Asserts.assertNotNull(values);
+		Asserts.assertGreaterOrEqual(values.length, 1);
 
 		for (int i = values.length; i-- > 0;) {
 			if (!isInMinMaxRange(values[i])) {
@@ -119,7 +122,7 @@ public class NetworkMathUtils {
 	}
 
 	public static double roundToDefaultPrecision(final double value) {
-		return (long)(P_ROUNDING_FACTOR * value + 0.5) / P_ROUNDING_FACTOR;
+		return (long) (P_ROUNDING_FACTOR * value + 0.5) / P_ROUNDING_FACTOR;
 	}
 
 	private static void ensureSumIsOne(final double[] values) {
@@ -146,7 +149,8 @@ public class NetworkMathUtils {
 		for (final Node parent : node.getParents()) {
 			numberOfProbabilities *= parent.getStates().length;
 		}
-		ensureEquals(numberOfProbabilities, node.getProbabilities().length, "incomplete probability definition");
+		Asserts.assertEquals(numberOfProbabilities, node.getProbabilities().length,
+				"incomplete probability definition");
 	}
 
 	public static void ensureMinimumTwoStates(final Node node) {
@@ -154,7 +158,7 @@ public class NetworkMathUtils {
 	}
 
 	public static void ensureMinimumTwoStates(final String[] states) {
-		ensureIsGreaterOrEqualTo(states.length, 2, "less than 2 states: %s", Arrays.toString(states));
+		Asserts.assertGreaterOrEqual(states.length, 2);
 	}
 
 	public static double[] createPriorProbabilitiesForContextNodeAssumingDummyStateAtFirstIndex(final int length) {

@@ -10,8 +10,6 @@
  */
 package cc.recommenders.mining.calls.pbn;
 
-import static cc.recommenders.assertions.Checks.ensureIsGreaterOrEqualTo;
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.mining.calls.NetworkMathUtils.ensureAllProbabilitiesInValidRange;
 import static cc.recommenders.mining.calls.NetworkMathUtils.getProbabilityInMinMaxRange;
 import static cc.recommenders.mining.calls.NetworkMathUtils.safeDivMaxMin;
@@ -33,8 +31,6 @@ import static java.lang.System.arraycopy;
 import java.util.List;
 import java.util.Set;
 
-import smile.Network;
-import smile.utils.SmileNameConverter;
 import cc.recommenders.assertions.Asserts;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
@@ -44,6 +40,8 @@ import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
 import cc.recommenders.utils.dictionary.Dictionary;
+import smile.Network;
+import smile.utils.SmileNameConverter;
 
 public class PBNSmileModelBuilder implements ModelBuilder<UsageFeature, Network> {
 	
@@ -74,7 +72,7 @@ public class PBNSmileModelBuilder implements ModelBuilder<UsageFeature, Network>
 
 	private void ensureAtLeastTwoPatternsExist() {
 		int numPatterns = patterns.size();
-		ensureIsGreaterOrEqualTo(numPatterns, 1, "no pattern provided");
+		Asserts.assertGreaterOrEqual(numPatterns, 1);
 
 		if (numPatterns < 2) {
 			patterns.add(patterns.get(0).clone("other"));
@@ -197,7 +195,7 @@ public class PBNSmileModelBuilder implements ModelBuilder<UsageFeature, Network>
 		int i = 0;
 		for (UsageFeature f : statesSet) {
 			final String state = getTitle(f);
-			ensureIsNotNull(state);
+			Asserts.assertNotNull(state);
 			states[i++] = state;
 		}
 

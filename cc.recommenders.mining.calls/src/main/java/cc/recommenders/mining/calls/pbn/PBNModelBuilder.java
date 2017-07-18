@@ -10,8 +10,6 @@
  */
 package cc.recommenders.mining.calls.pbn;
 
-import static cc.recommenders.assertions.Checks.ensureIsGreaterOrEqualTo;
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.mining.calls.NetworkMathUtils.ensureAllProbabilitiesInValidRange;
 import static cc.recommenders.mining.calls.NetworkMathUtils.getProbabilityInMinMaxRange;
 import static cc.recommenders.mining.calls.NetworkMathUtils.safeDivMaxMin;
@@ -75,7 +73,7 @@ public class PBNModelBuilder implements ModelBuilder<UsageFeature, BayesianNetwo
 
 	private void ensureAtLeastTwoPatternsExist() {
 		int numPatterns = patterns.size();
-		ensureIsGreaterOrEqualTo(numPatterns, 1, "no pattern provided");
+		Asserts.assertGreaterOrEqual(numPatterns, 1);
 
 		if (numPatterns < 2) {
 			patterns.add(patterns.get(0).clone("other"));
@@ -182,7 +180,7 @@ public class PBNModelBuilder implements ModelBuilder<UsageFeature, BayesianNetwo
 		int i = 0;
 		for (UsageFeature f : statesSet) {
 			final String state = getTitle(f);
-			ensureIsNotNull(state);
+			Asserts.assertNotNull(state);
 			states[i++] = state;
 		}
 

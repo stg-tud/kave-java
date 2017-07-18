@@ -10,10 +10,6 @@
  */
 package cc.recommenders.utils;
 
-import static cc.recommenders.assertions.Checks.ensureExists;
-import static cc.recommenders.assertions.Checks.ensureIsFile;
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,11 +19,12 @@ import java.util.Formatter;
 
 import org.apache.commons.io.IOUtils;
 
-import cc.recommenders.assertions.Throws;
-
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
+
+import cc.recommenders.assertions.Asserts;
+import cc.recommenders.assertions.Throws;
 
 public class Fingerprints {
 	private static final class StreamInputSupplier implements InputSupplier<InputStream> {
@@ -52,9 +49,9 @@ public class Fingerprints {
 	}
 
 	public static byte[] internal_sha1v2(final File file) {
-		ensureIsNotNull(file);
-		ensureExists(file);
-		ensureIsFile(file);
+		Asserts.assertNotNull(file);
+		Asserts.assertTrue(file.exists());
+		Asserts.assertFalse(file.isDirectory());
 		//
 		try {
 			final MessageDigest digest = createMessageDigest();
@@ -75,7 +72,7 @@ public class Fingerprints {
 	}
 
 	public static String sha1(final String message) {
-		ensureIsNotNull(message);
+		Asserts.assertNotNull(message);
 		//
 		try {
 			final MessageDigest digest = createMessageDigest();
@@ -87,7 +84,7 @@ public class Fingerprints {
 	}
 
 	public static String sha1(final InputStream stream) {
-		ensureIsNotNull(stream);
+		Asserts.assertNotNull(stream);
 		try {
 			final MessageDigest digest = createMessageDigest();
 			final StreamInputSupplier supplier = new StreamInputSupplier(stream);
@@ -101,7 +98,7 @@ public class Fingerprints {
 	}
 
 	private static String toHexString(final byte[] hash) {
-		ensureIsNotNull(hash);
+		Asserts.assertNotNull(hash);
 		// this is said to be very slow... - we may look at this if hashing
 		// actually takes too long.
 		final Formatter formatter = new Formatter();

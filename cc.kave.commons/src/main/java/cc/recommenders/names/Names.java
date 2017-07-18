@@ -10,7 +10,6 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.assertions.Throws.throwUnreachable;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import cc.kave.commons.model.naming.IName;
+import cc.recommenders.assertions.Asserts;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class Names {
 		BOOLEAN('Z', "boolean"), VOID('V', "void"), CHAR('C', "char"), BYTE('B', "byte"), SHORT('S', "short"), INT('I',
 				"int"), FLOAT('F', "float"), LONG('J', "long"), DOUBLE('D', "double");
 		public static PrimitiveType fromSrc(final String src) {
-			ensureIsNotNull(src, "src");
+			Asserts.assertNotNull(src, "src");
 			//
 			for (final PrimitiveType t : values()) {
 				if (t.src.equals(src)) {
@@ -93,7 +93,7 @@ public class Names {
 	 * </ol>
 	 */
 	public static String[] parseMethodSignature1(final String methodSignature) {
-		ensureIsNotNull(methodSignature, "s");
+		Asserts.assertNotNull(methodSignature, "s");
 		//
 		// this is not high performance code but it might be ok for now.
 		// final int lastDot = s.lastIndexOf('.');
@@ -145,7 +145,7 @@ public class Names {
 	}
 
 	private static int internal_findEndOfObjectType(final char[] desc, final int off) {
-		ensureIsNotNull(desc, "desc");
+		Asserts.assertNotNull(desc, "desc");
 		//
 		for (int index = off; index < desc.length; index++) {
 			if (desc[index] == ';') {
@@ -156,7 +156,7 @@ public class Names {
 	}
 
 	private static String internal_vm2srcTypeName(final char[] buf, final int off) {
-		ensureIsNotNull(buf, "buf");
+		Asserts.assertNotNull(buf, "buf");
 		//
 		int len;
 		switch (buf[off]) {
@@ -235,9 +235,9 @@ public class Names {
 	public static String src2vmMethod(final String methodName, final String[] srcParameterTypes,
 			final String srcReturnType) {
 		// TODO this code is incomplete and does not work well with arrays!
-		ensureIsNotNull(methodName, "methodName");
-		ensureIsNotNull(srcParameterTypes, "srcParameterTypes");
-		ensureIsNotNull(srcReturnType, "srcReturnType");
+		Asserts.assertNotNull(methodName, "methodName");
+		Asserts.assertNotNull(srcParameterTypes, "srcParameterTypes");
+		Asserts.assertNotNull(srcReturnType, "srcReturnType");
 		//
 		final StringBuilder sb = new StringBuilder();
 		sb.append(methodName).append('(');
@@ -257,7 +257,7 @@ public class Names {
 	}
 
 	public static String src2vmType(String type) {
-		ensureIsNotNull(type, "type");
+		Asserts.assertNotNull(type, "type");
 		//
 		final PrimitiveType p = PrimitiveType.fromSrc(type);
 		if (p != null) {
@@ -272,7 +272,7 @@ public class Names {
 	}
 
 	public static List<String> src2vmType(final String[] srcTypes) {
-		ensureIsNotNull(srcTypes, "srcTypes");
+		Asserts.assertNotNull(srcTypes, "srcTypes");
 		//
 		final LinkedList<String> res = new LinkedList<String>();
 		for (final String srcName : srcTypes) {
@@ -320,7 +320,7 @@ public class Names {
 	 *         - no return value.
 	 */
 	public static String vm2srcSimpleMethod(final ICoReMethodName name) {
-		ensureIsNotNull(name, "name");
+		Asserts.assertNotNull(name, "name");
 		final StringBuilder sb = new StringBuilder();
 		if (name.getName().equals("<subtype-init>")) {
 			sb.append("ConstructorCallFromSubtype");
@@ -342,7 +342,7 @@ public class Names {
 	}
 
 	public static String vm2srcSimpleTypeName(final String CoReTypeName) {
-		ensureIsNotNull(CoReTypeName, "CoReTypeName");
+		Asserts.assertNotNull(CoReTypeName, "CoReTypeName");
 		//
 		final String type = internal_vm2srcTypeName(CoReTypeName.toCharArray(), 0);
 		final int lastDot = type.lastIndexOf('.');
@@ -397,7 +397,7 @@ public class Names {
 	 * </ul>
 	 */
 	public static String vm2srcTypeName(final String CoReTypeName) {
-		ensureIsNotNull(CoReTypeName, "CoReTypeName");
+		Asserts.assertNotNull(CoReTypeName, "CoReTypeName");
 		//
 		return internal_vm2srcTypeName(CoReTypeName.toCharArray(), 0);
 	}

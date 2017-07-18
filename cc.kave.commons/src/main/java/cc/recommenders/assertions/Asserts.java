@@ -125,4 +125,12 @@ public class Asserts {
 			throw new AssertionException("expected null");
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T assertInstanceOf(final Object obj, final Class<T> clazz) {
+		assertNotNull(clazz);
+		assertNotNull(obj);
+		assertTrue(clazz.isInstance(obj));
+		return null;// (T) obj;
+	}
 }

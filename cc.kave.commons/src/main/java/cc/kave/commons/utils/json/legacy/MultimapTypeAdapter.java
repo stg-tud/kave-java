@@ -10,9 +10,6 @@
  */
 package cc.kave.commons.utils.json.legacy;
 
-import static cc.recommenders.assertions.Checks.ensureEquals;
-import static cc.recommenders.assertions.Checks.ensureIsInstanceOf;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -27,35 +24,37 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import cc.recommenders.assertions.Asserts;
+
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MultimapTypeAdapter implements JsonSerializer<Multimap>, JsonDeserializer<Multimap> {
 
-    @Override
-    public JsonElement serialize(final Multimap src, final Type typeOfSrc, final JsonSerializationContext context) {
-        return context.serialize(src.asMap(), createMapType(typeOfSrc));
-    }
+	@Override
+	public JsonElement serialize(final Multimap src, final Type typeOfSrc, final JsonSerializationContext context) {
+		return context.serialize(src.asMap(), createMapType(typeOfSrc));
+	}
 
-    @Override
-    public Multimap deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context)
-            throws JsonParseException {
-        final Multimap multimap = HashMultimap.create();
-        final Map map = context.deserialize(json, createMapType(typeOfT));
-        for (final Object key : map.keySet()) {
-            final Collection values = (Collection) map.get(key);
-            multimap.putAll(key, values);
-        }
+	@Override
+	public Multimap deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context)
+			throws JsonParseException {
+		final Multimap multimap = HashMultimap.create();
+		final Map map = context.deserialize(json, createMapType(typeOfT));
+		for (final Object key : map.keySet()) {
+			final Collection values = (Collection) map.get(key);
+			multimap.putAll(key, values);
+		}
 
-        return multimap;
-    }
+		return multimap;
+	}
 
-    private Type createMapType(final Type multimapType) {
-        final ParameterizedType paramType = ensureIsInstanceOf(multimapType, ParameterizedType.class);
-        final Type[] typeArguments = paramType.getActualTypeArguments();
-        ensureEquals(2, typeArguments.length, "Type must contain exactly 2 type arguments.");
+	private Type createMapType(final Type multimapType) {
+		final ParameterizedType paramType = Asserts.assertInstanceOf(multimapType, ParameterizedType.class);
+		final Type[] typeArguments = paramType.getActualTypeArguments();
+		Asserts.assertEquals(2, typeArguments.length, "Type must contain exactly 2 type arguments.");
 
-        final ParameterizedTypeImpl valueType = new ParameterizedTypeImpl(Collection.class, null, typeArguments[1]);
-        final ParameterizedTypeImpl mapType = new ParameterizedTypeImpl(Map.class, null, typeArguments[0], valueType);
-        return mapType;
-    }
+		final ParameterizedTypeImpl valueType = new ParameterizedTypeImpl(Collection.class, null, typeArguments[1]);
+		final ParameterizedTypeImpl mapType = new ParameterizedTypeImpl(Map.class, null, typeArguments[0], valueType);
+		return mapType;
+	}
 
 }

@@ -10,7 +10,6 @@
  */
 package cc.kave.commons.utils.json.legacy;
 
-import static cc.recommenders.assertions.Checks.ensureIsNotNull;
 import static cc.recommenders.assertions.Throws.throwUnhandledException;
 
 import java.io.BufferedInputStream;
@@ -35,6 +34,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
+import cc.recommenders.assertions.Asserts;
 import cc.recommenders.assertions.Throws;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
@@ -118,14 +118,14 @@ public class GsonUtil {
 	}
 
 	public static <T> T deserialize(final String json, final Type classOfT) {
-		ensureIsNotNull(json);
-		ensureIsNotNull(classOfT);
+		Asserts.assertNotNull(json);
+		Asserts.assertNotNull(classOfT);
 		return getInstance().fromJson(json, classOfT);
 	}
 
 	public static <T> T deserialize(final InputStream jsonStream, final Type classOfT) {
-		ensureIsNotNull(jsonStream);
-		ensureIsNotNull(classOfT);
+		Asserts.assertNotNull(jsonStream);
+		Asserts.assertNotNull(classOfT);
 		final InputStreamReader reader = new InputStreamReader(jsonStream);
 		final T res = getInstance().fromJson(reader, classOfT);
 		IOUtils.closeQuietly(reader);
@@ -133,8 +133,8 @@ public class GsonUtil {
 	}
 
 	public static <T> T deserialize(final File jsonFile, final Type classOfT) {
-		ensureIsNotNull(jsonFile);
-		ensureIsNotNull(classOfT);
+		Asserts.assertNotNull(jsonFile);
+		Asserts.assertNotNull(classOfT);
 		InputStream fis;
 		try {
 			fis = new BufferedInputStream(new FileInputStream(jsonFile));
@@ -145,21 +145,21 @@ public class GsonUtil {
 	}
 
 	public static String serialize(final Object obj) {
-		ensureIsNotNull(obj);
+		Asserts.assertNotNull(obj);
 		final StringBuilder sb = new StringBuilder();
 		serialize(obj, sb);
 		return sb.toString();
 	}
 
 	public static void serialize(final Object obj, final Appendable writer) {
-		ensureIsNotNull(obj);
-		ensureIsNotNull(writer);
+		Asserts.assertNotNull(obj);
+		Asserts.assertNotNull(writer);
 		getInstance().toJson(obj, writer);
 	}
 
 	public static void serialize(final Object obj, final File dest) {
-		ensureIsNotNull(obj);
-		ensureIsNotNull(dest);
+		Asserts.assertNotNull(obj);
+		Asserts.assertNotNull(dest);
 		Writer fw = null;
 		try {
 			fw = new BufferedWriter(new FileWriter(dest));
