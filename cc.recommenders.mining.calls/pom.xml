@@ -5,7 +5,7 @@
 	<artifactId>cc.recommenders.mining.calls</artifactId>
 	<packaging>jar</packaging>
 	<parent>
-		<groupId>cc.kave</groupId>
+		<groupId>kave-java</groupId>
 		<artifactId>cc.kave.root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -42,7 +42,7 @@
 			<version>3.6</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.io</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -52,23 +52,23 @@
 			<version>1.7.5</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>org.eclipse.recommenders.jayes</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.utils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.nativelibs</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
-			<artifactId>cc.kave.commons</artifactId>
+			<groupId>kave-java</groupId>
+			<artifactId>kave-java.commons</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

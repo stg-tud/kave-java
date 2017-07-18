@@ -5,7 +5,7 @@
 	<artifactId>cc.recommenders.io</artifactId>
 	<packaging>jar</packaging>
 	<parent>
-		<groupId>cc.kave</groupId>
+		<groupId>kave-java</groupId>
 		<artifactId>cc.kave.root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -17,7 +17,7 @@
 			<version>14.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.utils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>

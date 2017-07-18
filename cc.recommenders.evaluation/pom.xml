@@ -5,7 +5,7 @@
 	<artifactId>cc.recommenders.evaluation</artifactId>
 	<packaging>jar</packaging>
 	<parent>
-		<groupId>cc.kave</groupId>
+		<groupId>kave-java</groupId>
 		<artifactId>cc.kave.root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -32,22 +32,22 @@
 			<version>2.2.4</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.utils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.io</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.mining.calls</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
+			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.testutils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
@@ -58,8 +58,8 @@
 			<version>4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>cc.kave</groupId>
-			<artifactId>cc.kave.commons</artifactId>
+			<groupId>kave-java</groupId>
+			<artifactId>kave-java.commons</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

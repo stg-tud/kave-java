@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cc.kave.episodes</artifactId>
   <parent>
-  	<groupId>cc.kave</groupId>
+  	<groupId>kave-java</groupId>
   	<artifactId>cc.kave.root</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
   </parent>
@@ -18,17 +18,17 @@
   		<version>0.9.1</version>
   	</dependency>
   	<dependency>
-  		<groupId>cc.kave</groupId>
-  		<artifactId>cc.kave.commons</artifactId>
+  		<groupId>kave-java</groupId>
+  		<artifactId>kave-java.commons</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
   	<dependency>
-  		<groupId>cc.kave</groupId>
+  		<groupId>kave-java</groupId>
   		<artifactId>cc.recommenders.testutils</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
   	<dependency>
-  		<groupId>cc.kave</groupId>
+  		<groupId>kave-java</groupId>
   		<artifactId>cc.recommenders.evaluation</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>

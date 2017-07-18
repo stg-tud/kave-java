@@ -7,7 +7,7 @@
 	<artifactId>org.eclipse.recommenders.jayes</artifactId>
 	<packaging>jar</packaging>
 	<parent>
-		<groupId>cc.kave</groupId>
+		<groupId>kave-java</groupId>
 		<artifactId>cc.kave.root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
