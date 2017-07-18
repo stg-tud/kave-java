@@ -12,7 +12,7 @@ package cc.recommenders.evaluation.evaluators;
 
 import java.util.List;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.MiningOptions;

@@ -10,8 +10,8 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
-import static cc.recommenders.assertions.Throws.throwUnreachable;
+import static cc.kave.assertions.Throws.throwIllegalArgumentException;
+import static cc.kave.assertions.Throws.throwUnreachable;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class CoReTypeName implements ICoReTypeName {
 	private static Map<String /* vmTypeName */, CoReTypeName> index = new MapMaker().weakValues().makeMap();

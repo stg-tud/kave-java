@@ -35,6 +35,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cc.kave.assertions.Asserts;
+import cc.kave.assertions.Throws;
 import cc.kave.commons.model.events.ActivityEvent;
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.ErrorEvent;
@@ -162,8 +164,6 @@ import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
 import cc.kave.commons.utils.json.legacy.GsonUtil;
-import cc.recommenders.assertions.Asserts;
-import cc.recommenders.assertions.Throws;
 
 public abstract class JsonUtils {
 

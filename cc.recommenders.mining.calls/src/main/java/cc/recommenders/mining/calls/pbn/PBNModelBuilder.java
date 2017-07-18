@@ -34,7 +34,7 @@ import java.util.Set;
 import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import org.eclipse.recommenders.commons.bayesnet.Node;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
 import cc.recommenders.mining.calls.Pattern;

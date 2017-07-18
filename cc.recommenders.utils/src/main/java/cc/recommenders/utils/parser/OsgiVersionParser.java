@@ -13,7 +13,7 @@ package cc.recommenders.utils.parser;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import cc.recommenders.assertions.Throws;
+import cc.kave.assertions.Throws;
 import cc.recommenders.utils.Version;
 
 public class OsgiVersionParser implements IVersionParser {

@@ -23,8 +23,8 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
 
-import cc.recommenders.assertions.Asserts;
-import cc.recommenders.assertions.Throws;
+import cc.kave.assertions.Asserts;
+import cc.kave.assertions.Throws;
 
 public class Fingerprints {
 	private static final class StreamInputSupplier implements InputSupplier<InputStream> {

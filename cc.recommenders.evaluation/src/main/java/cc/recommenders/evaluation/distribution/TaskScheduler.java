@@ -10,16 +10,16 @@
  */
 package cc.recommenders.evaluation.distribution;
 
-import static cc.recommenders.assertions.Asserts.assertNotNull;
+import static cc.kave.assertions.Asserts.assertNotNull;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
-import cc.recommenders.assertions.Asserts;
-
 import com.google.common.collect.Lists;
+
+import cc.kave.assertions.Asserts;
 
 public class TaskScheduler<T> extends UnicastRemoteObject implements ITaskScheduler<T> {
 

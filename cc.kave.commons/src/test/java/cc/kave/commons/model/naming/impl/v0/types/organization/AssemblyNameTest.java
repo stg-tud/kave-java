@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

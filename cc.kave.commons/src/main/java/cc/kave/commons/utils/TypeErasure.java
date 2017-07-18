@@ -25,11 +25,11 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.assertions.Asserts;
 
 public class TypeErasure {
 	public static ITypeName of(ITypeName type) {

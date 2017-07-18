@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.others.IReSharperLiveTemplateName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class ReSharperLiveTemplateNameTest {
 

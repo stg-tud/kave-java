@@ -10,8 +10,8 @@
  */
 package cc.recommenders.utils;
 
-import static cc.recommenders.assertions.Asserts.assertNotNull;
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.kave.assertions.Asserts.assertNotNull;
+import static cc.kave.assertions.Asserts.assertTrue;
 
 import java.util.Date;
 

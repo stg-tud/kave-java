@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.model;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.kave.assertions.Asserts.assertTrue;
 
 import java.util.List;
 import java.util.Set;

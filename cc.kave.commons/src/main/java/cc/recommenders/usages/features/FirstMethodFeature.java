@@ -10,7 +10,8 @@
  */
 package cc.recommenders.usages.features;
 
-import static cc.recommenders.assertions.Asserts.assertNotNull;
+import static cc.kave.assertions.Asserts.assertNotNull;
+
 import cc.recommenders.names.ICoReMethodName;
 
 public class FirstMethodFeature extends UsageFeature {

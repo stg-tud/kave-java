@@ -28,7 +28,7 @@ import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class TypeName extends BaseTypeName {
 

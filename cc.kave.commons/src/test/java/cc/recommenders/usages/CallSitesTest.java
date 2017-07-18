@@ -15,8 +15,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.ICoReMethodName;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
 
 public class CallSitesTest {

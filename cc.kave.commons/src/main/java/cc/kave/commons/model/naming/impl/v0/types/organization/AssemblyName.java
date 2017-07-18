@@ -18,7 +18,7 @@ package cc.kave.commons.model.naming.impl.v0.types.organization;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class AssemblyName extends BaseName implements IAssemblyName {
 

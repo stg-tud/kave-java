@@ -33,7 +33,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Lists;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class ReadingArchiveTest {
 

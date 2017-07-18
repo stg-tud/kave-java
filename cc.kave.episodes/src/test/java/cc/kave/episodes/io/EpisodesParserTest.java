@@ -31,7 +31,7 @@ import org.junit.rules.TemporaryFolder;
 
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 

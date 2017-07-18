@@ -10,15 +10,16 @@
  */
 package cc.recommenders.mining.calls;
 
-import static cc.recommenders.assertions.Asserts.assertGreaterThan;
-import static cc.recommenders.assertions.Asserts.assertNotNegative;
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.clustering.CanopyClusteredPatternFinder;
 import cc.recommenders.mining.calls.clustering.CombinedKmeansAndCanopyClusteredPatternFinder;
 import cc.recommenders.mining.calls.clustering.FeatureWeighter;
 import cc.recommenders.mining.calls.clustering.KMeansClusteredPatternFinder;
 import cc.recommenders.mining.calls.clustering.VectorBuilder;
 import cc.recommenders.usages.features.CallFeature;
+
+import static cc.kave.assertions.Asserts.assertGreaterThan;
+import static cc.kave.assertions.Asserts.assertNotNegative;
 
 import com.google.inject.Inject;
 

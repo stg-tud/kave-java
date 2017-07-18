@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class CoReVariableName implements ICoReVariableName {
 

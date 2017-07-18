@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.features.FeatureExtractor;
 import cc.recommenders.names.CoReMethodName;

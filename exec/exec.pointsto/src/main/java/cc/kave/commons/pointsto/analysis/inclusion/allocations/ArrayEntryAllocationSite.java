@@ -12,8 +12,8 @@
  */
 package cc.kave.commons.pointsto.analysis.inclusion.allocations;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.assertions.Asserts;
 
 public class ArrayEntryAllocationSite implements AllocationSite {
 

@@ -24,7 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.common.collect.Maps;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 

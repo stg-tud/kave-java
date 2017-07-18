@@ -30,8 +30,8 @@ import org.junit.rules.ExpectedException;
 
 import cc.kave.episodes.mining.evaluation.ProposalHelper;
 import cc.kave.episodes.model.Episode;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 

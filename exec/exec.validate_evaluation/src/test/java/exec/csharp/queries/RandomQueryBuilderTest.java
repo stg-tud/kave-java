@@ -15,7 +15,7 @@
  */
 package exec.csharp.queries;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.kave.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;

@@ -20,7 +20,7 @@ import org.eclipse.recommenders.commons.bayesnet.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.DistanceMeasureFactory;
 import cc.recommenders.mining.calls.MiningOptions;

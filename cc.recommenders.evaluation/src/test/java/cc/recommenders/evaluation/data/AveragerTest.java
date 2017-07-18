@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class AveragerTest {
 

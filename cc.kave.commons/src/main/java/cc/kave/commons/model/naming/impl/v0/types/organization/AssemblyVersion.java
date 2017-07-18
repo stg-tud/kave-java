@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 

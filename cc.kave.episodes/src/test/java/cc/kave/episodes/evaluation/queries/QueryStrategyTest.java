@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class QueryStrategyTest {
 

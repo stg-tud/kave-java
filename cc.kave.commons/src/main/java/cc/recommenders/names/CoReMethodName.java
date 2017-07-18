@@ -10,8 +10,8 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
-import static cc.recommenders.assertions.Throws.throwNotImplemented;
+import static cc.kave.assertions.Throws.throwIllegalArgumentException;
+import static cc.kave.assertions.Throws.throwNotImplemented;
 import static cc.recommenders.names.CoReTypeName.BOOLEAN;
 import static cc.recommenders.names.CoReTypeName.BYTE;
 import static cc.recommenders.names.CoReTypeName.CHAR;
@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class CoReMethodName implements ICoReMethodName {
 	private static final long serialVersionUID = 688964238062226061L;

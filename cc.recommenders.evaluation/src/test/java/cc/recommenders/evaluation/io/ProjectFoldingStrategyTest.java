@@ -19,9 +19,9 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
-
 import com.google.common.collect.Maps;
+
+import cc.kave.exceptions.AssertionException;
 
 public class ProjectFoldingStrategyTest {
 

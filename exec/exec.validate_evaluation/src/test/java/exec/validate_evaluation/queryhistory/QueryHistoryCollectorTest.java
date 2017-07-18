@@ -29,8 +29,8 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;

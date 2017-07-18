@@ -28,6 +28,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.naming.types.ITypeName;
@@ -48,7 +49,6 @@ import cc.kave.commons.pointsto.analysis.inclusion.contexts.ContextFactory;
 import cc.kave.commons.pointsto.analysis.inclusion.contexts.EmptyContextFactory;
 import cc.kave.commons.pointsto.analysis.references.DistinctReference;
 import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
-import cc.recommenders.assertions.Asserts;
 
 public class ConstraintGraph {
 

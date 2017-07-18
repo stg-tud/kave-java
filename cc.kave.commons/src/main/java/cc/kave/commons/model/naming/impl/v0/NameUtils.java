@@ -23,12 +23,12 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.ParameterName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeParameterName;
 import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.utils.StringUtils;
-import cc.recommenders.assertions.Asserts;
 
 public class NameUtils {
 

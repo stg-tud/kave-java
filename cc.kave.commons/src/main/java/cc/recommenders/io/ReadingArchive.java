@@ -25,8 +25,8 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.assertions.Asserts;
 
 public class ReadingArchive implements IReadingArchive {
 

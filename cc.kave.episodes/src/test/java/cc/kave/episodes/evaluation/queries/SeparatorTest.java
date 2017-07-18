@@ -28,8 +28,8 @@ import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
 public class SeparatorTest {
 

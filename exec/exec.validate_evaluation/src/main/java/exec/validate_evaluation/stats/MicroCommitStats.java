@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReMethodName;

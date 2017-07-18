@@ -10,7 +10,7 @@
  */
 package cc.recommenders.mining.features;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ClassFeature;

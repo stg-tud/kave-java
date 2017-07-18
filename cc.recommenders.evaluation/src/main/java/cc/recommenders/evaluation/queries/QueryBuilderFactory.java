@@ -10,8 +10,8 @@
  */
 package cc.recommenders.evaluation.queries;
 
-import cc.recommenders.assertions.Asserts;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.assertions.Asserts;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;

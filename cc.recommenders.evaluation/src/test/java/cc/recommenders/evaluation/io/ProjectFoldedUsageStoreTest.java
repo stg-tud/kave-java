@@ -33,7 +33,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.ReadingArchive;
 import cc.recommenders.names.ICoReTypeName;

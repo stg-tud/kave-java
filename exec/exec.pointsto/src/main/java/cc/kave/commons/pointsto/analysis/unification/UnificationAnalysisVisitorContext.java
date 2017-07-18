@@ -32,6 +32,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -75,7 +76,6 @@ import cc.kave.commons.pointsto.analysis.utils.PropertyAsFieldPredicate;
 import cc.kave.commons.pointsto.analysis.visitors.DistinctReferenceVisitorContext;
 import cc.kave.commons.pointsto.analysis.visitors.ThisReferenceOption;
 import cc.kave.commons.pointsto.extraction.DeclarationMapper;
-import cc.recommenders.assertions.Asserts;
 
 public class UnificationAnalysisVisitorContext extends DistinctReferenceVisitorContext {
 

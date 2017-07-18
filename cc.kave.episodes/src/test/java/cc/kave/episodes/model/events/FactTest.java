@@ -21,8 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.exceptions.AssertionException;
 
 public class FactTest {
 

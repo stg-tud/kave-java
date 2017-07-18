@@ -30,9 +30,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;

@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.names.ICoReFieldName;
 import cc.recommenders.names.ICoReMethodName;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 

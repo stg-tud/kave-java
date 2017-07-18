@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.idecomponents.ISolutionName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class SolutionNameTest {
 

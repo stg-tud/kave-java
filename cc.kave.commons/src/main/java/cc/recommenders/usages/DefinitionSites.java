@@ -10,9 +10,9 @@
  */
 package cc.recommenders.usages;
 
-import cc.recommenders.assertions.Asserts;
 import cc.recommenders.names.ICoReFieldName;
 import cc.recommenders.names.ICoReMethodName;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 

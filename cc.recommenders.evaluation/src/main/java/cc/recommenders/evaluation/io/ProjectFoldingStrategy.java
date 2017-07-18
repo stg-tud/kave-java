@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import cc.recommenders.assertions.Asserts;
-
 import com.google.common.collect.Maps;
+
+import cc.kave.assertions.Asserts;
 
 public class ProjectFoldingStrategy {
 

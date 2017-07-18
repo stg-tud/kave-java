@@ -20,7 +20,7 @@ import org.apache.commons.math.util.MathUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class BoxplotDataTest {
 

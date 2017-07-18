@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.usages.features.CallFeature;

@@ -10,8 +10,8 @@
  */
 package cc.recommenders.evaluation.data;
 
-import static cc.recommenders.assertions.Asserts.assertLessOrEqual;
-import static cc.recommenders.assertions.Asserts.assertNotNegative;
+import static cc.kave.assertions.Asserts.assertLessOrEqual;
+import static cc.kave.assertions.Asserts.assertNotNegative;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Set;

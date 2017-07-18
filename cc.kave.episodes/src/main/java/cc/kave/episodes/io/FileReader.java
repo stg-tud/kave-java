@@ -15,8 +15,8 @@
  */
 package cc.kave.episodes.io;
 
-import static cc.recommenders.assertions.Asserts.assertFalse;
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.kave.assertions.Asserts.assertFalse;
+import static cc.kave.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.io.IOException;

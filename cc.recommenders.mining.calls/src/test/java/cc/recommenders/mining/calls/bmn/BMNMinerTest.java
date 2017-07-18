@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;

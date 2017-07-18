@@ -31,7 +31,7 @@ import static java.lang.System.arraycopy;
 import java.util.List;
 import java.util.Set;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
 import cc.recommenders.mining.calls.Pattern;

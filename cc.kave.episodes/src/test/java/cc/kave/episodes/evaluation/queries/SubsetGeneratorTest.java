@@ -13,7 +13,7 @@ import org.junit.rules.ExpectedException;
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class SubsetGeneratorTest {
 

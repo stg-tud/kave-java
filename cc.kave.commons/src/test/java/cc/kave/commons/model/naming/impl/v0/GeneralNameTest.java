@@ -27,7 +27,7 @@ import cc.kave.commons.model.naming.impl.v0.types.DelegateTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.PredefinedTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class GeneralNameTest {
 

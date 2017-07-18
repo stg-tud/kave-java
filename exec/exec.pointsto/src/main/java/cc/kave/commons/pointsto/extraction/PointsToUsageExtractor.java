@@ -43,7 +43,7 @@ import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.utils.SSTNodeHierarchy;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;

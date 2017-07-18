@@ -12,7 +12,7 @@ package cc.recommenders.mining.calls.bmn;
 
 import java.util.List;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MiningOptions;

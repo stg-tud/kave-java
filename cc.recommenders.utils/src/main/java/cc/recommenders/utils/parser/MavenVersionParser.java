@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 
-import cc.recommenders.assertions.Throws;
+import cc.kave.assertions.Throws;
 import cc.recommenders.utils.Version;
 
 public class MavenVersionParser implements IVersionParser {

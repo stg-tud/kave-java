@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class MiningOptions {
 

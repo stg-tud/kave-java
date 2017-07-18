@@ -22,7 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 import smile.Network;
 import smile.utils.SmileNameConverter;
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.mining.calls.Pattern;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;

@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.assertions.Asserts;
 
 public class LambdaTerm implements ConstructedTerm {
 

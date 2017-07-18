@@ -10,7 +10,7 @@
  */
 package cc.kave.commons.utils.json.legacy;
 
-import static cc.recommenders.assertions.Throws.throwUnhandledException;
+import static cc.kave.assertions.Throws.throwUnhandledException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -33,9 +33,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import cc.kave.assertions.Asserts;
+import cc.kave.assertions.Throws;
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
-import cc.recommenders.assertions.Asserts;
-import cc.recommenders.assertions.Throws;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;

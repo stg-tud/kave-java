@@ -44,7 +44,7 @@ import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.usages.Usage;
 
 public class PointsToUsageGenerator {

@@ -23,7 +23,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cc.kave.commons.model.naming.codeelements.IAliasName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class AliasNameTest {
 

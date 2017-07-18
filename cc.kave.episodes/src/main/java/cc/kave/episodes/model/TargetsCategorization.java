@@ -15,12 +15,13 @@
  */
 package cc.kave.episodes.model;
 
+import static cc.kave.assertions.Asserts.assertTrue;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import static cc.recommenders.assertions.Asserts.assertTrue;
 
 public class TargetsCategorization {
 

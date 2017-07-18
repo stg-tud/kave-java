@@ -11,8 +11,8 @@
  */
 package cc.recommenders.mining.calls;
 
-import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
-import static cc.recommenders.assertions.Throws.throwIllegalStateException;
+import static cc.kave.assertions.Throws.throwIllegalArgumentException;
+import static cc.kave.assertions.Throws.throwIllegalStateException;
 import static java.lang.Math.abs;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.eclipse.recommenders.commons.bayesnet.Node;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class NetworkMathUtils {
 

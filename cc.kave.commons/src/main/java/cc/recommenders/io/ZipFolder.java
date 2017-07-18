@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class ZipFolder {
 

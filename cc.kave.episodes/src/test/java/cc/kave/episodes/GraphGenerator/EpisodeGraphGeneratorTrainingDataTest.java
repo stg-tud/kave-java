@@ -53,7 +53,7 @@ import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
 import com.google.common.collect.Lists;

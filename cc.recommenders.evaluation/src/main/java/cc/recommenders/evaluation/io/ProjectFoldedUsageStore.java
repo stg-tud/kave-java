@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.names.ICoReTypeName;

@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.apache.commons.math.util.MathUtils;
 
-import cc.recommenders.assertions.Asserts;
-
 import com.google.common.collect.Lists;
+
+import cc.kave.assertions.Asserts;
 
 public class Averager {
 

@@ -15,11 +15,11 @@
  */
 package cc.kave.commons.model.naming.impl.v0.types;
 
+import static cc.kave.assertions.Asserts.assertFalse;
+import static cc.kave.assertions.Asserts.assertTrue;
 import static cc.kave.commons.model.naming.impl.v0.NameUtils.ParseTypeParameterList;
 import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
 import static cc.kave.commons.utils.StringUtils.FindPrevious;
-import static cc.recommenders.assertions.Asserts.assertFalse;
-import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.util.List;
 

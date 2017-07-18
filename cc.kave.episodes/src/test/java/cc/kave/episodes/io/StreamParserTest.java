@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.StreamParser;
 import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class StreamParserTest {
 

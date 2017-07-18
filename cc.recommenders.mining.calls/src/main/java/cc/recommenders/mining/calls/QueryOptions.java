@@ -19,7 +19,7 @@ import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCod
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 
 public class QueryOptions {
 

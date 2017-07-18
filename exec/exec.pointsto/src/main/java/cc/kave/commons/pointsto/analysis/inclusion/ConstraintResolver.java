@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.ContextAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.annotations.InclusionAnnotation;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintEdge;
 import cc.kave.commons.pointsto.analysis.inclusion.graph.ConstraintNode;
-import cc.recommenders.assertions.Asserts;
 
 public class ConstraintResolver {
 

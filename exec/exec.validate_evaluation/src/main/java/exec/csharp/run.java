@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.NestedZipFolders;

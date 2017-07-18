@@ -33,7 +33,7 @@ import org.junit.rules.TemporaryFolder;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 
 public class ZipFolderLRUCacheTest {
 

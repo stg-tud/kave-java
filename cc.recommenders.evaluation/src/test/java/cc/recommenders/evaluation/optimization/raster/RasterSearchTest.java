@@ -39,12 +39,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.evaluation.optimization.CandidateSelector;
 import cc.recommenders.evaluation.optimization.EvaluationOptions;
 import cc.recommenders.evaluation.optimization.OptimizationOptions;
 import cc.recommenders.evaluation.optimization.ScoreCalculator;
 import cc.recommenders.evaluation.optimization.Vector;
-import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Sets;

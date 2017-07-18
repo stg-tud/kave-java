@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.evaluators;
 
-import static cc.recommenders.assertions.Throws.throwNotImplemented;
+import static cc.kave.assertions.Throws.throwNotImplemented;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

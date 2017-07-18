@@ -28,7 +28,7 @@ import cc.kave.commons.model.naming.impl.v0.TestUtils;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

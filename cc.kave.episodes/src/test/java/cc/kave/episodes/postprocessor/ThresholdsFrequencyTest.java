@@ -42,7 +42,7 @@ import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;

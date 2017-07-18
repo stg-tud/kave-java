@@ -10,7 +10,7 @@
  */
 package cc.recommenders.names;
 
-import static cc.recommenders.assertions.Throws.throwUnreachable;
+import static cc.kave.assertions.Throws.throwUnreachable;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.IName;
-import cc.recommenders.assertions.Asserts;
 
 /**
  * 

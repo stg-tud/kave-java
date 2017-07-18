@@ -54,7 +54,7 @@ import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 

@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
@@ -34,8 +35,7 @@ import cc.kave.commons.model.naming.types.ITypeParameterName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
 import cc.kave.commons.utils.StringUtils;
-import cc.recommenders.assertions.Asserts;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class TypeParameterName extends BaseName implements ITypeParameterName, IArrayTypeName {
 

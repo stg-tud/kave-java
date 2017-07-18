@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.io;
 
-import static cc.recommenders.assertions.Throws.throwIllegalArgumentException;
+import static cc.kave.assertions.Throws.throwIllegalArgumentException;
 import static cc.recommenders.io.Directory.createFileName;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static com.google.common.collect.Lists.newArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cc.recommenders.assertions.Throws;
+import cc.kave.assertions.Throws;
 import cc.recommenders.collections.SublistSelector;
 import cc.recommenders.io.DataStore;
 import cc.recommenders.io.Directory;

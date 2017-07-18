@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import cc.kave.assertions.Asserts;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.assertions.Asserts;
 
 public class IoUtils {
 	public static final String TEMP_PREFIX = "recommenders-temp-folder.";

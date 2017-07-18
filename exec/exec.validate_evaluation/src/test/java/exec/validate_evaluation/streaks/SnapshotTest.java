@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import exec.validate_evaluation.utils.DateUtils;
 
 public class SnapshotTest {

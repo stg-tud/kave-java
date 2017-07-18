@@ -15,6 +15,8 @@
  */
 package cc.kave.episodes.evaluation.queries;
 
+import static cc.kave.assertions.Asserts.assertTrue;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,7 +27,6 @@ import com.google.common.collect.Sets;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.datastructures.Tuple;
-import static cc.recommenders.assertions.Asserts.assertTrue;
 
 public class MDMISeparator {
 	

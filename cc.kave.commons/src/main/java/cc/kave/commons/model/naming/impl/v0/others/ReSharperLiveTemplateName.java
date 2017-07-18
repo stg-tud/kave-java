@@ -17,7 +17,7 @@ package cc.kave.commons.model.naming.impl.v0.others;
 
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.others.IReSharperLiveTemplateName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class ReSharperLiveTemplateName extends BaseName implements IReSharperLiveTemplateName {
 

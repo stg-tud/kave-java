@@ -19,7 +19,7 @@ import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class ParameterName extends BaseName implements IParameterName {
 

@@ -17,7 +17,7 @@ package cc.recommenders.mining.calls;
 
 import java.util.Set;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.names.ICoReMethodName;
 

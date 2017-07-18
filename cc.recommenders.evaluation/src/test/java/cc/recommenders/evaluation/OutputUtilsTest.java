@@ -24,7 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.utils.DateProvider;

@@ -17,7 +17,7 @@ package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
 import cc.kave.commons.model.naming.idecomponents.ICommandBarControlName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.recommenders.exceptions.ValidationException;
+import cc.kave.exceptions.ValidationException;
 
 public class CommandBarControlName extends BaseName implements ICommandBarControlName {
 

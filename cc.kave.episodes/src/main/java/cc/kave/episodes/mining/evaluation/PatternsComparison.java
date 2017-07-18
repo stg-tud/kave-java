@@ -1,6 +1,6 @@
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.recommenders.assertions.Asserts.assertTrue;
+import static cc.kave.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.io.IOException;

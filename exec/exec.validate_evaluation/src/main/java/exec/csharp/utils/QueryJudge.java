@@ -17,7 +17,7 @@ package exec.csharp.utils;
 
 import javax.annotation.Nonnull;
 
-import cc.recommenders.assertions.Asserts;
+import cc.kave.assertions.Asserts;
 import cc.recommenders.usages.DefinitionSite;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Usage;

@@ -10,7 +10,7 @@
  */
 package cc.recommenders.mining.calls;
 
-import cc.recommenders.exceptions.AssertionException;
+import cc.kave.exceptions.AssertionException;
 import cc.recommenders.mining.calls.bmn.BMNMiner;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
 import cc.recommenders.usages.Query;
