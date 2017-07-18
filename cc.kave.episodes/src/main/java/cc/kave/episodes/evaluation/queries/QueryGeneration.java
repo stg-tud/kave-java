@@ -1,6 +1,6 @@
 package cc.kave.episodes.evaluation.queries;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;

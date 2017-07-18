@@ -15,8 +15,8 @@
  */
 package cc.recommenders.io;
 
-import static cc.kave.assertions.Asserts.assertFalse;
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertFalse;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;

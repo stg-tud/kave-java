@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.codeelements.ParameterName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeParameterName;

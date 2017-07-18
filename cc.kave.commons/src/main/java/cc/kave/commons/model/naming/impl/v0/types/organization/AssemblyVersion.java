@@ -17,9 +17,9 @@ package cc.kave.commons.model.naming.impl.v0.types.organization;
 
 import java.util.regex.Pattern;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.kave.exceptions.ValidationException;
 
 public class AssemblyVersion extends BaseName implements IAssemblyVersion {
 

@@ -24,7 +24,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MultimapTypeAdapter implements JsonSerializer<Multimap>, JsonDeserializer<Multimap> {

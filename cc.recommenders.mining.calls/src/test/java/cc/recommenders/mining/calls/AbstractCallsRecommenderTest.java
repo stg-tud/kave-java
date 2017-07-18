@@ -18,7 +18,7 @@ package cc.recommenders.mining.calls;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 
 public class AbstractCallsRecommenderTest {
 

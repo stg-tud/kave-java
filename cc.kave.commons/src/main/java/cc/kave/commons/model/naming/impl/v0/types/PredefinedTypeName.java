@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyVersion;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.IName;
 
 public abstract class NameSerializerBase implements INameSerializer {

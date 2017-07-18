@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.model;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

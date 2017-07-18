@@ -13,7 +13,7 @@ package cc.recommenders.evaluation.io;
 import java.util.List;
 import java.util.Map;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.Usage;
 

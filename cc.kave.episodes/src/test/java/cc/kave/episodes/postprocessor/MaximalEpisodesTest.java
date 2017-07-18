@@ -24,9 +24,9 @@ import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
-import cc.kave.exceptions.AssertionException;
 
 public class MaximalEpisodesTest {
 

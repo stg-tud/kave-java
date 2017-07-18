@@ -19,7 +19,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;

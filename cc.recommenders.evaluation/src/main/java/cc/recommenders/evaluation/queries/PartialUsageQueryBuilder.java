@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;

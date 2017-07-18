@@ -15,7 +15,7 @@
  */
 package exec.csharp.queries;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;

@@ -22,8 +22,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.idecomponents.IDocumentName;
-import cc.kave.exceptions.ValidationException;
 import cc.recommenders.testutils.ParameterData;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;

@@ -26,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 
 public class AveragerTest {
 

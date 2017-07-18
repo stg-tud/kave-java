@@ -11,7 +11,7 @@
 package cc.recommenders.usages;
 
 import cc.recommenders.names.ICoReMethodName;
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.names.CoReMethodName;
 
 public class CallSites {

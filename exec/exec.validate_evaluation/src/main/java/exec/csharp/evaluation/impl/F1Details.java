@@ -20,7 +20,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;

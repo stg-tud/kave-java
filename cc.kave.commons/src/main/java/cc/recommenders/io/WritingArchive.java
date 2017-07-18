@@ -19,7 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class WritingArchive implements IWritingArchive {

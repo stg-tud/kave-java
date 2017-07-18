@@ -12,7 +12,7 @@ package cc.recommenders.evaluation.data;
 
 import java.io.Serializable;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class NM implements Serializable {
 

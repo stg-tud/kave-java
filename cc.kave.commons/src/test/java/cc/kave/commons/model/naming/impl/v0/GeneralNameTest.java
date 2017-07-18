@@ -22,12 +22,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.IName;
 import cc.kave.commons.model.naming.impl.v0.types.DelegateTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.PredefinedTypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.exceptions.ValidationException;
 
 public class GeneralNameTest {
 

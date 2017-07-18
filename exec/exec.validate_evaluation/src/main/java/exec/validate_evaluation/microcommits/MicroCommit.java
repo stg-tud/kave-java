@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.utils.ToStringUtils;
 import cc.recommenders.names.ICoReMethodName;

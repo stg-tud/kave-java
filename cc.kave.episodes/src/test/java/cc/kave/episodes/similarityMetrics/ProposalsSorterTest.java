@@ -28,9 +28,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.episodes.mining.evaluation.ProposalHelper;
 import cc.kave.episodes.model.Episode;
-import cc.kave.exceptions.AssertionException;
 import cc.recommenders.datastructures.Tuple;
 
 import com.google.common.collect.Sets;

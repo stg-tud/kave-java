@@ -12,7 +12,7 @@ package cc.recommenders.mining.features;
 
 import java.util.List;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.utils.dictionary.Dictionary;
 
 public class RareFeatureDropper<Feature> {

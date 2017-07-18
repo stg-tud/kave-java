@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
@@ -43,7 +44,6 @@ import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.utils.SSTNodeHierarchy;
-import cc.kave.exceptions.AssertionException;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;

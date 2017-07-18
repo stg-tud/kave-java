@@ -15,7 +15,7 @@ import static cc.recommenders.io.Logger.log;
 
 import java.util.List;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.collections.SublistSelector;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
 import cc.recommenders.mining.calls.ICallsRecommender;

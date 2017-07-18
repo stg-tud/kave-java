@@ -15,9 +15,9 @@
  */
 package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.idecomponents.IWindowName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.exceptions.ValidationException;
 
 public class WindowName extends BaseName implements IWindowName {
 

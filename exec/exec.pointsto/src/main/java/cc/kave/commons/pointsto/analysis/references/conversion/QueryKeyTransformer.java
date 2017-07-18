@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;

@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.testutils.Serialization;
 
 public class NMTest {

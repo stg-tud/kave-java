@@ -19,7 +19,7 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.evaluation.OptionsUtils;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.ModelBuilder;

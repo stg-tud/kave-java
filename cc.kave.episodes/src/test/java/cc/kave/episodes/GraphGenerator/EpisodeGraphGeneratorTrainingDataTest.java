@@ -39,6 +39,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
@@ -53,7 +54,6 @@ import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
-import cc.kave.exceptions.AssertionException;
 import cc.recommenders.io.Directory;
 
 import com.google.common.collect.Lists;

@@ -23,8 +23,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
-import cc.kave.exceptions.AssertionException;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;

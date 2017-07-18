@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 import static cc.recommenders.io.Logger.append;
 
 import java.util.Date;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.utils.DateProvider;

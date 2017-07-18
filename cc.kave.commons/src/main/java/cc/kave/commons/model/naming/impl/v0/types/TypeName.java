@@ -23,12 +23,12 @@ import static cc.kave.commons.utils.StringUtils.f;
 
 import java.util.regex.Pattern;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.impl.v0.types.organization.AssemblyName;
 import cc.kave.commons.model.naming.impl.v0.types.organization.NamespaceName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.INamespaceName;
-import cc.kave.exceptions.ValidationException;
 
 public class TypeName extends BaseTypeName {
 

@@ -12,7 +12,7 @@
  */
 package cc.kave.commons.pointsto.analysis.references;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.codeelements.IMemberName;
 import cc.kave.commons.model.ssts.references.IMemberReference;
 

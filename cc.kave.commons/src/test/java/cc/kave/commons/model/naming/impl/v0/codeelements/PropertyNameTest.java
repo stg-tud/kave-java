@@ -18,7 +18,7 @@ package cc.kave.commons.model.naming.impl.v0.codeelements;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import cc.kave.exceptions.ValidationException;
+import cc.kave.commons.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

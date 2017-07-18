@@ -15,7 +15,7 @@
  */
 package exec.csharp.utils;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;

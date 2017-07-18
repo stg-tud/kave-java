@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.utils.dictionary.Dictionary;
 
 import com.google.common.collect.Lists;

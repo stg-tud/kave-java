@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class CoReFieldName implements ICoReFieldName {
 	private static final long serialVersionUID = 5067244907255465328L;

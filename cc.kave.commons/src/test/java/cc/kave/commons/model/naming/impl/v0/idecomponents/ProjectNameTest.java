@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cc.kave.exceptions.ValidationException;
+import cc.kave.commons.exceptions.ValidationException;
 
 public class ProjectNameTest {
 

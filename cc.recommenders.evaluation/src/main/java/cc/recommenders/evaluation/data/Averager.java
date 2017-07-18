@@ -16,7 +16,7 @@ import org.apache.commons.math.util.MathUtils;
 
 import com.google.common.collect.Lists;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class Averager {
 

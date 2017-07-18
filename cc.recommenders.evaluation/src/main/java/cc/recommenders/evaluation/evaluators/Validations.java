@@ -10,9 +10,9 @@
  */
 package cc.recommenders.evaluation.evaluators;
 
-import static cc.kave.assertions.Asserts.assertGreaterOrEqual;
-import static cc.kave.assertions.Asserts.assertGreaterThan;
-import static cc.kave.assertions.Asserts.assertPositive;
+import static cc.kave.commons.assertions.Asserts.assertGreaterOrEqual;
+import static cc.kave.commons.assertions.Asserts.assertGreaterThan;
+import static cc.kave.commons.assertions.Asserts.assertPositive;
 import static com.google.common.collect.Iterables.partition;
 import static com.google.common.collect.Lists.newArrayList;
 

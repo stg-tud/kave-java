@@ -17,9 +17,9 @@ package cc.kave.commons.model.naming.impl.v0.idecomponents;
 
 import static cc.kave.commons.utils.StringUtils.f;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.idecomponents.IDocumentName;
 import cc.kave.commons.model.naming.impl.v0.BaseName;
-import cc.kave.exceptions.ValidationException;
 
 public class DocumentName extends BaseName implements IDocumentName {
 

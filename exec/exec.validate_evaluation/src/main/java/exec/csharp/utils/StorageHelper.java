@@ -15,7 +15,7 @@
  */
 package exec.csharp.utils;
 
-import static cc.kave.assertions.Asserts.assertNotNull;
+import static cc.kave.commons.assertions.Asserts.assertNotNull;
 
 import java.io.File;
 import java.util.Map;

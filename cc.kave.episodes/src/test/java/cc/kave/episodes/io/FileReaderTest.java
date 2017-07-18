@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.episodes.io.FileReader;
-import cc.kave.exceptions.AssertionException;
 
 public class FileReaderTest {
 

@@ -26,7 +26,7 @@ import cc.kave.commons.model.naming.impl.v0.types.organization.*;
 import cc.kave.commons.model.naming.codeelements.*;
 import cc.kave.commons.model.naming.types.*;
 import cc.kave.commons.model.naming.types.organization.*;
-import cc.kave.exceptions.*;
+import cc.kave.commons.exceptions.*;
 import cc.kave.commons.model.naming.*;
 
 import com.google.common.collect.*;

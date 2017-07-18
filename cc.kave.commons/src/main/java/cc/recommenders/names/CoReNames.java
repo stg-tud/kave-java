@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 /**
  * 

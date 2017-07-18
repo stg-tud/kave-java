@@ -29,9 +29,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.kave.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 

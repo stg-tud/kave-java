@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.analysis.PointsToAnalysis;
@@ -44,7 +45,6 @@ import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.UsageStore;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.exceptions.AssertionException;
 import cc.recommenders.usages.Usage;
 
 public class PointsToUsageGenerator {

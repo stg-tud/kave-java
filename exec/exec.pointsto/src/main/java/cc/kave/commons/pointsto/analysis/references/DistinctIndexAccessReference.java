@@ -14,7 +14,7 @@ package cc.kave.commons.pointsto.analysis.references;
 
 import com.google.common.base.MoreObjects;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.references.IIndexAccessReference;

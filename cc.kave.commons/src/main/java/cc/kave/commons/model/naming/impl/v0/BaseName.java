@@ -15,8 +15,8 @@
  */
 package cc.kave.commons.model.naming.impl.v0;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.IName;
-import cc.kave.exceptions.ValidationException;
 
 public abstract class BaseName implements IName {
 

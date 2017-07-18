@@ -15,7 +15,7 @@
  */
 package cc.recommenders.datastructures;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class Histogram {
 

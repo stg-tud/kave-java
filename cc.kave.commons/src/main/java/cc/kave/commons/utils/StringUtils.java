@@ -15,15 +15,15 @@
  */
 package cc.kave.commons.utils;
 
-import static cc.kave.assertions.Asserts.assertNotNull;
-import static cc.kave.assertions.Asserts.assertTrue;
-import static cc.kave.assertions.Asserts.fail;
+import static cc.kave.commons.assertions.Asserts.assertNotNull;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.fail;
 import static java.util.Arrays.binarySearch;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class StringUtils {
 

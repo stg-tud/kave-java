@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.datastructures.Map2D;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.Boxplot;

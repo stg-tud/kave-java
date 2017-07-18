@@ -22,7 +22,7 @@ import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.eclipse.recommenders.commons.bayesnet.Node;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class NetworkMathUtils {
 

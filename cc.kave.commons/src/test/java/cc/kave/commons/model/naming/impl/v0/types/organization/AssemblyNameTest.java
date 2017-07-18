@@ -22,10 +22,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyVersion;
-import cc.kave.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

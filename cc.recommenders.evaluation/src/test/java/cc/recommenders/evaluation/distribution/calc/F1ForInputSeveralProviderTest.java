@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.kave.assertions.Asserts.assertNotNull;
+import static cc.kave.commons.assertions.Asserts.assertNotNull;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
 import static cc.recommenders.evaluation.distribution.calc.F1ForInputSeveralProvider.TYPES;

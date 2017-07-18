@@ -16,7 +16,7 @@
 
 package cc.kave.commons.model.naming.impl.v0.types;
 
-import static cc.kave.assertions.Asserts.assertFalse;
+import static cc.kave.commons.assertions.Asserts.assertFalse;
 import static cc.kave.commons.utils.StringUtils.FindCorrespondingCloseBracket;
 import static cc.kave.commons.utils.StringUtils.FindCorrespondingOpenBracket;
 import static cc.kave.commons.utils.StringUtils.FindNext;
@@ -27,7 +27,7 @@ import static cc.kave.commons.utils.StringUtils.remove;
 
 import java.util.regex.Pattern;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.naming.types.IArrayTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;

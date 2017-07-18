@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 

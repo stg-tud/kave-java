@@ -22,8 +22,8 @@ import static org.junit.Assert.fail;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.codeelements.IAliasName;
-import cc.kave.exceptions.ValidationException;
 
 public class AliasNameTest {
 

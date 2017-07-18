@@ -25,7 +25,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
 import cc.recommenders.io.Logger;
 import cc.recommenders.io.LoggerUtils;

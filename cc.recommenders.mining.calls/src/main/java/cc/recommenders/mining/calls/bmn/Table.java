@@ -11,7 +11,7 @@
  */
 package cc.recommenders.mining.calls.bmn;
 
-import static cc.kave.assertions.Asserts.assertEquals;
+import static cc.kave.commons.assertions.Asserts.assertEquals;
 
 import java.util.Arrays;
 

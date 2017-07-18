@@ -17,7 +17,7 @@ package exec.csharp.queries;
 
 import com.google.inject.Inject;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 

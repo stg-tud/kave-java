@@ -10,7 +10,7 @@
  */
 package cc.recommenders.usages.features;
 
-import static cc.kave.assertions.Asserts.assertNotNull;
+import static cc.kave.commons.assertions.Asserts.assertNotNull;
 
 import cc.recommenders.usages.DefinitionSite;
 

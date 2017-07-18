@@ -10,7 +10,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 
 import java.util.Map;
 import java.util.Set;

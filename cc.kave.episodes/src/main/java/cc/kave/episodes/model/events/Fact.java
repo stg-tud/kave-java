@@ -18,7 +18,7 @@ package cc.kave.episodes.model.events;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.datastructures.Tuple;
 
 public class Fact {

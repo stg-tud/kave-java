@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class CoReMethodName implements ICoReMethodName {
 	private static final long serialVersionUID = 688964238062226061L;

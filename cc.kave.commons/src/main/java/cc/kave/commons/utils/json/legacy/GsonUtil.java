@@ -33,8 +33,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import cc.kave.assertions.Asserts;
 import cc.kave.assertions.Throws;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.utils.json.RuntimeTypeAdapterFactory;
 import cc.recommenders.names.CoReFieldName;
 import cc.recommenders.names.CoReMethodName;

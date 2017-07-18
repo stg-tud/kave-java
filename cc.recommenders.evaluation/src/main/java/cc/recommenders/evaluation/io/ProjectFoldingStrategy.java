@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class ProjectFoldingStrategy {
 

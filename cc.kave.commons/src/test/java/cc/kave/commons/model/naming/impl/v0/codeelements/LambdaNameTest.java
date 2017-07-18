@@ -28,12 +28,12 @@ import org.junit.runner.RunWith;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.codeelements.ILambdaName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.impl.v0.TestUtils;
 import cc.kave.commons.model.naming.impl.v0.types.TypeName;
 import cc.kave.commons.model.naming.impl.v0.types.TypeUtils;
-import cc.kave.exceptions.ValidationException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

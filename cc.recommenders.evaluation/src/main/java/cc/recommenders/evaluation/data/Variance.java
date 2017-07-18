@@ -12,7 +12,7 @@ package cc.recommenders.evaluation.data;
 
 import static org.apache.commons.math.util.MathUtils.round;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class Variance {
 

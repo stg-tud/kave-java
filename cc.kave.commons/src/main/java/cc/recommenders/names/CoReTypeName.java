@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.MapMaker;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 
 public class CoReTypeName implements ICoReTypeName {
 	private static Map<String /* vmTypeName */, CoReTypeName> index = new MapMaker().weakValues().makeMap();

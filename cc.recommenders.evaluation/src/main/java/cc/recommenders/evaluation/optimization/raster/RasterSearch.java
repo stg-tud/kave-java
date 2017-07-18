@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.evaluation.optimization.CandidateSelector;
 import cc.recommenders.evaluation.optimization.EvaluationOptions;
 import cc.recommenders.evaluation.optimization.EvaluationOptionsSearcher;

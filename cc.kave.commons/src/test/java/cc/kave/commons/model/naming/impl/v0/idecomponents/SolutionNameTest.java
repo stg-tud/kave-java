@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.idecomponents.ISolutionName;
-import cc.kave.exceptions.ValidationException;
 
 public class SolutionNameTest {
 

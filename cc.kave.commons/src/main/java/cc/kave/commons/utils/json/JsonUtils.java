@@ -35,8 +35,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cc.kave.assertions.Asserts;
 import cc.kave.assertions.Throws;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.events.ActivityEvent;
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.ErrorEvent;

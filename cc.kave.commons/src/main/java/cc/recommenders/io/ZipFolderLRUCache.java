@@ -22,7 +22,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class ZipFolderLRUCache<T> implements AutoCloseable {

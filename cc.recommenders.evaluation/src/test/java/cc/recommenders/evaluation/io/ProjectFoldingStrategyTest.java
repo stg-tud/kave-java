@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 
 public class ProjectFoldingStrategyTest {
 

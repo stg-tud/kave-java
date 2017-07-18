@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cc.kave.assertions.Asserts;
+import cc.kave.commons.assertions.Asserts;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.io.NestedZipFolders;

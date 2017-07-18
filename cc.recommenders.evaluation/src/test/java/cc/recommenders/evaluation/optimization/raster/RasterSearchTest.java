@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.evaluation.optimization.CandidateSelector;
 import cc.recommenders.evaluation.optimization.EvaluationOptions;
 import cc.recommenders.evaluation.optimization.OptimizationOptions;

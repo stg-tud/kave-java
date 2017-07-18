@@ -30,8 +30,8 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
-import cc.kave.assertions.Asserts;
 import cc.kave.assertions.Throws;
+import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.utils.json.JsonUtils;
 
 public class Directory {

@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.data;
 
-import static cc.kave.assertions.Asserts.assertFalse;
+import static cc.kave.commons.assertions.Asserts.assertFalse;
 
 import java.util.List;
 

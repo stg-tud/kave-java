@@ -32,8 +32,8 @@ import org.junit.rules.TemporaryFolder;
 
 import com.google.common.collect.Lists;
 
+import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.exceptions.AssertionException;
 
 public class ZipFolderLRUCacheTest {
 

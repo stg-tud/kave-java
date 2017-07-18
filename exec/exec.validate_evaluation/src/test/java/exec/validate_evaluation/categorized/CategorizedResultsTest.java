@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.utils.LocaleUtils;
 

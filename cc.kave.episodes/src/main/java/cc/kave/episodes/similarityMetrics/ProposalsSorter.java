@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.similarityMetrics;
 
-import static cc.kave.assertions.Asserts.assertTrue;
+import static cc.kave.commons.assertions.Asserts.assertTrue;
 
 import java.util.List;
 import java.util.Map;

@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Maps;
 
-import cc.kave.exceptions.AssertionException;
+import cc.kave.commons.exceptions.AssertionException;
 
 public class TaskSchedulerTest {
 

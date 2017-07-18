@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation;
 
-import static cc.kave.assertions.Asserts.assertGreaterThan;
+import static cc.kave.commons.assertions.Asserts.assertGreaterThan;
 import static cc.recommenders.io.Logger.append;
 
 import java.io.IOException;
