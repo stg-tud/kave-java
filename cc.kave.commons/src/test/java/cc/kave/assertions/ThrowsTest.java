@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Technische Universität Darmstadt
+ * Copyright 2016 University of Zurich
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,13 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package cc.recommenders.exceptions;
+package cc.kave.assertions;
 
-public class ValidationException extends RuntimeException {
+import static org.junit.Assert.fail;
 
-	private static final long serialVersionUID = 1L;
+import org.junit.Ignore;
+import org.junit.Test;
 
-	public ValidationException(String message) {
-		super(message);
+@Ignore
+public class ThrowsTest {
+
+	@Test
+	public void implementMe() {
+		fail();
 	}
 }
