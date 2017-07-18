@@ -34,5 +34,11 @@
 			<artifactId>cc.kave.commons</artifactId>
 			<version>${version.kave}</version>
 		</dependency>
+		<dependency>
+			<groupId>cc.kave</groupId>
+			<artifactId>cc.kave.testcommons</artifactId>
+			<version>${version.kave}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

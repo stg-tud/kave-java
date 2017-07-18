@@ -30,7 +30,7 @@ import cc.kave.commons.model.ssts.impl.SSTBaseTest;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.recommenders.testutils.ToStringAssert;
+import cc.kave.testcommons.ToStringAssert;
 
 public class TryBlockTest extends SSTBaseTest {
 

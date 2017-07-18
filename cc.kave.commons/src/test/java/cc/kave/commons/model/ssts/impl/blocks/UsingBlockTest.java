@@ -32,7 +32,7 @@ import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.GotoStatement;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
-import cc.recommenders.testutils.ToStringAssert;
+import cc.kave.testcommons.ToStringAssert;
 
 public class UsingBlockTest extends SSTBaseTest {
 

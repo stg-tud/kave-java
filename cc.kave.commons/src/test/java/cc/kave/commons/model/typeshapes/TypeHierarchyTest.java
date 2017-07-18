@@ -29,7 +29,7 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.naming.Names;
-import cc.recommenders.testutils.ToStringAssert;
+import cc.kave.testcommons.ToStringAssert;
 
 public class TypeHierarchyTest {
 

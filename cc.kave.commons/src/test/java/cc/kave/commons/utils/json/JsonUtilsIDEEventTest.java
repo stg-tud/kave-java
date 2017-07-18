@@ -50,7 +50,7 @@ import cc.kave.commons.model.events.visualstudio.InstallEvent;
 import cc.kave.commons.model.events.visualstudio.SolutionEvent;
 import cc.kave.commons.model.events.visualstudio.UpdateEvent;
 import cc.kave.commons.model.events.visualstudio.WindowEvent;
-import cc.recommenders.testutils.ParameterData;
+import cc.kave.testcommons.ParameterData;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.naming.TestCaseName;

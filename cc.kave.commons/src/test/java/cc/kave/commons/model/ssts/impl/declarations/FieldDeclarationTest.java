@@ -24,7 +24,7 @@ import org.junit.Test;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IFieldName;
 import cc.kave.commons.model.ssts.impl.SSTTestHelper;
-import cc.recommenders.testutils.ToStringAssert;
+import cc.kave.testcommons.ToStringAssert;
 
 public class FieldDeclarationTest {
 

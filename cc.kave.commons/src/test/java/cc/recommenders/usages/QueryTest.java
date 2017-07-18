@@ -24,10 +24,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.testcommons.ToStringAssert;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.recommenders.testutils.ToStringAssert;
 
 public class QueryTest {
 

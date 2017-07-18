@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 
 import cc.kave.commons.exceptions.ValidationException;
 import cc.kave.commons.model.naming.idecomponents.IDocumentName;
-import cc.recommenders.testutils.ParameterData;
+import cc.kave.testcommons.ParameterData;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

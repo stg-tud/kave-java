@@ -17,7 +17,7 @@ package cc.kave.commons.model.events.completionevents;
 
 import org.junit.Test;
 
-import cc.recommenders.testutils.ToStringAssert;
+import cc.kave.testcommons.ToStringAssert;
 
 public class ContextTest {
 
