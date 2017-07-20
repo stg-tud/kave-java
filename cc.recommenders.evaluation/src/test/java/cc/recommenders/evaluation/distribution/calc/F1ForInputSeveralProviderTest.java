@@ -11,10 +11,10 @@
 package cc.recommenders.evaluation.distribution.calc;
 
 import static cc.kave.commons.assertions.Asserts.assertNotNull;
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
 import static cc.recommenders.evaluation.distribution.calc.F1ForInputSeveralProvider.TYPES;
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,12 +30,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.datastructures.Map2D;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
 
@@ -157,18 +157,18 @@ public class F1ForInputSeveralProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "app: APP1");
-		LoggerUtils.assertLogContains(1, "all");
-		LoggerUtils.assertLogContains(2, "20000");
-		LoggerUtils.assertLogContains(3, "9000");
-		LoggerUtils.assertLogContains(4, "3000");
-		LoggerUtils.assertLogContains(5, "1000");
-		LoggerUtils.assertLogContains(6, "app: APP2");
-		LoggerUtils.assertLogContains(7, "all");
-		LoggerUtils.assertLogContains(8, "20000");
-		LoggerUtils.assertLogContains(9, "9000");
-		LoggerUtils.assertLogContains(10, "3000");
-		LoggerUtils.assertLogContains(11, "1000");
+		LoggerAsserts.assertLogContains(0, "app: APP1");
+		LoggerAsserts.assertLogContains(1, "all");
+		LoggerAsserts.assertLogContains(2, "20000");
+		LoggerAsserts.assertLogContains(3, "9000");
+		LoggerAsserts.assertLogContains(4, "3000");
+		LoggerAsserts.assertLogContains(5, "1000");
+		LoggerAsserts.assertLogContains(6, "app: APP2");
+		LoggerAsserts.assertLogContains(7, "all");
+		LoggerAsserts.assertLogContains(8, "20000");
+		LoggerAsserts.assertLogContains(9, "9000");
+		LoggerAsserts.assertLogContains(10, "3000");
+		LoggerAsserts.assertLogContains(11, "1000");
 	}
 
 	@Test
@@ -230,30 +230,30 @@ public class F1ForInputSeveralProviderTest {
 		sut.logResults();
 		
 		int i = 0;
-		LoggerUtils.assertLogContains(i++, "app: APP");
-		LoggerUtils.assertLogContains(i++, "«num» == all");
-		LoggerUtils.assertLogContains(i, "input", "Button", "\n");
-		LoggerUtils.assertLogContains(i += 3, "1000", "0.01000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "3000", "0.03000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "9000", "0.09000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "10000", "0.10000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "15000", "0.15000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "20000", "0.20000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "30000", "0.30000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "40000", "0.40000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "\n");
+		LoggerAsserts.assertLogContains(i++, "app: APP");
+		LoggerAsserts.assertLogContains(i++, "«num» == all");
+		LoggerAsserts.assertLogContains(i, "input", "Button", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "1000", "0.01000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "3000", "0.03000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "9000", "0.09000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "10000", "0.10000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "15000", "0.15000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "20000", "0.20000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "30000", "0.30000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "40000", "0.40000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "\n");
 
-		LoggerUtils.assertLogContains(i += 1, "«num» == 20000");
-		LoggerUtils.assertLogContains(i += 1, "input", "Button", "\n");
-		LoggerUtils.assertLogContains(i += 3, "1000", "0.01000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "3000", "0.03000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "9000", "0.09000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "10000", "0.10000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "15000", "0.15000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "20000", "0.20000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "30000", "0.30000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "40000", "0.40000", "\n");
-		LoggerUtils.assertLogContains(i += 3, "\n");
+		LoggerAsserts.assertLogContains(i += 1, "«num» == 20000");
+		LoggerAsserts.assertLogContains(i += 1, "input", "Button", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "1000", "0.01000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "3000", "0.03000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "9000", "0.09000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "10000", "0.10000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "15000", "0.15000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "20000", "0.20000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "30000", "0.30000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "40000", "0.40000", "\n");
+		LoggerAsserts.assertLogContains(i += 3, "\n");
 	}
 
 	@SuppressWarnings("unused")

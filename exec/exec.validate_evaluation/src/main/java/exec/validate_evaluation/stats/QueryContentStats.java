@@ -21,8 +21,8 @@ import java.util.Set;
 
 import com.google.common.collect.Maps;
 
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import exec.csharp.utils.NoiseMode;
 import exec.csharp.utils.QueryJudge;

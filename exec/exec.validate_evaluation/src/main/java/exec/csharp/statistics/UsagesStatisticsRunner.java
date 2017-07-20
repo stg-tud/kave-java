@@ -17,8 +17,8 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;

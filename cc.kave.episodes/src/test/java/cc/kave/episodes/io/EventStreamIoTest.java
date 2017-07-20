@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.io;
 
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -38,14 +39,12 @@ import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.LocaleUtils;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
-
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
 
 public class EventStreamIoTest {
 

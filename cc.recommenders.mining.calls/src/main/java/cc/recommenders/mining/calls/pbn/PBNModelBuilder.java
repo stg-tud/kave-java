@@ -35,6 +35,7 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import org.eclipse.recommenders.commons.bayesnet.Node;
 
 import cc.kave.commons.assertions.Asserts;
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.ModelBuilder;
 import cc.recommenders.mining.calls.NetworkMathUtils;
 import cc.recommenders.mining.calls.Pattern;
@@ -42,7 +43,6 @@ import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class PBNModelBuilder implements ModelBuilder<UsageFeature, BayesianNetwork> {
 

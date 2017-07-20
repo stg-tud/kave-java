@@ -45,9 +45,9 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.WritingArchive;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;

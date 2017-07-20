@@ -11,7 +11,7 @@
 package cc.recommenders.evaluation.io;
 
 import static cc.kave.assertions.Throws.throwIllegalArgumentException;
-import static cc.recommenders.io.Directory.createFileName;
+import static cc.kave.commons.utils.io.Directory.createFileName;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.assertions.Throws;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.WritingArchive;
 import cc.recommenders.collections.SublistSelector;
 import cc.recommenders.io.DataStore;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.WritingArchive;
 import cc.recommenders.names.ICoReTypeName;
 
 import com.codetrails.data.CallSite;

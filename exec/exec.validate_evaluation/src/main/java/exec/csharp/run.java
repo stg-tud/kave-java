@@ -24,9 +24,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import cc.kave.commons.assertions.Asserts;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.mining.calls.pbn.BatchPBNSmileMiner;
 import cc.recommenders.names.ICoReTypeName;
 import exec.csharp.queries.QueryBuilderFactory;

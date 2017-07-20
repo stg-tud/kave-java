@@ -28,13 +28,13 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.ReadingArchive;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.kave.episodes.eventstream.StreamFilterGenerator;
 import cc.kave.episodes.eventstream.ToFactsVisitor;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

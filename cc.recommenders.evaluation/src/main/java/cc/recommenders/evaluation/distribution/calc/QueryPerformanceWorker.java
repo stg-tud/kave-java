@@ -15,8 +15,8 @@ import static cc.recommenders.collections.SublistSelector.pickRandomSublist;
 import java.util.List;
 
 import cc.kave.commons.utils.Timer;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.collections.SublistSelector;
-import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.usages.Query;

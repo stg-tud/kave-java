@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.mining.calls.AbstractCallsRecommender;
 import cc.recommenders.mining.calls.ProposalHelper;
@@ -34,7 +35,6 @@ import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.TypeFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

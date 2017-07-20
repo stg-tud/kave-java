@@ -41,7 +41,7 @@ import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.kave.commons.utils.ssts.SSTPrintingUtils;
 
 /**

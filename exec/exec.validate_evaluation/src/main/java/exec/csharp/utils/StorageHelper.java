@@ -22,8 +22,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 
 public class StorageHelper {

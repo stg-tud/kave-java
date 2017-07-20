@@ -2,12 +2,12 @@ package cc.kave.episodes.preprocessing;
 
 import java.util.List;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
 

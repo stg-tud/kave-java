@@ -15,7 +15,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
-import cc.recommenders.io.Logger;
+import cc.kave.commons.utils.io.Logger;
 
 public class RmiUtils {
 

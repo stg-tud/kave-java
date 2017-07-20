@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.mining.evaluation;
 
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -47,6 +47,7 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.utils.LocaleUtils;
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
@@ -56,7 +57,6 @@ import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 

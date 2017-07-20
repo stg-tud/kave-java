@@ -44,7 +44,7 @@ import cc.kave.commons.pointsto.io.StreamingZipReader;
 import cc.kave.commons.pointsto.io.ZipArchive;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.recommenders.usages.Usage;
 
 public class PointsToUsageGenerator {

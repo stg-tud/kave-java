@@ -11,13 +11,13 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.evaluation.PatternsValidation;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 public class SpecificPatternsTest {
 

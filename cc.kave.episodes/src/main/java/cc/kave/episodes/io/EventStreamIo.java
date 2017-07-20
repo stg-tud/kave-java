@@ -27,10 +27,10 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;

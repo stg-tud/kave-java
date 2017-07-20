@@ -29,6 +29,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
+import cc.recommenders.datastructures.Dictionary;
+import cc.recommenders.datastructures.IMatcher;
 import cc.recommenders.mining.calls.pbn.DictionaryHelper;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
@@ -39,8 +41,6 @@ import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.UsageFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.TypeFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
-import cc.recommenders.utils.dictionary.IMatcher;
 
 import com.google.common.collect.Sets;
 

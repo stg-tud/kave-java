@@ -34,6 +34,7 @@ import org.mockito.Mock;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.datastructures.Tuple;
 import cc.kave.commons.exceptions.AssertionException;
 import cc.recommenders.mining.calls.QueryOptions;
@@ -48,7 +49,6 @@ import cc.recommenders.usages.features.DefinitionFeature;
 import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 @SuppressWarnings("unchecked")
 public class BMNRecommenderTest {

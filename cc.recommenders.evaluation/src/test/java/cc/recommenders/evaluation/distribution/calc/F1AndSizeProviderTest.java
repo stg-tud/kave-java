@@ -25,10 +25,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.names.CoReTypeName;
 
 import com.google.common.collect.Maps;
@@ -130,8 +130,8 @@ public class F1AndSizeProviderTest {
 		task.sizeInB = 102400;
 		sut.addResult2(task);
 
-		LoggerUtils.assertLogContains(0, "size: 100.0 KiB (raw: 102400 B)");
-		LoggerUtils.assertLogContains(1, "f1:   [1 values (avg: 0.300) - 0.30; 0.30; 0.30; 0.30; 0.30]");
+		LoggerAsserts.assertLogContains(0, "size: 100.0 KiB (raw: 102400 B)");
+		LoggerAsserts.assertLogContains(1, "f1:   [1 values (avg: 0.300) - 0.30; 0.30; 0.30; 0.30; 0.30]");
 	}
 
 	@Test
@@ -150,8 +150,8 @@ public class F1AndSizeProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "rec\tsize\tf1\t% boxplot\n");
-		LoggerUtils.assertLogContains(1, "APP1\t204800\t0.40000\t% [2 values (avg: 0.400) - 0.20; 0.20; 0.40; 0.60; 0.60]");
-		LoggerUtils.assertLogContains(2, "APP2\t30720\t0.30000\t% [1 values (avg: 0.300) - 0.30; 0.30; 0.30; 0.30; 0.30]");
+		LoggerAsserts.assertLogContains(0, "rec\tsize\tf1\t% boxplot\n");
+		LoggerAsserts.assertLogContains(1, "APP1\t204800\t0.40000\t% [2 values (avg: 0.400) - 0.20; 0.20; 0.40; 0.60; 0.60]");
+		LoggerAsserts.assertLogContains(2, "APP2\t30720\t0.30000\t% [1 values (avg: 0.300) - 0.30; 0.30; 0.30; 0.30; 0.30]");
 	}
 }

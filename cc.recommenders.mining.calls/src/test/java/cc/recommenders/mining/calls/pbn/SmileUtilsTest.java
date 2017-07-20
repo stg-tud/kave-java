@@ -30,7 +30,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.io.Directory;
+import cc.kave.commons.utils.io.Directory;
 import cc.recommenders.io.IoUtils;
 import smile.Network;
 

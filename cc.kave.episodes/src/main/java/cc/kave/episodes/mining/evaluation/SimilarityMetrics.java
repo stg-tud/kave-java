@@ -11,6 +11,7 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.evaluation.queries.QueryGeneration;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -25,7 +26,6 @@ import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.kave.episodes.similarityMetrics.Metrics;
 import cc.kave.episodes.similarityMetrics.ProposalsSorter;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

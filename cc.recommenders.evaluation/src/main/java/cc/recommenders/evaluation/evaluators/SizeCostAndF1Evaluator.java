@@ -13,7 +13,7 @@ package cc.recommenders.evaluation.evaluators;
 import java.util.List;
 
 import cc.kave.commons.assertions.Asserts;
-import cc.recommenders.io.Logger;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.usages.Query;

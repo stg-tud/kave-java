@@ -18,8 +18,8 @@ package exec.validate_evaluation.usageconversion;
 import java.util.List;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.recommenders.io.IWritingArchive;
-import cc.recommenders.io.ZipFolderLRUCache;
+import cc.kave.commons.utils.io.IWritingArchive;
+import cc.kave.commons.utils.io.ZipFolderLRUCache;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import exec.validate_evaluation.io.ContextIo;

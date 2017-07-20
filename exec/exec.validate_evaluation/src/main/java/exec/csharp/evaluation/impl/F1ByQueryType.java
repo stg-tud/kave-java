@@ -21,9 +21,9 @@ import java.util.TreeSet;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
-import cc.recommenders.io.Logger;
 import cc.recommenders.usages.Usage;
 import exec.csharp.evaluation.AbstractEvaluationConsumer;
 import exec.csharp.evaluation.IEvaluation;

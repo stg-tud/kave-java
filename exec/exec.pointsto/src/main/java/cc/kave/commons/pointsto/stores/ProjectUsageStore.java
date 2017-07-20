@@ -43,7 +43,7 @@ import com.google.common.reflect.TypeToken;
 
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
-import cc.kave.commons.utils.json.legacy.GsonUtil;
+import cc.kave.commons.utils.io.json.legacy.GsonUtil;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReNames;
 import cc.recommenders.usages.Usage;

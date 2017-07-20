@@ -10,11 +10,11 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
+import static cc.kave.commons.utils.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.log;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
 import static cc.recommenders.evaluation.OutputUtils.humanReadableByteCount;
-import static cc.recommenders.io.Logger.append;
-import static cc.recommenders.io.Logger.log;
 
 import java.util.Map;
 import java.util.Set;

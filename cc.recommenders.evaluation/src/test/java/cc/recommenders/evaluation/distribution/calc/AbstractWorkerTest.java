@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -30,11 +30,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.utils.Timer;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
-import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
 import cc.recommenders.mining.calls.MiningOptions;

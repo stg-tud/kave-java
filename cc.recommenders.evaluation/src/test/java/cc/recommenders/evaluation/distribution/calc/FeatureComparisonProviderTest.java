@@ -23,12 +23,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 
 public class FeatureComparisonProviderTest {
 
@@ -106,8 +106,8 @@ public class FeatureComparisonProviderTest {
 		Logger.setCapturing(true);
 		sut.addResult2(r("APP", 123456, 0));
 
-		LoggerUtils.assertLogContains(0, "f1:   " + BoxplotData.from(new double[] { 0 }).getBoxplot());
-		LoggerUtils.assertLogContains(1, "size: " + 123456);
+		LoggerAsserts.assertLogContains(0, "f1:   " + BoxplotData.from(new double[] { 0 }).getBoxplot());
+		LoggerAsserts.assertLogContains(1, "size: " + 123456);
 	}
 
 	@Test
@@ -119,9 +119,9 @@ public class FeatureComparisonProviderTest {
 		Logger.setCapturing(true);
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "option\tf1\tmodel_size\t% approach: boxplot");
-		LoggerUtils.assertLogContains(1, "1\t0.30000\t15\t% A: " + bp(0, 0.6));
-		LoggerUtils.assertLogContains(2, "2\t0.70000\t30\t% B: " + bp(0.7));
+		LoggerAsserts.assertLogContains(0, "option\tf1\tmodel_size\t% approach: boxplot");
+		LoggerAsserts.assertLogContains(1, "1\t0.30000\t15\t% A: " + bp(0, 0.6));
+		LoggerAsserts.assertLogContains(2, "2\t0.70000\t30\t% B: " + bp(0.7));
 	}
 
 	@Test
@@ -134,7 +134,7 @@ public class FeatureComparisonProviderTest {
 		sut.logResults();
 
 		for (int i = 1; i < 10; i++) {
-			LoggerUtils.assertLogContains(i, "% APP" + i + ":");
+			LoggerAsserts.assertLogContains(i, "% APP" + i + ":");
 		}
 	}
 

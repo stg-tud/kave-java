@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.recommenders.io.Logger.log;
+import static cc.kave.commons.utils.io.Logger.log;
 
 import java.io.IOException;
 import java.io.Serializable;

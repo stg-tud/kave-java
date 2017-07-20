@@ -36,9 +36,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.ssts.impl.SST;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.WritingArchive;
 
 public class EditStreakGenerationIoTest {
 	@Rule

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.utils.dictionary.Dictionary;
+import cc.recommenders.datastructures.Dictionary;
 
 @SuppressWarnings("unchecked")
 public class BMNModelTest {

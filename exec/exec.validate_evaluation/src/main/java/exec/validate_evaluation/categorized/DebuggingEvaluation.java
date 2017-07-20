@@ -20,11 +20,11 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.data.Measure;
-import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;

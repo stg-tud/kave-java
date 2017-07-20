@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import cc.kave.commons.exceptions.AssertionException;
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.MiningOptions.Algorithm;
@@ -43,7 +44,6 @@ import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.SuperMethodFeature;
 import cc.recommenders.usages.features.TypeFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 import com.google.common.collect.Lists;
 

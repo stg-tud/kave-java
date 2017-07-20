@@ -11,7 +11,7 @@
 package cc.recommenders.evaluation;
 
 import static cc.kave.commons.assertions.Asserts.assertTrue;
-import static cc.recommenders.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.append;
 
 import java.util.Date;
 import java.util.Map;
@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.utils.DateProvider;
-import cc.recommenders.io.Logger;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 
 import com.google.common.collect.LinkedListMultimap;

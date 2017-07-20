@@ -13,6 +13,7 @@ package cc.recommenders.mining.calls.bmn;
 import java.util.List;
 
 import cc.kave.commons.assertions.Asserts;
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MiningOptions;
@@ -24,7 +25,6 @@ import cc.recommenders.mining.features.OptionAwareFeaturePredicate;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 import com.google.inject.Inject;
 

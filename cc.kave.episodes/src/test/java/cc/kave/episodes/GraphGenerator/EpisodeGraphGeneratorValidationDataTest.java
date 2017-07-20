@@ -40,6 +40,7 @@ import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.io.Directory;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -49,7 +50,6 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
-import cc.recommenders.io.Directory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

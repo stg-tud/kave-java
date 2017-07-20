@@ -24,13 +24,13 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.assertions.Asserts;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.optimization.CandidateSelector;
 import cc.recommenders.evaluation.optimization.EvaluationOptions;
 import cc.recommenders.evaluation.optimization.EvaluationOptionsSearcher;
 import cc.recommenders.evaluation.optimization.OptimizationOptions;
 import cc.recommenders.evaluation.optimization.ScoreCalculator;
 import cc.recommenders.evaluation.optimization.Vector;
-import cc.recommenders.io.Logger;
 import cc.recommenders.usages.Usage;
 
 import com.google.common.collect.Sets;

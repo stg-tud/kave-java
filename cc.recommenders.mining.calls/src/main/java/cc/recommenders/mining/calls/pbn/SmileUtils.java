@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.google.inject.Inject;
 
-import cc.recommenders.io.Directory;
+import cc.kave.commons.utils.io.Directory;
 import cc.recommenders.io.IoUtils;
 import smile.Network;
 

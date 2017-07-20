@@ -10,7 +10,7 @@
  */
 package cc.recommenders.mining.calls.clustering;
 
-import static cc.recommenders.io.Logger.debug;
+import static cc.kave.commons.utils.io.Logger.debug;
 import static cc.recommenders.mining.calls.Pattern.newPattern;
 
 import java.util.Iterator;
@@ -21,9 +21,9 @@ import org.apache.mahout.clustering.DistanceMeasureCluster;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.Vector.Element;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
 import cc.recommenders.mining.calls.PatternFinder;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public abstract class ClusteredPatternFinder<Feature> implements PatternFinder<Feature> {
 

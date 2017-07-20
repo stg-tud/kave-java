@@ -28,7 +28,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 public class ContextSampler {
 

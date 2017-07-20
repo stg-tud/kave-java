@@ -19,8 +19,8 @@ import org.apache.mahout.clustering.kmeans.KMeansClusterer;
 import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.math.Vector;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class KMeansClusteredPatternFinder<Feature> extends ClusteredPatternFinder<Feature> {
 

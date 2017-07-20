@@ -22,6 +22,7 @@ import java.util.List;
 import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import org.eclipse.recommenders.commons.bayesnet.Node;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
@@ -37,7 +38,6 @@ import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.TypeFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class PBNModelBuilderFixture {
 

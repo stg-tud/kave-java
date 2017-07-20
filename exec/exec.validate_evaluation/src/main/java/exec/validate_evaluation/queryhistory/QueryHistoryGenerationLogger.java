@@ -15,8 +15,8 @@
  */
 package exec.validate_evaluation.queryhistory;
 
-import static cc.recommenders.io.Logger.append;
-import static cc.recommenders.io.Logger.log;
+import static cc.kave.commons.utils.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.log;
 
 import java.util.Iterator;
 import java.util.Set;

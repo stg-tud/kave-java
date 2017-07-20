@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 import exec.csharp.utils.MapSorter;

@@ -16,10 +16,10 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.ReadingArchive;
 import cc.kave.episodes.model.events.Event;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

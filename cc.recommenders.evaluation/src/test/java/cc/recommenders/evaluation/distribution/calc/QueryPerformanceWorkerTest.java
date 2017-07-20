@@ -27,10 +27,10 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 
 import cc.kave.commons.utils.Timer;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
@@ -105,9 +105,9 @@ public class QueryPerformanceWorkerTest {
 	@Test
 	public void correctLogging() {
 		sut.call2();
-		LoggerUtils.assertLogContains(0, "working on QueryPerformanceTask: APP - LType (fold 5/13) - input size: 123");
-		LoggerUtils.assertLogContains(1, "learning... (from 123 usages)");
-		LoggerUtils.assertLogContains(2, "querying... (with 40 querys)");
+		LoggerAsserts.assertLogContains(0, "working on QueryPerformanceTask: APP - LType (fold 5/13) - input size: 123");
+		LoggerAsserts.assertLogContains(1, "learning... (from 123 usages)");
+		LoggerAsserts.assertLogContains(2, "querying... (with 40 querys)");
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class QueryPerformanceWorkerTest {
 		validationData.clear();
 		addUsages(1001, validationData);
 		sut.call2();
-		LoggerUtils.assertLogContains(2, "querying... (with 300 querys)");
+		LoggerAsserts.assertLogContains(2, "querying... (with 300 querys)");
 	}
 
 	@Test

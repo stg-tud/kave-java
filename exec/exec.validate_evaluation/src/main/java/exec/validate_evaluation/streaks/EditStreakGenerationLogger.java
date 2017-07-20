@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.io.Logger;
+import cc.kave.commons.utils.io.Logger;
 import exec.validate_evaluation.streaks.EditStreakGenerationRunner.IRemovalFilter;
 
 public class EditStreakGenerationLogger {

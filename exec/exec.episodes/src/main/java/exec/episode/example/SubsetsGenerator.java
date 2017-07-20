@@ -7,8 +7,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.io.Logger;
 
 public class SubsetsGenerator {
 

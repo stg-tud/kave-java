@@ -15,7 +15,7 @@
  */
 package exec.validate_evaluation.categorized;
 
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import exec.csharp.queries.QueryBuilderFactory;
 import exec.csharp.utils.ModelHelper;

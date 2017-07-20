@@ -20,13 +20,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.evaluators.SizeAndF1Evaluator;
 import cc.recommenders.evaluation.io.DecoratedObjectUsageStore;
 import cc.recommenders.evaluation.optimization.EvaluationOptions;
 import cc.recommenders.evaluation.optimization.OptimizationOptions;
 import cc.recommenders.evaluation.optimization.raster.RasterSearch;
-import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.mining.calls.pbn.PBNMiner;

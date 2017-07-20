@@ -24,7 +24,7 @@ import java.util.zip.ZipFile;
 
 import org.slf4j.LoggerFactory;
 
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 public class StreamingZipReader implements Closeable {
 

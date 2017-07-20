@@ -34,7 +34,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.NoCallRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;

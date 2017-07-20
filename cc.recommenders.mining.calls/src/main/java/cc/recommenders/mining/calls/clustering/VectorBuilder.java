@@ -15,10 +15,10 @@ import java.util.List;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
-import cc.recommenders.utils.dictionary.Dictionary;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+
+import cc.recommenders.datastructures.Dictionary;
 
 public class VectorBuilder<Feature> {
 

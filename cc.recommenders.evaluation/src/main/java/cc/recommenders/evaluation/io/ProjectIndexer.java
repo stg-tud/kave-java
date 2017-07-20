@@ -14,10 +14,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.WritingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;

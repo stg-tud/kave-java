@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.GraphGenerator;
 
-import static cc.recommenders.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.append;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipException;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
-import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
 

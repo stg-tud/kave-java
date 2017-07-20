@@ -19,9 +19,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.CallSite;
 import cc.recommenders.usages.Query;

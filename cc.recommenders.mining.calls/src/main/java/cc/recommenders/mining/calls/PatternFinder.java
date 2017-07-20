@@ -12,7 +12,7 @@ package cc.recommenders.mining.calls;
 
 import java.util.List;
 
-import cc.recommenders.utils.dictionary.Dictionary;
+import cc.recommenders.datastructures.Dictionary;
 
 public interface PatternFinder<Feature> {
 

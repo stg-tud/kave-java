@@ -29,6 +29,8 @@ import org.junit.Test;
 
 import com.google.common.io.Files;
 
+import cc.kave.commons.utils.io.Directory;
+
 public class IoUtilsTest {
 
 	private String type;

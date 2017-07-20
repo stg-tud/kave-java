@@ -24,8 +24,8 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.events.completionevents.Context;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.ReadingArchive;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.ReadingArchive;
 
 /**
  * this class explains how contexts can be read from the file system

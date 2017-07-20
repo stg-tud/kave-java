@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 @RunWith(Parameterized.class)
 public class SerializationTestSuite {

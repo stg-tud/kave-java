@@ -59,6 +59,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
 import cc.recommenders.mining.calls.pbn.PBNModelBuilder;
 import cc.recommenders.mining.calls.pbn.PBNModelConstants;
@@ -67,7 +68,6 @@ import cc.recommenders.usages.features.ClassFeature;
 import cc.recommenders.usages.features.DefinitionFeature;
 import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class PBNModelBuilderTest {
 

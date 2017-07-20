@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.assertions.Asserts;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;
 import cc.recommenders.usages.ProjectFoldingIndex;

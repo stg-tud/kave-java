@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.recommenders.io.Logger.log;
+import static cc.kave.commons.utils.io.Logger.log;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -19,11 +19,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.distribution.ITaskProvider;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
-import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 

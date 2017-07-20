@@ -16,7 +16,7 @@
 package cc.kave.episodes.mining.evaluation;
 
 import static cc.kave.commons.assertions.Asserts.assertTrue;
-import static cc.recommenders.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.append;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.apache.mahout.math.Arrays;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
@@ -44,7 +45,6 @@ import cc.kave.episodes.model.TargetsCategorization;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;

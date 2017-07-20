@@ -22,7 +22,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
-import cc.recommenders.io.NestedZipFolders;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.names.ICoReTypeName;
 import exec.validate_evaluation.microcommits.MicroCommit;
 import exec.validate_evaluation.microcommits.MicroCommitIo;

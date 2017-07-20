@@ -30,9 +30,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.recommenders.io.IWritingArchive;
-import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.IWritingArchive;
+import cc.kave.commons.utils.io.ReadingArchive;
+import cc.kave.commons.utils.io.WritingArchive;
 
 public class CompletionEventProcessor {
 

@@ -24,8 +24,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.commons.assertions.Asserts;
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.NoUsage;

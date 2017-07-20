@@ -20,6 +20,8 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Set;
 
+import cc.recommenders.datastructures.Dictionary;
+import cc.recommenders.datastructures.IMatcher;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.features.CallFeature;
 import cc.recommenders.usages.features.ClassFeature;
@@ -28,8 +30,6 @@ import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.ParameterFeature;
 import cc.recommenders.usages.features.TypeFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
-import cc.recommenders.utils.dictionary.IMatcher;
 
 import com.google.common.collect.Sets;
 

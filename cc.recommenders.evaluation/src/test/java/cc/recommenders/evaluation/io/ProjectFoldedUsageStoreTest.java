@@ -34,8 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.ReadingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.ReadingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;

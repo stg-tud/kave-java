@@ -24,9 +24,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.WritingArchive;
 import cc.recommenders.usages.Usage;
 
 public class QueryHistoryIo {

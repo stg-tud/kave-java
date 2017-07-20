@@ -18,8 +18,8 @@ import org.apache.mahout.clustering.canopy.Canopy;
 import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.math.Vector;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class CanopyClusteredPatternFinder<Feature> extends ClusteredPatternFinder<Feature> {
 

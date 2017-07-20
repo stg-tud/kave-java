@@ -19,9 +19,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.features.FeatureExtractor;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 import org.junit.Before;
 import org.junit.Test;

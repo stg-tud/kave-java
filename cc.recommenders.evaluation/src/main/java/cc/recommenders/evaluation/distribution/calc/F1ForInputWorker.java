@@ -10,8 +10,8 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.recommenders.io.Logger.append;
-import static cc.recommenders.io.Logger.log;
+import static cc.kave.commons.utils.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.log;
 
 import java.util.List;
 

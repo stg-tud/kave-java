@@ -16,6 +16,7 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 
 import com.google.inject.Inject;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.MiningOptions;
@@ -29,7 +30,6 @@ import cc.recommenders.mining.features.RareFeatureDropper;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class PBNMiner extends AbstractPBNMiner<BayesianNetwork> {
 

@@ -10,9 +10,9 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -24,10 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.usages.DefinitionSiteKind;
 
 import com.google.common.collect.Maps;
@@ -151,10 +151,10 @@ public class DefinitionSitesProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "type\tcount", "\tAPP1", "\tAPP2", "\tnometa\n");
-		LoggerUtils.assertLogContains(4, "NEW\t1", "\t0.8", "\t0.1", "\t~\n");
-		LoggerUtils.assertLogContains(8, "THIS\t1", "\t0.9", "\t0.2", "\t~\n");
-		LoggerUtils.assertLogContains(12, "FIELD\t1", "\t1.0", "\t0.3", "\t~\n");
+		LoggerAsserts.assertLogContains(0, "type\tcount", "\tAPP1", "\tAPP2", "\tnometa\n");
+		LoggerAsserts.assertLogContains(4, "NEW\t1", "\t0.8", "\t0.1", "\t~\n");
+		LoggerAsserts.assertLogContains(8, "THIS\t1", "\t0.9", "\t0.2", "\t~\n");
+		LoggerAsserts.assertLogContains(12, "FIELD\t1", "\t1.0", "\t0.3", "\t~\n");
 	}
 
 	@Test
@@ -172,8 +172,8 @@ public class DefinitionSitesProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "type\tcount", "\tAPP1", "\tnometa\n");
-		LoggerUtils.assertLogContains(3, "NEW\t2", "\t0.2", "\t~\n");
+		LoggerAsserts.assertLogContains(0, "type\tcount", "\tAPP1", "\tnometa\n");
+		LoggerAsserts.assertLogContains(3, "NEW\t2", "\t0.2", "\t~\n");
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class DefinitionSitesProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "type\tcount", "\tAPP1", "\tnometa\n");
-		LoggerUtils.assertLogContains(3, "NEW\t2", "\t0.2", "\t~\n");
+		LoggerAsserts.assertLogContains(0, "type\tcount", "\tAPP1", "\tnometa\n");
+		LoggerAsserts.assertLogContains(3, "NEW\t2", "\t0.2", "\t~\n");
 	}
 }

@@ -21,7 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import cc.kave.commons.assertions.Asserts;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 public class IoUtils {
 	public static final String TEMP_PREFIX = "recommenders-temp-folder.";

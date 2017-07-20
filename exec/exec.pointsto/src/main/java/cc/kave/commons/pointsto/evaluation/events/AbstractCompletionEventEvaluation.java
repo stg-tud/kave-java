@@ -29,7 +29,7 @@ import cc.kave.commons.pointsto.PointsToAnalysisFactory;
 import cc.kave.commons.pointsto.evaluation.AbstractEvaluation;
 import cc.kave.commons.pointsto.io.IOHelper;
 import cc.kave.commons.pointsto.io.ZipArchive;
-import cc.kave.commons.utils.json.JsonUtils;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 public abstract class AbstractCompletionEventEvaluation extends AbstractEvaluation {
 

@@ -19,11 +19,6 @@
 			<version>0.9.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fatboyindustrial.gson-javatime-serialisers</groupId>
-			<artifactId>gson-javatime-serialisers</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
 			<groupId>kave-java</groupId>
 			<artifactId>cc.recommenders.testutils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>

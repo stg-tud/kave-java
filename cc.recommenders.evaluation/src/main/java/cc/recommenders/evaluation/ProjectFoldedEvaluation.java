@@ -11,7 +11,7 @@
 package cc.recommenders.evaluation;
 
 import static cc.kave.commons.assertions.Asserts.assertGreaterThan;
-import static cc.recommenders.io.Logger.append;
+import static cc.kave.commons.utils.io.Logger.append;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import cc.kave.commons.utils.DateProvider;
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
-import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 

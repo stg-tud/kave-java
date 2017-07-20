@@ -18,6 +18,7 @@ package exec.episodes;
 import java.io.File;
 import java.util.Map;
 
+import cc.kave.commons.utils.io.Directory;
 import cc.kave.episodes.GraphGenerator.TrainingDataGraphGenerator;
 import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
@@ -34,7 +35,6 @@ import cc.kave.episodes.postprocessor.MaximalEpisodes;
 import cc.kave.episodes.postprocessor.ThresholdsFrequency;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.kave.episodes.statistics.EpisodesStatistics;
-import cc.recommenders.io.Directory;
 
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;

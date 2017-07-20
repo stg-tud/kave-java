@@ -37,10 +37,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
-import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;

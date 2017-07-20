@@ -15,8 +15,8 @@ import static com.google.common.collect.Lists.newLinkedList;
 import java.util.List;
 import java.util.Set;
 
+import cc.kave.commons.utils.io.Directory;
 import cc.recommenders.io.DataStore;
-import cc.recommenders.io.Directory;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
 

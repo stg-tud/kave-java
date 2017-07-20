@@ -15,6 +15,7 @@ import javax.inject.Named;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -26,7 +27,6 @@ import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

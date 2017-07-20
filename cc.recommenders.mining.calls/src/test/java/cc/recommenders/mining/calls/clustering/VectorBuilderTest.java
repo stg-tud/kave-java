@@ -25,9 +25,9 @@ import org.apache.mahout.math.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.clustering.FeatureWeighter;
 import cc.recommenders.mining.calls.clustering.VectorBuilder;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class VectorBuilderTest {
 

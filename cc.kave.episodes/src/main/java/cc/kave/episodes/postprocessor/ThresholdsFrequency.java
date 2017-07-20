@@ -27,11 +27,11 @@ import org.apache.commons.io.FileUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.io.EpisodesParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
-import cc.recommenders.io.Logger;
 
 public class ThresholdsFrequency {
 

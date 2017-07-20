@@ -37,8 +37,8 @@ import org.eclipse.recommenders.jayes.BayesNode;
 import org.eclipse.recommenders.jayes.inference.junctionTree.JunctionTreeAlgorithm;
 import org.eclipse.recommenders.jayes.util.NumericalInstabilityException;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.ProposalHelper;
 import cc.recommenders.mining.calls.QueryOptions;

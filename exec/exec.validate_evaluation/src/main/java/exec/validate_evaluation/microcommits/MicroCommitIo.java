@@ -21,9 +21,9 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.WritingArchive;
 
 public class MicroCommitIo {
 	private String root;

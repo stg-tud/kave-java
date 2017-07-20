@@ -10,9 +10,9 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,10 +29,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
 
@@ -77,9 +77,9 @@ public class QueryPerformanceProviderTest {
 
 		sut.addResult2(task);
 
-		LoggerUtils.assertLogContains(0, "model size: 123 B");
-		LoggerUtils.assertLogContains(1, "learning: 2.35s");
-		LoggerUtils.assertLogContains(2, "per query: 34.57ms");
+		LoggerAsserts.assertLogContains(0, "model size: 123 B");
+		LoggerAsserts.assertLogContains(1, "learning: 2.35s");
+		LoggerAsserts.assertLogContains(2, "per query: 34.57ms");
 	}
 
 	@Test

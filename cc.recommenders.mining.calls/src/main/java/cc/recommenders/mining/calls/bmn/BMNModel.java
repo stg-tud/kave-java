@@ -14,8 +14,8 @@ package cc.recommenders.mining.calls.bmn;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class BMNModel {
 

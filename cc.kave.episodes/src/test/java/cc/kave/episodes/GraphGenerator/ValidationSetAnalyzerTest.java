@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.GraphGenerator;
 
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
+import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 

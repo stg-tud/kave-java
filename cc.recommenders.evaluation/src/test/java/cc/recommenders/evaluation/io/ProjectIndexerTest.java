@@ -37,11 +37,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import cc.recommenders.io.Directory;
-import cc.recommenders.io.IReadingArchive;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.ReadingArchive;
-import cc.recommenders.io.WritingArchive;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.IReadingArchive;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.ReadingArchive;
+import cc.kave.commons.utils.io.WritingArchive;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.ProjectFoldedUsage;

@@ -24,6 +24,7 @@ import org.eclipse.recommenders.commons.bayesnet.BayesianNetwork;
 import org.junit.Before;
 import org.junit.Test;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.DictionaryBuilder;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.ModelBuilder;
@@ -40,7 +41,6 @@ import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.usages.Usage;
 import cc.recommenders.usages.features.FirstMethodFeature;
 import cc.recommenders.usages.features.UsageFeature;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class PBNMinerTest {
 

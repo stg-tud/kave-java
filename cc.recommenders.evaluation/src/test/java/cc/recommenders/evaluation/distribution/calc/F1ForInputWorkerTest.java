@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
@@ -120,14 +120,14 @@ public class F1ForInputWorkerTest {
 	public void loggingManyIterations() {
 		task.numFolds = 1;
 		sut.call2();
-		LoggerUtils.assertLogContains(0, "124 iterations");
-		LoggerUtils.assertLogContains(1, "\n");
+		LoggerAsserts.assertLogContains(0, "124 iterations");
+		LoggerAsserts.assertLogContains(1, "\n");
 		for (int i = 2; i < 122; i++) {
-			LoggerUtils.assertLogContains(i, ".");
+			LoggerAsserts.assertLogContains(i, ".");
 		}
-		LoggerUtils.assertLogContains(122, "\n");
+		LoggerAsserts.assertLogContains(122, "\n");
 		for (int i = 123; i <= 126; i++) {
-			LoggerUtils.assertLogContains(i, ".");
+			LoggerAsserts.assertLogContains(i, ".");
 		}
 	}
 
@@ -135,9 +135,9 @@ public class F1ForInputWorkerTest {
 	public void loggingFewIterations() {
 		task.inputSize = 8000;
 		sut.call2();
-		LoggerUtils.assertLogContains(0, "4 iterations");
+		LoggerAsserts.assertLogContains(0, "4 iterations");
 		for (int i = 1; i <= 4; i++) {
-			LoggerUtils.assertLogContains(i, String.format("- iteration %d/4", i));
+			LoggerAsserts.assertLogContains(i, String.format("- iteration %d/4", i));
 		}
 	}
 

@@ -20,8 +20,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
+import cc.kave.commons.utils.io.NestedZipFolders;
 import cc.recommenders.collections.SublistSelector;
-import cc.recommenders.io.NestedZipFolders;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.NoCallRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;

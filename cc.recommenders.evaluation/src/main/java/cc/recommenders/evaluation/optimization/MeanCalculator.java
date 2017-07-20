@@ -20,10 +20,10 @@ import static cc.recommenders.mining.calls.MiningOptions.newMiningOptions;
 
 import java.util.List;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
 import cc.recommenders.evaluation.evaluators.SizeCostAndF1Evaluator;
 import cc.recommenders.evaluation.evaluators.SizeEvaluator;
-import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;

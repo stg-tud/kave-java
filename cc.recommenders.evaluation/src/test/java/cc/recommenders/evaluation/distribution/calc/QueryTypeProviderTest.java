@@ -23,13 +23,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
+import cc.kave.commons.utils.io.Logger;
+import cc.kave.commons.utils.io.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;
 import cc.recommenders.evaluation.data.NM;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
-import cc.recommenders.io.Logger;
-import cc.recommenders.io.LoggerUtils;
 
 public class QueryTypeProviderTest {
 
@@ -95,11 +95,11 @@ public class QueryTypeProviderTest {
 		}
 		sut.addResult2(task);
 
-		LoggerUtils.assertLogContains(0, "f1(nm):");
+		LoggerAsserts.assertLogContains(0, "f1(nm):");
 		for (int i = 0; i < 13; i++) {
 			Boxplot bp = BoxplotData.from(new double[] { i * 0.01 }).getBoxplot();
 			String line = String.format("- %d|13: %s", i, bp);
-			LoggerUtils.assertLogContains((i + 1), line);
+			LoggerAsserts.assertLogContains((i + 1), line);
 		}
 	}
 
@@ -124,35 +124,35 @@ public class QueryTypeProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "prepend 'Q0_'");
-		LoggerUtils.assertLogContains(1, "type\tcount");
-		LoggerUtils.assertLogContains(2, "\tA");
-		LoggerUtils.assertLogContains(3, "\n");
-		LoggerUtils.assertLogContains(4, "0$|$2\t1");
-		LoggerUtils.assertLogContains(5, "\t0.020");
-		LoggerUtils.assertLogContains(6, "\n");
-		LoggerUtils.assertLogContains(7, "0$|$3\t2");
-		LoggerUtils.assertLogContains(8, "\t0.040");
-		LoggerUtils.assertLogContains(9, "\n");
-		LoggerUtils.assertLogContains(10, "0$|$4\t1");
-		LoggerUtils.assertLogContains(11, "\t0.060");
-		LoggerUtils.assertLogContains(12, "\n");
+		LoggerAsserts.assertLogContains(0, "prepend 'Q0_'");
+		LoggerAsserts.assertLogContains(1, "type\tcount");
+		LoggerAsserts.assertLogContains(2, "\tA");
+		LoggerAsserts.assertLogContains(3, "\n");
+		LoggerAsserts.assertLogContains(4, "0$|$2\t1");
+		LoggerAsserts.assertLogContains(5, "\t0.020");
+		LoggerAsserts.assertLogContains(6, "\n");
+		LoggerAsserts.assertLogContains(7, "0$|$3\t2");
+		LoggerAsserts.assertLogContains(8, "\t0.040");
+		LoggerAsserts.assertLogContains(9, "\n");
+		LoggerAsserts.assertLogContains(10, "0$|$4\t1");
+		LoggerAsserts.assertLogContains(11, "\t0.060");
+		LoggerAsserts.assertLogContains(12, "\n");
 
-		LoggerUtils.assertLogContains(13, "prepend 'QNM_'");
-		LoggerUtils.assertLogContains(14, "type\tcount");
-		LoggerUtils.assertLogContains(15, "\tA");
-		LoggerUtils.assertLogContains(16, "\n");
+		LoggerAsserts.assertLogContains(13, "prepend 'QNM_'");
+		LoggerAsserts.assertLogContains(14, "type\tcount");
+		LoggerAsserts.assertLogContains(15, "\tA");
+		LoggerAsserts.assertLogContains(16, "\n");
 
-		LoggerUtils.assertLogContains(17, "1$|$4\t1");
-		LoggerUtils.assertLogContains(18, "\t0.310");
-		LoggerUtils.assertLogContains(19, "\n");
+		LoggerAsserts.assertLogContains(17, "1$|$4\t1");
+		LoggerAsserts.assertLogContains(18, "\t0.310");
+		LoggerAsserts.assertLogContains(19, "\n");
 
-		LoggerUtils.assertLogContains(20, "2$|$4\t1");
-		LoggerUtils.assertLogContains(21, "\t0.320");
-		LoggerUtils.assertLogContains(22, "\n");
-		LoggerUtils.assertLogContains(23, "3$|$4\t1");
-		LoggerUtils.assertLogContains(24, "\t0.330");
-		LoggerUtils.assertLogContains(25, "\n");
+		LoggerAsserts.assertLogContains(20, "2$|$4\t1");
+		LoggerAsserts.assertLogContains(21, "\t0.320");
+		LoggerAsserts.assertLogContains(22, "\n");
+		LoggerAsserts.assertLogContains(23, "3$|$4\t1");
+		LoggerAsserts.assertLogContains(24, "\t0.330");
+		LoggerAsserts.assertLogContains(25, "\n");
 	}
 
 	@Test
@@ -165,13 +165,13 @@ public class QueryTypeProviderTest {
 		Logger.clearLog();
 		sut.logResults();
 
-		LoggerUtils.assertLogContains(0, "prepend 'Q0_'");
-		LoggerUtils.assertLogContains(1, "type\tcount");
-		LoggerUtils.assertLogContains(3, "0$|$7+\t1");
+		LoggerAsserts.assertLogContains(0, "prepend 'Q0_'");
+		LoggerAsserts.assertLogContains(1, "type\tcount");
+		LoggerAsserts.assertLogContains(3, "0$|$7+\t1");
 
-		LoggerUtils.assertLogContains(5, "prepend 'QNM_'");
-		LoggerUtils.assertLogContains(6, "type\tcount");
-		LoggerUtils.assertLogContains(8, "*$|$7+\t1");
+		LoggerAsserts.assertLogContains(5, "prepend 'QNM_'");
+		LoggerAsserts.assertLogContains(6, "type\tcount");
+		LoggerAsserts.assertLogContains(8, "*$|$7+\t1");
 	}
 
 	private QueryTypeTask newTask(String app) {

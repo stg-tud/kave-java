@@ -33,10 +33,10 @@ import org.mockito.MockitoAnnotations;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cc.recommenders.io.Directory;
+import cc.kave.commons.utils.io.Directory;
+import cc.kave.commons.utils.io.NestedZipFolders;
+import cc.kave.commons.utils.io.WritingArchive;
 import cc.recommenders.io.IoUtils;
-import cc.recommenders.io.NestedZipFolders;
-import cc.recommenders.io.WritingArchive;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.names.ICoReTypeName;

@@ -21,8 +21,8 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.recommenders.evaluation.data.BoxplotData;
-import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;
 import cc.recommenders.usages.Usage;

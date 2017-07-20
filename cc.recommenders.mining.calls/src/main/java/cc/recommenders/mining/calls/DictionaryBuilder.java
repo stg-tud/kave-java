@@ -12,8 +12,8 @@ package cc.recommenders.mining.calls;
 
 import java.util.Collection;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.features.FeatureExtractor;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;

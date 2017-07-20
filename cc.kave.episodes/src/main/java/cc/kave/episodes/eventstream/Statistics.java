@@ -5,9 +5,9 @@ import java.util.Set;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.model.events.Event;
 import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 

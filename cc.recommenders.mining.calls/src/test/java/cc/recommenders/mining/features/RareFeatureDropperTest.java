@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
-import cc.recommenders.utils.dictionary.Dictionary;
+import cc.recommenders.datastructures.Dictionary;
 
 import com.google.common.collect.Lists;
 

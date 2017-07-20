@@ -24,8 +24,8 @@ import com.google.common.collect.Lists;
 
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.utils.json.JsonUtils;
-import cc.recommenders.io.ReadingArchive;
+import cc.kave.commons.utils.io.ReadingArchive;
+import cc.kave.commons.utils.io.json.JsonUtils;
 
 /**
  * This class contains several code examples that explain how to read enriched

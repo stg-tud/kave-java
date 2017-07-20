@@ -22,8 +22,8 @@ import org.apache.mahout.clustering.kmeans.Cluster;
 import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.math.Vector;
 
+import cc.recommenders.datastructures.Dictionary;
 import cc.recommenders.mining.calls.Pattern;
-import cc.recommenders.utils.dictionary.Dictionary;
 
 public class CombinedKmeansAndCanopyClusteredPatternFinder<Feature> extends ClusteredPatternFinder<Feature> {
 

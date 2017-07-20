@@ -23,9 +23,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import cc.kave.commons.utils.io.Logger;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
-import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
