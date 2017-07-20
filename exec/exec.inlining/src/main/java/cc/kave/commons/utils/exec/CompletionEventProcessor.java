@@ -30,8 +30,9 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.events.completionevents.ICompletionEvent;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.utils.zip.ZipReader;
-import cc.kave.commons.utils.zip.ZipWriter;
+import cc.recommenders.io.IWritingArchive;
+import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.WritingArchive;
 
 public class CompletionEventProcessor {
 
@@ -87,20 +88,21 @@ public class CompletionEventProcessor {
 
 	private List<CompletionEvent> read(String inZip) {
 		List<CompletionEvent> events = Lists.newLinkedList();
-		ZipReader r = new ZipReader(inZip);
-		while (r.hasNext()) {
-			CompletionEvent e = (CompletionEvent) r.getNext(ICompletionEvent.class);
-			events.add(e);
+		try (ReadingArchive ra = new ReadingArchive(new File(inZip))) {
+			while (ra.hasNext()) {
+				CompletionEvent e = (CompletionEvent) ra.getNext(ICompletionEvent.class);
+				events.add(e);
+			}
 		}
 		return events;
 	}
 
 	private void write(List<CompletionEvent> outEvents, String outZip) {
-		ZipWriter w = new ZipWriter(outZip);
-		for (CompletionEvent e : outEvents) {
-			w.add(e, ICompletionEvent.class);
+		try (IWritingArchive w = new WritingArchive(new File(outZip))) {
+			for (CompletionEvent e : outEvents) {
+				w.add(e);
+			}
 		}
-		w.dispose();
 	}
 
 	private void inline(CompletionEvent orig) {

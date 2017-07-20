@@ -29,8 +29,10 @@ import cc.kave.commons.assertions.Asserts;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.utils.zip.ZipReader;
-import cc.kave.commons.utils.zip.ZipWriter;
+import cc.recommenders.io.IReadingArchive;
+import cc.recommenders.io.IWritingArchive;
+import cc.recommenders.io.ReadingArchive;
+import cc.recommenders.io.WritingArchive;
 
 public class ContextBatchInlining {
 
@@ -58,32 +60,33 @@ public class ContextBatchInlining {
 		int zipIndex = 1;
 		for (String zipFile : zipFiles) {
 			log("Reading Zip %d/%d, %s ", zipIndex++, zipFiles.size(), zipFile);
-			ZipReader reader = new ZipReader(zipFile);
-			String outFile = getOutName(zipFile);
-			List<Context> contexts = reader.getAll(Context.class);
-			List<Context> inlinedContexts = new ArrayList<>();
-			int index = 1;
-			log("Inlining %d Contexts: ", contexts.size());
-			log("");
-			for (Context context : contexts) {
-				if (context != null && !isIgnored(zipIndex, index)) {
-					append(" %d ", index);
-					inlinedContexts.add(inline(context));
-				} else if (context != null && isIgnored(zipIndex, index)) {
-					inlinedContexts.add(context);
+			try (IReadingArchive reader = new ReadingArchive(new File(zipFile))) {
+				String outFile = getOutName(zipFile);
+				List<Context> contexts = reader.getAll(Context.class);
+				List<Context> inlinedContexts = new ArrayList<>();
+				int index = 1;
+				log("Inlining %d Contexts: ", contexts.size());
+				log("");
+				for (Context context : contexts) {
+					if (context != null && !isIgnored(zipIndex, index)) {
+						append(" %d ", index);
+						inlinedContexts.add(inline(context));
+					} else if (context != null && isIgnored(zipIndex, index)) {
+						inlinedContexts.add(context);
+					}
+					index++;
+					if (index % 10 == 0) {
+						append("\n");
+					}
 				}
-				index++;
-				if (index % 10 == 0) {
-					append("\n");
+				log("Writing to %s", outFile);
+				try (IWritingArchive wa = new WritingArchive(new File(outFile))) {
+					for (Context context : inlinedContexts) {
+						wa.add(context);
+					}
 				}
+				log("####################\n");
 			}
-			log("Writing to %s", outFile);
-			ZipWriter writer = new ZipWriter(outFile);
-			for (Context context : inlinedContexts) {
-				writer.add(context, Context.class);
-			}
-			writer.dispose();
-			log("####################\n");
 		}
 	}
 
