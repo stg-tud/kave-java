@@ -37,13 +37,14 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.utils.LocaleUtils;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
-import cc.recommenders.utils.LocaleUtils;
+
 import static cc.recommenders.io.LoggerUtils.assertLogContains;
 
 public class EventStreamIoTest {

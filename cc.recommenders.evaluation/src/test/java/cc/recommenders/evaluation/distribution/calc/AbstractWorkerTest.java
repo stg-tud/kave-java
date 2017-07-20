@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import cc.kave.commons.utils.Timer;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.evaluation.queries.QueryBuilder;
@@ -42,7 +43,6 @@ import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.Timer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

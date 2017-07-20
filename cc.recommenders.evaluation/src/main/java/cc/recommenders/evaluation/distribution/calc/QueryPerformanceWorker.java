@@ -14,13 +14,13 @@ import static cc.recommenders.collections.SublistSelector.pickRandomSublist;
 
 import java.util.List;
 
+import cc.kave.commons.utils.Timer;
 import cc.recommenders.collections.SublistSelector;
 import cc.recommenders.io.Logger;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.Timer;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;

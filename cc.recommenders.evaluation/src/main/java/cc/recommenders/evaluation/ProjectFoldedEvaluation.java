@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cc.kave.commons.utils.DateProvider;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.DateProvider;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Maps;

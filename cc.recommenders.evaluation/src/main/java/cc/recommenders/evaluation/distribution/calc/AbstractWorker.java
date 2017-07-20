@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import cc.kave.commons.utils.Timer;
 import cc.recommenders.evaluation.io.ProjectFoldedUsageStore;
 import cc.recommenders.evaluation.io.TypeStore;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
@@ -25,7 +26,6 @@ import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.Timer;
 
 import com.google.inject.Inject;
 

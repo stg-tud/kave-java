@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.utils.LocaleUtils;
+import cc.kave.commons.utils.LocaleUtils;
 
 public class BoxplotTest {
 

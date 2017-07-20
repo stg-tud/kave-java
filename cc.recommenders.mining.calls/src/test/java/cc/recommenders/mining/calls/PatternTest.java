@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import cc.recommenders.utils.LocaleUtils;
+import cc.kave.commons.utils.LocaleUtils;
 
 public class PatternTest {
 

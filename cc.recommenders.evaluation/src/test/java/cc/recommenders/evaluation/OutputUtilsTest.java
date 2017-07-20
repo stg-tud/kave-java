@@ -25,9 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
+import cc.kave.commons.utils.DateProvider;
 import cc.recommenders.io.Logger;
 import cc.recommenders.names.CoReTypeName;
-import cc.recommenders.utils.DateProvider;
 
 import com.google.common.collect.Maps;
 

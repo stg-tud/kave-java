@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
-import cc.recommenders.utils.LocaleUtils;
+import cc.kave.commons.utils.LocaleUtils;
 
 import com.google.common.collect.Lists;
 

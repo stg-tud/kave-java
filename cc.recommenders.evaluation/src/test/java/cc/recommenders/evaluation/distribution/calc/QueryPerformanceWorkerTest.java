@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 
+import cc.kave.commons.utils.Timer;
 import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.io.Logger;
@@ -35,7 +36,6 @@ import cc.recommenders.mining.calls.Miner;
 import cc.recommenders.mining.calls.MinerFactory;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
-import cc.recommenders.utils.Timer;
 
 import com.google.common.collect.Lists;
 

@@ -31,9 +31,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import cc.kave.commons.utils.LocaleUtils;
 import cc.recommenders.mining.calls.MiningOptions;
 import cc.recommenders.mining.calls.QueryOptions;
-import cc.recommenders.utils.LocaleUtils;
 
 
 public class VectorTest {
