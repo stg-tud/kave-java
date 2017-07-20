@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import cc.recommenders.evaluation.OptionsUtils.OptionsBuilder;
 import cc.kave.commons.utils.io.Logger;
-import cc.kave.commons.utils.io.LoggerAsserts;
+import cc.kave.testcommons.LoggerAsserts;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.Boxplot;
 import cc.recommenders.evaluation.data.BoxplotData;

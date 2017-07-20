@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cc.kave.testcommons.ToStringAssert;
+import cc.kave.commons.testing.ToStringAsserts;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
@@ -200,7 +200,7 @@ public class QueryTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.assertToStringUtils(new Query());
+		ToStringAsserts.assertToStringUtils(new Query());
 	}
 
 	private static CallSite createReceiverCallSite() {

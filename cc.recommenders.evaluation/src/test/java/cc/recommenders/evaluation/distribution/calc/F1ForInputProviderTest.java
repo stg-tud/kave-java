@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
+import static cc.kave.testcommons.LoggerAsserts.assertLogContains;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
 import static org.junit.Assert.assertArrayEquals;

@@ -25,11 +25,11 @@ import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.testing.ToStringAsserts;
 import cc.recommenders.names.CoReMethodName;
 import cc.recommenders.names.CoReTypeName;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
-import cc.kave.testcommons.ToStringAssert;
 import cc.recommenders.usages.NoUsage;
 import cc.recommenders.usages.Query;
 import cc.recommenders.usages.Usage;
@@ -196,6 +196,6 @@ public class MicroCommitTest {
 
 	@Test
 	public void toStringIsImplemented() {
-		ToStringAssert.assertToStringUtils(new MicroCommit());
+		ToStringAsserts.assertToStringUtils(new MicroCommit());
 	}
 }

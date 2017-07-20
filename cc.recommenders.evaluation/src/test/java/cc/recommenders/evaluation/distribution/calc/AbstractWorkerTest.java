@@ -10,7 +10,7 @@
  */
 package cc.recommenders.evaluation.distribution.calc;
 
-import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
+import static cc.kave.testcommons.LoggerAsserts.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;

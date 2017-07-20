@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.utils.io.Logger;
-import cc.kave.commons.utils.io.LoggerAsserts;
+import cc.kave.testcommons.LoggerAsserts;
 import cc.recommenders.evaluation.evaluators.F1Evaluator;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.Miner;

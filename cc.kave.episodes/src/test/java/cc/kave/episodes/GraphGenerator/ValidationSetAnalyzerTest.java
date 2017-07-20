@@ -15,7 +15,7 @@
  */
 package cc.kave.episodes.GraphGenerator;
 
-import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
+import static cc.kave.testcommons.LoggerAsserts.assertLogContains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

@@ -11,7 +11,7 @@
 package cc.recommenders.evaluation.distribution.calc;
 
 import static cc.kave.commons.assertions.Asserts.assertNotNull;
-import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
+import static cc.kave.testcommons.LoggerAsserts.assertLogContains;
 import static cc.recommenders.evaluation.OptionsUtils.bmn;
 import static cc.recommenders.evaluation.OptionsUtils.pbn;
 import static cc.recommenders.evaluation.distribution.calc.F1ForInputSeveralProvider.TYPES;
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cc.kave.commons.utils.io.Logger;
-import cc.kave.commons.utils.io.LoggerAsserts;
+import cc.kave.testcommons.LoggerAsserts;
 import cc.recommenders.datastructures.Map2D;
 import cc.recommenders.evaluation.OutputUtils;
 import cc.recommenders.evaluation.data.BoxplotData;

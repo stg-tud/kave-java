@@ -1,6 +1,6 @@
 package cc.kave.episodes.eventstream;
 
-import static cc.kave.commons.utils.io.LoggerAsserts.assertLogContains;
+import static cc.kave.testcommons.LoggerAsserts.assertLogContains;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;

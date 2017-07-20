@@ -28,7 +28,7 @@ import org.mockito.Mock;
 
 import cc.kave.commons.utils.Timer;
 import cc.kave.commons.utils.io.Logger;
-import cc.kave.commons.utils.io.LoggerAsserts;
+import cc.kave.testcommons.LoggerAsserts;
 import cc.recommenders.evaluation.queries.QueryBuilder;
 import cc.recommenders.evaluation.queries.QueryBuilderFactory;
 import cc.recommenders.mining.calls.ICallsRecommender;
