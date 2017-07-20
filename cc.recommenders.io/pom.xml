@@ -17,11 +17,6 @@
 			<version>14.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>kave-java</groupId>
-			<artifactId>cc.recommenders.utils</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>

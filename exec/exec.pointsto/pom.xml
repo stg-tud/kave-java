@@ -14,12 +14,6 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- for serializing Usages -->
-		<dependency>
-			<groupId>kave-java</groupId>
-			<artifactId>cc.recommenders.utils</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 		<!-- for the evaluation -->
 		<dependency>
 			<groupId>kave-java</groupId>
