@@ -28,7 +28,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import cc.kave.commons.model.naming.IName;
-import cc.kave.commons.utils.naming.NameSerialization;
+import cc.kave.commons.utils.naming.serialization.NameSerialization;
 
 public class GsonNameDeserializer implements JsonDeserializer<IName>, JsonSerializer<IName> {
 
