@@ -37,7 +37,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpressi
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
-import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 

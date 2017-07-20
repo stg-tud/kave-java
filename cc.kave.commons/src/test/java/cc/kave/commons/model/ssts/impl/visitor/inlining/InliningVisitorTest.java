@@ -38,7 +38,7 @@ import cc.kave.commons.model.ssts.impl.expressions.assignable.UnaryExpression;
 import cc.kave.commons.model.ssts.impl.expressions.simple.UnknownExpression;
 import cc.kave.commons.model.ssts.impl.statements.BreakStatement;
 import cc.kave.commons.testutils.model.ssts.SSTFixture;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
+import cc.kave.commons.utils.ssts.SSTPrintingUtils;
 
 public class InliningVisitorTest extends InliningBaseTest {
 

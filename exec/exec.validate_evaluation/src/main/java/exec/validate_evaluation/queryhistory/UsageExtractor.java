@@ -24,7 +24,7 @@ import cc.kave.commons.pointsto.analysis.PointsToContext;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.TypeBasedAnalysis;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
-import cc.kave.commons.utils.SSTNodeHierarchy;
+import cc.kave.commons.utils.ssts.SSTNodeHierarchy;
 import cc.recommenders.usages.Usage;
 
 public class UsageExtractor implements IUsageExtractor {

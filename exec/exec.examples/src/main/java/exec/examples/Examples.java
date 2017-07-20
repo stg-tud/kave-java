@@ -42,7 +42,7 @@ import cc.kave.commons.pointsto.analysis.PointsToQuery;
 import cc.kave.commons.pointsto.analysis.PointsToQueryBuilder;
 import cc.kave.commons.pointsto.analysis.unification.UnificationAnalysis;
 import cc.kave.commons.utils.json.JsonUtils;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
+import cc.kave.commons.utils.ssts.SSTPrintingUtils;
 
 /**
  * This class contains several code examples that explain how to use our CARET

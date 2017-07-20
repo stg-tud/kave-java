@@ -98,7 +98,7 @@ import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IThrowStatement;
 import cc.kave.commons.model.ssts.statements.IUnknownStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.utils.SSTCloneUtil;
+import cc.kave.commons.utils.ssts.SSTCloneUtil;
 
 public class InliningVisitor extends AbstractThrowingNodeVisitor<InliningContext, Void> {
 

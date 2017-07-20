@@ -16,7 +16,7 @@ import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
 import cc.kave.commons.model.typeshapes.IMethodHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
-import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 

@@ -20,7 +20,7 @@ import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.visitor.ISSTNode;
 import cc.kave.commons.pointsto.analysis.exceptions.UnexpectedSSTNodeException;
-import cc.kave.commons.utils.SSTNodeHierarchy;
+import cc.kave.commons.utils.ssts.SSTNodeHierarchy;
 
 public class EnclosingNodeHelper {
 

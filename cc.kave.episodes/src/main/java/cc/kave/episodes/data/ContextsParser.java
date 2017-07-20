@@ -38,7 +38,7 @@ import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.eventstream.Filters;
 import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.eventstream.StreamFilterGenerator;

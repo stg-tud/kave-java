@@ -43,7 +43,7 @@ import cc.kave.commons.pointsto.analysis.utils.LanguageOptions;
 import cc.kave.commons.pointsto.analysis.utils.SSTBuilder;
 import cc.kave.commons.pointsto.statistics.NopUsageStatisticsCollector;
 import cc.kave.commons.pointsto.statistics.UsageStatisticsCollector;
-import cc.kave.commons.utils.SSTNodeHierarchy;
+import cc.kave.commons.utils.ssts.SSTNodeHierarchy;
 import cc.recommenders.names.ICoReMethodName;
 import cc.recommenders.names.ICoReTypeName;
 import cc.recommenders.usages.DefinitionSiteKind;

@@ -52,7 +52,7 @@ import cc.kave.commons.pointsto.evaluation.measures.AbstractMeasure;
 import cc.kave.commons.pointsto.extraction.CoReNameConverter;
 import cc.kave.commons.pointsto.extraction.PointsToUsageExtractor;
 import cc.kave.commons.pointsto.stores.UsageStore;
-import cc.kave.commons.utils.SSTNodeHierarchy;
+import cc.kave.commons.utils.ssts.SSTNodeHierarchy;
 import cc.recommenders.mining.calls.ICallsRecommender;
 import cc.recommenders.mining.calls.pbn.PBNMiner;
 import cc.recommenders.names.CoReNames;

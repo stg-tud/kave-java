@@ -26,7 +26,7 @@ import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
-import cc.kave.commons.utils.TypeErasure;
+import cc.kave.commons.utils.naming.TypeErasure;
 
 public class TypeErasureVisitor extends AbstractThrowingNodeVisitor<Object, Object> {
 

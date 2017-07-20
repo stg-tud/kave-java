@@ -20,7 +20,7 @@ import java.io.File;
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.utils.sstprinter.SSTPrintingUtils;
+import cc.kave.commons.utils.ssts.SSTPrintingUtils;
 import cc.recommenders.io.IReadingArchive;
 import cc.recommenders.io.ReadingArchive;
 

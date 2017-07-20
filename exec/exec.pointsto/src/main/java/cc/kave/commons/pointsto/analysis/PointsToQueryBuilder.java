@@ -20,7 +20,7 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.pointsto.analysis.types.TypeCollector;
 import cc.kave.commons.pointsto.analysis.utils.EnclosingNodeHelper;
-import cc.kave.commons.utils.SSTNodeHierarchy;
+import cc.kave.commons.utils.ssts.SSTNodeHierarchy;
 
 /**
  * A convenience class for building {@link PointsToQuery} objects for a
