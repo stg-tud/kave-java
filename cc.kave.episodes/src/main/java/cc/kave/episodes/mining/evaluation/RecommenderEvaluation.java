@@ -33,7 +33,7 @@ import org.apache.commons.math.util.MathUtils;
 import org.apache.mahout.math.Arrays;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Averager;
@@ -61,7 +61,7 @@ public class RecommenderEvaluation {
 	private EventStreamIo streamIo;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 	private TargetsCategorization categorizer;
 
@@ -80,7 +80,7 @@ public class RecommenderEvaluation {
 	@Inject
 	public RecommenderEvaluation(@Named("evaluation") File directory, ValidationContextsParser parser,
 			EventStreamIo streamIo, QueryStrategy queryGenerator, EpisodeRecommender recommender,
-			EpisodesReader episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
+			EpisodeReader episodeParser, MaximalEpisodes maxEpisodeTracker, TargetsCategorization categorizer) {
 
 		assertTrue(directory.exists(), "Evaluations folder does not exist");
 		assertTrue(directory.isDirectory(), "Evaluations folder is not a folder, but a file");
@@ -301,7 +301,7 @@ public class RecommenderEvaluation {
 
 	private Map<Integer, Set<Episode>> readPatterns() {
 		Logger.log("Reading the learned patterns");
-		Map<Integer, Set<Episode>> patterns = episodeParser.parse(100);
+		Map<Integer, Set<Episode>> patterns = episodeParser.read(100);
 		Map<Integer, Set<Episode>> maxPatterns = maxEpisodeTracker.getMaximalEpisodes(patterns);
 		return maxPatterns;
 	}

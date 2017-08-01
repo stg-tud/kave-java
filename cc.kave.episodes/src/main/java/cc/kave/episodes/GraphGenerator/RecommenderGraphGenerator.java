@@ -20,7 +20,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
@@ -43,7 +43,7 @@ public class RecommenderGraphGenerator {
 	private EpisodeAsGraphWriter writer;
 	private QueryStrategy queryGenerator;
 	private EpisodeRecommender recommender;
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	private MaximalEpisodes maxEpisodeTracker;
 
 	private File rootFolder;
@@ -53,7 +53,7 @@ public class RecommenderGraphGenerator {
 			EventStreamIo streamIo,  TransClosedEpisodes transitivityClosure, 
 			EpisodeAsGraphWriter writer, EpisodeToGraphConverter graphConverter,
 			QueryStrategy queryGenerator, EpisodeRecommender recommender, 
-			EpisodesReader episodeParser, MaximalEpisodes maxEpisodeTracker) {
+			EpisodeReader episodeParser, MaximalEpisodes maxEpisodeTracker) {
 
 		assertTrue(directory.exists(), "Validation data folder does not exist");
 		assertTrue(directory.isDirectory(), "Validation data folder is not a folder, but a file");

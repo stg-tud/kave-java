@@ -45,7 +45,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.ValidationContextsParser;
 import cc.kave.episodes.model.Episode;
@@ -70,7 +70,7 @@ public class RecommenderEvaluationTest {
 	@Mock
 	private EventStreamIo pisodePa;
 	@Mock
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	@Mock
 	private MaximalEpisodes maxEpisodeTracker;
 	@Mock
@@ -146,7 +146,7 @@ public class RecommenderEvaluationTest {
 
 		when(categorizer.categorize(validationData)).thenReturn(categories);
 
-		when(episodeParser.parse(anyInt())).thenReturn(patterns);
+		when(episodeParser.read(anyInt())).thenReturn(patterns);
 		when(pisodePa.readMapping(FREQUENCY)).thenReturn(events);
 		when(validationParser.parse(events)).thenReturn(validationData);
 		when(maxEpisodeTracker.getMaximalEpisodes(patterns)).thenReturn(maxPatterns);
@@ -180,7 +180,7 @@ public class RecommenderEvaluationTest {
 		Logger.clearLog();
 		sut.evaluate(REPOS);
 
-		verify(episodeParser).parse(anyInt());
+		verify(episodeParser).read(anyInt());
 		verify(pisodePa).readMapping(FREQUENCY);
 		verify(validationParser).parse(events);
 		verify(maxEpisodeTracker).getMaximalEpisodes(patterns);

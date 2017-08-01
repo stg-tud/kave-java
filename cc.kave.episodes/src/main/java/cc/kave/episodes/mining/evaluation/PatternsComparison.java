@@ -15,7 +15,7 @@ import javax.inject.Named;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -37,7 +37,7 @@ public class PatternsComparison {
 
 	private EventStreamIo eventStream;
 
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	private EpisodesFilter episodeFilter;
 	private TransClosedEpisodes transClosure;
 
@@ -49,7 +49,7 @@ public class PatternsComparison {
 
 	@Inject
 	public PatternsComparison(@Named("patterns") File folder,
-			EventStreamIo streamIo, EpisodesReader parser,
+			EventStreamIo streamIo, EpisodeReader parser,
 			EpisodesFilter filter, TransClosedEpisodes transClosed,
 			EpisodeToGraphConverter graphConverter,
 			EpisodeAsGraphWriter graphWriter) {
@@ -87,7 +87,7 @@ public class PatternsComparison {
 
 	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
 			int frequency) {
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodes = episodeParser.read(frequency);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
 				episodes, THRESHFREQ, THRESHENT);
 		return patterns;
@@ -146,7 +146,7 @@ public class PatternsComparison {
 		Logger.log("\tThreshold analyzes for partial-order configuration!");
 		Logger.log("\tFrequency\tEntropy\t#Patterns");
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.read(frequency);
 		Set<Integer> frequencies = getFrequencies(episodeGens);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -169,7 +169,7 @@ public class PatternsComparison {
 		Logger.log("\tEntropy analyzes for partial-order configuration!");
 		Logger.log("\tFrequency\tEntropy\t#Patterns");
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.read(frequency);
 		Set<Integer> frequencies = getFrequencies(episodeGens);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -229,7 +229,7 @@ public class PatternsComparison {
 	// }
 
 	public void createHistogram(EpisodeType type, int foldNum, int frequency) {
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodes = episodeParser.read(frequency);
 		Set<Integer> frequencies = getFrequencies(episodes);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -298,7 +298,7 @@ public class PatternsComparison {
 		// Map<Integer, Set<Episode>> patternsPars = getPatterns(
 		// EpisodeType.PARALLEL, foldNum, frequency);
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.read(frequency);
 
 		for (double entropy = 0.0; entropy <= 1.0; entropy += 0.01) {
 			Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(

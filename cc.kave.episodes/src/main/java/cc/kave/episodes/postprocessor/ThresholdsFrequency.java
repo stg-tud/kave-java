@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
@@ -36,12 +36,12 @@ import cc.recommenders.io.Logger;
 public class ThresholdsFrequency {
 
 	private File patternsFolder;
-	private EpisodesReader parser;
+	private EpisodeReader parser;
 	private EpisodesStatistics statistics;
 
 	@Inject
 	public ThresholdsFrequency(@Named("patterns") File folder,
-			EpisodesReader parse, EpisodesStatistics stats) {
+			EpisodeReader parse, EpisodesStatistics stats) {
 		assertTrue(folder.exists(), "Patterns folder does not exist");
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFolder = folder;
@@ -51,7 +51,7 @@ public class ThresholdsFrequency {
 
 	public void writer(EpisodeType episodeType, int frequency, int foldNum)
 			throws IOException {
-		Map<Integer, Set<Episode>> episodes = parser.parse(frequency);
+		Map<Integer, Set<Episode>> episodes = parser.read(frequency);
 		StringBuilder freqsBuilder = new StringBuilder();
 
 		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {

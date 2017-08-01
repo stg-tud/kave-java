@@ -41,7 +41,7 @@ import org.mockito.Mock;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -70,7 +70,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private static final int REPOS = 2;
 
 	@Mock
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	@Mock
 	private EventStreamIo streamIo;
 	@Mock
@@ -104,7 +104,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
-		when(episodeParser.parse(anyInt())).thenReturn(episodes);
+		when(episodeParser.read(anyInt())).thenReturn(episodes);
 		when(streamIo.readMapping(FREQ)).thenReturn(events);
 	}
 

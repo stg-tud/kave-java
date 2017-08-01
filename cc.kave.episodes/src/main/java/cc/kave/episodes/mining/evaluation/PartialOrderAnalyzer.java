@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.postprocessor.EpisodesFilter;
@@ -19,12 +19,12 @@ import com.google.inject.name.Named;
 public class PartialOrderAnalyzer {
 
 	private File eventsFolder;
-	private EpisodesReader parser;
+	private EpisodeReader parser;
 	private EpisodesFilter processor;
 
 	@Inject
 	public PartialOrderAnalyzer(@Named("events") File folder,
-			EpisodesReader parser, EpisodesFilter processor) {
+			EpisodeReader parser, EpisodesFilter processor) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsFolder = folder;
@@ -33,7 +33,7 @@ public class PartialOrderAnalyzer {
 	}
 
 	public void analyze(int foldNum, int frequency, double entropy) {
-		Map<Integer, Set<Episode>> episodes = parser.parse(frequency);
+		Map<Integer, Set<Episode>> episodes = parser.read(frequency);
 //		Map<Integer, Set<Episode>> patterns = processor.filter(episodes, frequency, entropy);
 		
 		Logger.log("Number of Nodes\tPartial\tSequential\tParallel");

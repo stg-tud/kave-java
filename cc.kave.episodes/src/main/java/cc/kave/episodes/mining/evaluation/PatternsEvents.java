@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -22,11 +22,11 @@ import com.google.common.collect.Sets;
 public class PatternsEvents {
 
 	private EventStreamIo eventsStream;
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	private EpisodesFilter episodeFilter;
 
 	@Inject
-	public PatternsEvents(EventStreamIo eventsIo, EpisodesReader parser,
+	public PatternsEvents(EventStreamIo eventsIo, EpisodeReader parser,
 			EpisodesFilter filter) {
 		this.eventsStream = eventsIo;
 		this.episodeParser = parser;
@@ -36,7 +36,7 @@ public class PatternsEvents {
 	public void getEventsType(EpisodeType type, int frequency, double entropy,
 			int foldNum) {
 		List<Event> events = eventsStream.readMapping(frequency);
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
+		Map<Integer, Set<Episode>> episodes = episodeParser.read(frequency);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
 				episodes, frequency, entropy);
 

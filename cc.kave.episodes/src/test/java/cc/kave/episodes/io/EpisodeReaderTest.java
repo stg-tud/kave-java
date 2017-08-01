@@ -35,7 +35,7 @@ import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 
-public class EpisodesReaderTest {
+public class EpisodeReaderTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -47,7 +47,7 @@ public class EpisodesReaderTest {
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
 	private Set<Episode> episodes;
-	private EpisodesReader sut;
+	private EpisodeReader sut;
 
 	@Before
 	public void setup() {
@@ -56,14 +56,14 @@ public class EpisodesReaderTest {
 		expected = new HashMap<Integer, Set<Episode>>();
 		episodes = Sets.newHashSet();
 
-		sut = new EpisodesReader(rootFolder.getRoot(), reader);
+		sut = new EpisodeReader(rootFolder.getRoot(), reader);
 	}
 
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events folder does not exist");
-		sut = new EpisodesReader(new File("does not exist"), reader);
+		sut = new EpisodeReader(new File("does not exist"), reader);
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class EpisodesReaderTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events is not a folder, but a file");
-		sut = new EpisodesReader(file, reader);
+		sut = new EpisodeReader(file, reader);
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class EpisodesReaderTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
+		Map<Integer, Set<Episode>> actual = sut.read(FREQUENCY);
 
 		verify(reader).readFile(file);
 
@@ -130,7 +130,7 @@ public class EpisodesReaderTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
+		Map<Integer, Set<Episode>> actual = sut.read(FREQUENCY);
 
 		verify(reader).readFile(file);
 
@@ -174,7 +174,7 @@ public class EpisodesReaderTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
+		Map<Integer, Set<Episode>> actual = sut.read(FREQUENCY);
 
 		verify(reader).readFile(file);
 

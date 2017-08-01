@@ -14,7 +14,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodesReader;
+import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.evaluation.EpisodeRecommender;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -26,7 +26,7 @@ import com.google.inject.name.Named;
 
 public class Suggestions {
 
-	private EpisodesReader episodeParser;
+	private EpisodeReader episodeParser;
 	private MaximalEpisodes maximalEpisodes;
 	private TransClosedEpisodes transitivityClosure;
 	private EventStreamIo streamIo;
@@ -37,7 +37,7 @@ public class Suggestions {
 	private File rootFolder;
 
 	@Inject
-	public Suggestions(@Named("graph") File directory, EpisodesReader episodeParser, MaximalEpisodes maximalEpisodes,
+	public Suggestions(@Named("graph") File directory, EpisodeReader episodeParser, MaximalEpisodes maximalEpisodes,
 			TransClosedEpisodes transitivityClosure, EventStreamIo streamIo,
 			EpisodeRecommender recommender, EpisodeToGraphConverter graphConverter, EpisodeAsGraphWriter graphWriter) {
 		this.rootFolder = directory;
