@@ -20,6 +20,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,8 +31,10 @@ import org.apache.commons.io.FileUtils;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
@@ -77,14 +80,38 @@ public class EventStreamIo {
 		return stream;
 	}
 
+	public List<List<Fact>> parseStream(int frequency) throws IOException {
+		String streamText = readStreamText(frequency);
+		String[] streamLines = streamText.split("\n");
+
+		List<List<Fact>> stream = Lists.newLinkedList();
+		List<Fact> method = Lists.newLinkedList();
+
+		double timer = -1;
+
+		for (String line : streamLines) {
+			String[] eventTime = line.split(",");
+			int eventID = Integer.parseInt(eventTime[0]);
+			double timestamp = Double.parseDouble(eventTime[1]);
+			if ((timer != -1) && ((timestamp - timer) >= 5.0)) {
+				stream.add(method);
+				method = new LinkedList<Fact>();
+			}
+			timer = timestamp;
+			method.add(new Fact(eventID));
+		}
+		stream.add(method);
+		return stream;
+	}
+
 	public void streamStats(int frequency) throws IOException {
 		String stream = readStreamText(frequency);
 		List<Event> events = readMapping(frequency);
-		
+
 		Set<Event> ctxFirst = Sets.newHashSet();
 		Set<Event> ctxSuper = Sets.newHashSet();
 		Set<Event> invs = Sets.newHashSet();
-		
+
 		int numFirst = 0;
 		int numSuper = 0;
 		int numInvs = 0;
@@ -94,7 +121,7 @@ public class EventStreamIo {
 			String[] eventTime = line.split(",");
 			int eventID = Integer.parseInt(eventTime[0]);
 			Event event = events.get(eventID);
-			
+
 			switch (event.getKind()) {
 			case FIRST_DECLARATION:
 				ctxFirst.add(event);

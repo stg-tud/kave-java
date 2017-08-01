@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.io;
 
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +26,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,19 +34,18 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import com.google.common.collect.Lists;
-
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-import cc.recommenders.datastructures.Tuple;
+import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
-import static cc.recommenders.io.LoggerUtils.assertLogContains;
+
+import com.google.common.collect.Lists;
 
 public class EventStreamIoTest {
 
@@ -64,7 +65,7 @@ public class EventStreamIoTest {
 	private File streamTextFile;
 	
 	private EventStream eventStream;
-
+	
 	private EventStreamIo sut;
 
 	@Before
@@ -112,16 +113,44 @@ public class EventStreamIoTest {
 
 	@Test
 	public void invalidMethodCtx() throws IOException {
-		String expected = "";
-		expected += "1,0.000\n2,0.001\n";
-		expected += "3,5.002\n";
-		expected += "2,15.003\n3,15.004\n";
+		String stream = "";
+		stream += "1,0.000\n2,0.001\n";
+		stream += "3,5.002\n";
+		stream += "2,15.003\n3,15.004\n";
 
-		JsonUtils.toJson(expected, getStreamTextFile());
+		JsonUtils.toJson(stream, getStreamTextFile());
+		
+		String expected = FileUtils.readFileToString(getStreamTextFile());
 
 		String actuals = sut.readStreamText(FREQUENCY);
 
-		assertEquals(actuals, actuals);
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void streamParserTest() throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append("1,0.000");
+		sb.append("\n");
+		sb.append("2,0.001");
+		sb.append("\n");
+		sb.append("3,5.002");
+		sb.append("\n");
+		sb.append("2,15.003");
+		sb.append("\n");
+		sb.append("3,15.004");
+		sb.append("\n");
+		
+		FileUtils.writeStringToFile(getStreamTextFile(), sb.toString());
+		
+		List<List<Fact>> expected = Lists.newLinkedList();
+		expected.add(Lists.newArrayList(new Fact(1), new Fact(2)));
+		expected.add(Lists.newArrayList(new Fact(3)));
+		expected.add(Lists.newArrayList(new Fact(2), new Fact(3)));
+
+		List<List<Fact>> actuals = sut.parseStream(FREQUENCY);
+
+		assertEquals(expected, actuals);
 	}
 
 	@Test
