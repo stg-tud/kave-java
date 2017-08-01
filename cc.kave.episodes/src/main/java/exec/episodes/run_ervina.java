@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.eventstream.PartitionStream;
 import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
@@ -51,7 +52,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(Preprocessing.class).run(FREQUENCY);
+//		load(Preprocessing.class).run(FREQUENCY);
+		load(PartitionStream.class).partition(FREQUENCY);
 		
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
 		// load(PreChecking.class).reposInfo();
