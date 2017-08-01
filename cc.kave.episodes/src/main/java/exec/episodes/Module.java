@@ -21,7 +21,7 @@ import java.util.Map;
 import cc.kave.episodes.GraphGenerator.TrainingDataGraphGenerator;
 import cc.kave.episodes.GraphGenerator.ValidationDataGraphGenerator;
 import cc.kave.episodes.evaluation.queries.QueryStrategy;
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.io.ValidationContextsParser;
@@ -87,7 +87,7 @@ public class Module extends AbstractModule {
 		bind(ValidationContextsParser.class).toInstance(new ValidationContextsParser(vcr));
 
 		FileReader reader = new FileReader();
-		EpisodesParser episodeParser = new EpisodesParser(eventsData, reader);
+		EpisodesReader episodeParser = new EpisodesReader(eventsData, reader);
 		MaximalEpisodes episodeLearned = new MaximalEpisodes();
 		EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 		EpisodeAsGraphWriter graphWriter = new EpisodeAsGraphWriter();

@@ -26,13 +26,12 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
@@ -51,7 +50,7 @@ public class SampleCodeMatcher {
 		this.rootFolder = folder;
 	}
 	private FileReader reader = new FileReader();
-	private EpisodesParser epParser = new EpisodesParser(rootFolder, reader);
+	private EpisodesReader epParser = new EpisodesReader(rootFolder, reader);
 	private EventStreamIo streamIo = new EventStreamIo(rootFolder);
 	private EpisodeToGraphConverter graphConverter = new EpisodeToGraphConverter();
 	private TransClosedEpisodes transitivity = new TransClosedEpisodes();
@@ -62,7 +61,7 @@ public class SampleCodeMatcher {
 //		Set<String> types = Sets.newHashSet();
 //		types.add("ArrayList");
 		
-		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(EpisodeType.GENERAL, frequency, 0);
+		Map<Integer, Set<Episode>> allEpisodes = epParser.parse(frequency);
 		List<Event> mapper = streamIo.readMapping(frequency);
 		
 		int nodeLevel = allEpisodes.size() - 1;

@@ -15,7 +15,7 @@ import javax.inject.Named;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
@@ -37,7 +37,7 @@ public class PatternsComparison {
 
 	private EventStreamIo eventStream;
 
-	private EpisodesParser episodeParser;
+	private EpisodesReader episodeParser;
 	private EpisodesFilter episodeFilter;
 	private TransClosedEpisodes transClosure;
 
@@ -49,7 +49,7 @@ public class PatternsComparison {
 
 	@Inject
 	public PatternsComparison(@Named("patterns") File folder,
-			EventStreamIo streamIo, EpisodesParser parser,
+			EventStreamIo streamIo, EpisodesReader parser,
 			EpisodesFilter filter, TransClosedEpisodes transClosed,
 			EpisodeToGraphConverter graphConverter,
 			EpisodeAsGraphWriter graphWriter) {
@@ -87,8 +87,7 @@ public class PatternsComparison {
 
 	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
 			int frequency) {
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				frequency, 0);
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
 				episodes, THRESHFREQ, THRESHENT);
 		return patterns;
@@ -147,8 +146,7 @@ public class PatternsComparison {
 		Logger.log("\tThreshold analyzes for partial-order configuration!");
 		Logger.log("\tFrequency\tEntropy\t#Patterns");
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
-				EpisodeType.GENERAL, frequency, foldNum);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
 		Set<Integer> frequencies = getFrequencies(episodeGens);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -171,8 +169,7 @@ public class PatternsComparison {
 		Logger.log("\tEntropy analyzes for partial-order configuration!");
 		Logger.log("\tFrequency\tEntropy\t#Patterns");
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
-				EpisodeType.GENERAL, frequency, foldNum);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
 		Set<Integer> frequencies = getFrequencies(episodeGens);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -232,8 +229,7 @@ public class PatternsComparison {
 	// }
 
 	public void createHistogram(EpisodeType type, int foldNum, int frequency) {
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				frequency, foldNum);
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
 		Set<Integer> frequencies = getFrequencies(episodes);
 		int maxFreq = getMax(frequencies);
 		int prevValue = 0;
@@ -302,8 +298,7 @@ public class PatternsComparison {
 		// Map<Integer, Set<Episode>> patternsPars = getPatterns(
 		// EpisodeType.PARALLEL, foldNum, frequency);
 
-		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(
-				EpisodeType.GENERAL, frequency, foldNum);
+		Map<Integer, Set<Episode>> episodeGens = episodeParser.parse(frequency);
 
 		for (double entropy = 0.0; entropy <= 1.0; entropy += 0.01) {
 			Map<Integer, Set<Episode>> patternGens = episodeFilter.filter(
@@ -481,50 +476,50 @@ public class PatternsComparison {
 		return results;
 	}
 
-//	public void overlappingPatterns(EpisodeType type1, EpisodeType type2,
-//			int frequency, int foldNum) throws IOException {
-//		int equal = 0;
-//		int noRepres = 0;
-//		int set = 0;
-//
-//		int onePattern = 0;
-//		int twoPatterns = 0;
-//		Map<Set<Fact>, Set<Episode>> patterns1 = patternsSetFact(getPatterns(
-//				type1, frequency));
-//		Map<Set<Fact>, Set<Episode>> patterns2 = patternsSetFact(getPatterns(
-//				type2, foldNum, frequency));
-//
-//		for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
-//			Set<Fact> events = entry.getKey();
-//			Set<Episode> episodes2 = entry.getValue();
-//
-//			if (patterns1.containsKey(events)) {
-//				if (!equalEpisodes(episodes2, patterns1.get(events))) {
-//					store(frequency, patterns1.get(events), type1, set, foldNum);
-//					store(frequency, episodes2, type2, set, foldNum);
-//					noRepres++;
-//					set++;
-//
-//					int numb = patterns1.get(events).size();
-//					if (numb == 1) {
-//						onePattern++;
-//					}
-//					if (entry.getKey().size() == 2) {
-//						if (numb == 2) {
-//							twoPatterns++;
-//						}
-//					}
-//				} else {
-//					equal += episodes2.size();
-//				}
-//			}
-//		}
-//		Logger.log(
-//				"Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
-//				type1.toString(), type2.toString(), equal, noRepres);
-//		Logger.log("Number of single patterns: %d", onePattern);
-//		Logger.log("Number of two patterns: %d", twoPatterns);
-//	}
+	// public void overlappingPatterns(EpisodeType type1, EpisodeType type2,
+	// int frequency, int foldNum) throws IOException {
+	// int equal = 0;
+	// int noRepres = 0;
+	// int set = 0;
+	//
+	// int onePattern = 0;
+	// int twoPatterns = 0;
+	// Map<Set<Fact>, Set<Episode>> patterns1 = patternsSetFact(getPatterns(
+	// type1, frequency));
+	// Map<Set<Fact>, Set<Episode>> patterns2 = patternsSetFact(getPatterns(
+	// type2, foldNum, frequency));
+	//
+	// for (Map.Entry<Set<Fact>, Set<Episode>> entry : patterns2.entrySet()) {
+	// Set<Fact> events = entry.getKey();
+	// Set<Episode> episodes2 = entry.getValue();
+	//
+	// if (patterns1.containsKey(events)) {
+	// if (!equalEpisodes(episodes2, patterns1.get(events))) {
+	// store(frequency, patterns1.get(events), type1, set, foldNum);
+	// store(frequency, episodes2, type2, set, foldNum);
+	// noRepres++;
+	// set++;
+	//
+	// int numb = patterns1.get(events).size();
+	// if (numb == 1) {
+	// onePattern++;
+	// }
+	// if (entry.getKey().size() == 2) {
+	// if (numb == 2) {
+	// twoPatterns++;
+	// }
+	// }
+	// } else {
+	// equal += episodes2.size();
+	// }
+	// }
+	// }
+	// Logger.log(
+	// "Configurations %s and %s have %d equal patterns, and %d different representations of patterns.",
+	// type1.toString(), type2.toString(), equal, noRepres);
+	// Logger.log("Number of single patterns: %d", onePattern);
+	// Logger.log("Number of two patterns: %d", twoPatterns);
+	// }
 
 	private boolean equalEpisodes(Set<Episode> set1, Set<Episode> set2) {
 		if (set1.size() != set2.size()) {

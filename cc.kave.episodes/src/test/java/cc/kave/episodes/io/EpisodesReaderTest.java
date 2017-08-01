@@ -35,7 +35,7 @@ import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Sets;
 
-public class EpisodesParserTest {
+public class EpisodesReaderTest {
 
 	@Rule
 	public TemporaryFolder rootFolder = new TemporaryFolder();
@@ -43,12 +43,11 @@ public class EpisodesParserTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private static final int FREQUENCY = 100;
-	private static final int FOLDNUM = 0;
 
 	private FileReader reader;
 	private Map<Integer, Set<Episode>> expected;
 	private Set<Episode> episodes;
-	private EpisodesParser sut;
+	private EpisodesReader sut;
 
 	@Before
 	public void setup() {
@@ -57,14 +56,14 @@ public class EpisodesParserTest {
 		expected = new HashMap<Integer, Set<Episode>>();
 		episodes = Sets.newHashSet();
 
-		sut = new EpisodesParser(rootFolder.getRoot(), reader);
+		sut = new EpisodesReader(rootFolder.getRoot(), reader);
 	}
-	
+
 	@Test
 	public void cannotBeInitializedWithNonExistingFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events folder does not exist");
-		sut = new EpisodesParser(new File("does not exist"), reader);
+		sut = new EpisodesReader(new File("does not exist"), reader);
 	}
 
 	@Test
@@ -72,7 +71,7 @@ public class EpisodesParserTest {
 		File file = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Events is not a folder, but a file");
-		sut = new EpisodesParser(file, reader);
+		sut = new EpisodesReader(file, reader);
 	}
 
 	@Test
@@ -91,15 +90,14 @@ public class EpisodesParserTest {
 			throw new RuntimeException(e);
 		}
 
-		Episode episode = createEpisode(3, 1, "1");
+		Episode episode = createEpisode(3, 1.0, "1");
 		episodes.add(episode);
 
 		expected.put(1, episodes);
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.GENERAL,
-				FREQUENCY, FOLDNUM);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
 
 		verify(reader).readFile(file);
 
@@ -132,8 +130,7 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.SEQUENTIAL,
-				FREQUENCY, FOLDNUM);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
 
 		verify(reader).readFile(file);
 
@@ -177,8 +174,7 @@ public class EpisodesParserTest {
 
 		doCallRealMethod().when(reader).readFile(eq(file));
 
-		Map<Integer, Set<Episode>> actual = sut.parse(EpisodeType.PARALLEL,
-				FREQUENCY, FOLDNUM);
+		Map<Integer, Set<Episode>> actual = sut.parse(FREQUENCY);
 
 		verify(reader).readFile(file);
 
@@ -196,17 +192,8 @@ public class EpisodesParserTest {
 	}
 
 	private File getFilePath(EpisodeType type) {
-		String episodeType = "";
-		if (type == EpisodeType.SEQUENTIAL) {
-			episodeType = "Seq";
-		} else if (type == EpisodeType.GENERAL) {
-			episodeType = "Mix";
-		} else {
-			episodeType = "Par";
-		}
 		File fileName = new File(rootFolder.getRoot().getAbsolutePath()
-				+ "/freq" + FREQUENCY + "/TrainingData/fold0/episodes"
-				+ episodeType + ".txt");
+				+ "/freq" + FREQUENCY + "/episodes.txt");
 		return fileName;
 	}
 }

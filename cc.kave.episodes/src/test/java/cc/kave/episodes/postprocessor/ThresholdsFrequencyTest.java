@@ -17,7 +17,6 @@ package cc.kave.episodes.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +37,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
@@ -56,7 +55,7 @@ public class ThresholdsFrequencyTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private EpisodesParser parser;
+	private EpisodesReader parser;
 
 	private EpisodesStatistics stats;
 	
@@ -94,7 +93,7 @@ public class ThresholdsFrequencyTest {
 		
 		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
-		when(parser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
+		when(parser.parse(anyInt())).thenReturn(episodes);
 	}
 	
 	@After
@@ -121,14 +120,14 @@ public class ThresholdsFrequencyTest {
 	public void mockIsCalled() throws ZipException, IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
+		verify(parser).parse(anyInt());
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
+		verify(parser).parse(anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 
@@ -139,7 +138,7 @@ public class ThresholdsFrequencyTest {
 	public void contentTest() throws IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).parse(any(EpisodeType.class), anyInt(), anyInt());
+		verify(parser).parse(anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 		

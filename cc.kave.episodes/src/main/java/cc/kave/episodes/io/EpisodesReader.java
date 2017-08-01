@@ -25,30 +25,27 @@ import java.util.Set;
 import javax.inject.Named;
 
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-public class EpisodesParser {
+public class EpisodesReader {
 
 	private File eventsDir;
 	private FileReader reader;
 
 	@Inject
-	public EpisodesParser(@Named("events") File folder, FileReader reader) {
+	public EpisodesReader(@Named("events") File folder, FileReader reader) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsDir = folder;
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> parse(EpisodeType episodeType,
-			int frequency, int foldNum) {
+	public Map<Integer, Set<Episode>> parse(int frequency) {
 
-		List<String> lines = reader.readFile(getEpisodesFile(episodeType,
-				frequency, foldNum));
+		List<String> lines = reader.readFile(getEpisodesFile(frequency));
 
 		Map<Integer, Set<Episode>> episodeIndexed = Maps.newLinkedHashMap();
 		Set<Episode> episodes = Sets.newLinkedHashSet();
@@ -81,27 +78,16 @@ public class EpisodesParser {
 		return episodeIndexed;
 	}
 
-	private String getPath(int frequency, int foldNum) {
-		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency
-				+ "/TrainingData/fold" + foldNum);
+	private String getPath(int frequency) {
+		File path = new File(eventsDir.getAbsolutePath() + "/freq" + frequency);
 		if (!path.isDirectory()) {
 			path.mkdirs();
 		}
 		return path.getAbsolutePath();
 	}
 
-	private File getEpisodesFile(EpisodeType episodeType, int frequency,
-			int foldNum) {
-		String type = "";
-		if (episodeType == EpisodeType.SEQUENTIAL) {
-			type = "Seq";
-		} else if (episodeType == EpisodeType.GENERAL) {
-			type = "Mix";
-		} else {
-			type = "Par";
-		}
-		File fileName = new File(getPath(frequency, foldNum) + "/episodes"
-				+ type + ".txt");
+	private File getEpisodesFile(int frequency) {
+		File fileName = new File(getPath(frequency) + "/episodes.txt");
 		return fileName;
 	}
 

@@ -17,7 +17,6 @@ package cc.kave.episodes.GraphGenerator;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,12 +41,11 @@ import org.mockito.Mock;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Fact;
@@ -72,7 +70,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 	private static final int REPOS = 2;
 
 	@Mock
-	private EpisodesParser episodeParser;
+	private EpisodesReader episodeParser;
 	@Mock
 	private EventStreamIo streamIo;
 	@Mock
@@ -106,7 +104,7 @@ public class EpisodeGraphGeneratorTrainingDataTest {
 		tmpFolderName = rootFolder.getRoot().getAbsolutePath();
 		folderStructure = new File(tmpFolderName + "/graphs/TrainingData/" + "/configurationF" + FREQ + "B" + BD + "/");
 
-		when(episodeParser.parse(any(EpisodeType.class), anyInt(), anyInt())).thenReturn(episodes);
+		when(episodeParser.parse(anyInt())).thenReturn(episodes);
 		when(streamIo.readMapping(FREQ)).thenReturn(events);
 	}
 

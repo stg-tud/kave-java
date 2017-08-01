@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodesParser;
+import cc.kave.episodes.io.EpisodesReader;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -22,11 +22,11 @@ import com.google.common.collect.Sets;
 public class PatternsEvents {
 
 	private EventStreamIo eventsStream;
-	private EpisodesParser episodeParser;
+	private EpisodesReader episodeParser;
 	private EpisodesFilter episodeFilter;
 
 	@Inject
-	public PatternsEvents(EventStreamIo eventsIo, EpisodesParser parser,
+	public PatternsEvents(EventStreamIo eventsIo, EpisodesReader parser,
 			EpisodesFilter filter) {
 		this.eventsStream = eventsIo;
 		this.episodeParser = parser;
@@ -36,8 +36,7 @@ public class PatternsEvents {
 	public void getEventsType(EpisodeType type, int frequency, double entropy,
 			int foldNum) {
 		List<Event> events = eventsStream.readMapping(frequency);
-		Map<Integer, Set<Episode>> episodes = episodeParser.parse(type,
-				frequency, foldNum);
+		Map<Integer, Set<Episode>> episodes = episodeParser.parse(frequency);
 		Map<Integer, Set<Episode>> patterns = episodeFilter.filter(type,
 				episodes, frequency, entropy);
 
@@ -60,10 +59,12 @@ public class PatternsEvents {
 				}
 			}
 		}
-		Logger.log("Configuration %s learns %d patterns", type.toString(), numPatterns);
+		Logger.log("Configuration %s learns %d patterns", type.toString(),
+				numPatterns);
 		Logger.log("Patterns contains the following event kinds:");
 		for (Map.Entry<EventKind, Set<Event>> entry : eventKinds.entrySet()) {
-			Logger.log("Kind %s: %d events", entry.getKey().toString(), entry.getValue().size());
+			Logger.log("Kind %s: %d events", entry.getKey().toString(), entry
+					.getValue().size());
 		}
 	}
 }
