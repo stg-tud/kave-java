@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.model.events.Fact;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,29 +29,73 @@ public class EpisodeClassifier {
 
 		if (type == EpisodeType.GENERAL) {
 			return generalEpisode(episodes, frequency, entropy);
-		}
-		if (type == EpisodeType.SEQUENTIAL) {
+		} else if (type == EpisodeType.SEQUENTIAL) {
 			return sequentialEpisodes(episodes, frequency);
+		} else if (type == EpisodeType.PARALLEL) {
+			return (parallelEpisodes(episodes, frequency));
 		}
 
 		return output;
 	}
 
-	private Map<Integer, Set<Episode>> sequentialEpisodes(
-			Map<Integer, Set<Episode>> episodes, int frequency) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Map<Integer, Set<Episode>> generalEpisode(
-			Map<Integer, Set<Episode>> allEpisodes, int frequency, double entropy) {
+	private Map<Integer, Set<Episode>> parallelEpisodes(
+			Map<Integer, Set<Episode>> allEpisodes, int frequency) {
 		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
-			Set<Episode> episodes = Sets.newLinkedHashSet();
+			Map<Set<Fact>, Set<Episode>> episodeGroups = getEpisodeGroups(entry.getValue());
 			
+		}
+		return output;
+	}
+
+	private Map<Set<Fact>, Set<Episode>> getEpisodeGroups(Set<Episode> episodes) {
+		Map<Set<Fact>, Set<Episode>> output = Maps.newLinkedHashMap();
+		return output;
+	}
+
+	private Episode createParEp(Episode input) {
+		Episode output = new Episode();
+		output.setFrequency(input.getFrequency());
+		output.setEntropy(input.getEntropy());
+		
+		for (Fact fact : input.getEvents()) {
+			output.addFact(fact);
+		}
+		return output;
+	}
+
+	private Map<Integer, Set<Episode>> sequentialEpisodes(
+			Map<Integer, Set<Episode>> allEpisodes, int frequency) {
+		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
+			Set<Episode> episodes = Sets.newLinkedHashSet();
+
 			for (Episode ep : entry.getValue()) {
-				if (ep.getEntropy() >= entropy) {
+				if ((ep.getFrequency() >= frequency) && (ep.getEntropy() == 1)
+						&& (!ep.getRelations().isEmpty())) {
+					episodes.add(ep);
+				}
+			}
+			if (!episodes.isEmpty()) {
+				output.put(entry.getKey(), episodes);
+			}
+		}
+		return output;
+	}
+
+	private Map<Integer, Set<Episode>> generalEpisode(
+			Map<Integer, Set<Episode>> allEpisodes, int frequency,
+			double entropy) {
+		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();
+
+		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
+			Set<Episode> episodes = Sets.newLinkedHashSet();
+
+			for (Episode ep : entry.getValue()) {
+				if ((ep.getFrequency() >= frequency)
+						&& (ep.getEntropy() >= entropy)) {
 					episodes.add(ep);
 				}
 			}
