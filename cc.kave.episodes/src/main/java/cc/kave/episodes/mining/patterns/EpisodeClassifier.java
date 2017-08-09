@@ -51,6 +51,16 @@ public class EpisodeClassifier {
 
 	private Map<Set<Fact>, Set<Episode>> getEpisodeGroups(Set<Episode> episodes) {
 		Map<Set<Fact>, Set<Episode>> output = Maps.newLinkedHashMap();
+		
+		for (Episode ep : episodes) {
+			Set<Fact> events = ep.getEvents();
+			
+			if (output.containsKey(events)) {
+				output.get(events).add(ep);
+			} else {
+				output.put(events, Sets.newHashSet(ep));
+			}
+		}
 		return output;
 	}
 
