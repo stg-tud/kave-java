@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.Properties;
 
 import cc.kave.episodes.eventstream.PartitionStream;
+import cc.kave.episodes.mining.patterns.EpisodeClassifier;
+import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.kave.episodes.statistics.EventsStatistics;
 import cc.recommenders.io.Logger;
@@ -34,7 +36,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 2;
+	private static final int FREQUENCY = 400;
 
 	private static final int THF = 400;
 	private static final double THE = 0.73;
@@ -55,7 +57,9 @@ public class run_ervina {
 		
 //		load(Preprocessing.class).run(FREQUENCY);
 //		load(PartitionStream.class).partition(FREQUENCY);
-		load(EventsStatistics.class).histogram(FREQUENCY);
+//		load(EventsStatistics.class).histogram(FREQUENCY);
+		load(EpisodeClassifier.class).getEpisodeType(EpisodeType.PARALLEL, FREQUENCY, THE);
+		
 		
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
 		// load(PreChecking.class).reposInfo();

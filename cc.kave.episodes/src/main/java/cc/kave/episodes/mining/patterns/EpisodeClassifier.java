@@ -9,6 +9,7 @@ import cc.kave.episodes.io.EpisodeReader;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -22,7 +23,7 @@ public class EpisodeClassifier {
 		this.episodeReader = reader;
 	}
 
-	Map<Integer, Set<Episode>> getEpisodeType(EpisodeType type, int frequency,
+	public Map<Integer, Set<Episode>> getEpisodeType(EpisodeType type, int frequency,
 			double entropy) {
 		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();
 		Map<Integer, Set<Episode>> episodes = episodeReader.read(frequency);
@@ -43,8 +44,22 @@ public class EpisodeClassifier {
 		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();
 		
 		for (Map.Entry<Integer, Set<Episode>> entry : allEpisodes.entrySet()) {
+			if (entry.getKey() == 1) {
+				continue;
+			}
+			Logger.log("Number of node episodes: %d", entry.getKey());
 			Map<Set<Fact>, Set<Episode>> episodeGroups = getEpisodeGroups(entry.getValue());
+			Logger.log("Number of sets of facts: %d", episodeGroups.size());
+			Set<Episode> currentEpisodes = Sets.newHashSet();
 			
+			for (Map.Entry<Set<Fact>, Set<Episode>> entryEpisodes : episodeGroups.entrySet()) {
+				for (Episode episode : entryEpisodes.getValue()) {
+					if (episode.getRelations().isEmpty()) {
+						currentEpisodes.add(episode);
+						break;
+					} 
+				}
+			}
 		}
 		return output;
 	}
@@ -60,17 +75,6 @@ public class EpisodeClassifier {
 			} else {
 				output.put(events, Sets.newHashSet(ep));
 			}
-		}
-		return output;
-	}
-
-	private Episode createParEp(Episode input) {
-		Episode output = new Episode();
-		output.setFrequency(input.getFrequency());
-		output.setEntropy(input.getEntropy());
-		
-		for (Fact fact : input.getEvents()) {
-			output.addFact(fact);
 		}
 		return output;
 	}
