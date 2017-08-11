@@ -21,11 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.eventstream.PartitionStream;
-import cc.kave.episodes.mining.patterns.EpisodeClassifier;
-import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.preprocessing.Preprocessing;
-import cc.kave.episodes.statistics.EventsStatistics;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -58,7 +53,6 @@ public class run_ervina {
 //		load(Preprocessing.class).run(FREQUENCY);
 //		load(PartitionStream.class).partition(FREQUENCY);
 //		load(EventsStatistics.class).histogram(FREQUENCY);
-		load(EpisodeClassifier.class).getEpisodeType(EpisodeType.PARALLEL, FREQUENCY, THE);
 		
 		
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
