@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.statistics.PatternsStatistics;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -34,7 +35,7 @@ public class run_ervina {
 	private static final int FREQUENCY = 400;
 
 	private static final int THF = 400;
-	private static final double THE = 0.73;
+	private static final double THE = 0.001;
 
 	private static final int METHODSIZE = 5000;
 
@@ -53,6 +54,7 @@ public class run_ervina {
 //		load(Preprocessing.class).run(FREQUENCY);
 //		load(PartitionStream.class).partition(FREQUENCY);
 //		load(EventsStatistics.class).histogram(FREQUENCY);
+		load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
 		
 		
 		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
