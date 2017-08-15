@@ -21,8 +21,10 @@ public class SequentialPatterns {
 			Set<Episode> filtered = Sets.newLinkedHashSet();
 
 			for (Episode ep : entry.getValue()) {
-				if ((ep.getFrequency() >= frequency) && (ep.getEntropy() == 1)
-						&& (!ep.getRelations().isEmpty())) {
+				if ((ep.getFrequency() >= frequency)
+						&& (ep.getEntropy() == 1.0)
+						&& (ep.getRelations().size() == numRels(ep
+								.getNumEvents()))) {
 					filtered.add(ep);
 				}
 			}
@@ -31,5 +33,15 @@ public class SequentialPatterns {
 			}
 		}
 		return results;
+	}
+
+	private int numRels(int numEvents) {
+		int numRels = 0;
+		if (numEvents == 2) {
+			return 1;
+		} else {
+			numRels = numEvents - 1 + numRels(numEvents - 1);
+			return numRels;
+		}
 	}
 }

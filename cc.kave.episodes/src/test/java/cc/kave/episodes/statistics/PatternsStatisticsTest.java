@@ -1,9 +1,17 @@
 package cc.kave.episodes.statistics;
 
+import static cc.recommenders.io.LoggerUtils.assertLogContains;
+
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -66,10 +74,26 @@ public class PatternsStatisticsTest {
 		sequentials = new SequentialPatterns();
 		parallels = new ParallelPatterns();
 		
-//		when(episodeReader.read(anyInt())).
+		when(episodeReader.read(anyInt())).thenReturn(episodes);
 
 		sut = new PatternsStatistics(episodeReader, partials, sequentials,
 				parallels);
+	}
+	
+	@After
+	public void teardown() {
+		Logger.reset();
+	}
+	
+	@Test
+	public void logger() {
+		sut.numPatterns(FREQUENCY, FREQUENCY, ENTROPY);
+		
+		verify(episodeReader).read(anyInt());
+		
+		assertLogContains(0, "Number of patterns learned by partial configuration: 2");
+		assertLogContains(1, "Number of patterns learned by sequential configuration: 5");
+		assertLogContains(2, "Number of patterns learned by parallel configuration: 2");
 	}
 
 	private Episode createEpisode(int frequency, double entropy,

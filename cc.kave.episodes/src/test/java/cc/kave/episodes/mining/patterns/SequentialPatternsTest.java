@@ -53,6 +53,30 @@ public class SequentialPatternsTest {
 		assertEquals(episodes, actuals);
 	}
 	
+	@Test
+	public void threeNodes() {
+		Set<Episode> threeNodes = Sets.newLinkedHashSet();
+		threeNodes.add(createEpisode(3, 0.5, "1", "2", "3"));
+		threeNodes.add(createEpisode(3, 0.6, "1", "2", "3", "1>2"));
+		threeNodes.add(createEpisode(4, 0.7, "1", "2", "3", "2>1", "2>3"));
+		threeNodes.add(createEpisode(5, 0.8, "1", "2", "3", "1>3"));
+		threeNodes.add(createEpisode(4, 1.0, "1", "2", "3", "1>2", "1>3", "2>3"));
+		threeNodes.add(createEpisode(4, 1.0, "1", "2", "3", "2>1", "2>3", "1>3"));
+		threeNodes.add(createEpisode(6, 1.0, "1", "2", "3", "3>1", "3>2", "1>2"));
+		episodes.put(3, threeNodes);
+		
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY);
+		
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(4, 1.0, "1", "2", "3", "1>2", "1>3", "2>3"));
+		set.add(createEpisode(4, 1.0, "1", "2", "3", "2>1", "2>3", "1>3"));
+		set.add(createEpisode(6, 1.0, "1", "2", "3", "3>1", "3>2", "1>2"));
+		expected.put(3, set);
+		
+		assertEquals(expected, actuals);
+	}
+	
 	private Episode createEpisode(int freq, double bdmeas, String... strings) {
 		Episode episode = new Episode();
 		episode.setFrequency(freq);
