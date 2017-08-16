@@ -1,4 +1,4 @@
-package cc.kave.episodes.eventstream;
+package cc.kave.episodes.statistics;
 
 import java.util.List;
 import java.util.Set;
@@ -11,7 +11,7 @@ import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Sets;
 
-public class Statistics {
+public class StreamStatistics {
 
 	private Set<ITypeName> typeDecls = Sets.newHashSet();
 	private Set<ITypeName> apis = Sets.newHashSet();

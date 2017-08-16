@@ -1,4 +1,4 @@
-package cc.kave.episodes.eventstream;
+package cc.kave.episodes.statistics;
 
 import static cc.recommenders.io.LoggerUtils.assertLogContains;
 import static org.junit.Assert.assertEquals;
@@ -16,17 +16,18 @@ import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
 import com.google.common.collect.Lists;
 
-public class StatisticsTest {
+public class StreamStatisticsTest {
 
 	private List<Tuple<Event, List<Event>>> stream;
 
-	private Statistics sut;
+	private StreamStatistics sut;
 
 	@Before
 	public void setup() {
@@ -34,7 +35,7 @@ public class StatisticsTest {
 		Logger.reset();
 		Logger.setCapturing(true);
 		
-		sut = new Statistics();
+		sut = new StreamStatistics();
 
 		stream = Lists.newLinkedList();
 		List<Event> method = Lists.newLinkedList();

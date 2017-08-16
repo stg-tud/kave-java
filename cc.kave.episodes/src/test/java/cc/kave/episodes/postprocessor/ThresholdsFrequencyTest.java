@@ -37,7 +37,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodeReader;
+import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.statistics.EpisodesStatistics;
@@ -55,7 +55,7 @@ public class ThresholdsFrequencyTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private EpisodeReader parser;
+	private EpisodeParser parser;
 
 	private EpisodesStatistics stats;
 	
@@ -93,7 +93,7 @@ public class ThresholdsFrequencyTest {
 		
 		sut = new ThresholdsFrequency(rootFolder.getRoot(), parser, stats);
 		
-		when(parser.read(anyInt())).thenReturn(episodes);
+		when(parser.parser(anyInt())).thenReturn(episodes);
 	}
 	
 	@After
@@ -120,14 +120,14 @@ public class ThresholdsFrequencyTest {
 	public void mockIsCalled() throws ZipException, IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).read(anyInt());
+		verify(parser).parser(anyInt());
 	}
 	
 	@Test
 	public void filesAreCreated() throws IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).read(anyInt());
+		verify(parser).parser(anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 
@@ -138,7 +138,7 @@ public class ThresholdsFrequencyTest {
 	public void contentTest() throws IOException {
 		sut.writer(EpisodeType.GENERAL, FREQUENCY, FOLDNUM);
 
-		verify(parser).read(anyInt());
+		verify(parser).parser(anyInt());
 
 		File freqsFile = new File(getFreqsPath());
 		

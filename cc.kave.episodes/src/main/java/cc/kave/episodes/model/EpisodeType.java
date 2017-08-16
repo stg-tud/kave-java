@@ -16,5 +16,5 @@
 package cc.kave.episodes.model;
 
 public enum EpisodeType {
-	GENERAL, SEQUENTIAL, PARALLEL
+	GENERAL, SEQUENTIAL, PARALLEL, OTHER
 }

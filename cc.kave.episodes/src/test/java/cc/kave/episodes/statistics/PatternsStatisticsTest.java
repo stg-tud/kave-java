@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodeReader;
+import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.mining.patterns.ParallelPatterns;
 import cc.kave.episodes.mining.patterns.PartialPatterns;
 import cc.kave.episodes.mining.patterns.SequentialPatterns;
@@ -31,7 +31,7 @@ public class PatternsStatisticsTest {
 	private static final double ENTROPY = 0.5;
 
 	@Mock
-	private EpisodeReader episodeReader;
+	private EpisodeParser episodeReader;
 
 	private Map<Integer, Set<Episode>> episodes;
 
@@ -74,7 +74,7 @@ public class PatternsStatisticsTest {
 		sequentials = new SequentialPatterns();
 		parallels = new ParallelPatterns();
 		
-		when(episodeReader.read(anyInt())).thenReturn(episodes);
+		when(episodeReader.parser(anyInt())).thenReturn(episodes);
 
 		sut = new PatternsStatistics(episodeReader, partials, sequentials,
 				parallels);
@@ -89,7 +89,7 @@ public class PatternsStatisticsTest {
 	public void logger() {
 		sut.numPatterns(FREQUENCY, FREQUENCY, ENTROPY);
 		
-		verify(episodeReader).read(anyInt());
+		verify(episodeReader).parser(anyInt());
 		
 		assertLogContains(0, "Number of patterns learned by partial configuration: 2");
 		assertLogContains(1, "Number of patterns learned by sequential configuration: 5");

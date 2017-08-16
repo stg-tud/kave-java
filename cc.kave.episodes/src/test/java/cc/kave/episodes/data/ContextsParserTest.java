@@ -29,9 +29,9 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -47,7 +47,7 @@ public class ContextsParserTest {
 	@Mock
 	private Directory rootDirectory;
 	@Mock
-	private Statistics statistics;
+	private StreamStatistics statistics;
 
 	private static final String REPO0 = "Github/usr1/repo0/ws.zip";
 	private static final String REPO1 = "Github/usr1/repo1/ws.zip";

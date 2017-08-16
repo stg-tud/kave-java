@@ -40,10 +40,10 @@ import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.eventstream.Filters;
-import cc.kave.episodes.eventstream.Statistics;
 import cc.kave.episodes.eventstream.StreamFilterGenerator;
 import cc.kave.episodes.eventstream.StreamRepoGenerator;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.statistics.StreamStatistics;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Directory;
 import cc.recommenders.io.Logger;
@@ -73,12 +73,12 @@ public class ContextsParser {
 			.newLinkedList();
 	private Filters filters = new Filters();
 
-	Statistics statRepos = new Statistics();
-	Statistics statGenerated = new Statistics();
-	Statistics statUnknowns = new Statistics();
-	Statistics statLocals = new Statistics();
-	Statistics statOverlaps = new Statistics();
-	Statistics statFrequent = new Statistics();
+	StreamStatistics statRepos = new StreamStatistics();
+	StreamStatistics statGenerated = new StreamStatistics();
+	StreamStatistics statUnknowns = new StreamStatistics();
+	StreamStatistics statLocals = new StreamStatistics();
+	StreamStatistics statOverlaps = new StreamStatistics();
+	StreamStatistics statFrequent = new StreamStatistics();
 
 	public List<Tuple<Event, List<Event>>> parse(int frequency)
 			throws Exception {

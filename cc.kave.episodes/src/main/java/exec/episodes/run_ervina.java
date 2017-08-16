@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.statistics.PatternsStatistics;
+import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
+import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -50,31 +51,24 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
-		
-//		load(Preprocessing.class).run(FREQUENCY);
-//		load(PartitionStream.class).partition(FREQUENCY);
-//		load(EventsStatistics.class).histogram(FREQUENCY);
-		load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
-		
-		
-		// load(PatternsStatistics.class).generate(FREQUENCY, FOLDNUM);
-		// load(PreChecking.class).reposInfo();
-		// load(EventOccurrences.class).generate(FREQUENCY);
 
-		// load(PostChecking.class).updatedEvent(FREQUENCY);
+		// load(Preprocessing.class).run(FREQUENCY);
+		// load(PartitionStream.class).partition(FREQUENCY);
+		// load(EventsStatistics.class).histogram(FREQUENCY);
 
-		// load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL,
+		// load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
+//		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
+//				THF, THE);
+		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,
 		// FOLDNUM, THF, THE);
-//		load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL, FREQUENCY,
-//				FOLDNUM, THF, THE);
 
 		// load(PatternsComparison.class).extractConcreteCode(FREQUENCY,
 		// FOLDNUM);
-//		load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL,
-//				EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
-//		 load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
-//		 EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
+		// load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL,
+		// EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
+		// load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
+		// EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
 
 		// load(SpecificPatterns.class).patternsInfo(EpisodeType.GENERAL,
 		// FREQUENCY, FOLDNUM, FREQUENCY, ENTROPY);

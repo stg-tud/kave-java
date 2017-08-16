@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import cc.kave.episodes.io.EpisodeReader;
+import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.mining.patterns.ParallelPatterns;
 import cc.kave.episodes.mining.patterns.PartialPatterns;
 import cc.kave.episodes.mining.patterns.SequentialPatterns;
@@ -14,13 +14,13 @@ import cc.recommenders.io.Logger;
 
 public class PatternsStatistics {
 
-	private EpisodeReader episodeReader;
+	private EpisodeParser episodeReader;
 	private PartialPatterns partials;
 	private SequentialPatterns sequentials;
 	private ParallelPatterns parallels;
 
 	@Inject
-	public PatternsStatistics(EpisodeReader episodeReader,
+	public PatternsStatistics(EpisodeParser episodeReader,
 			PartialPatterns partials, SequentialPatterns sequentials,
 			ParallelPatterns parallels) {
 		this.episodeReader = episodeReader;
@@ -30,7 +30,7 @@ public class PatternsStatistics {
 	}
 
 	public void numPatterns(int frequency, int threshFreq, double threshEnt) {
-		Map<Integer, Set<Episode>> episodes = episodeReader.read(frequency);
+		Map<Integer, Set<Episode>> episodes = episodeReader.parser(frequency);
 
 		Map<Integer, Set<Episode>> partPatterns = partials.filter(episodes,
 				threshFreq, threshEnt);

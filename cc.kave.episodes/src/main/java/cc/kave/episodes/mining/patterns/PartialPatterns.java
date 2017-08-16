@@ -11,7 +11,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class PartialPatterns {
-
+	
 	public Map<Integer, Set<Episode>> filter(
 			Map<Integer, Set<Episode>> episodes, int frequency, double entropy) {
 		Map<Integer, Set<Episode>> output = Maps.newLinkedHashMap();

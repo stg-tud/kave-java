@@ -30,20 +30,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-public class EpisodeReader {
+public class EpisodeParser {
 
 	private File eventsDir;
 	private FileReader reader;
 
 	@Inject
-	public EpisodeReader(@Named("events") File folder, FileReader reader) {
+	public EpisodeParser(@Named("events") File folder, FileReader reader) {
 		assertTrue(folder.exists(), "Events folder does not exist");
 		assertTrue(folder.isDirectory(), "Events is not a folder, but a file");
 		this.eventsDir = folder;
 		this.reader = reader;
 	}
 
-	public Map<Integer, Set<Episode>> read(int frequency) {
+	public Map<Integer, Set<Episode>> parser(int frequency) {
 
 		List<String> lines = reader.readFile(getEpisodesFile(frequency));
 
