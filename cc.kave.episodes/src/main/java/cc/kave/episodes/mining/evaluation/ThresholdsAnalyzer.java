@@ -1,39 +1,20 @@
 package cc.kave.episodes.mining.evaluation;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.inject.Inject;
-
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
-import cc.kave.episodes.model.Threshold;
-import cc.kave.episodes.model.Triplet;
-import cc.kave.episodes.model.events.Event;
-import cc.kave.episodes.model.events.Fact;
-import cc.recommenders.datastructures.Tuple;
-import cc.recommenders.io.Logger;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import cc.kave.episodes.mining.patterns.PatternFilter;
 
 public class ThresholdsAnalyzer {
 
-//	private EventStreamIo eventStream;
-//	private EpisodeParser episodeParser;
-//	private EpisodesFilter episodeFilter;
-//
-//	private ContextsParser repoParser;
-//	private ValidationDataIO validationIo;
-//
-//	private PatternsValidation patternsValidation;
-//
+	private EventStreamIo eventStream;
+	private EpisodeParser episodeParser;
+	private PatternFilter patternFilter;
+
+	private ContextsParser repoParser;
+
+	private PatternsValidation patternsValidation;
+
 //	@Inject
 //	public ThresholdsAnalyzer(EventStreamIo eventStream, EpisodesParser parser,
 //			EpisodesFilter filter, ContextsParser reposParser,
