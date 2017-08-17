@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.evaluations.thresholds.EntropyAnalyzer;
 import cc.kave.episodes.mining.evaluation.ThresholdsAnalyzer;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
@@ -57,6 +58,8 @@ public class run_ervina {
 		// load(EventsStatistics.class).histogram(FREQUENCY);
 
 		// load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
+		load(EntropyAnalyzer.class).threshold(FREQUENCY);
+		
 //		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
 //				THF, THE);
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,

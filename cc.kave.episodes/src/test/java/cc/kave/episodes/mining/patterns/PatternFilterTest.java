@@ -16,7 +16,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 
@@ -27,8 +26,6 @@ public class PatternFilterTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Mock
-	private EpisodeParser parser;
 	@Mock
 	private PartialPatterns partials;
 	@Mock
@@ -50,9 +47,7 @@ public class PatternFilterTest {
 
 		episodes = Maps.newLinkedHashMap();
 
-		sut = new PatternFilter(parser, partials, sequentials, parallels);
-
-		when(parser.parser(anyInt())).thenReturn(episodes);
+		sut = new PatternFilter(partials, sequentials, parallels);
 	}
 
 	@Test
@@ -60,9 +55,7 @@ public class PatternFilterTest {
 		thrown.expect(Exception.class);
 		thrown.expectMessage("Not valid episode type!");
 
-		sut.filter(EpisodeType.OTHER, FREQUENCY, FREQTHRESH, ENTROPY);
-
-		verify(parser).parser(anyInt());
+		sut.filter(EpisodeType.OTHER, episodes, FREQTHRESH, ENTROPY);
 	}
 
 	@Test
@@ -70,9 +63,8 @@ public class PatternFilterTest {
 		when(partials.filter(anyMap(), anyInt(), anyDouble())).thenReturn(
 				episodes);
 
-		sut.filter(EpisodeType.GENERAL, FREQUENCY, FREQTHRESH, ENTROPY);
+		sut.filter(EpisodeType.GENERAL, episodes, FREQTHRESH, ENTROPY);
 
-		verify(parser).parser(anyInt());
 		verify(partials).filter(anyMap(), anyInt(), anyDouble());
 	}
 
@@ -80,9 +72,8 @@ public class PatternFilterTest {
 	public void sequentials() throws Exception {
 		when(sequentials.filter(anyMap(), anyInt())).thenReturn(episodes);
 
-		sut.filter(EpisodeType.SEQUENTIAL, FREQUENCY, FREQTHRESH, ENTROPY);
+		sut.filter(EpisodeType.SEQUENTIAL, episodes, FREQTHRESH, ENTROPY);
 
-		verify(parser).parser(anyInt());
 		verify(sequentials).filter(anyMap(), anyInt());
 	}
 
@@ -90,9 +81,8 @@ public class PatternFilterTest {
 	public void parallel() throws Exception {
 		when(parallels.filter(anyMap(), anyInt())).thenReturn(episodes);
 
-		sut.filter(EpisodeType.PARALLEL, FREQUENCY, FREQTHRESH, ENTROPY);
+		sut.filter(EpisodeType.PARALLEL, episodes, FREQTHRESH, ENTROPY);
 
-		verify(parser).parser(anyInt());
 		verify(parallels).filter(anyMap(), anyInt());
 	}
 }
