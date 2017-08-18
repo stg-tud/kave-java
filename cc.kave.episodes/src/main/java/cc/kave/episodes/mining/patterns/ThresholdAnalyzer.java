@@ -44,8 +44,7 @@ public class ThresholdAnalyzer {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 		Set<Integer> frequencies = getFrequencies(episodes);
 		int maxFreq = getMax(frequencies);
-//		Logger.log("Max frequency = %d", maxFreq);
-		int prevValue = 0;
+		// Logger.log("Max frequency = %d", maxFreq);
 
 		Logger.log("\tHistogram for %s-configuration:", type.toString());
 		Logger.log("\tEntropy threshold = %.2f", entropy);
@@ -54,10 +53,7 @@ public class ThresholdAnalyzer {
 			Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
 					freq, entropy);
 			int numbPatterns = getNumbPatterns(patterns);
-			if (prevValue != numbPatterns) {
-				prevValue = numbPatterns;
-				Logger.log("\t%d\t%d", freq, numbPatterns);
-			}
+			Logger.log("\t%d\t%d", freq, numbPatterns);
 		}
 	}
 
