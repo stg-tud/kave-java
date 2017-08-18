@@ -5,7 +5,7 @@ import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 
-public class ThresholdsAnalyzer {
+public class ThresholdsAnalyzerTemp {
 
 	private EventStreamIo eventStream;
 	private EpisodeParser episodeParser;

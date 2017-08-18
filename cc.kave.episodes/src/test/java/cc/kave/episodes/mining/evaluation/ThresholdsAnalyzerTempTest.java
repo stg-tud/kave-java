@@ -1,3 +1,4 @@
+package cc.kave.episodes.mining.evaluation;
 //package cc.kave.episodes.mining.evaluation;
 //
 //import static cc.recommenders.io.LoggerUtils.assertLogContains;
