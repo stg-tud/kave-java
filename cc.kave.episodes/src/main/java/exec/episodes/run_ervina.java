@@ -37,7 +37,7 @@ public class run_ervina {
 	private static final int FREQUENCY = 200;
 
 	private static final int THF = 200;
-	private static final double THE = 0.59;
+	private static final double THE = 0.00 ;
 
 	private static final int METHODSIZE = 5000;
 
@@ -60,8 +60,6 @@ public class run_ervina {
 		// load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
 		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.SEQUENTIAL, FREQUENCY, THE);
 		
-//		load(ThresholdsAnalyzer.class).analyze(EpisodeType.GENERAL, FREQUENCY,
-//				THF, THE);
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,
 		// FOLDNUM, THF, THE);

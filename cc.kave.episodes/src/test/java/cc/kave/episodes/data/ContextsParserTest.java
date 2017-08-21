@@ -178,16 +178,6 @@ public class ContextsParserTest {
 		List<Tuple<Event, List<Event>>> expected = Lists.newLinkedList();
 
 		List<Event> method = Lists.newLinkedList();
-		IMethodName decl1 = Names.newMethod("[T,P] [T1,P].M2()");
-		
-		String inv1 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI1()";
-		method.add(Events.newInvocation(Names.newMethod(inv1)));
-		expected.add(Tuple.newTuple(Events.newContext(decl1), method));
-
-		IMethodName decl2 = Names.newMethod("[T,P] [T2,P].M()");
-		method = Lists.newLinkedList();
-		method.add(Events.newInvocation(Names.newMethod(inv1)));
-		expected.add(Tuple.newTuple(Events.newContext(decl2), method));
 
 		IMethodName decl3 = Names.newMethod("[T,P] [T3,P].M3()");
 		String inv3 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
