@@ -13,7 +13,7 @@ public class ThresholdsAnalyzerTemp {
 
 	private ContextsParser repoParser;
 
-	private PatternsValidation patternsValidation;
+	private PatternsValidationFolded patternsValidation;
 
 //	@Inject
 //	public ThresholdsAnalyzer(EventStreamIo eventStream, EpisodesParser parser,

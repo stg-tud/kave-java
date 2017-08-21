@@ -18,7 +18,7 @@ import cc.recommenders.datastructures.Tuple;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class PatternsValidation {
+public class PatternsValidationFolded {
 
 	public Map<Integer, Set<Triplet<Episode, Integer, Integer>>> validate(
 			Map<Integer, Set<Episode>> episodes,

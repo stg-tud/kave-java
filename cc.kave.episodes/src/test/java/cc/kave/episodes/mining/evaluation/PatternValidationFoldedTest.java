@@ -22,20 +22,34 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class PatternValidationTest {
+public class PatternValidationFoldedTest {
 
+	private Map<Integer, Set<Episode>> patterns;
 	private List<Tuple<Event, List<Fact>>> streamMethods;
 	private Map<String, Set<IMethodName>> repoMethods;
 	private List<Event> events;
 
-	private PatternValidation sut;
+	private List<Event> valStream;
+	private List<List<Fact>> valFactStream;
+
+	private PatternsValidationFolded sut;
 
 	@Before
 	public void setup() throws Exception {
 
+		patterns = Maps.newLinkedHashMap();
+		Set<Episode> episodes = Sets.newLinkedHashSet();
+
 		Episode ep = createEpisode(4, 1.0, "3", "4", "3>4");
+		episodes.add(ep);
 		ep = createEpisode(3, 0.5, "6", "7", "6>7");
+		episodes.add(ep);
+		patterns.put(2, episodes);
+
+		episodes = Sets.newLinkedHashSet();
 		ep = createEpisode(2, 0.3, "1", "3", "4");
+		episodes.add(ep);
+		patterns.put(3, episodes);
 
 		streamMethods = Lists.newLinkedList();
 		streamMethods.add(Tuple.newTuple(enclCtx(2), Lists
@@ -55,36 +69,62 @@ public class PatternValidationTest {
 		repoMethods
 				.put("Repository2", Sets.newHashSet(enclCtx2(5).getMethod()));
 
-		events = Lists.newArrayList(dummy(), firstCtx(1), inv(3), inv(4),
-				inv(6), inv(7), inv(8), firstCtx(10), firstCtx(11),
-				superCtx(12), firstCtx(13));
+		events = Lists.newArrayList(dummy(), firstCtx(1), enclCtx(2), inv(3),
+				inv(4), enclCtx(5), inv(6), inv(7), inv(8), enclCtx(9),
+				firstCtx(10), firstCtx(11), superCtx(12), firstCtx(13),
+				enclCtx(14), enclCtx2(15));
 
-		sut = new PatternValidation();
+		valStream = Lists.newArrayList(firstCtx(10), enclCtx(5), inv(3),
+				inv(4), firstCtx(11), superCtx(12), enclCtx(9), inv(4),
+				firstCtx(13), enclCtx(5), inv(3), inv(4), firstCtx(11),
+				enclCtx(14), inv(4), firstCtx(11), enclCtx(9), inv(3), inv(4),
+				firstCtx(13), enclCtx2(15), inv(3), inv(4));
+
+		valFactStream = Lists.newLinkedList();
+		List<Fact> method = Lists.newArrayList(new Fact(10), new Fact(5),
+				new Fact(3), new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(11), new Fact(12), new Fact(9),
+				new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(13), new Fact(5), new Fact(3),
+				new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(11), new Fact(14), new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(11), new Fact(9), new Fact(3),
+				new Fact(4));
+		valFactStream.add(method);
+		method = Lists.newArrayList(new Fact(13), new Fact(15), new Fact(3),
+				new Fact(4));
+		valFactStream.add(method);
+
+		sut = new PatternsValidationFolded();
 	}
 
-//	@Test
-//	public void validationTest() throws Exception {
-//
-//		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> actuals = sut
-//				.validate(pattern, streamMethods, repoMethods, events,
-//						valFactStream);
-//		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> expected = Maps
-//				.newLinkedHashMap();
-//		Set<Triplet<Episode, Integer, Integer>> expSet = Sets
-//				.newLinkedHashSet();
-//		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(4, 1.0,
-//				"3", "4", "3>4"), 1, 4));
-//		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(3, 0.5,
-//				"6", "7", "6>7"), 2, 0));
-//		expected.put(2, expSet);
-//
-//		expSet = Sets.newLinkedHashSet();
-//		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(2, 0.3,
-//				"1", "3", "4"), 1, 0));
-//		expected.put(3, expSet);
-//
-//		assertEquals(expected, actuals);
-//	}
+	@Test
+	public void validationTest() throws Exception {
+
+		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> actuals = sut
+				.validate(patterns, streamMethods, repoMethods, events,
+						valFactStream);
+		Map<Integer, Set<Triplet<Episode, Integer, Integer>>> expected = Maps
+				.newLinkedHashMap();
+		Set<Triplet<Episode, Integer, Integer>> expSet = Sets
+				.newLinkedHashSet();
+		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(4, 1.0,
+				"3", "4", "3>4"), 1, 4));
+		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(3, 0.5,
+				"6", "7", "6>7"), 2, 0));
+		expected.put(2, expSet);
+
+		expSet = Sets.newLinkedHashSet();
+		expSet.add(new Triplet<Episode, Integer, Integer>(createEpisode(2, 0.3,
+				"1", "3", "4"), 1, 0));
+		expected.put(3, expSet);
+
+		assertEquals(expected, actuals);
+	}
 
 	private Episode createEpisode(int frequency, double entropy,
 			String... strings) {

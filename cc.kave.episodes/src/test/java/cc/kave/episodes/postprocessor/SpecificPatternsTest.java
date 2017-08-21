@@ -12,7 +12,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cc.kave.episodes.io.EventStreamIo;
-import cc.kave.episodes.mining.evaluation.PatternsValidation;
+import cc.kave.episodes.mining.evaluation.PatternsValidationFolded;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.events.Event;
@@ -22,7 +22,7 @@ import cc.recommenders.io.Logger;
 public class SpecificPatternsTest {
 
 	@Mock
-	private PatternsValidation validation;
+	private PatternsValidationFolded validation;
 	@Mock
 	private EventStreamIo eventsStream;
 
