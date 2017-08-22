@@ -58,6 +58,7 @@ public class Generalizability {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
+		this.patternFolder = folder;
 		this.cxtParser = ctxParser;
 		this.episodeParser = epParser;
 		this.patternFilter = pattFilter;
@@ -94,7 +95,7 @@ public class Generalizability {
 				sb.append(pattern.getFacts().toString() + "\t");
 				sb.append(pattern.getFrequency() + "\t");
 				sb.append(pattern.getEntropy() + "\t");
-				sb.append(numReposOccurs + "\t");
+				sb.append(numReposOccurs + "\n");
 				
 				store(pattern, type, patternId, events, frequency);
 				patternId++;
@@ -138,7 +139,7 @@ public class Generalizability {
 			}
 		}
 		int numOccs = methodsOrderRelation.getOccurrences();
-		assertTrue(numOccs != pattern.getFrequency(),
+		assertTrue(numOccs == pattern.getFrequency(),
 				"Frequency and numbOccs do not match!");
 
 		Set<IMethodName> methodOcc = methodsOrderRelation
