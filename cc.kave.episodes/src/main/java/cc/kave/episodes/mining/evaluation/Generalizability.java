@@ -68,15 +68,27 @@ public class Generalizability {
 		this.graphWriter = graphWriter;
 	}
 
-	public void validate(EpisodeType type, int frequency, int threshFreq,
-			double threshEntropy) throws Exception {
+	public void validate(int frequency, int threshFreq, double threshEntropy)
+			throws Exception {
 		List<Tuple<Event, List<Event>>> stream = cxtParser.parse(frequency);
 		List<Event> events = streamIo.readMapping(frequency);
 		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamToFacts(
 				stream, events);
-
-		Map<String, Set<IMethodName>> repos = cxtParser.getRepoCtxMapper();
 		Map<Integer, Set<Episode>> episodes = episodeParser.parser(frequency);
+
+		checkGeneralizability(EpisodeType.SEQUENTIAL, threshFreq, threshEntropy, events,
+				streamOfFacts, episodes);
+		checkGeneralizability(EpisodeType.PARALLEL, threshFreq, threshEntropy, events,
+				streamOfFacts, episodes);
+		checkGeneralizability(EpisodeType.GENERAL, threshFreq, threshEntropy, events,
+				streamOfFacts, episodes);
+	}
+
+	private void checkGeneralizability(EpisodeType type, int threshFreq,
+			double threshEntropy, List<Event> events,
+			List<Tuple<Event, List<Fact>>> streamOfFacts,
+			Map<Integer, Set<Episode>> episodes) throws Exception {
+		Map<String, Set<IMethodName>> repos = cxtParser.getRepoCtxMapper();
 		Map<Integer, Set<Episode>> patterns = patternFilter.filter(type,
 				episodes, threshFreq, threshEntropy);
 
@@ -84,6 +96,7 @@ public class Generalizability {
 		int patternId = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			Logger.log("Cheking generalizability for %s-order configuration...", type.toString());
 			Logger.log("Outputing episodes with %d-nodes ...", entry.getKey());
 			sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
 			sb.append("PatternId\tFacts\tFrequency\tEntropy\t#Repos\n");
@@ -96,14 +109,16 @@ public class Generalizability {
 				sb.append(pattern.getFrequency() + "\t");
 				sb.append(pattern.getEntropy() + "\t");
 				sb.append(numReposOccurs + "\n");
-				
-				store(pattern, type, patternId, events, frequency);
+
+				store(pattern, type, patternId, events, threshFreq,
+						threshEntropy);
 				patternId++;
 			}
 			sb.append("\n");
 		}
-		FileUtils.writeStringToFile(getEvalPath(frequency, type),
-				sb.toString());
+		FileUtils.writeStringToFile(
+				getEvalPath(threshFreq, threshEntropy, type), sb.toString());
+
 	}
 
 	private List<Tuple<Event, List<Fact>>> convertStreamToFacts(
@@ -159,38 +174,44 @@ public class Generalizability {
 	}
 
 	private void store(Episode episode, EpisodeType type, int patternId,
-			List<Event> events, int frequency) throws IOException {
+			List<Event> events, int frequency, double entropy)
+			throws IOException {
 		Episode pattern = transClosure.remTransClosure(episode);
 		DirectedGraph<Fact, DefaultEdge> graph = graphConverter.convert(
 				pattern, events);
-		graphWriter.write(graph, getGraphPath(frequency, type, patternId));
+		graphWriter.write(graph,
+				getGraphPath(frequency, entropy, type, patternId));
 	}
-	
-	private String getGraphPath(int frequency, EpisodeType type, int patternId) {
-		String fileName = getPatternsPath(frequency, type) + "/pattern"
-				+ patternId + ".dot";
+
+	private String getGraphPath(int frequency, double entropy,
+			EpisodeType type, int patternId) {
+		String fileName = getPatternsPath(frequency, entropy, type)
+				+ "/pattern" + patternId + ".dot";
 		return fileName;
 	}
 
-	private String getPatternsPath(int frequency, EpisodeType type) {
-		File path = new File(getResultPath(frequency, type) + "/allPatterns");
+	private String getPatternsPath(int frequency, double entropy,
+			EpisodeType type) {
+		File path = new File(getResultPath(frequency, entropy, type)
+				+ "/allPatterns");
 		if (!path.exists()) {
 			path.mkdirs();
 		}
 		return path.getAbsolutePath();
 	}
 
-	private String getResultPath(int frequency, EpisodeType type) {
+	private String getResultPath(int frequency, double entropy, EpisodeType type) {
 		File path = new File(patternFolder.getAbsolutePath() + "/freq"
-				+ frequency + "/" + type.toString());
+				+ frequency + "/entropy" + entropy + "/" + type.toString());
 		if (!path.exists()) {
 			path.mkdirs();
 		}
 		return path.getAbsolutePath();
 	}
 
-	private File getEvalPath(int frequency, EpisodeType episodeType) {
-		File fileName = new File(getResultPath(frequency, episodeType)
+	private File getEvalPath(int frequency, double entropy,
+			EpisodeType episodeType) {
+		File fileName = new File(getResultPath(frequency, entropy, episodeType)
 				+ "/evaluations.txt");
 		return fileName;
 	}
