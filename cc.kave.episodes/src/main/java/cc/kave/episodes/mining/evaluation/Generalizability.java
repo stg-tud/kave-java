@@ -31,6 +31,7 @@ import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 
@@ -71,9 +72,18 @@ public class Generalizability {
 	public void validate(int frequency, int threshFreq, double threshEntropy)
 			throws Exception {
 		List<Tuple<Event, List<Event>>> stream = cxtParser.parse(frequency);
+		
+		Logger.log("Reading event's list ...");
 		List<Event> events = streamIo.readMapping(frequency);
-		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamToFacts(
-				stream, events);
+		Logger.log("Converting to map of events ...");
+		Map<Event, Integer> eventsMap = mapConverter(events);
+		
+		Logger.log("Converting to stream of facts ...");
+		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamOfFacts(
+				stream, eventsMap);
+		stream.clear();
+		
+		Logger.log("Parsing list of episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parser(frequency);
 
 		checkGeneralizability(EpisodeType.SEQUENTIAL, threshFreq, threshEntropy, events,
@@ -82,6 +92,17 @@ public class Generalizability {
 				streamOfFacts, episodes);
 		checkGeneralizability(EpisodeType.GENERAL, threshFreq, threshEntropy, events,
 				streamOfFacts, episodes);
+	}
+	
+	private Map<Event, Integer> mapConverter(List<Event> events) {
+		Map<Event, Integer> map = Maps.newLinkedHashMap();
+		int id = 0;
+		
+		for (Event event : events) {
+			map.put(event, id);
+			id++;
+		}
+		return map;
 	}
 
 	private void checkGeneralizability(EpisodeType type, int threshFreq,
@@ -121,15 +142,15 @@ public class Generalizability {
 
 	}
 
-	private List<Tuple<Event, List<Fact>>> convertStreamToFacts(
-			List<Tuple<Event, List<Event>>> stream, List<Event> events) {
+	private List<Tuple<Event, List<Fact>>> convertStreamOfFacts(
+			List<Tuple<Event, List<Event>>> stream, Map<Event, Integer> events) {
 		List<Tuple<Event, List<Fact>>> results = Lists.newLinkedList();
 
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			List<Fact> facts = Lists.newLinkedList();
 
 			for (Event event : tuple.getSecond()) {
-				int id = events.indexOf(event);
+				int id = events.get(event);
 				facts.add(new Fact(id));
 			}
 			results.add(Tuple.newTuple(tuple.getFirst(), facts));
@@ -154,8 +175,8 @@ public class Generalizability {
 			}
 		}
 		int numOccs = methodsOrderRelation.getOccurrences();
-		assertTrue(numOccs == pattern.getFrequency(),
-				"Frequency and numbOccs do not match!");
+		assertTrue(numOccs >= pattern.getFrequency(),
+				"Found insufficient number of occurences!");
 
 		Set<IMethodName> methodOcc = methodsOrderRelation
 				.getMethodNames(numOccs);
