@@ -49,16 +49,16 @@ public class EventStreamGenerator2 {
 			process(zip);
 		}
 
-//		List<Future<?>> futures = Lists.newLinkedList();
-//		for (int i = 0; i < NUM_CORES; i++) {
-//			futures.add(pool.submit(new Worker(i)));
-//		}
-//
-//		// block until done
-//		for (Future<?> f : futures) {
-//			f.get();
-//		}
-//		pool.shutdown();
+		List<Future<?>> futures = Lists.newLinkedList();
+		for (int i = 0; i < NUM_CORES; i++) {
+			futures.add(pool.submit(new Worker(i)));
+		}
+
+		// block until done
+		for (Future<?> f : futures) {
+			f.get();
+		}
+		pool.shutdown();
 		createStats();
 
 		return eventsAll;

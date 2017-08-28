@@ -86,9 +86,9 @@ public class PartialEventStreamGenerator {
 			ctxFirst = null;
 			ctxSuper = null;
 			IMethodName m = decl.getName();
-//			if (!seenMethods.add(TypeErasure.of(m))) {
-//				return null;
-//			}
+			if (!seenMethods.add(TypeErasure.of(m))) {
+				return null;
+			}
 			ctxElem = m;
 			for (IMethodHierarchy h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(m)) {

@@ -36,9 +36,6 @@ import java.util.Set;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.ssts.ISST;
-import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
-import cc.kave.commons.utils.TypeErasure;
 import cc.kave.episodes.eventstream.Filters;
 import cc.kave.episodes.eventstream.StreamFilterGenerator;
 import cc.kave.episodes.eventstream.StreamRepoGenerator;
@@ -66,7 +63,6 @@ public class ContextsParser {
 	}
 
 	private Map<String, Set<IMethodName>> repoDecls = Maps.newLinkedHashMap();
-	private Set<IMethodName> seenMethods = Sets.newHashSet();
 
 	private List<Tuple<Event, List<Event>>> streamRepos = Lists.newLinkedList();
 	private List<Tuple<Event, List<Event>>> streamFilters = Lists
@@ -105,7 +101,6 @@ public class ContextsParser {
 			ReadingArchive ra = contextsDir.getReadingArchive(zip);
 			while (ra.hasNext()) {
 				Context ctx = ra.getNext(Context.class);
-				// saveElementCtx(repoName, ctx);
 				eventStreamRepo.add(ctx);
 				eventStreamFilter.add(ctx);
 			}
