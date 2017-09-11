@@ -4,6 +4,7 @@ import static cc.recommenders.assertions.Asserts.assertTrue;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 
@@ -26,7 +28,7 @@ public class APIsGeneralizability {
 
 	private FileReader reader;
 	private EventStreamIo streamIo;
-	
+
 	@Inject
 	public APIsGeneralizability(@Named("patterns") File folder,
 			FileReader fileReader, EventStreamIo streamIo) {
@@ -51,7 +53,7 @@ public class APIsGeneralizability {
 				continue;
 			}
 			if (line.contains("Patterns")) {
-				if (array[0][0] > 0) {
+				if (sum(array) > 0) {
 					Logger.log("\t%s", line);
 					Logger.log("\t\t1 API\tMultiple APIs");
 					Logger.log("\tSpecific\t%d\t%d", array[0][0], array[0][1]);
@@ -89,9 +91,82 @@ public class APIsGeneralizability {
 		Logger.log("\tSpecific\t%d\t%d", array[0][0], array[0][1]);
 		Logger.log("\tGeneral\t%d\t%d", array[1][0], array[1][1]);
 	}
-	
-	public void apiUsages(EpisodeType type, int frequency, int threshFreq, double threshEnt) {
-		
+
+	private int sum(int[][] array) {
+		int sum = 0;
+		for (int[] vect : array) {
+			for (int value : vect) {
+				sum += value;
+			}
+		}
+		return sum;
+	}
+
+	public void apiUsages(EpisodeType type, int frequency, int threshFreq,
+			double threshEntropy) {
+		List<Event> events = streamIo.readMapping(frequency);
+		Set<String> apiSpecific = Sets.newHashSet();
+		Set<String> apiGeneral = Sets.newHashSet();
+
+		Map<Episode, Integer> patterns = getEvaluations(type, threshFreq,
+				threshEntropy);
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			Set<Fact> factEvent = entry.getKey().getEvents();
+			if (factEvent.size() == 2) {
+				if (entry.getValue() == 1) {
+					for (Fact fact : factEvent) {
+						int factId = fact.getFactID();
+						ITypeName typeName = events.get(factId).getMethod()
+								.getDeclaringType();
+						apiSpecific
+								.add(typeName.getNamespace().getIdentifier());
+					}
+				} else {
+					for (Fact fact : factEvent) {
+						int factId = fact.getFactID();
+						ITypeName typeName = events.get(factId).getMethod()
+								.getDeclaringType();
+						apiGeneral.add(typeName.getNamespace().getIdentifier());
+					}
+				}
+			}
+		}
+		Logger.log("APIs only in specific patterns:");
+		for (String api : apiSpecific) {
+			if (!apiGeneral.contains(api)) {
+				Logger.log("%s", api);
+			}
+		}
+		Logger.log("\nAPIs only in general patterns:");
+		for (String api : apiGeneral) {
+			if (!apiSpecific.contains(api)) {
+				Logger.log("%s", api);
+			}
+		}
+	}
+
+	private Map<Episode, Integer> getEvaluations(EpisodeType type,
+			int frequency, double entropy) {
+		File evaluationFile = getFilePath(type, frequency, entropy);
+		List<String> evalText = reader.readFile(evaluationFile);
+
+		Map<Episode, Integer> evaluations = Maps.newLinkedHashMap();
+
+		for (String line : evalText) {
+			if (line.isEmpty() || line.contains("PatternId")
+					|| line.contains("Patterns")) {
+				continue;
+			}
+			String[] elems = line.split("\t");
+			String facts = elems[1];
+			int freq = Integer.parseInt(elems[2]);
+			double ent = Double.parseDouble(elems[3]);
+			int gens = Integer.parseInt(elems[4]);
+
+			Episode pattern = createPattern(facts, freq, ent);
+			evaluations.put(pattern, gens);
+		}
+		return evaluations;
 	}
 
 	private Episode createPattern(String facts, int freq, double ent) {

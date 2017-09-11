@@ -34,7 +34,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 200;
+	private static final int FREQUENCY = 300;
 
 	private static final int THF = 700;
 	private static final double THE = 0.59 ;
@@ -62,7 +62,8 @@ public class run_ervina {
 //		load(ThresholdAnalyzer.class).EntDim(FREQUENCY);
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
 //		load(Generalizability.class).validate(FREQUENCY, THF, THE);
-		load(APIsGeneralizability.class).analyze(EpisodeType.SEQUENTIAL, FREQUENCY, THF, THE);
+		load(APIsGeneralizability.class).analyze(EpisodeType.GENERAL, FREQUENCY, THF, THE);
+//		load(APIsGeneralizability.class).apiUsages(EpisodeType.GENERAL, FREQUENCY, THF, THE);
 		
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,
