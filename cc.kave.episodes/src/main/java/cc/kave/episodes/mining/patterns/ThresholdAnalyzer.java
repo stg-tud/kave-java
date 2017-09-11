@@ -49,7 +49,7 @@ public class ThresholdAnalyzer {
 		Logger.log("\tHistogram for %s-configuration:", type.toString());
 		Logger.log("\tEntropy threshold = %.2f", entropy);
 		Logger.log("\tFrequency\t#Patterns");
-		for (int freq = frequency; freq < maxFreq + 1; freq += 5) {
+		for (int freq = frequency; freq < maxFreq + 1; freq ++) {
 			Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
 					freq, entropy);
 			int numbPatterns = getNumbPatterns(patterns);
@@ -63,7 +63,7 @@ public class ThresholdAnalyzer {
 
 		int prevValue = 0;
 
-		for (int freq = frequency; freq < maxFreq + 1; freq += 20) {
+		for (int freq = frequency; freq < maxFreq; freq += 10) {
 
 			for (double ent = 0.0; ent < 1.01; ent += 0.01) {
 				double entropy = Math.round(ent * 100.0) / 100.0;

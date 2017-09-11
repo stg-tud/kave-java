@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
@@ -35,10 +36,12 @@ import com.google.common.collect.Sets;
 public class EventsStatistics {
 
 	private EventStreamIo eventStreamIo;
+	private EpisodeToGraphConverter graphConverter;
 
 	@Inject
-	public EventsStatistics(EventStreamIo streamIo) {
+	public EventsStatistics(EventStreamIo streamIo, EpisodeToGraphConverter graphConverter) {
 		this.eventStreamIo = streamIo;
+		this.graphConverter = graphConverter;
 	}
 
 	public static int minFreq(Map<Event, Integer> occ) {
@@ -89,6 +92,20 @@ public class EventsStatistics {
 		Logger.log("\tFrequency\tNumbEvents");
 		for (Map.Entry<Integer, Integer> entry : histogram.entrySet()) {
 			Logger.log("\t%d\t%d", entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public void printEventFreqs(int frequency) throws IOException {
+		List<List<Fact>> stream = eventStreamIo.parseStream(frequency);
+		List<Event> events = eventStreamIo.readMapping(frequency);
+		Map<Fact, Integer> factOccs = getEventFreqs(stream);
+		
+		Logger.log("\tEvent\tFrequency");
+		for (Map.Entry<Fact, Integer> entry : factOccs.entrySet()) {
+			int factId = entry.getKey().getFactID();
+			Event e = events.get(factId);
+			String label = graphConverter.toLabel(e.getMethod());
+			Logger.log("\t%s\t%d", label, entry.getValue());
 		}
 	}
 
