@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 
-public class APIsGeneralizability {
+public class APIUsages {
 
 	private File patternFolder;
 
@@ -30,7 +30,7 @@ public class APIsGeneralizability {
 	private EventStreamIo streamIo;
 
 	@Inject
-	public APIsGeneralizability(@Named("patterns") File folder,
+	public APIUsages(@Named("patterns") File folder,
 			FileReader fileReader, EventStreamIo streamIo) {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
@@ -40,7 +40,7 @@ public class APIsGeneralizability {
 		this.streamIo = streamIo;
 	}
 
-	public void analyze(EpisodeType type, int frequeny, int threshFreq,
+	public void genVSnoapis(EpisodeType type, int frequeny, int threshFreq,
 			double threshEnt) {
 		File evaluationFile = getFilePath(type, threshFreq, threshEnt);
 		List<String> evalText = reader.readFile(evaluationFile);
