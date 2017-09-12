@@ -187,7 +187,15 @@ public class APIUsages {
 
 		return pattern;
 	}
-
+	
+	private int maxRels(int numEvents) {
+	if (numEvents < 3) {
+		return 1;
+	} else {
+		return (numEvents - 1) + maxRels(numEvents - 1);
+	}
+}
+	
 	private File getFilePath(EpisodeType type, int frequeny, double entropy) {
 		String path = patternFolder.getAbsolutePath() + "/freq" + frequeny
 				+ "/entropy" + entropy + "/" + type + "/evaluations.txt";
