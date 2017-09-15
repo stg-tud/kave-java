@@ -1,8 +1,10 @@
 package exec.episodes;
 
 import java.util.Map;
+import java.util.TreeSet;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class Examples {
 
@@ -18,5 +20,12 @@ public class Examples {
 			}
 		}
 		System.out.println(map.toString());
+		
+		TreeSet<String> treeStruct = Sets.newTreeSet();
+		treeStruct.add("c");
+		treeStruct.add("a");
+		treeStruct.add("b");
+		
+		System.out.println(treeStruct.toString());
 	}
 }
