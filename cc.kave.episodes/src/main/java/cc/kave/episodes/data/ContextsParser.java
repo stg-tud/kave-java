@@ -118,6 +118,7 @@ public class ContextsParser {
 		printStats();
 		checkForEmptyRepos();
 		checkElementCtxs(streamFreq);
+		
 		return streamFreq;
 	}
 
@@ -154,16 +155,22 @@ public class ContextsParser {
 	}
 
 	private void checkForEmptyRepos() {
-		int numbEmptyRepos = 0;
-
+		Logger.log("\tRepository statistics:");
+		Logger.log("\tRepository\tnumMethods");
 		for (Map.Entry<String, Set<IMethodName>> entry : repoDecls.entrySet()) {
-			if (entry.getValue().isEmpty()) {
-				Logger.log("Empty repository: %s", entry.getKey());
-				numbEmptyRepos++;
-			}
+			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue().size());
 		}
-		Logger.log("------");
-		Logger.log("Empty repositories counted: %d\n", numbEmptyRepos);
+		
+//		int numbEmptyRepos = 0;
+//
+//		for (Map.Entry<String, Set<IMethodName>> entry : repoDecls.entrySet()) {
+//			if (entry.getValue().isEmpty()) {
+//				Logger.log("Empty repository: %s", entry.getKey());
+//				numbEmptyRepos++;
+//			}
+//		}
+//		Logger.log("------");
+//		Logger.log("Empty repositories counted: %d\n", numbEmptyRepos);
 	}
 
 	private List<Tuple<Event, List<Event>>> processStreamRepo(

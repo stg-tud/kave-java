@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.APIUsages;
-import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.mining.evaluation.Generalizability;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -33,9 +32,9 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 200;
+	private static final int FREQUENCY = 300;
 
-	private static final int THF = 700;
+	private static final int THF = 1200;
 	private static final double THE = 0.6 ;
 
 	private static final int METHODSIZE = 5000;
@@ -60,7 +59,7 @@ public class run_ervina {
 //		 load(PatternsStatistics.class).numPatterns(FREQUENCY, THF, THE);
 //		load(ThresholdAnalyzer.class).EntDim(FREQUENCY);
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
-//		load(Generalizability.class).validate(FREQUENCY, THF, THE);
+		load(Generalizability.class).validate(FREQUENCY, THF, THE);
 //		load(APIUsages.class).categorise(EpisodeType.GENERAL, FREQUENCY, THF, THE);
 //		load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
@@ -68,7 +67,8 @@ public class run_ervina {
 //		load(APIUsages.class).specificPatterns(FREQUENCY, THF, THE);
 //		load(APIUsages.class).apiUsages(EpisodeType.GENERAL, FREQUENCY, THF, THE);
 //		load(APIUsages.class).patternEvents(FREQUENCY, THF, THE);
-		load(APIUsages.class).getRepoOccSpecPatt(FREQUENCY, THF, THE);
+//		load(APIUsages.class).getRepoOccStrictPatt(FREQUENCY, THF, THE);
+//		load(APIUsages.class).getRepoOccSpecPatt(FREQUENCY, THF, THE);
 		
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,

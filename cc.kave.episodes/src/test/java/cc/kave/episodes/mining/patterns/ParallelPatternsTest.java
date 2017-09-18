@@ -72,7 +72,11 @@ public class ParallelPatternsTest {
 
 		Set<Episode> twoNodes = Sets.newLinkedHashSet();
 		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
+		twoNodes.add(createEpisode(8, 0.7, "1", "2", "1>2"));
 		twoNodes.add(createEpisode(5, 0.5, "1", "3", "1>3"));
+		twoNodes.add(createEpisode(6, 0.5, "1", "3", "3>1"));
+		twoNodes.add(createEpisode(6, 0.4, "1", "3", "3>1"));
+		twoNodes.add(createEpisode(6, 0.5, "1", "3"));
 		episodes.put(2, twoNodes);
 
 		Set<Episode> threeNodes = Sets.newLinkedHashSet();
@@ -82,6 +86,7 @@ public class ParallelPatternsTest {
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		Set<Episode> set2 = Sets.newLinkedHashSet();
 		set2.add(createEpisode(8, 0.7, "1", "2"));
+		set2.add(createEpisode(6, 0.5, "1", "3"));
 		expected.put(2, set2);
 
 		Set<Episode> set3 = Sets.newLinkedHashSet();

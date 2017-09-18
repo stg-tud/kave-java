@@ -493,19 +493,23 @@ public class APIUsages {
 				threshFreq, threshEntr);
 
 		List<Tuple<Event, List<Event>>> stream = ctxParser.parse(frequency);
+		Logger.log("Getting repos-ctx mapper ...");
 		Map<String, Set<IMethodName>> repos = ctxParser.getRepoCtxMapper();
+		Logger.log("Converting stream of events into stream of facts ...");
 		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamOfFacts(
 				stream, eventsMap);
 		stream.clear();
 
 		Map<String, Integer> repoNoPatterns = Maps.newLinkedHashMap();
-
+		int patternId = 0;
+		
 		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			Logger.log("Analyzing pattern %d ...", patternId);
 			Episode pattern = entry.getKey();
-			if (!isPartial(pattern)) {
+			if (isPartial(pattern)) {
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
 						true);
-
+				Logger.log("Iterating through the events of facts ...");
 				for (Tuple<Event, List<Fact>> tuple : streamOfFacts) {
 					List<Fact> method = tuple.getSecond();
 					if (method.size() < 2) {
@@ -524,6 +528,7 @@ public class APIUsages {
 						.getMethodNames(numOccs);
 				List<String> repositories = Lists.newLinkedList();
 
+				Logger.log("Iterating through the repositories ...");
 				for (Map.Entry<String, Set<IMethodName>> entryRepos : repos
 						.entrySet()) {
 					for (IMethodName methodName : entryRepos.getValue()) {
@@ -533,6 +538,7 @@ public class APIUsages {
 						}
 					}
 				}
+				Logger.log("Storing repos-number of patterns occurrences ...");
 				for (String repoName : repositories) {
 					if (repoNoPatterns.containsKey(repoName)) {
 						int counter = repoNoPatterns.get(repoName);
@@ -542,8 +548,9 @@ public class APIUsages {
 					}
 				}
 			}
+			patternId++;
 		}
-		Logger.log("\tStrict-order patterns:");
+		Logger.log("\tPartial-order patterns:");
 		Logger.log("\tRepoName\tNoPatterns");
 		for (Map.Entry<String, Integer> entry : repoNoPatterns.entrySet()) {
 			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue());
