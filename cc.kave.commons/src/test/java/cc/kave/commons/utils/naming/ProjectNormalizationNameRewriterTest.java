@@ -27,28 +27,28 @@ public class ProjectNormalizationNameRewriterTest {
 
 	@Test
 	public void type_localtype() {
-		assertNormalization(Names.newType("a.B, myproject"), Names.newType("a.B, UNKNOWN, 0"));
+		assertNormalization(Names.newType("a.B, myproject"), Names.newType("a.B, ???"));
 	}
 
 	@Test
 	public void type_libtype() {
-		assertNormalization(Names.newType("a.B, lib, 1.2.3"), Names.newType("a.B, lib, 1.2.3"));
+		assertNormalization(Names.newType("a.B, lib, 1.2.3.4"), Names.newType("a.B, lib, 1.2.3.4"));
 	}
 
 	@Test
 	public void method_return() {
-		assertNormalization(Names.newMethod("[T,P] [T,L,1].m()"), Names.newMethod("[T, UNKNOWN, 0] [T,L,1].m()"));
+		assertNormalization(Names.newMethod("[T,P] [T,L,1.2.3.4].m()"), Names.newMethod("[T,???] [T,L,1.2.3.4].m()"));
 	}
 
 	@Test
 	public void method_declaring() {
-		assertNormalization(Names.newMethod("[T,L,1] [T,P].m()"), Names.newMethod("[T,L,1] [T, UNKNOWN, 0].m()"));
+		assertNormalization(Names.newMethod("[T,L,1.2.3.4] [T,P].m()"), Names.newMethod("[T,L,1.2.3.4] [T,???].m()"));
 	}
 
 	@Test
 	public void method_param() {
-		assertNormalization(Names.newMethod("[T,L,1] [T,L,2].m([T,P] p)"),
-				Names.newMethod("[T,L,1] [T,L,2].m([T, UNKNOWN, 0] p)"));
+		assertNormalization(Names.newMethod("[T,L,1.2.3.4] [T,L,2.3.4.5].m([T,P] p)"),
+				Names.newMethod("[T,L,1.2.3.4] [T,L,2.3.4.5].m([T,???] p)"));
 	}
 
 	// still to add: fields, properties, generic types, etc..
