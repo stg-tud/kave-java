@@ -1,7 +1,12 @@
 package cc.kave.episodes.preprocessing;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.EventStream;
@@ -36,5 +41,13 @@ public class Preprocessing {
 		}
 		eventStreamIo.write(es, frequency);
 		return es;
+	}
+	
+	public void temp(int frequency) throws Exception {
+		List<Tuple<Event, List<Event>>> stream = ctxParser.parse(frequency);
+		
+		Map<String, Set<IMethodName>> repoCtsx = ctxParser.getRepoCtxMapper();
+		
+		eventStreamIo.writeObjects(repoCtsx, frequency);
 	}
 }

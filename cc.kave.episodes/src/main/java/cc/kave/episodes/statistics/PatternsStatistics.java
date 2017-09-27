@@ -32,21 +32,28 @@ public class PatternsStatistics {
 	public void numPatterns(int frequency, int threshFreq, double threshEnt) {
 		Map<Integer, Set<Episode>> episodes = episodeReader.parser(frequency);
 
+		Logger.log("\tPartial-order configuration:");
 		Map<Integer, Set<Episode>> partPatterns = partials.filter(episodes,
 				threshFreq, threshEnt);
-		Logger.log("Number of patterns learned by partial configuration: %d",
-				patternsCounter(partPatterns));
+		outputStats(partPatterns);
 
+		Logger.log("\tSequential-order configuration:");
 		Map<Integer, Set<Episode>> seqPatterns = sequentials.filter(episodes,
 				threshFreq);
-		Logger.log(
-				"Number of patterns learned by sequential configuration: %d",
-				patternsCounter(seqPatterns));
+		outputStats(seqPatterns);
 
+		Logger.log("\tNo-order configuration:");
 		Map<Integer, Set<Episode>> paraPatterns = parallels.filter(episodes,
 				threshFreq);
-		Logger.log("Number of patterns learned by parallel configuration: %d",
-				patternsCounter(paraPatterns));
+		outputStats(paraPatterns);
+	}
+
+	private void outputStats(Map<Integer, Set<Episode>> patterns) {
+		Logger.log("\tPatternSize\tNumPatterns");
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			Logger.log("\t%d-node\t%d", entry.getKey(), entry.getValue().size());
+		}
+		Logger.log("");
 	}
 
 	private int patternsCounter(Map<Integer, Set<Episode>> patterns) {

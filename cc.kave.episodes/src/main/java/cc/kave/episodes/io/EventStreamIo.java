@@ -22,16 +22,19 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
 import com.google.common.collect.Lists;
@@ -63,6 +66,21 @@ public class EventStreamIo {
 		}
 	}
 
+	public void writeObjects(Map<String, Set<IMethodName>> repoCtxs, int frequency) {
+//		JsonUtils.toJson(streamObject, new File(
+//				getTrainPath(frequency).streamObject));
+		JsonUtils.toJson(repoCtxs, new File(getTrainPath(frequency).repoCtxs));
+	}
+	
+	public List<Tuple<Event, List<Event>>> readStreamObject(int frequency) {
+		String streamObject = getTrainPath(frequency).streamObject;
+
+		@SuppressWarnings("serial")
+		Type type = new TypeToken<List<Tuple<Event, List<Event>>>>() {
+		}.getType();
+		return JsonUtils.fromJson(new File(streamObject), type);
+	}
+
 	public List<Event> readMapping(int frequency) {
 		String mappingPath = getTrainPath(frequency).mappingPath;
 
@@ -70,6 +88,15 @@ public class EventStreamIo {
 		Type type = new TypeToken<List<Event>>() {
 		}.getType();
 		return JsonUtils.fromJson(new File(mappingPath), type);
+	}
+	
+	public Map<String, Set<IMethodName>> readRepoCtxs(int frequency) {
+		String repoCtxsPath = getTrainPath(frequency).repoCtxs;
+		
+		@SuppressWarnings("serial")
+		Type type = new TypeToken<Map<String, Set<IMethodName>>>() {
+		}.getType();
+		return JsonUtils.fromJson(new File(repoCtxsPath), type);
 	}
 
 	public String readStreamText(int frequency) throws IOException {
@@ -148,6 +175,8 @@ public class EventStreamIo {
 	private class TrainingPath {
 		String streamPath = "";
 		String mappingPath = "";
+		String streamObject = "";
+		String repoCtxs = "";
 	}
 
 	private TrainingPath getTrainPath(int frequency) {
@@ -158,6 +187,8 @@ public class EventStreamIo {
 		TrainingPath trainPath = new TrainingPath();
 		trainPath.streamPath = path.getAbsolutePath() + "/stream.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
+		trainPath.streamObject = path.getAbsolutePath() + "/streamObject.txt";
+		trainPath.repoCtxs = path.getAbsolutePath() + "/repoCtxs.txt";
 
 		return trainPath;
 	}

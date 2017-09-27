@@ -72,32 +72,32 @@ public class Generalizability {
 	public void validate(int frequency, int threshFreq, double threshEntropy)
 			throws Exception {
 		List<Tuple<Event, List<Event>>> stream = cxtParser.parse(frequency);
-		
+
 		Logger.log("Reading event's list ...");
 		List<Event> events = streamIo.readMapping(frequency);
 		Logger.log("Converting to map of events ...");
 		Map<Event, Integer> eventsMap = mapConverter(events);
-		
+
 		Logger.log("Converting to stream of facts ...");
 		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamOfFacts(
 				stream, eventsMap);
 		stream.clear();
-		
+
 		Logger.log("Parsing list of episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parser(frequency);
 
-		checkGeneralizability(EpisodeType.SEQUENTIAL, threshFreq, threshEntropy, events,
-				streamOfFacts, episodes);
-		checkGeneralizability(EpisodeType.PARALLEL, threshFreq, threshEntropy, events,
-				streamOfFacts, episodes);
-		checkGeneralizability(EpisodeType.GENERAL, threshFreq, threshEntropy, events,
-				streamOfFacts, episodes);
+		checkGeneralizability(EpisodeType.GENERAL, threshFreq, threshEntropy,
+				events, streamOfFacts, episodes);
+		checkGeneralizability(EpisodeType.PARALLEL, threshFreq, threshEntropy,
+				events, streamOfFacts, episodes);
+		checkGeneralizability(EpisodeType.SEQUENTIAL, threshFreq,
+				threshEntropy, events, streamOfFacts, episodes);
 	}
-	
+
 	private Map<Event, Integer> mapConverter(List<Event> events) {
 		Map<Event, Integer> map = Maps.newLinkedHashMap();
 		int id = 0;
-		
+
 		for (Event event : events) {
 			map.put(event, id);
 			id++;
@@ -117,7 +117,31 @@ public class Generalizability {
 		int patternId = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			Logger.log("Cheking generalizability for %s-order configuration...", type.toString());
+
+//			if ((type == EpisodeType.SEQUENTIAL)
+//					|| (type == EpisodeType.PARALLEL)) {
+//				if (entry.getKey() < 6) {
+//					continue;
+//				}
+//				if (entry.getKey() == 6) {
+//					if (type == EpisodeType.SEQUENTIAL) {
+//						patternId = 1200;
+//					}
+//					if (type == EpisodeType.PARALLEL) {
+//						patternId = 948;
+//					}
+//				}
+//			} else {
+//				if (entry.getKey() == 2) {
+//					continue;
+//				}
+//				if (entry.getKey() == 3) {
+//					patternId = 390;
+//				}
+//			}
+			Logger.log(
+					"Cheking generalizability for %s-order configuration...",
+					type.toString());
 			Logger.log("Outputing episodes with %d-nodes ...", entry.getKey());
 			sb.append("Patterns with " + entry.getKey() + "-nodes:\n");
 			sb.append("PatternId\tFacts\tFrequency\tEntropy\t#Repos\n");

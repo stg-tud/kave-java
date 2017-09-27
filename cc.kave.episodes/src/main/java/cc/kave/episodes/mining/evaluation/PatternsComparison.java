@@ -1,39 +1,61 @@
 package cc.kave.episodes.mining.evaluation;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.episodes.io.EpisodeParser;
+import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
+import cc.kave.episodes.mining.patterns.PatternFilter;
+import cc.kave.episodes.model.Episode;
+import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.EnclosingMethods;
+import cc.kave.episodes.postprocessor.TransClosedEpisodes;
+import cc.recommenders.datastructures.Tuple;
+import cc.recommenders.io.Logger;
 
 public class PatternsComparison {
 
-//	private File patternsFile;
-//
-//	private EventStreamIo eventStream;
-//
-//	private EpisodeReader episodeParser;
-//	private EpisodesFilter episodeFilter;
-//	private TransClosedEpisodes transClosure;
-//
-//	private EpisodeToGraphConverter episodeGraphConverter;
-//	private EpisodeAsGraphWriter graphWriter;
-//
-//	private static final int THRESHFREQ = 300;
-//	private static final double THRESHENT = 0.73;
-//
-//	@Inject
-//	public PatternsComparison(@Named("patterns") File folder,
-//			EventStreamIo streamIo, EpisodeReader parser,
-//			EpisodesFilter filter, TransClosedEpisodes transClosed,
-//			EpisodeToGraphConverter graphConverter,
-//			EpisodeAsGraphWriter graphWriter) {
-//		assertTrue(folder.exists(), "Patterns folder does not exist");
-//		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
-//		this.patternsFile = folder;
-//		this.eventStream = streamIo;
-//		this.episodeParser = parser;
-//		this.episodeFilter = filter;
-//		this.transClosure = transClosed;
-//		this.episodeGraphConverter = graphConverter;
-//		this.graphWriter = graphWriter;
-//	}
-//
+	private File patternsFile;
+
+	private EventStreamIo eventStream;
+
+	private EpisodeParser episodeParser;
+	private PatternFilter episodeFilter;
+	private TransClosedEpisodes transClosure;
+
+	private EpisodeToGraphConverter episodeGraphConverter;
+	private EpisodeAsGraphWriter graphWriter;
+
+	private static final int THRESHFREQ = 300;
+	private static final double THRESHENT = 0.73;
+
+	@Inject
+	public PatternsComparison(@Named("patterns") File folder,
+			EventStreamIo streamIo, EpisodeParser parser,
+			PatternFilter filter, TransClosedEpisodes transClosed,
+			EpisodeToGraphConverter graphConverter,
+			EpisodeAsGraphWriter graphWriter) {
+		assertTrue(folder.exists(), "Patterns folder does not exist");
+		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
+		this.patternsFile = folder;
+		this.eventStream = streamIo;
+		this.episodeParser = parser;
+		this.episodeFilter = filter;
+		this.transClosure = transClosed;
+		this.episodeGraphConverter = graphConverter;
+		this.graphWriter = graphWriter;
+	}
+
 //	public void storePatterns(EpisodeType type, int foldNum, int frequency)
 //			throws IOException {
 //		List<Event> events = eventStream.readMapping(frequency);
@@ -566,35 +588,35 @@ public class PatternsComparison {
 //		// }
 //	}
 //
-//	// public void extractConcreteCode(int frequency, int foldNum) {
-//	// List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
-//	// frequency, foldNum);
-//	// Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
-//	//
-//	// EnclosingMethods enclMethods = new EnclosingMethods(true);
-//	// int numMethods = 0;
-//	// for (Tuple<Event, List<Fact>> tuple : stream) {
-//	// List<Fact> method = tuple.getSecond();
-//	//
-//	// if (method.size() < 2) {
-//	// continue;
-//	// }
-//	// if (method.containsAll(pattern.getEvents())) {
-//	// enclMethods.addMethod(pattern, method, tuple.getFirst());
-//	// numMethods = enclMethods.getOccurrences();
-//	// }
-//	// if (numMethods > 500) {
-//	// break;
-//	// }
-//	// }
-//	// Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
-//	//
-//	// for (IMethodName eventName : methodNames) {
-//	// Logger.log("General pattern occurrences: %s",
-//	// eventName.getDeclaringType().getFullName() + "."
-//	// + eventName.getName());
-//	// }
-//	// }
+//	public void extractConcreteCode(int frequency, int foldNum) {
+//		List<Tuple<Event, List<Fact>>> stream = eventStream.parseStream(
+//				frequency, foldNum);
+//		Episode pattern = createEpisode(312, 0.985606, "46671", "46672");
+//
+//		EnclosingMethods enclMethods = new EnclosingMethods(true);
+//		int numMethods = 0;
+//		for (Tuple<Event, List<Fact>> tuple : stream) {
+//			List<Fact> method = tuple.getSecond();
+//
+//			if (method.size() < 2) {
+//				continue;
+//			}
+//			if (method.containsAll(pattern.getEvents())) {
+//				enclMethods.addMethod(pattern, method, tuple.getFirst());
+//				numMethods = enclMethods.getOccurrences();
+//			}
+//			if (numMethods > 500) {
+//				break;
+//			}
+//		}
+//		Set<IMethodName> methodNames = enclMethods.getMethodNames(numMethods);
+//
+//		for (IMethodName eventName : methodNames) {
+//			Logger.log("General pattern occurrences: %s",
+//					eventName.getDeclaringType().getFullName() + "."
+//							+ eventName.getName());
+//		}
+//	}
 //
 //	private boolean assertFactSets(Set<Fact> facts1, Set<Fact> facts2) {
 //		if (facts1.size() != facts2.size()) {
@@ -610,16 +632,16 @@ public class PatternsComparison {
 //		return true;
 //	}
 //
-//	private Episode createEpisode(int frequency, double entropy,
-//			String... strings) {
-//		Episode episode = new Episode();
-//
-//		episode.setFrequency(frequency);
-//		episode.setEntropy(entropy);
-//		episode.addStringsOfFacts(strings);
-//
-//		return episode;
-//	}
+	private Episode createEpisode(int frequency, double entropy,
+			String... strings) {
+		Episode episode = new Episode();
+
+		episode.setFrequency(frequency);
+		episode.setEntropy(entropy);
+		episode.addStringsOfFacts(strings);
+
+		return episode;
+	}
 //
 //	private boolean checkValidity(Set<Fact> events, Set<Episode> episodes1,
 //			Set<Episode> episodes2) {
