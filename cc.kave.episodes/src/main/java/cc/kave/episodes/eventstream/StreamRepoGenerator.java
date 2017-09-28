@@ -95,7 +95,7 @@ public abstract class StreamRepoGenerator {
 
 		private void addEnclosingMethodIfAvailable() {
 			if (elementCtx != null) {
-				events.add(Events.newContext(erase(elementCtx)));
+				events.add(Events.newElementContext(erase(elementCtx)));
 				elementCtx = null;
 			}
 			if (firstCtx != null) {

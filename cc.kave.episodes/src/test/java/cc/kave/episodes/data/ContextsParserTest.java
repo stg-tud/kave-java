@@ -179,12 +179,12 @@ public class ContextsParserTest {
 
 		List<Event> method = Lists.newLinkedList();
 
-		IMethodName decl3 = Names.newMethod("[T,P] [T3,P].M3()");
+		IMethodName decl3 = Names.newMethod("[T,???] [T3,???].M3()");
 		String inv3 = "[System.Void, mscore, 4.0.0.0] [T, P, 1.2.3.4].MI3()";
 		method = Lists.newLinkedList();
 		method.add(Events.newInvocation(Names.newMethod(inv3)));
 		method.add(Events.newInvocation(Names.newMethod(inv3)));
-		expected.add(Tuple.newTuple(Events.newContext(decl3), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(decl3), method));
 		
 		List<Tuple<Event, List<Event>>> actuals = sut.parse(FREQUENCY);
 		
@@ -199,9 +199,9 @@ public class ContextsParserTest {
 		String repo3 = "Github/usr1/repo3";
 		String repo2 = "Github/usr1/repo2";
 		
-		IMethodName decl1 = Names.newMethod("[T,P] [T1,P].M2()");
-		IMethodName decl2 = Names.newMethod("[T,P] [T2,P].M()");
-		IMethodName decl3 = Names.newMethod("[T,P] [T3,P].M3()");
+		IMethodName decl1 = Names.newMethod("[T,???] [T1,???].M2()");
+		IMethodName decl2 = Names.newMethod("[T,???] [T2,???].M()");
+		IMethodName decl3 = Names.newMethod("[T,???] [T3,???].M3()");
 		
 		expected.put(repo1, Sets.newHashSet(decl1));
 		expected.put(repo3, Sets.newHashSet(decl2));

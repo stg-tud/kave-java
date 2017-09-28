@@ -41,7 +41,7 @@ public class EventsTest {
 	@Test
 	public void methodDecl() {
 		IMethodName m = mock(IMethodName.class);
-		Event actual = Events.newContext(m);
+		Event actual = Events.newElementContext(m);
 
 		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
 		assertSame(m, actual.getMethod());

@@ -21,7 +21,7 @@ public class FiltersTest {
 
 	private List<Event> stream;
 	private List<Tuple<Event, List<Event>>> expected;
-	
+
 	private static final int FREQUENCY = 2;
 
 	private Filters sut;
@@ -36,20 +36,20 @@ public class FiltersTest {
 
 	@Test
 	public void testStruct() {
-		stream.add(Events.newContext(m(11)));
+		stream.add(Events.newElementContext(m(11)));
 		stream.add(Events.newFirstContext(m(21)));
 		stream.add(Events.newSuperContext(m(30)));
 		stream.add(Events.newInvocation(m(41)));
 		stream.add(Events.newInvocation(m(42)));
 		stream.add(Events.newInvocation(m(43)));
 
-		stream.add(Events.newContext(m(30)));
+		stream.add(Events.newElementContext(m(30)));
 		stream.add(Events.newFirstContext(m(22)));
 		stream.add(Events.newSuperContext(m(32)));
-		
-		stream.add(Events.newContext(m(12)));
-		
-		stream.add(Events.newContext(m(30)));
+
+		stream.add(Events.newElementContext(m(12)));
+
+		stream.add(Events.newElementContext(m(30)));
 		stream.add(Events.newInvocation(m(44)));
 
 		List<Event> method = Lists.newLinkedList();
@@ -58,11 +58,11 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
 		method.add(Events.newInvocation(m(43)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
-		
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
+
 		method = Lists.newLinkedList();
 		method.add(Events.newInvocation(m(44)));
-		expected.add(Tuple.newTuple(Events.newContext(m(30)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(30)), method));
 
 		List<Tuple<Event, List<Event>>> actual = sut.getStructStream(stream);
 
@@ -78,22 +78,22 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(30)));
 		method.add(Events.newInvocation(m(43)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(30)));
 		method.add(Events.newInvocation(m(44)));
-		input.add(Tuple.newTuple(Events.newContext(m(30)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(30)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(43)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newInvocation(m(44)));
-		expected.add(Tuple.newTuple(Events.newContext(m(30)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(30)), method));
 
 		List<Tuple<Event, List<Event>>> actual = sut.locals(input);
 
@@ -109,28 +109,28 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(0)));
 		method.add(Events.newInvocation(m(43)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(0)));
 		method.add(Events.newInvocation(m(44)));
-		input.add(Tuple.newTuple(Events.newContext(m(0)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(0)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(43)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newInvocation(m(44)));
-		expected.add(Tuple.newTuple(Events.newContext(m(0)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(0)), method));
 
 		List<Tuple<Event, List<Event>>> actual = sut.unknowns(input);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testOverlaps() {
 		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
@@ -140,17 +140,22 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
 		method.add(Events.newInvocation(m(43)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(22)));
 		method.add(Events.newInvocation(m(44)));
-		input.add(Tuple.newTuple(Events.newContext(m(12)), method));
-		
+		input.add(Tuple.newTuple(Events.newElementContext(m(30)), method));
+
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
+
+		method = Lists.newLinkedList();
+		method.add(Events.newFirstContext(m(22)));
+		method.add(Events.newInvocation(m(44)));
+		input.add(Tuple.newTuple(Events.newElementContext(m(30)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
@@ -158,18 +163,20 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
 		method.add(Events.newInvocation(m(43)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
+		IMethodName normMethod = Names.newMethod("[T,???] [T,???].m30()");
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(22)));
 		method.add(Events.newInvocation(m(44)));
-		expected.add(Tuple.newTuple(Events.newContext(m(12)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(normMethod),
+				method));
 
 		List<Tuple<Event, List<Event>>> actual = sut.overlaps(input);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testFreqs() {
 		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
@@ -179,34 +186,35 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
 		method.add(Events.newInvocation(m(43)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(22)));
 		method.add(Events.newInvocation(m(42)));
-		input.add(Tuple.newTuple(Events.newContext(m(12)), method));
-		
+		input.add(Tuple.newTuple(Events.newElementContext(m(12)), method));
+
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
-		input.add(Tuple.newTuple(Events.newContext(m(13)), method));
+		input.add(Tuple.newTuple(Events.newElementContext(m(13)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
 
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newInvocation(m(41)));
-		expected.add(Tuple.newTuple(Events.newContext(m(13)), method));
+		expected.add(Tuple.newTuple(Events.newElementContext(m(13)), method));
 
-		List<Tuple<Event, List<Event>>> actual = sut.freqEvents(input, FREQUENCY);
+		List<Tuple<Event, List<Event>>> actual = sut.freqEvents(input,
+				FREQUENCY);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testErrMsg() {
 		List<Tuple<Event, List<Event>>> input = Lists.newLinkedList();
@@ -216,22 +224,23 @@ public class FiltersTest {
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(0)));
 		method.add(Events.newInvocation(m(43)));
-		input.add(Tuple.newTuple(Events.newContext(m(11)), method));
-		
+		input.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
+
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(21)));
 		method.add(Events.newSuperContext(m(31)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(0)));
 		method.add(Events.newInvocation(m(43)));
-		expected.add(Tuple.newTuple(Events.newContext(m(11)), method));
-		
+		expected.add(Tuple.newTuple(Events.newElementContext(m(11)), method));
+
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 		System.setErr(new PrintStream(outContent));
-		
+
 		List<Tuple<Event, List<Event>>> actual = sut.locals(input);
-		
-		assertEquals("different localness for: TypeName(?)\n", outContent.toString());
+
+		assertEquals("different localness for: TypeName(?)\n",
+				outContent.toString());
 		assertEquals(expected, actual);
 	}
 

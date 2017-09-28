@@ -43,14 +43,14 @@ public class StreamStatisticsTest {
 		method.add(Events.newSuperContext(m(3)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(42)));
-		stream.add(Tuple.newTuple(Events.newContext(m(0)), method));
+		stream.add(Tuple.newTuple(Events.newElementContext(m(0)), method));
 		
 		method = Lists.newLinkedList();
 		method.add(Events.newFirstContext(m(12)));
 		method.add(Events.newInvocation(m(43)));
 		method.add(Events.newInvocation(m(41)));
 		method.add(Events.newInvocation(m(44)));
-		stream.add(Tuple.newTuple(Events.newContext(m(1)), method));
+		stream.add(Tuple.newTuple(Events.newElementContext(m(1)), method));
 	}
 	
 	@After
@@ -77,7 +77,7 @@ public class StreamStatisticsTest {
 	public void testErrMsg() {
 		List<Event> method = Lists.newLinkedList();
 		method.add(Events.newDummyEvent());
-		stream.add(Tuple.newTuple(Events.newContext(m(1)), method));
+		stream.add(Tuple.newTuple(Events.newElementContext(m(1)), method));
 		
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 		System.setErr(new PrintStream(outContent));

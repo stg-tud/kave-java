@@ -27,7 +27,7 @@ public class Events {
 		return event;
 	}
 	
-	public static Event newContext(IMethodName ctx) {
+	public static Event newElementContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.METHOD_DECLARATION);
 		event.setMethod(ctx);
@@ -58,7 +58,7 @@ public class Events {
 	public static Event newDummyEvent() {
 		String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 		IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
-		Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+		Event DUMMY_EVENT = Events.newElementContext(DUMMY_METHOD);
 		return DUMMY_EVENT;
 	}
 }

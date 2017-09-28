@@ -64,7 +64,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), Events.newInvocation(m(2, 3)));
+		assertStream(Events.newElementContext(m(1, 1)), Events.newInvocation(m(2, 3)));
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -98,7 +98,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
+		assertStream(Events.newElementContext(erase(mGenericBound(1, 2, 3))), //
 				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
 				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
 				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
@@ -116,7 +116,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericBound(1, 2, 3))), //
+		assertStream(Events.newElementContext(erase(mGenericBound(1, 2, 3))), //
 				Events.newFirstContext(erase(mGenericBound(21, 22, 23))), //
 				Events.newSuperContext(erase(mGenericBound(11, 12, 13))), //
 				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
@@ -134,7 +134,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -153,7 +153,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -172,7 +172,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
+		assertStream(Events.newElementContext(erase(mGenericFree(1, 2))), //
 				Events.newFirstContext(erase(mGenericFree(21, 22))), //
 				Events.newSuperContext(erase(mGenericFree(11, 12))), //
 				Events.newInvocation(erase(mGenericBound(2, 3, 4))));
@@ -190,7 +190,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(mGenericFree(1, 2))), //
+		assertStream(Events.newElementContext(erase(mGenericFree(1, 2))), //
 				Events.newFirstContext(erase(mGenericFree(21, 22))), //
 				Events.newSuperContext(erase(mGenericFree(11, 12))), //
 				Events.newInvocation(erase(mGenericFree(2, 3))));
@@ -208,7 +208,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -226,7 +226,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newSuperContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
 
@@ -243,7 +243,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(4, 1)), //
 				Events.newSuperContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
@@ -271,7 +271,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newInvocation(Names.getUnknownMethod()));
 	}
@@ -287,7 +287,7 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newInvocation(Names.getUnknownMethod()));
 	}
 
@@ -305,10 +305,10 @@ public class StreamRepoGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(1, 2)),
+				Events.newElementContext(m(1, 2)),
 				Events.newFirstContext(m(12, 2)), //
 				Events.newInvocation(m(3, 4)) //
 		);
@@ -331,10 +331,10 @@ public class StreamRepoGeneratorTest {
 		sut.add(ctx1);
 		sut.add(ctx2);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(2, 1)), //
+				Events.newElementContext(m(2, 1)), //
 				Events.newFirstContext(m(12, 1)), //
 				Events.newInvocation(m(3, 4))//
 		);

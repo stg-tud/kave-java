@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -41,11 +42,14 @@ import cc.kave.episodes.model.EventStream;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.exceptions.AssertionException;
 import cc.recommenders.io.Logger;
 import cc.recommenders.utils.LocaleUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class EventStreamIoTest {
 
@@ -57,15 +61,18 @@ public class EventStreamIoTest {
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = Names
 			.newMethod(DUMMY_METHOD_NAME);
-	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+	public static final Event DUMMY_EVENT = Events
+			.newElementContext(DUMMY_METHOD);
 
 	private static final int FREQUENCY = 2;
 
 	private File mappingFile;
 	private File streamTextFile;
-	
+	private File streamObjectFile;
+	private File repoCtxsFile;
+
 	private EventStream eventStream;
-	
+
 	private EventStreamIo sut;
 
 	@Before
@@ -73,10 +80,12 @@ public class EventStreamIoTest {
 		LocaleUtils.setDefaultLocale();
 		Logger.reset();
 		Logger.setCapturing(true);
-		
+
 		streamTextFile = getStreamTextFile();
 		mappingFile = getMappingFile();
-		
+		streamObjectFile = getStreamObjectFile();
+		repoCtxsFile = getRepoCtxsFile();
+
 		eventStream = new EventStream();
 		eventStream.addEvent(firstCtx(1)); // 1
 		eventStream.addEvent(superCtx(3));
@@ -90,7 +99,7 @@ public class EventStreamIoTest {
 
 		sut = new EventStreamIo(tmp.getRoot());
 	}
-	
+
 	@After
 	public void teardown() {
 		Logger.reset();
@@ -112,37 +121,32 @@ public class EventStreamIoTest {
 	}
 
 	@Test
-	public void invalidMethodCtx() throws IOException {
+	public void readWriteStreamText() throws IOException {
 		String stream = "";
 		stream += "1,0.000\n2,0.001\n";
 		stream += "3,5.002\n";
 		stream += "2,15.003\n3,15.004\n";
 
 		JsonUtils.toJson(stream, getStreamTextFile());
-		
+
 		String expected = FileUtils.readFileToString(getStreamTextFile());
 
 		String actuals = sut.readStreamText(FREQUENCY);
 
 		assertEquals(expected, actuals);
 	}
-	
+
 	@Test
 	public void streamParserTest() throws IOException {
 		StringBuilder sb = new StringBuilder();
-		sb.append("1,0.000");
-		sb.append("\n");
-		sb.append("2,0.001");
-		sb.append("\n");
-		sb.append("3,5.002");
-		sb.append("\n");
-		sb.append("2,15.003");
-		sb.append("\n");
-		sb.append("3,15.004");
-		sb.append("\n");
-		
+		sb.append("1,0.000\n");
+		sb.append("2,0.001\n");
+		sb.append("3,5.002\n");
+		sb.append("2,15.003\n");
+		sb.append("3,15.004\n");
+
 		FileUtils.writeStringToFile(getStreamTextFile(), sb.toString());
-		
+
 		List<List<Fact>> expected = Lists.newLinkedList();
 		expected.add(Lists.newArrayList(new Fact(1), new Fact(2)));
 		expected.add(Lists.newArrayList(new Fact(3)));
@@ -154,7 +158,7 @@ public class EventStreamIoTest {
 	}
 
 	@Test
-	public void happyPath() throws IOException {
+	public void happyPathEventStream() throws IOException {
 
 		sut.write(eventStream, FREQUENCY);
 
@@ -162,37 +166,64 @@ public class EventStreamIoTest {
 		assertTrue(mappingFile.exists());
 
 		List<Event> actMapping = sut.readMapping(FREQUENCY);
-
 		String actStreamText = sut.readStreamText(FREQUENCY);
 
 		assertMapping(eventStream.getMapping(), actMapping);
 		assertEquals(eventStream.getStreamText(), actStreamText);
 		assertTrue(actMapping.size() == 6);
 	}
-	
+
+	@Test
+	public void happyPathObjects() {
+		List<Tuple<Event, List<Event>>> stream = Lists.newLinkedList();
+		stream.add(Tuple.newTuple(element(10),
+				Lists.newArrayList(firstCtx(1), inv(2))));
+		stream.add(Tuple.newTuple(element(11),
+				Lists.newArrayList(firstCtx(0), inv(5))));
+		stream.add(Tuple.newTuple(element(12),
+				Lists.newArrayList(firstCtx(0), inv(2), inv(5))));
+
+		Map<String, Set<IMethodName>> repoCtxs = Maps.newLinkedHashMap();
+		repoCtxs.put("repo1", Sets.newHashSet(element(10).getMethod()));
+		repoCtxs.put("repo2", Sets.newHashSet(element(11).getMethod(),
+				element(12).getMethod()));
+		
+		sut.writeObjects(stream, repoCtxs, FREQUENCY);
+
+		assertTrue(streamObjectFile.exists());
+		assertTrue(repoCtxsFile.exists());
+
+		List<Tuple<Event, List<Event>>> actStreamObject = sut
+				.readStreamObject(FREQUENCY);
+		Map<String, Set<IMethodName>> actRepoCtxs = sut.readRepoCtxs(FREQUENCY);
+		
+		assertEquals(stream, actStreamObject);
+		assertEquals(repoCtxs, actRepoCtxs);
+	}
+
 	@Test
 	public void testStats() throws IOException {
 
 		sut.write(eventStream, FREQUENCY);
 		sut.streamStats(FREQUENCY);
-		
+
 		assertLogContains(0, "Statistics from event stream:");
 		assertLogContains(1, "ctxFirst: 4 (2 unique)");
 		assertLogContains(2, "ctxSuper 1 (1 unique)");
 		assertLogContains(3, "invs: 4 (2 unique)");
 	}
-	
+
 	@Test
 	public void testErrMsg() throws IOException {
 		eventStream.addEvent(Events.newDummyEvent());
 
 		sut.write(eventStream, FREQUENCY);
-		
+
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 		System.setErr(new PrintStream(outContent));
-		
+
 		sut.streamStats(FREQUENCY);
-		
+
 		assertEquals("should not happen\n", outContent.toString());
 	}
 
@@ -218,6 +249,16 @@ public class EventStreamIoTest {
 		return fileName;
 	}
 
+	private File getRepoCtxsFile() {
+		File fileName = new File(getPath() + "/repoCtxs.json");
+		return fileName;
+	}
+
+	private File getStreamObjectFile() {
+		File fileName = new File(getPath() + "/streamObject.json");
+		return fileName;
+	}
+
 	private String getPath() {
 		File path = new File(tmp.getRoot().getAbsolutePath() + "/freq"
 				+ FREQUENCY);
@@ -231,10 +272,14 @@ public class EventStreamIoTest {
 		return Events.newInvocation(m(i));
 	}
 
+	private static Event element(int i) {
+		return Events.newElementContext(m(i));
+	}
+
 	private static Event firstCtx(int i) {
 		return Events.newFirstContext(m(i));
 	}
-	
+
 	private static Event superCtx(int i) {
 		return Events.newSuperContext(m(i));
 	}

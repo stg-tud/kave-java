@@ -7,8 +7,10 @@ import java.util.Set;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.commons.utils.naming.ProjectNormalizationNameRewriter;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.EventKind;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.statistics.EventsStatistics;
 import cc.recommenders.datastructures.Tuple;
 
@@ -81,20 +83,31 @@ public class Filters {
 		List<Tuple<Event, List<Event>>> result = Lists.newLinkedList();
 
 		for (Tuple<Event, List<Event>> tuple : stream) {
-			IMethodName methodName = tuple.getFirst().getMethod();
+			Event normEvent = normalize(tuple.getFirst());
+			IMethodName methodName = normEvent.getMethod();
 
 			if (seenMethods.add(methodName)) {
-				result.add(tuple);
+				result.add(Tuple.newTuple(normEvent, tuple.getSecond()));
 			}
 		}
 		return result;
 	}
 
+	private Event normalize(Event event) {
+		ProjectNormalizationNameRewriter rw = new ProjectNormalizationNameRewriter();
+
+		IMethodName normMethod = rw.rewrite(event.getMethod());
+		Event normEvent = Events.newElementContext(normMethod);
+
+		return normEvent;
+	}
+
 	public List<Tuple<Event, List<Event>>> freqEvents(
 			List<Tuple<Event, List<Event>>> stream, int frequency) {
 		List<Tuple<Event, List<Event>>> results = Lists.newLinkedList();
-		Map<Event, Integer> occurrences = EventsStatistics.getFrequencies(stream);
-		
+		Map<Event, Integer> occurrences = EventsStatistics
+				.getFrequencies(stream);
+
 		for (Tuple<Event, List<Event>> tuple : stream) {
 			List<Event> method = Lists.newLinkedList();
 			for (Event event : tuple.getSecond()) {
@@ -108,7 +121,7 @@ public class Filters {
 		}
 		return results;
 	}
-	
+
 	private boolean validMethod(List<Event> method) {
 		if (method.size() == 0) {
 			return false;

@@ -61,12 +61,12 @@ public class EnclosingMethodsTest {
 
 		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(2));
 
-		sut0.addMethod(episode, method, Events.newContext(m(3, 1)));
-		sut1.addMethod(episode, method, Events.newContext(m(3, 1)));
+		sut0.addMethod(episode, method, Events.newElementContext(m(3, 1)));
+		sut1.addMethod(episode, method, Events.newElementContext(m(3, 1)));
 
 		Set<IMethodName> expMethods = Sets.newHashSet(Events
-				.newContext(m(3, 1)).getMethod());
-		Set<ITypeName> expTypes = Sets.newHashSet(Events.newContext(m(3, 1))
+				.newElementContext(m(3, 1)).getMethod());
+		Set<ITypeName> expTypes = Sets.newHashSet(Events.newElementContext(m(3, 1))
 				.getMethod().getDeclaringType());
 
 		assertTrue(sut0.getOccurrences() == 1);
@@ -83,12 +83,12 @@ public class EnclosingMethodsTest {
 		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(2),
 				new Fact(2), new Fact(3), new Fact(3), new Fact(2));
 
-		sut0.addMethod(episode, method, Events.newContext(m(3, 1)));
-		sut1.addMethod(episode, method, Events.newContext(m(3, 1)));
+		sut0.addMethod(episode, method, Events.newElementContext(m(3, 1)));
+		sut1.addMethod(episode, method, Events.newElementContext(m(3, 1)));
 
 		Set<IMethodName> expMethods = Sets.newHashSet(Events
-				.newContext(m(3, 1)).getMethod());
-		Set<ITypeName> expTypes = Sets.newHashSet(Events.newContext(m(3, 1))
+				.newElementContext(m(3, 1)).getMethod());
+		Set<ITypeName> expTypes = Sets.newHashSet(Events.newElementContext(m(3, 1))
 				.getMethod().getDeclaringType());
 
 		assertTrue(sut0.getOccurrences() == 2);
@@ -107,13 +107,13 @@ public class EnclosingMethodsTest {
 		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
 				new Fact(3), new Fact(3), new Fact(2));
 
-		sut0.addMethod(episode, method1, Events.newContext(m(3, 1)));
-		sut0.addMethod(episode, method2, Events.newContext(m(3, 2)));
+		sut0.addMethod(episode, method1, Events.newElementContext(m(3, 1)));
+		sut0.addMethod(episode, method2, Events.newElementContext(m(3, 2)));
 
-		sut1.addMethod(episode, method1, Events.newContext(m(3, 1)));
-		sut1.addMethod(episode, method2, Events.newContext(m(3, 2)));
+		sut1.addMethod(episode, method1, Events.newElementContext(m(3, 1)));
+		sut1.addMethod(episode, method2, Events.newElementContext(m(3, 2)));
 
-		IMethodName methodName = Events.newContext(m(3, 1)).getMethod();
+		IMethodName methodName = Events.newElementContext(m(3, 1)).getMethod();
 		Set<IMethodName> expMethods = Sets.newHashSet(methodName);
 		Set<ITypeName> expTypes = Sets
 				.newHashSet(methodName.getDeclaringType());
@@ -134,8 +134,8 @@ public class EnclosingMethodsTest {
 		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
 				new Fact(3), new Fact(3), new Fact(2));
 
-		Event event1 = Events.newContext(m(3, 1));
-		Event event2 = Events.newContext(m(3, 2));
+		Event event1 = Events.newElementContext(m(3, 1));
+		Event event2 = Events.newElementContext(m(3, 2));
 
 		sut1.addMethod(episode, method1, event1);
 		sut1.addMethod(episode, method2, event2);
@@ -160,8 +160,8 @@ public class EnclosingMethodsTest {
 		List<Fact> method2 = Lists.newArrayList(new Fact(4), new Fact(5),
 				new Fact(3), new Fact(3), new Fact(2));
 
-		Event event1 = Events.newContext(m(3, 1));
-		Event event2 = Events.newContext(m(3, 2));
+		Event event1 = Events.newElementContext(m(3, 1));
+		Event event2 = Events.newElementContext(m(3, 2));
 
 		sut1.addMethod(episode, method1, event1);
 		sut1.addMethod(episode, method2, event2);
@@ -186,8 +186,8 @@ public class EnclosingMethodsTest {
 		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4),
 				new Fact(2), new Fact(3), new Fact(2), new Fact(3));
 
-		Event event1 = Events.newContext(m(3, 1));
-		Event event2 = Events.newContext(m(3, 2));
+		Event event1 = Events.newElementContext(m(3, 1));
+		Event event2 = Events.newElementContext(m(3, 2));
 
 		sut1.addMethod(episode, method1, event1);
 		sut1.addMethod(episode, method2, event2);
@@ -213,9 +213,9 @@ public class EnclosingMethodsTest {
 		List<Fact> method2 = Lists.newArrayList(new Fact(5), new Fact(4),
 				new Fact(2), new Fact(3), new Fact(2), new Fact(3));
 
-		Event event1 = Events.newContext(m(0, 0));
-		Event event2 = Events.newContext(m(3, 2));
-		Event event3 = Events.newContext(m(2, 0));
+		Event event1 = Events.newElementContext(m(0, 0));
+		Event event2 = Events.newElementContext(m(3, 2));
+		Event event3 = Events.newElementContext(m(2, 0));
 
 		sut1.addMethod(episode, method1, event1);
 		sut1.addMethod(episode, method2, event2);
@@ -250,10 +250,10 @@ public class EnclosingMethodsTest {
 		List<Fact> method = Lists.newArrayList(new Fact(1), new Fact(2));
 
 		EnclosingMethods a = new EnclosingMethods(false);
-		a.addMethod(episode, method, Events.newContext(m(1, 2)));
+		a.addMethod(episode, method, Events.newElementContext(m(1, 2)));
 
 		EnclosingMethods b = new EnclosingMethods(false);
-		b.addMethod(episode, method, Events.newContext(m(1, 2)));
+		b.addMethod(episode, method, Events.newElementContext(m(1, 2)));
 
 		assertTrue(a.equals(b));
 		assertTrue(a.getOccurrences() == b.getOccurrences());
@@ -272,10 +272,10 @@ public class EnclosingMethodsTest {
 				new Fact(3));
 
 		EnclosingMethods a = new EnclosingMethods(false);
-		a.addMethod(episode, method1, Events.newContext(m(3, 1)));
+		a.addMethod(episode, method1, Events.newElementContext(m(3, 1)));
 
 		EnclosingMethods b = new EnclosingMethods(false);
-		b.addMethod(episode, method2, Events.newContext(m(3, 2)));
+		b.addMethod(episode, method2, Events.newElementContext(m(3, 2)));
 
 		assertTrue(a.getOccurrences() == b.getOccurrences());
 		assertFalse(a.equals(b));
@@ -294,10 +294,10 @@ public class EnclosingMethodsTest {
 				new Fact(3));
 
 		EnclosingMethods a = new EnclosingMethods(false);
-		a.addMethod(episode, method1, Events.newContext(m(1, 2)));
+		a.addMethod(episode, method1, Events.newElementContext(m(1, 2)));
 
 		EnclosingMethods b = new EnclosingMethods(false);
-		b.addMethod(episode, method2, Events.newContext(m(1, 2)));
+		b.addMethod(episode, method2, Events.newElementContext(m(1, 2)));
 
 		assertTrue(a.getOccurrences() != b.getOccurrences());
 		assertFalse(a.equals(b));

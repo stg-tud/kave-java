@@ -131,7 +131,7 @@ public class PartialEventStreamGenerator {
 				if (!seenMethods.add(TypeErasure.of(ctxElem))) {
 					return false;
 				}
-				events.add(Events.newContext(TypeErasure.of(ctxElem)));
+				events.add(Events.newElementContext(TypeErasure.of(ctxElem)));
 				ctxElem = null;
 			}
 			if (ctxFirst != null) {

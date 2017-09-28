@@ -36,7 +36,7 @@ public class EventsStatisticsTest {
 
 	private static final String DUMMY_METHOD_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
 	private static final IMethodName DUMMY_METHOD = Names.newMethod(DUMMY_METHOD_NAME);
-	public static final Event DUMMY_EVENT = Events.newContext(DUMMY_METHOD);
+	public static final Event DUMMY_EVENT = Events.newElementContext(DUMMY_METHOD);
 
 	private List<Tuple<Event, List<Event>>> stream;
 	private Map<Event, Integer> occurrences;
@@ -73,7 +73,7 @@ public class EventsStatisticsTest {
 	}
 
 	private static Event ctx(int i) {
-		return Events.newContext(m(i));
+		return Events.newElementContext(m(i));
 	}
 
 	private static IMethodName m(int i) {

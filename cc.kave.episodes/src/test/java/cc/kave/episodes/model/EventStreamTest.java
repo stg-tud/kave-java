@@ -255,7 +255,7 @@ public class EventStreamTest {
 	}
 
 	private static Event ctxElem(int i) {
-		return Events.newContext(m(i));
+		return Events.newElementContext(m(i));
 	}
 
 	private static Event dummy() {

@@ -280,11 +280,11 @@ public class GeneralizabilityTest {
 	}
 
 	private static Event enclCtx(int i) {
-		return Events.newContext(m(i));
+		return Events.newElementContext(m(i));
 	}
 
 	private static Event enclCtx2(int i) {
-		return Events.newContext(m2(i));
+		return Events.newElementContext(m2(i));
 	}
 
 	private static Event dummy() {

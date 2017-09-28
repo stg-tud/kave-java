@@ -64,7 +64,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(erase(m(1, 1))), //
+		assertStream(Events.newElementContext(erase(m(1, 1))), //
 				Events.newInvocation(erase(m(2, 3))));
 
 	}
@@ -81,7 +81,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -133,7 +133,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -152,7 +152,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -203,7 +203,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(mGenericFree(1, 2)), //
+		assertStream(Events.newElementContext(mGenericFree(1, 2)), //
 				Events.newFirstContext(mGenericFree(21, 22)), //
 				Events.newSuperContext(mGenericFree(11, 12)), //
 				Events.newInvocation(mGenericFree(2, 3)));
@@ -221,7 +221,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newSuperContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
 
@@ -238,7 +238,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(4, 1)), //
 				Events.newSuperContext(m(3, 1)), //
 				Events.newInvocation(m(2, 3)));
@@ -269,7 +269,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newInvocation(m(2, 3)), //
 				Events.newInvocation(unknown()));
 	}
@@ -285,7 +285,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)),
+		assertStream(Events.newElementContext(m(1, 1)),
 				Events.newInvocation(unknown()));
 	}
 
@@ -303,10 +303,10 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(1, 2)), //
+				Events.newElementContext(m(1, 2)), //
 				Events.newFirstContext(m(12, 2)), //
 				Events.newInvocation(m(3, 4)) //
 		);
@@ -329,10 +329,10 @@ public class StreamFilterGeneratorTest {
 		sut.add(ctx1);
 		sut.add(ctx2);
 
-		assertStream(Events.newContext(m(1, 1)), //
+		assertStream(Events.newElementContext(m(1, 1)), //
 				Events.newFirstContext(m(11, 1)), //
 				Events.newInvocation(m(2, 3)), //
-				Events.newContext(m(2, 1)), //
+				Events.newElementContext(m(2, 1)), //
 				Events.newFirstContext(m(12, 1)), //
 				Events.newInvocation(m(3, 4))//
 		);

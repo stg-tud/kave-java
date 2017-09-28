@@ -66,12 +66,13 @@ public class EventStreamIo {
 		}
 	}
 
-	public void writeObjects(Map<String, Set<IMethodName>> repoCtxs, int frequency) {
-//		JsonUtils.toJson(streamObject, new File(
-//				getTrainPath(frequency).streamObject));
+	public void writeObjects(List<Tuple<Event, List<Event>>> streamObject,
+			Map<String, Set<IMethodName>> repoCtxs, int frequency) {
+		JsonUtils.toJson(streamObject, new File(
+				getTrainPath(frequency).streamObject));
 		JsonUtils.toJson(repoCtxs, new File(getTrainPath(frequency).repoCtxs));
 	}
-	
+
 	public List<Tuple<Event, List<Event>>> readStreamObject(int frequency) {
 		String streamObject = getTrainPath(frequency).streamObject;
 
@@ -89,10 +90,10 @@ public class EventStreamIo {
 		}.getType();
 		return JsonUtils.fromJson(new File(mappingPath), type);
 	}
-	
+
 	public Map<String, Set<IMethodName>> readRepoCtxs(int frequency) {
 		String repoCtxsPath = getTrainPath(frequency).repoCtxs;
-		
+
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<Map<String, Set<IMethodName>>>() {
 		}.getType();
@@ -187,8 +188,8 @@ public class EventStreamIo {
 		TrainingPath trainPath = new TrainingPath();
 		trainPath.streamPath = path.getAbsolutePath() + "/stream.txt";
 		trainPath.mappingPath = path.getAbsolutePath() + "/mapping.txt";
-		trainPath.streamObject = path.getAbsolutePath() + "/streamObject.txt";
-		trainPath.repoCtxs = path.getAbsolutePath() + "/repoCtxs.txt";
+		trainPath.streamObject = path.getAbsolutePath() + "/streamObject.json";
+		trainPath.repoCtxs = path.getAbsolutePath() + "/repoCtxs.json";
 
 		return trainPath;
 	}

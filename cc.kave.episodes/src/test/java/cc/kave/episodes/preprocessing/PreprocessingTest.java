@@ -100,7 +100,7 @@ public class PreprocessingTest {
 	}
 
 	private static Event enclCtx(int i) {
-		return Events.newContext(m(i));
+		return Events.newElementContext(m(i));
 	}
 
 	private static IMethodName m(int i) {
