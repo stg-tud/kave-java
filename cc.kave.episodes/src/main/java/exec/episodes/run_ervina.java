@@ -51,8 +51,9 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		 load(Preprocessing.class).run(FREQUENCY);
-//		load(Preprocessing.class).temp(FREQUENCY);
+		load(EventStreamChecker.class).duplicates(FREQUENCY);
+		
+//		 load(Preprocessing.class).run(FREQUENCY);
 		// load(PartitionStream.class).partition(FREQUENCY);
 		// load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);

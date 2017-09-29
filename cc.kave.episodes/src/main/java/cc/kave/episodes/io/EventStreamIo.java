@@ -66,18 +66,18 @@ public class EventStreamIo {
 		}
 	}
 
-	public void writeObjects(List<Tuple<Event, List<Event>>> streamObject,
+	public void writeObjects(List<Tuple<IMethodName, List<Fact>>> streamObject,
 			Map<String, Set<IMethodName>> repoCtxs, int frequency) {
+		JsonUtils.toJson(repoCtxs, new File(getTrainPath(frequency).repoCtxs));
 		JsonUtils.toJson(streamObject, new File(
 				getTrainPath(frequency).streamObject));
-		JsonUtils.toJson(repoCtxs, new File(getTrainPath(frequency).repoCtxs));
 	}
 
-	public List<Tuple<Event, List<Event>>> readStreamObject(int frequency) {
+	public List<Tuple<IMethodName, List<Fact>>> readStreamObject(int frequency) {
 		String streamObject = getTrainPath(frequency).streamObject;
 
 		@SuppressWarnings("serial")
-		Type type = new TypeToken<List<Tuple<Event, List<Event>>>>() {
+		Type type = new TypeToken<List<Tuple<IMethodName, List<Fact>>>>() {
 		}.getType();
 		return JsonUtils.fromJson(new File(streamObject), type);
 	}

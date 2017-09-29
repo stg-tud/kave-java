@@ -175,13 +175,24 @@ public class EventStreamIoTest {
 
 	@Test
 	public void happyPathObjects() {
-		List<Tuple<Event, List<Event>>> stream = Lists.newLinkedList();
-		stream.add(Tuple.newTuple(element(10),
-				Lists.newArrayList(firstCtx(1), inv(2))));
-		stream.add(Tuple.newTuple(element(11),
-				Lists.newArrayList(firstCtx(0), inv(5))));
-		stream.add(Tuple.newTuple(element(12),
-				Lists.newArrayList(firstCtx(0), inv(2), inv(5))));
+		eventStream.addEvent(firstCtx(1)); // 1
+		eventStream.addEvent(superCtx(3));
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(5)); // 4
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(firstCtx(0)); // 3
+		eventStream.addEvent(inv(2)); // 2
+		eventStream.addEvent(inv(5)); // 4
+		
+		
+		List<Tuple<IMethodName, List<Fact>>> stream = Lists.newLinkedList();
+		stream.add(Tuple.newTuple(element(10).getMethod(),
+				Lists.newArrayList(new Fact(1), new Fact(2))));
+		stream.add(Tuple.newTuple(element(11).getMethod(),
+				Lists.newArrayList(new Fact(3), new Fact(4))));
+		stream.add(Tuple.newTuple(element(12).getMethod(),
+				Lists.newArrayList(new Fact(3), new Fact(2), new Fact(4))));
 
 		Map<String, Set<IMethodName>> repoCtxs = Maps.newLinkedHashMap();
 		repoCtxs.put("repo1", Sets.newHashSet(element(10).getMethod()));
@@ -193,7 +204,7 @@ public class EventStreamIoTest {
 		assertTrue(streamObjectFile.exists());
 		assertTrue(repoCtxsFile.exists());
 
-		List<Tuple<Event, List<Event>>> actStreamObject = sut
+		List<Tuple<IMethodName, List<Fact>>> actStreamObject = sut
 				.readStreamObject(FREQUENCY);
 		Map<String, Set<IMethodName>> actRepoCtxs = sut.readRepoCtxs(FREQUENCY);
 		
