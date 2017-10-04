@@ -32,7 +32,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 300;
+	private static final int FREQUENCY = 10;
 
 	private static final int THF = 700;
 	private static final double THE = 0.6 ;
@@ -51,9 +51,9 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(EventStreamChecker.class).duplicates(FREQUENCY);
+//		load(EventStreamChecker.class).duplicates(FREQUENCY);
 		
-//		 load(Preprocessing.class).run(FREQUENCY);
+		 load(Preprocessing.class).run(FREQUENCY);
 		// load(PartitionStream.class).partition(FREQUENCY);
 		// load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
