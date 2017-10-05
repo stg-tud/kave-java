@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.Preprocessing;
+import cc.kave.episodes.mining.evaluation.PatternsComparison;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -32,7 +32,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 300;
+	private static final int FREQUENCY = 3000;
 
 	private static final int THF = 700;
 	private static final double THE = 0.6 ;
@@ -77,8 +77,7 @@ public class run_ervina {
 		// FREQUENCY,
 		// FOLDNUM, THF, THE);
 
-		// load(PatternsComparison.class).extractConcreteCode(FREQUENCY,
-		// FOLDNUM);
+		load(PatternsComparison.class).overlappingPatterns(FREQUENCY, THF, THE);
 		// load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL,
 		// EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
 		// load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
