@@ -462,104 +462,6 @@ public class PatternsComparison {
 	// return results;
 	// }
 	//
-	public void overlappingPatterns(int frequency, int threshFreq,
-			double threshEnt) throws Exception {
-		int equals = 0;
-		int notEquals = 0;
-		int covered = 0;
-		int notCovered = 0;
-
-		Set<Episode> covSeqs = Sets.newLinkedHashSet();
-		Map<Integer, Set<Episode>> partials = getPatterns(EpisodeType.GENERAL,
-				frequency, threshFreq, threshEnt);
-		Map<Integer, Set<Episode>> sequentials = getPatterns(
-				EpisodeType.SEQUENTIAL, frequency, threshFreq, threshEnt);
-
-		for (Map.Entry<Integer, Set<Episode>> entSeq : sequentials.entrySet()) {
-			Map<Integer, Set<Episode>> tempPartials = Maps.newLinkedHashMap();
-			for (Episode seqPat : entSeq.getValue()) {
-				Set<Episode> partialPatt = partials.get(entSeq.getKey());
-				boolean areEqual = false;
-				for (Episode partPat : partialPatt) {
-					areEqual = equalEpisodes(seqPat, partPat);
-					if (areEqual) {
-						equals++;
-						break;
-					}
-				}
-				if (!areEqual) {
-					notEquals++;
-					boolean isCovered = false;
-					for (Episode partPat : partialPatt) {
-						isCovered = doesCover(partPat, seqPat);
-						if (isCovered) {
-							int numRels = partPat.getRelations().size();
-							if (tempPartials.containsKey(numRels)) {
-								tempPartials.get(numRels).add(partPat);
-							} else {
-								tempPartials.put(numRels, Sets.newHashSet(partPat));
-							}
-							covered++;
-							break;
-						}
-					}
-					if (!isCovered) {
-						notCovered++;
-						Logger.log("Sequential: %s", seqPat.getFacts()
-								.toString());
-					}
-				}
-			}
-			for (Map.Entry<Integer, Set<Episode>> tmpEntry : tempPartials.entrySet()) {
-				covSeqs.addAll(tmpEntry.getValue());
-			}
-		}
-		Logger.log("");
-		Logger.log("Number of equal patterns: %d", equals);
-		Logger.log("Number of not equal patterns: %d", notEquals);
-		Logger.log("Partials covers %d from sequentials", covered);
-		Logger.log("Partials do not cover %d from sequentials", notCovered);
-		Logger.log(
-				"Number of partial patterns for covering sequential patterns: %d",
-				covSeqs.size());
-
-		Set<Episode> adds = Sets.newLinkedHashSet();
-		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
-			for (Episode pattern : entry.getValue()) {
-				if (!covSeqs.contains(pattern) && isPartial(pattern)) {
-					adds.add(pattern);
-				}
-			}
-		}
-		writePatterns(covSeqs, "coverSeqs", frequency, threshFreq, threshEnt);
-		writePatterns(adds, "additionals", frequency, threshFreq, threshEnt);
-	}
-
-	private void writePatterns(Set<Episode> patterns, String folderName,
-			int frequency, int threshFreq, double threshEnt) throws IOException {
-		List<Event> events = eventStream.readMapping(frequency);
-		int patternId = 0;
-		for (Episode pattern : patterns) {
-			Episode epGraph = transClosure.remTransClosure(pattern);
-			DirectedGraph<Fact, DefaultEdge> graph = episodeGraphConverter
-					.convert(epGraph, events);
-			graphWriter.write(graph,
-					getFilepath(threshFreq, threshEnt, folderName, patternId));
-			patternId++;
-		}
-	}
-
-	private String getFilepath(int frequency, double entropy, String folderName,
-			int patternId) {
-		File filePath = new File(patternsFile.getAbsolutePath() + "/freq"
-				+ frequency + "/entropy" + entropy + "/" + folderName);
-		if (!filePath.exists()) {
-			filePath.mkdirs();
-		}
-		String fileName = filePath.getAbsolutePath() + "/pattern" + patternId
-				+ ".dot";
-		return fileName;
-	}
 
 	private boolean isPartial(Episode pattern) {
 		int numRels = pattern.getRelations().size();
@@ -574,40 +476,6 @@ public class PatternsComparison {
 			return 1;
 		} else {
 			return (numEvents - 1) + maxRels(numEvents - 1);
-		}
-	}
-
-	private boolean doesCover(Episode partial, Episode sequential) {
-		Set<Fact> partEvents = partial.getEvents();
-		Set<Fact> seqEvents = sequential.getEvents();
-
-		if (!partEvents.containsAll(seqEvents)) {
-			return false;
-		}
-		Set<Fact> seqRels = sequential.getRelations();
-		Set<Fact> partRels = partial.getRelations();
-		for (Fact relation : seqRels) {
-			Tuple<Fact, Fact> relFacts = relation.getRelationFacts();
-			String factString = relFacts.getSecond().getFactID() + ">"
-					+ relFacts.getFirst().getFactID();
-			Fact fact = new Fact(factString);
-			if (partRels.contains(fact)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean equalEpisodes(Episode episode1, Episode episode2) {
-		Set<Fact> facts1 = episode1.getFacts();
-		Set<Fact> facts2 = episode2.getFacts();
-		if (facts1.size() != facts2.size()) {
-			return false;
-		}
-		if (facts1.containsAll(facts2) && facts2.containsAll(facts1)) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -820,10 +688,4 @@ public class PatternsComparison {
 	// numPatterns);
 	// return results;
 	// }
-
-	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
-			int frequency, int threshFreq, double threshEnt) throws Exception {
-		Map<Integer, Set<Episode>> episodes = episodeParser.parser(frequency);
-		return episodeFilter.filter(type, episodes, threshFreq, threshEnt);
-	}
 }

@@ -11,14 +11,12 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.commons.model.naming.types.IDelegateTypeName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.naming.types.organization.IAssemblyName;
 import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
-import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -43,15 +41,12 @@ public class APIUsages {
 	private EpisodeParser parser;
 	private PatternFilter filter;
 
-	private EpisodeToGraphConverter graphConverter;
-
 	private ContextsParser ctxParser;
 
 	@Inject
 	public APIUsages(@Named("patterns") File folder, FileReader fileReader,
 			EventStreamIo streamIo, EpisodeParser episodeParser,
-			PatternFilter patternFilter,
-			EpisodeToGraphConverter graphConverter, ContextsParser ctxParser) {
+			PatternFilter patternFilter, ContextsParser ctxParser) {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
@@ -60,7 +55,6 @@ public class APIUsages {
 		this.streamIo = streamIo;
 		this.parser = episodeParser;
 		this.filter = patternFilter;
-		this.graphConverter = graphConverter;
 		this.ctxParser = ctxParser;
 	}
 
@@ -124,47 +118,6 @@ public class APIUsages {
 					pc.isMultApis(), entry.getValue());
 		}
 		// outputStats(stats);
-	}
-
-	public void partialSequentials(int frequency, int threshFreq,
-			double threshEntr) throws Exception {
-		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-
-		Map<Integer, Set<Episode>> sequentials = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
-		int counterSeq = countPatterns(sequentials);
-		Map<Set<Fact>, Set<Episode>> groups = Maps.newLinkedHashMap();
-
-		for (Map.Entry<Integer, Set<Episode>> entry : sequentials.entrySet()) {
-			for (Episode pattern : entry.getValue()) {
-				Set<Fact> events = pattern.getEvents();
-
-				if (groups.containsKey(events)) {
-					groups.get(events).add(pattern);
-				} else {
-					groups.put(events, Sets.newHashSet(pattern));
-				}
-			}
-		}
-		Map<Integer, Set<Episode>> partials = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
-		int counterPart = 0;
-		
-		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
-			for (Episode pattern : entry.getValue()) {
-				Set<Fact> events = pattern.getEvents();
-				
-				if (groups.containsKey(events)) {
-					if (isPartial(pattern)) {
-						Logger.log("%s", pattern.getFacts().toString());
-					} else {
-						counterPart++;
-					}
-				}
-			}
-		}
-		Logger.log("Sequential-order patterns: %d", counterSeq);
-		Logger.log("Partial-order patterns with strict-order: %d", counterPart);
 	}
 
 	public void getApisComp(int frequency, int threshFreq, double threshEnt) {
@@ -466,12 +419,13 @@ public class APIUsages {
 					Event e = events.get(id);
 					IMethodName methodName = e.getMethod();
 					ITypeName typeName = methodName.getDeclaringType();
-					
-					if (typeName.getFullName().contains("NUnit") && !isPartial(pattern)) {
+
+					if (typeName.getFullName().contains("NUnit")
+							&& !isPartial(pattern)) {
 						testPatterns++;
 						break;
 					}
-					
+
 					if (types.containsKey(typeName)) {
 						int counter = types.get(typeName);
 						types.put(typeName, counter + 1);
@@ -483,9 +437,11 @@ public class APIUsages {
 		}
 		Logger.log("\tEvent types in partial-order patterns:");
 		for (Map.Entry<ITypeName, Integer> entry : types.entrySet()) {
-			Logger.log("\t%s\t%d", entry.getKey().getFullName(), entry.getValue());
+			Logger.log("\t%s\t%d", entry.getKey().getFullName(),
+					entry.getValue());
 		}
-		Logger.log("Number of patterns learned from testing code: %d", testPatterns);
+		Logger.log("Number of patterns learned from testing code: %d",
+				testPatterns);
 	}
 
 	public void getRepoOccSpecPatt(int frequency, int threshFreq,
@@ -797,15 +753,6 @@ public class APIUsages {
 		} else {
 			return (numEvents - 1) + maxRels(numEvents - 1);
 		}
-	}
-	
-	private int countPatterns(Map<Integer, Set<Episode>> sequentials) {
-		int counter = 0;
-		
-		for (Map.Entry<Integer, Set<Episode>> entry : sequentials.entrySet()) {
-			counter += entry.getValue().size();
-		}
-		return counter;
 	}
 
 	private File getFilePath(EpisodeType type, int frequeny, double entropy) {
