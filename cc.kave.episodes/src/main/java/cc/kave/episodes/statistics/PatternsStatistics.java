@@ -187,10 +187,19 @@ public class PatternsStatistics {
 
 		Set<Episode> adds = Sets.newLinkedHashSet();
 		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
+			Map<Integer, Set<Episode>> tmpAdds = Maps.newLinkedHashMap();
 			for (Episode pattern : entry.getValue()) {
 				if (!covSeqs.contains(pattern) && isPartial(pattern)) {
-					adds.add(pattern);
+					int numRels = pattern.getRelations().size();
+					if (tmpAdds.containsKey(numRels)) {
+						tmpAdds.get(numRels).add(pattern);
+					} else {
+						tmpAdds.put(numRels, Sets.newHashSet(pattern));
+					}
 				}
+			}
+			for (Map.Entry<Integer, Set<Episode>> entAdds : tmpAdds.entrySet()) {
+				adds.addAll(entAdds.getValue());
 			}
 		}
 		writePatterns(covSeqs, "coverSeqs", frequency, threshFreq, threshEnt);

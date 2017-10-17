@@ -17,10 +17,12 @@ import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.recommenders.datastructures.Tuple;
@@ -43,10 +45,13 @@ public class APIUsages {
 
 	private ContextsParser ctxParser;
 
+	private EpisodeToGraphConverter graphConverter;
+
 	@Inject
 	public APIUsages(@Named("patterns") File folder, FileReader fileReader,
 			EventStreamIo streamIo, EpisodeParser episodeParser,
-			PatternFilter patternFilter, ContextsParser ctxParser) {
+			PatternFilter patternFilter, ContextsParser ctxParser,
+			EpisodeToGraphConverter graphConverter) {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
@@ -56,6 +61,7 @@ public class APIUsages {
 		this.parser = episodeParser;
 		this.filter = patternFilter;
 		this.ctxParser = ctxParser;
+		this.graphConverter = graphConverter;
 	}
 
 	public void categorise(EpisodeType type, int frequeny, int threshFreq,
@@ -446,33 +452,36 @@ public class APIUsages {
 
 	public void getRepoOccSpecPatt(int frequency, int threshFreq,
 			double threshEntr) throws Exception {
-		List<Event> events = streamIo.readMapping(frequency);
-		Map<Event, Integer> eventsMap = mapConverter(events);
+		Logger.log("Reading event stream ...");
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 
+		Logger.log("Reading pattern evaluations ...");
 		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEntr);
 
-		List<Tuple<Event, List<Event>>> stream = ctxParser.parse(frequency);
-		Map<String, Set<IMethodName>> repos = ctxParser.getRepoCtxMapper();
-		List<Tuple<Event, List<Fact>>> streamOfFacts = convertStreamOfFacts(
-				stream, eventsMap);
-		stream.clear();
-
 		Map<String, Integer> repoNoPatterns = Maps.newLinkedHashMap();
 
+		int patternId = 0;
+
+		Logger.log("Going thorugh the patterns ...");
 		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			if ((patternId % 100) == 0) {
+				Logger.log("Analyzed %d patterns", patternId);
+			}
 			Episode pattern = entry.getKey();
 			if (entry.getValue() == 1) {
 				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
 						true);
 
-				for (Tuple<Event, List<Fact>> tuple : streamOfFacts) {
+				for (Tuple<IMethodName, List<Fact>> tuple : stream) {
 					List<Fact> method = tuple.getSecond();
 					if (method.size() < 2) {
 						continue;
 					}
 					if (method.containsAll(pattern.getEvents())) {
-						Event ctx = tuple.getFirst();
+						Event ctx = Events.newElementContext(tuple.getFirst());
 						methodsOrderRelation.addMethod(pattern, method, ctx);
 					}
 				}
@@ -505,12 +514,66 @@ public class APIUsages {
 					}
 				}
 			}
+			patternId++;
 		}
 		Logger.log("\tRepository-specific patterns:");
 		Logger.log("\tRepoName\tNoPatterns");
 		for (Map.Entry<String, Integer> entry : repoNoPatterns.entrySet()) {
 			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue());
 		}
+	}
+
+	public void specRepo(int frequency, int threshFreq, double threshEnt) {
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		Set<IMethodName> repo = repos
+				.get("Contexts-170503/msgpack/msgpack-cli");
+
+		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEnt);
+		int patternId = 0;
+		int numCtxs = 0;
+		int imported = 0;
+
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			if ((patternId % 100) == 0) {
+				Logger.log("Analyzed %d patterns", patternId);
+			}
+			Episode pattern = entry.getKey();
+			if (entry.getValue() == 1) {
+				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
+						true);
+
+				for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+					List<Fact> method = tuple.getSecond();
+					if (method.size() < 2) {
+						continue;
+					}
+					if (method.containsAll(pattern.getEvents())) {
+						Event ctx = Events.newElementContext(tuple.getFirst());
+						methodsOrderRelation.addMethod(pattern, method, ctx);
+					}
+				}
+				int numOccs = methodsOrderRelation.getOccurrences();
+				assertTrue(numOccs >= pattern.getFrequency(),
+						"Found insufficient number of occurences!");
+
+				Set<IMethodName> methodOcc = methodsOrderRelation
+						.getMethodNames(numOccs);
+				for (IMethodName methodName : methodOcc) {
+					if (repo.contains(methodName)) {
+						numCtxs++;
+						if (methodName.toString().contains("???")) {
+							imported++;
+						}
+					}
+				}
+			}
+			patternId++;
+		}
+		Logger.log("Number of ctxs for specific patterns: %d", numCtxs);
+		Logger.log("Number of imported ctxs: %d", imported);
 	}
 
 	public void getRepoOccStrictPatt(int frequency, int threshFreq,
@@ -583,6 +646,16 @@ public class APIUsages {
 		Logger.log("\tRepoName\tNoPatterns");
 		for (Map.Entry<String, Integer> entry : repoNoPatterns.entrySet()) {
 			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue());
+		}
+	}
+
+	public void repoNumCtxs(int frequency) {
+		Map<String, Set<IMethodName>> repoCtxs = streamIo
+				.readRepoCtxs(frequency);
+		Logger.log("\tRepository statistics:");
+		Logger.log("\tRepository\tNum.Ctxs.");
+		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxs.entrySet()) {
+			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue().size());
 		}
 	}
 
