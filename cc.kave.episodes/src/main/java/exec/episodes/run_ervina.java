@@ -61,8 +61,7 @@ public class run_ervina {
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
 //		load(Generalizability.class).validate(FREQUENCY, THF, THE);
-		load(APIUsages.class).specRepo(FREQUENCY, THF, THE);
-//		load(APIUsages.class).categorise(EpisodeType.GENERAL, FREQUENCY, THF, THE);
+		load(APIUsages.class).repoEvents(FREQUENCY);
 //		load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqGensApis(FREQUENCY, THF, THE);

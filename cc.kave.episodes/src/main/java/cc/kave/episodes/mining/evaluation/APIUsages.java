@@ -17,7 +17,6 @@ import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
-import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -45,13 +44,10 @@ public class APIUsages {
 
 	private ContextsParser ctxParser;
 
-	private EpisodeToGraphConverter graphConverter;
-
 	@Inject
 	public APIUsages(@Named("patterns") File folder, FileReader fileReader,
 			EventStreamIo streamIo, EpisodeParser episodeParser,
-			PatternFilter patternFilter, ContextsParser ctxParser,
-			EpisodeToGraphConverter graphConverter) {
+			PatternFilter patternFilter, ContextsParser ctxParser) {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
@@ -61,7 +57,6 @@ public class APIUsages {
 		this.parser = episodeParser;
 		this.filter = patternFilter;
 		this.ctxParser = ctxParser;
-		this.graphConverter = graphConverter;
 	}
 
 	public void categorise(EpisodeType type, int frequeny, int threshFreq,
@@ -523,12 +518,41 @@ public class APIUsages {
 		}
 	}
 
+	public void repoEvents(int frequency) {
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Map<String, Set<IMethodName>> repoCtxs = streamIo
+				.readRepoCtxs(frequency);
+		Map<IMethodName, List<Fact>> streamMap = streamToMap(stream);
+
+		Logger.log("\tRepository\tNumbEvents\tAvgEventOccs");
+		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxs.entrySet()) {
+			Map<Fact, Integer> eventOccs = Maps.newLinkedHashMap();
+
+			for (IMethodName methodName : entry.getValue()) {
+				if (streamMap.containsKey(methodName)) {
+					List<Fact> method = streamMap.get(methodName);
+
+					for (Fact fact : method) {
+						if (eventOccs.containsKey(fact)) {
+							int counter = eventOccs.get(fact);
+							eventOccs.put(fact, counter + 1);
+						} else {
+							eventOccs.put(fact, 1);
+						}
+					}
+				}
+			}
+			Logger.log("\t%s\t%d\t%.3f", entry.getKey(), eventOccs.size(),
+					avg(eventOccs));
+		}
+	}
+
 	public void specRepo(int frequency, int threshFreq, double threshEnt) {
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
 				.readStreamObject(frequency);
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
-		Set<IMethodName> repo = repos
-				.get("Contexts-170503/msgpack/msgpack-cli");
+		Set<IMethodName> repo = repos.get("Contexts-170503/aws/aws-sdk-net");
 
 		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEnt);
@@ -564,7 +588,7 @@ public class APIUsages {
 				for (IMethodName methodName : methodOcc) {
 					if (repo.contains(methodName)) {
 						numCtxs++;
-						if (methodName.toString().contains("???")) {
+						if (methodName.getIdentifier().contains("???")) {
 							imported++;
 						}
 					}
@@ -679,6 +703,28 @@ public class APIUsages {
 			}
 			Logger.log("\t%d-node\t%d\t%d", entry.getKey(), numStrict, numPart);
 		}
+	}
+
+	private double avg(Map<Fact, Integer> eventOccs) {
+		if (eventOccs.isEmpty()) {
+			return 0.0;
+		}
+		int sum = 0;
+
+		for (Map.Entry<Fact, Integer> entry : eventOccs.entrySet()) {
+			sum += entry.getValue();
+		}
+		return (sum / eventOccs.size());
+	}
+
+	private Map<IMethodName, List<Fact>> streamToMap(
+			List<Tuple<IMethodName, List<Fact>>> stream) {
+		Map<IMethodName, List<Fact>> streamMap = Maps.newLinkedHashMap();
+
+		for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+			streamMap.put(tuple.getFirst(), tuple.getSecond());
+		}
+		return streamMap;
 	}
 
 	private List<Tuple<Event, List<Fact>>> convertStreamOfFacts(

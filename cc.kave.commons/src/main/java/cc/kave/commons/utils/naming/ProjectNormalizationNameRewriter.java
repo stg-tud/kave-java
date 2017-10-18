@@ -44,7 +44,6 @@ public class ProjectNormalizationNameRewriter extends FailsafeNameRewriter {
 			ITypeName type = pm.getValueType();
 			normType = normalize(normType, type);
 		}
-		
 		return Names.newMethod(normType);
 	}
 	
