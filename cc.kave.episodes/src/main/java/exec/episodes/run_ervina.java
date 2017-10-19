@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.APIUsages;
-import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.statistics.PatternsStatistics;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -57,11 +56,11 @@ public class run_ervina {
 		// load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
 		
-//		 load(PatternsStatistics.class).overlappingPatterns(FREQUENCY, THF, THE);
+		 load(PatternsStatistics.class).specRepoPatterns(FREQUENCY, THF, THE);
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
 //		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
 //		load(Generalizability.class).validate(FREQUENCY, THF, THE);
-		load(APIUsages.class).repoEvents(FREQUENCY);
+//		load(APIUsages.class).repoNumCtxs(FREQUENCY);
 //		load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqGensApis(FREQUENCY, THF, THE);

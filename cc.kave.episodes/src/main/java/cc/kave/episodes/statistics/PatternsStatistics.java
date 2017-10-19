@@ -14,15 +14,19 @@ import javax.inject.Named;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
@@ -33,9 +37,10 @@ import com.google.common.collect.Sets;
 public class PatternsStatistics {
 
 	private File patternsFile;
-	
+
 	private EventStreamIo streamIo;
 
+	private FileReader reader;
 	private EpisodeParser parser;
 	private PatternFilter filter;
 
@@ -45,7 +50,8 @@ public class PatternsStatistics {
 	private EpisodeAsGraphWriter graphWriter;
 
 	@Inject
-	public PatternsStatistics(@Named("patterns") File folder, EventStreamIo eventsStreamIo,
+	public PatternsStatistics(@Named("patterns") File folder,
+			EventStreamIo eventsStreamIo, FileReader fileReader,
 			EpisodeParser episodeReader, PatternFilter patternFilter,
 			TransClosedEpisodes transClosure,
 			EpisodeToGraphConverter graphConverter,
@@ -54,6 +60,7 @@ public class PatternsStatistics {
 		assertTrue(folder.isDirectory(), "Patterns is not a folder, but a file");
 		this.patternsFile = folder;
 		this.streamIo = eventsStreamIo;
+		this.reader = fileReader;
 		this.parser = episodeReader;
 		this.filter = patternFilter;
 		this.transClosure = transClosure;
@@ -206,6 +213,139 @@ public class PatternsStatistics {
 		writePatterns(adds, "additionals", frequency, threshFreq, threshEnt);
 	}
 
+	public void specRepoPatterns(int frequency, int threshFreq, double threshEnt) {
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		List<Event> events = streamIo.readMapping(frequency);
+		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEnt);
+		Set<Event> specRepoEvents = Sets.newHashSet();
+		Set<Event> otherReposEvents = Sets.newHashSet();
+		Map<String, Boolean> defaultEvents = Maps.newLinkedHashMap();
+		defaultEvents.put("System.Nullable`1[[T]].GetValueOrDefault() : T",
+				false);
+		defaultEvents
+				.put("System.Tuple.Create(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) : Tuple",
+						false);
+		defaultEvents.put("System.IO.MemoryStream..ctor(byte[] buffer) : void",
+				false);
+		defaultEvents.put(
+				"NUnit.Framework.Assert.Throws(TestDelegate code) : T", false);
+		defaultEvents
+				.put("NUnit.Framework.Constraints.ConstraintExpression.SameAs(object expected) : SameAsConstraint",
+						false);
+		defaultEvents
+				.put("NUnit.Framework.Is.InstanceOf(Type expectedType) : InstanceOfTypeConstraint",
+						false);
+		int patternId = 0;
+		int numPatterns = 0;
+
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			Episode pattern = entry.getKey();
+			if (entry.getValue() > 1) {
+				patternId++;
+				otherReposEvents.addAll(getEvents(pattern, events));
+				continue;
+			}
+			EnclosingMethods ctxs = new EnclosingMethods(true);
+
+			for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+				List<Fact> method = tuple.getSecond();
+				if (method.size() < 2) {
+					continue;
+				}
+				if (method.containsAll(pattern.getEvents())) {
+					Event ctx = Events.newElementContext(tuple.getFirst());
+					ctxs.addMethod(pattern, method, ctx);
+				}
+			}
+			int numOccs = ctxs.getOccurrences();
+			assertTrue(numOccs >= pattern.getFrequency(),
+					"Found insufficient number of occurences!");
+
+			Set<IMethodName> methodOccs = ctxs.getMethodNames(numOccs);
+
+			boolean isContained = false;
+			for (IMethodName methodName : methodOccs) {
+				if (repos.get("Contexts-170503/msgpack/msgpack-cli").contains(
+						methodName)) {
+					isContained = true;
+					Logger.log("Pattern = %d", patternId);
+					specRepoEvents.addAll(getEvents(pattern, events));
+					break;
+				}
+			}
+			if (!isContained) {
+				otherReposEvents.addAll(getEvents(pattern, events));
+			}
+			patternId++;
+		}
+		Logger.log("Events only from (msgpack/msgpack-cli) specific-patterns");
+		for (Event event : specRepoEvents) {
+			if (!otherReposEvents.contains(event))
+				Logger.log("%s",
+						episodeGraphConverter.toLabel(event.getMethod()));
+		}
+	}
+
+	private Set<Event> getEvents(Episode pattern, List<Event> events) {
+		Set<Event> patternEvents = Sets.newHashSet();
+		for (Fact fact : pattern.getEvents()) {
+			patternEvents.add(events.get(fact.getFactID()));
+		}
+		return patternEvents;
+	}
+
+	private Map<Episode, Integer> getEvaluations(EpisodeType type,
+			int frequency, double entropy) {
+		File evaluationFile = getEvalFile(type, frequency, entropy);
+		List<String> evalText = reader.readFile(evaluationFile);
+
+		Map<Episode, Integer> evaluations = Maps.newLinkedHashMap();
+
+		for (String line : evalText) {
+			if (line.isEmpty() || line.contains("PatternId")
+					|| line.contains("Patterns")) {
+				continue;
+			}
+			String[] elems = line.split("\t");
+			String facts = elems[1];
+			int freq = Integer.parseInt(elems[2]);
+			double ent = Double.parseDouble(elems[3]);
+			int gens = Integer.parseInt(elems[4]);
+
+			Episode pattern = createPattern(facts, freq, ent);
+			evaluations.put(pattern, gens);
+		}
+		return evaluations;
+	}
+
+	private Episode createPattern(String facts, int freq, double ent) {
+		Episode pattern = new Episode();
+
+		String[] indFacts = facts.split(",");
+		for (String fact : indFacts) {
+			if (fact.contains("]")) {
+				String factId = fact.substring(1, fact.length() - 1);
+				pattern.addFact(new Fact(factId));
+				continue;
+			}
+			String factId = fact.substring(1);
+			pattern.addFact(new Fact(factId));
+		}
+		pattern.setFrequency(freq);
+		pattern.setEntropy(ent);
+
+		return pattern;
+	}
+
+	private File getEvalFile(EpisodeType type, int frequeny, double entropy) {
+		String path = patternsFile.getAbsolutePath() + "/freq" + frequeny
+				+ "/entropy" + entropy + "/" + type + "/evaluations.txt";
+		return new File(path);
+	}
+
 	private void writePatterns(Set<Episode> patterns, String folderName,
 			int frequency, int threshFreq, double threshEnt) throws IOException {
 		List<Event> events = streamIo.readMapping(frequency);
@@ -219,9 +359,9 @@ public class PatternsStatistics {
 			patternId++;
 		}
 	}
-	
-	private String getFilepath(int frequency, double entropy, String folderName,
-			int patternId) {
+
+	private String getFilepath(int frequency, double entropy,
+			String folderName, int patternId) {
 		File filePath = new File(patternsFile.getAbsolutePath() + "/freq"
 				+ frequency + "/entropy" + entropy + "/" + folderName);
 		if (!filePath.exists()) {

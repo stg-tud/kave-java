@@ -17,6 +17,7 @@ import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
+import cc.kave.episodes.mining.graphs.EpisodeToGraphConverter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
@@ -43,11 +44,13 @@ public class APIUsages {
 	private PatternFilter filter;
 
 	private ContextsParser ctxParser;
+	private EpisodeToGraphConverter graphConverter;
 
 	@Inject
 	public APIUsages(@Named("patterns") File folder, FileReader fileReader,
 			EventStreamIo streamIo, EpisodeParser episodeParser,
-			PatternFilter patternFilter, ContextsParser ctxParser) {
+			PatternFilter patternFilter, ContextsParser ctxParser,
+			EpisodeToGraphConverter graphConverter) {
 		assertTrue(folder.exists(), "Patterns folder does not exist!");
 		assertTrue(folder.isDirectory(),
 				"Patterns is not a folder, but a file!");
@@ -57,6 +60,7 @@ public class APIUsages {
 		this.parser = episodeParser;
 		this.filter = patternFilter;
 		this.ctxParser = ctxParser;
+		this.graphConverter = graphConverter;
 	}
 
 	public void categorise(EpisodeType type, int frequeny, int threshFreq,
@@ -552,52 +556,85 @@ public class APIUsages {
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
 				.readStreamObject(frequency);
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
-		Set<IMethodName> repo = repos.get("Contexts-170503/aws/aws-sdk-net");
+		Set<IMethodName> repo = repos
+				.get("Contexts-170503/msgpack/msgpack-cli");
 
 		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEnt);
+
 		int patternId = 0;
-		int numCtxs = 0;
-		int imported = 0;
+		int specifics = 0;
+		int generals = 0;
+
+		Map<Integer, Set<Episode>> specPatterns = Maps.newLinkedHashMap();
 
 		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
 			if ((patternId % 100) == 0) {
 				Logger.log("Analyzed %d patterns", patternId);
 			}
+			boolean isContained = false;
 			Episode pattern = entry.getKey();
-			if (entry.getValue() == 1) {
-				EnclosingMethods methodsOrderRelation = new EnclosingMethods(
-						true);
+			EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
 
-				for (Tuple<IMethodName, List<Fact>> tuple : stream) {
-					List<Fact> method = tuple.getSecond();
-					if (method.size() < 2) {
-						continue;
-					}
-					if (method.containsAll(pattern.getEvents())) {
-						Event ctx = Events.newElementContext(tuple.getFirst());
-						methodsOrderRelation.addMethod(pattern, method, ctx);
+			for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+				List<Fact> method = tuple.getSecond();
+				if (method.size() < 2) {
+					continue;
+				}
+				if (method.containsAll(pattern.getEvents())) {
+					Event ctx = Events.newElementContext(tuple.getFirst());
+					methodsOrderRelation.addMethod(pattern, method, ctx);
+				}
+			}
+			int numOccs = methodsOrderRelation.getOccurrences();
+			assertTrue(numOccs >= pattern.getFrequency(),
+					"Found insufficient number of occurences!");
+
+			Set<IMethodName> methodOcc = methodsOrderRelation
+					.getMethodNames(numOccs);
+			Map<String, Set<IMethodName>> duplicates = Maps.newLinkedHashMap();
+			for (IMethodName methodName : methodOcc) {
+				if (repo.contains(methodName)) {
+					isContained = true;
+					String name = graphConverter.toLabel(methodName);
+					if (duplicates.containsKey(name)) {
+						duplicates.get(name).add(methodName);
+					} else {
+						duplicates.put(name, Sets.newHashSet(methodName));
 					}
 				}
-				int numOccs = methodsOrderRelation.getOccurrences();
-				assertTrue(numOccs >= pattern.getFrequency(),
-						"Found insufficient number of occurences!");
-
-				Set<IMethodName> methodOcc = methodsOrderRelation
-						.getMethodNames(numOccs);
-				for (IMethodName methodName : methodOcc) {
-					if (repo.contains(methodName)) {
-						numCtxs++;
-						if (methodName.getIdentifier().contains("???")) {
-							imported++;
-						}
+			}
+			if (isContained) {
+				if (entry.getValue() == 1) {
+					specifics++;
+					int numEvents = entry.getKey().getNumEvents();
+					if (specPatterns.containsKey(numEvents)) {
+						specPatterns.get(numEvents).add(entry.getKey());
+					} else {
+						specPatterns.put(numEvents,
+								Sets.newHashSet(entry.getKey()));
+					}
+				} else {
+					generals++;
+				}
+			}
+			for (Map.Entry<String, Set<IMethodName>> entryDupl : duplicates
+					.entrySet()) {
+				if (entryDupl.getValue().size() > 1) {
+					for (IMethodName mn : entryDupl.getValue()) {
+						Logger.log("%s", mn.toString());
 					}
 				}
 			}
 			patternId++;
+			Logger.log("");
 		}
-		Logger.log("Number of ctxs for specific patterns: %d", numCtxs);
-		Logger.log("Number of imported ctxs: %d", imported);
+		Logger.log("Number of specific patterns: %d", specifics);
+		Logger.log("\tNumEvents\tNumPatterns");
+		for (Map.Entry<Integer, Set<Episode>> entry : specPatterns.entrySet()) {
+			Logger.log("\t%d\t%d", entry.getKey(), entry.getValue().size());
+		}
+		Logger.log("Number of general patterns: %d", generals);
 	}
 
 	public void getRepoOccStrictPatt(int frequency, int threshFreq,
@@ -676,10 +713,21 @@ public class APIUsages {
 	public void repoNumCtxs(int frequency) {
 		Map<String, Set<IMethodName>> repoCtxs = streamIo
 				.readRepoCtxs(frequency);
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Map<IMethodName, List<Fact>> streamMap = streamToMap(stream);
+
 		Logger.log("\tRepository statistics:");
-		Logger.log("\tRepository\tNum.Ctxs.");
+		Logger.log("\tRepository\tNum.Ctxs.\tstreamLength");
 		for (Map.Entry<String, Set<IMethodName>> entry : repoCtxs.entrySet()) {
-			Logger.log("\t%s\t%d", entry.getKey(), entry.getValue().size());
+			int streamLength = 0;
+			for (IMethodName methodName : entry.getValue()) {
+				if (streamMap.containsKey(methodName)) {
+					streamLength += streamMap.get(methodName).size();
+				}
+			}
+			Logger.log("\t%s\t%d\t%d", entry.getKey(), entry.getValue().size(),
+					streamLength);
 		}
 	}
 
