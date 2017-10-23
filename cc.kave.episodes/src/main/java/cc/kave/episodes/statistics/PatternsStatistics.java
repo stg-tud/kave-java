@@ -213,6 +213,107 @@ public class PatternsStatistics {
 		writePatterns(adds, "additionals", frequency, threshFreq, threshEnt);
 	}
 
+	public void patternsOrigin(int frequency, int threshFreq, double threshEnt) {
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEnt);
+		Map<Episode, Set<IMethodName>> specRepoPatterns = Maps
+				.newLinkedHashMap();
+		Map<Episode, Set<IMethodName>> specPatterns = Maps.newLinkedHashMap();
+		Map<Episode, Set<IMethodName>> genPatterns = Maps.newLinkedHashMap();
+		int patternId = 0;
+
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			if ((patternId % 100) == 0) {
+				Logger.log("Processing patterns = %d", patternId);
+			}
+			Episode pattern = entry.getKey();
+
+			EnclosingMethods ctxs = new EnclosingMethods(true);
+			for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+				List<Fact> method = tuple.getSecond();
+				if (method.size() < 2) {
+					continue;
+				}
+				if (method.containsAll(pattern.getEvents())) {
+					Event ctx = Events.newElementContext(tuple.getFirst());
+					ctxs.addMethod(pattern, method, ctx);
+				}
+			}
+			int numOccs = ctxs.getOccurrences();
+			assertTrue(numOccs >= pattern.getFrequency(),
+					"Found insufficient number of occurences!");
+
+			Set<IMethodName> methodOccs = ctxs.getMethodNames(numOccs);
+
+			boolean specRepo = false;
+			for (IMethodName methodName : methodOccs) {
+				if (repos.get("Contexts-170503/msgpack/msgpack-cli").contains(
+						methodName)
+						&& (entry.getValue() == 1)) {
+					specRepo = true;
+				}
+			}
+			if (specRepo) {
+				specRepoPatterns.put(pattern, methodOccs);
+			} else {
+				if (entry.getValue() == 1) {
+					specPatterns.put(pattern, methodOccs);
+				} else {
+					genPatterns.put(pattern, methodOccs);
+				}
+			}
+			patternId++;
+		}
+		Logger.log("Patterns specific from msgpack/msgpack-cli repository");
+		printCtxsInfo(specRepoPatterns);
+		Logger.log("Other repository-specific patterns");
+		printCtxsInfo(specPatterns);
+		Logger.log("General patterns");
+		printCtxsInfo(genPatterns);
+	}
+
+	public void repoClases(int frequency) {
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		
+		Logger.log("\tRepository\tTestClasses\tDevClasses");
+		for (Map.Entry<String, Set<IMethodName>> entry : repos.entrySet()) {
+			int numTests = 0;
+			int numDevs = 0;
+			for (IMethodName methodName : entry.getValue()) {
+				if (methodName.getDeclaringType().getIdentifier()
+						.contains("Test")) {
+					numTests++;
+				} else {
+					numDevs++;
+				}
+			}
+			Logger.log("\t%s\t%d\t%d", entry.getKey(), numTests, numDevs);
+		}
+	}
+
+	private void printCtxsInfo(Map<Episode, Set<IMethodName>> patterns) {
+		Logger.log("\tPattern\tTests\tDevs");
+		int patternId = 0;
+		for (Map.Entry<Episode, Set<IMethodName>> entry : patterns.entrySet()) {
+			int numTests = 0;
+			int numDevs = 0;
+			for (IMethodName methodName : entry.getValue()) {
+				if (methodName.getDeclaringType().getFullName()
+						.contains("Test")) {
+					numTests++;
+				} else {
+					numDevs++;
+				}
+			}
+			Logger.log("\t%d\t%d\t%d", patternId, numTests, numDevs);
+			patternId++;
+		}
+		Logger.log("");
+	}
+
 	public void specRepoPatterns(int frequency, int threshFreq, double threshEnt) {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
@@ -222,24 +323,8 @@ public class PatternsStatistics {
 				threshFreq, threshEnt);
 		Set<Event> specRepoEvents = Sets.newHashSet();
 		Set<Event> otherReposEvents = Sets.newHashSet();
-		Map<String, Boolean> defaultEvents = Maps.newLinkedHashMap();
-		defaultEvents.put("System.Nullable`1[[T]].GetValueOrDefault() : T",
-				false);
-		defaultEvents
-				.put("System.Tuple.Create(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) : Tuple",
-						false);
-		defaultEvents.put("System.IO.MemoryStream..ctor(byte[] buffer) : void",
-				false);
-		defaultEvents.put(
-				"NUnit.Framework.Assert.Throws(TestDelegate code) : T", false);
-		defaultEvents
-				.put("NUnit.Framework.Constraints.ConstraintExpression.SameAs(object expected) : SameAsConstraint",
-						false);
-		defaultEvents
-				.put("NUnit.Framework.Is.InstanceOf(Type expectedType) : InstanceOfTypeConstraint",
-						false);
+		String specEvent = "System.Tuple.Create(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) : Tuple";
 		int patternId = 0;
-		int numPatterns = 0;
 
 		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
 			Episode pattern = entry.getKey();
@@ -271,22 +356,32 @@ public class PatternsStatistics {
 				if (repos.get("Contexts-170503/msgpack/msgpack-cli").contains(
 						methodName)) {
 					isContained = true;
-					Logger.log("Pattern = %d", patternId);
 					specRepoEvents.addAll(getEvents(pattern, events));
-					break;
 				}
 			}
 			if (!isContained) {
 				otherReposEvents.addAll(getEvents(pattern, events));
+			} else {
+				Logger.log("Pattern = %d", patternId);
+				Logger.log("");
+				for (Fact fact : pattern.getEvents()) {
+					Event event = events.get(fact.getFactID());
+					String name = episodeGraphConverter.toLabel(event
+							.getMethod());
+					if (name.equalsIgnoreCase(specEvent)) {
+						break;
+					}
+
+				}
 			}
 			patternId++;
 		}
-		Logger.log("Events only from (msgpack/msgpack-cli) specific-patterns");
-		for (Event event : specRepoEvents) {
-			if (!otherReposEvents.contains(event))
-				Logger.log("%s",
-						episodeGraphConverter.toLabel(event.getMethod()));
-		}
+		// Logger.log("Events only from (msgpack/msgpack-cli) specific-patterns");
+		// for (Event event : specRepoEvents) {
+		// if (!otherReposEvents.contains(event))
+		// Logger.log("%s",
+		// episodeGraphConverter.toLabel(event.getMethod()));
+		// }
 	}
 
 	private Set<Event> getEvents(Episode pattern, List<Event> events) {

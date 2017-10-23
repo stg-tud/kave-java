@@ -637,6 +637,51 @@ public class APIUsages {
 		Logger.log("Number of general patterns: %d", generals);
 	}
 
+	public void defaultEvents(int frequency) {
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		repos.remove("Contexts-170503/msgpack/msgpack-cli");
+		Set<IMethodName> ctxs = getCtxs(repos);
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		List<Event> events = streamIo.readMapping(frequency);
+
+		Map<String, Boolean> defaultEvents = Maps.newLinkedHashMap();
+		defaultEvents.put("System.Nullable`1[[T]].GetValueOrDefault() : T",
+				false);
+		//event only in this repository
+		defaultEvents
+				.put("System.Tuple.Create(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) : Tuple",
+						false);
+		defaultEvents.put("System.IO.MemoryStream..ctor(byte[] buffer) : void",
+				false);
+		defaultEvents.put(
+				"NUnit.Framework.Assert.Throws(TestDelegate code) : T", false);
+		defaultEvents
+				.put("NUnit.Framework.Constraints.ConstraintExpression.SameAs(object expected) : SameAsConstraint",
+						false);
+		defaultEvents
+				.put("NUnit.Framework.Is.InstanceOf(Type expectedType) : InstanceOfTypeConstraint",
+						false);
+
+		for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+			if (ctxs.contains(tuple.getFirst())) {
+				for (Fact fact : tuple.getSecond()) {
+					Event event = events.get(fact.getFactID());
+					String name = graphConverter.toLabel(event.getMethod());
+
+					if (defaultEvents.containsKey(name)) {
+						defaultEvents.put(name, true);
+					}
+				}
+			}
+		}
+		for (Map.Entry<String, Boolean> entry : defaultEvents.entrySet()) {
+			if (entry.getValue()) {
+				Logger.log("%s", entry.getKey());
+			}
+		}
+	}
+
 	public void getRepoOccStrictPatt(int frequency, int threshFreq,
 			double threshEntr) throws Exception {
 		List<Event> events = streamIo.readMapping(frequency);
@@ -920,6 +965,14 @@ public class APIUsages {
 		} else {
 			return (numEvents - 1) + maxRels(numEvents - 1);
 		}
+	}
+
+	private Set<IMethodName> getCtxs(Map<String, Set<IMethodName>> repos) {
+		Set<IMethodName> ctxs = Sets.newHashSet();
+		for (Map.Entry<String, Set<IMethodName>> entry : repos.entrySet()) {
+			ctxs.addAll(entry.getValue());
+		}
+		return ctxs;
 	}
 
 	private File getFilePath(EpisodeType type, int frequeny, double entropy) {
