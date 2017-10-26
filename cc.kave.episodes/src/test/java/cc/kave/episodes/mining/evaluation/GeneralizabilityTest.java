@@ -30,7 +30,6 @@ import org.mockito.MockitoAnnotations;
 
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
-import cc.kave.episodes.data.ContextsParser;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
@@ -57,8 +56,6 @@ public class GeneralizabilityTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
-	private ContextsParser ctxParser;
-	@Mock
 	private EventStreamIo streamIo;
 	@Mock
 	private EpisodeParser episodeParser;
@@ -70,7 +67,7 @@ public class GeneralizabilityTest {
 	private EpisodeToGraphConverter graphConverter;
 
 	private Map<Integer, Set<Episode>> patterns;
-	private List<Tuple<Event, List<Event>>> streamMethods;
+	private List<Tuple<IMethodName, List<Fact>>> streamMethods;
 	private Map<String, Set<IMethodName>> repoMethods;
 	private List<Event> events;
 
@@ -103,15 +100,18 @@ public class GeneralizabilityTest {
 		patterns.put(3, episodes);
 
 		streamMethods = Lists.newLinkedList();
-		streamMethods
-				.add(Tuple.newTuple(enclCtx(2), Lists.newArrayList(firstCtx(1),
-						inv(2), inv(2), inv(3), inv(3))));
-		streamMethods.add(Tuple.newTuple(enclCtx2(5),
-				Lists.newArrayList(inv(4), inv(4), inv(5), inv(5))));
-		streamMethods.add(Tuple.newTuple(enclCtx(3),
-				Lists.newArrayList(firstCtx(1), inv(2), inv(6), inv(3))));
-		streamMethods.add(Tuple.newTuple(enclCtx(9),
-				Lists.newArrayList(inv(4), inv(2), inv(5), inv(3))));
+		streamMethods.add(Tuple.newTuple(enclCtx(2).getMethod(), Lists
+				.newArrayList(new Fact(1), new Fact(2), new Fact(2),
+						new Fact(3), new Fact(3))));
+		streamMethods.add(Tuple.newTuple(enclCtx2(5).getMethod(), Lists
+				.newArrayList(new Fact(4), new Fact(4), new Fact(5),
+						new Fact(5))));
+		streamMethods.add(Tuple.newTuple(enclCtx(3).getMethod(), Lists
+				.newArrayList(new Fact(1), new Fact(2), new Fact(6),
+						new Fact(3))));
+		streamMethods.add(Tuple.newTuple(enclCtx(9).getMethod(), Lists
+				.newArrayList(new Fact(4), new Fact(2), new Fact(5),
+						new Fact(3))));
 
 		repoMethods = Maps.newLinkedHashMap();
 		repoMethods
@@ -126,17 +126,17 @@ public class GeneralizabilityTest {
 		graph = new DefaultDirectedGraph<Fact, DefaultEdge>(DefaultEdge.class);
 		graphWriter = new EpisodeAsGraphWriter();
 
-		sut = new Generalizability(rootFolder.getRoot(), ctxParser,
-				episodeParser, patternFilter, streamIo, transClosure,
-				graphConverter, graphWriter);
+		sut = new Generalizability(rootFolder.getRoot(), episodeParser,
+				patternFilter, streamIo, transClosure, graphConverter,
+				graphWriter);
 
 		when(streamIo.readMapping(FREQUENCY)).thenReturn(events);
 		when(episodeParser.parser(anyInt())).thenReturn(patterns);
 		when(
 				patternFilter.filter(any(EpisodeType.class), any(Map.class),
 						anyInt(), anyDouble())).thenReturn(patterns);
-		when(ctxParser.parse(anyInt())).thenReturn(streamMethods);
-		when(ctxParser.getRepoCtxMapper()).thenReturn(repoMethods);
+		when(streamIo.readStreamObject(anyInt())).thenReturn(streamMethods);
+		when(streamIo.readRepoCtxs(anyInt())).thenReturn(repoMethods);
 
 		when(transClosure.remTransClosure(eq(episode1))).thenReturn(episode1);
 		when(transClosure.remTransClosure(eq(episode2))).thenReturn(episode2);
@@ -151,9 +151,9 @@ public class GeneralizabilityTest {
 	public void cannotBeInitializedWithNonExistingPatternsFolder() {
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns folder does not exist!");
-		sut = new Generalizability(new File("does not exists"), ctxParser,
-				episodeParser, patternFilter, streamIo, transClosure,
-				graphConverter, graphWriter);
+		sut = new Generalizability(new File("does not exists"), episodeParser,
+				patternFilter, streamIo, transClosure, graphConverter,
+				graphWriter);
 	}
 
 	@Test
@@ -161,9 +161,8 @@ public class GeneralizabilityTest {
 		File patternsFile = rootFolder.newFile("a");
 		thrown.expect(AssertionException.class);
 		thrown.expectMessage("Patterns is not a folder, but a file!");
-		sut = new Generalizability(patternsFile, ctxParser, episodeParser,
-				patternFilter, streamIo, transClosure, graphConverter,
-				graphWriter);
+		sut = new Generalizability(patternsFile, episodeParser, patternFilter,
+				streamIo, transClosure, graphConverter, graphWriter);
 	}
 
 	@Test
@@ -172,15 +171,15 @@ public class GeneralizabilityTest {
 
 		verify(streamIo).readMapping(anyInt());
 		verify(episodeParser).parser(anyInt());
-		verify(patternFilter, times(3)).filter(any(EpisodeType.class), any(Map.class),
-				anyInt(), anyDouble());
-		verify(ctxParser).parse(anyInt());
-		verify(ctxParser, times(3)).getRepoCtxMapper();
+		verify(patternFilter, times(3)).filter(any(EpisodeType.class),
+				any(Map.class), anyInt(), anyDouble());
+		verify(streamIo).readStreamObject(anyInt());
+		verify(streamIo).readRepoCtxs(anyInt());
 		verify(transClosure, times(12)).remTransClosure(any(Episode.class));
 		verify(graphConverter, times(12)).convert(any(Episode.class),
 				any(List.class));
 	}
-	
+
 	@Test
 	public void filesAreCreated() throws Exception {
 		File patternFile1 = getPatternFile(EpisodeType.SEQUENTIAL, 0);
@@ -188,13 +187,13 @@ public class GeneralizabilityTest {
 		File patternFile3 = getPatternFile(EpisodeType.SEQUENTIAL, 2);
 		File patternFile4 = getPatternFile(EpisodeType.SEQUENTIAL, 3);
 		File evalFile1 = getEvalFile(EpisodeType.SEQUENTIAL);
-		
+
 		File patternFile5 = getPatternFile(EpisodeType.PARALLEL, 0);
 		File patternFile6 = getPatternFile(EpisodeType.PARALLEL, 1);
 		File patternFile7 = getPatternFile(EpisodeType.PARALLEL, 2);
 		File patternFile8 = getPatternFile(EpisodeType.PARALLEL, 3);
 		File evalFile2 = getEvalFile(EpisodeType.PARALLEL);
-		
+
 		File patternFile9 = getPatternFile(EpisodeType.GENERAL, 0);
 		File patternFile10 = getPatternFile(EpisodeType.GENERAL, 1);
 		File patternFile11 = getPatternFile(EpisodeType.GENERAL, 2);
@@ -208,20 +207,20 @@ public class GeneralizabilityTest {
 		assertTrue(patternFile3.exists());
 		assertTrue(patternFile4.exists());
 		assertTrue(evalFile1.exists());
-		
+
 		assertTrue(patternFile5.exists());
 		assertTrue(patternFile6.exists());
 		assertTrue(patternFile7.exists());
 		assertTrue(patternFile8.exists());
 		assertTrue(evalFile2.exists());
-		
+
 		assertTrue(patternFile9.exists());
 		assertTrue(patternFile10.exists());
 		assertTrue(patternFile11.exists());
 		assertTrue(patternFile12.exists());
 		assertTrue(evalFile3.exists());
 	}
-	
+
 	@Test
 	public void checkFileContent() throws Exception {
 
@@ -275,10 +274,6 @@ public class GeneralizabilityTest {
 		return Events.newFirstContext(m(i));
 	}
 
-	private static Event superCtx(int i) {
-		return Events.newSuperContext(m(i));
-	}
-
 	private static Event enclCtx(int i) {
 		return Events.newElementContext(m(i));
 	}
@@ -309,7 +304,8 @@ public class GeneralizabilityTest {
 
 	private String getResultsPath(EpisodeType episodeType) {
 		String path = rootFolder.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY + "/entropy" + ENTROPY + "/" + episodeType.toString();
+				+ FREQUENCY + "/entropy" + ENTROPY + "/"
+				+ episodeType.toString();
 		return path;
 	}
 

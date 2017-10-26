@@ -277,7 +277,7 @@ public class PatternsStatistics {
 
 	public void repoClases(int frequency) {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
-		
+
 		Logger.log("\tRepository\tTestClasses\tDevClasses");
 		for (Map.Entry<String, Set<IMethodName>> entry : repos.entrySet()) {
 			int numTests = 0;
@@ -382,6 +382,48 @@ public class PatternsStatistics {
 		// Logger.log("%s",
 		// episodeGraphConverter.toLabel(event.getMethod()));
 		// }
+	}
+
+	public void addsPartials(int frequency, double entropy) {
+		Map<Episode, Integer> partials = getEvaluations(EpisodeType.GENERAL,
+				frequency, entropy);
+		Map<Episode, Integer> sequentials = getEvaluations(
+				EpisodeType.SEQUENTIAL, frequency, entropy);
+
+		Map<Set<Fact>, Set<Episode>> partGroups = groupEvents(partials);
+		Map<Set<Fact>, Set<Episode>> seqGroups = groupEvents(sequentials);
+		
+		int numGens = 0;
+		int numSpecs = 0;
+
+		for (Map.Entry<Set<Fact>, Set<Episode>> entry : partGroups.entrySet()) {
+			if (!seqGroups.containsKey(entry.getKey())) {
+				for (Episode pattern : entry.getValue()) {
+					if (partials.get(pattern) > 1) {
+						numGens++;
+					} else {
+						numSpecs++;
+					}
+				}
+			}
+		}
+		Logger.log("Number of additional general partial patterns: %d", numGens);
+		Logger.log("Number of additional specific partial patterns: %d", numSpecs);
+	}
+
+	private Map<Set<Fact>, Set<Episode>> groupEvents(
+			Map<Episode, Integer> patterns) {
+		Map<Set<Fact>, Set<Episode>> result = Maps.newLinkedHashMap();
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			Episode p = entry.getKey();
+			Set<Fact> events = p.getEvents();
+			if (result.containsKey(events)) {
+				result.get(events).add(p);
+			} else {
+				result.put(events, Sets.newHashSet(p));
+			}
+		}
+		return result;
 	}
 
 	private Set<Event> getEvents(Episode pattern, List<Event> events) {
