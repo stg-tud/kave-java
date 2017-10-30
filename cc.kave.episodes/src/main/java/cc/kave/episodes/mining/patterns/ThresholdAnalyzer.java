@@ -1,5 +1,7 @@
 package cc.kave.episodes.mining.patterns;
 
+import static cc.recommenders.assertions.Asserts.assertTrue;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +15,9 @@ import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
+import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
@@ -70,22 +74,56 @@ public class ThresholdAnalyzer {
 	public void generalizability(int frequency) throws Exception {
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
 				.readStreamObject(frequency);
-		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
-		List<Event> events = streamIo.readMapping(frequency);
+		Map<String, Set<IMethodName>> repoCtxMapper = streamIo
+				.readRepoCtxs(frequency);
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Set<Integer> frequencies = getFrequencies(episodes);
 
-		int bestFreq = 0;
-		double bestEntr = 0;
-		
-		for (int freq : frequencies) {
-			if (freq > 638) {
-				continue;
-			}
-			for (double ent = 0.0; ent < 1.01; ent += 0.01) {
+		Logger.log("\tFrequency\tEntropy\tNumPatterns\tGeneral");
+		for (int freq = 200; freq < 638; freq += 5) {
+			for (double ent = 0.05; ent < 1.01; ent += 0.05) {
 				double entropy = Math.round(ent * 100.0) / 100.0;
+				int generals = 0;
 				Map<Integer, Set<Episode>> patterns = filter.filter(
-						EpisodeType.GENERAL, episodes, freq, ent);
+						EpisodeType.GENERAL, episodes, freq, entropy);
+				for (Map.Entry<Integer, Set<Episode>> entry : patterns
+						.entrySet()) {
+					for (Episode pattern : entry.getValue()) {
+						EnclosingMethods ctxOccs = new EnclosingMethods(true);
+
+						for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+							List<Fact> method = tuple.getSecond();
+							if (method.size() < 2) {
+								continue;
+							}
+							if (method.containsAll(pattern.getEvents())) {
+								Event ctx = Events.newElementContext(tuple
+										.getFirst());
+								ctxOccs.addMethod(pattern, method, ctx);
+							}
+						}
+						int numOccs = ctxOccs.getOccurrences();
+						assertTrue(numOccs >= pattern.getFrequency(),
+								"Found insufficient number of occurences!");
+						Set<IMethodName> methodOccs = ctxOccs
+								.getMethodNames(numOccs);
+						Set<String> repositories = Sets.newHashSet();
+
+						for (Map.Entry<String, Set<IMethodName>> repoEntry : repoCtxMapper
+								.entrySet()) {
+							for (IMethodName methodName : repoEntry.getValue()) {
+								if (methodOccs.contains(methodName)) {
+									repositories.add(repoEntry.getKey());
+									break;
+								}
+							}
+						}
+						if (repositories.size() > 1) {
+							generals++;
+						}
+					}
+				}
+				int numPatterns = getNumbPatterns(patterns);
+				Logger.log("\t%d\t%.2f\t%d\t%d", freq, entropy, numPatterns, generals);
 			}
 		}
 	}

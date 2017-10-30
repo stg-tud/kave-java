@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.Generalizability;
+import cc.kave.episodes.mining.patterns.ThresholdAnalyzer;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -57,9 +57,8 @@ public class run_ervina {
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
 		
 //		 load(PatternsStatistics.class).addsPartials(THF, THE);
-//		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
-//		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.PARALLEL, FREQUENCY, THE);
-		load(Generalizability.class).validate(FREQUENCY, THF, THE);
+		load(ThresholdAnalyzer.class).generalizability(FREQUENCY);
+//		load(Generalizability.class).validate(FREQUENCY, THF, THE);
 //		load(APIUsages.class).defaultEvents(FREQUENCY);
 //		load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
 //		load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
