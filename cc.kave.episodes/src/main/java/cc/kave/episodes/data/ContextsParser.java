@@ -93,8 +93,10 @@ public class ContextsParser {
 				saveRepoCtx(repoName, partStream);
 				streamFilters.addAll(partStream);
 
+				eventStreamRepo.getEventStream().clear();
 				eventStreamRepo = new StreamRepoGenerator() {
 				};
+				eventStreamFilter.getEventStream().clear();
 				eventStreamFilter = new StreamFilterGenerator();
 				repoName = getRepoName(zip);
 			}
@@ -135,10 +137,6 @@ public class ContextsParser {
 		for (Map.Entry<String, Set<IMethodName>> entry : repoDecls.entrySet()) {
 			ctxsRepos.addAll(entry.getValue());
 		}
-		System.out.println("Number of ctxs in stream: " + ctxsStream.size());
-		System.out.println("Number of ctxs in repos: " + ctxsRepos.size());
-		System.out.println("Repo-ctx mapper includes all stream ctx? "
-				+ ctxsRepos.containsAll(ctxsStream));
 	}
 
 	private void saveRepoCtx(String repoName,
@@ -189,6 +187,10 @@ public class ContextsParser {
 				.overlaps(streamLocals);
 		statOverlaps.addStats(streamOverlaps);
 
+		streamStruct.clear();
+		streamUnknowns.clear();
+		streamLocals.clear();
+		
 		return streamOverlaps;
 	}
 

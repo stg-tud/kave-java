@@ -67,6 +67,9 @@ public class ThresholdAnalyzer {
 			Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
 					freq, entropy);
 			int numbPatterns = getNumbPatterns(patterns);
+			if (numbPatterns < 100) {
+				break;
+			}
 			Logger.log("\t%d\t%d", freq, numbPatterns);
 		}
 	}
@@ -79,8 +82,8 @@ public class ThresholdAnalyzer {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 
 		Logger.log("\tFrequency\tEntropy\tNumPatterns\tGeneral");
-		for (int freq = 200; freq < 638; freq += 5) {
-			for (double ent = 0.05; ent < 1.01; ent += 0.05) {
+		for (int freq = 320; freq < 321; freq += 5) {
+			for (double ent = 0.45; ent < 1.01; ent += 0.05) {
 				double entropy = Math.round(ent * 100.0) / 100.0;
 				int generals = 0;
 				Map<Integer, Set<Episode>> patterns = filter.filter(
