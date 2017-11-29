@@ -275,6 +275,91 @@ public class PatternsStatistics {
 		printCtxsInfo(genPatterns);
 	}
 
+	public void specPatternsRepos(int frequency, int threshFreq, double threshEnt) {
+		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		List<Event> events = streamIo.readMapping(frequency);
+		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEnt);
+
+		Map<String, Set<Episode>> specPatterns = Maps.newLinkedHashMap();
+		specPatterns.put("Contexts-170503/msgpack/msgpack-cli",
+				Sets.newHashSet());
+		specPatterns.put("Contexts-170503/ServiceStack/ServiceStack",
+				Sets.newHashSet());
+		specPatterns.put("Contexts-170503/Glimpse/Glimpse", Sets.newHashSet());
+		specPatterns.put("Contexts-170503/mono/mono", Sets.newHashSet());
+		specPatterns.put("Contexts-170503/aumcode/nfx", Sets.newHashSet());
+		specPatterns.put("Contexts-170503/devbridge/BetterCMS",
+				Sets.newHashSet());
+		specPatterns.put("Contexts-170503/octokit/octokit.net",
+				Sets.newHashSet());
+		specPatterns.put("Contexts-170503/nhibernate/nhibernate-core",
+				Sets.newHashSet());
+		specPatterns
+				.put("Contexts-170503/OsmSharp/OsmSharp", Sets.newHashSet());
+		specPatterns.put("Contexts-170503/ravendb/ravendb", Sets.newHashSet());
+		specPatterns.put("Contexts-170503/aws/aws-sdk-net", Sets.newHashSet());
+
+		int patternId = 0;
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			if ((patternId % 100) == 0) {
+				Logger.log("Processing pattern = %d", patternId);
+			}
+			if (entry.getValue() > 1) {
+				patternId++;
+				continue;
+			}
+			Episode pattern = entry.getKey();
+
+			EnclosingMethods ctxs = new EnclosingMethods(true);
+			for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+				List<Fact> method = tuple.getSecond();
+				if (method.size() < 2) {
+					continue;
+				}
+				if (method.containsAll(pattern.getEvents())) {
+					Event ctx = Events.newElementContext(tuple.getFirst());
+					ctxs.addMethod(pattern, method, ctx);
+				}
+			}
+			int numOccs = ctxs.getOccurrences();
+			assertTrue(numOccs >= pattern.getFrequency(),
+					"Found insufficient number of occurences!");
+
+			Set<IMethodName> methodOccs = ctxs.getMethodNames(numOccs);
+			for (IMethodName methodName : methodOccs) {
+				for (Map.Entry<String, Set<Episode>> entryRepo : specPatterns
+						.entrySet()) {
+					String repoName = entryRepo.getKey();
+					if (repos.get(repoName).contains(methodName)) {
+						specPatterns.get(repoName).add(pattern);
+						break;
+					}
+				}
+				break;
+			}
+			patternId++;
+		}
+		patternId = 0;
+		for (Map.Entry<String, Set<Episode>> entry : specPatterns.entrySet()) {
+			Logger.log("\tPatterns from repository: %s", entry.getKey());
+			for (Episode pattern : entry.getValue()) {
+				String patternName = patternId + ". ";
+				Set<Fact> facts = pattern.getEvents();
+				for (Fact fact : facts) {
+					Event event = events.get(fact.getFactID());
+					IMethodName methodName = event.getMethod();
+					patternName += episodeGraphConverter.toLabel(methodName) + "\n";
+				}
+				Logger.log("\t%s", patternName);
+				patternId++;
+			}
+			Logger.log("");
+		}
+	}
+
 	public void repoClases(int frequency) {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 
@@ -392,7 +477,7 @@ public class PatternsStatistics {
 
 		Map<Set<Fact>, Set<Episode>> partGroups = groupEvents(partials);
 		Map<Set<Fact>, Set<Episode>> seqGroups = groupEvents(sequentials);
-		
+
 		int numGens = 0;
 		int numSpecs = 0;
 
@@ -408,7 +493,8 @@ public class PatternsStatistics {
 			}
 		}
 		Logger.log("Number of additional general partial patterns: %d", numGens);
-		Logger.log("Number of additional specific partial patterns: %d", numSpecs);
+		Logger.log("Number of additional specific partial patterns: %d",
+				numSpecs);
 	}
 
 	private Map<Set<Fact>, Set<Episode>> groupEvents(
