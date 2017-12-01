@@ -68,6 +68,99 @@ public class PatternsStatistics {
 		this.graphWriter = graphWriter;
 	}
 
+	public void generalizability(int threshFreq, double threshEntr) {
+		Map<Episode, Integer> generals = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEntr);
+		Map<Episode, Integer> sequentials = getEvaluations(
+				EpisodeType.SEQUENTIAL, threshFreq, threshEntr);
+		int numGens = 0;
+		int numSpecs = 0;
+		
+		for (Map.Entry<Episode, Integer> entryPart : generals.entrySet()) {
+			Episode gen = entryPart.getKey();
+			boolean repr = false;
+			for (Map.Entry<Episode, Integer> entSeq : sequentials.entrySet()) {
+				if (gen.getEvents().equals(entSeq.getKey().getEvents())) {
+					repr = true;
+					break;
+				}
+			}
+			if (!repr) {
+				if (entryPart.getValue() > 1) {
+					numGens++;
+				} else {
+					numSpecs++;
+				}
+			}
+		}
+		Logger.log("Number of unique partial-patterns that are general: %d", numGens);
+		Logger.log("Number of unique partial patterns that are specific: %d", numSpecs);
+	}
+
+	public void patternSizes(int frequency, int threshFreq, double threshEntr)
+			throws Exception {
+		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
+		Map<Integer, Set<Episode>> partials = filter.filter(
+				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
+
+		int numPatterns = 0;
+		Logger.log("Analyzing partial-order patterns ...");
+		Logger.log("Size-level\t#Patterns");
+		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
+			Logger.log("%d\t%d", entry.getKey(), entry.getValue().size());
+			numPatterns += entry.getValue().size();
+		}
+		Logger.log("Number of partial-order patterns: %d", numPatterns);
+		Logger.log("");
+
+		numPatterns = 0;
+		Map<Integer, Set<Episode>> sequentials = filter.filter(
+				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+		Logger.log("Analyzing sequential-order patterns ...");
+		Logger.log("Size-level\t#Patterns");
+		for (Map.Entry<Integer, Set<Episode>> entry : sequentials.entrySet()) {
+			Logger.log("%d\t%d", entry.getKey(), entry.getValue().size());
+			numPatterns += entry.getValue().size();
+		}
+		Logger.log("Number of sequential-order patterns: %d", numPatterns);
+		Logger.log("");
+
+		for (int idx = 5; idx <= 7; idx++) {
+			Set<Episode> partLevel = partials.get(idx);
+			Map<Set<Fact>, Set<Episode>> partEvents = getPatternEvents(partLevel);
+			Logger.log("Number of uniques partials for %d level is %d", idx,
+					partEvents.size());
+			int partOrder = 0;
+			int strictOrder = 0;
+			for (Episode p : partLevel) {
+				if (isPartial(p)) {
+					partOrder++;
+				} else {
+					strictOrder++;
+				}
+			}
+			Logger.log("Patterns with partial-order = %d", partOrder);
+			Logger.log("Patterns with strict-order = %d", strictOrder);
+
+			Set<Episode> seqLevel = sequentials.get(idx);
+			Map<Set<Fact>, Set<Episode>> seqEvents = getPatternEvents(seqLevel);
+			Logger.log("Number of sequentials for %d-level is %d", idx,
+					seqEvents.size());
+
+			int isContained = 0;
+			for (Map.Entry<Set<Fact>, Set<Episode>> entry : partEvents
+					.entrySet()) {
+				if (seqEvents.containsKey(entry.getKey())) {
+					isContained++;
+				} else {
+					Logger.log("Partials: %s", entry.getKey().toString());
+				}
+			}
+			Logger.log("Number of equal event groups: %s", isContained);
+			Logger.log("");
+		}
+	}
+
 	public void numPatterns(int frequency, int threshFreq, double threshEnt)
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
@@ -137,10 +230,10 @@ public class PatternsStatistics {
 		int notCovered = 0;
 
 		Set<Episode> covSeqs = Sets.newLinkedHashSet();
-		Map<Integer, Set<Episode>> partials = getPatterns(EpisodeType.GENERAL,
+		Map<Integer, Set<Episode>> partials = getPatterns(EpisodeType.PARALLEL,
 				frequency, threshFreq, threshEnt);
 		Map<Integer, Set<Episode>> sequentials = getPatterns(
-				EpisodeType.SEQUENTIAL, frequency, threshFreq, threshEnt);
+				EpisodeType.GENERAL, frequency, threshFreq, threshEnt);
 
 		for (Map.Entry<Integer, Set<Episode>> entSeq : sequentials.entrySet()) {
 			Map<Integer, Set<Episode>> tempPartials = Maps.newLinkedHashMap();
@@ -275,7 +368,8 @@ public class PatternsStatistics {
 		printCtxsInfo(genPatterns);
 	}
 
-	public void specPatternsRepos(int frequency, int threshFreq, double threshEnt) {
+	public void specPatternsRepos(int frequency, int threshFreq,
+			double threshEnt) {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
 				.readStreamObject(frequency);
@@ -351,7 +445,8 @@ public class PatternsStatistics {
 				for (Fact fact : facts) {
 					Event event = events.get(fact.getFactID());
 					IMethodName methodName = event.getMethod();
-					patternName += episodeGraphConverter.toLabel(methodName) + "\n";
+					patternName += episodeGraphConverter.toLabel(methodName)
+							+ "\n";
 				}
 				Logger.log("\t%s", patternName);
 				patternId++;
@@ -666,5 +761,19 @@ public class PatternsStatistics {
 			counter += entry.getValue().size();
 		}
 		return counter;
+	}
+
+	private Map<Set<Fact>, Set<Episode>> getPatternEvents(Set<Episode> patterns) {
+		Map<Set<Fact>, Set<Episode>> results = Maps.newLinkedHashMap();
+
+		for (Episode p : patterns) {
+			Set<Fact> facts = p.getEvents();
+			if (results.containsKey(facts)) {
+				results.get(facts).add(p);
+			} else {
+				results.put(facts, Sets.newHashSet(p));
+			}
+		}
+		return results;
 	}
 }

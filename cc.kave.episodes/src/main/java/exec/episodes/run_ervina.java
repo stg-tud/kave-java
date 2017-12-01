@@ -56,7 +56,7 @@ public class run_ervina {
 // 		load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
 		
-		 load(PatternsStatistics.class).specPatternsRepos(FREQUENCY, THF, THE);
+		 load(PatternsStatistics.class).generalizability(THF, THE);
 //		load(ThresholdAnalyzer.class).generalizability(FREQUENCY);
 //		load(Generalizability.class).validate(FREQUENCY, THF, THE);
 //		load(APIUsages.class).defaultEvents(FREQUENCY);
