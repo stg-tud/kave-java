@@ -22,7 +22,6 @@ import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -48,31 +47,70 @@ public class SpecificPatterns {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
 				.readStreamObject(frequency);
-		Map<IMethodName, List<Fact>> eventStream = streamToMap(stream);
-		Map<String, List<Fact>> repoStream = getRepoStreams(repos, eventStream);
 
 		List<Event> events = streamIo.readMapping(frequency);
 		Map<Episode, Integer> patterns = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEntr);
+		Set<ITypeName> generalTypes = getGenAPITypes(patterns, events);
 
-		Map<String, Set<Episode>> specPatterns = initSpecRepoPatterns();
-		Map<String, Set<Episode>> repoPatterns = getRepoPatterns(repos, stream,
-				patterns, specPatterns);
-		Map<String, Set<ITypeName>> repoTypes = getRepoTypes(repoPatterns);
+		Map<String, Set<Episode>> repoSpecPatterns = getRepoSpecPatterns(repos,
+				stream, patterns);
+
+		printSpecPatterns(repoSpecPatterns, events);
+		printGeneralTypes(generalTypes);
 	}
 
-	private Map<String, Set<ITypeName>> getRepoTypes(
-			Map<String, Set<Episode>> repoPatterns) {
-		// TODO Auto-generated method stub
-		return null;
+	private void printGeneralTypes(Set<ITypeName> types) {
+		Logger.log("\tAPI types occurring in general patterns:");
+		for (ITypeName typeName : types) {
+			Logger.log("\t%s", typeName.getIdentifier());
+		}
 	}
 
-	private Map<String, Set<Episode>> getRepoPatterns(
+	private void printSpecPatterns(Map<String, Set<Episode>> repoSpecPatterns,
+			List<Event> events) {
+		int patternId = 0;
+		for (Map.Entry<String, Set<Episode>> entry : repoSpecPatterns
+				.entrySet()) {
+			Logger.log("\tPatterns from repository: %s", entry.getKey());
+			for (Episode pattern : entry.getValue()) {
+				String patternName = patternId + ". ";
+				Set<Fact> facts = pattern.getEvents();
+				for (Fact fact : facts) {
+					Event event = events.get(fact.getFactID());
+					IMethodName methodName = event.getMethod();
+					patternName += methodName.getDeclaringType().getIdentifier()
+							+ "\n";
+				}
+				Logger.log("\t%s", patternName);
+				patternId++;
+			}
+			Logger.log("");
+		}
+	}
+
+	private Set<ITypeName> getGenAPITypes(Map<Episode, Integer> patterns,
+			List<Event> events) {
+		Set<ITypeName> types = Sets.newHashSet();
+
+		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
+			if (entry.getValue() == 1) {
+				continue;
+			}
+			for (Fact fact : entry.getKey().getEvents()) {
+				int id = fact.getFactID();
+				types.add(events.get(id).getMethod().getDeclaringType());
+			}
+		}
+		return types;
+	}
+
+	private Map<String, Set<Episode>> getRepoSpecPatterns(
 			Map<String, Set<IMethodName>> repos,
 			List<Tuple<IMethodName, List<Fact>>> stream,
-			Map<Episode, Integer> patterns,
-			Map<String, Set<Episode>> specPatterns) {
+			Map<Episode, Integer> patterns) {
 
+		Map<String, Set<Episode>> specPatterns = initSpecRepoPatterns();
 		int patternId = 0;
 		for (Map.Entry<Episode, Integer> entry : patterns.entrySet()) {
 			if ((patternId % 100) == 0) {
@@ -182,31 +220,5 @@ public class SpecificPatterns {
 		pattern.setEntropy(ent);
 
 		return pattern;
-	}
-
-	private Map<String, List<Fact>> getRepoStreams(
-			Map<String, Set<IMethodName>> repos,
-			Map<IMethodName, List<Fact>> eventStream) {
-		Map<String, List<Fact>> result = Maps.newLinkedHashMap();
-
-		for (Map.Entry<String, Set<IMethodName>> entry : repos.entrySet()) {
-			List<Fact> stream = Lists.newLinkedList();
-
-			for (IMethodName methodName : entry.getValue()) {
-				stream.addAll(eventStream.get(methodName));
-			}
-			result.put(entry.getKey(), stream);
-		}
-		return result;
-	}
-
-	private Map<IMethodName, List<Fact>> streamToMap(
-			List<Tuple<IMethodName, List<Fact>>> stream) {
-		Map<IMethodName, List<Fact>> streamMap = Maps.newLinkedHashMap();
-
-		for (Tuple<IMethodName, List<Fact>> tuple : stream) {
-			streamMap.put(tuple.getFirst(), tuple.getSecond());
-		}
-		return streamMap;
 	}
 }

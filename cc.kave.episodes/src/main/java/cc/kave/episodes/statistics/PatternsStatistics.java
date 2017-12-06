@@ -15,6 +15,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.io.FileReader;
@@ -68,6 +69,40 @@ public class PatternsStatistics {
 		this.graphWriter = graphWriter;
 	}
 
+	public void numbAPIs(int frequency, int threshFreq, double threshEntr)
+			throws Exception {
+		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
+		Map<Integer, Set<Episode>> patterns = filter.filter(
+				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+		List<Event> events = streamIo.readMapping(frequency);
+
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			System.out.println(entry.getKey() + "-event patterns");
+//			Logger.log("\t%d-event patterns", entry.getKey());
+			Logger.log("\tNumber of API\tNumber of patterns");
+			Map<Integer, Integer> numbAPIPatterns = Maps.newLinkedHashMap();
+
+			for (Episode p : entry.getValue()) {
+				Set<ITypeName> types = Sets.newHashSet();
+				for (Fact fact : p.getEvents()) {
+					int id = fact.getFactID();
+					types.add(events.get(id).getMethod().getDeclaringType());
+				}
+				int numbTypes = types.size();
+				if (numbAPIPatterns.containsKey(numbTypes)) {
+					int counter = numbAPIPatterns.get(numbTypes);
+					numbAPIPatterns.put(numbTypes, counter + 1);
+				} else {
+					numbAPIPatterns.put(numbTypes, 1);
+				}
+			}
+			for (Map.Entry<Integer, Integer> count : numbAPIPatterns.entrySet()) {
+				Logger.log("\t%d\t%d", count.getKey(), count.getValue());
+			}
+			Logger.log("");
+		}
+	}
+
 	public void generalizability(int threshFreq, double threshEntr) {
 		Map<Episode, Integer> generals = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEntr);
@@ -75,7 +110,7 @@ public class PatternsStatistics {
 				EpisodeType.SEQUENTIAL, threshFreq, threshEntr);
 		int numGens = 0;
 		int numSpecs = 0;
-		
+
 		for (Map.Entry<Episode, Integer> entryPart : generals.entrySet()) {
 			Episode gen = entryPart.getKey();
 			boolean repr = false;
@@ -93,8 +128,10 @@ public class PatternsStatistics {
 				}
 			}
 		}
-		Logger.log("Number of unique partial-patterns that are general: %d", numGens);
-		Logger.log("Number of unique partial patterns that are specific: %d", numSpecs);
+		Logger.log("Number of unique partial-patterns that are general: %d",
+				numGens);
+		Logger.log("Number of unique partial patterns that are specific: %d",
+				numSpecs);
 	}
 
 	public void patternSizes(int frequency, int threshFreq, double threshEntr)
