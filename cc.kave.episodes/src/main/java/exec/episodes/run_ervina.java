@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.preprocessing.Preprocessing;
+import cc.kave.episodes.statistics.PatternsStatistics;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -32,7 +32,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 5;
+	private static final int FREQUENCY = 300;
 
 	private static final int THF = 345;
 	private static final double THE = 0.72 ;
@@ -51,12 +51,12 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(Preprocessing.class).run(FREQUENCY);
+//		load(Preprocessing.class).run(FREQUENCY);
 // 		load(PartitionStream.class).partition(FREQUENCY);
 // 		load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
 		
-//		 load(PatternsStatistics.class).numbAPIs(FREQUENCY, THF, THE);
+		 load(PatternsStatistics.class).partialsGroups(FREQUENCY, THF, THE);
 //		load(ThresholdAnalyzer.class).generalizability(FREQUENCY);
 //		load(Generalizability.class).validate(FREQUENCY, THF, THE);
 //		load(APIUsages.class).defaultEvents(FREQUENCY);

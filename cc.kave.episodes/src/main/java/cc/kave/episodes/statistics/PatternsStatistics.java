@@ -73,12 +73,11 @@ public class PatternsStatistics {
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+				EpisodeType.PARALLEL, episodes, threshFreq, threshEntr);
 		List<Event> events = streamIo.readMapping(frequency);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			System.out.println(entry.getKey() + "-event patterns");
-//			Logger.log("\t%d-event patterns", entry.getKey());
+			Logger.log("\t%d-event patterns", entry.getKey());
 			Logger.log("\tNumber of API\tNumber of patterns");
 			Map<Integer, Integer> numbAPIPatterns = Maps.newLinkedHashMap();
 
@@ -267,10 +266,10 @@ public class PatternsStatistics {
 		int notCovered = 0;
 
 		Set<Episode> covSeqs = Sets.newLinkedHashSet();
-		Map<Integer, Set<Episode>> partials = getPatterns(EpisodeType.PARALLEL,
+		Map<Integer, Set<Episode>> partials = getPatterns(EpisodeType.GENERAL,
 				frequency, threshFreq, threshEnt);
 		Map<Integer, Set<Episode>> sequentials = getPatterns(
-				EpisodeType.GENERAL, frequency, threshFreq, threshEnt);
+				EpisodeType.SEQUENTIAL, frequency, threshFreq, threshEnt);
 
 		for (Map.Entry<Integer, Set<Episode>> entSeq : sequentials.entrySet()) {
 			Map<Integer, Set<Episode>> tempPartials = Maps.newLinkedHashMap();
@@ -511,26 +510,6 @@ public class PatternsStatistics {
 		}
 	}
 
-	private void printCtxsInfo(Map<Episode, Set<IMethodName>> patterns) {
-		Logger.log("\tPattern\tTests\tDevs");
-		int patternId = 0;
-		for (Map.Entry<Episode, Set<IMethodName>> entry : patterns.entrySet()) {
-			int numTests = 0;
-			int numDevs = 0;
-			for (IMethodName methodName : entry.getValue()) {
-				if (methodName.getDeclaringType().getFullName()
-						.contains("Test")) {
-					numTests++;
-				} else {
-					numDevs++;
-				}
-			}
-			Logger.log("\t%d\t%d\t%d", patternId, numTests, numDevs);
-			patternId++;
-		}
-		Logger.log("");
-	}
-
 	public void specRepoPatterns(int frequency, int threshFreq, double threshEnt) {
 		Map<String, Set<IMethodName>> repos = streamIo.readRepoCtxs(frequency);
 		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
@@ -627,6 +606,96 @@ public class PatternsStatistics {
 		Logger.log("Number of additional general partial patterns: %d", numGens);
 		Logger.log("Number of additional specific partial patterns: %d",
 				numSpecs);
+	}
+
+	public void partialsGroups(int frequency, int threshFreq, double threshEntr)
+			throws Exception {
+		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
+		Map<Integer, Set<Episode>> partials = filter.filter(
+				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> sequentials = filter.filter(
+				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+
+		Map<Episode, Integer> evaluations = getEvaluations(EpisodeType.GENERAL,
+				threshFreq, threshEntr);
+
+		Set<Episode> adds = Sets.newLinkedHashSet();
+		Tuple<Integer, Integer> addsEval = Tuple.newTuple(0, 0);
+		Tuple<Integer, Integer> equals = Tuple.newTuple(0, 0);
+		Tuple<Integer, Integer> covers = Tuple.newTuple(0, 0);
+		Set<Episode> coverGens = Sets.newLinkedHashSet();
+		Set<Episode> coverSpecs = Sets.newLinkedHashSet();
+		int partOrder = 0;
+		int strictOrder = 0;
+
+		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
+			for (Episode partial : entry.getValue()) {
+				boolean areEqual = false;
+				boolean doesCover = false;
+
+				for (Episode sequential : sequentials.get(entry.getKey())) {
+					if (equalEpisodes(partial, sequential)) {
+						areEqual = true;
+						int eval = evaluations.get(partial);
+						int gens = equals.getFirst();
+						int specs = equals.getSecond();
+
+						if (eval > 1) {
+							equals = Tuple.newTuple(gens + 1, specs);
+						} else {
+							equals = Tuple.newTuple(gens, specs + 1);
+						}
+						break;
+					}
+					if (doesCover(partial, sequential)) {
+						doesCover = true;
+						int eval = evaluations.get(partial);
+						int gens = covers.getFirst();
+						int specs = covers.getSecond();
+
+						if (eval > 1) {
+							covers = Tuple.newTuple(gens + 1, specs);
+							coverGens.add(partial);
+						} else {
+							covers = Tuple.newTuple(gens, specs + 1);
+							coverSpecs.add(partial);
+						}
+						if (isPartial(partial)) {
+							partOrder++;
+						} else {
+							strictOrder++;
+						}
+						break;
+					}
+				}
+				if (!areEqual && !doesCover) {
+					adds.add(partial);
+					int eval = evaluations.get(partial);
+					int gens = addsEval.getFirst();
+					int specs = addsEval.getSecond();
+
+					if (eval > 1) {
+						addsEval = Tuple.newTuple(gens + 1, specs);
+					} else {
+						addsEval = Tuple.newTuple(gens, specs + 1);
+					}
+				}
+			}
+		}
+		Logger.log("Equal patterns: generals = %d, specs = %d",
+				equals.getFirst(), equals.getSecond());
+		Logger.log("Coverage patterns: generals = %d, specs = %d",
+				covers.getFirst(), covers.getSecond());
+		Logger.log("Coverage patterns: partial-order = %d, strict-order = %d",
+				partOrder, strictOrder);
+		Logger.log("Additional patterns: general = %d, specs = %d",
+				addsEval.getFirst(), addsEval.getSecond());
+		// writePatterns(adds, "addsPartials", frequency, threshFreq,
+		// threshEntr);
+		writePatterns(coverGens, "partCoverGens", frequency, threshFreq,
+				threshEntr);
+		writePatterns(coverSpecs, "partCoverSpecs", frequency, threshFreq,
+				threshEntr);
 	}
 
 	private Map<Set<Fact>, Set<Episode>> groupEvents(
@@ -812,5 +881,25 @@ public class PatternsStatistics {
 			}
 		}
 		return results;
+	}
+
+	private void printCtxsInfo(Map<Episode, Set<IMethodName>> patterns) {
+		Logger.log("\tPattern\tTests\tDevs");
+		int patternId = 0;
+		for (Map.Entry<Episode, Set<IMethodName>> entry : patterns.entrySet()) {
+			int numTests = 0;
+			int numDevs = 0;
+			for (IMethodName methodName : entry.getValue()) {
+				if (methodName.getDeclaringType().getFullName()
+						.contains("Test")) {
+					numTests++;
+				} else {
+					numDevs++;
+				}
+			}
+			Logger.log("\t%d\t%d\t%d", patternId, numTests, numDevs);
+			patternId++;
+		}
+		Logger.log("");
 	}
 }
