@@ -14,12 +14,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
 import org.apache.commons.io.FilenameUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class ExternalTestCaseProvider {
 	private static final String settingsFile = "settings.ini";
@@ -47,7 +50,6 @@ public class ExternalTestCaseProvider {
 
 	private static List<TestCase[]> getTestCasesInCurrentFolder(File currentDirectory, String rootPrefix)
 			throws ClassNotFoundException, IOException {
-		List<TestCase[]> testCases = new LinkedList<TestCase[]>();
 
 		Class<?> serializedType = Object.class;
 		String expectedCompact = null;
@@ -73,6 +75,7 @@ public class ExternalTestCaseProvider {
 			return new LinkedList<TestCase[]>();
 		}
 
+		Map<String, TestCase[]> testCases = Maps.newHashMap();
 		for (File file : currentDirectory.listFiles()) {
 			boolean isInputFile = !file.getName().equals(settingsFile) && !file.getName().equals(expectedCompactFile)
 					&& !file.getName().equals(expectedFormattedFile);
@@ -81,11 +84,16 @@ public class ExternalTestCaseProvider {
 			}
 
 			String input = new String(Files.readAllBytes(file.toPath()));
-			testCases.add(new TestCase[] { new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix),
-					serializedType, input, expectedCompact, expectedFormatted) });
+			TestCase[] tc = new TestCase[] { new TestCase(getTestCaseName(file.getAbsolutePath(), rootPrefix),
+					serializedType, input, expectedCompact, expectedFormatted) };
+			testCases.put(file.getName(), tc);
 		}
 
-		return testCases;
+		List<TestCase[]> orderedCases = new LinkedList<TestCase[]>();
+		for(String key : new TreeSet<String>(testCases.keySet())) {
+			orderedCases.add(testCases.get(key));
+		}
+		return orderedCases;
 	}
 
 	private static File[] getSubdirectories(File currentDirectory) {

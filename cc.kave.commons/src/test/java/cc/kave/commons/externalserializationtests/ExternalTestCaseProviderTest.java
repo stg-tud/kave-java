@@ -98,7 +98,8 @@ public class ExternalTestCaseProviderTest {
 	}
 
 	private TestCase getFirstTestCase() throws ClassNotFoundException, IOException {
-		return ExternalTestCaseProvider.getTestCases(baseDirectory).get(0)[0];
+		TestCase[] cases = ExternalTestCaseProvider.getTestCases(baseDirectory).get(0);
+		return cases[0];
 	}
 
 	@Test
