@@ -3,6 +3,8 @@ package cc.kave.episodes.statistics;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -14,16 +16,14 @@ import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
 import cc.kave.commons.model.ssts.visitor.ISSTNodeVisitor;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 
-import com.google.common.collect.Lists;
-
 public class PartialEventStreamGenerator {
-	
+
 	private String name1 = "[p:void] [Arp.Generator.Preprocessing.Impl.AttributesGroupGenerationInfo, Arp.Generator]..init()";
 	private IMethodName decl1 = Names.newMethod(name1);
 
@@ -33,8 +33,7 @@ public class PartialEventStreamGenerator {
 	private Set<IMethodName> seenMethods;
 	private List<Event> events;
 
-	public List<Event> extract(List<Context> ctxs, Set<ITypeName> seenTypes,
-			Set<IMethodName> seenMethods) {
+	public List<Event> extract(List<Context> ctxs, Set<ITypeName> seenTypes, Set<IMethodName> seenMethods) {
 		this.seenTypes = seenTypes;
 		this.seenMethods = seenMethods;
 		events = Lists.newLinkedList();
@@ -49,8 +48,7 @@ public class PartialEventStreamGenerator {
 		return events;
 	}
 
-	private class EventStreamGenerationVisitor extends
-			AbstractTraversingNodeVisitor<ITypeShape, Void> {
+	private class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
 		@Override
 		public Void visit(ISST sst, ITypeShape context) {
@@ -60,9 +58,9 @@ public class PartialEventStreamGenerator {
 			}
 
 			ITypeName type = TypeErasure.of(sst.getEnclosingType());
-//			if (!seenTypes.add(type) && !sst.isPartialClass()) {
-//				return null;
-//			}
+			// if (!seenTypes.add(type) && !sst.isPartialClass()) {
+			// return null;
+			// }
 			events.add(Events.newType(type));
 
 			return super.visit(sst, context);
@@ -70,10 +68,8 @@ public class PartialEventStreamGenerator {
 
 		private boolean isGenerated(ISST td) {
 			String partId = td.getPartialClassIdentifier();
-			return td.isPartialClass()
-					&& partId != null
-					&& (partId.contains(".Designer") || partId
-							.contains(".designer"));
+			return td.isPartialClass() && partId != null
+					&& (partId.contains(".Designer") || partId.contains(".designer"));
 		}
 
 		private IMethodName ctxElem;
@@ -86,11 +82,11 @@ public class PartialEventStreamGenerator {
 			ctxFirst = null;
 			ctxSuper = null;
 			IMethodName m = decl.getName();
-//			if (!seenMethods.add(TypeErasure.of(m))) {
-//				return null;
-//			}
+			// if (!seenMethods.add(TypeErasure.of(m))) {
+			// return null;
+			// }
 			ctxElem = m;
-			for (IMethodHierarchy h : context.getMethodHierarchies()) {
+			for (IMemberHierarchy<IMethodName> h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(m)) {
 					ctxSuper = h.getSuper();
 					ctxFirst = h.getFirst();

@@ -60,7 +60,7 @@ import cc.kave.commons.model.ssts.impl.references.FieldReference;
 import cc.kave.commons.model.ssts.impl.references.PropertyReference;
 import cc.kave.commons.model.ssts.references.IFieldReference;
 import cc.kave.commons.model.ssts.references.IPropertyReference;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
@@ -119,7 +119,7 @@ public class TestSSTBuilder {
 		ITypeHierarchy typeHierarchy = new TypeHierarchy(sst.getEnclosingType().getIdentifier());
 		typeShape.setTypeHierarchy(typeHierarchy);
 
-		Set<IMethodHierarchy> methodHierarchies = new HashSet<>();
+		Set<IMemberHierarchy<IMethodName>> methodHierarchies = new HashSet<>();
 		for (IMethodDeclaration methodDecl : sst.getEntryPoints()) {
 			methodHierarchies.add(new MethodHierarchy(methodDecl.getName()));
 		}
@@ -130,10 +130,10 @@ public class TestSSTBuilder {
 
 	/**
 	 * Creates a SST which realizes a class that copies one source file to a
-	 * specific destination via FileStream instances. The source file is
-	 * specified as constructor argument and saved in a field. The source stream
-	 * is constructed in a separate helper method, whereas the destination
-	 * stream is created in the single entry point method <i>CopyTo</i>.
+	 * specific destination via FileStream instances. The source file is specified
+	 * as constructor argument and saved in a field. The source stream is
+	 * constructed in a separate helper method, whereas the destination stream is
+	 * created in the single entry point method <i>CopyTo</i>.
 	 */
 	public Context createStreamTest() {
 		ITypeName streamTestType = Names.newType("Test.StreamTest, Test");
@@ -180,17 +180,15 @@ public class TestSSTBuilder {
 						invocationExpr(fileStreamCtorName, refExpr(variableReference("dest")), constant("Create"),
 								constant("Write"))),
 				declareVar("buffer", getByteArrayType()),
-				assignmentToLocal("buffer",
-						invocationExpr(byteArrayCtorName, constant("1024"))),
-				declareVar("read",
-						getInt32Type()),
+				assignmentToLocal("buffer", invocationExpr(byteArrayCtorName, constant("1024"))),
+				declareVar("read", getInt32Type()),
 				whileLoop(
 						loopHeader(
 								assignmentToLocal("read",
 										invocationExpression("input", fsReadName,
 												Iterators.forArray(refExpr("buffer"), constant("0"),
 														refExpr(buildPropertyRef("buffer", intArrLengthName))))),
-						unknownStatement()),
+								unknownStatement()),
 						invocationStatement("output", fsWriteName,
 								Iterators.forArray(refExpr("buffer"), constant("0"), refExpr("read")))),
 				invocationStatement("input", fsCloseName), invocationStatement("output", fsCloseName));
@@ -259,11 +257,11 @@ public class TestSSTBuilder {
 						getVoidType().getIdentifier(), bType.getIdentifier()))),
 				invocationStatement("this", entry3Name));
 		IMethodDeclaration entry3Decl = declareMethod(entry3Name, true, declareVar("d", dType),
-				assignmentToLocal("d",
-						invocationExpr(dConstructor)),
-				buildTryBlock(invocationStatement("d",
-						Names.newMethod(String.format(Locale.US, "[%s] [%s].m4()", getVoidType().getIdentifier(),
-								dType.getIdentifier()))),
+				assignmentToLocal("d", invocationExpr(dConstructor)),
+				buildTryBlock(
+						invocationStatement("d",
+								Names.newMethod(String.format(Locale.US, "[%s] [%s].m4()",
+										getVoidType().getIdentifier(), dType.getIdentifier()))),
 						buildCatchBlock(invocationStatement("d", Names.newMethod(String.format(Locale.US,
 								"[%s] [%s].m5()", getVoidType().getIdentifier(), dType.getIdentifier()))))));
 		sst.setMethods(Sets.newHashSet(entry2Decl, entry3Decl));

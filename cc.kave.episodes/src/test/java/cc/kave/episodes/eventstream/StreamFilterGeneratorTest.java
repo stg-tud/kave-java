@@ -24,6 +24,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
@@ -35,14 +38,11 @@ import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.expressions.assignable.InvocationExpression;
 import cc.kave.commons.model.ssts.impl.statements.ExpressionStatement;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class StreamFilterGeneratorTest {
 
@@ -73,8 +73,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesGenerics() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericBound(1, 2, 3),
-				mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
 
 		ctx.setSST(sst(1, methodDeclGenericBound(1, 2, 3, //
 				inv("o", mGenericBound(2, 3, 4)))));
@@ -91,8 +90,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesPartialClass1() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericBound(1, 2, 3),
-				mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
 
 		ctx.setSST(sstPartialClass1(1, methodDeclGenericBound(1, 2, 3, //
 				inv("o", mGenericBound(2, 3, 4)))));
@@ -108,8 +106,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesPartialClass2() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericBound(1, 2, 3),
-				mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
 
 		ctx.setSST(sstPartialClass2(1, methodDeclGenericBound(1, 2, 3, //
 				inv("o", mGenericBound(2, 3, 4)))));
@@ -125,8 +122,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesUserCode() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericBound(1, 2, 3),
-				mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
+		addMethodHierarchy(ctx, mGenericBound(1, 2, 3), mGenericBound(11, 12, 13), mGenericBound(21, 22, 23));
 
 		ctx.setSST(sstUserCode(1, methodDeclGenericBound(1, 2, 3, //
 				inv("o", mGenericBound(2, 3, 4)))));
@@ -144,8 +140,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesGenericsFree() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12),
-				mGenericFree(21, 22));
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
 
 		ctx.setSST(sst(1, methodDeclGenericFree(1, 2, //
 				inv("o", mGenericFree(2, 3)))));
@@ -163,8 +158,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesPartialFreeClass1() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12),
-				mGenericFree(21, 22));
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
 
 		ctx.setSST(sstPartialClass1(1, methodDeclGenericFree(1, 2, //
 				inv("o", mGenericBound(2, 3, 4)))));
@@ -179,8 +173,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesPartialFreeClass2() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12),
-				mGenericFree(21, 22));
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
 
 		ctx.setSST(sstPartialClass2(1, methodDeclGenericFree(1, 2, //
 				inv("o", mGenericFree(2, 3)))));
@@ -195,8 +188,7 @@ public class StreamFilterGeneratorTest {
 	public void handlesUserFreeCode() {
 		Context ctx = new Context();
 
-		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12),
-				mGenericFree(21, 22));
+		addMethodHierarchy(ctx, mGenericFree(1, 2), mGenericFree(11, 12), mGenericFree(21, 22));
 
 		ctx.setSST(sstUserCode(1, methodDeclGenericFree(1, 2, //
 				inv("o", mGenericFree(2, 3)))));
@@ -285,8 +277,7 @@ public class StreamFilterGeneratorTest {
 
 		sut.add(ctx);
 
-		assertStream(Events.newContext(m(1, 1)),
-				Events.newInvocation(unknown()));
+		assertStream(Events.newContext(m(1, 1)), Events.newInvocation(unknown()));
 	}
 
 	@Test
@@ -356,8 +347,7 @@ public class StreamFilterGeneratorTest {
 		assertEquals(expecteds, actuals);
 	}
 
-	private void addMethodHierarchy(Context ctx, IMethodName m, IMethodName s,
-			IMethodName f) {
+	private void addMethodHierarchy(Context ctx, IMethodName m, IMethodName s, IMethodName f) {
 		MethodHierarchy h = new MethodHierarchy();
 		h.setElement(m);
 		if (s != null) {
@@ -366,7 +356,7 @@ public class StreamFilterGeneratorTest {
 		if (f != null) {
 			h.setFirst(f);
 		}
-		Set<IMethodHierarchy> hs = ctx.getTypeShape().getMethodHierarchies();
+		Set<IMemberHierarchy<IMethodName>> hs = ctx.getTypeShape().getMethodHierarchies();
 		hs.add(h);
 	}
 
@@ -401,8 +391,7 @@ public class StreamFilterGeneratorTest {
 		return sst;
 	}
 
-	private IMethodDeclaration methodDecl(int typeNum, int methodNum,
-			IStatement... stmtArr) {
+	private IMethodDeclaration methodDecl(int typeNum, int methodNum, IStatement... stmtArr) {
 		MethodDeclaration decl = new MethodDeclaration();
 		decl.setName(m(typeNum, methodNum));
 		decl.setBody(Lists.newArrayList(stmtArr));
@@ -410,40 +399,35 @@ public class StreamFilterGeneratorTest {
 	}
 
 	private IMethodName m(int typeNum, int methodNum) {
-		return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum),
-				methodNum));
+		return Names.newMethod(String.format("[R,P] [%s].m%d()", t(typeNum), methodNum));
 	}
 
 	private ITypeName t(int typeNum) {
 		return Names.newType(String.format("T%d,P", typeNum));
 	}
 
-	private IMethodDeclaration methodDeclGenericBound(int typeNum,
-			int methodNum, int typeParamNum, IStatement... stmtArr) {
+	private IMethodDeclaration methodDeclGenericBound(int typeNum, int methodNum, int typeParamNum,
+			IStatement... stmtArr) {
 		MethodDeclaration decl = new MethodDeclaration();
 		decl.setName(mGenericBound(typeNum, methodNum, typeParamNum));
 		decl.setBody(Lists.newArrayList(stmtArr));
 		return decl;
 	}
 
-	private IMethodDeclaration methodDeclGenericFree(int typeNum,
-			int methodNum, IStatement... stmtArr) {
+	private IMethodDeclaration methodDeclGenericFree(int typeNum, int methodNum, IStatement... stmtArr) {
 		MethodDeclaration decl = new MethodDeclaration();
 		decl.setName(mGenericFree(typeNum, methodNum));
 		decl.setBody(Lists.newArrayList(stmtArr));
 		return decl;
 	}
 
-	private IMethodName mGenericBound(int typeNum, int methodNum,
-			int typeParamNum) {
-		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T -> %s]]()",
-				tGenericBound(typeNum, typeParamNum), methodNum,
-				t(typeParamNum)));
+	private IMethodName mGenericBound(int typeNum, int methodNum, int typeParamNum) {
+		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T -> %s]]()", tGenericBound(typeNum, typeParamNum),
+				methodNum, t(typeParamNum)));
 	}
 
 	private IMethodName mGenericFree(int typeNum, int methodNum) {
-		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T]]()",
-				tGenericFree(typeNum), methodNum));
+		return Names.newMethod(String.format("[R,P] [%s].m%d`1[[T]]()", tGenericFree(typeNum), methodNum));
 	}
 
 	private ITypeName tGenericFree(int typeNum) {
@@ -451,10 +435,9 @@ public class StreamFilterGeneratorTest {
 	}
 
 	private ITypeName tGenericBound(int typeNum, int typeParamNum) {
-		return Names.newType(String.format("T%d`1[[T -> %s]],P", typeNum,
-				t(typeParamNum)));
+		return Names.newType(String.format("T%d`1[[T -> %s]],P", typeNum, t(typeParamNum)));
 	}
-	
+
 	private IMethodName erase(IMethodName methodName) {
 		IMethodName erased = TypeErasure.of(methodName);
 		return erased;

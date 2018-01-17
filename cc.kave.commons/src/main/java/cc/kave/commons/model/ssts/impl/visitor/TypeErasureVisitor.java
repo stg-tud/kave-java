@@ -16,11 +16,12 @@
 package cc.kave.commons.model.ssts.impl.visitor;
 
 import cc.kave.commons.model.events.completionevents.Context;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
@@ -40,13 +41,13 @@ public class TypeErasureVisitor extends AbstractThrowingNodeVisitor<Object, Obje
 	public static ITypeShape erase(ITypeShape in) {
 		TypeShape out = new TypeShape();
 		out.setTypeHierarchy(erase(in.getTypeHierarchy()));
-		for (IMethodHierarchy mh : in.getMethodHierarchies()) {
+		for (IMemberHierarchy<IMethodName> mh : in.getMethodHierarchies()) {
 			out.getMethodHierarchies().add(erase(mh));
 		}
 		return out;
 	}
 
-	public static IMethodHierarchy erase(IMethodHierarchy in) {
+	public static IMemberHierarchy<IMethodName> erase(IMemberHierarchy<IMethodName> in) {
 		MethodHierarchy out = new MethodHierarchy();
 		if (in.getElement() != null) {
 			out.setElement(TypeErasure.of(in.getElement()));

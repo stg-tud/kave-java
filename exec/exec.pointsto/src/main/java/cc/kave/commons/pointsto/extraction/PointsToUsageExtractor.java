@@ -25,12 +25,13 @@ import com.google.inject.Inject;
 
 import cc.kave.commons.exceptions.AssertionException;
 import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.IMemberDeclaration;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IMethodDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.ICompletionExpression;
 import cc.kave.commons.model.ssts.references.IVariableReference;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
@@ -275,7 +276,8 @@ public class PointsToUsageExtractor {
 		}
 	}
 
-	private ICoReMethodName getMethodContext(ICoReMethodName currentContext, Collection<IMethodHierarchy> hierarchies) {
+	private ICoReMethodName getMethodContext(ICoReMethodName currentContext,
+			Collection<IMemberHierarchy<IMethodName>> hierarchies) {
 		boolean wasLambdaContext = CoReNameConverter.isLambdaName(currentContext);
 		ICoReMethodName restoredMethod = currentContext;
 		if (wasLambdaContext) {
@@ -284,7 +286,7 @@ public class PointsToUsageExtractor {
 			restoredMethod = CoReNameConverter.removeLambda(currentContext);
 		}
 
-		for (IMethodHierarchy methodHierarchy : hierarchies) {
+		for (IMemberHierarchy<IMethodName> methodHierarchy : hierarchies) {
 			ICoReMethodName method = CoReNameConverter.convert(methodHierarchy.getElement());
 
 			if (restoredMethod.equals(method)) {

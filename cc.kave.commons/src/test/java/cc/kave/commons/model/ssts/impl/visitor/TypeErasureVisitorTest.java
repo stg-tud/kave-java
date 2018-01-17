@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
 import cc.kave.commons.model.ssts.IStatement;
 import cc.kave.commons.model.ssts.declarations.IDelegateDeclaration;
@@ -31,7 +32,7 @@ import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.impl.SST;
 import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.statements.ContinueStatement;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
@@ -177,7 +178,7 @@ public class TypeErasureVisitorTest {
 		out.setSuper(Names.newMethod("[T,P] [T,P].S`1[[G1]]()"));
 		out.setFirst(Names.newMethod("[T,P] [T,P].F`1[[G1]]()"));
 
-		IMethodHierarchy actual = TypeErasureVisitor.erase(in);
+		IMemberHierarchy<IMethodName> actual = TypeErasureVisitor.erase(in);
 		assertEquals(out, actual);
 	}
 

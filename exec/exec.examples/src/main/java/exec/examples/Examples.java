@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.Names;
+import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.codeelements.IParameterName;
 import cc.kave.commons.model.naming.types.ITypeName;
 import cc.kave.commons.model.ssts.IReference;
@@ -31,7 +32,7 @@ import cc.kave.commons.model.ssts.impl.declarations.MethodDeclaration;
 import cc.kave.commons.model.ssts.impl.references.VariableReference;
 import cc.kave.commons.model.ssts.impl.statements.ReturnStatement;
 import cc.kave.commons.model.ssts.impl.visitor.inlining.InliningContext;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.pointsto.analysis.AbstractLocation;
@@ -76,7 +77,7 @@ public class Examples {
 		// ... as well as information about the implemented methods within this
 		// class, e.g., which original method was overridden by the
 		// declaration
-		Set<IMethodHierarchy> methodHierarchies = ts.getMethodHierarchies();
+		Set<IMemberHierarchy<IMethodName>> methodHierarchies = ts.getMethodHierarchies();
 
 		// you can access the "simplified syntax tree" (SST), our intermediate
 		// representation, which includes the normalized representation of a
@@ -146,11 +147,11 @@ public class Examples {
 	 * Names are a bit ambiguous in this example.
 	 * 
 	 * The parameter "originalContext" points to the class "Context", which
-	 * represents a class (incl. the IR of the source code, and information
-	 * about the type sytem).
+	 * represents a class (incl. the IR of the source code, and information about
+	 * the type sytem).
 	 * 
-	 * The class "PointsToContext" refers to the result of the points-to
-	 * analysis and which can be used to find abstract locations.
+	 * The class "PointsToContext" refers to the result of the points-to analysis
+	 * and which can be used to find abstract locations.
 	 */
 	public static void performPointsTo(Context originalContext) {
 		// pick an implementation for a pointer analysis

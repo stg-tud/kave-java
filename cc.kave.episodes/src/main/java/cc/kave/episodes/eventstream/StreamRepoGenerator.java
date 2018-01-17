@@ -17,6 +17,8 @@ package cc.kave.episodes.eventstream;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import cc.kave.commons.model.events.completionevents.Context;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.ssts.ISST;
@@ -25,18 +27,16 @@ import cc.kave.commons.model.ssts.declarations.IPropertyDeclaration;
 import cc.kave.commons.model.ssts.expressions.assignable.IInvocationExpression;
 import cc.kave.commons.model.ssts.expressions.assignable.ILambdaExpression;
 import cc.kave.commons.model.ssts.impl.visitor.AbstractTraversingNodeVisitor;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.ITypeShape;
 import cc.kave.commons.utils.naming.TypeErasure;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Events;
 
-import com.google.common.collect.Lists;
-
 public abstract class StreamRepoGenerator {
 
 	private List<Event> events = Lists.newLinkedList();
-	
+
 	public void add(Context ctx) {
 		ISST sst = ctx.getSST();
 		sst.accept(new EventStreamGenerationVisitor(), ctx.getTypeShape());
@@ -46,8 +46,7 @@ public abstract class StreamRepoGenerator {
 		return events;
 	}
 
-	public class EventStreamGenerationVisitor extends
-			AbstractTraversingNodeVisitor<ITypeShape, Void> {
+	public class EventStreamGenerationVisitor extends AbstractTraversingNodeVisitor<ITypeShape, Void> {
 
 		private IMethodName firstCtx;
 		private IMethodName superCtx;
@@ -60,7 +59,7 @@ public abstract class StreamRepoGenerator {
 			superCtx = null;
 			IMethodName name = decl.getName();
 			elementCtx = name;
-			for (IMethodHierarchy h : context.getMethodHierarchies()) {
+			for (IMemberHierarchy<IMethodName> h : context.getMethodHierarchies()) {
 				if (h.getElement().equals(name)) {
 					firstCtx = h.getFirst();
 					superCtx = h.getSuper();
@@ -68,7 +67,7 @@ public abstract class StreamRepoGenerator {
 			}
 			return super.visit(decl, context);
 		}
-		
+
 		@Override
 		public Void visit(IPropertyDeclaration pdecl, ITypeShape context) {
 			return null;

@@ -59,7 +59,7 @@ import cc.kave.commons.model.ssts.statements.IAssignment;
 import cc.kave.commons.model.ssts.statements.IExpressionStatement;
 import cc.kave.commons.model.ssts.statements.IReturnStatement;
 import cc.kave.commons.model.ssts.statements.IVariableDeclaration;
-import cc.kave.commons.model.typeshapes.IMethodHierarchy;
+import cc.kave.commons.model.typeshapes.IMemberHierarchy;
 import cc.kave.commons.model.typeshapes.MethodHierarchy;
 import cc.kave.commons.model.typeshapes.TypeHierarchy;
 import cc.kave.commons.model.typeshapes.TypeShape;
@@ -221,11 +221,12 @@ public abstract class TestBuilder {
 		TypeHierarchy typeHierarchy = new TypeHierarchy();
 		typeHierarchy.setElement(type);
 		typeShape.setTypeHierarchy(typeHierarchy);
-		Set<IMethodHierarchy> methodHierarchies = methods.stream().filter(IMethodDeclaration::isEntryPoint).map(md -> {
-			MethodHierarchy methodHierarchy = new MethodHierarchy();
-			methodHierarchy.setElement(md.getName());
-			return methodHierarchy;
-		}).collect(Collectors.toCollection(Sets::newLinkedHashSet));
+		Set<IMemberHierarchy<IMethodName>> methodHierarchies = methods.stream().filter(IMethodDeclaration::isEntryPoint)
+				.map(md -> {
+					MethodHierarchy methodHierarchy = new MethodHierarchy();
+					methodHierarchy.setElement(md.getName());
+					return methodHierarchy;
+				}).collect(Collectors.toCollection(Sets::newLinkedHashSet));
 		typeShape.setMethodHierarchies(methodHierarchies);
 
 		Context context = new Context();
