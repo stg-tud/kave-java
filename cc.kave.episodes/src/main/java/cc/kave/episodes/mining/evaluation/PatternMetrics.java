@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodeParser;
@@ -78,12 +79,92 @@ public class PatternMetrics {
 				EpisodeType.PARALLEL, episodes, stream, freqThresh, entThresh);
 		Logger.log("\tOrder importance in partial-order patterns\n");
 		orderInfo(partials, unordered);
-		
+
 		Logger.log("Getting results for sequential-order ...");
 		Map<Episode, Tuple<Integer, Integer>> sequentials = getOccs(
 				EpisodeType.SEQUENTIAL, episodes, stream, freqThresh, entThresh);
 		Logger.log("\tOrder importance in sequential-order patterns\n");
 		orderInfo(sequentials, unordered);
+	}
+
+	public void importancePartials(int frequency, int freqThresh,
+			double entThresh) throws Exception {
+		Logger.log("Reading the event stream file ...");
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		Logger.log("Reading the episode results file ...");
+		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
+
+		Logger.log("Getting results for partial-order ...");
+		Map<Episode, Tuple<Integer, Integer>> partials = getOccs(
+				EpisodeType.GENERAL, episodes, stream, freqThresh, entThresh);
+		Logger.log("Getting results for sequential-order ...");
+		Map<Episode, Tuple<Integer, Integer>> sequentials = getOccs(
+				EpisodeType.SEQUENTIAL, episodes, stream, freqThresh, entThresh);
+		Logger.log("\tOrder importance in sequential-order patterns\n");
+
+		Map<Set<Fact>, Set<Episode>> partialGroups = groupPartials(partials);
+		int patternId = 0;
+
+		Logger.log("\tOrder importance of sequential-order over partial-order");
+		Logger.log("\tID\tFacts\tFrequency\tEntropy\tSequential\tPartial");
+		for (Map.Entry<Episode, Tuple<Integer, Integer>> entry : sequentials
+				.entrySet()) {
+			Episode seqPattern = entry.getKey();
+			for (Episode partPattern : partialGroups
+					.get(seqPattern.getEvents())) {
+				if (doesCover(partPattern, seqPattern)) {
+					String facts = seqPattern.getFacts().toString();
+					int seqOccs = sequentials.get(seqPattern).getSecond();
+					int partOccs = partials.get(partPattern).getSecond();
+
+					Logger.log("\t%d\t%s\t%d\t%.2f\t%d\t%d", patternId, facts,
+							seqPattern.getFrequency(), seqPattern.getEntropy(),
+							seqOccs, partOccs);
+					patternId++;
+					break;
+				}
+			}
+		}
+	}
+
+	private boolean doesCover(Episode partial, Episode sequential) {
+		Set<Fact> partEvents = partial.getEvents();
+		Set<Fact> seqEvents = sequential.getEvents();
+
+		if (!partEvents.containsAll(seqEvents)) {
+			return false;
+		}
+		Set<Fact> seqRels = sequential.getRelations();
+		Set<Fact> partRels = partial.getRelations();
+		for (Fact relation : seqRels) {
+			Tuple<Fact, Fact> relFacts = relation.getRelationFacts();
+			String factString = relFacts.getSecond().getFactID() + ">"
+					+ relFacts.getFirst().getFactID();
+			Fact fact = new Fact(factString);
+			if (partRels.contains(fact)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private Map<Set<Fact>, Set<Episode>> groupPartials(
+			Map<Episode, Tuple<Integer, Integer>> partials) {
+		Map<Set<Fact>, Set<Episode>> results = Maps.newLinkedHashMap();
+
+		for (Map.Entry<Episode, Tuple<Integer, Integer>> entry : partials
+				.entrySet()) {
+			Episode pattern = entry.getKey();
+			Set<Fact> events = pattern.getEvents();
+
+			if (results.containsKey(events)) {
+				results.get(events).add(pattern);
+			} else {
+				results.put(events, Sets.newHashSet(pattern));
+			}
+		}
+		return results;
 	}
 
 	private void orderInfo(Map<Episode, Tuple<Integer, Integer>> ordered,

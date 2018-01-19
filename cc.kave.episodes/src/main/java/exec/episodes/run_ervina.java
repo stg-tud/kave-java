@@ -53,7 +53,7 @@ public class run_ervina {
 		Logger.log("started: %s\n", new Date());
 		
 //		load(Preprocessing.class).run(FREQUENCY);
-		load(PatternMetrics.class).importance(FREQUENCY, THF, THE);
+		load(PatternMetrics.class).importancePartials(FREQUENCY, THF, THE);
 // 		load(PartitionStream.class).partition(FREQUENCY);
 // 		load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
