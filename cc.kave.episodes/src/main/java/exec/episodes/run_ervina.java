@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.mining.evaluation.PatternMetrics;
 import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
@@ -33,7 +32,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 300;
+	private static final int FREQUENCY = 1000;
 
 	private static final int THF = 345;
 	private static final double THE = 0.72 ;
@@ -52,8 +51,8 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-//		load(Preprocessing.class).run(FREQUENCY);
-		load(PatternMetrics.class).importancePartials(FREQUENCY, THF, THE);
+		load(Preprocessing.class).run(FREQUENCY);
+//		load(PatternMetrics.class).genDecl(FREQUENCY, THF, THE);
 // 		load(PartitionStream.class).partition(FREQUENCY);
 // 		load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
@@ -73,6 +72,8 @@ public class run_ervina {
 //		load(APIUsages.class).getApisComp(FREQUENCY, THF, THE);
 //		load(APIUsages.class).getOrderInfo(FREQUENCY, THF, THE);
 //		load(APIUsages.class).partialSequentials(FREQUENCY, THF, THE);
+		
+//		load(APITypes.class).streamAPIs(FREQUENCY);
 		
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,

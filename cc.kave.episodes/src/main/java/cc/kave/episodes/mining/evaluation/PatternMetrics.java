@@ -8,9 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
@@ -18,11 +16,15 @@ import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
+import cc.kave.episodes.model.events.EventKind;
 import cc.kave.episodes.model.events.Events;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.EnclosingMethods;
 import cc.recommenders.datastructures.Tuple;
 import cc.recommenders.io.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class PatternMetrics {
 
@@ -85,6 +87,110 @@ public class PatternMetrics {
 				EpisodeType.SEQUENTIAL, episodes, stream, freqThresh, entThresh);
 		Logger.log("\tOrder importance in sequential-order patterns\n");
 		orderInfo(sequentials, unordered);
+	}
+
+	public void genDecl(int frequency, int freqThresh, double entThresh)
+			throws Exception {
+		Logger.log("Reading input files ...");
+		List<Tuple<IMethodName, List<Fact>>> stream = streamIo
+				.readStreamObject(frequency);
+		List<Event> events = streamIo.readMapping(frequency);
+		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
+
+		Logger.log("\tGeneralizability for partial-order:");
+		Map<Integer, Set<Episode>> partials = filter.filter(
+				EpisodeType.GENERAL, episodes, freqThresh, entThresh);
+		methodDecl(partials, stream, events);
+		
+		Logger.log("\tGeneralizability for no-order:");
+		Map<Integer, Set<Episode>> unordered = filter.filter(
+				EpisodeType.PARALLEL, episodes, freqThresh, entThresh);
+		methodDecl(unordered, stream, events);
+		
+		Logger.log("\tGeneralizability for sequential-order:");
+		Map<Integer, Set<Episode>> sequentials = filter.filter(
+				EpisodeType.SEQUENTIAL, episodes, freqThresh, entThresh);
+		methodDecl(sequentials, stream, events);
+	}
+
+	private void methodDecl(Map<Integer, Set<Episode>> patterns,
+			List<Tuple<IMethodName, List<Fact>>> stream, List<Event> events) {
+
+		int patternId = 0;
+
+		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
+			Logger.log("\tPatterns with %d-nodes:", entry.getKey());
+			Logger.log("\tPatternId\tFacts\tFrequency\tEntropy\t#Decls");
+
+			for (Episode pattern : entry.getValue()) {
+				int numDecls = getDeclOccs(pattern, stream, events);
+				Logger.log("\t%d\t%s\t%d\t%.2f\t%d", patternId, pattern
+						.getFacts().toString(), pattern.getFrequency(), pattern
+						.getEntropy(), numDecls);
+				patternId++;
+			}
+			Logger.log("");
+		}
+	}
+
+	private int getDeclOccs(Episode pattern,
+			List<Tuple<IMethodName, List<Fact>>> stream, List<Event> events) {
+		Map<IMethodName, List<Fact>> streamMap = getMapStream(stream);
+		Set<IMethodName> decls = Sets.newHashSet();
+
+		EnclosingMethods methodsOrderRelation = new EnclosingMethods(true);
+		for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+			List<Fact> method = tuple.getSecond();
+			if (method.size() < pattern.getNumEvents()) {
+				continue;
+			}
+			if (method.containsAll(pattern.getEvents())) {
+				Event ctx = Events.newElementContext(tuple.getFirst());
+				methodsOrderRelation.addMethod(pattern, method, ctx);
+			}
+		}
+		int numOccs = methodsOrderRelation.getOccurrences();
+		assertTrue(numOccs >= pattern.getFrequency(),
+				"Found insufficient number of occurences!");
+
+		Set<IMethodName> methodOcc = methodsOrderRelation
+				.getMethodNames(numOccs);
+		for (IMethodName enclMethod : methodOcc) {
+			IMethodName mn = getDeclName(streamMap.get(enclMethod), events);
+			if (mn.isUnknown()) {
+				decls.add(enclMethod);
+			} else {
+				decls.add(mn);
+			}
+		}
+		return decls.size();
+	}
+
+	private IMethodName getDeclName(List<Fact> method, List<Event> events) {
+
+		for (Fact fact : method) {
+			Event event = events.get(fact.getFactID());
+			if (event.getKind() == EventKind.FIRST_DECLARATION) {
+				return event.getMethod();
+			}
+		}
+		for (Fact fact : method) {
+			Event event = events.get(fact.getFactID());
+			if (event.getKind() == EventKind.SUPER_DECLARATION) {
+				return event.getMethod();
+			}
+		}
+		return Names.getUnknownMethod();
+	}
+
+	private Map<IMethodName, List<Fact>> getMapStream(
+			List<Tuple<IMethodName, List<Fact>>> stream) {
+		Map<IMethodName, List<Fact>> result = Maps.newLinkedHashMap();
+		for (Tuple<IMethodName, List<Fact>> tuple : stream) {
+			result.put(tuple.getFirst(), tuple.getSecond());
+		}
+		assertTrue(stream.size() == result.size(), "Stream conversion error");
+		return result;
 	}
 
 	public void importancePartials(int frequency, int freqThresh,
@@ -233,6 +339,9 @@ public class PatternMetrics {
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode p : entry.getValue()) {
 				EnclosingMethods ctxOccs = new EnclosingMethods(true);
+				if (type == EpisodeType.PARALLEL) {
+					ctxOccs = new EnclosingMethods(false);
+				}
 
 				for (Tuple<IMethodName, List<Fact>> tuple : stream) {
 					List<Fact> method = tuple.getSecond();
