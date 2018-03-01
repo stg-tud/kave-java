@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.data.DataCounter;
+import cc.kave.episodes.evaluations.expressiveness.PatternEvents;
 import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
@@ -32,7 +34,7 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 1000;
+	private static final int FREQUENCY = 300;
 
 	private static final int THF = 345;
 	private static final double THE = 0.72 ;
@@ -51,11 +53,14 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(Preprocessing.class).run(FREQUENCY);
+		load(DataCounter.class).namespaces();
+//		load(Preprocessing.class).run(FREQUENCY);
 //		load(PatternMetrics.class).genDecl(FREQUENCY, THF, THE);
 // 		load(PartitionStream.class).partition(FREQUENCY);
 // 		load(EventsStatistics.class).histogram(FREQUENCY);
 //		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
+		
+//		load(PatternEvents.class).acrossTypes(FREQUENCY, THF, THE);
 		
 //		 load(PatternsStatistics.class).partialsGroups(FREQUENCY, THF, THE);
 //		load(ThresholdAnalyzer.class).generalizability(FREQUENCY);
