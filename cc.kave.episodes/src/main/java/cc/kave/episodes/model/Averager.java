@@ -33,6 +33,10 @@ public class Averager {
 		this.data.add(value);
 	}
 	
+	public void addValue(int value) {
+		this.data.add(value*1.0);
+	}
+	
 	public List<Double> getValues() {
 		return this.data;
 	}

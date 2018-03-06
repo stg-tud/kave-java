@@ -53,6 +53,11 @@ public class AveragerTest {
 		thrown.expectMessage("Enter a proper similarity value, between 0 and 1!");
 		sut.addValue(-2.0);
 	}
+	
+	@Test
+	public void zeroElements() {
+		assertTrue(sut.average() == 0.0);
+	}
 
 	@Test
 	public void addValues() {
@@ -86,5 +91,15 @@ public class AveragerTest {
 		double expected = 0.5;
 
 		assertTrue(expected == sut.average());
+	}
+	
+	@Test
+	public void intValues() {
+		sut.addValue(2);
+		sut.addValue(4);
+		sut.addValue(1);
+		sut.addValue(3);
+		
+		assertTrue(sut.average() == 2.5);
 	}
 }
