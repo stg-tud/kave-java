@@ -21,9 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.data.DataCounter;
-import cc.kave.episodes.evaluations.expressiveness.PatternEvents;
-import cc.kave.episodes.preprocessing.Preprocessing;
+import cc.kave.episodes.mining.patterns.ThresholdAnalyzer;
+import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -34,10 +33,10 @@ public class run_ervina {
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
 
-	private static final int FREQUENCY = 300;
+	private static final int FREQUENCY = 200;
 
 	private static final int THF = 345;
-	private static final double THE = 0.72 ;
+	private static final double THE = 0.23;
 
 	private static final int METHODSIZE = 5000;
 
@@ -52,45 +51,48 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
-		
-		load(DataCounter.class).namespaces();
-//		load(Preprocessing.class).run(FREQUENCY);
-//		load(PatternMetrics.class).genDecl(FREQUENCY, THF, THE);
-// 		load(PartitionStream.class).partition(FREQUENCY);
-// 		load(EventsStatistics.class).histogram(FREQUENCY);
-//		load(EventsStatistics.class).printEventFreqs(FREQUENCY);
-		
-//		load(PatternEvents.class).acrossTypes(FREQUENCY, THF, THE);
-		
-//		 load(PatternsStatistics.class).partialsGroups(FREQUENCY, THF, THE);
-//		load(ThresholdAnalyzer.class).generalizability(FREQUENCY);
-//		load(Generalizability.class).validate(FREQUENCY, THF, THE);
-//		load(APIUsages.class).defaultEvents(FREQUENCY);
-//		load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
-//		load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
-//		load(APIUsages.class).freqGensApis(FREQUENCY, THF, THE);
-//		load(APIUsages.class).specificPatterns(FREQUENCY, THF, THE);
-//		load(APIUsages.class).apiUsages(EpisodeType.GENERAL, FREQUENCY, THF, THE);
-//		load(APIUsages.class).patternEvents(FREQUENCY, THF, THE);
-//		load(APIUsages.class).getRepoOccStrictPatt(FREQUENCY, THF, THE);
-//		load(APIUsages.class).getRepoOccSpecPatt(FREQUENCY, THF, THE);
-//		load(APIUsages.class).getApisComp(FREQUENCY, THF, THE);
-//		load(APIUsages.class).getOrderInfo(FREQUENCY, THF, THE);
-//		load(APIUsages.class).partialSequentials(FREQUENCY, THF, THE);
-		
-//		load(APITypes.class).streamAPIs(FREQUENCY);
-		
+
+		// load(DataCounter.class).namespaces();
+		// load(Preprocessing.class).run(FREQUENCY);
+		// load(PatternMetrics.class).genDecl(FREQUENCY, THF, THE);
+		// load(PartitionStream.class).partition(FREQUENCY);
+		// load(EventsStatistics.class).histogram(FREQUENCY);
+		// load(EventsStatistics.class).printEventFreqs(FREQUENCY);
+
+		// load(PatternEvents.class).acrossTypes(FREQUENCY, THF, THE);
+
+		// load(PatternsStatistics.class).partialsGroups(FREQUENCY, THF, THE);
+		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.SEQUENTIAL,
+				FREQUENCY, THE);
+		// load(Generalizability.class).validate(FREQUENCY, THF, THE);
+		// load(APIUsages.class).defaultEvents(FREQUENCY);
+		// load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
+		// load(APIUsages.class).freqOrderApis(FREQUENCY, THF, THE);
+		// load(APIUsages.class).freqGensApis(FREQUENCY, THF, THE);
+		// load(APIUsages.class).specificPatterns(FREQUENCY, THF, THE);
+		// load(APIUsages.class).apiUsages(EpisodeType.GENERAL, FREQUENCY, THF,
+		// THE);
+		// load(APIUsages.class).patternEvents(FREQUENCY, THF, THE);
+		// load(APIUsages.class).getRepoOccStrictPatt(FREQUENCY, THF, THE);
+		// load(APIUsages.class).getRepoOccSpecPatt(FREQUENCY, THF, THE);
+		// load(APIUsages.class).getApisComp(FREQUENCY, THF, THE);
+		// load(APIUsages.class).getOrderInfo(FREQUENCY, THF, THE);
+		// load(APIUsages.class).partialSequentials(FREQUENCY, THF, THE);
+
+		// load(APITypes.class).streamAPIs(FREQUENCY);
+
 		// load(Evaluations.class).patternsOutput(EpisodeType.PARALLEL,
 		// FREQUENCY,
 		// FOLDNUM, THF, THE);
 
-//		load(PatternsComparison.class).overlappingPatterns(FREQUENCY, THF, THE);
+		// load(PatternsComparison.class).overlappingPatterns(FREQUENCY, THF,
+		// THE);
 		// load(PatternsComparison.class).coverage(EpisodeType.SEQUENTIAL,
 		// EpisodeType.PARALLEL, FOLDNUM, FREQUENCY);
 		// load(PatternsComparison.class).compStats(EpisodeType.PARALLEL,
 		// EpisodeType.SEQUENTIAL, FOLDNUM, FREQUENCY);
 
-//		 load(SpecificPatterns.class).apiTypes(FREQUENCY, THF, THE);
+		// load(SpecificPatterns.class).apiTypes(FREQUENCY, THF, THE);
 		// load(PatternsEvents.class).getEventsType(EpisodeType.PARALLEL,
 		// FREQUENCY, ENTROPY, FOLDNUM);
 		// load(EpisodeWriter.class).writeNewEpisodes(FREQ);
