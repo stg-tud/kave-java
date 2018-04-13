@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
+import cc.kave.episodes.manuals.patterns.ManualPatterns;
 import cc.kave.episodes.mining.patterns.ThresholdAnalyzer;
 import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.io.Logger;
@@ -39,6 +40,9 @@ public class run_ervina {
 	private static final double THE = 0.23;
 
 	private static final int METHODSIZE = 5000;
+	
+	private static final int MISUSEID = 3;
+	private static final int NUMNODES = 9;
 
 	private static Injector injector;
 
@@ -51,6 +55,8 @@ public class run_ervina {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
+		
+		load(ManualPatterns.class).filter(MISUSEID, NUMNODES);
 
 		// load(DataCounter.class).namespaces();
 		// load(Preprocessing.class).run(FREQUENCY);
@@ -62,8 +68,8 @@ public class run_ervina {
 		// load(PatternEvents.class).acrossTypes(FREQUENCY, THF, THE);
 
 		// load(PatternsStatistics.class).partialsGroups(FREQUENCY, THF, THE);
-		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.SEQUENTIAL,
-				FREQUENCY, THE);
+//		load(ThresholdAnalyzer.class).createHistogram(EpisodeType.SEQUENTIAL,
+//				FREQUENCY, THE);
 		// load(Generalizability.class).validate(FREQUENCY, THF, THE);
 		// load(APIUsages.class).defaultEvents(FREQUENCY);
 		// load(APIUsages.class).orderApis(FREQUENCY, THF, THE);
