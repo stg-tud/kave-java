@@ -33,11 +33,25 @@ public class Events {
 		event.setMethod(ctx);
 		return event;
 	}
+	
+	public static Event newElementContext(String ctx) {
+		Event event = new Event();
+		event.setKind(EventKind.METHOD_DECLARATION);
+		event.setMethod(Names.newMethod(ctx));
+		return event;
+	}
 
 	public static Event newFirstContext(IMethodName ctx) {
 		Event event = new Event();
 		event.setKind(EventKind.FIRST_DECLARATION);
 		event.setMethod(ctx);
+		return event;
+	}
+	
+	public static Event newFirstContext(String ctx) {
+		Event event = new Event();
+		event.setKind(EventKind.FIRST_DECLARATION);
+		event.setMethod(Names.newMethod(ctx));
 		return event;
 	}
 
@@ -47,11 +61,25 @@ public class Events {
 		event.setMethod(ctx);
 		return event;
 	}
+	
+	public static Event newSuperContext(String ctx) {
+		Event event = new Event();
+		event.setKind(EventKind.SUPER_DECLARATION);
+		event.setMethod(Names.newMethod(ctx));
+		return event;
+	}
 
 	public static Event newInvocation(IMethodName m) {
 		Event event = new Event();
 		event.setKind(EventKind.INVOCATION);
 		event.setMethod(m);
+		return event;
+	}
+	
+	public static Event newInvocation(String m) {
+		Event event = new Event();
+		event.setKind(EventKind.INVOCATION);
+		event.setMethod(Names.newMethod(m));
 		return event;
 	}
 

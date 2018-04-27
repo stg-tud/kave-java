@@ -19,8 +19,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
+import cc.kave.commons.model.naming.codeelements.IMethodName;
+import cc.kave.commons.model.naming.codeelements.IParameterName;
+import cc.kave.commons.model.naming.types.ITypeName;
+import cc.kave.commons.model.naming.types.organization.IAssemblyName;
+import cc.kave.commons.model.naming.types.organization.INamespaceName;
+import cc.kave.episodes.io.EventStreamIo;
+import cc.kave.episodes.model.events.Event;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -30,13 +38,19 @@ public class run {
 
 	private static final String PROPERTY_NAME = "episodeFolder";
 	private static final String PROPERTY_FILE = "episode.properties";
-	
-	private static final int FREQTHRESH = 4;
+
+	private static final int FREQTHRESH = 300;
 	private static final double BIDIRECTTHRESH = 0.6;
-	
+
 	private static final int METHODSIZE = 500;
 
 	private static Injector injector;
+
+	private static EventStreamIo eventStream;
+
+	public run(EventStreamIo streamIo) {
+		this.eventStream = streamIo;
+	}
 
 	public static void main(String[] args) throws Exception {
 		initLogger();
@@ -47,47 +61,61 @@ public class run {
 
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
-		
-//		load(PreprocessingFolded.class).runPreparation(FREQTHRESH);
-//		load(PreChecking.class).methodsOverlap();
-		
-//		load(ReposPreprocess.class).generate(FREQTHRESH);
-		
-//		load(FrameworksDistribution.class).getDistribution(NUMBREPOS);
-//		load(Preprocessing.class).generate(NUMBREPOS, FREQTHRESH);
-		
-//		load(MethodSize.class).identifier(NUMBREPOS, METHODSIZE);
-		
-//		load(ThresholdsFrequency.class).writer(NUMBREPOS);
-//		load(ThresholdsBidirection.class).writer(NUMBREPOS, FREQTHRESH);
-		
-//		load(PatternsOutput.class).write(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).trainingCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(PatternsIdentifier.class).validationCode(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
-//		load(FrequenciesAnalyzer.class).analyzeSuperEpisodes(NUMBREPOS, FREQTHRESH, BIDIRECTTHRESH);
 
-		
-//		load(FrameworksData.class).getFrameworksDistribution();
-//		load(StreamFrequencies.class).frequencies();
-//		load(Preprocessing.class).generate();
-//		load(StreamPartition.class).partition();
-//		load(SampleCodeMatcher.class).generateGraphs();
-		
-		// load(EpisodeGraphGeneratorValidationData.class).generateGraphs();
-		// load(QueriesGraphGenerator.class).generateGraphs();
-		// load(EpisodeGraphGeneratorTrainingData.class).generateGraphs(5,
-		// 0.01);
-		// load(RecommenderGraphGenerator.class).generateGraphs();
-		// load(ProposalStrategyProvider.class).evaluate();
-//		load(Evaluation.class).evaluate();
-		// load(TargetsCategorization.class).categorize();
+		List<Event> events = load(EventStreamIo.class).readMapping(FREQTHRESH);
 
-		// load(Suggestions.class).run();
-		// load(EventStreamModifier.class).modify();
-		// load(EventStreamReader.class).read();
-		// load(MappingReader.class).read();
+		int i = 0;
+		for (Event e : events) {
+			if (i < 1) {
+				i++;
+				continue;
+			}
+			IMethodName methodName = e.getMethod();
 
-		// load(PatternAnalyzer.class).readPatterns();
+			Logger.log("Event: %s", e.toString());
+			Logger.log("Method: %s", methodName.getIdentifier());
+			Logger.log("");
+
+			ITypeName returnType = methodName.getReturnType();
+			Logger.log("Return type identifier: %s", returnType.getIdentifier());
+			Logger.log("Return type full name: %s", returnType.getFullName());
+
+			INamespaceName namespace = returnType.getNamespace();
+			Logger.log("Namespace: %s", namespace.getIdentifier());
+//			Logger.log("Namespace name: %s", namespace.getName());
+			Logger.log("Return type name: %s", returnType.getName());
+
+			Logger.log("");
+
+			IAssemblyName assembly = returnType.getAssembly();
+			Logger.log("Assembly identifier: %s", assembly.getIdentifier());
+			Logger.log("Assembly name: %s", assembly.getName());
+			Logger.log("Assembly version identifier: %s", assembly.getVersion()
+					.getIdentifier());
+//			Logger.log("Assembly version major: %d", assembly.getVersion()
+//					.getMajor());
+//			Logger.log("Assembly version minor: %d", assembly.getVersion()
+//					.getMinor());
+//			Logger.log("Assembly version revision: %d", assembly.getVersion()
+//					.getRevision());
+//			Logger.log("Assembly version build: %d", assembly.getVersion()
+//					.getBuild());
+			Logger.log("");
+
+			ITypeName declaringType = methodName.getDeclaringType();
+			Logger.log("Declaring type: %s", declaringType.getIdentifier());
+			Logger.log("");
+
+			Logger.log("Method name: %s", methodName.getFullName());
+			List<IParameterName> parameters = methodName.getParameters();
+			for (IParameterName param : parameters) {
+				Logger.log("Parameter: %s", param.getIdentifier());
+				Logger.log("Parameter type: %s", param.getValueType().getIdentifier());
+				Logger.log("Parameter name: %s", param.getName());
+			}
+
+			break;
+		}
 
 		Logger.log("done");
 	}
@@ -110,7 +138,8 @@ public class run {
 			properties.load(new FileReader(PROPERTY_FILE));
 			String property = properties.getProperty(propertyName);
 			if (property == null) {
-				throw new RuntimeException("property '" + propertyName + "' not found in properties file");
+				throw new RuntimeException("property '" + propertyName
+						+ "' not found in properties file");
 			}
 			Logger.log("%s: %s", propertyName, property);
 

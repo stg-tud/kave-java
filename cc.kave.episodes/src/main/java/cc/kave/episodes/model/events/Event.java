@@ -26,9 +26,15 @@ import cc.kave.commons.utils.ToStringUtils;
 public class Event {
 
 	// capital letters are necessary for JSON compatibility!
-	private EventKind Kind = EventKind.METHOD_DECLARATION;
+	private EventKind Kind;
 	private ITypeName Type;
 	private IMethodName Method;
+	
+	public Event() {
+		this.Kind = EventKind.METHOD_DECLARATION;
+		this.Type = Names.getUnknownType();
+		this.Method = Names.getUnknownMethod();
+	}
 
 	public EventKind getKind() {
 		return Kind;

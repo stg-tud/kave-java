@@ -17,24 +17,26 @@ package cc.kave.episodes.model.events;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
+import cc.kave.commons.model.naming.Names;
 import cc.kave.commons.model.naming.codeelements.IMethodName;
 import cc.kave.commons.model.naming.types.ITypeName;
 
 public class EventTest {
 
+	private static final String DUMMY_NAME = "[You, Can] [Safely, Ignore].ThisDummyValue()";
+
 	@Test
 	public void defaultValues() {
 		Event sut = new Event();
 		assertEquals(EventKind.METHOD_DECLARATION, sut.getKind());
-		assertNull(sut.getType());
-		assertNull(sut.getMethod());
+		assertEquals(Names.getUnknownType(), sut.getType());
+		assertEquals(Names.getUnknownMethod(), sut.getMethod());
 	}
-	
+
 	@Test
 	public void settingValues() {
 		ITypeName typeName = mock(ITypeName.class);
@@ -48,6 +50,16 @@ public class EventTest {
 		assertEquals(EventKind.INVOCATION, sut.getKind());
 		assertEquals(typeName, sut.getType());
 		assertEquals(methodName, sut.getMethod());
+	}
+
+	@Test
+	public void dummyEvent() {
+		Event sut = new Event();
+		sut.createDummyEvent();
+		
+		assertEquals(EventKind.METHOD_DECLARATION, sut.getKind());
+		assertEquals(Names.getUnknownType(), sut.getType());
+		assertEquals(Names.newMethod(DUMMY_NAME), sut.getMethod());
 	}
 
 	@Test

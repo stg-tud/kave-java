@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-import cc.kave.episodes.manuals.patterns.ManualPatterns;
-import cc.kave.episodes.mining.patterns.ThresholdAnalyzer;
-import cc.kave.episodes.model.EpisodeType;
+import cc.kave.episodes.preprocessing.Preprocessing;
 import cc.recommenders.io.Logger;
 
 import com.google.inject.Guice;
@@ -56,10 +54,10 @@ public class run_ervina {
 		Logger.append("\n");
 		Logger.log("started: %s\n", new Date());
 		
-		load(ManualPatterns.class).filter(MISUSEID, NUMNODES);
+//		load(ManualPatterns.class).filter(MISUSEID, NUMNODES);
 
 		// load(DataCounter.class).namespaces();
-		// load(Preprocessing.class).run(FREQUENCY);
+		 load(Preprocessing.class).run(FREQUENCY);
 		// load(PatternMetrics.class).genDecl(FREQUENCY, THF, THE);
 		// load(PartitionStream.class).partition(FREQUENCY);
 		// load(EventsStatistics.class).histogram(FREQUENCY);
