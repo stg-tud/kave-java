@@ -36,6 +36,7 @@ public class PatternFilterTest {
 	private static final int FREQUENCY = 5;
 	private static final int FREQTHRESH = 5;
 	private static final double ENTROPY = 0.5;
+	private static final double THRESHSUB = 1.0;
 
 	private Map<Integer, Set<Episode>> episodes;
 

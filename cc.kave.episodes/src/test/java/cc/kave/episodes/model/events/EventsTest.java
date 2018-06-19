@@ -35,7 +35,7 @@ public class EventsTest {
 		
 		assertEquals(EventKind.TYPE, actual.getKind());
 		assertSame(type, actual.getType());
-		assertNull(actual.getMethod());
+		assertEquals(Names.getUnknownMethod(), actual.getMethod());
 	}
 	
 	@Test
@@ -45,7 +45,7 @@ public class EventsTest {
 
 		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
 		assertSame(m, actual.getMethod());
-		assertNull(actual.getType());
+		assertEquals(Names.getUnknownType(), actual.getType());
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class EventsTest {
 
 		assertEquals(EventKind.FIRST_DECLARATION, actual.getKind());
 		assertSame(m, actual.getMethod());
-		assertNull(actual.getType());
+		assertEquals(Names.getUnknownType(), actual.getType());
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class EventsTest {
 
 		assertEquals(EventKind.SUPER_DECLARATION, actual.getKind());
 		assertSame(m, actual.getMethod());
-		assertNull(actual.getType());
+		assertEquals(Names.getUnknownType(), actual.getType());
 	}
 
 	@Test
@@ -75,7 +75,7 @@ public class EventsTest {
 
 		assertEquals(EventKind.INVOCATION, actual.getKind());
 		assertSame(m, actual.getMethod());
-		assertNull(actual.getType());
+		assertEquals(Names.getUnknownType(), actual.getType());
 	}
 
 	@Test
@@ -87,6 +87,6 @@ public class EventsTest {
 
 		assertEquals(EventKind.METHOD_DECLARATION, actual.getKind());
 		assertEquals(DUMMY_METHOD, actual.getMethod());
-		assertNull(actual.getType());
+		assertEquals(Names.getUnknownType(), actual.getType());
 	}
 }

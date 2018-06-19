@@ -121,9 +121,6 @@ public class ThresholdAnalyzer {
 			Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
 					freq, entropy);
 			int numbPatterns = count(patterns);
-			if (numbPatterns < 100) {
-				break;
-			}
 			Logger.log("\t%d\t%d", freq, numbPatterns);
 		}
 	}
