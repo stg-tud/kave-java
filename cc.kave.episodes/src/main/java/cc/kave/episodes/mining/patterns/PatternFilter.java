@@ -2,16 +2,16 @@ package cc.kave.episodes.mining.patterns;
 
 import static cc.recommenders.assertions.Asserts.assertTrue;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.Sets;
-
 import cc.kave.episodes.model.Episode;
 import cc.kave.episodes.model.EpisodeType;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class PatternFilter {
 
@@ -42,42 +42,44 @@ public class PatternFilter {
 		}
 	}
 
-	public Set<Episode> subPatterns(EpisodeType type,
-			Map<Integer, Set<Episode>> episodes, int thf, double the,
-			double thsp) throws Exception {
-		Map<Integer, Set<Episode>> patterns = filter(type, episodes, thf, the);
+	public Map<Integer, Set<Episode>> subEpisodes(
+			Map<Integer, Set<Episode>> episodes, double thsp) throws Exception {
 
-		assertTrue(!patterns.isEmpty(),
-				"The list of learned patterns is empty!");
+		assertTrue(!episodes.isEmpty(), "The list of episodes is empty!");
 
-		Set<Episode> results = Sets.newLinkedHashSet();
-		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
-			if (entry.getKey() == (patterns.size() + 1)) {
-				results.addAll(entry.getValue());
+		Map<Integer, Set<Episode>> results = Maps.newLinkedHashMap();
+		for (Map.Entry<Integer, Set<Episode>> entry : episodes.entrySet()) {
+			if (entry.getKey() == 1) {
+				continue;
+			}
+			if (entry.getKey() == episodes.size()) {
+				results.put(entry.getKey(), entry.getValue());
 				break;
 			}
-			results.addAll(getPatterns(entry.getValue(),
-					patterns.get(entry.getKey() + 1), thsp));
+			Set<Episode> superepisodes = episodes.get(entry.getKey() + 1);
+			results.put(entry.getKey(),
+					getSubEpisodes(entry.getValue(), superepisodes, thsp));
 		}
 		return results;
 	}
 
-	private Set<Episode> getPatterns(Set<Episode> subPatterns,
-			Set<Episode> patterns, double thsp) {
+	private Set<Episode> getSubEpisodes(Set<Episode> subEpisodes,
+			Set<Episode> superEpisodes, double thsp) {
 		Set<Episode> results = Sets.newLinkedHashSet();
 
-		for (Episode sp : subPatterns) {
-			if (!isSubpattern(sp, patterns, thsp)) {
+		for (Episode sp : subEpisodes) {
+			if (!isSubepisode(sp, superEpisodes, thsp)) {
 				results.add(sp);
 			}
 		}
 		return results;
 	}
 
-	private boolean isSubpattern(Episode sp, Set<Episode> patterns, double thsp) {
-		for (Episode p : patterns) {
-			if (p.getFacts().containsAll(sp.getFacts())
-					&& ((p.getFrequency() / sp.getFrequency()) < thsp)) {
+	private boolean isSubepisode(Episode subepisode, Set<Episode> superepisode,
+			double thsp) {
+		for (Episode ep : superepisode) {
+			if (ep.getFacts().containsAll(subepisode.getFacts())
+					&& ((ep.getFrequency() / subepisode.getFrequency()) < thsp)) {
 				return true;
 			}
 		}
