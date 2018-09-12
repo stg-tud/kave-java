@@ -15,6 +15,7 @@
  */
 package cc.kave.episodes.model;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class EventStream {
 	private void addEventIdToStream(int idx) {
 		sb.append(idx);
 		sb.append(',');
-		sb.append(String.format("%.3f", time));
+		sb.append(String.format(Locale.ENGLISH, "%.3f", time));
 		sb.append('\n');
 
 		time += DELTA;
