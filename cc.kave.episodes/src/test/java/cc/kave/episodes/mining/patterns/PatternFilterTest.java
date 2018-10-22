@@ -116,7 +116,6 @@ public class PatternFilterTest {
 		
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		epSet = Sets.newLinkedHashSet();
-		epSet.add(createEpisode(6,  0.5, "c", "d"));
 		epSet.add(createEpisode(5, 1.0, "e", "f", "e>f"));
 		expected.put(2, epSet);
 		

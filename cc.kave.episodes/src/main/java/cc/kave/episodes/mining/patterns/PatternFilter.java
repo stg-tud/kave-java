@@ -115,8 +115,7 @@ public class PatternFilter {
 	private boolean isSubepisode(Episode subepisode, Set<Episode> superepisode,
 			double thsp) {
 		for (Episode ep : superepisode) {
-			if (ep.getFacts().containsAll(subepisode.getFacts())
-					&& ((ep.getFrequency() / subepisode.getFrequency()) < thsp)) {
+			if (ep.getFacts().containsAll(subepisode.getFacts())) {
 				return true;
 			}
 		}
