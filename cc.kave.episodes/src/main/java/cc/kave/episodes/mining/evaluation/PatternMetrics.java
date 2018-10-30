@@ -98,18 +98,18 @@ public class PatternMetrics {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 
 		Logger.log("\tGeneralizability for partial-order:");
-		Map<Integer, Set<Episode>> partials = filter.filter(
-				EpisodeType.GENERAL, episodes, freqThresh, entThresh);
+		Map<Integer, Set<Episode>> partials = filter.filter(episodes,
+				freqThresh, entThresh);
 		methodDecl(partials, stream, events);
-		
+
 		Logger.log("\tGeneralizability for no-order:");
-		Map<Integer, Set<Episode>> unordered = filter.filter(
-				EpisodeType.PARALLEL, episodes, freqThresh, entThresh);
+		Map<Integer, Set<Episode>> unordered = filter.filter(episodes,
+				freqThresh, entThresh);
 		methodDecl(unordered, stream, events);
-		
+
 		Logger.log("\tGeneralizability for sequential-order:");
-		Map<Integer, Set<Episode>> sequentials = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, freqThresh, entThresh);
+		Map<Integer, Set<Episode>> sequentials = filter.filter(episodes,
+				freqThresh, entThresh);
 		methodDecl(sequentials, stream, events);
 	}
 
@@ -333,7 +333,7 @@ public class PatternMetrics {
 			double entThresh) throws Exception {
 		Map<Episode, Tuple<Integer, Integer>> results = Maps.newLinkedHashMap();
 
-		Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
 				freqThresh, entThresh);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {

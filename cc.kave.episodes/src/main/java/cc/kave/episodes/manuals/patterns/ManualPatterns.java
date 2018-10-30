@@ -14,7 +14,6 @@ import cc.kave.episodes.io.FileReader;
 import cc.kave.episodes.mining.graphs.EpisodeAsGraphWriter;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Fact;
 import cc.kave.episodes.postprocessor.TransClosedEpisodes;
 import cc.recommenders.datastructures.Tuple;
@@ -47,14 +46,13 @@ public class ManualPatterns {
 
 		Map<Integer, Set<Episode>> episodes = parseEpisodes(lines);
 
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.GENERAL, episodes, 1, 0.0);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes, 1, 0.0);
 		File misusePath = new File(getPath() + "/misuse" + misuseId);
 		if (!misusePath.exists()) {
 			misusePath.mkdir();
 		}
 		int patternId = 0;
-		
+
 		for (Episode episode : patterns.get(size)) {
 			String patternName = misusePath.getAbsolutePath() + "/p"
 					+ patternId + ".dot";
@@ -63,7 +61,8 @@ public class ManualPatterns {
 		}
 	}
 
-	private void writePattern(Episode episode, String patternName) throws IOException {
+	private void writePattern(Episode episode, String patternName)
+			throws IOException {
 		Episode pattern = transClosure.remTransClosure(episode);
 
 		DirectedGraph<Fact, DefaultEdge> graph = new DefaultDirectedGraph<Fact, DefaultEdge>(

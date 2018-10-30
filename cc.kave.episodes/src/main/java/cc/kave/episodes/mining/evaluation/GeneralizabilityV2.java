@@ -91,16 +91,16 @@ public class GeneralizabilityV2 {
 		Logger.log("Parsing list of episodes ...");
 		Map<Integer, Set<Episode>> episodes = episodeParser.parser(frequency);
 
-		Map<Integer, Set<Episode>> seqPatterns = patternFilter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntropy);
+		Map<Integer, Set<Episode>> seqPatterns = patternFilter.filter(episodes,
+				threshFreq, threshEntropy);
 		initializer(seqPatterns, seqMethods);
 
 		Map<Integer, Set<Episode>> paralPatterns = patternFilter.filter(
-				EpisodeType.PARALLEL, episodes, threshFreq, threshEntropy);
+				episodes, threshFreq, threshEntropy);
 		initializer(paralPatterns, paraMethods);
 
 		Map<Integer, Set<Episode>> partPatterns = patternFilter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntropy);
+				episodes, threshFreq, threshEntropy);
 		initializer(partPatterns, partMethods);
 
 		int numMethods = 0;
@@ -113,7 +113,7 @@ public class GeneralizabilityV2 {
 			checkGeneralizability(partMethods, tuple.getFirst(),
 					tuple.getSecond());
 			numMethods++;
-			
+
 			if (numMethods % 100 == 0) {
 				Logger.log("Processed %d / %d", numMethods,
 						streamOfFacts.size());

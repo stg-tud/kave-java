@@ -8,7 +8,6 @@ import cc.kave.episodes.io.EpisodeParser;
 import cc.kave.episodes.io.EventStreamIo;
 import cc.kave.episodes.mining.patterns.PatternFilter;
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 import cc.kave.episodes.model.events.Event;
 import cc.kave.episodes.model.events.Fact;
 import cc.recommenders.io.Logger;
@@ -23,7 +22,8 @@ public class APITypes {
 	private PatternFilter filter;
 
 	@Inject
-	public APITypes(EventStreamIo eventStream, EpisodeParser episodeParser, PatternFilter patternFilter) {
+	public APITypes(EventStreamIo eventStream, EpisodeParser episodeParser,
+			PatternFilter patternFilter) {
 		this.streamIo = eventStream;
 		this.parser = episodeParser;
 		this.filter = patternFilter;
@@ -47,10 +47,10 @@ public class APITypes {
 			throws Exception {
 		List<Event> events = streamIo.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.PARALLEL, episodes, freqThresh, entThresh);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				freqThresh, entThresh);
 		Set<String> libraries = Sets.newHashSet();
-		
+
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			for (Episode pattern : entry.getValue()) {
 				for (Fact fact : pattern.getEvents()) {
@@ -65,10 +65,9 @@ public class APITypes {
 			Logger.log("\t%s", lib);
 		}
 	}
-	
+
 	private String getLibraryName(Event event) {
-		String typeName = event.getMethod().getDeclaringType()
-				.getFullName();
+		String typeName = event.getMethod().getDeclaringType().getFullName();
 		if (typeName.contains(".")) {
 			int idx = typeName.indexOf(".");
 			String libName = typeName.substring(0, idx);

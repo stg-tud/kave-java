@@ -87,8 +87,8 @@ public class Generalizability {
 			Map<String, Set<IMethodName>> repos,
 			Map<Integer, Set<Episode>> episodes) throws Exception {
 
-		Map<Integer, Set<Episode>> patterns = patternFilter.filter(type,
-				episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> patterns = patternFilter.filter(episodes,
+				threshFreq, threshEntr);
 
 		StringBuilder sb = new StringBuilder();
 		int patternId = 0;

@@ -132,9 +132,8 @@ public class GeneralizabilityTest {
 
 		when(streamIo.readMapping(FREQUENCY)).thenReturn(events);
 		when(episodeParser.parser(anyInt())).thenReturn(patterns);
-		when(
-				patternFilter.filter(any(EpisodeType.class), any(Map.class),
-						anyInt(), anyDouble())).thenReturn(patterns);
+		when(patternFilter.filter(any(Map.class), anyInt(), anyDouble()))
+				.thenReturn(patterns);
 		when(streamIo.readStreamObject(anyInt())).thenReturn(streamMethods);
 		when(streamIo.readRepoCtxs(anyInt())).thenReturn(repoMethods);
 
@@ -171,8 +170,8 @@ public class GeneralizabilityTest {
 
 		verify(streamIo).readMapping(anyInt());
 		verify(episodeParser).parser(anyInt());
-		verify(patternFilter, times(3)).filter(any(EpisodeType.class),
-				any(Map.class), anyInt(), anyDouble());
+		verify(patternFilter, times(3)).filter(any(Map.class), anyInt(),
+				anyDouble());
 		verify(streamIo).readStreamObject(anyInt());
 		verify(streamIo).readRepoCtxs(anyInt());
 		verify(transClosure, times(12)).remTransClosure(any(Episode.class));

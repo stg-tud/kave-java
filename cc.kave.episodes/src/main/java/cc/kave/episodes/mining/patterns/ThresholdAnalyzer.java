@@ -52,22 +52,21 @@ public class ThresholdAnalyzer {
 					Tuple.newTuple(Integer.MAX_VALUE, Integer.MIN_VALUE));
 		}
 
-//		for (int freq = frequency; freq < (frequency + 100); freq += 5) {
+		// for (int freq = frequency; freq < (frequency + 100); freq += 5) {
 		for (int freq = 210; freq < 231; freq += 5) {
 			Logger.log("\tFrequency = %d", freq);
-//			Logger.log("\tEntropy\tNumPatterns");
+			// Logger.log("\tEntropy\tNumPatterns");
 
-			Map<Integer, Set<Episode>> patterns = filter.filter(
-					EpisodeType.GENERAL, episodes, freq, 0.0);
+			Map<Integer, Set<Episode>> patterns = filter.filter(episodes, freq,
+					0.0);
 			int prev = count(patterns);
-			
+
 			for (double ent = 0.01; ent < 1.1; ent += 0.01) {
 				double entth = Math.round(ent * 100.0) / 100.0;
-				patterns = filter.filter(EpisodeType.GENERAL, episodes, freq,
-						entth);
+				patterns = filter.filter(episodes, freq, entth);
 				int counter = count(patterns);
 				int diff = Math.abs(counter - prev);
-//				Logger.log("\t%.2f\t%d", entth, counter);
+				// Logger.log("\t%.2f\t%d", entth, counter);
 
 				averager.get(entth).addValue(diff);
 				int min = minmax.get(entth).getFirst();
@@ -118,8 +117,8 @@ public class ThresholdAnalyzer {
 		Logger.log("\tEntropy threshold = %.2f", entropy);
 		Logger.log("\tFrequency\t#Patterns");
 		for (int freq = frequency; freq < maxFreq + 1; freq++) {
-			Map<Integer, Set<Episode>> patterns = filter.filter(type, episodes,
-					freq, entropy);
+			Map<Integer, Set<Episode>> patterns = filter.filter(episodes, freq,
+					entropy);
 			int numbPatterns = count(patterns);
 			Logger.log("\t%d\t%d", freq, numbPatterns);
 		}
@@ -137,8 +136,8 @@ public class ThresholdAnalyzer {
 			for (double ent = 0.45; ent < 1.01; ent += 0.05) {
 				double entropy = Math.round(ent * 100.0) / 100.0;
 				int generals = 0;
-				Map<Integer, Set<Episode>> patterns = filter.filter(
-						EpisodeType.GENERAL, episodes, freq, entropy);
+				Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+						freq, entropy);
 				for (Map.Entry<Integer, Set<Episode>> entry : patterns
 						.entrySet()) {
 					for (Episode pattern : entry.getValue()) {
@@ -194,8 +193,8 @@ public class ThresholdAnalyzer {
 			for (double ent = 0.0; ent < 1.01; ent += 0.01) {
 				double entropy = Math.round(ent * 100.0) / 100.0;
 				// System.out.println(entropy);;
-				Map<Integer, Set<Episode>> patterns = filter.filter(
-						EpisodeType.GENERAL, episodes, freq, entropy);
+				Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+						freq, entropy);
 				int counter = count(patterns);
 				if (counter != prevValue) {
 					prevValue = counter;

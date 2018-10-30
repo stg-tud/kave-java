@@ -132,9 +132,8 @@ public class GeneralizabilityV2Test {
 
 		when(streamIo.readMapping(FREQUENCY)).thenReturn(events);
 		when(episodeParser.parser(anyInt())).thenReturn(patterns);
-		when(
-				patternFilter.filter(any(EpisodeType.class), any(Map.class),
-						anyInt(), anyDouble())).thenReturn(patterns);
+		when(patternFilter.filter(any(Map.class), anyInt(), anyDouble()))
+				.thenReturn(patterns);
 		when(ctxParser.parse(anyInt())).thenReturn(streamMethods);
 		when(ctxParser.getRepoCtxMapper()).thenReturn(repoMethods);
 
@@ -172,15 +171,15 @@ public class GeneralizabilityV2Test {
 
 		verify(streamIo).readMapping(anyInt());
 		verify(episodeParser).parser(anyInt());
-		verify(patternFilter, times(3)).filter(any(EpisodeType.class), any(Map.class),
-				anyInt(), anyDouble());
+		verify(patternFilter, times(3)).filter(any(Map.class), anyInt(),
+				anyDouble());
 		verify(ctxParser).parse(anyInt());
 		verify(ctxParser).getRepoCtxMapper();
 		verify(transClosure, times(12)).remTransClosure(any(Episode.class));
 		verify(graphConverter, times(12)).convert(any(Episode.class),
 				any(List.class));
 	}
-	
+
 	@Test
 	public void filesAreCreated() throws Exception {
 		File patternFile1 = getPatternFile(EpisodeType.SEQUENTIAL, 0);
@@ -188,13 +187,13 @@ public class GeneralizabilityV2Test {
 		File patternFile3 = getPatternFile(EpisodeType.SEQUENTIAL, 2);
 		File patternFile4 = getPatternFile(EpisodeType.SEQUENTIAL, 3);
 		File evalFile1 = getEvalFile(EpisodeType.SEQUENTIAL);
-		
+
 		File patternFile5 = getPatternFile(EpisodeType.PARALLEL, 0);
 		File patternFile6 = getPatternFile(EpisodeType.PARALLEL, 1);
 		File patternFile7 = getPatternFile(EpisodeType.PARALLEL, 2);
 		File patternFile8 = getPatternFile(EpisodeType.PARALLEL, 3);
 		File evalFile2 = getEvalFile(EpisodeType.PARALLEL);
-		
+
 		File patternFile9 = getPatternFile(EpisodeType.GENERAL, 0);
 		File patternFile10 = getPatternFile(EpisodeType.GENERAL, 1);
 		File patternFile11 = getPatternFile(EpisodeType.GENERAL, 2);
@@ -208,20 +207,20 @@ public class GeneralizabilityV2Test {
 		assertTrue(patternFile3.exists());
 		assertTrue(patternFile4.exists());
 		assertTrue(evalFile1.exists());
-		
+
 		assertTrue(patternFile5.exists());
 		assertTrue(patternFile6.exists());
 		assertTrue(patternFile7.exists());
 		assertTrue(patternFile8.exists());
 		assertTrue(evalFile2.exists());
-		
+
 		assertTrue(patternFile9.exists());
 		assertTrue(patternFile10.exists());
 		assertTrue(patternFile11.exists());
 		assertTrue(patternFile12.exists());
 		assertTrue(evalFile3.exists());
 	}
-	
+
 	@Test
 	public void checkFileContent() throws Exception {
 
@@ -302,7 +301,8 @@ public class GeneralizabilityV2Test {
 
 	private String getResultsPath(EpisodeType episodeType) {
 		String path = rootFolder.getRoot().getAbsolutePath() + "/freq"
-				+ FREQUENCY + "/entropy" + ENTROPY + "/" + episodeType.toString();
+				+ FREQUENCY + "/entropy" + ENTROPY + "/"
+				+ episodeType.toString();
 		return path;
 	}
 

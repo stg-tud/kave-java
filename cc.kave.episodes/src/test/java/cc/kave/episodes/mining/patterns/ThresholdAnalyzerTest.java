@@ -102,9 +102,8 @@ public class ThresholdAnalyzerTest {
 		sut = new ThresholdAnalyzer(streamIo, parser, filter);
 
 		when(parser.parser(anyInt())).thenReturn(episodes);
-		when(
-				filter.filter(eq(EpisodeType.GENERAL), anyMap(), anyInt(),
-						anyDouble())).thenReturn(episodes);
+		when(filter.filter(anyMap(), anyInt(), anyDouble())).thenReturn(
+				episodes);
 		when(streamIo.readStreamObject(FREQUENCY)).thenReturn(stream);
 		when(streamIo.readRepoCtxs(FREQUENCY)).thenReturn(repoCtxs);
 	}
@@ -123,8 +122,7 @@ public class ThresholdAnalyzerTest {
 		assertLogContains(2, "\t2\t0.00\t12");
 
 		verify(parser).parser(anyInt());
-		verify(filter, times(1010)).filter(eq(EpisodeType.GENERAL),
-				eq(episodes), anyInt(), anyDouble());
+		verify(filter, times(1010)).filter(eq(episodes), anyInt(), anyDouble());
 	}
 
 	@Test
@@ -136,8 +134,7 @@ public class ThresholdAnalyzerTest {
 		assertLogContains(2, "\t2\t0.00\t12");
 
 		verify(parser, times(2)).parser(anyInt());
-		verify(filter, times(101)).filter(eq(EpisodeType.GENERAL),
-				eq(episodes), anyInt(), anyDouble());
+		verify(filter, times(101)).filter(eq(episodes), anyInt(), anyDouble());
 	}
 
 	@Test
@@ -150,8 +147,7 @@ public class ThresholdAnalyzerTest {
 		assertLogContains(3, "\t2\t12");
 
 		verify(parser).parser(anyInt());
-		verify(filter, times(3)).filter(eq(EpisodeType.GENERAL), eq(episodes),
-				anyInt(), anyDouble());
+		verify(filter, times(3)).filter(eq(episodes), anyInt(), anyDouble());
 	}
 
 	@Test

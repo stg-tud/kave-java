@@ -157,8 +157,8 @@ public class APIUsages {
 			throws Exception {
 		List<Event> events = streamIo.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntropy);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				threshFreq, threshEntropy);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			TreeSet<String> apiStrict = Sets.newTreeSet();
@@ -314,8 +314,8 @@ public class APIUsages {
 			double threshEntropy) throws Exception {
 		List<Event> events = streamIo.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntropy);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				threshFreq, threshEntropy);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
 			Map<String, Tuple<Integer, Integer>> types = Maps.newTreeMap();
@@ -411,8 +411,8 @@ public class APIUsages {
 			double threshEntropy) throws Exception {
 		List<Event> events = streamIo.readMapping(frequency);
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntropy);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				threshFreq, threshEntropy);
 
 		Map<ITypeName, Integer> types = Maps.newLinkedHashMap();
 		int testPatterns = 0;
@@ -648,7 +648,7 @@ public class APIUsages {
 		Map<String, Boolean> defaultEvents = Maps.newLinkedHashMap();
 		defaultEvents.put("System.Nullable`1[[T]].GetValueOrDefault() : T",
 				false);
-		//event only in this repository
+		// event only in this repository
 		defaultEvents
 				.put("System.Tuple.Create(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) : Tuple",
 						false);
@@ -779,8 +779,8 @@ public class APIUsages {
 	public void getOrderInfo(int frequency, int threshFreq, double threshEnt)
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEnt);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				threshFreq, threshEnt);
 
 		Logger.log("\tPatternSize\tNumStrict\tNumPartials");
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {

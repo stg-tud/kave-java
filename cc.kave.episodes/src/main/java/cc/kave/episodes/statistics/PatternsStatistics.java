@@ -72,8 +72,8 @@ public class PatternsStatistics {
 	public void numbAPIs(int frequency, int threshFreq, double threshEntr)
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> patterns = filter.filter(
-				EpisodeType.PARALLEL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> patterns = filter.filter(episodes,
+				threshFreq, threshEntr);
 		List<Event> events = streamIo.readMapping(frequency);
 
 		for (Map.Entry<Integer, Set<Episode>> entry : patterns.entrySet()) {
@@ -136,8 +136,8 @@ public class PatternsStatistics {
 	public void patternSizes(int frequency, int threshFreq, double threshEntr)
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> partials = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> partials = filter.filter(episodes,
+				threshFreq, threshEntr);
 
 		int numPatterns = 0;
 		Logger.log("Analyzing partial-order patterns ...");
@@ -150,8 +150,8 @@ public class PatternsStatistics {
 		Logger.log("");
 
 		numPatterns = 0;
-		Map<Integer, Set<Episode>> sequentials = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> sequentials = filter.filter(episodes,
+				threshFreq, threshEntr);
 		Logger.log("Analyzing sequential-order patterns ...");
 		Logger.log("Size-level\t#Patterns");
 		for (Map.Entry<Integer, Set<Episode>> entry : sequentials.entrySet()) {
@@ -202,18 +202,18 @@ public class PatternsStatistics {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 
 		Logger.log("\tPartial-order configuration:");
-		Map<Integer, Set<Episode>> partPatterns = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEnt);
+		Map<Integer, Set<Episode>> partPatterns = filter.filter(episodes,
+				threshFreq, threshEnt);
 		outputStats(partPatterns);
 
 		Logger.log("\tSequential-order configuration:");
-		Map<Integer, Set<Episode>> seqPatterns = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEnt);
+		Map<Integer, Set<Episode>> seqPatterns = filter.filter(episodes,
+				threshFreq, threshEnt);
 		outputStats(seqPatterns);
 
 		Logger.log("\tNo-order configuration:");
-		Map<Integer, Set<Episode>> paraPatterns = filter.filter(
-				EpisodeType.PARALLEL, episodes, threshFreq, threshEnt);
+		Map<Integer, Set<Episode>> paraPatterns = filter.filter(episodes,
+				threshFreq, threshEnt);
 		outputStats(paraPatterns);
 	}
 
@@ -221,8 +221,8 @@ public class PatternsStatistics {
 			double threshEntr) throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
 
-		Map<Integer, Set<Episode>> sequentials = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> sequentials = filter.filter(episodes,
+				threshFreq, threshEntr);
 		int counterSeq = patternsCounter(sequentials);
 		Map<Set<Fact>, Set<Episode>> groups = Maps.newLinkedHashMap();
 
@@ -237,8 +237,8 @@ public class PatternsStatistics {
 				}
 			}
 		}
-		Map<Integer, Set<Episode>> partials = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> partials = filter.filter(episodes,
+				threshFreq, threshEntr);
 		int counterPart = 0;
 
 		for (Map.Entry<Integer, Set<Episode>> entry : partials.entrySet()) {
@@ -611,10 +611,10 @@ public class PatternsStatistics {
 	public void partialsGroups(int frequency, int threshFreq, double threshEntr)
 			throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		Map<Integer, Set<Episode>> partials = filter.filter(
-				EpisodeType.GENERAL, episodes, threshFreq, threshEntr);
-		Map<Integer, Set<Episode>> sequentials = filter.filter(
-				EpisodeType.SEQUENTIAL, episodes, threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> partials = filter.filter(episodes,
+				threshFreq, threshEntr);
+		Map<Integer, Set<Episode>> sequentials = filter.filter(episodes,
+				threshFreq, threshEntr);
 
 		Map<Episode, Integer> evaluations = getEvaluations(EpisodeType.GENERAL,
 				threshFreq, threshEntr);
@@ -799,7 +799,7 @@ public class PatternsStatistics {
 	private Map<Integer, Set<Episode>> getPatterns(EpisodeType type,
 			int frequency, int threshFreq, double threshEnt) throws Exception {
 		Map<Integer, Set<Episode>> episodes = parser.parser(frequency);
-		return filter.filter(type, episodes, threshFreq, threshEnt);
+		return filter.filter(episodes, threshFreq, threshEnt);
 	}
 
 	private boolean equalEpisodes(Episode episode1, Episode episode2) {

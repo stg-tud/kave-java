@@ -1,11 +1,5 @@
 package cc.kave.episodes.mining.patterns;
 
-import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
@@ -15,11 +9,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import cc.kave.episodes.model.Episode;
-import cc.kave.episodes.model.EpisodeType;
 import cc.recommenders.exceptions.AssertionException;
 
 import com.google.common.collect.Maps;
@@ -30,14 +21,7 @@ public class PatternFilterTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Mock
-	private PartialPatterns partials;
-	@Mock
-	private SequentialPatterns sequentials;
-	@Mock
-	private ParallelPatterns parallels;
-
-	private static final int FREQTHRESH = 5;
+	private static final int FREQUENCY = 2;
 	private static final double ENTROPY = 0.5;
 	private static final double THRESHSUB = 1.0;
 
@@ -47,49 +31,125 @@ public class PatternFilterTest {
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-
 		episodes = Maps.newLinkedHashMap();
 
-		sut = new PatternFilter(partials, sequentials, parallels);
-	}
-
-	@Test
-	public void exception() throws Exception {
-		thrown.expect(Exception.class);
-		thrown.expectMessage("Not valid episode type!");
-
-		sut.filter(EpisodeType.OTHER, episodes, FREQTHRESH, ENTROPY);
-	}
-
-	@Test
-	public void partials() throws Exception {
-		when(partials.filter(anyMap(), anyInt(), anyDouble())).thenReturn(
-				episodes);
-
-		sut.filter(EpisodeType.GENERAL, episodes, FREQTHRESH, ENTROPY);
-
-		verify(partials).filter(anyMap(), anyInt(), anyDouble());
-	}
-
-	@Test
-	public void sequentials() throws Exception {
-		when(sequentials.filter(anyMap(), anyInt())).thenReturn(episodes);
-
-		sut.filter(EpisodeType.SEQUENTIAL, episodes, FREQTHRESH, ENTROPY);
-
-		verify(sequentials).filter(anyMap(), anyInt());
-	}
-
-	@Test
-	public void parallel() throws Exception {
-		when(parallels.filter(anyMap(), anyInt())).thenReturn(episodes);
-
-		sut.filter(EpisodeType.PARALLEL, episodes, FREQTHRESH, ENTROPY);
-
-		verify(parallels).filter(anyMap(), anyInt());
+		sut = new PatternFilter();
 	}
 	
+	@Test
+	public void removeOneNodes() throws Exception {
+		Set<Episode> oneNodes = Sets.newLinkedHashSet();
+
+		oneNodes.add(createEpisode(3, 0.7, "1"));
+		oneNodes.add(createEpisode(8, 0.5, "2"));
+		episodes.put(1, oneNodes);
+
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY,
+				ENTROPY);
+
+		assertEquals(Maps.newLinkedHashMap(), actuals);
+	}
+	
+	@Test
+	public void oneElement() {
+		Set<Episode> nodes = Sets.newLinkedHashSet();
+		nodes.add(createEpisode(8, 0.7, "1", "2", "1>2"));
+		nodes.add(createEpisode(5, 0.6, "1", "2", "2>1"));
+		episodes.put(2, nodes);
+		
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+		
+		assertEquals(episodes, actuals);
+	}
+	
+	@Test
+	public void seqEpisodes() throws Exception {
+
+		Set<Episode> twoNodes = Sets.newLinkedHashSet();
+		twoNodes.add(createEpisode(8, 1.0, "1", "2", "1>2"));
+		twoNodes.add(createEpisode(5, 1.0, "1", "2", "2>1"));
+		episodes.put(2, twoNodes);
+
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY,
+				ENTROPY);
+
+		assertEquals(episodes, actuals);
+	}
+	
+	@Test
+	public void freqRepr() throws Exception {
+
+		Set<Episode> twoNodes = Sets.newLinkedHashSet();
+		twoNodes.add(createEpisode(8, 1.0, "1", "2", "1>2"));
+		twoNodes.add(createEpisode(9, 1.0, "1", "2", "2>1"));
+		twoNodes.add(createEpisode(9, 0.5, "1", "2"));
+		episodes.put(2, twoNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(9, 0.5, "1", "2"));
+		expected.put(2, set);
+
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void multiRepr() {
+		Set<Episode> threNodes = Sets.newLinkedHashSet();
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34",
+				"8>34"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "7>34", "7>8",
+				"34>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8",
+				"7>8"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
+		threNodes.add(createEpisode(5, 0.5, "7", "8", "34", "34>8", "34>7",
+				"8>7"));
+		episodes.put(3, threNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
+		expected.put(3, set);
+
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void bidirect() throws Exception {
+
+		Set<Episode> twoNodes = Sets.newLinkedHashSet();
+		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
+		twoNodes.add(createEpisode(3, 0.4, "1", "3"));
+		episodes.put(2, twoNodes);
+
+		Set<Episode> threeNodes = Sets.newLinkedHashSet();
+		threeNodes.add(createEpisode(8, 0.5, "1", "2", "3"));
+		episodes.put(3, threeNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set2 = Sets.newLinkedHashSet();
+		set2.add(createEpisode(8, 0.7, "1", "2"));
+		expected.put(2, set2);
+
+		Set<Episode> set3 = Sets.newLinkedHashSet();
+		set3.add(createEpisode(8, 0.5, "1", "2", "3"));
+		expected.put(3, set3);
+
+		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
+
+		assertEquals(expected, actuals);
+	}
+
 	@Test
 	public void emptyEpisodes() throws Exception {
 		thrown.expect(AssertionException.class);
