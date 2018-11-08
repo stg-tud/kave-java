@@ -216,15 +216,15 @@ public class PatternFilter {
 			Map<Set<Fact>, Set<Episode>> supers, double thsp) {
 		Set<Episode> results = Sets.newLinkedHashSet();
 		for (Map.Entry<Set<Fact>, Set<Episode>> smallEntry : subs.entrySet()) {
-			Set<Episode> potSSupers = Sets.newLinkedHashSet();
+			Set<Episode> potSupers = Sets.newLinkedHashSet();
 			for (Map.Entry<Set<Fact>, Set<Episode>> bigEntry : supers
 					.entrySet()) {
 				if (bigEntry.getKey().containsAll(smallEntry.getKey())) {
-					potSSupers.addAll(bigEntry.getValue());
+					potSupers.addAll(bigEntry.getValue());
 				}
 			}
 			for (Episode episode : smallEntry.getValue()) {
-				if (!isSubepisode(episode, potSSupers, thsp)) {
+				if (!isSubepisode(episode, potSupers, thsp)) {
 					results.add(episode);
 				}
 			}
@@ -235,10 +235,26 @@ public class PatternFilter {
 	private boolean isSubepisode(Episode subepisode, Set<Episode> superepisode,
 			double thsp) {
 		for (Episode ep : superepisode) {
-			if (ep.getFacts().containsAll(subepisode.getFacts())) {
+			if (ep.getFacts().containsAll(subepisode.getFacts())
+					&& validRels(subepisode, ep)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean validRels(Episode subepisode, Episode superepisode) {
+		Set<Fact> events = subepisode.getEvents();
+		
+		for (Fact relation : superepisode.getRelations()) {
+			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
+			
+			if (events.contains(tuple.getFirst())
+					&& events.contains(tuple.getSecond())
+					&& !subepisode.containsFact(relation)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
