@@ -95,8 +95,8 @@ public class PatternFilter {
 			results.addAll(relsLevels.get(maxRelation));
 			return results;
 		}
-		while (!representative(results, relsLevels)) {
-			if (relsLevels.size() == 1) {
+		while (!representative(results, relsLevels) && !relsLevels.isEmpty()) {
+			if ((relsLevels.size() == 1) && results.isEmpty()) {
 				results.addAll(getSingleValue(relsLevels));
 				return results;
 			}

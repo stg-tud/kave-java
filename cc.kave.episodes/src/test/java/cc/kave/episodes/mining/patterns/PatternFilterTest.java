@@ -210,6 +210,32 @@ public class PatternFilterTest {
 		
 		assertEquals(expected, actuals);
 	}
+	
+	@Test
+	public void subLevelRepr() {
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "8>2", "8>4"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>8", "4>8"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "8>2", "8>4", "4>2"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "8>2", "8>4", "2>4"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>4", "2>8", "4>8"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>8", "4>2", "4>8"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>4", "2>8", "8>4"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "4>2", "4>8", "8>2"));
+		episodes.put(3, set);
+		
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "8>2", "8>4"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>8", "4>8"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "2>4", "2>8", "8>4"));
+		set.add(createEpisode(10, 0.5, "2", "4", "8", "4>2", "4>8", "8>2"));
+		expected.put(3, set);
+		
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+		
+		assertEquals(expected, actuals);
+	}
 
 	@Test
 	public void emptyEpisodes() throws Exception {
