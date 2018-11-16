@@ -87,7 +87,8 @@ public class PatternFilterTest {
 
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		Set<Episode> set = Sets.newLinkedHashSet();
-		set.add(createEpisode(9, 0.5, "1", "2"));
+		set.add(createEpisode(8, 1.0, "1", "2", "1>2"));
+		set.add(createEpisode(9, 1.0, "1", "2", "2>1"));
 		expected.put(2, set);
 
 		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
@@ -115,7 +116,9 @@ public class PatternFilterTest {
 
 		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
 		Set<Episode> set = Sets.newLinkedHashSet();
-		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "34>7", "34>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "34>8"));
+		set.add(createEpisode(5, 0.5, "7", "8", "34", "7>8", "7>34"));
 		set.add(createEpisode(5, 0.5, "7", "8", "34", "8>7", "34>7"));
 		expected.put(3, set);
 
@@ -147,6 +150,64 @@ public class PatternFilterTest {
 
 		Map<Integer, Set<Episode>> actuals = sut.filter(episodes, FREQUENCY, ENTROPY);
 
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void selfRepr() throws Exception {
+
+		Set<Episode> twoNodes = Sets.newLinkedHashSet();
+		twoNodes.add(createEpisode(8, 0.7, "1", "2"));
+		twoNodes.add(createEpisode(3, 0.4, "1", "3"));
+		episodes.put(2, twoNodes);
+
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(8, 0.7, "1", "2"));
+		set.add(createEpisode(3, 0.4, "1", "3"));
+		expected.put(2, set);
+
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void allDisconnected() {
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "1", "2", "3"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>2"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>3"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "2>3"));
+		episodes.put(3, set);
+		
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>2"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>3"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "2>3"));
+		expected.put(3, set);
+		
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+		
+		assertEquals(expected, actuals);
+	}
+	
+	@Test
+	public void notCoverage() {
+		Set<Episode> set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>2", "1>3"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "3>1", "3>2", "2>1"));
+		episodes.put(3, set);
+		
+		Map<Integer, Set<Episode>> expected = Maps.newLinkedHashMap();
+		set = Sets.newLinkedHashSet();
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "1>2", "1>3"));
+		set.add(createEpisode(10, 0.5, "1", "2", "3", "3>1", "3>2", "2>1"));
+		expected.put(3, set);
+		
+		Map<Integer, Set<Episode>> actuals = sut.representatives(episodes);
+		
 		assertEquals(expected, actuals);
 	}
 

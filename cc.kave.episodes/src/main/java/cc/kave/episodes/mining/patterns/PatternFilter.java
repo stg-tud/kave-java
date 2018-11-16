@@ -90,21 +90,74 @@ public class PatternFilter {
 		Set<Episode> results = Sets.newLinkedHashSet();
 		Map<Integer, Set<Episode>> relsLevels = getRelLevels(episodes);
 
-		if (relsLevels.size() == 1) {
-			results.addAll(getSingleValue(relsLevels));
+		int maxRelation = getMaxRels(relsLevels);
+		if (!containsConnectedEpisodes(relsLevels.get(maxRelation))) {
+			results.addAll(relsLevels.get(maxRelation));
 			return results;
 		}
 		while (!representative(results, relsLevels)) {
+			if (relsLevels.size() == 1) {
+				results.addAll(getSingleValue(relsLevels));
+				return results;
+			}
 			int minRelations = getMinRels(relsLevels);
-			Set<Episode> candidates = relsLevels.get(minRelations);
-			for (Episode ep : candidates) {
-				if (!isCovered(ep, results)) {
-					results.add(ep);
+			Set<Episode> levelEpisodes = relsLevels.get(minRelations);
+			Set<Episode> reprEpisodes = Sets.newLinkedHashSet();
+			for (Episode ep : levelEpisodes) {
+				if (!isCovered(ep, results) && !isDisconnected(ep)) {
+					reprEpisodes.add(ep);
 				}
 			}
+			results.addAll(reprEpisodes);
 			relsLevels.remove(minRelations);
 		}
 		return results;
+	}
+
+	private boolean containsConnectedEpisodes(Set<Episode> episodes) {
+		for (Episode ep : episodes) {
+			if (!isDisconnected(ep)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private int getMaxRels(Map<Integer, Set<Episode>> relsLevels) {
+		int max = Integer.MIN_VALUE;
+		
+		for (Map.Entry<Integer, Set<Episode>> entry : relsLevels.entrySet()) {
+			int numRels = entry.getKey();
+			if (numRels > max) {
+				max = numRels;
+			}
+		}
+		return max;
+	}
+
+	private boolean isDisconnected(Episode episode) {
+		Map<Fact, Set<Fact>> relations = Maps.newLinkedHashMap();
+		
+		for (Fact rel : episode.getRelations()) {
+			Tuple<Fact, Fact> tuple = rel.getRelationFacts();
+			Fact first = tuple.getFirst();
+			Fact second = tuple.getSecond();
+			
+			if (relations.containsKey(first)) {
+				relations.get(first).add(rel);
+			} else {
+				relations.put(first, Sets.newHashSet(rel));
+			}
+			if (relations.containsKey(second)) {
+				relations.get(second).add(rel);
+			} else {
+				relations.put(second, Sets.newHashSet(rel));
+			}
+		}
+		if (relations.size() < episode.getNumEvents()) {
+			return true;
+		}
+		return false;
 	}
 
 	private int getMinRels(Map<Integer, Set<Episode>> episodes) {
@@ -245,10 +298,10 @@ public class PatternFilter {
 
 	private boolean validRels(Episode subepisode, Episode superepisode) {
 		Set<Fact> events = subepisode.getEvents();
-		
+
 		for (Fact relation : superepisode.getRelations()) {
 			Tuple<Fact, Fact> tuple = relation.getRelationFacts();
-			
+
 			if (events.contains(tuple.getFirst())
 					&& events.contains(tuple.getSecond())
 					&& !subepisode.containsFact(relation)) {
