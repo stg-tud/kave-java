@@ -247,8 +247,6 @@ public class PatternFilterTest {
 	
 	@Test
 	public void subepisodes() throws Exception {
-		episodes.put(1, Sets.newHashSet(createEpisode(2, 1.0, "a")));
-		
 		Set<Episode> epSet = Sets.newLinkedHashSet();
 		epSet.add(createEpisode(5, 1.0, "a", "b", "a>b"));
 		epSet.add(createEpisode(6,  0.5, "c", "d"));

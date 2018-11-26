@@ -51,7 +51,7 @@ public class PatternFilter {
 			if (entry.getKey() == 1) {
 				continue;
 			}
-			if (entry.getKey() == episodes.size()) {
+			if (entry.getKey() == (episodes.size() + 1)) {
 				results.put(entry.getKey(), episodes.get(entry.getKey()));
 				break;
 			}
